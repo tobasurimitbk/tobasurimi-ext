@@ -189,8 +189,12 @@ class OrderForm extends BaseController
             // Create a new validation instance
             $dataSalesOrder =  $this->salesOrderExportModel->insert($values);
 
+            // var_dump($items);
+            // die();
+
             $totalQty = 0;
             foreach ($items as $row) {
+                $qty_sisa = $row->qty - $row->qtyOrder;
                 $valueBarang = [
                     "sales_order_export_id"         => $dataSalesOrder,
                     "barang_id"                     => $row->barang_master_sales_id,
@@ -198,6 +202,8 @@ class OrderForm extends BaseController
                     "barang_kode"                   => $row->kode_barang,
                     "sales_contract_detail_id"                   => $row->id_detail,
                     "qty"                           => isset($row->qtyOrder) ? number_format($row->qtyOrder, 2, '.', '') : number_format($row->qty, 2, '.', ''),
+                    "qty_awal"                           => number_format($row->qty_awal, 2, '.', ''),
+                    "qty_sisa"                           => number_format($qty_sisa, 2, '.', ''),
                     "satuan_id"                     => $row->satuan_order_id,
                     "remark"                        => $row->remark,
                     "kemasan"                       => $row->kemasan,
@@ -286,10 +292,12 @@ class OrderForm extends BaseController
                     $totalQtyDetail += $valueExportDetail['qtyOrder'];
                 }
                 if ($value['qty'] > $totalQtyDetail) {
+                    $value['qty_awal'] = $value['qty'];
                     $value['qty'] = $value['qty'] - $totalQtyDetail;
                     $dataSalesKontrakFilter[] = $value; // Tambahkan ke array jika kondisi terpenuhi
                 }
             } else {
+                $value['qty_awal'] = $value['qty'];
                 $dataSalesKontrakFilter[] = $value; // Tambahkan ke array jika tidak ada hasil query
             }
         }
@@ -353,6 +361,26 @@ class OrderForm extends BaseController
             ->where('tipe_input', "order_form")
             ->orderBy('createdAt', "DESC")
             ->findAll();
+
+        foreach ($dataSalesExportDetail as $row) {
+
+            $dataDetailExport = $this->salesOrderExportDetailModel
+                ->select('SUM(sales_order_detail_export.qty) AS qtyOrder')
+                ->join('sales_order_export', 'sales_order_export.sales_order_export_id = sales_order_detail_export.sales_order_export_id', 'left')
+                ->where('sales_order_detail_export.sales_contract_detail_id', $row->sales_contract_detail_id)
+                ->where('sales_order_export.status', "POSTED")
+                ->groupBy('sales_order_export.sales_order_export_id') // Ubah ke sales order export ID
+                ->findAll();
+
+
+
+            if ($dataDetailExport) {
+                $row->qtyContract = $row->qtyContract - $dataDetailExport[0]['qtyOrder'];
+            } else {
+                $row->qtyContract = $row->qtyContract;
+            }
+        }
+
         $dataAJU = $this->metaDataModel->getBCUsed('so_internasional');
 
         $data = [
@@ -379,12 +407,20 @@ class OrderForm extends BaseController
         $postData = $this->request->getPost();
         $postData["items"] = json_decode($postData["items"], true);
 
+        //update stoknya masih error
+
         try {
+
 
             $totalQty = 0;
             foreach ($items as $row) {
+
+
+                $qty_sisa = $row->qty - $row->qtyOrder;
+
                 $valueBarang = [
                     "qty"                           => isset($row->qtyOrder) ? number_format($row->qtyOrder, 2, '.', '') : number_format($row->qty, 2, '.', ''),
+                    "qty_sisa"                           =>  number_format($qty_sisa, 2, '.', ''),
                     "harga_barang"                  => isset($row->hargaOrder) ? number_format($row->hargaOrder, 2, '.', '') : number_format($row->harga, 2, '.', ''),
                     "total_harga_barang"            => isset($row->totalHargaOrder) ? number_format($row->totalHargaOrder, 2, '.', '') : number_format($row->total, 2, '.', ''),
                 ];

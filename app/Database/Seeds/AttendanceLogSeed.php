@@ -10,11 +10,11 @@ class AttendanceLogSeed extends Seeder
 {
     public function run()
     {
-        $month = "06";
+        $month = "05";
         $year = "2024";
-        $companyID = "15";
-        $attendancesUnitID = "2";
-        $mulaiMasuk = "16:00:00";
+        $companyID = "2";
+        $attendancesUnitID = "1";
+        $mulaiMasuk = "14:00:00";
 
         $modelEmployees = new EmployeesModel();
         $modelAttendanceLog = new AttendancesLogModel();

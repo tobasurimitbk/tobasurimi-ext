@@ -66,14 +66,14 @@
                     <div class="col-md-4">
                         <div class="form-floating" style="height: 50px;">
                             <select <?= !empty($dataSalesExport) ? 'disabled' : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
-                                <option value="">Pilih Dokumen Pabean</option>
+
                                 <?php foreach ($dataAJU as $aju) : ?>
-                                    <option <?= !empty($dataSalesExport) ? ($dataSalesExport->bc_type === $aju["id"] ? "selected" : "") : ""; ?> value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
+                                    <option selected value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput">Dokumen Pabean (Opsional)</label>
+                            <label for="floatingInput">Dokumen Pabean </label>
                         </div>
-                        <small class="mb-3"><i>Kosongkan jika non pabean</i></small>
+                        <!-- <small class="mb-3"><i>Kosongkan jika non pabean</i></small> -->
                     </div>
                 </div>
                 <div class="row">
@@ -237,7 +237,7 @@
                         id_detail_sales_order: "<?= $sales->sales_order_export_detail_id ?>",
                         kemasan: "<?= $sales->kemasan ?>",
                         kode_barang: "<?= $sales->barang_kode ?>",
-                        qty: "<?= $sales->qtyContract ?>",
+                        qty: "<?= $sales->qtyContract  ?>",
                         remark: "<?= $sales->remark ?>",
                         satuan_order_id: "<?= $sales->satuan_id ?>",
                         satuan_order_name: "<?= $sales->kode_satuan ?>",
@@ -625,6 +625,7 @@
                             kemasan: item.kemasan,
                             kode_barang: item.kode_barang,
                             qty: item.qty,
+                            qty_awal: item.qty_awal,
                             remark: item.remark,
                             satuan_order_id: item.satuan_order_id,
                             satuan_order_name: item.satuan_order_name,

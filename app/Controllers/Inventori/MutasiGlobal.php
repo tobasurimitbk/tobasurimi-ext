@@ -9,6 +9,7 @@ use App\Models\DivisisModel;
 use App\Models\MetadataModel;
 use App\Models\MutasiGlobalDetailModel;
 use App\Models\MutasiGlobalModel;
+use App\Models\PenerimaanMutasiGlobalDetailModel;
 use App\Models\WarehousesModel;
 
 class MutasiGlobal extends BaseController
@@ -20,6 +21,7 @@ class MutasiGlobal extends BaseController
     protected $companyModel;
     protected $mutasiGlobalModel;
     protected $mutasiGlobalDetailModel;
+    protected $penerimaanMutasiGlobalDetailModel;
     protected $warehouseModel;
     protected $bc27Model;
 
@@ -32,6 +34,7 @@ class MutasiGlobal extends BaseController
         $this->companyModel = new CompaniesModel();
         $this->mutasiGlobalModel = new MutasiGlobalModel();
         $this->mutasiGlobalDetailModel = new MutasiGlobalDetailModel();
+        $this->penerimaanMutasiGlobalDetailModel = new PenerimaanMutasiGlobalDetailModel();
         $this->warehouseModel = new WarehousesModel();
         $this->bc27Model = new BC27Model();
     }
@@ -92,8 +95,23 @@ class MutasiGlobal extends BaseController
             $warehouseAsalName = $warehouseAsal == null ? '-' : $warehouseAsal['warehouse_name'];
             $bc27 = $this->bc27Model->where('mutasi_global_id', $data->id)->first();
 
-            $totalDiterima = 0;
-            $totalMutasi = 1;
+            $penerimaanTotalDetail =   $this->penerimaanMutasiGlobalDetailModel
+                ->select('SUM(qty) AS qty_diterima')
+                ->where('mutasi_global_id', $data->id)
+                ->where('deletedAt', null)
+                ->groupBy('mutasi_global_id')
+                ->findAll();
+
+            $totalQtyMutasi = $this->mutasiGlobalDetailModel
+                ->select('SUM(qty) AS qty_mutasi')
+                ->where('mutasi_global_id', $data->id)
+                ->where('deletedAt', null)
+                ->groupBy('mutasi_global_id')
+                ->findAll();
+
+
+            $totalDiterima = count($penerimaanTotalDetail) == 0 ? 0 : $penerimaanTotalDetail[0]['qty_diterima'];
+            $totalMutasi = count($totalQtyMutasi) == 0 ? 0 : $totalQtyMutasi[0]['qty_mutasi'];
 
             array_push($dataResult, [
                 "no"                    => $no++,

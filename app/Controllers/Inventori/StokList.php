@@ -10,6 +10,7 @@ use App\Models\BC27Model;
 use App\Models\DivisisModel;
 use App\Models\KemasanModel;
 use App\Models\MetadataModel;
+use App\Models\MutasiGlobalModel;
 use App\Models\MutasiModel;
 use App\Models\ParentBarangModel;
 use App\Models\PenerimaanBarangDetailModel;
@@ -49,6 +50,7 @@ class StokList extends BaseController
     protected $ppbkbModel;
     protected $bc27Model;
     protected $mutasiModel;
+    protected $mutasiGlobalModel;
 
     public function __construct()
     {
@@ -74,6 +76,7 @@ class StokList extends BaseController
         $this->ppbkbModel = new PPBKBModel();
         $this->bc27Model = new BC27Model();
         $this->mutasiModel = new MutasiModel();
+        $this->mutasiGlobalModel = new MutasiGlobalModel();
     }
 
     public function index()
@@ -1261,11 +1264,23 @@ class StokList extends BaseController
                     ->join('mutasi_detail', 'mutasi.id = mutasi_detail.mutasi_id', 'left')
                     ->where('mutasi.no_mutasi', $data->no_dokumen2)
                     ->first();
+
+                $mutasiGlobal =  $this->mutasiGlobalModel
+                    ->select('bc_id, no_aju')
+                    ->join('mutasi_global_detail', 'mutasi_global.id = mutasi_global_detail.mutasi_global_id', 'left')
+                    ->where('mutasi_global.no_mutasi', $data->no_dokumen2)
+                    ->first();
+
                 if ($mutasi != null) {
                     $dokumenBC = $this->metaDataModel->find($mutasi['bc_id']);
                     $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
                     // MASUK 
                     $dokumenAsal =  $bcName . " / " . $mutasi['no_aju'];
+                } elseif ($mutasiGlobal != null) {
+                    $dokumenBC = $this->metaDataModel->find($mutasiGlobal['bc_id']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    // MASUK 
+                    $dokumenAsal =  $bcName . " / " . $mutasiGlobal['no_aju'];
                 } else {
                     $dokumenAsal =  "-";
                 }

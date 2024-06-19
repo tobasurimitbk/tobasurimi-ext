@@ -22,6 +22,8 @@ class SalesOrderExportDetailModel extends Model
         'barang_kode',
         'sales_contract_detail_id',
         'qty',
+        'qty_awal',
+        'qty_sisa',
         'satuan_id',
         'remark',
         'kemasan',

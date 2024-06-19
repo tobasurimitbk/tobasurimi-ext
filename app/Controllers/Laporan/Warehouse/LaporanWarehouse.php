@@ -21,6 +21,7 @@ use App\Models\EmployeesModel;
 use App\Models\MetadataModel;
 use App\Models\ProvincesModel;
 use App\Models\SalesOrderInvoiceModel;
+use App\Models\SalesOrderExportModel;
 use App\Models\SatuansModel;
 use App\Models\SuratJalanModel;
 use App\Models\RMPurchaseOrderDetailModel;
@@ -51,6 +52,7 @@ class LaporanWarehouse extends BaseController
     protected $satuanModel;
     protected $suratJalanModel;
     protected $salesOrderInvoiceModel;
+    protected $salesOrderExportModel;
     protected $rmPurchaseOrderDetailModel;
     protected $amPurchaseOrderDetailModel;
     protected $rmImportPODetailModel;
@@ -79,6 +81,7 @@ class LaporanWarehouse extends BaseController
         $this->db = \Config\Database::connect();
         $this->suratJalanModel = new SuratJalanModel();
         $this->salesOrderInvoiceModel = new SalesOrderInvoiceModel();
+        $this->salesOrderExportModel = new SalesOrderExportModel();
         $this->rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $this->amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->rmImportPODetailModel = new RMImportPODetailModel();
@@ -277,7 +280,7 @@ class LaporanWarehouse extends BaseController
         }
 
         $data = [
-            'no' => $no,
+            'no' => 1,
             'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
             'filter_jenis_dokumen' =>  $this->request->getGet("filter_jenis_dokumen"),
@@ -291,6 +294,159 @@ class LaporanWarehouse extends BaseController
 
         // load HTML content
         $domPdf->loadHtml(view('Laporan/Warehouse/LaporanSalesOrder/print', $data));
+
+        // (optional) setup the paper size and orientation
+        $domPdf->setPaper('legal', 'landscape');
+
+        // render html as PDF
+        $domPdf->render();
+
+        // output the generated pdf
+        $domPdf->stream($fileName, array("Attachment" => false));
+
+        exit();
+        // return view('Supplier/supplierBahanBaku/print');
+    }
+
+    public function laporanSalesOrderEkspor()
+    {
+        return view('Laporan/Warehouse/LaporanSalesOrderEkspor/index');
+    }
+
+    public function allLaporanSalesOrderEkspor()
+    {
+        $pageSize = $this->request->getGet("length");
+        $currentPage = ($this->request->getGet("start") / $this->request->getGet("length")) + 1;
+        $offset = $currentPage - 1;
+
+        $condition = [
+            'sales_order_export.company_id'  => $this->this_company_id,
+            'sales_order_export.status'  => 'POSTED',
+            'sales_order_detail_export.tipe_input'  => 'order_form',
+        ];
+
+        $payload = [
+            "pageSize"      => $pageSize,
+            "currentPage"   => $currentPage,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+
+        $addCondition = [
+            "dateStart"        => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"        => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+
+        $dataSalesOrderExport = $this->salesOrderExportModel->getAllSalesOrderExportReport($condition, $addCondition, $pageSize, $offset);
+
+
+
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $dataAllSalesOrderExport = [];
+
+        foreach ($dataSalesOrderExport['data'] as $data) {
+
+
+            array_push($dataAllSalesOrderExport, [
+                "no"                => $no++,
+                "sales_order_export_no"         => $data->sales_order_export_no,
+                "tanggal"    => date('Y-m-d', strtotime($data->updatedAt)),
+                "nama_pelanggan"    => $data->customer_name,
+                "kode_barang"    => $data->barang_kode,
+                "nama_barang"    => $data->barang_name,
+                "satuan"    => $data->satuan,
+                "qty"    => $data->qty_awal,
+                "qty_diterima"    => $data->qty,
+                "total_harga_barang"     => number_format(floatval($data->total_harga_barang)),
+                "qty_sisa"    => $data->qty_sisa,
+
+            ]);
+        }
+
+
+
+        $data = [
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $dataSalesOrderExport['totalData'],
+            "recordsFiltered" => $dataSalesOrderExport['totalFilteredData'],
+            'data'      => $dataAllSalesOrderExport,
+            "payload" => $payload,
+
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function exportPDFLaporanSalesOrderEkspor()
+    {
+
+
+
+        $condition = [
+            'sales_order_export.company_id'  => $this->this_company_id,
+            'sales_order_export.status'  => 'POSTED',
+            'sales_order_detail_export.tipe_input'  => 'order_form',
+        ];
+
+
+        $addCondition = [
+            "dateStart"        => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"        => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+
+        $dataSalesOrderExport = $this->salesOrderExportModel->getAllSalesOrderExportReportPDF($condition, $addCondition);
+
+
+        $no =  1;
+        $dataAllSalesOrderExport = [];
+
+        foreach ($dataSalesOrderExport['data'] as $data) {
+
+
+            array_push($dataAllSalesOrderExport, [
+                "no"                => $no++,
+                "sales_order_export_no"         => $data->sales_order_export_no,
+                "tanggal"    => date('Y-m-d', strtotime($data->updatedAt)),
+                "nama_pelanggan"    => $data->customer_name,
+                "kode_barang"    => $data->barang_kode,
+                "nama_barang"    => $data->barang_name,
+                "satuan"    => $data->satuan,
+                "qty"    => $data->qty_awal,
+                "qty_diterima"    => $data->qty,
+                "total_harga_barang"     => number_format(floatval($data->total_harga_barang)),
+                "qty_sisa"    => $data->qty_sisa,
+
+            ]);
+        }
+
+
+
+        $data = [
+            'no' => 1,
+            'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            'data'      => $dataAllSalesOrderExport,
+
+
+        ];
+
+
+        $domPdf = new Dompdf();
+
+        $fileName = 'Laporan Sales Order Ekspor';
+
+        // load HTML content
+        $domPdf->loadHtml(view('Laporan/Warehouse/LaporanSalesOrderEkspor/print', $data));
 
         // (optional) setup the paper size and orientation
         $domPdf->setPaper('legal', 'landscape');
@@ -456,7 +612,7 @@ class LaporanWarehouse extends BaseController
                 'rm_purchase_orders.company_id' => $this->this_company_id
             ];
 
-            $dataPurchaseOrder = $this->rmPurchaseOrderDetailModel->getListLPBBahanBakuReport($condition,  $addCondition, "LOKAL", "BAKU");
+            $dataPurchaseOrder = $this->rmPurchaseOrderDetailModel->getListLPBBahanBakuReportPDF($condition,  $addCondition, "LOKAL", "BAKU");
         } elseif ($po_type == "PO LOKAL BB") {
             $condition = [
                 'rm_purchase_orders.deletedAt' => null,
@@ -465,7 +621,7 @@ class LaporanWarehouse extends BaseController
                 'rm_purchase_orders.company_id' => $this->this_company_id
             ];
 
-            $dataPurchaseOrder = $this->rmPurchaseOrderDetailModel->getListLPBBahanBakuReport($condition,  $addCondition, "LOKAL", "BAKU");
+            $dataPurchaseOrder = $this->rmPurchaseOrderDetailModel->getListLPBBahanBakuReportPDF($condition,  $addCondition, "LOKAL", "BAKU");
         } elseif ($po_type == "PO LOKAL BP") {
             $condition = [
                 'am_purchase_orders.deletedAt' => null,
@@ -475,7 +631,7 @@ class LaporanWarehouse extends BaseController
                 'am_purchase_orders.company_id' => $this->this_company_id
             ];
 
-            $dataPurchaseOrder = $this->amPurchaseOrderDetailModel->getListLPBBahanPenolongReport($condition,  $addCondition, "LOKAL", "PENOLONG");
+            $dataPurchaseOrder = $this->amPurchaseOrderDetailModel->getListLPBBahanPenolongReportPDF($condition,  $addCondition, "LOKAL", "PENOLONG");
         } elseif ($po_type == "PO IMPOR BB") {
             $condition = [
                 'rm_import_pos.deletedAt' => null,
@@ -485,7 +641,7 @@ class LaporanWarehouse extends BaseController
             ];
 
 
-            $dataPurchaseOrder = $this->rmImportPODetailModel->getListLPBBahanBakuReport($condition,  $addCondition, "IMPORT", "BAKU");
+            $dataPurchaseOrder = $this->rmImportPODetailModel->getListLPBBahanBakuReportPDF($condition,  $addCondition, "IMPORT", "BAKU");
         } elseif ($po_type == "PO IMPOR BP") {
             $condition = [
                 'am_purchase_orders.deletedAt' => null,
@@ -495,7 +651,7 @@ class LaporanWarehouse extends BaseController
                 'am_purchase_orders.company_id' => $this->this_company_id
             ];
 
-            $dataPurchaseOrder = $this->amPurchaseOrderDetailModel->getListLPBBahanPenolongReport($condition,  $addCondition, "IMPORT", "PENOLONG");
+            $dataPurchaseOrder = $this->amPurchaseOrderDetailModel->getListLPBBahanPenolongReportPDF($condition,  $addCondition, "IMPORT", "PENOLONG");
         }
 
 
@@ -523,7 +679,7 @@ class LaporanWarehouse extends BaseController
         }
 
         $data = [
-            'no' => $no,
+            'no' => 1,
             'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
             'po' =>  $po_type,
