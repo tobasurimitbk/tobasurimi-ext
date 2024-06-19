@@ -10,6 +10,7 @@ use App\Models\AccountDivisisModel;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\AMPurchaseOrderModel;
 use App\Models\JurnalUmumModel;
+use App\Models\KursModel;
 use App\Models\MaterialRequestPenolongDetailsModel;
 use App\Models\MaterialRequestsPenolongModel;
 use App\Models\PenerimaanBarangDetailModel;
@@ -53,6 +54,7 @@ class RasioController extends BaseController
     protected $materialRequestsPenolongModel;
     protected $materialRequestPenolongDetailsModel;
     protected $metadataModel;
+    protected $kursModel;
 
     public function __construct()
     {
@@ -80,6 +82,7 @@ class RasioController extends BaseController
         $this->materialRequestsPenolongModel = new MaterialRequestsPenolongModel();
         $this->materialRequestPenolongDetailsModel = new MaterialRequestPenolongDetailsModel();
         $this->metadataModel = new MetadataModel();
+        $this->kursModel = new KursModel();
     }
 
     public function index()
@@ -438,6 +441,7 @@ class RasioController extends BaseController
                 'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
                 'divisi_id' => $this->request->getVar('department'),
             ];
+            $kursValue = 1;
             $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
             // $totalQtyAll = 0;
             foreach ($productionResultDataTitle as &$value) {
@@ -445,6 +449,9 @@ class RasioController extends BaseController
                 $poBBImport = $this->rmImportPOModel->where('po_no', $value['stock_dokumen'])->first();
                 $poBP = $this->amPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();
 
+
+                $rebus = "";
+                $biayaVendor = "";
 
                 $penerimaanBarang = $this->penerimaanBarangModel->where('no_penerimaan_barang', $value['no_dokumen'])->first();
                 if ($poBBLokal) {
@@ -460,6 +467,7 @@ class RasioController extends BaseController
                         ->where('barang2_id', $value['barang2_id'])
                         ->findAll();
                     foreach ($poBBLokalDetail as $valuePoBBLokal) {
+                        $kursValue = 1;
                         $hargaSatuan = $valuePoBBLokal['general_price'] + $valuePoBBLokal['daily_price'] + $valuePoBBLokal['monthly_price'];
                         $totalQty += $valuePoBBLokal['qty'];
                         $satuanPO = $valuePoBBLokal['kode_satuan'];
@@ -477,15 +485,26 @@ class RasioController extends BaseController
                     $hargaSatuanDisc = 0;
                     $satuanPO = "";
                     $poBBImportDetail = $this->rmImportPODetailModel
-                        ->select('rm_import_po_details.*, satuans.kode_satuan')
+                        ->select('rm_import_po_details.*, satuans.kode_satuan, rm_import_pos.currency, rm_import_pos.po_date')
+                        ->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
                         ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left')
                         ->where('rm_import_po_id', $poBBImport['id'])
                         ->where('barang_id', $value['barang1_id'])
                         ->where('spesifikasi_id', $value['barang2_id'])
                         ->findAll();
                     foreach ($poBBImportDetail as $valuePoBBImport) {
-                        $hargaSatuanDisc = $valuePoBBImport['price'] * ($valuePoBBImport['disc'] / 100);
-                        $hargaSatuan = $valuePoBBImport['price'] - $hargaSatuanDisc;
+                        $kurs = $this->kursModel
+                            ->where('metadata_id', $valuePoBBImport['currency'])
+                            ->where('start_date <=', $valuePoBBImport['po_date'])
+                            ->where('end_date >=', $valuePoBBImport['po_date'])
+                            ->first();
+                        if ($kurs) {
+                            $kursValue = $kurs['nilai_kurs'];
+                        } else {
+                            $kursValue = 1;
+                        }
+                        $hargaSatuanDisc = ($valuePoBBImport['price'] * $kursValue) * ($valuePoBBImport['disc'] / 100);
+                        $hargaSatuan = ($valuePoBBImport['price'] * $kursValue) - $hargaSatuanDisc;
                         $totalQty += $valuePoBBImport['qty'];
                         $satuanPO = $valuePoBBImport['kode_satuan'];
                     }
@@ -508,6 +527,16 @@ class RasioController extends BaseController
                         ->where('spesifikasi_id', $value['barang2_id'])
                         ->findAll();
                     foreach ($poBPDetail as $valuePoBPDetail) {
+                        $kurs = $this->kursModel
+                            ->where('metadata_id', $valuePoBBImport['currency'])
+                            ->where('start_date <=', $valuePoBBImport['po_date'])
+                            ->where('end_date >=', $valuePoBBImport['po_date'])
+                            ->first();
+                        if ($kurs) {
+                            $kursValue = $kurs['nilai_kurs'];
+                        } else {
+                            $kursValue = 1;
+                        }
                         $disc = $valuePoBPDetail['disc'] / 100;
                         $hargaSetelahDisc = $valuePoBPDetail['price'] * $disc;
                         $hargaSatuan = $valuePoBPDetail['price'] - $hargaSetelahDisc;
@@ -533,7 +562,7 @@ class RasioController extends BaseController
                         ->where('spesifikasi_id', $value['barang2_id'])
                         ->findAll();
                     foreach ($penerimaanBarangDetail as $valuePenerimaanBarangDetail) {
-                        $hargaSatuan = $valuePenerimaanBarangDetail['harga'] + $valuePenerimaanBarangDetail['harga_harian'] + $valuePenerimaanBarangDetail['harga_bulanan'];
+                        $hargaSatuan = ($valuePenerimaanBarangDetail['harga'] + $valuePenerimaanBarangDetail['harga_harian'] + $valuePenerimaanBarangDetail['harga_bulanan']) * $kursValue;
                         $totalQty += $valuePenerimaanBarangDetail['qty'];
                         $satuanLPB = $valuePenerimaanBarangDetail['kode_satuan'];
                     }
