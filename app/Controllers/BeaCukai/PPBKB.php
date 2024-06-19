@@ -117,7 +117,7 @@ class PPBKB extends BaseController
                 "divisi_tujuan_name"    => $divisi == null ? '-' : strtoupper($divisi['divisi']),
                 "warehouse_tujuan_name" => $warehouse == null ? '-' : strtoupper($warehouse['warehouse_name']),
                 "no_mutasi"             => $data->no_mutasi,
-                "no_ppbkb"              => $data->no_ppbkb,
+                "no_ppbkb"              => $data->no_ppbkb . " / " . ($data->no_daftar == "" ? "-" : $data->no_daftar),
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "status_posting"        => $data->status_posting,
             ]);
@@ -197,7 +197,8 @@ class PPBKB extends BaseController
             'tanggal' => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
             'nama' => $this->request->getVar('nama'),
             'jabatan' => $this->request->getVar('jabatan'),
-            'status_posting' => '0'
+            'status_posting' => '0',
+            'no_daftar' => $this->request->getVar('no_daftar')
         ]);
 
         foreach (json_decode($_POST['listData']) as $d) {
@@ -229,7 +230,8 @@ class PPBKB extends BaseController
             'tempat' => $this->request->getVar('tempat'),
             'tanggal' => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
             'nama' => $this->request->getVar('nama'),
-            'jabatan' => $this->request->getVar('jabatan')
+            'jabatan' => $this->request->getVar('jabatan'),
+            'no_daftar' => $this->request->getVar('no_daftar')
         ]);
 
         // get all id detail

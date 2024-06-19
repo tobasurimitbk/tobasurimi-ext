@@ -44,7 +44,7 @@ class PenerimaanMutasiGlobalModel extends Model
     {
         $availableSort = [
             'penerimaan_mutasi_no'                           => 'penerimaan_mutasi_no',
-            'penerimaan_mutasi_global.multiple_mutasi_no'    => 'penerimaan_mutasi_global.multiple_mutasi_no',
+            'penerimaan_mutasi_global.multiple_mutasi_no'    => 'penerimaan_mutasi_global.multiple_no_mutasi',
             'penerimaan_mutasi_global.tanggal'               => 'penerimaan_mutasi_global.tanggal',
             'penerimaan_mutasi_global.divisi_penerima_id'    => 'penerimaan_mutasi_global.divisi_penerima_id',
             'penerimaan_mutasi_global.warehouse_penerima_id' => 'penerimaan_mutasi_global.warehouse_penerima_id',
@@ -71,12 +71,12 @@ class PenerimaanMutasiGlobalModel extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['divisi_penerima_id'] || $addCondition['status'] || $addCondition['penerimaan_mutasi_no'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['company_pengirim_id'] || $addCondition['status'] || $addCondition['penerimaan_mutasi_no'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupStart();
         }
 
-        if ($addCondition['divisi_penerima_id']) {
-            $dataQry->where('penerimaan_mutasi_global.divisi_penerima_id', $addCondition['divisi_penerima_id']);
+        if ($addCondition['company_pengirim_id']) {
+            $dataQry->where('penerimaan_mutasi_global.company_pengirim_id', $addCondition['company_pengirim_id']);
         }
 
         if ($addCondition['dateStart']) {
@@ -95,10 +95,10 @@ class PenerimaanMutasiGlobalModel extends Model
         }
 
         if ($addCondition['multiple_mutasi_no']) {
-            $dataQry->like('multiple_mutasi_no', $addCondition['multiple_mutasi_no']);
+            $dataQry->like('multiple_no_mutasi', $addCondition['multiple_mutasi_no']);
         }
 
-        if ($addCondition['divisi_penerima_id'] || $addCondition['status'] || $addCondition['penerimaan_mutasi_no'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['company_pengirim_id'] || $addCondition['status'] || $addCondition['penerimaan_mutasi_no'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupEnd();
         }
 

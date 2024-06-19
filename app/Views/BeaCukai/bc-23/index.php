@@ -63,7 +63,7 @@
                     <input autocomplete="one-time-code" class="form-control noPo search form-out-search" placeholder="Cari Nomor Purchase Order" value="" />
                 </div>
                 <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 2.3" value="" />
+                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 2.3 / No Daftar" value="" />
                 </div>
             </div>
             <?php if ($akunCeisa == null) : ?>
@@ -86,7 +86,7 @@
                                 <th onclick="changeSort('bc_purchase_order.supplier_id')" class="sort" style="text-align: center;">Supplier</th>
                                 <th onclick="changeSort('bc_23.bc_no_lokal')" class="sort" style="text-align: center;">No BC 2.3</th>
                                 <th onclick="changeSort('bc_23.createdAt')" class="sort" style="text-align: center;">Tanggal BC 2.3</th>
-                                <th onclick="changeSort('bc_23.no_aju')" class="sort" style="text-align: center;">No Aju BC 2.3</th>
+                                <th onclick="changeSort('bc_23.no_aju')" class="sort" style="text-align: center;">No Aju BC 2.3 / No Daftar</th>
                                 <th onclick="changeSort('bc_purchase_order.po_type')" style="text-align: center;">Jenis PO</th>
                                 <th onclick="changeSort('bc_purchase_order.multiple_lpb_id')" class="sort" style="text-align: center;">No LPB</th>
                                 <th onclick="changeSort('bc_purchase_order.multiple_po_id')" class="sort" style="text-align: center;">No PO</th>
@@ -657,6 +657,13 @@
                             }).then((result) => {
                                 table.ajax.reload();
                             });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            })
                         }
                     }
                 })

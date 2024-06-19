@@ -118,6 +118,12 @@
                         </div>
                     </div>
                     <div class="col-sm-4">
+                        <div class="form-floating mb-3">
+                            <input <?= !empty($ppbkb) ? ($ppbkb['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($ppbkb) ? $ppbkb['no_daftar'] : "" ?>" autocomplete="one-time-code" type="number" class="form-control no_daftar" id="no_daftar" name="no_daftar" placeholder="No Daftar">
+                            <label for="floatingInput">Nomor Daftar</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -448,6 +454,9 @@
             jabatan: {
                 required: true
             },
+            no_daftar: {
+                required: true
+            },
         },
         messages: {
             divisi_asal_id: {
@@ -482,6 +491,9 @@
             },
             jabatan: {
                 required: "Jabatan Wajib Diisi"
+            },
+            no_daftar: {
+                required: "No Daftar Wajib Diisi"
             },
         },
         errorElement: 'span',

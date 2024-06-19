@@ -43,7 +43,7 @@
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control noPPBKB search form-out-search" placeholder="Cari Nomor PPBKB / Mutasi" value="" />
+                    <input autocomplete="one-time-code" class="form-control noPPBKB search form-out-search" placeholder="Cari Nomor PPBKB / Mutasi / Daftar" value="" />
                 </div>
             </div>
             <?php if ($akunCeisa == null) : ?>
@@ -68,7 +68,7 @@
                                 <th onclick="changeSort('mutasi.divisi_tujuan_id')" class="sort" style="text-align: center;">Departemen Tujuan</th>
                                 <th onclick="changeSort('mutasi.warehouse_tujuan_id')" class="sort" style="text-align: center;">Warehouse Tujuan</th>
                                 <th onclick="changeSort('mutasi.no_mutasi')" class="sort" style="text-align: center;">No Mutasi</th>
-                                <th onclick="changeSort('ppbkb.no_ppbkb')" class="sort" style="text-align: center;">No PPBKB</th>
+                                <th onclick="changeSort('ppbkb.no_ppbkb')" class="sort" style="text-align: center;">No PPBKB / Daftar</th>
                                 <th onclick="changeSort('ppbkb.createdAt')" class="sort" style="text-align: center;">Tanggal PPBKB</th>
                                 <th onclick="changeSort('ppbkb.status_posting')" style="text-align: center;">Status Posting</th>
                                 <th style="text-align: center;">Action</th>

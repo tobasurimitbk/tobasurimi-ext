@@ -26,7 +26,11 @@
                     <div class="form-floating">
                         <select class="form-select company_pengirim_id" id="company_pengirim_id" name="company_pengirim_id" aria-label="Floating label select example">
                             <option value=""></option>
-
+                            <?php foreach ($dropdownCompanyExcept as $d) : ?>
+                                <option value="<?= $d['id'] ?>">
+                                    <?= strtoupper($d['company']) ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                         <label style="z-index: 1;">Company Pengirim</label>
                     </div>
@@ -132,7 +136,7 @@
             url: "<?= base_url("penerimaan-mutasi/all-global"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.divisi_penerima_id = $(".divisi_penerima_id").val();
+                data.company_pengirim_id = $(".company_pengirim_id").val();
                 data.status = $(".status").val();
                 data.penerimaan_mutasi_no = $(".penerimaan_mutasi_no").val();
                 data.multiple_mutasi_no = $(".multiple_no_mutasi").val();

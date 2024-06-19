@@ -50,7 +50,7 @@
                     <input autocomplete="one-time-code" class="form-control noBC27 search form-out-search" placeholder="Cari Nomor BC 2.7" value="" />
                 </div>
                 <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 2.7" value="" />
+                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 2.7 / No Daftar" value="" />
                 </div>
             </div>
             <?php if ($akunCeisa == null) : ?>
@@ -77,7 +77,7 @@
                                 <th onclick="changeSort('mutasi_global.no_mutasi')" class="sort" style="text-align: center;">No Mutasi</th>
                                 <th onclick="changeSort('bc_27.bc_no_lokal')" class="sort" style="text-align: center;">No BC 2.7</th>
                                 <th onclick="changeSort('bc_27.createdAt')" class="sort" style="text-align: center;">Tanggal BC 2.7</th>
-                                <th onclick="changeSort('bc_27.no_aju')" class="sort" style="text-align: center;">No Aju BC 2.7</th>
+                                <th onclick="changeSort('bc_27.no_aju')" class="sort" style="text-align: center;">No Aju BC 2.7 / No Daftar</th>
                                 <th onclick="changeSort('bc_27.status_posting')" style="text-align: center;">Status Posting</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
@@ -266,7 +266,7 @@
         table.ajax.reload();
     });
 
-    $('.noBC27, .noAju').keyup(function() {
+    $('.noBC27, .noAju, .noDaftar').keyup(function() {
         table.ajax.reload();
     });
 
@@ -361,6 +361,15 @@
                 })
             }
         })
+    }
+
+    function changeSort(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
     }
 </script>
 <?= $this->endSection(); ?>

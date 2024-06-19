@@ -79,7 +79,7 @@
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input readonly autocomplete="one-time-code" <?= !empty($penerimaanMutasiGlobal) ? ($penerimaanMutasiGlobal['status_posting'] == "1" ? "disabled" : 'disabled') : ''; ?> value="<?= !empty($penerimaanMutasiGlobal) ? $penerimaanMutasiGlobal['penerimaan_mutasi_no'] : "PMG//" . date('m') . "/1/" . date('Y'); ?>" type="text" class="form-control penerimaan_mutasi_no" id="penerimaan_mutasi_no" name="penerimaan_mutasi_no" placeholder="No. Penerimaan Mutasi">
-                                    <label for="floatingInput">No Mutasi</label>
+                                    <label for="floatingInput">No Penerimaan Mutasi</label>
                                 </div>
                                 <div style="<?= !empty($penerimaanMutasiGlobal) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">

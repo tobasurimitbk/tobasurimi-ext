@@ -53,7 +53,11 @@ class PenerimaanMutasiGlobal extends BaseController
 
     public function index()
     {
-        return view('Warehouse/penerimaanMutasi/index_global');
+        $data = [
+            'dropdownCompanyExcept' => $this->companyModel->getCompaniesExcepct($this->this_company_id),
+        ];
+
+        return view('Warehouse/penerimaanMutasi/index_global', $data);
     }
 
     public function create()
@@ -99,7 +103,7 @@ class PenerimaanMutasiGlobal extends BaseController
             "sort"   => $this->request->getVar("sort"),
             "sortType"  => $this->request->getVar("sortType"),
             "search" => $this->request->getVar("search"),
-            "divisi_penerima_id" => $this->request->getVar("divisi_penerima_id"),
+            "company_pengirim_id" => $this->request->getVar('company_pengirim_id'),
             "status" => $this->request->getVar("status"),
             "penerimaan_mutasi_no" => $this->request->getVar("penerimaan_mutasi_no"),
             "multiple_mutasi_no" => $this->request->getVar("multiple_mutasi_no"),

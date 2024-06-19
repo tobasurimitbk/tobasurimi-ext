@@ -107,6 +107,12 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-sm-4">
+                        <div class="form-floating mb-3">
+                            <input <?= !empty($bc27) ? ($bc27['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc27) ? $bc27['no_daftar'] : $noAju ?>" autocomplete="one-time-code" type="number" class="form-control no_daftar" id="no_daftar" name="no_daftar" placeholder="No Daftar">
+                            <label for="floatingInput">Nomor Daftar</label>
+                        </div>
+                    </div>
                 </div>
             </form>
 
@@ -291,6 +297,9 @@
             no_aju: {
                 required: true
             },
+            no_daftar: {
+                required: true
+            },
         },
         messages: {
             company_tujuan_id: {
@@ -299,8 +308,8 @@
             mutasi_global_id: {
                 required: "Pilih nomor mutasi"
             },
-            no_aju: {
-                required: "No pengajuan wajib diisi"
+            no_daftar: {
+                required: "No Daftar wajib diisi"
             }
         },
         errorElement: 'span',

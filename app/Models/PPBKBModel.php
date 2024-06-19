@@ -88,7 +88,7 @@ class PPBKBModel extends Model
         }
 
         if ($addCondition['noPPBKB']) {
-            $bcDataQry->like('no_ppbkb', $addCondition['noPPBKB'])->orLike('no_mutasi', $addCondition['noPPBKB']);
+            $bcDataQry->like('no_ppbkb', $addCondition['noPPBKB'])->orLike('no_daftar', $addCondition['no_daftar'])->orLike('no_mutasi', $addCondition['noPPBKB']);
         }
 
 

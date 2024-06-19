@@ -70,6 +70,12 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-sm-4">
+                        <div class="form-floating mb-3">
+                            <input <?= $bcPo['status_posting'] === "1" ? 'disabled' : '' ?> value="<?= $bcPo['no_daftar'] ?>" autocomplete="one-time-code" type="number" class="form-control no_daftar" id="no_daftar" name="no_daftar" placeholder="No Daftar">
+                            <label for="floatingInput">Nomor Daftar</label>
+                        </div>
+                    </div>
                 </div>
             </form>
 

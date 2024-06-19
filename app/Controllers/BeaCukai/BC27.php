@@ -3,6 +3,7 @@
 namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
+use App\Helpers\BeaCukaiApi;
 use App\Models\BC27Model;
 use App\Models\CeisaSettingModel;
 use App\Models\CompaniesModel;
@@ -62,6 +63,41 @@ class BC27 extends BaseController
         return view('BeaCukai/bc-27/index', $data);
     }
 
+    public function online()
+    {
+        $data = [
+            'baseUrl' => $this->metaDataModel->where('name', "Base Url BC")->first()['value']
+        ];
+
+        return view('BeaCukai/bc-27/online', $data);
+    }
+
+    public function allOnline()
+    {
+        $username = ($this->akunCeisa == null ? "" : $this->akunCeisa['username']);
+        $password = ($this->akunCeisa == null ? "" : $this->akunCeisa['password']);
+
+        $beacukaiApi = new BeaCukaiApi($username, $password);
+        $dataOnline = $beacukaiApi->getListStatusResponseAll();
+
+        $newDataResult = [];
+        foreach ($dataOnline->dataRespon as $d) {
+            if ($d->kodeDokumen == "27") {
+                $newDataResult[] = $d;
+            }
+        }
+        $dataOnline->dataRespon = $newDataResult;
+
+        if ($dataOnline->status == false) {
+            return response()->setJSON($dataOnline);
+        } else {
+            return response()->setJSON([
+                'data' => $dataOnline,
+                'status' => true
+            ]);
+        }
+    }
+
     public function all()
     {
         $payload = [
@@ -87,7 +123,8 @@ class BC27 extends BaseController
             "mulaiTanggalBC27" => $this->request->getGet("mulaiTanggalBC27"),
             "selesaiTanggalBC27" => $this->request->getGet('selesaiTanggalBC27'),
             "noBC27" => $this->request->getGet('noBC27'),
-            "noAju" => $this->request->getGet('noAju')
+            "noAju" => $this->request->getGet('noAju'),
+            "noDaftar" => $this->request->getGet('noDaftar')
         ];
 
         $limit = $this->request->getGet("length");
@@ -110,7 +147,7 @@ class BC27 extends BaseController
                 "no_mutasi"             => $data->no_mutasi,
                 "bc_no_lokal"           => $data->bc_no_lokal,
                 "tanggal_bc_27"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
-                "no_aju"                => $data->no_aju,
+                "no_aju"                => $data->no_aju . " / " . ($data->no_daftar == "" ? "-" : $data->no_daftar),
                 "status_posting"        => $data->status_posting,
             ]);
         }
@@ -166,7 +203,8 @@ class BC27 extends BaseController
             'mutasi_global_id' => $this->request->getVar('mutasi_global_id'),
             'bc_no_lokal' => $this->bc27Model->getNo(date('m'), date('Y'), $last_day),
             'no_aju' => $this->request->getVar('no_aju'),
-            'status_posting' => '0'
+            'status_posting' => '0',
+            'no_daftar' => $this->request->getVar('no_daftar'),
         ]);
 
         return response()->setJSON([
@@ -183,7 +221,8 @@ class BC27 extends BaseController
             'company_asal_id' => $this->this_company_id,
             'company_tujuan_id' => $this->request->getVar('company_tujuan_id'),
             'mutasi_global_id' => $this->request->getVar('mutasi_global_id'),
-            'no_aju' => $this->request->getVar('no_aju')
+            'no_aju' => $this->request->getVar('no_aju'),
+            'no_daftar' => $this->request->getVar('no_daftar'),
         ]);
 
         return response()->setJSON([

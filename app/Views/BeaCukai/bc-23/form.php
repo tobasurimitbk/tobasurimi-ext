@@ -38,13 +38,13 @@
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="form-floating mb-3 mt-1" style="height: 50px;">
+                        <div class="form-floating mt-1" style="height: 50px;">
                             <select class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                                 <option value=""></option>
                             </select>
                             <label style="z-index: 1;">Supplier</label>
                         </div>
-
+                        <small class="mb-3"><i>Hanya menampilkan data supplier yang LPB nya belum dibuatkan dokumen Bea Cukai</i></small>
                     </div>
                 </div>
             </form>
