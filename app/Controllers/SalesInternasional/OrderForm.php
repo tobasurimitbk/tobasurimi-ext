@@ -241,7 +241,8 @@ class OrderForm extends BaseController
     public function dropdownSalesKontrak()
     {
         $dataSalesKontrakFilter = [];
-        $dataSalesKontrak = $this->salesKontrakModel->getSalesKontrakForOrderForm($this->this_user_id, '1');
+        $dataSalesKontrak = $this->salesKontrakModel->getSalesKontrakForOrderForm($this->this_user_id, '1', $this->this_company_id);
+
         foreach ($dataSalesKontrak as $value) {
             $totalQtyDetail = 0;
             $dataDetailExport = $this->salesOrderExportDetailModel
@@ -249,26 +250,38 @@ class OrderForm extends BaseController
                 ->join('sales_order_export', 'sales_order_export.sales_order_export_id = sales_order_detail_export.sales_order_export_id', 'left')
                 ->where('sales_order_detail_export.sales_contract_detail_id', $value['idContractDetail'])
                 ->where('sales_order_export.status', "POSTED")
-                ->groupBy('sales_order_export.sales_order_export_id') // Ubah ke sales order export ID
+                ->groupBy('sales_order_export.sales_order_export_id')
                 ->findAll();
-            if (count($dataDetailExport) > 0) { // Periksa apakah ada hasil query
+
+            if (count($dataDetailExport) > 0) {
                 foreach ($dataDetailExport as $valueExportDetail) {
                     $totalQtyDetail += $valueExportDetail['qtyOrder'];
                 }
                 if ($value['qtyContract'] > $totalQtyDetail) {
-                    $dataSalesKontrakFilter[] = $value; // Tambahkan ke array jika kondisi terpenuhi
+                    $dataSalesKontrakFilter[] = $value;
                 }
             } else {
-                $dataSalesKontrakFilter[] = $value; // Tambahkan ke array jika tidak ada hasil query
+                $dataSalesKontrakFilter[] = $value;
             }
         }
+
+        // Hapus duplikat dari $dataSalesKontrakFilter
+        $temp_array = [];
+        $key_array = [];
+
+        foreach ($dataSalesKontrakFilter as $val) {
+            if (!in_array($val['id'], $key_array)) {
+                $key_array[] = $val['id'];
+                $temp_array[] = $val;
+            }
+        }
+
         return response()->setJSON([
-            'data' => $dataSalesKontrakFilter,
+            'data' => $temp_array,
             'token' => csrf_hash(),
             'status' => true
         ]);
     }
-
 
     public function getDetailSalesKontrak()
     {

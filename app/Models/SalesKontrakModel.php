@@ -171,7 +171,7 @@ class SalesKontrakModel extends Model
         return $salesKontrak;
     }
 
-    public function getSalesKontrakForOrderForm($userID, $status)
+    public function getSalesKontrakForOrderForm($userID, $status, $companyID)
     {
         $salesKontrak = $this->asArray()
             ->select('sales_contract.*, sales_contract_detail.id AS idContractDetail, sales_contract_detail.qty AS qtyContract, customers.name AS customerName, CONCAT(metadata.value, " - ", metadata.description) AS currencyName')
@@ -181,6 +181,7 @@ class SalesKontrakModel extends Model
             ->where('sales_contract.deletedAt', null)
             ->where('sales_contract.status_posting', $status)
             ->where('sales_contract.createdBy', $userID)
+            ->where('sales_contract.company_id', $companyID)
             ->orderBy('sales_contract.createdAt', "DESC")
             ->findAll();
         return $salesKontrak;
