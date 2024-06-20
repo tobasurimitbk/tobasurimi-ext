@@ -55,9 +55,9 @@ class NeracaSaldo extends BaseController
             ->asObject()
             ->where('name', 'Kelompok Akun')
             ->findAll();
-        $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR("");
-        $dataHeaderAkun = $this->HeaderAkunsModel->getAPAR("");
-        $dataSubAkun = $this->Sub_AkunsModel->getAPAR("");
+        $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR($this->this_company_id);
+        $dataHeaderAkun = $this->HeaderAkunsModel->getAPAR($this->this_company_id);
+        $dataSubAkun = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
         // $dataJurnalUmum = $this->jurnalUmumModel->getDataJurnal($condition);
         $dataJurnalUmum = $this->jurnalUmumModel
             ->asObject()
@@ -117,9 +117,9 @@ class NeracaSaldo extends BaseController
             ->asObject()
             ->where('name', 'Kelompok Akun')
             ->findAll();
-        $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR("");
-        $dataHeaderAkun = $this->HeaderAkunsModel->getAPAR("");
-        $dataSubAkun = $this->Sub_AkunsModel->getAPAR("");
+        $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR($this->this_company_id);
+        $dataHeaderAkun = $this->HeaderAkunsModel->getAPAR($this->this_company_id);
+        $dataSubAkun = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
         // $dataJurnalUmum = $this->jurnalUmumModel->getDataJurnal($condition);
         $dataJurnalUmum = $this->jurnalUmumModel
             ->asObject()

@@ -59,12 +59,12 @@ class BukuBesar extends BaseController
             ->orLike('value', 'Beban')
             ->groupEnd()
             ->findAll();
-        $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR("");
-        $dataHeaderAkun = $this->HeaderAkunsModel->getAPAR("");
+        $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR($this->this_company_id);
+        $dataHeaderAkun = $this->HeaderAkunsModel->getAPAR($this->this_company_id);
         foreach ($dataHeaderAkun as $val) {
             $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
         }
-        $dataSubAkun = $this->Sub_AkunsModel->getAPAR("");
+        $dataSubAkun = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
         foreach ($dataSubAkun as $val) {
             $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
         }
@@ -141,7 +141,7 @@ class BukuBesar extends BaseController
             ->orLike('value', 'Beban')
             ->groupEnd()
             ->findAll();
-        $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR("");
+        $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR($this->this_company_id);
         $dataHeaderAkun = $this->HeaderAkunsModel
             ->asObject()
             ->select('*')
@@ -150,7 +150,7 @@ class BukuBesar extends BaseController
         foreach ($dataHeaderAkun as $val) {
             $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
         }
-        $dataSubAkun = $this->Sub_AkunsModel->getAPAR("");
+        $dataSubAkun = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
         foreach ($dataSubAkun as $val) {
             $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
         }

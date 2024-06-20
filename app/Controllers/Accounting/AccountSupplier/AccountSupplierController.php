@@ -28,7 +28,7 @@ class AccountSupplierController extends BaseController
     public function index()
     {
         $supplierModel = $this->SupplierModel->where('deletedAt', NULL)->findAll();
-        $subAkunsModel = $this->Sub_AkunsModel->getAPAR("");
+        $subAkunsModel = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
         foreach ($subAkunsModel as $val) {
             $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
         }

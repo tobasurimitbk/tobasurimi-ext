@@ -29,7 +29,7 @@ class AccountCustomerController extends BaseController
     public function index()
     {
         $customerModel = $this->CustomerModel->getCustomer();
-        $subAkunsModel = $this->Sub_AkunsModel->getAPAR("");
+        $subAkunsModel = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
         foreach ($subAkunsModel as $val) {
             $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
         }
@@ -66,6 +66,9 @@ class AccountCustomerController extends BaseController
             "sortType"      => $this->request->getGet("sortType")
         ];
 
+        $dataNamaAP = "";
+        $dataNamaAR = "";
+
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
@@ -78,18 +81,13 @@ class AccountCustomerController extends BaseController
 
 
         foreach ($res['data'] as $data) {
-            // var_dump($data);
             // exit;
             foreach ($subAkunsModel as $datas) {
                 if ($data->ap_id == $datas->id) {
                     $dataNamaAP = $datas->no_sub;
-                } else {
-                    $dataNamaAP = "-";
                 }
                 if ($data->ar_id == $datas->id) {
                     $dataNamaAR = $datas->no_sub;
-                } else {
-                    $dataNamaAR = "-";
                 }
             }
             array_push($rdata, [
