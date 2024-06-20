@@ -3,12 +3,17 @@
 namespace App\Controllers\Accounting\Rasio;
 
 use App\Controllers\BaseController;
+use App\Controllers\JasaVendor\BiayaKepiting;
+use App\Controllers\JasaVendor\BiayaUdang;
 use App\Models\MetadataModel;
 use App\Models\DivisisModel;
 use App\Models\Sub_AkunsModel;
 use App\Models\AccountDivisisModel;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\AMPurchaseOrderModel;
+use App\Models\BiayaKepitingModel;
+use App\Models\BiayaUdangModel;
+use App\Models\JasaVendorInModel;
 use App\Models\JurnalUmumModel;
 use App\Models\KursModel;
 use App\Models\MaterialRequestPenolongDetailsModel;
@@ -55,6 +60,9 @@ class RasioController extends BaseController
     protected $materialRequestPenolongDetailsModel;
     protected $metadataModel;
     protected $kursModel;
+    protected $biayaUdangModel;
+    protected $biayaKepitingModel;
+    protected $jasaVendorInModel;
 
     public function __construct()
     {
@@ -83,6 +91,9 @@ class RasioController extends BaseController
         $this->materialRequestPenolongDetailsModel = new MaterialRequestPenolongDetailsModel();
         $this->metadataModel = new MetadataModel();
         $this->kursModel = new KursModel();
+        $this->biayaUdangModel = new BiayaUdangModel();
+        $this->biayaKepitingModel = new BiayaKepitingModel();
+        $this->jasaVendorInModel = new JasaVendorInModel();
     }
 
     public function index()
@@ -358,8 +369,8 @@ class RasioController extends BaseController
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
-            "month"        => $tanggal_input != "" ? $tanggal_mysql : "",
-            "department"        => $this->request->getGet("divisi_id"),
+            "month"         => $tanggal_input != "" ? $tanggal_mysql : "",
+            "department"    => $this->request->getGet("divisi_id"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType")
         ];
@@ -443,15 +454,36 @@ class RasioController extends BaseController
             ];
             $kursValue = 1;
             $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
-            // $totalQtyAll = 0;
+
             foreach ($productionResultDataTitle as &$value) {
-                $poBBLokal = $this->rmPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();
-                $poBBImport = $this->rmImportPOModel->where('po_no', $value['stock_dokumen'])->first();
-                $poBP = $this->amPurchaseOrderModel->where('po_no', $value['stock_dokumen'])->first();
+                $stockDokumen = explode(' ', $value['stock_dokumen'])[0]; // Get the first part of the split string
+                $poBBLokal = $this->rmPurchaseOrderModel->where('po_no', $stockDokumen)->first();
+                $poBBImport = $this->rmImportPOModel->where('po_no', $stockDokumen)->first();
+                $poBP = $this->amPurchaseOrderModel->where('po_no', $stockDokumen)->first();
+                $jasaVendorIn = $this->jasaVendorInModel->where('no_penerimaan_surat_jalan', $stockDokumen)->first();
 
+                if ($jasaVendorIn) {
+                    // Ensure $jasaVendorIn['id'] is wrapped in an array for whereIn
+                    $biayaVendorUdang = $this->biayaUdangModel
+                        ->select('biaya_udang.*, biaya_udang_detail.*')
+                        ->join('biaya_udang_detail', 'biaya_udang_detail.biaya_udang_id = biaya_udang.id', 'left')
+                        ->whereIn('biaya_udang.multiple_jasa_vendor_in_id', [$jasaVendorIn['id']])
+                        ->first();
+                    $biayaVendorKepiting = $this->biayaKepitingModel
+                        ->select('biaya_kepiting.*, biaya_kepiting_detail.*')
+                        ->join('biaya_kepiting_detail', 'biaya_kepiting_detail.biaya_kepiting_id = biaya_kepiting.id', 'left')
+                        // ->join('biaya_kepiting_gaji', 'biaya_kepiting_gaji.biaya_kepiting_id = biaya_kepiting.id', 'left')
+                        ->where('biaya_kepiting.jasa_vendor_in_id', $jasaVendorIn['id'])
+                        ->first();
 
-                $rebus = "";
-                $biayaVendor = "";
+                    if ($biayaVendorUdang) {
+                        var_dump($biayaVendorUdang);
+                    }
+
+                    if ($biayaVendorKepiting) {
+                        var_dump($biayaVendorKepiting);
+                    }
+                }
 
                 $penerimaanBarang = $this->penerimaanBarangModel->where('no_penerimaan_barang', $value['no_dokumen'])->first();
                 if ($poBBLokal) {
@@ -498,11 +530,7 @@ class RasioController extends BaseController
                             ->where('start_date <=', $valuePoBBImport['po_date'])
                             ->where('end_date >=', $valuePoBBImport['po_date'])
                             ->first();
-                        if ($kurs) {
-                            $kursValue = $kurs['nilai_kurs'];
-                        } else {
-                            $kursValue = 1;
-                        }
+                        $kursValue = $kurs ? $kurs['nilai_kurs'] : 1;
                         $hargaSatuanDisc = ($valuePoBBImport['price'] * $kursValue) * ($valuePoBBImport['disc'] / 100);
                         $hargaSatuan = ($valuePoBBImport['price'] * $kursValue) - $hargaSatuanDisc;
                         $totalQty += $valuePoBBImport['qty'];
@@ -532,11 +560,7 @@ class RasioController extends BaseController
                             ->where('start_date <=', $valuePoBBImport['po_date'])
                             ->where('end_date >=', $valuePoBBImport['po_date'])
                             ->first();
-                        if ($kurs) {
-                            $kursValue = $kurs['nilai_kurs'];
-                        } else {
-                            $kursValue = 1;
-                        }
+                        $kursValue = $kurs ? $kurs['nilai_kurs'] : 1;
                         $disc = $valuePoBPDetail['disc'] / 100;
                         $hargaSetelahDisc = $valuePoBPDetail['price'] * $disc;
                         $hargaSatuan = $valuePoBPDetail['price'] - $hargaSetelahDisc;
@@ -573,6 +597,8 @@ class RasioController extends BaseController
                     $value['satuanLPB'] = $satuanLPB;
                 }
             }
+
+            exit;
 
             if ($productionResultDataTitle) {
                 return response()->setJSON([

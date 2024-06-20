@@ -837,6 +837,7 @@
             $('.body-detail-table').append(row);
         }
     }
+
     const drawTableDigunakanAlokasi = function(data) {
         $('.body-detail-table-alokasi').empty();
         $('.tfoot-detail-table-alokasi').empty();
