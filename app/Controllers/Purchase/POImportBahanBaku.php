@@ -189,7 +189,8 @@ class POImportBahanBaku extends BaseController
             $noPoNew =  $this->rmImportPOModel->get_new_no_po(
                 date('m'),
                 date('Y'),
-                getLastDay()
+                getLastDay(),
+                $this->this_company_id
             );
         }
 
@@ -274,7 +275,8 @@ class POImportBahanBaku extends BaseController
             $noPoNew =  $this->rmImportPOModel->get_new_no_po(
                 date('m'),
                 date('Y'),
-                getLastDay()
+                getLastDay(),
+                $this->this_company_id
             );
         }
 

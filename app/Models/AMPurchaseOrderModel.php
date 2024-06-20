@@ -320,13 +320,14 @@ class AMPurchaseOrderModel extends Model
         return $generatedNo;
     }
 
-    public function get_new_no_po($bln, $thn, $last_day)
+    public function get_new_no_po($bln, $thn, $last_day, $companyID)
     {
         $head = "PO/LBP-" . $bln . $thn . '/';
         $lastPO = $this->select('po_no')
             ->like('po_no', "PO/LBP-")
             ->where('am_purchase_orders.createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('am_purchase_orders.createdAt <=', $last_day . " 23:59:59")
+            ->where('am_purchase_orders.company_id', $companyID)
             ->orderBy('po_no', "DESC")
             ->first();
 
@@ -345,13 +346,14 @@ class AMPurchaseOrderModel extends Model
         }
     }
 
-    public function get_new_no_po_import($bln, $thn, $last_day)
+    public function get_new_no_po_import($bln, $thn, $last_day, $companyID)
     {
         $head = "PO/IBP-" . $bln . $thn . '/';
         $lastPO = $this->select('po_no')
             ->like('po_no', "PO/IBP-")
             ->where('am_purchase_orders.createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('am_purchase_orders.createdAt <=', $last_day . " 23:59:59")
+            ->where('am_purchase_orders.company_id', $companyID)
             ->orderBy('po_no', "DESC")
             ->first();
 

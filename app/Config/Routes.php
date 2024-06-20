@@ -1231,6 +1231,12 @@ $routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
     $routes->get('list-barang-mutasi', 'BeaCukai\BC27::getListMutasiDetail');
 });
 
+// BC 3.0
+$routes->group('bea-cukai-bc-30', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'BeaCukai\BC30::index');
+    $routes->get('create', 'BeaCukai\BC30::create');
+});
+
 // PPBKB
 $routes->group('bea-cukai-ppbkb', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\PPBKB::index');

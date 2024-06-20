@@ -152,7 +152,7 @@ class SppModel extends Model
         return $query->getResultArray();
     }
 
-    public function generateNoSpp($divisi)
+    public function generateNoSpp($divisi, $companyId)
     {
         $romanNumb = [
             'I',
@@ -181,6 +181,7 @@ class SppModel extends Model
         $builder = $this->db->table('purchase_requests');
         $builder->select('spp_no');
         $builder->orderBy('spp_no', 'desc');
+        $builder->where('company_id', $companyId);
         $builder->like('spp_no', $lastStr);
         $query = $builder->get();
 

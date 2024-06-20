@@ -105,7 +105,8 @@ class POLokalBahanPenolong extends BaseController
             $noPoNew =  $this->aMPurchaseOrderModel->get_new_no_po(
                 date('m'),
                 date('Y'),
-                getLastDay()
+                getLastDay(),
+                $this->this_company_id
             );
         }
 
@@ -327,7 +328,8 @@ class POLokalBahanPenolong extends BaseController
             $noPoNew =  $this->aMPurchaseOrderModel->get_new_no_po(
                 date('m'),
                 date('Y'),
-                getLastDay()
+                getLastDay(),
+                $this->this_company_id
             );
         }
 
@@ -698,11 +700,11 @@ class POLokalBahanPenolong extends BaseController
                     'nama_barang' => $s['nama_barang'],
                     'satuan_id' => $s['unit'],
                     'nama_satuan' => $s['kode_satuan'],
-                    'harga_satuan' => number_format($hargaTerakhir['hargaTerakhirNumber'], 2),
+                    'harga_satuan' => ($hargaTerakhir['hargaTerakhirNumber']),
                     'qty' => $totalQtySisa,
                     'diskon' => '0',
                     'biaya_tambahan' => '0',
-                    'total' => number_format($hargaTerakhir['hargaTerakhirNumber'] * $totalQtySisa, 2),
+                    'total' => ($hargaTerakhir['hargaTerakhirNumber'] * $totalQtySisa),
                     'keterangan' => $s['note'],
                     'ppn' => '',
                     'pph' => ''
