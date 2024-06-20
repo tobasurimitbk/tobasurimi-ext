@@ -55,7 +55,7 @@ class SalesKontrak extends BaseController
 
     public function createView()
     {
-        $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id);
+        $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id, $this->this_company_id);
         $dataCountry = $this->countryModel->findAll();
         $dataValuta = $this->metaDataModel->get_by_name('Valuta');
         $dataTipeHarga = $this->metaDataModel->get_by_name('Tipe Harga Sales Ekspor');
@@ -80,7 +80,7 @@ class SalesKontrak extends BaseController
 
         $dataSalesKontrak = $this->salesKontrakModel->find($id);
         $dataSalesKontrakDetail = $this->salesKontrakDetailModel->detail($id);
-        $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id);
+        $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id, $this->this_company_id);
         $dataCountry = $this->countryModel->findAll();
         $dataValuta = $this->metaDataModel->get_by_name('Valuta');
         $dataTipeHarga = $this->metaDataModel->get_by_name('Tipe Harga Sales Ekspor');
@@ -386,7 +386,7 @@ class SalesKontrak extends BaseController
 
     public function dropdownCustomer()
     {
-        $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id);
+        $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id, $this->this_company_id);
         return response()->setJSON([
             'data' => $dataCustomer,
             'token' => csrf_hash(),
@@ -406,7 +406,7 @@ class SalesKontrak extends BaseController
 
     public function getNo()
     {
-        $no = $this->salesKontrakModel->get_no(date('Y'), date('y'));
+        $no = $this->salesKontrakModel->get_no(date('Y'), date('y'), $this->this_company_id);
 
         return response()->setJSON([
             'token' => csrf_hash(),

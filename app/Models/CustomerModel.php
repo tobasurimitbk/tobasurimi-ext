@@ -190,9 +190,9 @@ class CustomerModel extends Model
         return $query->getResultArray();
     }
 
-    public function getCustomerEkspor($user_id)
+    public function getCustomerEkspor($user_id, $companyID)
     {
-        return $this->asArray()->where('tipe_customer', "INTERNASIONAL")->where('deletedAt', null)->where('sales_id', $user_id)->orderBy('createdAt', "DESC")->findAll();
+        return $this->asArray()->where('company_id', $companyID)->where('tipe_customer', "INTERNASIONAL")->where('deletedAt', null)->where('sales_id', $user_id)->orderBy('createdAt', "DESC")->findAll();
     }
 
     public function getCustomerLokal()

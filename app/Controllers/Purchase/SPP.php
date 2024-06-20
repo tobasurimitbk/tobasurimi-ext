@@ -269,7 +269,7 @@ class SPP extends BaseController
     public function generateSPP()
     {
         $divisi_name = $this->request->getVar("divisi_name");
-        $response = $this->SppModel->generateNoSpp($divisi_name);
+        $response = $this->SppModel->generateNoSpp($divisi_name, $this->this_company_id);
         if ($response) {
             $data = [
                 "status"  => true,

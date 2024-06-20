@@ -191,7 +191,8 @@ class POImportBahanPenolong extends BaseController
             $noPoNew =  $this->amPurchaseOrderModel->get_new_no_po_import(
                 date('m'),
                 date('y'),
-                getLastDay()
+                getLastDay(),
+                $this->this_company_id
             );
         }
 
@@ -275,7 +276,8 @@ class POImportBahanPenolong extends BaseController
             $noPoNew =  $this->amPurchaseOrderModel->get_new_no_po_import(
                 date('m'),
                 date('Y'),
-                getLastDay()
+                getLastDay(),
+                $this->this_company_id
             );
         }
 
