@@ -28,7 +28,7 @@
             </ul>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <div class="row mt-4">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -41,7 +41,14 @@
                             <label for="floatingInput" style="z-index: 1;">Departemen</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Warehouse</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -54,7 +61,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select kategori" name="kategori" id="kategori">
                                 <option value="" data-code=""></option>
@@ -345,9 +352,16 @@
         getDataRawMaterialI();
         getDataRawMaterialII();
         getDataCost();
+        getListWarehouseAsal()
     });
 
-    $("#divisi_id")
+    $('#warehouse_id').select2({
+        placeholder: "Pilih Warehouse",
+        theme: "bootstrap-5",
+        allowClear: true
+    });
+
+    $("#divisi_id, #warehouse_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -382,6 +396,27 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
+
+    function getListWarehouseAsal() {
+        setLoading();
+        // GET LIST WAREHOUSE ASAL
+        $.ajax({
+            url: `<?= base_url('mutasi/warehouse'); ?>`,
+            method: "GET",
+            data: {
+                divisi_id: $(".divisi_id option:selected").val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".warehouse_id").empty()
+                $(".warehouse_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
+                })
+                stopLoading();
+            }
+        });
+    }
 
     const getDataJurnalSubsidi = function() {
         var department_id = $('#divisi_id').val();
@@ -803,6 +838,45 @@
         }
     }
 
+    const drawTableDigunakanAlokasi = function(data) {
+        $('.body-detail-table-alokasi').empty();
+        $('.tfoot-detail-table-alokasi').empty();
+        var row = '';
+        var rowFooter = '';
+        var no = 1;
+        var strip = "-";
+
+        if (data.length === 0) {
+            var totalQty = 0;
+            var totalHarga = 0;
+            var hargaSatuan = 0;
+            row += '<tr><td colspan="6" class="text-center">Data Barang Tidak Ada</td></tr>';
+            $('.tfoot-detail-table-alokasi').append(row);
+        } else {
+            var totalQty = 0;
+            var totalHarga = 0;
+            var hargaSatuan = 0;
+            data.map((item, index) => {
+                // counting total
+                totalQty += item.totalQty !== undefined ? item.totalQty : 0;
+                totalHarga += item.totalHarga !== undefined ? item.totalHarga : 0;
+                hargaSatuan += item.hargaSatuan !== undefined ? item.hargaSatuan : 0;
+                // end counting
+                row += '<tr style="color:whitesmoke;text-align: center;">';
+                row += '<td>' + no + '</td>';
+                row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
+                row += '<td>' + (item.totalQty !== undefined ? parseFloat(item.totalQty).toLocaleString() : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.totalHarga !== undefined ? formatRupiah(parseFloat(item.totalHarga)) : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.hargaSatuan !== undefined ? formatRupiah(item.hargaSatuan) : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.satuanPO !== undefined ? item.satuanPO : strip) + '</td>';
+                row += '</tr>';
+                no++;
+            });
+
+            $('.body-detail-table-alokasi').append(row);
+        }
+    }
+
     const drawTableDigunakanJadi = function() {
         $('.body-detail-table-barang-proses-ulang').empty();
         $('.tfoot-detail-table-barang-proses-ulang').empty();
@@ -818,14 +892,14 @@
             var totalHargaLPB = 0;
             var hargaSatuanLPB = 0;
             row += '<tr><td colspan="10" class="text-center">Data Barang Tidak Ada</td></tr>';
-            $('.qtyTotalPembelian').val(totalQtyPO.toLocaleString());
-            $('.hargaTotalPembelian').val(formatRupiah(totalHargaPO));
-            $('.hargaSatuanPembelian').val(formatRupiah(hargaSatuanPO));
+            // $('.qtyTotalPembelian').val(totalQtyPO.toLocaleString());
+            // $('.hargaTotalPembelian').val(formatRupiah(totalHargaPO));
+            // $('.hargaSatuanPembelian').val(formatRupiah(hargaSatuanPO));
 
-            $('.qtyTotalPenerimaan').val(totalQtyLPB.toLocaleString());
-            $('.hargaTotalPenerimaan').val(formatRupiah(totalHargaLPB));
-            $('.hargaSatuanPenerimaan').val(formatRupiah(hargaSatuanLPB));
-            $('.tfoot-detail-table').append(row);
+            // $('.qtyTotalPenerimaan').val(totalQtyLPB.toLocaleString());
+            // $('.hargaTotalPenerimaan').val(formatRupiah(totalHargaLPB));
+            // $('.hargaSatuanPenerimaan').val(formatRupiah(hargaSatuanLPB));
+            $('.tfoot-detail-table-barang-proses-ulang').append(row);
         } else {
             var totalQtyPO = 0;
             var totalHargaPO = 0;
@@ -856,9 +930,9 @@
                 row += '</tr>';
                 no++;
             });
-            $('.qtyTotalPembelian').val(totalQtyPO.toLocaleString());
-            $('.hargaTotalPembelian').val(formatRupiah(totalHargaPO));
-            $('.hargaSatuanPembelian').val(formatRupiah(hargaSatuanPO));
+            // $('.qtyTotalPembelian').val(totalQtyPO.toLocaleString());
+            // $('.hargaTotalPembelian').val(formatRupiah(totalHargaPO));
+            // $('.hargaSatuanPembelian').val(formatRupiah(hargaSatuanPO));
 
             $('.body-detail-table-barang-proses-ulang').append(row);
         }
@@ -1557,6 +1631,9 @@
                     $('#content').html(response);
                     if (list_items_barang_digunakan.length != 0) {
                         drawTableDigunakan();
+                    }
+                    if (list_items_barang_digunakan_alokasi.length != 0) {
+                        drawTableDigunakanAlokasi(list_items_barang_digunakan_alokasi);
                     }
                     if (list_items_barang_jadi.length != 0) {
                         drawTableRasio();

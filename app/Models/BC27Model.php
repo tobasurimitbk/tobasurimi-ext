@@ -45,6 +45,7 @@ class BC27Model extends Model
         $availableSort = [
             'mutasi_global.divisi_asal_id'           => 'mutasi_global.divisi_asal_id',
             'mutasi_global.warehouse_asal_id'        => 'mutasi_global.warehouse_asal_id',
+            'bc_27.no_daftar'                        => 'bc_27.no_daftar',
             'bc_27.company_tujuan_id'                => 'bc_27.company_tujuan_id',
             'mutasi_global.no_mutasi'                => 'mutasi_global.no_mutasi',
             'bc_27.bc_no_lokal'                      => 'bc_27.bc_no_lokal',
@@ -89,13 +90,12 @@ class BC27Model extends Model
         }
 
         if ($addCondition['noAju']) {
-            $bcDataQry->like('no_aju', $addCondition['noAju']);
+            $bcDataQry->like('no_aju', $addCondition['noAju'])->orLike('no_daftar', $addCondition['noAju']);
         }
 
         if ($addCondition['noBC27']) {
             $bcDataQry->like('bc_no_lokal', $addCondition['noBC27']);
         }
-
 
         if ($addCondition['statusPosting'] || $addCondition['noAju'] || $addCondition['noBC27'] && (empty($addCondition['mulaiTanggalBC27']) && empty($addCondition['selesaiTanggalBC27']))) {
             $bcDataQry->groupEnd();

@@ -215,7 +215,7 @@ class BC40 extends BaseController
                 "id"                    => encrypt($data->bc_purchase_order_id),
                 "bc_no_lokal"           => $data->bc_no_lokal,
                 "tanggal_bc_40"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
-                "no_aju"                => $data->no_aju,
+                "no_aju"                => ($data->no_aju == "" ? "-" : $data->no_aju) . " / " . ($data->no_daftar == "" ? "-" : $data->no_daftar),
                 "po_type"               => $data->po_type,
                 "lpb_no"                => str_replace(['"', ']', '['], " ",  $data->multiple_lpb_no),
                 "po_no"                 => str_replace(['"', ']', '['], " ",  $data->multiple_po_no),
@@ -327,6 +327,7 @@ class BC40 extends BaseController
             'multiple_lpb_id' => str_replace(['\\"', '\\', '"'], '', json_encode($lpbIdArr)),
             'multiple_po_no' => str_replace(['\\"', '\\'], '', json_encode($poNoArr)),
             'multiple_lpb_no' => str_replace(['\\"', '\\'], '', json_encode($lpbNoArr)),
+            'no_daftar' => $this->request->getVar('no_daftar')
         ]);
 
         return response()->setJSON([
@@ -1554,7 +1555,13 @@ class BC40 extends BaseController
 
         // return response()->setJSON($payload);
         $res = $beacukaiApi->kirimDokumenBC($payload, false);
-
+        if ($res['status'] == false) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => "Gagal Kirim Ceisa Karena : " . $res['message'],
+            ]);
+        }
         // UPDATE STATUS
         $this->bc40Model->set('status_dokumen', "Sudah Kirim")->where('bc_purchase_order_id', $bcPurchaseOrderID)->update();
 
@@ -1673,12 +1680,40 @@ class BC40 extends BaseController
     {
         $poType = $this->request->getVar('po_type');
 
+        $supplierResult = [];
+
+        if (empty($this->request->getVar('po_type'))) {
+            return response()->setJSON([
+                'data' => $supplierResult,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        }
+
+
+
+
         if (!empty($poType)) {
             $poType = str_replace('LOKAL', 'BAHAN', $poType);
-            $supplier = $this->supplierModel->where('deletedAt', null)->where('type', $poType)->orderBy('name', "ASC")->findAll();
+            $supplier = $this->supplierModel
+                ->where('deletedAt', null)
+                ->where('type', $poType)
+                ->orderBy('name', "ASC")
+                ->findAll();
+
+            foreach ($supplier as $s) {
+                $result = $this->getListDataPurchaseOrderExport(
+                    $this->request->getVar('po_type'),
+                    $s['id'],
+                );
+
+                if (count($result) != 0) {
+                    array_push($supplierResult, $s);
+                }
+            }
 
             return response()->setJSON([
-                'data' => $supplier,
+                'data' => $supplierResult,
                 'token' => csrf_hash(),
                 'status' => true
             ]);

@@ -3,15 +3,15 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Dokumen BC 2.7</h1>
+        <h1>Dokumen BC 3.0</h1>
         <?php if ($akunCeisa != null) : ?>
             <?php if ($akunCeisa['status_integrasi']) : ?>
-                <a href="<?= base_url('bea-cukai-bc-27/online') ?>" class="btn btn-discard btn-dropdown-export float-right" type="button">
+                <a href="<?= base_url('bea-cukai-bc-30/online') ?>" class="btn btn-discard btn-dropdown-export float-right" type="button">
                     <i class="fa fa-upload fa-sm" aria-hidden="true"></i>
                     Status Respon
                 </a>
                 <?php if (can("Bea Cukai", "BC 2.7", "c")) : ?>
-                    <a href="<?= base_url('bea-cukai-bc-27/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+                    <a href="<?= base_url('bea-cukai-bc-30/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                     </a>
                 <?php endif; ?>
@@ -47,9 +47,6 @@
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control noBC27 search form-out-search" placeholder="Cari Nomor BC 2.7" value="" />
-                </div>
-                <div class="col-md-3 mb-3">
                     <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 2.7 / No Daftar" value="" />
                 </div>
             </div>
@@ -70,14 +67,11 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center;">No</th>
-                                <th style="text-align: center;">Company Asal</th>
-                                <th onclick="changeSort('mutasi_global.divisi_asal_id')" class="sort" style="text-align: center;">Departemen Asal</th>
-                                <th onclick="changeSort('mutasi_global.warehouse_asal_id')" class="sort" style="text-align: center;">Warehouse Asal</th>
-                                <th onclick="changeSort('bc_27.company_tujuan_id')" class="sort" style="text-align: center;">Company Tujuan</th>
-                                <th onclick="changeSort('mutasi_global.no_mutasi')" class="sort" style="text-align: center;">No Mutasi</th>
-                                <th onclick="changeSort('bc_27.bc_no_lokal')" class="sort" style="text-align: center;">No BC 2.7</th>
-                                <th onclick="changeSort('bc_27.createdAt')" class="sort" style="text-align: center;">Tanggal BC 2.7</th>
-                                <th onclick="changeSort('bc_27.no_aju')" class="sort" style="text-align: center;">No Aju BC 2.7 / No Daftar</th>
+                                <th style="text-align: center;">Departemen</th>
+                                <th onclick="changeSort('mutasi_global.divisi_asal_id')" class="sort" style="text-align: center;">No Aju / Daftar</th>
+                                <th onclick="changeSort('mutasi_global.warehouse_asal_id')" class="sort" style="text-align: center;">No Order Form</th>
+                                <th onclick="changeSort('bc_27.company_tujuan_id')" class="sort" style="text-align: center;">Jenis Pengeluaran</th>
+                                <th onclick="changeSort('bc_27.createdAt')" class="sort" style="text-align: center;">Tanggal BC 3.0</th>
                                 <th onclick="changeSort('bc_27.status_posting')" style="text-align: center;">Status Posting</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
@@ -98,160 +92,160 @@
     let sort = "bea_cukai.id";
     let sortType = "desc";
 
-    const table = $('.dataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        processing: true,
-        serverSide: true,
-        ordering: true,
-        order: [
-            [1, 'asc']
-        ],
-        fixedHeader: true,
-        lengthMenu: [
-            [25],
-            [25],
-        ],
-        pageLength: 25,
-        ajax: {
-            url: "<?= base_url("bea-cukai-bc-27/all"); ?>",
-            dataSrc: "data",
-            data: function(data) {
-                data.mulaiTanggalBC27 = $('.mulaiTanggalBC27').val();
-                data.selesaiTanggalBC27 = $('.selesaiTanggalBC27').val();
-                data.statusPosting = $('.statusPosting').val();
-                data.noAju = $('.noAju').val();
-                data.noBC27 = $('.noBC27').val();
-                data.sort = sort;
-                data.sortType = sortType;
-            }
-        },
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        display: "stripe",
-        searching: false,
-        columns: [{
-                data: "no",
-                className: "text-center",
-                sortable: false,
-                width: "5%"
-            },
-            {
-                data: "company_asal_name",
-                sortable: false,
-                className: "text-center"
-            },
-            {
-                data: "divisi_asal_name",
-                className: "text-center",
-            },
-            {
-                data: "warehouse_asal_name",
-                className: "text-center",
-            },
-            {
-                data: "company_tujuan_name",
-                className: "text-center"
-            },
-            {
-                data: "no_mutasi",
-                className: "text-center",
-            },
-            {
-                data: "bc_no_lokal",
-                className: "text-center"
-            },
-            {
-                data: "tanggal_bc_27",
-                className: "text-center"
-            },
-            {
-                data: "no_aju",
-                className: "text-center"
-            },
-            {
-                data: "status_posting",
-                className: "text-center",
-                searchable: false,
-                sortable: false,
-                render: function(data, type, row) {
-                    let htmlRes = '';
+    // const table = $('.dataTable').DataTable({
+    //     dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+    //     processing: true,
+    //     serverSide: true,
+    //     ordering: true,
+    //     order: [
+    //         [1, 'asc']
+    //     ],
+    //     fixedHeader: true,
+    //     lengthMenu: [
+    //         [25],
+    //         [25],
+    //     ],
+    //     pageLength: 25,
+    //     ajax: {
+    //         url: "<?= base_url("bea-cukai-bc-30/all"); ?>",
+    //         dataSrc: "data",
+    //         data: function(data) {
+    //             data.mulaiTanggalBC27 = $('.mulaiTanggalBC27').val();
+    //             data.selesaiTanggalBC27 = $('.selesaiTanggalBC27').val();
+    //             data.statusPosting = $('.statusPosting').val();
+    //             data.noAju = $('.noAju').val();
+    //             data.noBC27 = $('.noBC27').val();
+    //             data.sort = sort;
+    //             data.sortType = sortType;
+    //         }
+    //     },
+    //     "initComplete": function(settings, json) {
+    //         $('.dataTables_length').empty();
+    //         $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+    //         $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+    //     },
+    //     display: "stripe",
+    //     searching: false,
+    //     columns: [{
+    //             data: "no",
+    //             className: "text-center",
+    //             sortable: false,
+    //             width: "5%"
+    //         },
+    //         {
+    //             data: "company_asal_name",
+    //             sortable: false,
+    //             className: "text-center"
+    //         },
+    //         {
+    //             data: "divisi_asal_name",
+    //             className: "text-center",
+    //         },
+    //         {
+    //             data: "warehouse_asal_name",
+    //             className: "text-center",
+    //         },
+    //         {
+    //             data: "company_tujuan_name",
+    //             className: "text-center"
+    //         },
+    //         {
+    //             data: "no_mutasi",
+    //             className: "text-center",
+    //         },
+    //         {
+    //             data: "bc_no_lokal",
+    //             className: "text-center"
+    //         },
+    //         {
+    //             data: "tanggal_bc_27",
+    //             className: "text-center"
+    //         },
+    //         {
+    //             data: "no_aju",
+    //             className: "text-center"
+    //         },
+    //         {
+    //             data: "status_posting",
+    //             className: "text-center",
+    //             searchable: false,
+    //             sortable: false,
+    //             render: function(data, type, row) {
+    //                 let htmlRes = '';
 
-                    if (row.status_posting == "1") {
-                        htmlRes += `
-                            <div class="text-success">
-                                SUDAH POSTING
-                            </div>`
-                    } else {
-                        htmlRes += `
-                            <div class="text-danger">
-                                BELUM POSTING
-                            </div>`
-                    }
+    //                 if (row.status_posting == "1") {
+    //                     htmlRes += `
+    //                         <div class="text-success">
+    //                             SUDAH POSTING
+    //                         </div>`
+    //                 } else {
+    //                     htmlRes += `
+    //                         <div class="text-danger">
+    //                             BELUM POSTING
+    //                         </div>`
+    //                 }
 
-                    return htmlRes;
-                }
-            },
-            {
-                data: "id",
-                className: "text-center actions",
-                searchable: false,
-                sortable: false,
-                render: function(data, type, row) {
-                    let htmlRes = '';
+    //                 return htmlRes;
+    //             }
+    //         },
+    //         {
+    //             data: "id",
+    //             className: "text-center actions",
+    //             searchable: false,
+    //             sortable: false,
+    //             render: function(data, type, row) {
+    //                 let htmlRes = '';
 
-                    if (row.status_posting == "0") {
-                        <?php if (can('Bea Cukai', 'BC 2.7', 'd')) : ?>
-                            htmlRes += `
-                                <button data-toggle="tooltip" title="Hapus" onclick="deleteAction('${row.id}')" class="btn btn-danger delete-parent">
-                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                                </button>
-                            `;
-                        <?php endif; ?>
-                        <?php if (can('Bea Cukai', 'BC 2.7', 'a')) : ?>
-                            htmlRes += `
-                                <button data-toggle="tooltip" title="Posting" onclick="postingAction('${row.id}')" class="btn btn-success posting-spp">
-                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-                                </button>
-                            `;
-                        <?php endif; ?>
-                    } else {
-                        htmlRes += `
-                                
-                            `;
-                    }
+    //                 if (row.status_posting == "0") {
+    //                     <?php if (can('Bea Cukai', 'BC 2.7', 'd')) : ?>
+    //                         htmlRes += `
+    //                             <button data-toggle="tooltip" title="Hapus" onclick="deleteAction('${row.id}')" class="btn btn-danger delete-parent">
+    //                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+    //                             </button>
+    //                         `;
+    //                     <?php endif; ?>
+    //                     <?php if (can('Bea Cukai', 'BC 2.7', 'a')) : ?>
+    //                         htmlRes += `
+    //                             <button data-toggle="tooltip" title="Posting" onclick="postingAction('${row.id}')" class="btn btn-success posting-spp">
+    //                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+    //                             </button>
+    //                         `;
+    //                     <?php endif; ?>
+    //                 } else {
+    //                     htmlRes += `
 
-                    return htmlRes;
-                }
-            }
+    //                         `;
+    //                 }
+
+    //                 return htmlRes;
+    //             }
+    //         }
 
 
-        ],
-        "drawCallback": function(settings) {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
-            });
-        },
-        columnDefs: [{
-            defaultContent: "-",
-            targets: "_all"
-        }],
-        language: {
-            emptyTable: "Tidak ada riwayat dokumen BC 2.7", // Change this line
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
-            }
-        }
-    });
+    //     ],
+    //     "drawCallback": function(settings) {
+    //         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+    //         var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+    //             return new bootstrap.Tooltip(tooltipTriggerEl)
+    //         });
+    //     },
+    //     columnDefs: [{
+    //         defaultContent: "-",
+    //         targets: "_all"
+    //     }],
+    //     language: {
+    //         emptyTable: "Tidak ada riwayat dokumen BC 2.7", // Change this line
+    //         lengthMenu: "Show _MENU_ entries",
+    //         paginate: {
+    //             previous: '<i class="fa fa-angle-left"></i>',
+    //             next: '<i class="fa fa-angle-right"></i>'
+    //         }
+    //     }
+    // });
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        location.replace(`<?= base_url("bea-cukai-bc-27/id/"); ?>${data.id}`);
+        location.replace(`<?= base_url("bea-cukai-bc-30/id/"); ?>${data.id}`);
     });
 
     $(".mulaiTanggalBC27, .selesaiTanggalBC27").datepicker({
@@ -285,7 +279,7 @@
                 var formData = new FormData();
                 formData.append("id", id);
                 $.ajax({
-                    url: `<?= base_url("bea-cukai-bc-27/delete"); ?>`,
+                    url: `<?= base_url("bea-cukai-bc-30/delete"); ?>`,
                     method: "POST",
                     data: formData,
                     beforeSend: function(xhr) {
@@ -332,7 +326,7 @@
                 var formData = new FormData();
                 formData.append("id", id);
                 $.ajax({
-                    url: `<?= base_url("bea-cukai-bc-27/posting"); ?>`,
+                    url: `<?= base_url("bea-cukai-bc-30/posting"); ?>`,
                     method: "POST",
                     data: formData,
                     beforeSend: function(xhr) {

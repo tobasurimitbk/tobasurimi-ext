@@ -819,7 +819,7 @@ $routes->post('/biaya-kepiting/delete', 'JasaVendor\BiayaKepiting::delete', ['fi
 $routes->get('/biaya-kepiting/id/(:segment)',  'JasaVendor\BiayaKepiting::detail/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-kepiting/print/(:segment)',  'JasaVendor\BiayaKepiting::print/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-kepiting/all', 'JasaVendor\BiayaKepiting::all', ['filter' => 'Auth']);
-$routes->post('/biaya-udang/posting', 'JasaVendor\BiayaKepiting::posting', ['filter' => 'Auth']);
+$routes->post('/biaya-kepiting/posting', 'JasaVendor\BiayaKepiting::posting', ['filter' => 'Auth']);
 
 // Stuffing Lokal
 $routes->get('/pengeluaran-lokal',  'Stuffing\Lokal::index', ['filter' => 'Auth']);
@@ -937,6 +937,13 @@ $routes->get('/penerimaan-mutasi/get-penerimaan-mutasi-global-no', 'Inventori\Pe
 $routes->get('/penerimaan-mutasi/list-mutasi-global', 'Inventori\PenerimaanMutasiGlobal::dropdownListNomorMutasi', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/list-barang-global', 'Inventori\PenerimaanMutasiGlobal::dropdownListBarang', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/list-barang-masuk', 'Inventori\PenerimaanMutasiGlobal::dropdownListBarangMasuk', ['filter' => 'Auth']);
+$routes->post('/penerimaan-mutasi/save-global', 'Inventori\PenerimaanMutasiGlobal::createAction', ['filter' => 'Auth']);
+$routes->post('/penerimaan-mutasi/update-global', 'Inventori\PenerimaanMutasiGlobal::updateAction', ['filter' => 'Auth']);
+$routes->post('/penerimaan-mutasi/delete-global', 'Inventori\PenerimaanMutasiGlobal::delete', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/all-global', 'Inventori\PenerimaanMutasiGlobal::all', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/id-global/(:segment)', 'Inventori\PenerimaanMutasiGlobal::detail/$1', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/print-global/(:segment)', 'Inventori\PenerimaanMutasiGlobal::print/$1', ['filter' => 'Auth']);
+$routes->post('/penerimaan-mutasi/posting-global', 'Inventori\PenerimaanMutasiGlobal::posting', ['filter' => 'Auth']);
 
 // MUTASI GLOBAL
 $routes->get('/mutasi/global', 'Inventori\MutasiGlobal::index', ['filter' => 'Auth']);
@@ -1209,6 +1216,9 @@ $routes->group('bea-cukai-bc-40/', ['filter' => 'Auth'], function ($routes) {
 $routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BC27::index');
     $routes->get('all', 'BeaCukai\BC27::all');
+    $routes->get('online', 'BeaCukai\BC27::online');
+    $routes->get('download-response', 'BeaCukai\BC40::downloadResponPdf');
+    $routes->get('all-online', 'BeaCukai\BC27::allOnline');
     $routes->get('create', 'BeaCukai\BC27::create');
     $routes->get('id/(:segment)', 'BeaCukai\BC27::detail/$1');
     $routes->post('save', 'BeaCukai\BC27::createAction');
@@ -1219,6 +1229,12 @@ $routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
 
     $routes->get('list-mutasi-global', 'BeaCukai\BC27::dropdownMutasiGlobal');
     $routes->get('list-barang-mutasi', 'BeaCukai\BC27::getListMutasiDetail');
+});
+
+// BC 3.0
+$routes->group('bea-cukai-bc-30', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'BeaCukai\BC30::index');
+    $routes->get('create', 'BeaCukai\BC30::create');
 });
 
 // PPBKB

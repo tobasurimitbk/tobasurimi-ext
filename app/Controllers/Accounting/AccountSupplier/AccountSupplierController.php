@@ -28,7 +28,7 @@ class AccountSupplierController extends BaseController
     public function index()
     {
         $supplierModel = $this->SupplierModel->where('deletedAt', NULL)->findAll();
-        $subAkunsModel = $this->Sub_AkunsModel->getAPAR("");
+        $subAkunsModel = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
         foreach ($subAkunsModel as $val) {
             $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
         }
@@ -55,8 +55,8 @@ class AccountSupplierController extends BaseController
         ];
 
         $condition = [
-            "company_id"  => $this->this_company_id,
-            "deletedAt" => NULL
+            "suppliers.company_id"  => $this->this_company_id,
+            "suppliers.deletedAt" => NULL
         ];
 
         $addCondition = [

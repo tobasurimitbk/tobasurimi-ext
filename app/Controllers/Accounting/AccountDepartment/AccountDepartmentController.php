@@ -88,8 +88,8 @@ class AccountDepartmentController extends BaseController
         ];
 
         $condition = [
-            "company_id"  => $this->this_company_id,
-            "deletedAt" => NULL
+            "divisis.company_id"  => $this->this_company_id,
+            "divisis.deletedAt" => NULL
         ];
 
         $addCondition = [

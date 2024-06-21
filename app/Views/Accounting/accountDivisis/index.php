@@ -46,7 +46,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control" placeholder="Nama Department" id="parentName" name="parentName">
+                                <input readonly autocomplete="one-time-code" type="text" class="form-control" placeholder="Nama Department" id="parentName" name="parentName">
                                 <label for="floatingInput">Nama Department</label>
                             </div>
                         </div>

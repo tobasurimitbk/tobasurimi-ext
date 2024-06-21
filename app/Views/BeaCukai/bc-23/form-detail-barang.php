@@ -169,7 +169,7 @@
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <label style="z-index: 1;">Lokasi Negara</label>
+                                    <label style="z-index: 1;">Wilayah Lokasi Negara Pengirim</label>
                                 </div>
                             </div>
                             <label class="form-label font-weight-bold lable-title mb-3">

@@ -262,94 +262,94 @@
 
     let list_items = [];
 
-    $(document).ready(function() {
-        const table = $('.dataTable-barang').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            serverSide: true,
-            // ordering: true,
-            order: [
-                // [1, 'asc']
-            ],
-            fixedHeader: true,
-            lengthMenu: [
-                [25],
-                [25],
-            ],
-            pageLength: 25,
-            ajax: {
-                url: "<?= base_url("barang-master/all"); ?>",
-                dataSrc: "data",
-                data: function(data) {
-                    data.search = $(".search").val();
-                    data.sort = sort;
-                    data.sortType = sortType;
-                    data.parent_type = "<?= $type ?>";
-                    data.filter_coa = $(".filter_coa").val();
-                }
+    const table = $('.dataTable-barang').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        // ordering: true,
+        order: [
+            // [1, 'asc']
+        ],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("barang-master/all"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $(".search").val();
+                data.sort = sort;
+                data.sortType = sortType;
+                data.parent_type = "<?= $type ?>";
+                data.filter_coa = $(".filter_coa").val();
+            }
+        },
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        display: "stripe",
+        searching: false,
+        columns: [{
+                data: "no",
+                className: "text-center",
+                width: "5%"
+            }, {
+                data: "kelompok_barang",
+                className: "text-center",
             },
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            {
+                data: "kode_barang",
+                className: "text-center",
             },
-            display: "stripe",
-            searching: false,
-            columns: [{
-                    data: "no",
-                    className: "text-center",
-                    width: "5%"
-                }, {
-                    data: "kelompok_barang",
-                    className: "text-center",
-                },
-                {
-                    data: "kode_barang",
-                    className: "text-center",
-                },
-                {
-                    data: "barang_name",
-                    className: "text-center",
-                },
-                {
-                    data: "satuan",
-                    className: "text-center",
-                },
-                {
-                    data: "satuan2",
-                    className: "text-center",
-                },
-                {
-                    data: "satuan3",
-                    className: "text-center",
-                },
-                {
-                    data: "akun_coa", // Assuming "akun_coa" is the field name in your data source
-                    className: "text-center",
-                    render: function(data, type, row) {
-                        // If "akun_coa" exists and is not empty, display a checkbox
-                        if (data && data !== "") {
-                            return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
-                        } else { // Otherwise, display a dash "-"
-                            return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
-                        }
+            {
+                data: "barang_name",
+                className: "text-center",
+            },
+            {
+                data: "satuan",
+                className: "text-center",
+            },
+            {
+                data: "satuan2",
+                className: "text-center",
+            },
+            {
+                data: "satuan3",
+                className: "text-center",
+            },
+            {
+                data: "akun_coa", // Assuming "akun_coa" is the field name in your data source
+                className: "text-center",
+                render: function(data, type, row) {
+                    // If "akun_coa" exists and is not empty, display a checkbox
+                    if (data && data !== "") {
+                        return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
+                    } else { // Otherwise, display a dash "-"
+                        return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
                     }
                 }
-            ],
-            columnDefs: [{
-                targets: [0, 4, 5, 6, 7],
-                sortable: false,
-                orderable: false,
-            }, ],
-            language: {
-                emptyTable: "Master Data Bahan Baku Masih Kosong",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
             }
-        });
+        ],
+        columnDefs: [{
+            targets: [0, 4, 5, 6, 7],
+            sortable: false,
+            orderable: false,
+        }, ],
+        language: {
+            emptyTable: "Master Data Bahan Baku Masih Kosong",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+    $(document).ready(function() {
 
         $(".search").keyup(function() {
             table.ajax.reload();
@@ -602,8 +602,8 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        table.ajax.reload()
                                         $(".add-modal").modal("hide")
+                                        table.ajax.reload()
                                     });
                             }
                         },
@@ -1159,55 +1159,64 @@
     }
     const deleteRowDetail = function(id, spesifikasi_id) {
         if (spesifikasi_id) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Hapus Data Spesifikasi?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    setLoading()
-                    $.ajax({
-                        url: "<?= base_url("barang-master/delete-spek"); ?>",
-                        data: {
-                            id: spesifikasi_id
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                stopLoading()
+            console.log(list_items.length);
+            if (list_items.length <= 1) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Spesifikasi minimal 1 (satu)',
+                    confirmButtonColor: '#4e73df',
+                });
+            } else {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Hapus Data Spesifikasi?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Hapus',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const csrf = $(`[name="${csrfToken}"]`);
+                        setLoading()
+                        $.ajax({
+                            url: "<?= base_url("barang-master/delete-spek"); ?>",
+                            data: {
+                                id: spesifikasi_id
+                            },
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading()
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            table.ajax.reload();
+                                            $(".add-modal").modal("hide")
+                                        });
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
                                 Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        $('.dataTable').DataTable().ajax.reload();
-                                        $(".add-modal").modal("hide")
-                                    });
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
                             }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                        }
-                    });
-                }
-            })
+                        });
+                    }
+                })
+            }
         } else {
             const indexToRemove = list_items.findIndex(item => item.spek_id === id);
             if (indexToRemove !== -1) {

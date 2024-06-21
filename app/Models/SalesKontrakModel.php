@@ -108,7 +108,7 @@ class SalesKontrakModel extends Model
         return $salesData;
     }
 
-    public function get_no($thn, $thn2)
+    public function get_no($thn, $thn2, $companyId)
     {
         $lastStr =  "/TOBA/CN/EM/" . $thn2;
 
@@ -116,7 +116,8 @@ class SalesKontrakModel extends Model
         $builder->select('sales_contract_no');
         $builder->orderBy('sales_contract_no', 'desc')
             ->where('createdAt >=', $thn . "-01-01 00:00:00")
-            ->where('createdAt <=', $thn . "-12-31 23:59:59");
+            ->where('createdAt <=', $thn . "-12-31 23:59:59")
+            ->where('company_id', $companyId);
         $builder->like('sales_contract_no', $lastStr);
         $query = $builder->get();
 
@@ -170,7 +171,7 @@ class SalesKontrakModel extends Model
         return $salesKontrak;
     }
 
-    public function getSalesKontrakForOrderForm($userID, $status)
+    public function getSalesKontrakForOrderForm($userID, $status, $companyID)
     {
         $salesKontrak = $this->asArray()
             ->select('sales_contract.*, sales_contract_detail.id AS idContractDetail, sales_contract_detail.qty AS qtyContract, customers.name AS customerName, CONCAT(metadata.value, " - ", metadata.description) AS currencyName')
@@ -180,6 +181,7 @@ class SalesKontrakModel extends Model
             ->where('sales_contract.deletedAt', null)
             ->where('sales_contract.status_posting', $status)
             ->where('sales_contract.createdBy', $userID)
+            ->where('sales_contract.company_id', $companyID)
             ->orderBy('sales_contract.createdAt', "DESC")
             ->findAll();
         return $salesKontrak;

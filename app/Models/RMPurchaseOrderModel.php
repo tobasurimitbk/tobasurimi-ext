@@ -241,13 +241,14 @@ class RMPurchaseOrderModel extends Model
         return $generatedPoNo;
     }
 
-    public function get_new_no_po($bln, $thn, $last_day)
+    public function get_new_no_po($bln, $thn, $last_day, $companyId)
     {
         $head = "PO/LBB-" . $bln . $thn . '/';
         $lastPO = $this->select('po_no')
             ->like('po_no', "PO/LBB-")
             ->where('rm_purchase_orders.createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('rm_purchase_orders.createdAt <=', $last_day . " 23:59:59")
+            ->where('rm_purchase_orders.company_id', $companyId)
             ->orderBy('po_no', "DESC")
             ->first();
 

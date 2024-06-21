@@ -143,14 +143,15 @@ class BC23 extends BaseController
         $beacukaiApi = new BeaCukaiApi($username, $password);
         $dataOnline = $beacukaiApi->getListStatusResponseAll();
 
-        if ($dataOnline->status == false) {
-            $newDataResult = [];
-            foreach ($dataOnline->dataRespon as $d) {
-                if ($d->kodeDokumen == "23") {
-                    $newDataResult[] = $d;
-                }
+        $newDataResult = [];
+        foreach ($dataOnline->dataRespon as $d) {
+            if ($d->kodeDokumen == "23") {
+                $newDataResult[] = $d;
             }
-            $dataOnline->dataRespon = $newDataResult;
+        }
+        $dataOnline->dataRespon = $newDataResult;
+
+        if ($dataOnline->status == false) {
             return response()->setJSON($dataOnline);
         } else {
             return response()->setJSON([
@@ -206,7 +207,7 @@ class BC23 extends BaseController
                 "id"                    => encrypt($data->bc_purchase_order_id),
                 "bc_no_lokal"           => $data->bc_no_lokal,
                 "tanggal_bc_23"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
-                "no_aju"                => $data->no_aju,
+                "no_aju"                => ($data->no_aju == "" ? "-" : $data->no_aju) . " / " . ($data->no_daftar == "" ? "-" : $data->no_daftar),
                 "po_type"               => $data->po_type,
                 "lpb_no"                => str_replace(['"', ']', '['], " ",  $data->multiple_lpb_no),
                 "po_no"                 => str_replace(['"', ']', '['], " ",  $data->multiple_po_no),
@@ -497,6 +498,27 @@ class BC23 extends BaseController
             ->first();
 
         $seriDokumen = $lastData == null ? 1 : $lastData['seri_dokumen'] + 1;
+        $kodeDokumen =  decrypt($this->request->getVar('dokumen_jenis_dokumen'));
+
+        if ($seriDokumen == 1) {
+            // HARUS INVOICE 
+            if ($kodeDokumen != 380) {
+                return response()->setJSON([
+                    'status' => false,
+                    'token' => csrf_hash(),
+                    'message' => "Dokumen seri pertama wajib invoice ",
+                ]);
+            }
+        } elseif ($seriDokumen == 2) {
+            // HARUS BL/AWB
+            if ($kodeDokumen != 705 && $kodeDokumen != 740) {
+                return response()->setJSON([
+                    'status' => false,
+                    'token' => csrf_hash(),
+                    'message' => "Dokumen seri kedua wajib BL / AWB ",
+                ]);
+            }
+        }
 
         $this->bcDokumenModel->insert([
             'bc_type' => 23,
@@ -1736,6 +1758,13 @@ class BC23 extends BaseController
 
         $res = $beacukaiApi->kirimDokumenBC($payload, false);
 
+        if ($res['status'] == false) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => "Gagal Kirim Ceisa Karena : " . $res['message'],
+            ]);
+        }
         // // UPDATE STATUS
         $this->bc23Model->set('status_dokumen', "Sudah Kirim")->where('bc_purchase_order_id', $bcPurchaseOrderID)->update();
         $this->bcPurchaseOrderModel->update($bcPurchaseOrderID, [
@@ -1896,8 +1925,29 @@ class BC23 extends BaseController
             ->orderBy('name', "ASC")
             ->findAll();
 
+        $supplierResult = [];
+
+        if (empty($this->request->getVar('po_type'))) {
+            return response()->setJSON([
+                'data' => $supplierResult,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        }
+
+        foreach ($supplier as $s) {
+            $result = $this->bc40Controller->getListDataPurchaseOrderExport(
+                $this->request->getVar('po_type'),
+                $s['id'],
+            );
+
+            if (count($result) != 0) {
+                array_push($supplierResult, $s);
+            }
+        }
+
         return response()->setJSON([
-            'data' => $supplier,
+            'data' => $supplierResult,
             'token' => csrf_hash(),
             'status' => true
         ]);

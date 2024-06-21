@@ -38,13 +38,13 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input readonly id="entitas_nama_importir" value="<?= $bc23Entitas == null ? '' : $bc23Entitas['nama_entitas'] ?>" name="entitas_nama_importir" type="text" class="form-control entitas_nama_importir" placeholder="">
+                                    <input id="entitas_nama_importir" value="<?= $bc23Entitas == null ? '' : $bc23Entitas['nama_entitas'] ?>" name="entitas_nama_importir" type="text" class="form-control entitas_nama_importir" placeholder="">
                                     <label>Nama</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <textarea readonly name="entitas_alamat_importir" id="entitas_alamat_importir" class="form-control entitas_alamat_importir" style="height: 100px;"><?= ($bc23Entitas == null) ? '' : $bc23Entitas['alamat_entitas'] ?></textarea>
+                                    <textarea name="entitas_alamat_importir" id="entitas_alamat_importir" class="form-control entitas_alamat_importir" style="height: 100px;"><?= ($bc23Entitas == null) ? '' : $bc23Entitas['alamat_entitas'] ?></textarea>
                                     <label>Alamat</label>
                                 </div>
                             </div>

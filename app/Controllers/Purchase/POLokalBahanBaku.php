@@ -219,7 +219,8 @@ class POLokalBahanBaku extends BaseController
             ->where('po_no', !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->get_new_no_po(
                 date('m'),
                 date('Y'),
-                getLastDay()
+                getLastDay(),
+                $this->this_company_id
             ) : $this->request->getVar("po_no"))
             ->where('company_id', $this->this_company_id)
             ->first();
@@ -246,7 +247,8 @@ class POLokalBahanBaku extends BaseController
             "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->get_new_no_po(
                 date('m'),
                 date('Y'),
-                getLastDay()
+                getLastDay(),
+                $this->this_company_id
             ) : $this->request->getVar("po_no"),
             "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
             "pph" => $this->request->getVar("pph"),
@@ -313,7 +315,8 @@ class POLokalBahanBaku extends BaseController
             "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->get_new_no_po(
                 date('m'),
                 date('Y'),
-                getLastDay()
+                getLastDay(),
+                $this->this_company_id
             ) : $this->request->getVar("po_no"),
             "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
             "pph" => $this->request->getVar("pph"),

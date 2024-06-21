@@ -17,7 +17,7 @@
                     <a class="nav-link active" href="#">Penerimaan Mutasi PPBKB</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= base_url('penerimaan-mutasi/global') ?>">Penerimaan Mutasi BC 2.7</a>
+                    <a class="nav-link" href="<?= base_url('penerimaan-mutasi/global') ?>">Penerimaan Mutasi BC 2.7 (BC 2.7 IN)</a>
                 </li>
             </ul>
             <?= csrf_field() ?>

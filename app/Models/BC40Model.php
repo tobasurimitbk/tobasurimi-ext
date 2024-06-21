@@ -61,6 +61,7 @@ class BC40Model extends Model
             bc_purchase_order.multiple_lpb_no,
             bc_purchase_order.po_type,
             bc_purchase_order.status_posting,
+            bc_purchase_order.no_daftar,
             suppliers.name AS supplier_name";
 
         $bcDataQry = $this->asObject()
@@ -104,7 +105,7 @@ class BC40Model extends Model
         }
 
         if ($addCondition['noAju']) {
-            $bcDataQry->like('no_aju', $addCondition['noAju']);
+            $bcDataQry->like('no_aju', $addCondition['noAju'])->orLike('bc_purchase_order.no_daftar', $addCondition['noAju']);
         }
 
         if ($addCondition['statusBC'] || $addCondition['statusLPB'] || $addCondition['supplierName'] || $addCondition['noPenerimaanBarang'] || $addCondition['noAju'] && (empty($addCondition['mulaiTanggalBC40']) && empty($addCondition['selesaiTanggalBC40']))) {

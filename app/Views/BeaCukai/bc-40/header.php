@@ -50,6 +50,13 @@
                             }).then((result) => {
                                 location.replace("<?= base_url('bea-cukai-bc-40') ?>")
                             });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            })
                         }
                     }
                 })

@@ -92,7 +92,7 @@ class JurnalUmum extends BaseController
         $Sub_AkunsModel = new Sub_AkunsModel();
 
         $accountModuleData = $accountModuleModel->asObject()->findAll();
-        $subAkunsModel = $Sub_AkunsModel->getAPAR("");
+        $subAkunsModel = $Sub_AkunsModel->getAPAR($this->this_company_id);
         foreach ($subAkunsModel as $val) {
             $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
         }

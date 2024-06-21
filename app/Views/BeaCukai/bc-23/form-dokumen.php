@@ -18,7 +18,10 @@
             <div class="card-body">
                 <?php include_once('nav.php') ?>
                 <div class="alert alert-secondary alert-dismissible fade show mt-3 text-black" role="alert">
-                    Wajib melampirkan dokumen Invoice dan dokumen <b> B/L atau AWB </b> sebagai dokumen pendukung wajib
+                    Urutan penginputan dokumen adalah <br>
+                    <b>Seri Dokumen 1 : Invoice</b> <br>
+                    <b>Seri Dokumen 2 : B/L atau AWB</b> <br>
+                    <b>Seri Dokumen 3 : Dokumen Pelengkap</b>
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -279,6 +282,13 @@
                                 $('#dokumen_jenis_dokumen').val(null).change();
                                 $('#dokumen_nomor_dokumen').val('');
                                 $('#dokumen_tanggal').val('');
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    confirmButtonText: 'Ok'
+                                })
                             }
                         },
                     });

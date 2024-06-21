@@ -38,13 +38,13 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input readonly id="pengusaha_tpb_nama" value="<?= $bcEntitas == null ? "" : ($bcEntitas['nama_entitas'] != null ? $bcEntitas['nama_entitas'] : "")  ?>" name="pengusaha_tpb_nama" type="text" class="form-control pengusaha_tpb_nama" placeholder="">
+                                    <input id="pengusaha_tpb_nama" value="<?= $bcEntitas == null ? "" : ($bcEntitas['nama_entitas'] != null ? $bcEntitas['nama_entitas'] : "")  ?>" name="pengusaha_tpb_nama" type="text" class="form-control pengusaha_tpb_nama" placeholder="">
                                     <label>Nama</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <textarea readonly name="pengusaha_tpb_alamat" id="pengusaha_tpb_alamat" class="form-control pengusaha_tpb_alamat" style="height: 100px;"><?= ($bcEntitas == null) ? "" : ($bcEntitas['alamat_entitas'] != null ? $bcEntitas['alamat_entitas'] : "") ?></textarea>
+                                    <textarea name="pengusaha_tpb_alamat" id="pengusaha_tpb_alamat" class="form-control pengusaha_tpb_alamat" style="height: 100px;"><?= ($bcEntitas == null) ? "" : ($bcEntitas['alamat_entitas'] != null ? $bcEntitas['alamat_entitas'] : "") ?></textarea>
                                     <label>Alamat</label>
                                 </div>
                             </div>

@@ -150,26 +150,26 @@
 <div class="row mb-2">
     <div class="col-md-4">
         <div class="form-floating mb-3" style="height: 50px;">
-            <input readonly placeholder="Jumlah Biaya Subsidi" value="" class="form-control biayaSubsidi" id="biayaSubsidi" name="biayaSubsidi" aria-label="Floating label select example" />
+            <input placeholder="Jumlah Biaya Subsidi" value="" class="form-control biayaSubsidi" id="biayaSubsidi" name="biayaSubsidi" aria-label="Floating label select example" />
             <label for="floatingInput" style="z-index: 1;">Jumlah Biaya Subsidi</label>
         </div>
     </div>
     <div class="col-md-4">
         <div class="form-floating mb-3" style="height: 50px;">
-            <input readonly placeholder="Jumlah Biaya Lain-lain" value="" class="form-control biayaLain" id="biayaLain" name="biayaLain" aria-label="Floating label select example" />
+            <input placeholder="Jumlah Biaya Lain-lain" value="" class="form-control biayaLain" id="biayaLain" name="biayaLain" aria-label="Floating label select example" />
             <label for="floatingInput" style="z-index: 1;">Jumlah Biaya Lain-lain</label>
         </div>
     </div>
     <div class="col-md-4">
         <div class="form-floating mb-3" style="height: 50px;">
-            <input readonly placeholder="Jumlah Biaya Kopek" value="" class="form-control biayaKopek" id="biayaKopek" name="biayaKopek" aria-label="Floating label select example" />
+            <input placeholder="Jumlah Biaya Kopek" value="" class="form-control biayaKopek" id="biayaKopek" name="biayaKopek" aria-label="Floating label select example" />
             <label for="floatingInput" style="z-index: 1;">Jumlah Biaya Kopek</label>
         </div>
     </div>
 </div>
 <div class="row mb-2">
     <div class="col-sm-2">
-        <button class="btn btn-show-detail btn-add btn-submit-barang" data-btn="detail-modal" id="select-item-btn-alokasi-biaya" type="button">
+        <button class="btn btn-show-detail btn-add" data-btn="detail-modal" id="select-item-btn-alokasi-biaya" type="button">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Hitung Alokasi Biaya
         </button>
     </div>
@@ -225,4 +225,38 @@
         .children('span')
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('#select-item-btn-alokasi-biaya').click(function() {
+        list_items_barang_digunakan_alokasi = [];
+
+        var amount = $('#hargaTotalPenerimaan').val() ? parseFloat($('#hargaTotalPenerimaan').val().replace(/Rp|\./g, "")) : 0;
+        var qtyTotalPenerimaan = $('#qtyTotalPenerimaan').val() ? parseFloat($('#qtyTotalPenerimaan').val().replace(/Rp|\./g, "")) : 0;
+        var biayaSubsidi = $('#biayaSubsidi').val() ? parseFloat($('#biayaSubsidi').val().replace(/Rp|\./g, "")) : 0;
+        var biayaLain = $('#biayaLain').val() ? parseFloat($('#biayaLain').val().replace(/Rp|\./g, "")) : 0;
+        var biayaKopek = $('#biayaKopek').val() ? parseFloat($('#biayaKopek').val().replace(/Rp|\./g, "")) : 0;
+
+        var hargaTotalBiaya = biayaSubsidi + biayaLain + biayaKopek;
+        var hargaSatuan = 0;
+        list_items_barang_digunakan.forEach((item, index) => {
+            hargaSatuan = parseFloat(item.hargaSatuanLPB) + (parseFloat(hargaTotalBiaya) / list_items_barang_digunakan.length);
+            totalHarga = parseFloat(item.totalQtyLPB) * parseFloat(hargaSatuan);
+            list_items_barang_digunakan_alokasi.push({
+                'barang1_id': item.barang1_id,
+                'barang2_id': item.barang2_id,
+                'barang_name': item.barang_name,
+                'hargaSatuan': hargaSatuan,
+                'no_dokumen': item.no_dokumen,
+                'satuanLPB': item.satuanLPB,
+                'satuanPO': item.satuanPO,
+                'spesifikasi': item.spesifikasi,
+                'stock_dokumen': item.stock_dokumen,
+                'stock_dokumen2': item.stock_dokumen2,
+                'totalHarga': totalHarga,
+                'totalQty': item.totalQtyLPB,
+                'stock_dokumen2': item.stock_dokumen2,
+            });
+        });
+
+        drawTableDigunakanAlokasi(list_items_barang_digunakan_alokasi);
+    });
 </script>

@@ -46,9 +46,9 @@
                                 <tr>
                                     <td style="text-align: center;"><?= $no++ ?></td>
                                     <td style="text-align: center;"><?= ($p['pungutan']) ?></td>
-                                    <td style="text-align: center;"><?= formatRupiah($p['tidak_dipungut']) ?></td>
-                                    <td style="text-align: center;"><?= formatRupiah($p['dibebaskan']) ?></td>
-                                    <td style="text-align: center;"><?= formatRupiah($p['ditangguhkan']) ?></td>
+                                    <td style="text-align: center;"><?= number_format($p['tidak_dipungut'], 2) ?></td>
+                                    <td style="text-align: center;"><?= number_format($p['dibebaskan'], 2) ?></td>
+                                    <td style="text-align: center;"><?= number_format($p['ditangguhkan'], 2) ?></td>
                                 </tr>
                             <?php endforeach; ?>
 
