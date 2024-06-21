@@ -3,6 +3,7 @@
 namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
+use App\Models\BC30Model;
 use App\Models\CeisaSettingModel;
 
 // META DATA -> jenis_dok_aju
@@ -20,10 +21,12 @@ class BC30 extends BaseController
     protected $this_user_id;
     protected $akunCeisa;
     protected $ceisaSettingModel;
+    protected $bc30Model;
 
     public function __construct()
     {
         $this->ceisaSettingModel = new CeisaSettingModel();
+        $this->bc30Model = new BC30Model();
 
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
@@ -43,5 +46,20 @@ class BC30 extends BaseController
     {
         $data = [];
         return view('BeaCukai/bc-30/form', $data);
+    }
+
+    public function dropdownSalesOrder()
+    {
+        $tipeSalesOrder = $this->request->getVar('tipe_sales_order');
+        $result = $this->bc30Model->getListSalesOrder(
+            $this->this_company_id,
+            $tipeSalesOrder
+        );
+
+        return response()->setJSON([
+            'data' => $result,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
     }
 }

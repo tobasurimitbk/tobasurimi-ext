@@ -68,7 +68,7 @@ class Invoice extends BaseController
     {
         //Get Customers
         // $customers = $this->CustomerModel->asObject()->select(['id', 'name'])->where('company_id', $this->this_company_id)->findAll();
-        $customers = $this->CustomerModel->getCustomerLokal();
+        $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
         $tipeShipping = $this->MetadataModel->asObject()->select(['id', 'value'])->where('name', 'tipe_shipping_via')->findAll();
         $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur($this->this_company_id);
         $data = [
@@ -472,7 +472,7 @@ class Invoice extends BaseController
         $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur($this->this_company_id);
 
         // $customers = $this->CustomerModel->asObject()->select(['id', 'name'])->where('company_id', $this->this_company_id)->findAll();
-        $customers = $this->CustomerModel->getCustomerLokal();
+        $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
 
 
         // dd($documentList);

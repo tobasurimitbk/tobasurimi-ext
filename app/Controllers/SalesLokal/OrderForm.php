@@ -92,7 +92,7 @@ class OrderForm extends BaseController
         $dataBanks = $this->BanksModel->search_list(array(), 'name');
         $dataSatuan = $this->satuanModel->findAll();
         //Get Customers
-        $customers = $this->CustomerModel->getCustomerLokal();
+        $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
 
         $dataAJU = $this->MetaDataModel->getBCUsed('so_lokal');
 
@@ -1026,7 +1026,7 @@ class OrderForm extends BaseController
 
     public function dropdownCustomer()
     {
-        $dataCustomer = $this->CustomerModel->getCustomerLokal();
+        $dataCustomer = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
         return response()->setJSON([
             'data' => $dataCustomer,
             'token' => csrf_hash(),

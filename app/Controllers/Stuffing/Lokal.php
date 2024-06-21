@@ -114,6 +114,7 @@ class Lokal extends BaseController
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
                 "no_stuffing"        => $data->no_stuffing,
+                "no_sales_order"     => $data->no_sales_order,
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "total_item"            => count($stuffingLokalDetailModel),
                 "customer_name"           => $data->customer_name,
@@ -477,6 +478,7 @@ class Lokal extends BaseController
             ->where('type_barang_sales', 'LOKAL')
             ->where('type_barang', 'kemasan')
             ->where('barang_master_sales.deletedAt', null)
+            ->where('company_id', $this->this_company_id)
             ->groupBy('id_barang')
             ->findAll();
 

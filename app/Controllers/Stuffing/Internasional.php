@@ -115,6 +115,7 @@ class Internasional extends BaseController
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
                 "no_stuffing"        => $data->no_stuffing,
+                "no_sales_order"     => $data->no_sales_order,
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "total_item"            => count($stuffingInternasionalDetailModel),
                 "customer_name"           => $data->customer_name,
@@ -148,6 +149,7 @@ class Internasional extends BaseController
                 ->where('sales_order_export.deletedAt', null)
                 ->where('sales_order_export.status', 'POSTED')
                 ->where('sales_order_export.used', 'NOT USED')
+                ->where('sales_order_export.company_id', $this->this_company_id)
                 ->orderBy('sales_order_export.sales_order_export_no', "ASC")
                 ->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
@@ -185,6 +187,7 @@ class Internasional extends BaseController
                 ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                 ->join('customers', 'customers.id = sales_contract.customer_id')
                 ->where('sales_order_export.deletedAt', null)
+                ->where('sales_order_export.company_id', $this->this_company_id)
                 ->orderBy('sales_order_export.sales_order_export_no', "ASC")
                 ->findAll(),
             'stuffingInternasional' => $stuffingInternasionalModel,
@@ -469,6 +472,7 @@ class Internasional extends BaseController
             ->where('type_barang_sales', 'EKSPOR')
             ->where('type_barang', 'kemasan')
             ->where('barang_master_sales.deletedAt', null)
+            ->where('barang_master_sales.company_id', $this->this_company_id)
             ->groupBy('id_barang')
             ->findAll();
 

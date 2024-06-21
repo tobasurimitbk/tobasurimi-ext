@@ -51,37 +51,41 @@
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="form-floating mb-3 mt-1" style="height: 50px;">
-                            <select <?= !empty($bc30) ? ($bc30['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select company_tujuan_id" id="company_tujuan_id" name="company_tujuan_id" aria-label="Floating label select example">
+                            <select <?= !empty($bc30) ? ($bc30['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select tipe_sales_order" id="tipe_sales_order" name="tipe_sales_order" aria-label="Floating label select example">
                                 <option value=""></option>
-
+                                <option value="INTERNASIONAL">SALES ORDER EKSPOR</option>
+                                <option value="LOKAL">SALES ORDER LOKAL</option>
                             </select>
                             </select>
-                            <label style="z-index: 1;">Pilih Customer</label>
+                            <label style="z-index: 1;">Pilih Tipe Sales Order</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3 mt-1" style="height: 50px;">
-                            <select <?= !empty($bc30) ? ($bc30['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select mutasi_global_id" id="mutasi_global_id" name="mutasi_global_id" aria-label="Floating label select example">
+                            <select <?= !empty($bc30) ? ($bc30['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select sales_order_id" id="sales_order_id" name="sales_order_id" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <?php if (!empty($bc30)) : ?>
-                                    <option selected value="<?= $bc30['mutasi_global_id'] ?>">
-                                        <?= $bc30['no_mutasi'] ?>
-                                    </option>
-                                <?php endif; ?>
+
                             </select>
-                            <label style="z-index: 1;">Pilih Nomor Mutasi</label>
+                            </select>
+                            <label style="z-index: 1;">Pilih Order Form</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input disabled placeholder="Company Asal" value="<?= !empty($bc30) ? $bc30['divisi'] : '' ?>" class="form-control divisi_asal_name" id="divisi_asal_name" aria-label="Floating label select example" />
-                            <label for="floatingInput" style="z-index: 1;">Departemen Asal</label>
+                            <label for="floatingInput" style="z-index: 1;">Nama Customer</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input disabled placeholder="Negara" value="<?= !empty($bc30) ? $bc30['divisi'] : '' ?>" class="form-control divisi_asal_name" id="divisi_asal_name" aria-label="Floating label select example" />
+                            <label for="floatingInput" style="z-index: 1;">Negara</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input disabled placeholder="Company Asal" value="<?= !empty($bc30) ? $bc30['warehouse_name'] : '' ?>" class="form-control warehouse_asal_name" id="warehouse_asal_name" aria-label="Floating label select example" />
-                            <label for="floatingInput" style="z-index: 1;">Warehouse Asal</label>
+                            <label for="floatingInput" style="z-index: 1;">Alamat</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
@@ -108,7 +112,7 @@
 
             <div class="row mt-2">
                 <div class="col mb-3">
-                    <label class="form-label font-weight-bold lable-title">Daftar Barang Yang Akan Dipindahkan</label>
+                    <label class="form-label font-weight-bold lable-title">Daftar Barang Yang Akan Di Ekspor</label>
                 </div>
                 <div class="col-md-12 col-table-button-tts">
 
@@ -119,21 +123,24 @@
                                 <tr>
                                     <th style="text-align: center;">No</th>
                                     <th style="text-align: center;">Tipe Barang</th>
-                                    <th style="text-align: center;">Asal Barang</th>
-                                    <th style="text-align: center;">No Dokumen</th>
-                                    <th style="text-align: center;">Supplier</th>
-                                    <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">Tgl Penerimaan</th>
-                                    <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Qty Mutasi</th>
+                                    <th style="text-align: center;">Dokumen Asal</th>
+                                    <th style="text-align: center;">Kode Barang (Internal)</th>
+                                    <th style="text-align: center;">Barang - Spesifikasi (Internal)</th>
+                                    <th style="text-align: center;">Kode Barang (Sales)</th>
+                                    <th style="text-align: center;">Barang - Spesifikasi (Sales)</th>
+                                    <th style="text-align: center;">No Stuffing / Pengeluaran Barang</th>
+                                    <th style="text-align: center;">Departemen</th>
+                                    <th style="text-align: center;">Warehouse</th>
+                                    <th style="text-align: center;">Qty Keluar</th>
                                     <th style="text-align: center;">Satuan</th>
+                                    <th style="text-align: center;">Harga</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table">
                             </tbody>
                             <tfoot class="foot-detail-table" id="foot-detail-table">
                                 <tr>
-                                    <td colspan="10" style="text-align: center;">
+                                    <td colspan="13" style="text-align: center;">
                                         Tidak Ada Barang
                                     </td>
                                 </tr>
@@ -150,6 +157,58 @@
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
     var listData = [];
+
+    $('#tipe_sales_order').select2({
+        placeholder: "Pilih Tipe Sales Order",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+
+    });
+
+    $('#sales_order_id').select2({
+        placeholder: "Pilih Order Form",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+
+    });
+
+    $("#sales_order_id,#tipe_sales_order")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    function getListMutasiGobal() {
+        $.ajax({
+            url: `<?= base_url('bea-cukai-bc-30/list-sales-order'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                tipe_sales_order: $(".tipe_sales_order option:selected").val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".sales_order_id").empty()
+                $(".sales_order_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".sales_order_id").append(`<option 
+
+                        value="${item.id}">${item.no_mutasi}
+                    </option>`)
+                })
+                $(".sales_order_id").val();
+            }
+        });
+    }
 </script>
 
 <?= $this->endSection(); ?>

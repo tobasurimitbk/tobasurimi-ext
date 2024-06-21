@@ -1235,6 +1235,8 @@ $routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
 $routes->group('bea-cukai-bc-30', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BC30::index');
     $routes->get('create', 'BeaCukai\BC30::create');
+
+    $routes->get('list-sales-order', 'BeaCukai\BC30::dropdownSalesOrder');
 });
 
 // PPBKB
