@@ -475,4 +475,374 @@ class BCPurchaseOrderModel extends Model
 
         return $uniqueResults;
     }
+
+    public function getPenerimaanBarangListReportBc23($addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'no_aju'      => 'bc_23.no_aju'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'bc_purchase_order.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+
+        $selectQry = "bc_purchase_order.*, 
+        bc_23.no_aju";
+        $bcPurchaseOrderDataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('bc_23', 'bc_23.bc_purchase_order_id = bc_purchase_order.id', 'left')
+            ->where('bc_purchase_order.status_posting', '1')
+            ->where('bc_purchase_order.company_id', $addCondition['company_id'])
+            ->groupStart()
+            ->where('bc_purchase_order.po_type', 'IMPORT BAKU')
+            ->orWhere('bc_purchase_order.po_type', 'IMPORT PENOLONG')
+            ->groupEnd()
+            ->orderBy($sort, $sortType);
+
+        $totalData = $bcPurchaseOrderDataQry->countAllResults(false);
+
+        // if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+        //     $bcPurchaseOrderDataQry->groupStart();
+        // }
+
+
+        // if ($addCondition['dateStart']) {
+        //     $bcPurchaseOrderDataQry->where('DATE(bc_purchase_order.createdAt) >=', $addCondition['dateStart']);
+        // }
+
+        // if ($addCondition['dateEnd']) {
+        //     $bcPurchaseOrderDataQry->where('DATE(bc_purchase_order.createdAt) <=', $addCondition['dateEnd']);
+        // }
+
+        // if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+        //     $bcPurchaseOrderDataQry->groupEnd();
+        // }
+
+        $totalFilteredData = $bcPurchaseOrderDataQry->countAllResults(false);
+        $data = $bcPurchaseOrderDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
+
+    public function getPenerimaanBarangListReportBc40($addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'no_aju'      => 'bc_40.no_aju'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'bc_purchase_order.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+
+        $selectQry = "bc_purchase_order.*, 
+        bc_40.no_aju";
+        $bcPurchaseOrderDataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_purchase_order.id', 'left')
+            ->where('bc_purchase_order.status_posting', '1')
+            ->where('bc_purchase_order.company_id', $addCondition['company_id'])
+            ->groupStart()
+            ->where('bc_purchase_order.po_type', 'LOKAL BAKU')
+            ->orWhere('bc_purchase_order.po_type', 'LOKAL PENOLONG')
+            ->groupEnd()
+            ->orderBy($sort, $sortType);
+
+        $totalData = $bcPurchaseOrderDataQry->countAllResults(false);
+
+        // if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+        //     $bcPurchaseOrderDataQry->groupStart();
+        // }
+
+
+        // if ($addCondition['dateStart']) {
+        //     $bcPurchaseOrderDataQry->where('DATE(bc_purchase_order.createdAt) >=', $addCondition['dateStart']);
+        // }
+
+        // if ($addCondition['dateEnd']) {
+        //     $bcPurchaseOrderDataQry->where('DATE(bc_purchase_order.createdAt) <=', $addCondition['dateEnd']);
+        // }
+
+        // if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+        //     $bcPurchaseOrderDataQry->groupEnd();
+        // }
+
+        $totalFilteredData = $bcPurchaseOrderDataQry->countAllResults(false);
+        $data = $bcPurchaseOrderDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
+
+    public function getPenerimaanBarangListReportNoPabean($addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'lpb_date'      => 'penerimaan_barang.tanggal'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'penerimaan_barang.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+
+        $selectQry = "penerimaan_barang.tanggal AS lpb_date,
+                    penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
+                    penerimaan_barang.multiple_po_id,
+                    penerimaan_barang.status_penerimaan,
+                    penerimaan_barang.tipe_bahan,
+                    penerimaan_barang.status_post,
+                    penerimaan_barang_detail.penerimaan_barang_id,
+                    penerimaan_barang_detail.purchase_order_id,
+                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
+                    penerimaan_barang_detail.barang_id,
+                    penerimaan_barang_detail.nama_barang_dok,
+                    penerimaan_barang_detail.qty,
+                    penerimaan_barang_detail.jml_masuk,
+                    barang_master.barang_name,
+                    barang_master.kode_barang,
+                    satuans.kode_satuan,
+                    warehouses.warehouse_name, 
+                    divisis.divisi";
+        $penerimaanBarangDataQry = $penerimaanBarangModel->asObject()
+            ->select($selectQry)
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+            ->join('satuans', 'penerimaan_barang_detail.unit = satuans.id', 'left')
+            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+            ->where('penerimaan_barang.company_id', $addCondition['company_id'])
+            ->where('penerimaan_barang.bc_type', '0')
+            ->where('penerimaan_barang.status_post', 'FINISH')
+            ->where('penerimaan_barang.deletedAt', null)
+            ->where('penerimaan_barang_detail.deletedAt', null)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $penerimaanBarangDataQry->countAllResults(false);
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $penerimaanBarangDataQry->groupStart();
+        }
+
+
+        if ($addCondition['dateStart']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.tanggal >=', $addCondition['dateStart']);
+        }
+
+        if ($addCondition['dateEnd']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.tanggal <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $penerimaanBarangDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $penerimaanBarangDataQry->countAllResults(false);
+        $data = $penerimaanBarangDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
+
+    public function getPenerimaanBarangListReportBc23PDF($addCondition)
+    {
+        $availableSort = [
+            'no_aju'      => 'bc_23.no_aju'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'bc_purchase_order.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+
+        $selectQry = "bc_purchase_order.*, 
+        bc_23.no_aju";
+        $bcPurchaseOrderDataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('bc_23', 'bc_23.bc_purchase_order_id = bc_purchase_order.id', 'left')
+            ->where('bc_purchase_order.status_posting', '1')
+            ->where('bc_purchase_order.company_id', $addCondition['company_id'])
+            ->groupStart()
+            ->where('bc_purchase_order.po_type', 'IMPORT BAKU')
+            ->orWhere('bc_purchase_order.po_type', 'IMPORT PENOLONG')
+            ->groupEnd()
+            ->orderBy($sort, $sortType);
+
+        $totalData = $bcPurchaseOrderDataQry->countAllResults(false);
+
+        // if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+        //     $bcPurchaseOrderDataQry->groupStart();
+        // }
+
+
+        // if ($addCondition['dateStart']) {
+        //     $bcPurchaseOrderDataQry->where('DATE(bc_purchase_order.createdAt) >=', $addCondition['dateStart']);
+        // }
+
+        // if ($addCondition['dateEnd']) {
+        //     $bcPurchaseOrderDataQry->where('DATE(bc_purchase_order.createdAt) <=', $addCondition['dateEnd']);
+        // }
+
+        // if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+        //     $bcPurchaseOrderDataQry->groupEnd();
+        // }
+
+        $totalFilteredData = $bcPurchaseOrderDataQry->countAllResults(false);
+        $data = $bcPurchaseOrderDataQry->findAll();
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
+
+    public function getPenerimaanBarangListReportBc40PDF($addCondition)
+    {
+        $availableSort = [
+            'no_aju'      => 'bc_40.no_aju'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'bc_purchase_order.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+
+        $selectQry = "bc_purchase_order.*, 
+        bc_40.no_aju";
+        $bcPurchaseOrderDataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_purchase_order.id', 'left')
+            ->where('bc_purchase_order.status_posting', '1')
+            ->where('bc_purchase_order.company_id', $addCondition['company_id'])
+            ->groupStart()
+            ->where('bc_purchase_order.po_type', 'LOKAL BAKU')
+            ->orWhere('bc_purchase_order.po_type', 'LOKAL PENOLONG')
+            ->groupEnd()
+            ->orderBy($sort, $sortType);
+
+        $totalData = $bcPurchaseOrderDataQry->countAllResults(false);
+
+        // if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+        //     $bcPurchaseOrderDataQry->groupStart();
+        // }
+
+
+        // if ($addCondition['dateStart']) {
+        //     $bcPurchaseOrderDataQry->where('DATE(bc_purchase_order.createdAt) >=', $addCondition['dateStart']);
+        // }
+
+        // if ($addCondition['dateEnd']) {
+        //     $bcPurchaseOrderDataQry->where('DATE(bc_purchase_order.createdAt) <=', $addCondition['dateEnd']);
+        // }
+
+        // if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+        //     $bcPurchaseOrderDataQry->groupEnd();
+        // }
+
+        $totalFilteredData = $bcPurchaseOrderDataQry->countAllResults(false);
+        $data = $bcPurchaseOrderDataQry->findAll();
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
+
+    public function getPenerimaanBarangListReportNoPabeanPDF($addCondition)
+    {
+        $availableSort = [
+            'lpb_date'      => 'penerimaan_barang.tanggal'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'penerimaan_barang.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+
+        $selectQry = "penerimaan_barang.tanggal AS lpb_date,
+                    penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
+                    penerimaan_barang.multiple_po_id,
+                    penerimaan_barang.status_penerimaan,
+                    penerimaan_barang.tipe_bahan,
+                    penerimaan_barang.status_post,
+                    penerimaan_barang_detail.penerimaan_barang_id,
+                    penerimaan_barang_detail.purchase_order_id,
+                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
+                    penerimaan_barang_detail.barang_id,
+                    penerimaan_barang_detail.nama_barang_dok,
+                    penerimaan_barang_detail.qty,
+                    penerimaan_barang_detail.jml_masuk,
+                    barang_master.barang_name,
+                    barang_master.kode_barang,
+                    satuans.kode_satuan,
+                    warehouses.warehouse_name, 
+                    divisis.divisi";
+        $penerimaanBarangDataQry = $penerimaanBarangModel->asObject()
+            ->select($selectQry)
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+            ->join('satuans', 'penerimaan_barang_detail.unit = satuans.id', 'left')
+            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+            ->where('penerimaan_barang.company_id', $addCondition['company_id'])
+            ->where('penerimaan_barang.bc_type', '0')
+            ->where('penerimaan_barang.status_post', 'FINISH')
+            ->where('penerimaan_barang.deletedAt', null)
+            ->where('penerimaan_barang_detail.deletedAt', null)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $penerimaanBarangDataQry->countAllResults(false);
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $penerimaanBarangDataQry->groupStart();
+        }
+
+
+        if ($addCondition['dateStart']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.tanggal >=', $addCondition['dateStart']);
+        }
+
+        if ($addCondition['dateEnd']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.tanggal <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $penerimaanBarangDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $penerimaanBarangDataQry->countAllResults(false);
+        $data = $penerimaanBarangDataQry->findAll();
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
 }

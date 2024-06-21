@@ -1580,9 +1580,14 @@ $routes->get('/laporan-warehouse/sales-order-ekspor/all-sales-order-ekspor', 'La
 $routes->get('/laporan-warehouse/sales-order-ekspor/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanSalesOrderEkspor', ['filter' => 'Auth']);
 
 
-$routes->get('/laporan-warehouse/purchase_order', 'Laporan\Warehouse\LaporanWarehouse::laporanPurchaseOrder', ['filter' => 'Auth']);
-$routes->get('/laporan-warehouse/purchase_order/all-purchase_order', 'Laporan\Warehouse\LaporanWarehouse::allLaporanPurchaseOrder', ['filter' => 'Auth']);
-$routes->get('/laporan-warehouse/purchase_order/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanPurchaseOrder', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/purchase-order', 'Laporan\Warehouse\LaporanWarehouse::laporanPurchaseOrder', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/purchase-order/all-purchase-order', 'Laporan\Warehouse\LaporanWarehouse::allLaporanPurchaseOrder', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/purchase-order/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanPurchaseOrder', ['filter' => 'Auth']);
+
+
+$routes->get('/laporan-warehouse/penerimaan-barang', 'Laporan\Warehouse\LaporanWarehouse::laporanPenerimaanBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/penerimaan-barang/all-penerimaan-barang', 'Laporan\Warehouse\LaporanWarehouse::allLaporanPenerimaanBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/penerimaan-barang/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanPenerimaanBarang', ['filter' => 'Auth']);
 
 /*
  * --------------------------------------------------------------------

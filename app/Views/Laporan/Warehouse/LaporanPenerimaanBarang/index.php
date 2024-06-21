@@ -4,12 +4,12 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Laporan Purchase Order</h1>
+        <h1>Laporan Penerimaan Barang</h1>
         <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-warehouse/purchase-order/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-warehouse/penerimaan-barang/print"); ?>')">PDF</button></li>
         </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-warehouse"); ?>">
@@ -23,13 +23,13 @@
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-4">
                     <div class="form-floating mb-3">
-                        <select class="form-select filter_po_type" name="filter_po_type" id="filter_po_type">
-                            <option selected value="PO LOKAL BB" data-code="">PO LOKAL BB</option>
-                            <option value="PO LOKAL BP" data-code="">PO LOKAL BP</option>
-                            <option value="PO IMPOR BB" data-code="">PO IMPOR BB</option>
-                            <option value="PO IMPOR BP" data-code="">PO IMPOR BP</option>
+                        <select class="form-select filter_bc_type" name="filter_bc_type" id="filter_bc_type">
+                            <option selected value="BC 2.3" data-code="">BC 2.3</option>
+                            <option value="BC 4.0" data-code="">BC 4.0</option>
+                            <option value="No Pabean" data-code="">No Pabean</option>
+
                         </select>
-                        <label for="floatingInput">Filter Tipe PO</label>
+                        <label for="floatingInput">Filter Tipe BC</label>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -58,17 +58,20 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="changeSort('po_no')" class="sort">Nomor</th>
-                                <th onclick="changeSort('po_date')" class="sort">Tanggal</th>
-                                <th onclick="changeSort('nama_supplier')" class="sort">Supplier</th>
+                                <th onclick="changeSort('bc_type')" class="sort">Jenis Doc</th>
+                                <th onclick="changeSort('tanggal_bc')" class="sort">Tanggal Doc</th>
+                                <th onclick="changeSort('no_daftar')" class="sort">No Daftar</th>
+                                <th onclick="changeSort('no_aju')" class="sort">No Aju</th>
+                                <th onclick="changeSort('no_penerimaan_barang')" class="sort">No Bukti</th>
+                                <th onclick="changeSort('tanggal_lpb')" class="sort">Tanggal Bukti</th>
+                                <th onclick="changeSort('po_no')" class="sort">No Order</th>
+                                <th onclick="changeSort('po_date')" class="sort">Tanggal Order</th>
+                                <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
-                                <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('satuan')" class="sort">Satuan</th>
-                                <th onclick="changeSort('spesifikasi_name')" class="sort">Spesifikasi</th>
-                                <th onclick="changeSort('jml_order')" class="sort">Jumlah Order</th>
-                                <th onclick="changeSort('jml_diterima_lpb')" class="sort">Jumlah Diterima</th>
-                                <th onclick="changeSort('sisa_total')" class="sort">Sisa</th>
-                                <th onclick="changeSort('sub_total')" class="sort">Total Harga</th>
+                                <th onclick="changeSort('nama_barang_dok')" class="sort">Nama Barang</th>
+                                <th onclick="changeSort('kode_satuan')" class="sort">Kode Satuan</th>
+                                <th onclick="changeSort('qty')" class="sort">Jumlah Order</th>
+                                <th onclick="changeSort('jml_masuk')" class="sort">Jumlah Diterima</th>
 
                             </tr>
 
@@ -103,12 +106,12 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("/laporan-warehouse/purchase-order/all-purchase-order"); ?>",
+            url: "<?= base_url("/laporan-warehouse/penerimaan-barang/all-penerimaan-barang"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
-                data.filter_po_type = $(".filter_po_type").val();
+                data.filter_bc_type = $(".filter_bc_type").val();
                 data.sort = sort;
                 data.sortType = sortType;
 
@@ -130,16 +133,40 @@
                 sortable: false
             },
             {
-                data: "po_no",
+                data: "bc_type",
                 className: "text-center",
 
+            },
+            {
+                data: "tanggal_bc",
+                className: "text-center",
+            },
+            {
+                data: "no_daftar",
+                className: "text-center",
+            },
+            {
+                data: "no_aju",
+                className: "text-center",
+            },
+            {
+                data: "no_penerimaan_barang",
+                className: "text-center",
+            },
+            {
+                data: "tanggal_lpb",
+                className: "text-center",
+            },
+            {
+                data: "po_no",
+                className: "text-center",
             },
             {
                 data: "po_date",
                 className: "text-center",
             },
             {
-                data: "nama_supplier",
+                data: "divisi",
                 className: "text-center",
             },
             {
@@ -147,31 +174,19 @@
                 className: "text-center",
             },
             {
-                data: "nama_barang",
+                data: "nama_barang_dok",
                 className: "text-center",
             },
             {
-                data: "satuan",
+                data: "kode_satuan",
                 className: "text-center",
             },
             {
-                data: "spesifikasi_name",
+                data: "qty",
                 className: "text-center",
             },
             {
-                data: "jml_order",
-                className: "text-center",
-            },
-            {
-                data: "jml_diterima_lpb",
-                className: "text-center",
-            },
-            {
-                data: "sisa_total",
-                className: "text-center",
-            },
-            {
-                data: "sub_total",
+                data: "jml_masuk",
                 className: "text-center",
             },
 
@@ -225,23 +240,23 @@
         table.ajax.reload();
     })
 
-    $(".dateStart, .dateEnd, .filter_po_type").change(function() {
+    $(".dateStart, .dateEnd, .filter_bc_type").change(function() {
         table.ajax.reload();
     });
 
-    $('.filter_po_type').select2({
+    $('.filter_bc_type').select2({
         placeholder: "",
         theme: "bootstrap-5"
     })
 
-    $('.filter_po_type')
+    $('.filter_bc_type')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.filter_po_type')
+    $('.filter_bc_type')
         .parent('div')
         .children('span')
         .children('span')
@@ -249,7 +264,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.filter_po_type')
+    $('.filter_bc_type')
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -258,10 +273,10 @@
 
         let dateStart = $(".dateStart").val();
         let dateEnd = $(".dateEnd").val();
-        let filter_po_type = $(".filter_po_type").val();
+        let filter_bc_type = $(".filter_bc_type").val();
 
 
-        window.open(url + `?filter_po_type=${filter_po_type}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
+        window.open(url + `?filter_bc_type=${filter_bc_type}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 
