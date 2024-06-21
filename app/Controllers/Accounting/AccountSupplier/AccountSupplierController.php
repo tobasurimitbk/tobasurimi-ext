@@ -55,8 +55,8 @@ class AccountSupplierController extends BaseController
         ];
 
         $condition = [
-            "company_id"  => $this->this_company_id,
-            "deletedAt" => NULL
+            "suppliers.company_id"  => $this->this_company_id,
+            "suppliers.deletedAt" => NULL
         ];
 
         $addCondition = [

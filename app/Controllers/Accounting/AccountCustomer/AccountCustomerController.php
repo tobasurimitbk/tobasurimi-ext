@@ -56,8 +56,8 @@ class AccountCustomerController extends BaseController
         ];
 
         $condition = [
-            "company_id"  => $this->this_company_id,
-            "deletedAt" => NULL
+            "customers.company_id"  => $this->this_company_id,
+            "customers.deletedAt" => NULL
         ];
 
         $addCondition = [
