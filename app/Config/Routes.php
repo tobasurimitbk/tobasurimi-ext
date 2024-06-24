@@ -364,6 +364,10 @@ $routes->get('/pembayaran-po-lokal-bp/print/(:segment)', 'Pembayaran\PembayaranP
 $routes->post('/pembayaran-po-lokal-bp/posting', 'Pembayaran\PembayaranPOLokal::posting', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal/all', 'Pembayaran\PembayaranPOLokal::allPembayaranPOLokal', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal/delete', 'Pembayaran\PembayaranPOLokal::delete', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-lokal/get-panjar', 'Pembayaran\PembayaranPOLokal::getPanjarSupplier', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-lokal/get-panjar-table', 'Pembayaran\PembayaranPOLokal::getPanjarSupplierTable', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-lokal/get-panjar-amount', 'Pembayaran\PembayaranPOLokal::getPanjarSisaPembayaran', ['filter' => 'Auth']);
+
 // PEMBAYARAN PO LOKAL BB
 $routes->get('/pembayaran-po-lokal-bb', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBB', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bb/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBB', ['filter' => 'Auth']);
@@ -411,6 +415,20 @@ $routes->post('/pembayaran-lain/update', 'Pembayaran\OtherPayment::updateAction'
 // penerimaan pembayaran SO
 $routes->get('/penerimaan-penjualan-lokal', 'Penerimaan\SalesOrderPayment::index', ['filter' => 'Auth']);
 $routes->get('/penerimaan-penjualan-lokal/create', 'Penerimaan\SalesOrderPayment::create', ['filter' => 'Auth']);
+
+
+// PEMBAYARAN PANJAR SUPPLIER
+$routes->get('/panjar-supplier', 'Pembayaran\PanjarSupplier::index', ['filter' => 'Auth']);
+$routes->get('/panjar-supplier/list-supplier', 'Pembayaran\PanjarSupplier::dropdownSupplierByType', ['filter' => 'Auth']);
+$routes->post('/panjar-supplier/save', 'Pembayaran\PanjarSupplier::savePanjarSupplier', ['filter' => 'Auth']);
+$routes->get('/panjar-supplier/all', 'Pembayaran\PanjarSupplier::allPanjarSupplier', ['filter' => 'Auth']);
+$routes->get('/panjar-supplier/id/(:segment)', 'Pembayaran\PanjarSupplier::getByIdPanjarSupplier/$1', ['filter' => 'Auth']);
+$routes->post('/panjar-supplier/update', 'Pembayaran\PanjarSupplier::updatePanjarSupplier', ['filter' => 'Auth']);
+$routes->post('/panjar-supplier/update-status', 'Pembayaran\PanjarSupplier::updateStatusPanjarSupplier', ['filter' => 'Auth']);
+$routes->post('/panjar-supplier/delete', 'Pembayaran\PanjarSupplier::deletePanjarSupplier', ['filter' => 'Auth']);
+$routes->get('/panjar-supplier/history-pembayaran', 'Pembayaran\PanjarSupplier::dropDownHistoryPembayaranPanjar', ['filter' => 'Auth']);
+
+
 
 // SALES LOKAL
 // Order Form Lokal
