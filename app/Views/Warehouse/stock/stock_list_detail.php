@@ -855,6 +855,86 @@
                     </table>
                 </div>
             </div>
+
+            <div class="row mt-3">
+                <div class="col mb-3">
+                    <div class="alert alert-secondary">
+                        <label class="form-label font-weight-bold text-black lable-title">DATA PENGELUARAN BARANG DARI SALES LOKAL / EXPORT</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search_no_sales_order" id="search_no_sales_order" name="search_no_sales_order" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Stuffing / Order Form</label>
+                    </div>
+                </div>
+                <!-- <div class="col-md-3 mb-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search_no_aju_daftar" id="search_no_aju_daftar" name="search_no_aju_daftar" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Aju / Daftar</label>
+                    </div>
+                </div> -->
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_awal_stok_penjualan dateStart" id="tgl_awal_stok_penjualan" name="tgl_awal_stok_penjualan" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control tgl_akhir_stok_penjualan dateEnd" id="tgl_akhir_stok_penjualan" name="tgl_akhir_stok_penjualan " aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable stok-penjualan" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No</th>
+                                <th onclick="changeSortPembelian('stock_details2.no_aju')">Dokumen</th>
+                                <th onclick="changeSortPembelian('stock_details.tanggal')">Tanggal</th>
+                                <th>Barang - Spesifikasi</th>
+                                <th>Tipe Pengeluaran</th>
+                                <th onclick="changeSortPembelian('stock_details.no_dokumen')">No Order Form</th>
+                                <th onclick="changeSortPembelian('stock_details2.no_dokumen')">No Stuffing</th>
+                                <th>Customer / Penerima</th>
+                                <th>Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table">
+
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="7"></td>
+                                <td style="float: right;"><b>TOTAL</b></td>
+                                <td><b><?= ($total['totalPenjualan']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 </section>
@@ -886,6 +966,9 @@
 
     let sortStokRebus = "createdAt";
     let sortTypeRebus = "DESC";
+
+    let sortStokPenjualan = "createdAt";
+    let sortTypePenjualan = "DESC";
 
     const stokTableDokumenBC = $('.stok-dokumen-bc-table').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -1847,6 +1930,121 @@
         }
     });
 
+    const stokTablePenjualan = $('.stok-penjualan').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [
+            [4, 'desc']
+        ],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("stock-list/stock-log-penjualan"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $("#search_no_sales_order").val();
+                data.stok_id = "<?= encrypt($stok['id']) ?>";
+                data.sumber = "PENJUALAN";
+                data.dateStart = $('#tgl_awal_stok_penjualan').val();
+                data.dateEnd = $('#tgl_akhir_stok_penjualan').val();
+
+                data.sort = sortStokPenjualan
+                data.sortType = sortTypePenjualan;
+            },
+            beforeSend: function() {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
+            },
+            complete: function() {
+                $.LoadingOverlay("hide", {
+                    image: "",
+                    fontawesomeColor: "#222FCC",
+                    fontawesome: "fa fa-cog fa-spin"
+                });
+            },
+        },
+
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        display: "stripe",
+        searching: false,
+        columns: [{
+                data: "no",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "dokumen",
+                className: "text-center"
+            },
+            {
+                data: "tanggal",
+                className: "text-center"
+            },
+            {
+                data: "barang",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "tipe_sales_order",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "no_dokumen1",
+                className: "text-center",
+            },
+            {
+                data: "no_dokumen2",
+                className: "text-center",
+            },
+            {
+                data: "customer_name",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "stok_1",
+                className: "text-center"
+            }
+        ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+
     $('#bc_id_stok_per_dokumen').select2({
         placeholder: "Pilih Dokumen Pabean",
         theme: "bootstrap-5",
@@ -1996,6 +2194,10 @@
         stokTableRebus.ajax.reload();
     });
 
+    $('#tgl_awal_stok_penjualan,#tgl_akhir_stok_penjualan,#search_no_sales_order').change(function() {
+        stokTablePenjualan.ajax.reload();
+    });
+
     $(".dateStart").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
@@ -2107,6 +2309,16 @@
             sortTypeRebus = sortTypeRebus === "asc" ? "desc" : "asc";
         }
         stokTableRebus.ajax.reload();
+    }
+
+    const changeSortPembelian = function(val) {
+        if (sortStokPenjualan !== val) {
+            sortTypePenjualan = "asc";
+            sortStokPenjualan = val;
+        } else {
+            sortTypePenjualan = sortTypeRebus === "asc" ? "desc" : "asc";
+        }
+        stokTablePenjualan.ajax.reload();
     }
 </script>
 

@@ -5,6 +5,7 @@ namespace App\Controllers\Inventori;
 use App\Controllers\BaseController;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
+use App\Models\BC30Model;
 use App\Models\DivisisModel;
 use App\Models\KemasanModel;
 use App\Models\MetadataModel;
@@ -30,6 +31,7 @@ class StokHistori extends BaseController
     protected $satuanModel;
     protected $parentBarangModel;
     protected $warehouseModel;
+    protected $bc30Model;
 
     public function __construct()
     {
@@ -46,6 +48,7 @@ class StokHistori extends BaseController
         $this->satuanModel = new SatuansModel();
         $this->parentBarangModel = new ParentBarangModel();
         $this->warehouseModel = new WarehousesModel();
+        $this->bc30Model = new BC30Model();
     }
 
     public function index()
@@ -94,8 +97,6 @@ class StokHistori extends BaseController
 
         foreach ($dataQry['data'] as $data) {
 
-            $dokumenBC = $this->metaDataModel->find($data->bc_id);
-            $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
             $in_out = $data->status == "In" ? "(+)" : "(-)";
 
             if ($data->sumber == "LPB" || $data->sumber == "JASA VENDOR") {
@@ -106,6 +107,42 @@ class StokHistori extends BaseController
                 }
             } else {
                 $no_dokumen = $data->no_dokumen1;
+            }
+
+            // TEMPELKAN SAJA NO BC 3.0 JIKA PENJUALAN
+            if ($data->sumber == "PENJUALAN") {
+                $bc30Lokal = $this->bc30Model
+                    ->select('bc_30.no_aju, sales_order.bc_type')
+                    ->join('sales_order', 'sales_order.id = bc_30.sales_order_id', 'left')
+                    ->join('stuffing_lokal', 'stuffing_lokal.sales_order_id = sales_order.id', 'left')
+                    ->where('stuffing_lokal.no_stuffing', $data->no_dokumen2)
+                    ->first();
+
+                $bc30Internasional = $this->bc30Model
+                    ->select('bc_30.no_aju, sales_order_export.bc_type')
+                    ->join('sales_order_export', 'sales_order_export.sales_order_export_id = bc_30.sales_order_id', 'left')
+                    ->join('stuffing_internasional', 'stuffing_internasional.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
+                    ->where('stuffing_internasional.no_stuffing', $data->no_dokumen2)
+                    ->first();
+
+                if ($bc30Lokal != null) {
+                    // STUFFING LOKAL BC 3.0 SUDAH DIBUAT
+                    $dokumenBC = $this->metaDataModel->find($bc30Lokal['bc_type']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc30Lokal['no_aju'];
+                } elseif ($bc30Internasional != null) {
+                    // STUFFING INTERNASIONAL BC 3.0 SUDAH DIBUAT
+                    $dokumenBC = $this->metaDataModel->find($bc30Internasional['bc_type']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc30Internasional['no_aju'];
+                } else {
+                    // BELUM DIBUAT SAMA SEKALI DOKUMEN BC 3.O NYA
+                    $dokumenBC = $this->metaDataModel->find($data->bc_id);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                }
+            } else {
+                $dokumenBC = $this->metaDataModel->find($data->bc_id);
+                $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
             }
 
             if ($data->kemasan_id == 0) {

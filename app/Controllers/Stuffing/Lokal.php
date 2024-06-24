@@ -344,7 +344,7 @@ class Lokal extends BaseController
                 date('Y-m-d'),
                 $this->this_user_id,
                 "PENJUALAN",
-                // $salesOrder['no_sales_order'],
+                $salesOrder['no_sales_order'],
                 $j['no_dokumen_1'],
                 "-"
             );

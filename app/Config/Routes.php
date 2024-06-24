@@ -884,6 +884,7 @@ $routes->get('/stock-list/stock-log-mutasi', 'Inventori\StokList::allStokMutasi'
 $routes->get('/stock-list/stock-log-jasa-vendor', 'Inventori\StokList::allStokJasaVendor', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-log-produksi', 'Inventori\StokList::allStokProduksi', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-log-rebus', 'Inventori\StokList::allStokRebus', ['filter' => 'Auth']);
+$routes->get('/stock-list/stock-log-penjualan', 'Inventori\StokList::allStokPenjualan', ['filter' => 'Auth']);
 $routes->post('/stock-list/import', 'Inventori\StokList::import', ['filter' => 'Auth']);
 $routes->get('/stock-list/export-excel', 'Inventori\StokList::exportExcel', ['filter' => 'Auth']);
 
@@ -1234,8 +1235,19 @@ $routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
 // BC 3.0
 $routes->group('bea-cukai-bc-30', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BC30::index');
+    $routes->get('all', 'BeaCukai\BC30::all');
+    $routes->get('online', 'BeaCukai\BC30::online');
+    $routes->get('download-response', 'BeaCukai\BC40::downloadResponPdf');
+    $routes->get('all-online', 'BeaCukai\BC30::allOnline');
     $routes->get('create', 'BeaCukai\BC30::create');
+    $routes->get('id/(:segment)', 'BeaCukai\BC30::detail/$1');
+    $routes->post('save', 'BeaCukai\BC30::createAction');
+    $routes->post('update', 'BeaCukai\BC30::updateAction');
+    $routes->post('delete', 'BeaCukai\BC30::delete');
+    $routes->post('posting', 'BeaCukai\BC30::posting');
+    $routes->get('check-no-aju', 'BeaCukai\BC30::checkNoAju');
 
+    $routes->get('list-barang', 'BeaCukai\BC30::getListBarang');
     $routes->get('list-sales-order', 'BeaCukai\BC30::dropdownSalesOrder');
 });
 

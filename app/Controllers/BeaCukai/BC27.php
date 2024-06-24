@@ -124,7 +124,6 @@ class BC27 extends BaseController
             "selesaiTanggalBC27" => $this->request->getGet('selesaiTanggalBC27'),
             "noBC27" => $this->request->getGet('noBC27'),
             "noAju" => $this->request->getGet('noAju'),
-            "noDaftar" => $this->request->getGet('noDaftar')
         ];
 
         $limit = $this->request->getGet("length");
