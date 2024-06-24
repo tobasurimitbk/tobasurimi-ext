@@ -16,7 +16,10 @@ class LocalPOPaymentDetailModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'local_po_payment_id',
-        'local_po_inv_sum_detail_id',
+        'penerimaan_barang_id',
+        'penerimaan_barang_detail_id',
+        'rm_purchase_order_id',
+        'rm_purchase_order_details_id',
         'total'
     ];
 

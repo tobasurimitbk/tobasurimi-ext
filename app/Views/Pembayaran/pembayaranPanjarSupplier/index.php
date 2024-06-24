@@ -1,0 +1,797 @@
+<?= $this->extend('layouts/template'); ?>
+<?= $this->Section('content'); ?>
+
+
+<div class="modal add-modal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><label class="title-name"></label> Panjar Supplier</h5>
+            </div>
+            <div class="modal-body">
+                <form class="create-form" role="form" method="POST" enctype="multipart/form-data" action="panjar-supplier/save">
+                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
+                    <?= csrf_field() ?>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly value="<?= $noPanjar ?>" class="form-control name" id="no_panjar" name="no_panjar" placeholder="no_panjar">
+                                <label for="floatingInput">No Panjar</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="date" class="form-control name" id="payment_date" name="payment_date" placeholder="payment_date">
+                                <label for="floatingInput">Tanggal Panjar</label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select tipe_supplier" name="tipe_supplier" id="tipe_supplier">
+                                <option value="" selected ></option>
+                                    <option value="INTERNASIONAL">Internasional</option>
+                                    <option value="BAHAN PENOLONG">Bahan Penolong</option>
+                                    <option value="BAHAN BAKU">Bahan Baku</option>
+                                </select>
+                                <label for="floatingInput">Tipe Supplier</label>
+                            </div>
+                        </div>
+                    
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select supplier_id" name="supplier_id" id="supplier_id">
+
+                                </select>
+                                <label for="floatingInput">Supplier</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="total_panjar" name="total_panjar" placeholder="Nama" oninput="preventNegativeInput(this)">
+                                <label for="floatingInput">Total Panjar</label>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                </form>
+            </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
+            <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
+            <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
+        </div>
+        </div>
+    </div>
+</div>
+
+<!-- Begin Page Content -->
+<section class="section">
+    <div class="section-header">
+        <h1>Panjar Supplier</h1>
+        <button class="btn btn-show-form btn-add float-right" id="btn-display-modal">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </button>
+    </div>
+    <div class="card">
+        <div class="card-body">
+        <div class="row justify-content-end row-col-spp">
+                <div class="col mb-4">
+                    <?= csrf_field() ?>
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col mb-4">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating spp-ptspp mb-3" style="height: 50px;">
+                        <select class="form-select kategori panjar_status form-out-search" name="panjar_status" id="panjar_status" aria-label="Floating label select example">
+                            <option value="ALL">Status Posting:Semua</option>
+                            <option value="NOT_POSTING">Status Posting:tidak post</option>
+                            <option value="POSTING">Status Posting:post</option>
+                                
+                        </select>
+                        <label for="floatingInput" class="l-spp-ptspp">Status Posting</label>
+                    </div>
+                </div>
+                <div class="col mb-4">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="pencarian" value="" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No</th>
+                                <th onclick="changeSort('no_panjar')">No. Panjar</th>
+                                <th onclick="changeSort('supplier_id')">Supplier</th>
+                                <th onclick="changeSort('payment_date')">Payment Date</th>
+                                <th onclick="changeSort('payment_amount')">Total Panjar</th>
+                                <th onclick="changeSort('payment_amt_left')">Sisa Panjar</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- history modal -->
+<div class="modal fade" id="historiModal" tabindex="-1" role="dialog" aria-labelledby="historiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="historiModalLabel">Histori Pembayaran Panjar</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control nomor_panjar" name="nomor_panjar" id="nomor_panjar">
+                            <label for="floatingInput">No Panjar</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control supplier_name" name="supplier_name" id="supplier_name">
+                            <label for="floatingInput">Supplier</label>
+                        </div>
+                    </div>
+                    <!-- <div class="col-sm-12">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control lpb_no" name="lpb_no" id="lpb_no">
+                            <label for="floatingInput">Nomor LPB</label>
+                        </div>
+                    </div> -->
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-inside table-borderd nowrap table-hover-tobasurimi dataTable2" style="width: 100%;" id="tableHistori">
+                        <thead>
+                            <tr>
+                                <td style="width: 10px;text-align: center;color:#E7323A;font-weight:bold;">No</td>
+                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Nomor PO</td>
+                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Total Panjar</td>
+                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Bayar Panjar</td>
+                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Payment Date</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const csrfToken = '<?= csrf_token() ?>';
+    let sort = "no_panjar";
+    let sortType = "desc";
+    let trigger = true;
+
+    const table = $('.dataTable').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [
+            [1, 'asc']
+        ],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("panjar-supplier/all"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $(".search").val();
+                data.status = $(".is_posted").val();
+                data.dateStart = $(".dateStart").val();
+                data.dateEnd = $(".dateEnd").val();
+                data.panjar_status = $('.panjar_status option:selected').val();
+                data.sort = sort;
+                data.sortType = sortType;
+            }
+        },
+        // scrollX: true,
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        //responsive: true,
+        display: "stripe",
+        searching: false,
+        columns: [{
+                data: "no",
+                className: "text-center",
+                sortable: false,
+                width: "5%"
+            }, 
+            {
+                data: "no_panjar",
+                className: "text-center",
+                // width: "10%"
+            },
+            {
+                data: "supplier",
+                className: "text-center"
+            },
+            {
+                data: "payment_date",
+                className: "text-center"
+            }, 
+            {
+                data: "total_panjar",
+                className: "text-center"
+            },
+            {
+                data: "sisa_panjar",
+                className: "text-center"
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                
+                render: function(data, type, row) {
+                    let id = row.id;
+                    let is_posted = row.is_posted;
+    
+                    if(is_posted === '0'){
+                        
+                        return `
+                        <div class="mt-0">
+                        
+            
+
+
+                            <button data-toggle="tooltip" title="Posting" onclick="updateStatus('${id}', 1)" class="btn btn-success posting-panjar-supplier">
+                                <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                            </button>
+
+                            <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+
+                        <div>
+                        `
+                    }
+                    if(is_posted === '1'){
+                        return`
+
+                            <div class="mt-0">
+
+                                <button  data-toggle="tooltip" title="Histori LPB" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
+                                    <i class="fa-solid fa-clock-rotate-left"></i>
+                                </button>
+                            <div>
+                        `
+
+                    }   
+                    
+                    
+                }
+            }
+        ],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+
+    // INIT VALIDATOR
+    var validator = $(".create-form").validate({
+        rules: {
+            total_panjar: {
+                required: true,
+                digits: true
+            },
+            payment_date: {
+                required: true
+            },
+            name: {
+                required: true
+            }
+
+        },
+        messages: {
+            total_panjar: {
+                required: "total panjar wajib diisi",
+                digits:  "total panjar harus berupa nomor"
+            },
+            payment_date: {
+                required: "date have to be selected"
+            },
+            name: {
+                required: "Nama wajib diisi"
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    function remove(id){
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan di hapus?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("panjar-supplier/delete"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        }
+                    },
+                });
+            }
+        })
+    }    
+
+    const deleteForm = function(){
+        Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    let id = $(".id").val();
+                    setLoading()
+                    $.ajax({
+                        url: "<?= base_url("panjar-supplier/delete"); ?>",
+                        data: {
+                            id: id
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                stopLoading()
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        table.ajax.reload()
+                                        $(".add-modal").modal("hide")
+                                    })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Disimpan, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    });
+                }
+            })
+    }
+
+    // DISPLAY MODAL
+    $('#btn-display-modal').click(function(){
+        $('.add-modal').modal('show');
+        $(".title-name").text("Tambah");
+        $(".delete-form").css('display', 'none');
+        validator.resetForm();
+        validator.reset();
+        $(".create-form")[0].reset()
+    })
+
+    //delete form by form
+    $('.delete-form').click(deleteForm);
+
+
+    // HIDE MODAL
+    $('.btn-discard').click(function(){
+        $('.add-modal').modal('hide');
+        validator.resetForm();
+        validator.reset();
+    });
+
+    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+        const data = table.row(this).data();
+        $(".create-form")[0].reset()
+        $(".delete-form").css('display', '');
+        let id = data.id;
+        // $('.add-modal').modal('show');
+        $(".title-name").text("Update");
+        validator.resetForm();
+        validator.reset();
+
+        $.ajax({
+                url: "<?= base_url("panjar-supplier/id"); ?>" + "/" + id,
+                method: "GET",
+                dataType: "json",
+                beforeSend: function(){
+                    setLoading();
+                },
+                complete: function(){
+                    stopLoading();
+                    validator.resetForm();
+                    validator.reset();
+                },
+                success: function(res) {
+                    if (res.status) {
+                        try {
+                            // APPEND TO DROPDOWN SUPPLIER
+                            appendDropdownSupplier(res.supplier);
+                            // APPEND TO FORM
+                            $("#id").val(id);
+                            $("#no_panjar").val(res.data.no_panjar);
+                            $("#payment_date").val(res.data.payment_date);
+                            $("#tipe_supplier").val(res.data.type);
+                            $("#supplier_id").val(res.data.supplier_id);
+                            $("#payment_date").val(res.data.payment_date);
+                            $("#total_panjar").val(res.data.total_panjar);
+                            $("#sisa_panjar").val(res.data.fax);
+                            $(".add-modal").modal("show");
+                        } catch (error) {
+                            console.log(error);
+                        }
+
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                }
+            })
+
+    })
+
+    // GET SUPPLIER BY TYPE
+    $('#tipe_supplier').change(function(){
+            var typeSupplier = $('#tipe_supplier option:selected').val();
+            $.ajax({
+            url: `<?= base_url('panjar-supplier/list-supplier'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                type_supplier: typeSupplier,
+            },
+            dataType: "json",
+            success: function(res) {
+                // APPEND TO DROPDOWN
+                appendDropdownSupplier(res.data);
+            }
+        }); 
+    }); 
+
+    // APPEND DATA SUPPLIER BY TYPE
+    function appendDropdownSupplier(data){
+        $(".supplier_id").empty()
+        $(".supplier_id").append(`<option value=""></option>`)
+        data.forEach(function(item) {
+            $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`)
+        })
+    }
+
+
+        $(".btn-submit-parent").click(function() {
+            if ($(".create-form").valid()) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const csrf = $(`[name="${csrfToken}"]`);
+                        let data = new FormData(document.querySelector(".create-form"));
+                        let id = $(".id").val();
+
+                        $.ajax({
+                            url: id ? "<?= base_url("panjar-supplier/update"); ?>" : "<?= base_url("panjar-supplier/save"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading()
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            $(".add-modal").modal("hide")
+                                            table.ajax.reload()
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        });
+                    }
+                })
+            }
+        })
+
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
+
+    const updateStatus = function(id, status){
+        Swal.fire({
+            icon: 'question',
+            title: status == '1' ? 'Yakin akan diposting ?' : 'Batalkan Posting ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }). then((result) =>{
+            if(result.isConfirmed){
+                const csrf = $(`[name="${csrfToken}"]`);
+                console.log("CSRF Token:", csrf.val()); // Debugging
+                console.log("ID:", id); // Debugging
+                console.log("Status:", status); // Debugging
+                $.ajax({
+                    url: "<?= base_url("panjar-supplier/update-status"); ?>",
+                    data: {
+                        id: id,
+                        status: status
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        console.log("Response:", response); // Debugging
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        }
+                    },
+                });
+            }
+        })
+
+    }
+
+    $(".dateStart").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".dateEnd").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".search").keyup(function() {
+            table.ajax.reload();
+        })
+
+        $(".panjar_status").change(function() {
+            table.ajax.reload();
+        })
+
+        $(".dateStart, .dateEnd").change(function() {
+            table.ajax.reload();
+        })
+
+        $('.icon-dateStart').click(function() {
+            $(".dateStart").focus();
+        });
+
+        $('.icon-dateEnd').click(function() {
+            $(".dateEnd").focus();
+        });
+
+        $(".dataTable_info").addClass("pt-0");
+
+        function preventNegativeInput(inputElement) {
+        var inputValue = inputElement.value;
+        var numericValue = inputValue.replace(/[^0-9.]/g, '');
+        numericValue = numericValue.replace(/^0+/g, '');
+        numericValue = numericValue.replace(/^\./g, '0.');
+        if (parseFloat(numericValue) < 0 || isNaN(parseFloat(numericValue))) {
+            inputElement.value = '0';
+        } else {
+            inputElement.value = numericValue;
+        }
+    }
+
+    function displayHistory(id) {
+        // console.log(id);
+        $.ajax({
+            url: "<?= base_url("/panjar-supplier/history-pembayaran"); ?>",
+            data: {
+                id: id
+            },
+            method: "GET",
+            success: function(response) {
+            console.log(response);             
+                $('#nomor_panjar').val(response.panjar_detail.no_panjar);
+                $('#supplier_name').val(response.panjar_detail.name);
+                const table = $('#tableHistori');
+                var no = 1;
+               
+                table.find('tbody').empty();
+                if(response.data.length > 0){
+
+                    $.each(response.data, function(i, v) {
+                        var newRow = $('<tr>');
+                        newRow.append($('<td style="text-align:center;">').text(no++));
+                        newRow.append($('<td style="text-align:center;">').text(v.multiple_lpb_no));
+                        newRow.append($('<td style="text-align:center;">').text(v.total_panjar));
+                        newRow.append($('<td style="text-align:center;">').text(v.bayar_panjar));
+                        newRow.append($('<td style="text-align:center;">').text(v.payment_date));   
+                        table.find('tbody').append(newRow);
+                    });
+                }
+                else{
+                    var newRow = $('<tr>');
+                    newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Pembayaran</td>'));
+                    table.find('tbody').append(newRow);
+                }
+                $('#historiModal').modal('show');
+
+            },
+        });
+    }
+</script>
+
+
+<?= $this->endSection(); ?>

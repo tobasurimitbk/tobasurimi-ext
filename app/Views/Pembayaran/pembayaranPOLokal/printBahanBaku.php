@@ -86,11 +86,11 @@
                 <td>:</td>
                 <td><?= date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_date']))  ?></td>
             </tr>
-            <tr>
+            <!-- <tr>
                 <td>Jatuh Tempo</td>
                 <td>:</td>
-                <td><?= date('d/m/Y', strtotime($detail['pembayaranDetail']['due_date'])); ?></td>
-            </tr>
+                <td> //date('d/m/Y', strtotime($detail['pembayaranDetail']['due_date'])); ?></td>
+            </tr> -->
             <tr>
                 <td>Potongan</td>
                 <td>:</td>
@@ -127,9 +127,11 @@
                 <th style="text-align: center;">Tanggal PO</th>
                 <th style="text-align: center;">No PO</th>
                 <th style="text-align: center;">Barang</th>
-                <th style="text-align: center;">Total Order</th>
+       
                 <th style="text-align: center;">Total Diterima</th>
-                <th style="text-align: center;">Total Harga</th>
+        
+                <th style="text-align: center;">Total Dibayar</th>
+
             </tr>
         </thead>
         <tbody>
@@ -137,31 +139,31 @@
             <?php foreach ($detail['itemList']['detail'] as $d) : ?>
                 <tr>
                     <td><?= $no++; ?></td>
-                    <td><?= $d['tanggalLpb'] ?></td>
-                    <td><?= $d['lpbNo'] ?></td>
-                    <td><?= $d['tanggalPo'] ?></td>
-                    <td><?= $d['poNo'] ?></td>
+                    <td><?= date('d/m/Y', strtotime($d['tanggal_LPB'])) ?></td>
+                    <td><?= $d['no_penerimaan_barang'] ?></td>
+                    <td><?= date('d/m/Y', strtotime($d['tanggal_PO'])) ?></td>
+                    <td><?= $d['po_no'] ?></td>
                     <td><?= $d['barang'] ?></td>
-                    <td><?= $d['totalOrder'] ?></td>
-                    <td><?= $d['totalDiterima'] ?></td>
-                    <td><?= str_replace("Rp", "", $d['totalHarga'])  ?></td>
+              
+                    <td><?= $d['total_diterima'] ?></td>
+                  
+                    <td><?= number_format($d['total'] ,2)?></td>
                 </tr>
             <?php endforeach; ?>
             <tr>
                 <td colspan="6" style="text-align: right;">
-                    Total Tagihan
+                    Total Pembayaran
+                </td>
+             
+                <td style="text-align: center;">
+                    <b><?= $detail['itemList']['total_diterima']; ?></b>
                 </td>
                 <td style="text-align: center;">
-                    <b><?= $detail['itemList']['totalOrder'] ?></b>
+                    <b><?= number_format( $detail['itemList']['total_pembayaran'],2);?></b>
                 </td>
-                <td style="text-align: center;">
-                    <b><?= $detail['itemList']['totalDiterima'] ?></b>
-                </td>
-                <td style="text-align: center;">
-                    <b><?= str_replace("Rp", "", $detail['itemList']['totalHarga'])  ?></b>
-                </td>
+           
             </tr>
-            <tr>
+            <!-- <tr>
                 <td colspan="6" style="text-align: right;">
                     Total Dibayar
                 </td>
@@ -171,10 +173,8 @@
                 <td style="text-align: center;">
 
                 </td>
-                <td style="text-align: center;">
-                    <b><?= number_format($detail['pembayaranDetail']['harga_sebelum_diskon'], 2)  ?></b>
-                </td>
-            </tr>
+               
+            </tr> -->
             <tr>
                 <td colspan="6" style="text-align: right;">
                     Diskon
@@ -182,14 +182,70 @@
                 <td style="text-align: center;">
 
                 </td>
-                <td style="text-align: center;">
-
-                </td>
+       
                 <td style="text-align: center;">
                     <b><?= number_format($detail['pembayaranDetail']['potongan_harga'] ?? 0, 2)  ?></b>
                 </td>
+         
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: right;">
+                    Potongan Panjar
+                </td>
+                <td>
+
+                </td>
+                <td><b><?= number_format( $detail['itemList']['total_bayar_panjar'],2) ; ?></b></td>
+            </tr>
+   
+            <tr>
+                <td colspan="6" style="text-align: right;">
+                    Total Bayar
+                </td>
+                <td>
+
+                </td>
+                <td><b><?= number_format( $detail['itemList']['total_akhir'],2) ; ?></b></td>
             </tr>
 
+        </tbody>
+    </table>
+
+    <h6>
+        Rincian Panjar
+    </h6>
+    <table width="100%" border="1" id="dashed-border-table" style="margin-top:-20px">
+        <thead>
+            <tr>
+                <th style="text-align: center;">No</th>
+                <th style="text-align: center;">No. Panjar</th>
+                <th style="text-align: center;">Payment Date</th>
+              
+                <th style="text-align: center;">Bayar Panjar </th>
+        
+
+            </tr>
+        </thead>
+
+        <tbody>
+            <?php $no = 1; ?>
+            
+            <?php if(!empty($detail['panjar'])) :  ?>
+                
+                <?php foreach($detail['panjar'] as $p): ?>
+                   <tr>
+                        <td> <?=  $no++; ?> </td>
+                        <td> <?=  $p['no_panjar'] ; ?></td>
+                        <td> <?=  $p['payment_date'] ;?></td> 
+                        <td> <?=  number_format($p['bayar_panjar'],2) ;?></td>
+                
+                <?php endforeach; ?>
+                <?php else : ?>
+                    <tr>
+                        <td colspan="5">Tidak ada Pembayaran Panjar</td>
+                    </tr>
+                    
+            <?php endif; ?>
         </tbody>
     </table>
 

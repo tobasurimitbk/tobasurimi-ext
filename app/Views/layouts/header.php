@@ -90,6 +90,7 @@
                 <button class="btn btn-discard" onclick="hideLogoutForm()">Cancel</button>
                 <a class="btn btn-logout-form" href="<?= base_url("logout"); ?>">Logout</a>
             </div>
+            
         </div>
     </div>
 </div>

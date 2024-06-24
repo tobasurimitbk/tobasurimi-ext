@@ -17,7 +17,7 @@
             <div class="row justify-content-end row-col-spp">
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dueDate" id="dueDate" name="dueDate" placeholder="Tanggal Jatuh Tempo">
+                        <input autocomplete="one-time-code" class="form-control input-picker startDate" id="startDate" name="startDate" placeholder="Tanggal Jatuh Tempo">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -58,7 +58,7 @@
                                 <th>No. Pembayaran</th>
                                 <th>Tipe Bayar</th>
                                 <th>Supplier</th>
-                                <th>Tanggal Jatuh Tempo</th>
+                                <th>PO Number</th>
                                 <th>Tanggal Pembayaran</th>
                                 <th>Metode Pembayaran</th>
                                 <th>Jumlah</th>
@@ -99,9 +99,9 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
-                data.dueDate = $(".dueDate").val();
+                data.startDate = $(".startDate").val();
                 data.paymentDate = $(".paymentDate").val();
-                data.type_po = "Bahan Baku";
+                // data.type_po = "Bahan Baku";
                 data.type_bayar = $(".type_bayar").val();
                 data.status_posting = $(".status_posting").val();
                 data.sort = sort;
@@ -136,7 +136,7 @@
                 className: "text-center"
             },
             {
-                data: "due_date",
+                data: "po_number",
                 className: "text-center"
             },
             {
@@ -206,7 +206,7 @@
     });
 
     $(document).ready(function() {
-        $(".dueDate").datepicker({
+        $(".startDate").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
@@ -221,7 +221,7 @@
         })
 
         $('.icon-dateStart').click(function() {
-            $(".dueDate").focus();
+            $(".startDate").focus();
         });
 
         $('.icon-dateEnd').click(function() {
@@ -234,7 +234,7 @@
             table.ajax.reload();
         })
 
-        $(".dueDate, .paymentDate, .type_bayar").change(function() {
+        $(".startDate, .paymentDate, .type_bayar").change(function() {
             table.ajax.reload();
         })
 
