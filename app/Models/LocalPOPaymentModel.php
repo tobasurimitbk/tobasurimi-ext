@@ -92,7 +92,6 @@ class LocalPOPaymentModel extends Model
                       local_po_payments.amount AS amount,
                       local_po_payments.payment_method AS payment_method,
                       suppliers.name AS supplierName,
-           
                       ";
                     //   tanda_terima_faktur.faktur_no
                       //   DATE_FORMAT(local_po_payments.due_date, '%d/%m/%Y') AS due_date, 
@@ -333,6 +332,7 @@ class LocalPOPaymentModel extends Model
         ->join('barang_master', 'penerimaan_barang_detail.barang_id = barang_master.id')
         ->join('barang_master_spesifikasi', 'penerimaan_barang_detail.spesifikasi_id = barang_master_spesifikasi.id')
         ->where('local_po_payment_details.local_po_payment_id' ,  $pembayaranId)
+        ->where('local_po_payments.company_id' , $companyId)
         ->findAll();
 
       
