@@ -289,7 +289,32 @@
                         </div>
                     </div>
                 </div>
+
+                
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable-panjar" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>No</th>
+                                    <th onclick="changeSort('no_panjar')">No. Panjar</th>
+                                    <th onclick="changeSort('payment_date')">Payment Date</th>
+                                    <th onclick="changeSort('payment_amount')">Total Panjar</th>
+                                    <th>Bayar Panjar </th>
+                                    <th onclick="changeSort('payment_amt_left')">Sisa Panjar</th>
+                            
+                                </tr>
+                            </thead>
+                            <tbody class="body-table" id="body-table-panjar" style="cursor: pointer;">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </form>
+
+
 
             <div class="row">
                 <div class="col-sm mt-1">
@@ -954,6 +979,100 @@
             }
         })
     }
+
+    
+    $('#supplier_id').change(function(){
+            var supplierId = $('#supplier_id option:selected').val();
+            $.ajax({
+            url: `<?= base_url('/pembayaran-po-lokal/get-panjar'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                supplier_id: supplierId,
+            },
+            dataType: "json",
+            success: function(res) {
+                //after getting the data
+                // console.log(res);
+                listPanjar = [];
+                listPanjar = res.data;
+                appendPanjarNo(listPanjar);
+        
+                // console.log(listPanjar);
+            }
+        }); 
+    }); 
+    function appendPanjarNo(data){
+        const tablePanjar = $('#dataTable-panjar');
+        tablePanjar.find('tbody').empty();
+        tablePanjar.find('tfoot').empty();
+
+            if(data.length > 0){
+
+                let no = 1;
+                $("#no_panjar").empty();
+                // $("#no_panjar").append(`<option value=""></option>`);
+                // data.forEach(function(item){
+                //     $("#no_panjar").append(`<option value="${item.id}">${item.no_panjar}</option>`);
+                // });
+                tablePanjar.find('tbody').empty();
+    
+                $.each(data, function(i, v) {
+                    var newRow = $('<tr style="color:whitesmoke;">');
+                    newRow.append($('<td>').text(no++));
+                    newRow.append($('<td>').text(v.no_panjar));
+                    newRow.append($('<td>').text(v.payment_date));
+                    newRow.append($('<td>').text(v.total_panjar));
+                    
+                    newRow.append($('<td>').html(
+                        `
+                    <input  class="form-control bayar_panjar" oninput="limitInputBayarPanjar(this, ${v.total_panjar})" autocomplete="one-time-code" data-id="${v.id}"  class="form-control" type="text" value="" name = "bayar_panjar">
+                        `
+                    ));
+                       //limit amount input
+                    $(".bayar_panjar").on("input", function(){
+                        var amount = $(this).val();
+                        
+                        if(amount > v.total_panjar){
+                            $(this).val(v.total_panjar);
+                        }
+                    });
+
+                    newRow.append($('<td>').text(v.sisa_panjar));
+                   
+                    tablePanjar.find('tbody').append(newRow);
+                });
+            }else{
+                var newRow = $('<tr>');
+                newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Panjar</td>'));
+                tablePanjar.find('tbody').append(newRow);
+            }
+         
+    }
+
+    
+    function limitInputBayarPanjar(input, maxAmount){
+        
+        var inputValue = input.value;
+        var numericValue = inputValue.replace(/[^0-9.]/g, '');
+        numericValue = numericValue.replace(/^0+/g, '');
+        numericValue = numericValue.replace(/^\./g, '0.');
+        if (parseFloat(numericValue) < 0 || isNaN(parseFloat(numericValue))) {
+            input.value = '0';
+        } else {
+            input.value = numericValue;
+        }
+        if (numericValue > maxAmount) {
+            input.value = maxAmount;
+        }
+    }
+
+
 </script>
 
 <?= $this->endSection(); ?>

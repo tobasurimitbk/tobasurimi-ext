@@ -14,7 +14,7 @@
         <div class="card-body">
             <?= csrf_field() ?>
             <div class="row">
-                <div class="col-sm-6 ">
+                <div class="col-sm-3 ">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -27,7 +27,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-6 ">
+                <div class="col-sm-3 ">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -40,9 +40,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-sm-6 ">
+                <div class="col-sm-3 ">
                     <div class="form-floating">
                         <select class="form-select status" id="status" name="status" aria-label="Floating label select example">
                             <option value="">SEMUA</option>
@@ -52,23 +50,24 @@
                         <label style="z-index: 1;">Status Posting</label>
                     </div>
                 </div>
-                <div class="col-sm-6 ">
+                <div class="col-sm-3 ">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control no_stuffing" id="no_stuffing" name="no_stuffing" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Stuffing </label>
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Stuffing / Order Form</label>
                     </div>
                 </div>
             </div>
+
             <div class="table-responsive">
                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
                             <th>No</th>
                             <th onclick="changeSort('no_stuffing')">No Stuffing</th>
+                            <th onclick="changeSort('no_sales_order')">No Order Form</th>
                             <th onclick="changeSort('createdAt')">Tanggal</th>
                             <th>Total Item</th>
                             <th onclick="changeSort('customer_name')">Customer</th>
-
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -127,7 +126,10 @@
             {
                 data: "no_stuffing",
                 className: "text-center",
-
+            },
+            {
+                data: "no_sales_order",
+                className: "text-center",
             },
             {
                 data: "tanggal",

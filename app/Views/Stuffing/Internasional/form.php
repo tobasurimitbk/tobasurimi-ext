@@ -55,7 +55,7 @@
                 <input type="hidden" name="id" id="id" value="<?= !empty($stuffingInternasional) ? encrypt($stuffingInternasional['id']) : '' ?>" class="id">
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -68,7 +68,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -78,8 +78,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($stuffingInternasional) ? ($stuffingInternasional['status_posting'] ? 'disabled' : 'disabled') : '' ?> class="form-select sales_order_id" id="sales_order_id" name="sales_order_id" aria-label="Floating label select example">
@@ -118,7 +116,7 @@
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
                         <div class="col-md-6">
-                            <label class="form-label font-weight-bold modal-sub-title">Data Barang</label>
+                            <label class="form-label font-weight-bold modal-sub-title">Data Barang Sales</label>
                         </div>
 
                         <div class="col-md-6">
@@ -134,11 +132,11 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTableSalesOrder" id="dataTableSalesOrder" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th>#</th>
+                                    <th style="width: 10px;">#</th>
                                     <th>Kode Barang</th>
                                     <th>Nama Barang</th>
                                     <th>Qty</th>
-                                    <th>Aksi</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -147,8 +145,8 @@
                     </div>
                 </div>
                 <div class="row mt-3">
-                    <div class="col mb-0">
-                        <label class="form-label font-weight-bold lable-title">List Inventori Barang</label>
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Data Inventori Barang Internal</label>
                     </div>
                     <form class="detail-form">
                         <input type="hidden" name="id_detail" class="id_detail" id="id_detail">
@@ -196,7 +194,7 @@
                             <div class="col-md-6">
                                 <div class="form-floating" style="height: 50px;">
                                     <input placeholder="Qty" readonly oninput="preventNegativeInput(this)" class="form-control qty_mutasi_fifo" id="qty_mutasi_fifo" name="qty_mutasi_fifo" aria-label="Floating label select example" />
-                                    <label for="floatingInput" style="z-index: 1;">Qty Mutasi Keluar</label>
+                                    <label for="floatingInput" style="z-index: 1;">Qty Barang Keluar</label>
                                 </div>
                             </div>
                         </div>
@@ -206,9 +204,11 @@
                                     <select class="form-select type_barang" id="type_barang" name="type_barang" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($tipeBarang as $t) : ?>
-                                            <option value="<?= $t['description'] ?>">
-                                                <?= strtoupper($t['value']); ?>
-                                            </option>
+                                            <?php if ($t['description'] == "bahan_jadi" || $t['description'] == "bahan_penolong") : ?>
+                                                <option value="<?= $t['description'] ?>">
+                                                    <?= strtoupper($t['value']); ?>
+                                                </option>
+                                            <?php endif; ?>
                                         <?php endforeach; ?>
                                     </select>
                                     <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
@@ -238,7 +238,7 @@
                             <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th style="text-align: center;">#</th>
+                                        <th style="text-align: center; width:10px">#</th>
                                         <th style="text-align: center;">Tipe Barang</th>
                                         <th style="text-align: center;">Dokumen Pabean</th>
                                         <th style="text-align: center;">No Aju</th>
@@ -266,7 +266,7 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="text-align: center;">No</th>
+                                    <th style="text-align: center; width:10px">#</th>
                                     <th style="text-align: center;">Tipe Barang</th>
                                     <th style="text-align: center;">Dokumen Pabean</th>
                                     <th style="text-align: center;">No Aju</th>
@@ -311,7 +311,7 @@
                                     <select class="form-select id_barang" name="id_barang" id="id_barang" aria-label="Floating label select example">
                                         <option value=""></option>
                                     </select>
-                                    <label for="floatingInput">Nama Kemasan</label>
+                                    <label for="floatingInput" style="z-index: 1;">Nama Kemasan</label>
                                 </div>
 
                             </div>
@@ -339,17 +339,6 @@
 
                     </div>
 
-                    <div class="row">
-
-
-
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="hidden" readonly="true" class="form-control statusppn" name="statusppn" id="statusppn" placeholder="statusppn">
-                            </div>
-                        </div>
-
-                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -860,13 +849,6 @@
         }
     });
 
-    $("#sales_order_id,#warehouse_id,#divisi_id,#type_barang,#spesifikasi_id,#spesifikasi_in_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
 
     function getIDListDataSelected() {
         var id_selected = [];
@@ -1182,7 +1164,7 @@
         if (isNaN(qtyMutasiFifo)) {
             Swal.fire({
                 icon: 'error',
-                title: 'Terjadi Kesalahan : Qty Mutasi Keluar Wajib Diisi',
+                title: 'Terjadi Kesalahan : Qty Keluar Wajib Diisi',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 reverseButtons: true,
@@ -1544,9 +1526,8 @@
         let salesOrderId = $('#sales_order_id').val();
         if (!salesOrderId) {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: 'Sales Order tidak boleh kosong',
-                text: 'Silakan pilih Sales Order terlebih dahulu.',
                 confirmButtonText: 'OK'
             });
         } else {
@@ -1813,6 +1794,15 @@
             }
         })
     }
+
+
+    $("#id_barang,#type_pengambilan_stock,#sales_order_id,#warehouse_id,#divisi_id,#type_barang,#spesifikasi_id,#spesifikasi_in_id")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 </script>
 
 <?= $this->endSection(); ?>

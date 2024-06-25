@@ -44,6 +44,7 @@ class StuffingLokalModel extends Model
     {
         $availableSort = [
             'no_stuffing' => 'stuffing_lokal.no_stuffing',
+            'no_sales_order' => 'sales_order.no_sales_order',
             'createdAt' => 'stuffing_lokal.createdAt',
             'customer_name' => 'stuffing_lokal.customer_name',
             'status_closed' => 'status_closed'
@@ -55,17 +56,19 @@ class StuffingLokalModel extends Model
 
         $selectQry = "stuffing_lokal.*,
         customers.name as customer_name,
+        sales_order.no_sales_order
         ";
 
         $dataQry = $this->asObject()
             ->select($selectQry)
             ->join('customers', 'customers.id = stuffing_lokal.customer_id', 'left')
+            ->join('sales_order', 'stuffing_lokal.sales_order_id = sales_order.id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['status'] || $addCondition['no_stuffing'] || $addCondition['start_date'] || $addCondition['end_date']) {
+        if ($addCondition['status'] || $addCondition['no_stuffing']  || $addCondition['start_date'] || $addCondition['end_date']) {
             $dataQry->groupStart();
         }
 
@@ -74,7 +77,7 @@ class StuffingLokalModel extends Model
         }
 
         if ($addCondition['no_stuffing']) {
-            $dataQry->like('no_stuffing', $addCondition['no_stuffing']);
+            $dataQry->like('no_stuffing', $addCondition['no_stuffing'])->orLike('no_sales_order', $addCondition['no_stuffing']);
         }
 
         if ($addCondition['start_date']) {
@@ -85,7 +88,7 @@ class StuffingLokalModel extends Model
             $dataQry->where('tanggal <=', $addCondition['end_date']);
         }
 
-        if ($addCondition['status'] || $addCondition['no_stuffing'] || $addCondition['start_date'] || $addCondition['end_date']) {
+        if ($addCondition['status'] || $addCondition['no_stuffing']  || $addCondition['start_date'] || $addCondition['end_date']) {
             $dataQry->groupEnd();
         }
 

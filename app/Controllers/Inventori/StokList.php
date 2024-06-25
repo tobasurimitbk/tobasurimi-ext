@@ -7,6 +7,7 @@ use App\Models\AdjusmentModel;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\BC27Model;
+use App\Models\BC30Model;
 use App\Models\DivisisModel;
 use App\Models\KemasanModel;
 use App\Models\MetadataModel;
@@ -51,6 +52,7 @@ class StokList extends BaseController
     protected $bc27Model;
     protected $mutasiModel;
     protected $mutasiGlobalModel;
+    protected $bc30Model;
 
     public function __construct()
     {
@@ -77,6 +79,7 @@ class StokList extends BaseController
         $this->bc27Model = new BC27Model();
         $this->mutasiModel = new MutasiModel();
         $this->mutasiGlobalModel = new MutasiGlobalModel();
+        $this->bc30Model = new BC30Model();
     }
 
     public function index()
@@ -716,6 +719,13 @@ class StokList extends BaseController
             "stock_details.deletedAt" => null,
         ];
 
+        $conditionPenjualan = [
+            "stock_details2.stock_id" => $id,
+            "stock_details.sumber" => "PENJUALAN",
+            "stock_details2.deletedAt" => null,
+            "stock_details.deletedAt" => null,
+        ];
+
         $totalStokPerDokumen = $this->stockDetail2Model->getTotalStockLog($conditionPerDokumen);
         $totalStokInit = $this->stockDetail2Model->getTotalStockLog($conditionInisiasi);
         $totalStokPemasukkanBarang = $this->stockDetail2Model->getTotalStockLog($conditionPemasukkanBarang);
@@ -725,6 +735,7 @@ class StokList extends BaseController
         $totalStokProduksiOut = $this->stockDetail2Model->getTotalStockLog($conditionProduksiOut);
         $totalStokProduksiIn = $this->stockDetail2Model->getTotalStockLog($conditionProduksiIn);
         $totalStokRebus = $this->stockDetail2Model->getTotalStockLog($conditionRebus);
+        $totalStokPenjualan = $this->stockDetail2Model->getTotalStockLog($conditionPenjualan);
 
         $stok =  $this->stockModel->find($id);
 
@@ -742,7 +753,8 @@ class StokList extends BaseController
                 'totalJasaVendor' => $totalStokJasaVendor,
                 'totalProduksiIn' => $totalStokProduksiIn,
                 'totalProduksiOut' => $totalStokProduksiOut,
-                'totalRebus' => $totalStokRebus
+                'totalRebus' => $totalStokRebus,
+                'totalPenjualan' => $totalStokPenjualan
             ],
             'divisi' => $this->divisiModel->find($stok['divisi_id']),
             'warehouse' => $this->warehouseModel->find($stok['warehouse_id'])
@@ -1639,6 +1651,162 @@ class StokList extends BaseController
                     "stock_dokumen" => $data->stock_dokumen,
                     "no_po" => "-",
                     "barang" => strtoupper($barang['name']),
+                    "stok_1" => $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
+                    "stok_2" => "-",
+                    "stok_3" => "-",
+                ]);
+            }
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getVar("draw")),
+            "recordsTotal"      => $dataQry['totalData'],
+            "recordsFiltered"   => $dataQry['totalFilteredData'],
+            "data"              => $dataResult,
+            "payload"           => $payload,
+        ];
+
+        return response()->setJSON($data);
+    }
+
+    public function allStokPenjualan()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getVar("length"),
+            "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
+            "sort" => $this->request->getVar("sort"),
+            "sorttype" => $this->request->getVar("sortType"),
+        ];
+
+        $addCondition = [
+            "sort"   => $this->request->getVar("sort"),
+            "sortType"  => $this->request->getVar("sortType"),
+            "search" => $this->request->getVar("search"),
+            "bc_id" => "",
+            "divisi_id" => "",
+            "warehouse_id" => "",
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+        ];
+
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
+
+        $stok_id = decrypt($this->request->getVar('stok_id'));
+        $stok = $this->stockModel->find($stok_id);
+
+        $condition = [
+            "stock_details2.stock_id" => $stok_id,
+            "stock_details2.deletedAt" => null,
+            "stock.deletedAt" => null,
+            "stock_details.sumber" => trim($this->request->getVar('sumber')),
+            "stock_details.deletedAt" => null,
+        ];
+
+        $dataQry = $this->stockDetail2Model->getListStokLog($condition, $addCondition, $limit, $offset);
+        $dataResult = [];
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        if ($stok['kemasan_id'] == 0) {
+            // BARANG
+            $barang = $this->barangMasterSpesifikasiModel->find($stok['barang2_id']);
+            $satuan_1 = $this->satuanModel->find($barang['satuan_1']);
+        } else {
+            // KEMASAN
+            $barang = $this->kemasanModel->find($stok['kemasan_id']);
+            $satuan_1 = $this->satuanModel->find($barang['satuan_id']);
+        }
+
+        foreach ($dataQry['data'] as $data) {
+
+            // TEMPELKAN SAJA NO BC 3.0 JIKA PENJUALAN
+            if ($data->sumber == "PENJUALAN") {
+                $bc30Lokal = $this->bc30Model
+                    ->select('bc_30.no_aju, bc_30.tipe_sales_order, sales_order.bc_type, customers.name AS customer_name')
+                    ->join('sales_order', 'sales_order.id = bc_30.sales_order_id', 'left')
+                    ->join('stuffing_lokal', 'stuffing_lokal.sales_order_id = sales_order.id', 'left')
+                    ->join('customers', 'customers.id = sales_order.id_customer', 'left')
+                    ->where('stuffing_lokal.no_stuffing', $data->no_dokumen2)
+                    ->first();
+
+                $bc30Internasional = $this->bc30Model
+                    ->select('bc_30.no_aju, bc_30.tipe_sales_order, sales_order_export.bc_type, customers.name AS customer_name')
+                    ->join('sales_order_export', 'sales_order_export.sales_order_export_id = bc_30.sales_order_id', 'left')
+                    ->join('stuffing_internasional', 'stuffing_internasional.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
+                    ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+                    ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+                    ->where('stuffing_internasional.no_stuffing', $data->no_dokumen2)
+                    ->first();
+
+                if ($bc30Lokal != null) {
+                    // STUFFING LOKAL BC 3.0 SUDAH DIBUAT
+                    $dokumenBC = $this->metaDataModel->find($bc30Lokal['bc_type']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc30Lokal['no_aju'];
+                    $data->customer_name = $bc30Lokal['customer_name'];
+                    $data->tipe_sales_order = $bc30Lokal['tipe_sales_order'];
+                } elseif ($bc30Internasional != null) {
+                    // STUFFING INTERNASIONAL BC 3.0 SUDAH DIBUAT
+                    $dokumenBC = $this->metaDataModel->find($bc30Internasional['bc_type']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc30Internasional['no_aju'];
+                    $data->customer_name = $bc30Internasional['customer_name'];
+                    $data->tipe_sales_order = $bc30Internasional['tipe_sales_order'];
+                } else {
+                    // BELUM DIBUAT SAMA SEKALI DOKUMEN BC 3.O NYA
+                    $dokumenBC = $this->metaDataModel->find($data->bc_id);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->customer_name = "-";
+                    $data->tipe_sales_order = "-";
+                }
+            } else {
+                $dokumenBC = $this->metaDataModel->find($data->bc_id);
+                $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                $data->customer_name = "-";
+                $data->tipe_sales_order = "-";
+            }
+
+
+            $in_out = $data->status == "In" ? "(+)" : "(-)";
+
+            if ($stok['kemasan_id'] == 0) {
+                // BARANG
+                $satuan_2 = $this->satuanModel->find($barang['satuan_2']);
+                $satuan_3 = $this->satuanModel->find($barang['satuan_3']);
+                $barangMaster = $this->barangMasterModel->find($data->barang1_id);
+                $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($data->barang2_id);
+                $satuan_1 = $this->satuanModel->find($barang['satuan_1']);
+
+                array_push($dataResult, [
+                    "no" => $no++,
+                    "tanggal" => date('d/m/Y', strtotime($data->stock_date)),
+                    "dokumen" => $bcName . " / " . $data->no_aju,
+                    "supplier_name" => $data->supplier_name,
+                    "no_dokumen1" => $data->no_dokumen1,
+                    "no_dokumen2" => $data->no_dokumen2,
+                    "stock_dokumen" => $data->stock_dokumen,
+                    "no_po" => $data->no_po,
+                    "barang" => strtoupper($barangMaster['barang_name'] . " - " . $barangMasterSpesifikasi['spesifikasi']),
+                    "customer_name" => $data->customer_name,
+                    "tipe_sales_order" => $data->tipe_sales_order,
+                    "stok_1" =>  $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
+                    "stok_2" => $satuan_2 == null ? "-" : $in_out . (sprintf("%.2f", $data->stok_total / $barang['konversi_satuan_2'])) . " " . $satuan_2['kode_satuan'],
+                    "stok_3" => $satuan_3 == null ? "-" : $in_out .  (sprintf("%.2f", $data->stok_total / $barang['konversi_satuan_3'])) . " " . $satuan_3['kode_satuan'],
+                ]);
+            } else {
+                $satuan_1 = $this->satuanModel->find($barang['satuan_id']);
+                array_push($dataResult, [
+                    "no" => $no++,
+                    "tanggal" => date('d/m/Y', strtotime($data->stock_date)),
+                    "dokumen" => $bcName . " / " . $data->no_aju,
+                    "supplier_name" => $data->supplier_name,
+                    "no_dokumen1" => $data->no_dokumen1,
+                    "no_dokumen2" => $data->no_dokumen2,
+                    "stock_dokumen" => $data->stock_dokumen,
+                    "no_po" => "-",
+                    "barang" => strtoupper($barang['name']),
+                    "customer_name" => $data->customer_name,
+                    "tipe_sales_order" => $data->tipe_sales_order,
                     "stok_1" => $in_out . " " . $data->stok_total . " " . $satuan_1['kode_satuan'],
                     "stok_2" => "-",
                     "stok_3" => "-",

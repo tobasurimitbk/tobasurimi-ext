@@ -57,7 +57,7 @@ class SuratJalan extends BaseController
     public function createView()
     {
         //Get Customers
-        $customers = $this->CustomerModel->getCustomerLokal();
+        $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
 
 
 
@@ -291,7 +291,7 @@ class SuratJalan extends BaseController
             return view('errors/html/error_404', ['message' => 'Not Found']);
         }
 
-        $customers = $this->CustomerModel->getCustomerLokal();
+        $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
 
         $dataSuratJalan->shipping_date = date("m/d/Y", strtotime($dataSuratJalan->shipping_date));
         $dataSo = $this->SalesOrderModel

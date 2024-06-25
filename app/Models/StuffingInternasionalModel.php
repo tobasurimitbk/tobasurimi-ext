@@ -44,6 +44,7 @@ class StuffingInternasionalModel extends Model
     {
         $availableSort = [
             'no_stuffing' => 'stuffing_internasional.no_stuffing',
+            'no_sales_order' => 'sales_order_export.sales_order_export_no',
             'createdAt' => 'stuffing_internasional.createdAt',
             'customer_name' => 'stuffing_internasional.customer_name',
             'status_closed' => 'status_closed'
@@ -55,11 +56,13 @@ class StuffingInternasionalModel extends Model
 
         $selectQry = "stuffing_internasional.*,
         customers.name as customer_name,
+        sales_order_export.sales_order_export_no AS no_sales_order
         ";
 
         $dataQry = $this->asObject()
             ->select($selectQry)
             ->join('customers', 'customers.id = stuffing_internasional.customer_id', 'left')
+            ->join('sales_order_export', 'stuffing_internasional.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
@@ -74,7 +77,7 @@ class StuffingInternasionalModel extends Model
         }
 
         if ($addCondition['no_stuffing']) {
-            $dataQry->like('no_stuffing', $addCondition['no_stuffing']);
+            $dataQry->like('no_stuffing', $addCondition['no_stuffing'])->orLike('no_sales_order', $addCondition['no_stuffing']);
         }
 
         if ($addCondition['start_date']) {

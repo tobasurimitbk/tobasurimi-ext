@@ -236,7 +236,7 @@
         });
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
+            const r= table.row(this).data();
             location.replace(`<?= base_url("pembayaran-po-lokal-bp/id/"); ?>${data.id}`);
         });
     });

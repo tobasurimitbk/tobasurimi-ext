@@ -82,7 +82,7 @@ class TandaTerimaSupBB extends BaseController
 
         foreach ($supplierData['data'] as $data) {
             $jumlahItem = $this->tandaTerimaFakturDetailModel->where('deletedAt', null)->where('tanda_terima_faktur_id', $data->id)->findAll();
-            $is_used = $this->tandaTerimaFakturModel->getTandaTerimaFakturInPembayaran($data->id);
+            // $is_used = $this->tandaTerimaFakturModel->getTandaTerimaFakturInPembayaran($data->id);
 
             if (empty($addCondition['status_lunas'])) {
                 array_push($dataSupplier, [
@@ -96,42 +96,54 @@ class TandaTerimaSupBB extends BaseController
                     "invoice_date"   => $data->invoice_date,
                     "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
                     "recipient"      => $data->recipient,
-                    "is_used"        => $is_used == null ? false : true
+                    "is_used"        =>  true
                 ]);
             } else {
-                if ($addCondition['status_lunas'] == "LUNAS") {
-                    if ($is_used) {
-                        array_push($dataSupplier, [
-                            "no"             => $no++,
-                            "id"             => encrypt($data->id),
-                            "faktur_no"      => $data->faktur_no,
-                            "divisi"         => $data->divisi,
-                            "supplier_name"  => strtoupper($data->supplierName),
-                            "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur - ($data->potongan + $data->tambahan), 0, ',', '.')),
-                            "jumlah_item"    => count($jumlahItem),
-                            "invoice_date"   => $data->invoice_date,
-                            "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
-                            "recipient"      => $data->recipient,
-                            "is_used"        => $is_used == null ? false : true
-                        ]);
-                    }
-                } else {
-                    if (!$is_used) {
-                        array_push($dataSupplier, [
-                            "no"             => $no++,
-                            "id"             => encrypt($data->id),
-                            "faktur_no"      => $data->faktur_no,
-                            "divisi"         => $data->divisi,
-                            "supplier_name"  => strtoupper($data->supplierName),
-                            "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur - ($data->potongan + $data->tambahan), 0, ',', '.')),
-                            "jumlah_item"    => count($jumlahItem),
-                            "invoice_date"   => $data->invoice_date,
-                            "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
-                            "recipient"      => $data->recipient,
-                            "is_used"        => $is_used == null ? false : true
-                        ]);
-                    }
-                }
+                array_push($dataSupplier, [
+                    "no"             => $no++,
+                    "id"             => encrypt($data->id),
+                    "faktur_no"      => $data->faktur_no,
+                    "divisi"         => $data->divisi,
+                    "supplier_name"  => strtoupper($data->supplierName),
+                    "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur - ($data->potongan + $data->tambahan), 0, ',', '.')),
+                    "jumlah_item"    => count($jumlahItem),
+                    "invoice_date"   => $data->invoice_date,
+                    "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
+                    "recipient"      => $data->recipient,
+                    "is_used"        =>  true
+                ]);
+                //     if ($addCondition['status_lunas'] == "LUNAS") {
+                //         if ($is_used) {
+                //             array_push($dataSupplier, [
+                //                 "no"             => $no++,
+                //                 "id"             => encrypt($data->id),
+                //                 "faktur_no"      => $data->faktur_no,
+                //                 "divisi"         => $data->divisi,
+                //                 "supplier_name"  => strtoupper($data->supplierName),
+                //                 "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur - ($data->potongan + $data->tambahan), 0, ',', '.')),
+                //                 "jumlah_item"    => count($jumlahItem),
+                //                 "invoice_date"   => $data->invoice_date,
+                //                 "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
+                //                 "recipient"      => $data->recipient,
+                //                 "is_used"        => $is_used == null ? false : true
+                //             ]);
+                //         }
+                //     } else {
+                //         if (!$is_used) {
+                //             array_push($dataSupplier, [
+                //                 "no"             => $no++,
+                //                 "id"             => encrypt($data->id),
+                //                 "faktur_no"      => $data->faktur_no,
+                //                 "divisi"         => $data->divisi,
+                //                 "supplier_name"  => strtoupper($data->supplierName),
+                //                 "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur - ($data->potongan + $data->tambahan), 0, ',', '.')),
+                //                 "jumlah_item"    => count($jumlahItem),
+                //                 "invoice_date"   => $data->invoice_date,
+                //                 "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
+                //                 "recipient"      => $data->recipient,
+                //                 "is_used"        => $is_used == null ? false : true
+                //             ]);
+                //         }
             }
         }
 
@@ -172,7 +184,8 @@ class TandaTerimaSupBB extends BaseController
             'dataDetailTandaTerimaFaktur' => $this->tandaTerimaFakturDetailModel->getDetail($id),
             'dataPajak' => $this->pajakTandaTerimaFakturModel->where('tanda_terima_faktur_id', $id)->where('deletedAt', null)->findAll(),
             'dataPenerimaanBarang' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed($tandaTerimaFakturDetail['supplier_id'], $tandaTerimaFakturDetail['divisi_id']),
-            'isUsed' => $this->tandaTerimaFakturModel->getTandaTerimaFakturInPembayaran($id) == null ? false : true,
+            // 'isUsed' => $this->tandaTerimaFakturModel->getTandaTerimaFakturInPembayaran($id) == null ? false : true,
+            'isUsed' => true,
             'divisi' => $this->divisiModel->getDivisiAccess(),
         ];
 

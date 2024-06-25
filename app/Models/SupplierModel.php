@@ -142,6 +142,7 @@ class SupplierModel extends Model
         return $supplierData;
     }
 
+
     public function getSupplierByType($type)
     {
         $arrCondition = [
