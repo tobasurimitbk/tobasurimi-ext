@@ -646,6 +646,7 @@
                     if (res.status) {
                         list_items_saldo_awal = [];
                         list_items_saldo_awal = res.data;
+                        console.log(res.data);
                         drawTableSaldoAwal();
                     } else {
                         stopLoading()
@@ -1007,6 +1008,47 @@
                 no++;
             });
             $('.body-detail-table-saldo-akhir').append(row);
+        }
+    }
+
+    const drawTableSaldoAwal = function() {
+        $('.body-detail-table-saldo-awal').empty();
+        $('.tfoot-detail-table-saldo-awal').empty();
+        var row = '';
+        var rowFooter = '';
+        var no = 1;
+        var strip = "-";
+        if (list_items_saldo_awal.length === 0) {
+            row += '<tr><td colspan="6" class="text-center">Data Barang Tidak Ada</td></tr>';
+
+            $('.tfoot-detail-table-saldo-awal').append(row);
+        } else {
+            var hargaUmum = 0;
+            var hargaHarian = 0;
+            var hargaBulanan = 0;
+            var stok = 0;
+            var stokProduksi = 0;
+            var totalHarga = 0;
+            list_items_saldo_awal.map((item, index) => {
+                // counting total
+                hargaUmum += item.harga_umum !== null ? parseFloat(item.harga_umum) : 0;
+                hargaHarian += item.harga_harian !== null ? parseFloat(item.harga_harian) : 0;
+                hargaBulanan += item.harga_bulanan !== null ? parseFloat(item.harga_bulanan) : 0;
+                stok = item.stok_total !== null ? parseFloat(item.stok_total) : 0;
+                stokProduksi = item.stok_produksi !== null ? parseFloat(item.stok_produksi) : 0;
+                totalStok = stok + stokProduksi;
+                totalHarga = (hargaUmum + hargaHarian + hargaBulanan) * totalStok;
+                // end counting
+                row += '<tr style="color:whitesmoke;text-align: center;">';
+                row += '<td>' + no + '</td>';
+                row += '<td>' + item.barang + '</td>';
+                row += '<td>' + (totalStok !== 0 ? parseFloat(totalStok).toLocaleString() : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.satuan !== undefined ? item.satuan : strip) + '</td>';
+                row += '<td>' + (totalHarga !== 0 ? formatRupiah(parseFloat(totalHarga)) : formatRupiah(0)) + '</td>';
+                row += '</tr>';
+                no++;
+            });
+            $('.body-detail-table-saldo-awal').append(row);
         }
     }
 
@@ -1712,6 +1754,9 @@
                     }
                     if (list_items_saldo_akhir.length != 0) {
                         drawTableSaldoAkhir();
+                    }
+                    if (list_items_saldo_awal.length != 0) {
+                        drawTableSaldoAwal();
                     }
                 },
                 error: function() {

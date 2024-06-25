@@ -141,6 +141,9 @@ class ProductionResultModel extends Model
         production_result_details.barang1_id,
         production_result_details.barang2_id,
         production_result_details.stock_id,
+        production_result_details.qty,
+        production_result_details.qty2,
+        production_result_details.qty_isi,
         stock_details2.stock_dokumen AS stock_dokumen2,
         stock_details.no_dokumen,
         production_result_details.stock_dokumen AS stock_dokumen

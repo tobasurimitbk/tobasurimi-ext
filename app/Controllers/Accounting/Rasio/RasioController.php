@@ -1076,13 +1076,13 @@ class RasioController extends BaseController
         ];
         $kursValue = 1;
         $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
-        // var_dump($productionResultDataTitle);
-        // exit;
+
         $dataResults = [];
         $dataStockModel = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
             "bahan_baku",
             $this->request->getVar('divisi_id')
         );
+
         foreach ($dataStockModel as $value) {
             $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
                 $value['stock_id']
@@ -1111,12 +1111,21 @@ class RasioController extends BaseController
                 $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
                 $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
                 $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
+
+                // Initialize stok_produksi to 0
+                $dataResult[$i]['stok_produksi'] = 0;
+
+                foreach ($productionResultDataTitle as $valueProductionResultData) {
+                    if ($valueProductionResultData['stock_id'] == $dataResult[$i]['stock_id']) {
+                        $dataResult[$i]['stok_produksi'] = $valueProductionResultData['qty'];
+                        break; // Exit the loop once a match is found
+                    }
+                }
             }
 
             // Merge current dataResult into dataResults
             $dataResults = array_merge($dataResults, $dataResult);
         }
-        // var_dump($dataResults);
         return response()->setJSON([
             'data' => $dataResults,
             'token' => csrf_hash(),
