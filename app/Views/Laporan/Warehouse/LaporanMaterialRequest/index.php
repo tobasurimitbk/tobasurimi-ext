@@ -4,12 +4,12 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Laporan Penerimaan Barang</h1>
+        <h1>Laporan Materal Request</h1>
         <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-warehouse/penerimaan-barang/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-warehouse/material-request/print"); ?>')">PDF</button></li>
         </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-warehouse"); ?>">
@@ -23,15 +23,14 @@
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-4">
                     <div class="form-floating mb-3">
-                        <select class="form-select filter_bc_type" name="filter_bc_type" id="filter_bc_type">
-                            <option selected value="BC 2.3" data-code="">BC 2.3</option>
-                            <option value="BC 2.7" data-code="">BC 2.7</option>
-                            <option value="BC 4.0" data-code="">BC 4.0</option>
-                            <option value="PPB KB" data-code="">PPB KB</option>
-                            <option value="Non Pabean" data-code="">Non Pabean</option>
-
+                        <select class="form-select filter_tipe_barang" name="filter_tipe_barang" id="filter_tipe_barang">
+                            <option selected value="bahan_baku" data-code="">Bahan Baku</option>
+                            <option value="bahan_penolong" data-code="">Bahan Penolong</option>
+                            <option value="bahan_jadi" data-code="">Bahan Jadi</option>
+                            <option value="bahan_scrap" data-code="">Bahan Scrap</option>
+                            <option value="bahan_setengah_jadi" data-code="">Bahan Setengah Jadi</option>
                         </select>
-                        <label for="floatingInput">Filter Tipe BC</label>
+                        <label for="floatingInput">Filter Tipe Barang</label>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -60,20 +59,15 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="changeSort('bc_type')" class="sort">Jenis Doc</th>
-                                <th onclick="changeSort('tanggal_bc')" class="sort">Tanggal Doc</th>
-                                <th onclick="changeSort('no_daftar')" class="sort">No Daftar</th>
-                                <th onclick="changeSort('no_aju')" class="sort">No Aju</th>
-                                <th onclick="changeSort('no_penerimaan_barang')" class="sort">No Bukti</th>
-                                <th onclick="changeSort('tanggal_lpb')" class="sort">Tanggal Bukti</th>
-                                <th onclick="changeSort('po_no')" class="sort">No Order</th>
-                                <th onclick="changeSort('po_date')" class="sort">Tanggal Order</th>
+                                <th onclick="changeSort('wo_no')" class="sort">Kode Produksi</th>
+                                <th onclick="changeSort('req_no')" class="sort">No Request</th>
+                                <th onclick="changeSort('request_date')" class="sort">Tanggal Request</th>
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
-                                <th onclick="changeSort('nama_barang_dok')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('kode_satuan')" class="sort">Kode Satuan</th>
-                                <th onclick="changeSort('qty')" class="sort">Jumlah Order</th>
-                                <th onclick="changeSort('jml_masuk')" class="sort">Jumlah Diterima</th>
+                                <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
+                                <th onclick="changeSort('qty2')" class="sort">Jumlah</th>
+                                <th onclick="changeSort('satuan')" class="sort">Satuan</th>
+                                <th onclick="changeSort('ref_no')" class="sort">Refrensi</th>
 
                             </tr>
 
@@ -89,7 +83,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "tanggal_lpb";
+    let sort = "request_date";
     let sortType = "desc";
     var row = 0;
 
@@ -108,12 +102,12 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("/laporan-warehouse/penerimaan-barang/all-penerimaan-barang"); ?>",
+            url: "<?= base_url("laporan-warehouse/material-request/all-material-request"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
-                data.filter_bc_type = $(".filter_bc_type").val();
+                data.filter_tipe_barang = $(".filter_tipe_barang").val();
                 data.sort = sort;
                 data.sortType = sortType;
 
@@ -135,36 +129,16 @@
                 sortable: false
             },
             {
-                data: "bc_type",
+                data: "wo_no",
                 className: "text-center",
 
             },
             {
-                data: "tanggal_bc",
+                data: "req_no",
                 className: "text-center",
             },
             {
-                data: "no_daftar",
-                className: "text-center",
-            },
-            {
-                data: "no_aju",
-                className: "text-center",
-            },
-            {
-                data: "no_penerimaan_barang",
-                className: "text-center",
-            },
-            {
-                data: "tanggal_lpb",
-                className: "text-center",
-            },
-            {
-                data: "po_no",
-                className: "text-center",
-            },
-            {
-                data: "po_date",
+                data: "request_date",
                 className: "text-center",
             },
             {
@@ -176,19 +150,19 @@
                 className: "text-center",
             },
             {
-                data: "nama_barang_dok",
+                data: "nama_barang",
                 className: "text-center",
             },
             {
-                data: "kode_satuan",
+                data: "qty2",
                 className: "text-center",
             },
             {
-                data: "qty",
+                data: "satuan",
                 className: "text-center",
             },
             {
-                data: "jml_masuk",
+                data: "ref_no",
                 className: "text-center",
             },
 
@@ -242,23 +216,23 @@
         table.ajax.reload();
     })
 
-    $(".dateStart, .dateEnd, .filter_bc_type").change(function() {
+    $(".dateStart, .dateEnd, .filter_tipe_barang").change(function() {
         table.ajax.reload();
     });
 
-    $('.filter_bc_type').select2({
+    $('.filter_tipe_barang').select2({
         placeholder: "",
         theme: "bootstrap-5"
     })
 
-    $('.filter_bc_type')
+    $('.filter_tipe_barang')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.filter_bc_type')
+    $('.filter_tipe_barang')
         .parent('div')
         .children('span')
         .children('span')
@@ -266,7 +240,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.filter_bc_type')
+    $('.filter_tipe_barang')
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -275,10 +249,10 @@
 
         let dateStart = $(".dateStart").val();
         let dateEnd = $(".dateEnd").val();
-        let filter_bc_type = $(".filter_bc_type").val();
+        let filter_tipe_barang = $(".filter_tipe_barang").val();
 
 
-        window.open(url + `?filter_bc_type=${filter_bc_type}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
+        window.open(url + `?filter_tipe_barang=${filter_tipe_barang}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 
