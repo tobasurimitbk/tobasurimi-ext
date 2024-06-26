@@ -326,6 +326,8 @@ class StockDetail2Model extends Model
     public function getStockListWithBCDocNoGroup($stockID, $isAdjusment = false)
     {
         $selectQry = '
+            stock.barang1_id,
+            stock.barang2_id,
             suppliers.name AS supplier_name,
             stock_details2.id,
             stock_details2.bc_id,
@@ -354,6 +356,7 @@ class StockDetail2Model extends Model
                 ->select($selectQry)
                 ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
                 ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+                ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
                 ->where('stock_details2.stock_id', $stockID)
                 ->groupBy('stock_details2.stock_id')
                 ->orderBy('stock_details.createdAt', "ASC")
@@ -363,6 +366,7 @@ class StockDetail2Model extends Model
                 ->select($selectQry)
                 ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
                 ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+                ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
                 ->where('stock_details2.stock_id', $stockID)
                 ->groupBy('stock_details2.stock_id')
                 ->having('stok_total >', 0)
@@ -410,6 +414,50 @@ class StockDetail2Model extends Model
             ->groupBy('stock_details2.bc_id')
             ->groupBy('stock_details2.no_aju')
             ->first();
+
+        return $dataQry;
+    }
+
+    public function getStockListWithAddCondition($stockID, $condition)
+    {
+        // JIKA $isAdjusment = true MAKA STOK < 0 MUNCUL
+        // JIKA $isAdjusment = false MAKA STOK > 0 YANG MUNCUL
+        $selectQry = '
+            suppliers.name AS supplier_name,
+            stock_details2.id,
+            stock_details2.bc_id,
+            stock_details2.stock_detail_id,
+            stock_details2.no_aju,
+            stock_details2.stock_id,
+            stock_details2.stock_dokumen,
+            stock_details2.no_dokumen AS no_dokumen_2,
+            stock_details2.supplier_id,
+            stock_details2.harga_umum,
+            stock_details2.harga_harian,
+            stock_details2.harga_bulanan,
+            stock_details2.no_po,
+            stock_details.no_dokumen AS no_dokumen_1,
+            stock_details.stock_date,
+            stock_details.sumber,
+            (SUM(CASE WHEN stock_details.status = "In" 
+            THEN stock_details2.qty ELSE 0 END) - 
+            SUM(CASE WHEN stock_details.status = "Out" 
+            THEN stock_details2.qty ELSE 0 END)) 
+            AS stok_total,        
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+            ->where('stock_details2.stock_id', $stockID)
+            ->where($condition)
+            ->groupBy('stock_details2.stock_dokumen')
+            ->groupBy('stock_details2.bc_id')
+            ->groupBy('stock_details2.no_aju')
+            ->having('stok_total >', 0)
+            ->orderBy('stock_details.createdAt', "ASC")
+            ->findAll();
 
         return $dataQry;
     }

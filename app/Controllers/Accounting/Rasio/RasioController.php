@@ -33,6 +33,8 @@ use App\Models\RasioBarangDigunakanModel;
 use App\Models\RasioBarangJadiModel;
 use App\Models\RasioCostModel;
 use App\Models\RasioModel;
+use App\Models\RasioSaldoAkhirModel;
+use App\Models\RasioSaldoAwalModel;
 use App\Models\RMImportPODetailModel;
 use App\Models\RMImportPOModel;
 use App\Models\RMPurchaseOrderDetailModel;
@@ -81,6 +83,8 @@ class RasioController extends BaseController
     protected $barangMasterSpesifikasiModel;
     protected $satuanModel;
     protected $kemasanModel;
+    protected $rasioSaldoAwalModel;
+    protected $rasioSaldoAkhirModel;
 
     public function __construct()
     {
@@ -121,6 +125,8 @@ class RasioController extends BaseController
         $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->satuanModel = new SatuansModel();
         $this->kemasanModel = new KemasanModel();
+        $this->rasioSaldoAwalModel = new RasioSaldoAwalModel();
+        $this->rasioSaldoAkhirModel = new RasioSaldoAkhirModel();
     }
 
     public function index()
@@ -188,14 +194,20 @@ class RasioController extends BaseController
                 "harga_average_po_bp" => $this->request->getVar("hargaSatuanPembelian_material_2") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("hargaSatuanPembelian_material_2")), 2, '.', '') : 0,
             ];
 
-            $id = $this->rasioModel->insert($data);
 
             $barang_digunakan = json_decode($this->request->getVar("items_digunakan"));
             $barang_jadi = json_decode($this->request->getVar("items_jadi"));
             $barang_digunakan_material_2 = json_decode($this->request->getVar("items_digunakan_material_2"));
+            $saldo_awal = json_decode($this->request->getVar("saldo_awal"));
+            $saldo_akhir = json_decode($this->request->getVar("saldo_akhir"));
             $labor_cost = json_decode($this->request->getVar("labor_cost"));
             $overhead_cost = json_decode($this->request->getVar("overhead_cost"));
             $fixed_cost = json_decode($this->request->getVar("fixed_cost"));
+
+            // var_dump($saldo_awal);
+            // var_dump($saldo_akhir);
+            // exit;
+            $id = $this->rasioModel->insert($data);
 
             foreach ($barang_digunakan as $s) {
                 $this->rasioBarangDigunakanModel->insert([
@@ -327,6 +339,66 @@ class RasioController extends BaseController
                 }
             }
 
+            foreach ($saldo_awal as $s) {
+                $this->rasioSaldoAwalModel->insert([
+                    'rasio_id' => $id,
+                    'barang1_id' => $s->barang1_id,
+                    'barang2_id' => $s->barang2_id,
+                    'supplier_name' => $s->supplier_name,
+                    'bc_id' => $s->bc_id,
+                    'stock_detail_id' => $s->stock_detail_id,
+                    'no_aju' => $s->no_aju,
+                    'stock_id' => $s->stock_id,
+                    'stock_dokumen' => $s->stock_dokumen,
+                    'no_dokumen_2' => $s->no_dokumen_2,
+                    'supplier_id' => $s->supplier_id,
+                    'harga_umum' => $s->harga_umum ?? 0,
+                    'harga_harian' => $s->harga_harian ?? 0,
+                    'harga_bulanan' => $s->harga_bulanan ?? 0,
+                    'no_po' => $s->no_po,
+                    'no_dokumen_1' => $s->no_dokumen_1,
+                    'stock_date' => $s->stock_date,
+                    'sumber' => $s->sumber,
+                    'stok_total' => $s->stok_total,
+                    'bc_type' => $s->bc_type,
+                    'satuan' => $s->satuan,
+                    'barang' => $s->barang,
+                    'type_barang' => $s->type_barang,
+                    'type_barang_text' => $s->type_barang_text,
+                    'stok_produksi' => $s->stok_produksi ?? 0,
+                ]);
+            }
+
+            foreach ($saldo_akhir as $s) {
+                $this->rasioSaldoAkhirModel->insert([
+                    'rasio_id' => $id,
+                    'barang1_id' => $s->barang1_id,
+                    'barang2_id' => $s->barang2_id,
+                    'supplier_name' => $s->supplier_name,
+                    'bc_id' => $s->bc_id,
+                    'stock_detail_id' => $s->stock_detail_id,
+                    'no_aju' => $s->no_aju,
+                    'stock_id' => $s->stock_id,
+                    'stock_dokumen' => $s->stock_dokumen,
+                    'no_dokumen_2' => $s->no_dokumen_2,
+                    'supplier_id' => $s->supplier_id,
+                    'harga_umum' => $s->harga_umum ?? 0,
+                    'harga_harian' => $s->harga_harian ?? 0,
+                    'harga_bulanan' => $s->harga_bulanan ?? 0,
+                    'no_po' => $s->no_po,
+                    'no_dokumen_1' => $s->no_dokumen_1,
+                    'stock_date' => $s->stock_date,
+                    'sumber' => $s->sumber,
+                    'stok_total' => $s->stok_total,
+                    'bc_type' => $s->bc_type,
+                    'satuan' => $s->satuan,
+                    'barang' => $s->barang,
+                    'type_barang' => $s->type_barang,
+                    'type_barang_text' => $s->type_barang_text,
+                    'stok_produksi' => $s->stok_produksi ?? 0,
+                ]);
+            }
+
             return response()->setJSON([
                 "id"      => encrypt($id),
                 "status"  => true,
@@ -362,13 +434,14 @@ class RasioController extends BaseController
         $data = [
             'dataDivisi' => $this->divisisModel->getDivisiAccess(),
             "subAkuns" => $subAkunsModel,
+            'kategoriBarangAkun' => $this->metadataModel->asObject()->where('name', 'kategori_barang_akun')->findAll(),
             "rasio" => $rasioModel,
             "rasioBarangDigunakan" => $rasioBarangDigunakanModel,
             "rasioBarangJadi" => $rasioBarangJadiModel,
             "rasioBarangPenolong" => $rasioBarangPenolongModel,
             "rasioCost" => $rasioCostModel,
         ];
-        // var_dump($data);
+        // var_dump($rasioModel);
         // exit;
         return view('Accounting/rasio/form', $data);
     }

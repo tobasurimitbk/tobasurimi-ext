@@ -3,97 +3,68 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Proses Rebusan Bahan Baku</h1>
-        <?php if (can("Jasa Vendor", "Proses Rebus", "c")) : ?>
-            <a href="<?= base_url('proses-rebus/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+        <h1>Order Form Penjualan Lain Lain</h1>
+        <?php if (can("Penjualan Lain", "Order Form", "c")) : ?>
+            <a href="<?= base_url('order-form-lain/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
     </div>
     <div class="card">
+        <?= csrf_field() ?>
         <div class="card-body">
-            <?= csrf_field() ?>
-            <div class="row mb-4">
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating">
-                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php foreach ($dataDivisi as $divisi) : ?>
-                                <option value="<?= $divisi["id"]; ?>"><?= strtoupper($divisi["divisi"]); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label style="z-index: 1;">Departemen</label>
-                    </div>
-                </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating">
-                        <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                        </select>
-                        <label style="z-index: 1;">Warehouse</label>
-                    </div>
-                </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating">
-                        <select class="form-select status" id="status" name="status" aria-label="Floating label select example">
-                            <option value="">SEMUA</option>
-                            <option value="1">POSTED</option>
-                            <option value="0">WAITING</option>
-                        </select>
-                        <label style="z-index: 1;">Status Posting</label>
-                    </div>
-                </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" class="form-control input-picker start_date" id="start_date" name="start_date" placeholder="Tanggal Dibuat" />
-                                <label for="floatingInput">Tanggal Mulai</label>
-                            </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 25px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
-                            </div>
+            <div class="row justify-content-start row-col-spp">
+                <div class="col-md-3 mb-3">
+                    <?= csrf_field() ?>
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker tanggal_mulai" id="tanggal_mulai" name="tanggal_mulai" placeholder="Mulai Tanggal Dibuat">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-tanggal_mulai"></i>
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" class="form-control input-picker end_date" id="end_date" name="end_date" placeholder="Tanggal Selesai" />
-                                <label for="floatingInput">Tanggal Selesai</label>
-                            </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 25px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
-                            </div>
+                <div class="col-md-3 mb-3">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker tanggal_selesai" id="tanggal_selesai" name="tanggal_selesai" placeholder="Selesai Tanggal Dibuat">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-tanggal_selesai"></i>
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control no_rebus" id="no_rebus" name="no_rebus" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Perebusan </label>
-                    </div>
+                <div class="col-md-3 mb-3">
+                    <select name="status_posting" class="form-select status_posting" id="status_posting">
+                        <option selected value="ALL">STATUS POSTING : SEMUA</option>
+                        <option value="SUDAH POSTING">STATUS POSTING : SUDAH POSTING</option>
+                        <option value="BELUM POSTING">STATUS POSTING : BELUM POSTING</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <input autocomplete="one-time-code" class="form-control no_sales_order search form-out-search" id="no_sales_order" placeholder="Cari Nomor Order Form" value="" />
                 </div>
             </div>
-            <div class="table-responsive">
-                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>No</th>
-                            <th onclick="changeSort('no_rebus')">No Rebus</th>
-                            <th onclick="changeSort('proses_rebus.createdAt')">Tanggal</th>
-                            <th onclick="changeSort('divisi_id')">Departemen</th>
-                            <th onclick="changeSort('warehouse_id')">Warehouse</th>
-                            <th>Total Item</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
-                    </tbody>
-                </table>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="text-align: center;">No</th>
+                                <th onclick="changeSort('tanggal')" style="text-align: center;">Tanggal Order</th>
+                                <th onclick="changeSort('divisi_id')" class="sort" style="text-align: center;">Departemen</th>
+                                <th onclick="changeSort('no_sales_order')" class="sort" style="text-align: center;">No Order Form</th>
+                                <th onclick="changeSort('tipe_customer')" style="text-align: center;">Tipe Customer</th>
+                                <th onclick="changeSort('customer_name')" style="text-align: center;">Customer</th>
+                                <th style="text-align: center;">Dokumen Pengeluaran</th>
+                                <th onclick="changeSort('keterangan')" style="text-align: center;">Keterangan</th>
+                                <th style="text-align: center;">Total Barang</th>
+                                <th onclick="changeSort('total_harga')" style="text-align: center;">Total Harga</th>
+                                <th style="text-align: center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        </tbody>
+                    </table>
+                </div>
             </div>
-
         </div>
     </div>
 </section>
@@ -102,6 +73,7 @@
     let sort = "createdAt";
     let sortType = "desc";
     const csrfToken = '<?= csrf_token() ?>';
+    const csrf = $(`[name="${csrfToken}"]`);
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -118,15 +90,13 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("proses-rebus/all"); ?>",
+            url: "<?= base_url("order-form-lain/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.divisi_id = $(".divisi_id").val();
-                data.warehouse_id = $(".warehouse_id").val();
-                data.status = $(".status").val();
-                data.start_date = $(".start_date").val();
-                data.end_date = $(".end_date").val();
-                data.no_rebus = $(".no_rebus").val();
+                data.mulai_tanggal = $(".mulai_tanggal").val();
+                data.selesai_tanggal = $(".selesai_tanggal").val();
+                data.status_posting = $(".status_posting").val();
+                data.no_sales_order = $(".no_sales_order").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -144,27 +114,45 @@
                 orderable: false
             },
             {
-                data: "no_rebus",
+                data: "tanggal",
                 className: "text-center",
 
             },
             {
-                data: "tanggal",
+                data: "divisi",
                 className: "text-center"
             },
             {
-                data: "divisi",
+                data: "no_sales_order",
                 className: "text-center",
             },
             {
-                data: "warehouse_name",
+                data: "tipe_customer",
                 className: "text-center"
             },
             {
-                data: "total_item",
+                data: "customer_name",
+                className: "text-center"
+            },
+            {
+                data: "dokumen_pengeluaran",
                 className: "text-center",
                 searchable: false,
                 sortable: false
+            },
+            {
+                data: "keterangan",
+                className: "text-center"
+            },
+            {
+                data: "total_barang",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "total_harga",
+                className: "text-center"
             },
             {
                 data: "id",
@@ -173,29 +161,34 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row.id;
-                    let status = row.status_posting
+                    let status_posting = row.status_posting
                     let status_used = row.status_used;
 
-                    if (status === "0") {
+                    if (status_posting === "0") {
                         return `
                         <div class="mt-0">
-                        <?php if (can('Jasa Vendor', 'Proses Rebus', 'a')) : ?>
-                            <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
-                                <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-                            </button>
-                        <?php endif; ?>
-                        <?php if (can('Jasa Vendor', 'Proses Rebus', 'd')) : ?>
-                            <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-                        <?php endif; ?>
+                            <?php if (can('Penjualan Lain', 'Order Form', 'a')) : ?>
+                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
+                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                            <?php if (can('Penjualan Lain', 'Order Form', 'd')) : ?>
+                                <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                            <?php if (can('Penjualan Lain', 'Order Form', 'p')) : ?>
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-lain/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
                         </div>
                     `
                     } else {
                         var res = '';
                         if (status_used == '0') {
                             res += `
-                        <?php if (can('Jasa Vendor', 'Proses Rebus', 'ua')) : ?>
+                        <?php if (can('Penjualan Lain', 'Order Form', 'ua')) : ?>
                                 <button data-toggle="tooltip" title="Un-Posting" onclick="unPosting('${id}')" class="btn btn-danger posting-spp">
                                     <i class="fa-solid fa-ban"></i>    
                                 </button>
@@ -229,89 +222,36 @@
         }
     });
 
-
-    $(".start_date").datepicker({
+    $(".tanggal_mulai").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
     })
 
-    $(".end_date").datepicker({
+    $(".tanggal_selesai").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
-    })
+    });
 
-    $('#divisi_id').select2({
-        placeholder: "Pilih Departemen",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        // GET WAREHOUSES
-        $.ajax({
-            url: `<?= base_url('proses-rebus/warehouse'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                divisi_id: $(".divisi_id option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".warehouse_id").empty()
-                $(".warehouse_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
-                })
-                $(".warehouse_id").val();
-            }
-        });
+    $(".tanggal_mulai,.tanggal_selesai,.status_posting").change(function() {
         table.ajax.reload();
     });
 
-    $('#warehouse_id').select2({
-        placeholder: "Pilih Warehouse",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
+    $('.no_sales_order').keyup(function() {
         table.ajax.reload();
     });
-
-    $('#status').select2({
-        placeholder: "Pilih Status",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        table.ajax.reload();
-    });
-
-    $("#divisi_id,#warehouse_id,#status")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-
-    $('.start_date,.end_date').change(function() {
-        table.ajax.reload();
-    });
-
-    $('.no_rebus').keyup(function() {
-        table.ajax.reload();
-    })
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        location.replace(`<?= base_url("proses-rebus/id"); ?>/${data.id}`);
+        location.replace(`<?= base_url("order-form-lain/id"); ?>/${data.id}`);
     });
+
+    const print = function(url) {
+        window.open(url, "_blank");
+    }
 
     const unPosting = function(id) {
         Swal.fire({
@@ -327,7 +267,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("proses-rebus/unposting"); ?>",
+                    url: "<?= base_url("order-form-lain/unposting"); ?>",
                     data: {
                         id: id,
                         status: status
@@ -363,7 +303,7 @@
     const posting = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Posting Proses Rebus ?',
+            title: 'Posting Order Form ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -374,7 +314,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("proses-rebus/posting"); ?>",
+                    url: "<?= base_url("order-form-lain/posting"); ?>",
                     data: {
                         id: id
                     },
@@ -397,12 +337,6 @@
                             }).then((result) => {
                                 table.ajax.reload()
                             });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            })
                         }
                     },
                 });
@@ -413,7 +347,7 @@
     const remove = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Hapus Proses Rebus ?',
+            title: 'Hapus Order Form ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -424,7 +358,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("proses-rebus/delete"); ?>",
+                    url: "<?= base_url("order-form-lain/delete"); ?>",
                     data: {
                         id: id
                     },
@@ -460,6 +394,7 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+        table.ajax.reload();
     }
 </script>
 
