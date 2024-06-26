@@ -302,4 +302,77 @@ class MaterialRequestsModel extends Model
 
         return $data;
     }
+
+
+    public function getAllMaterialRequestReport($addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'req_no'             => 'material_requests.req_no',
+            'department'       => 'divisis.divisi',
+            'nama_barang'       => 'material_request_details.nama_barang',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'material_requests.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "material_requests.id, 
+            material_requests.request_date, 
+            material_requests.req_no, 
+            work_orders.wo_no,
+            material_request_details.nama_barang,
+            material_request_details.satuan,
+            material_request_details.ref_no,
+            material_request_details.qty2,
+            divisis.divisi,
+            stock.tipe_barang,    
+            stock.barang1_id,    
+            stock.barang2_id  
+              
+        ";
+
+        $materialRequestsDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where('material_requests.is_posted', '1')
+            ->where('material_requests.company_id', $addCondition['company_id'])
+            ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
+            ->join('work_orders', 'work_orders.id = material_requests.work_order_id', 'left')
+            ->join('divisis', 'divisis.id = material_request_details.divisi_tujuan_id', 'left')
+            ->join('stock', 'stock.id = material_request_details.stock_id', 'left')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $materialRequestsDataQry->countAllResults(false);
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_tipe_barang']) {
+            $materialRequestsDataQry->groupStart();
+        }
+
+
+        if ($addCondition['dateStart']) {
+            $materialRequestsDataQry->where('material_requests.request_date >=', $addCondition['dateStart']);
+        }
+
+        if ($addCondition['dateEnd']) {
+            $materialRequestsDataQry->where('material_requests.request_date <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['filter_tipe_barang']) {
+            $materialRequestsDataQry->where('material_request_details.barang_type', $addCondition['filter_tipe_barang']);
+        }
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_tipe_barang']) {
+            $materialRequestsDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $materialRequestsDataQry->countAllResults(false);
+        $data = $materialRequestsDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
 }

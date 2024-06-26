@@ -1605,6 +1605,10 @@ $routes->get('/laporan-warehouse/penerimaan-barang', 'Laporan\Warehouse\LaporanW
 $routes->get('/laporan-warehouse/penerimaan-barang/all-penerimaan-barang', 'Laporan\Warehouse\LaporanWarehouse::allLaporanPenerimaanBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-warehouse/penerimaan-barang/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanPenerimaanBarang', ['filter' => 'Auth']);
 
+$routes->get('/laporan-warehouse/material-request', 'Laporan\Warehouse\LaporanWarehouse::laporanMaterialRequest', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/material-request/all-material-request', 'Laporan\Warehouse\LaporanWarehouse::allLaporanMaterialRequest', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/material-request/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanMaterialRequest', ['filter' => 'Auth']);
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing

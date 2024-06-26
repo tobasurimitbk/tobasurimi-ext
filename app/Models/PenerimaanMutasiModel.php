@@ -392,4 +392,178 @@ class PenerimaanMutasiModel extends Model
 
         return $generatedNo;
     }
+
+    public function getPenerimaanBarangListReportPPBKB($addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'no_ppbkb'      => 'ppbkb.no_ppbkb'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'penerimaan_mutasi.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "penerimaan_mutasi.penerimaan_mutasi_no,
+        penerimaan_mutasi.multiple_mutasi_id,
+        penerimaan_mutasi_detail.stock_asal_id as stock_id,
+        penerimaan_mutasi.tanggal,
+        penerimaan_mutasi_detail.mutasi_id,
+
+        mutasi_detail.stock_id AS stock_id_asal,
+        mutasi_detail.bc_id AS bc_id_asal,
+        mutasi_detail.no_aju AS no_aju_asal,
+        mutasi_detail.stock_dokumen AS stock_dokumen_asal,
+        
+        divisis.divisi AS divisi_penerima,
+           
+        
+        mutasi_detail.qty AS qty,    
+        penerimaan_mutasi_detail.qty AS jml_masuk,
+
+        mutasi.tanggal AS tanggal_bc, 
+
+        ppbkb.no_ppbkb AS no_ppbkb,    
+        ppbkb.no_daftar AS no_daftar,    
+          
+        stock.tipe_barang,    
+        stock.barang1_id,    
+        stock.barang2_id,    
+        stock.kemasan_id,    
+          
+        ";
+
+        $penerimaanMutasi = $this->asObject()
+            ->select($selectQry)
+            ->join('divisis', 'divisis.id = penerimaan_mutasi.divisi_id', 'left')
+            ->join('penerimaan_mutasi_detail', 'penerimaan_mutasi_detail.penerimaan_mutasi_id = penerimaan_mutasi.id', 'left')
+            ->join('mutasi', 'mutasi.id = penerimaan_mutasi_detail.mutasi_id', 'left')
+            ->join('mutasi_detail', 'mutasi_detail.id = penerimaan_mutasi_detail.mutasi_detail_id', 'left')
+            ->join('ppbkb', 'ppbkb.mutasi_id = penerimaan_mutasi_detail.mutasi_id', 'left')
+            ->join('stock', 'stock.id = mutasi_detail.stock_id', 'left')
+
+            ->where('penerimaan_mutasi.company_id', $addCondition['company_id'])
+
+            ->where('penerimaan_mutasi.deletedAt', null)
+            ->where('penerimaan_mutasi_detail.deletedAt', null)
+            ->where('penerimaan_mutasi.status_posting', '1')
+
+            ->orderBy($sort, $sortType);
+
+        $totalData = $penerimaanMutasi->countAllResults(false);
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $penerimaanMutasi->groupStart();
+        }
+
+
+        if ($addCondition['dateStart']) {
+            $penerimaanMutasi->where('mutasi.tanggal >=', $addCondition['dateStart']);
+        }
+
+        if ($addCondition['dateEnd']) {
+            $penerimaanMutasi->where('mutasi.tanggal <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $penerimaanMutasi->groupEnd();
+        }
+
+        $totalFilteredData = $penerimaanMutasi->countAllResults(false);
+        $data = $penerimaanMutasi->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
+
+    public function getPenerimaanBarangListReportPPBKBPDF($addCondition)
+    {
+        $availableSort = [
+            'no_ppbkb'      => 'ppbkb.no_ppbkb'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'penerimaan_mutasi.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "penerimaan_mutasi.penerimaan_mutasi_no,
+        penerimaan_mutasi.multiple_mutasi_id,
+        penerimaan_mutasi_detail.stock_asal_id as stock_id,
+        penerimaan_mutasi.tanggal,
+        penerimaan_mutasi_detail.mutasi_id,
+
+        mutasi_detail.stock_id AS stock_id_asal,
+        mutasi_detail.bc_id AS bc_id_asal,
+        mutasi_detail.no_aju AS no_aju_asal,
+        mutasi_detail.stock_dokumen AS stock_dokumen_asal,
+        
+        divisis.divisi AS divisi_penerima,
+           
+        
+        mutasi_detail.qty AS qty,    
+        penerimaan_mutasi_detail.qty AS jml_masuk,
+
+        mutasi.tanggal AS tanggal_bc, 
+
+        ppbkb.no_ppbkb AS no_ppbkb,    
+        ppbkb.no_daftar AS no_daftar,    
+          
+        stock.tipe_barang,    
+        stock.barang1_id,    
+        stock.barang2_id,    
+        stock.kemasan_id,    
+          
+        ";
+
+        $penerimaanMutasi = $this->asObject()
+            ->select($selectQry)
+            ->join('divisis', 'divisis.id = penerimaan_mutasi.divisi_id', 'left')
+            ->join('penerimaan_mutasi_detail', 'penerimaan_mutasi_detail.penerimaan_mutasi_id = penerimaan_mutasi.id', 'left')
+            ->join('mutasi', 'mutasi.id = penerimaan_mutasi_detail.mutasi_id', 'left')
+            ->join('mutasi_detail', 'mutasi_detail.id = penerimaan_mutasi_detail.mutasi_detail_id', 'left')
+            ->join('ppbkb', 'ppbkb.mutasi_id = penerimaan_mutasi_detail.mutasi_id', 'left')
+            ->join('stock', 'stock.id = mutasi_detail.stock_id', 'left')
+
+            ->where('penerimaan_mutasi.company_id', $addCondition['company_id'])
+
+            ->where('penerimaan_mutasi.deletedAt', null)
+            ->where('penerimaan_mutasi_detail.deletedAt', null)
+            ->where('penerimaan_mutasi.status_posting', '1')
+
+            ->orderBy($sort, $sortType);
+
+        $totalData = $penerimaanMutasi->countAllResults(false);
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $penerimaanMutasi->groupStart();
+        }
+
+
+        if ($addCondition['dateStart']) {
+            $penerimaanMutasi->where('mutasi.tanggal >=', $addCondition['dateStart']);
+        }
+
+        if ($addCondition['dateEnd']) {
+            $penerimaanMutasi->where('mutasi.tanggal <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $penerimaanMutasi->groupEnd();
+        }
+
+        $totalFilteredData = $penerimaanMutasi->countAllResults(false);
+        $data = $penerimaanMutasi->findAll();
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
 }
