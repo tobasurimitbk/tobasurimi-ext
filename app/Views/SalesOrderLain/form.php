@@ -31,7 +31,11 @@
                         </button>
                     <?php endif; ?>
                 <?php else : ?>
-
+                    <?php if (can('Penjualan Lain', 'Order Form', 'p')) : ?>
+                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("order-form-lain/print/"); ?><?= encrypt($salesOrderLain['id']); ?>')">
+                            Print
+                        </button>
+                    <?php endif; ?>
                 <?php endif; ?>
             <?php else : ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
@@ -163,7 +167,7 @@
                                 <select class="form-select type_barang" id="type_barang" name="type_barang" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($tipeBarang as $t) : ?>
-                                        <?php if ($t['description'] != "bahan_jadi" && $t['description'] != "bahan_setengah_jadi" && $t['description'] != "bahan_scrap" && $t['description'] != "bahan_modal") : ?>
+                                        <?php if ($t['description'] != "bahan_jadi" && $t['description'] != "bahan_setengah_jadi" &&  $t['description'] != "bahan_modal") : ?>
                                             <option value="<?= $t['description'] ?>">
                                                 <?= strtoupper($t['value']); ?>
                                             </option>
@@ -404,6 +408,9 @@
 
     // INIT PAS UPDATE
     <?php if (!empty($salesOrderLain)) : ?>
+        <?php if ($salesOrderLain['status_posting'] === "1") : ?>
+            $('.detail-form-layout').hide();
+        <?php endif; ?>
         $.ajax({
             url: `<?= base_url('order-form-lain/list-sales-order-detail'); ?>`,
             method: "GET",
@@ -1029,8 +1036,8 @@
                 newRow.append($('<td style="text-align: center;">').text(formatRupiah(v.total_harga)));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <button type="button" class="btn btn-danger mr-1" onclick="deleteDetail(${v.id})"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-                    <button type="button" class="btn btn-primary" onclick="displayDetail(${v.id})" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
+                    <button <?= !empty($salesOrderLain) ? ($salesOrderLain['status_posting'] === "1" ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger mr-1" onclick="deleteDetail(${v.id})"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                    <button <?= !empty($salesOrderLain) ? ($salesOrderLain['status_posting'] === "1" ? 'disabled' : '') : '' ?> type="button" class="btn btn-primary" onclick="displayDetail(${v.id})" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
                 `
                 ));
                 table.find('tbody').append(newRow);
