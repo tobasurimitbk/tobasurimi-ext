@@ -3,7 +3,13 @@
 namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
+use App\Helpers\BeaCukaiApi;
+use App\Models\BC30Model;
 use App\Models\CeisaSettingModel;
+use App\Models\MetadataModel;
+use App\Models\StockDetail2Model;
+use App\Models\StuffingInternasionalModel;
+use App\Models\StuffingLokalModel;
 
 // META DATA -> jenis_dok_aju
 // BC 2.3 -> 48
@@ -20,10 +26,20 @@ class BC30 extends BaseController
     protected $this_user_id;
     protected $akunCeisa;
     protected $ceisaSettingModel;
+    protected $bc30Model;
+    protected $metaDataModel;
+    protected $stuffingLokalModel;
+    protected $stuffingInternasionalModel;
+    protected $stockDetail2Model;
 
     public function __construct()
     {
         $this->ceisaSettingModel = new CeisaSettingModel();
+        $this->bc30Model = new BC30Model();
+        $this->metaDataModel = new MetadataModel();
+        $this->stuffingLokalModel = new StuffingLokalModel();
+        $this->stuffingInternasionalModel = new StuffingInternasionalModel();
+        $this->stockDetail2Model = new StockDetail2Model();
 
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
@@ -33,15 +49,304 @@ class BC30 extends BaseController
     public function index()
     {
         $data = [
-            'akunCeisa' => $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first()
+            'akunCeisa' => $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first(),
         ];
 
         return view('BeaCukai/bc-30/index', $data);
     }
 
+
+    public function online()
+    {
+        $data = [
+            'baseUrl' => $this->metaDataModel->where('name', "Base Url BC")->first()['value']
+        ];
+
+        return view('BeaCukai/bc-30/online', $data);
+    }
+
+    public function allOnline()
+    {
+        $username = ($this->akunCeisa == null ? "" : $this->akunCeisa['username']);
+        $password = ($this->akunCeisa == null ? "" : $this->akunCeisa['password']);
+
+        $beacukaiApi = new BeaCukaiApi($username, $password);
+        $dataOnline = $beacukaiApi->getListStatusResponseAll();
+
+        $newDataResult = [];
+        foreach ($dataOnline->dataRespon as $d) {
+            if ($d->kodeDokumen == "30") {
+                $newDataResult[] = $d;
+            }
+        }
+        $dataOnline->dataRespon = $newDataResult;
+
+        if ($dataOnline->status == false) {
+            return response()->setJSON($dataOnline);
+        } else {
+            return response()->setJSON([
+                'data' => $dataOnline,
+                'status' => true
+            ]);
+        }
+    }
+
+    public function all()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "company_id"    => $this->this_company_id,
+            "type"          => "BC 3.0"
+        ];
+
+        $condition = [
+            "bc_30.company_id"  => $this->this_company_id,
+            "bc_30.deletedAt" => null,
+        ];
+
+        $addCondition = [
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            "statusPosting" => $this->request->getGet("statusPosting"),
+            "mulaiTanggalBC30" => $this->request->getGet("mulaiTanggalBC30"),
+            "selesaiTanggalBC30" => $this->request->getGet('selesaiTanggalBC30'),
+            "noAju" => $this->request->getGet('noAju'),
+            "tipeSalesOrder" => $this->request->getGet('tipeSalesOrder')
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $beaCukaiData = $this->bc30Model->getList($condition, $addCondition, $limit, $offset);
+
+        $dataBeaCukai = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($beaCukaiData['data'] as $data) {
+            $detail = $this->bc30Model->detail($data->id);
+            array_push($dataBeaCukai, [
+                "no"                    => $no++,
+                "id"                    => encrypt($data->id),
+                "tipe_sales_order"      => $data->tipe_sales_order,
+                "no_order_form"         => $detail != null ? $detail['no_sales_order'] : "-",
+                "no_stuffing"           => $detail != null ? $detail['no_stuffing'] : "-",
+                "customer_name"         => $detail != null ? $detail['nama_customer'] : "-",
+                "no_aju"                => $data->no_aju . " / " . $data->no_daftar,
+                "tanggal_bc_30"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
+                "status_posting"        => $data->status_posting,
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $beaCukaiData['totalData'],
+            "recordsFiltered"   => $beaCukaiData['totalFilteredData'],
+            "data"              => $dataBeaCukai,
+            "payload"           => $payload
+        ];
+
+        return response()->setJSON($data);
+    }
+
     public function create()
     {
-        $data = [];
+        $data = [
+            'noAju' => $this->generateNomorAju()
+        ];
         return view('BeaCukai/bc-30/form', $data);
+    }
+
+    public function createAction()
+    {
+        $this->bc30Model->insert([
+            'company_id' => $this->this_company_id,
+            'sales_order_id' => $this->request->getVar('sales_order_id'),
+            'tipe_sales_order' => $this->request->getVar('tipe_sales_order'),
+            'no_aju' => $this->request->getVar('no_aju'),
+            'no_daftar' => $this->request->getVar('no_daftar'),
+            'status_posting' => '0',
+        ]);
+
+        return response()->setJSON([
+            'status' => true,
+            'message' => "Dokumen BC 3.0 Berhasil Disimpan"
+        ]);
+    }
+
+    public function updateAction()
+    {
+        $id = decrypt($this->request->getVar('id'));
+
+        $this->bc30Model->update($id, [
+            'company_id' => $this->this_company_id,
+            'sales_order_id' => $this->request->getVar('sales_order_id'),
+            'tipe_sales_order' => $this->request->getVar('tipe_sales_order'),
+            'no_aju' => $this->request->getVar('no_aju'),
+            'no_daftar' => $this->request->getVar('no_daftar'),
+            'status_posting' => '0',
+        ]);
+        return response()->setJSON([
+            'status' => true,
+            'message' => "Dokumen BC 3.0 Berhasil Diupdate"
+        ]);
+    }
+
+    public function detail($id)
+    {
+        $id = decrypt($id);
+        $bc30 = $this->bc30Model->detail($id);
+
+        if ($bc30 == null) {
+            return redirect()->to('bea-cukai-bc-27');
+        }
+
+        $data = [
+            'noAju' => $this->generateNomorAju(),
+            'bc30' => $bc30
+        ];
+
+        return view('BeaCukai/bc-30/form', $data);
+    }
+
+    public function checkNoAju()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $noAju = $this->request->getVar('no_aju');
+        $isUsed = true;
+
+        if (!empty($this->request->getVar('id'))) {
+            // UPDATE
+            $first = $this->bc30Model
+                ->where('company_id', $this->this_company_id)
+                ->where(
+                    'no_aju',
+                    $noAju
+                )
+                ->where('id != ', $id)
+                ->first();
+
+            if ($first != null) {
+                $isUsed = false;
+            }
+        } else {
+            // CREATE
+            $first = $this->bc30Model
+                ->where('company_id', $this->this_company_id)
+                ->where(
+                    'no_aju',
+                    $noAju
+                )
+                ->first();
+
+            if ($first != null) {
+                $isUsed = false;
+            }
+        }
+
+        if (!$isUsed) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "No aju sudah digunakan"
+            ]);
+        } else {
+            return response()->setJSON([
+                'status' => true,
+                'message' => "No aju tersedia"
+            ]);
+        }
+    }
+
+    public function delete()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->bc30Model->delete($id);
+        return response()->setJSON([
+            'status' => true,
+            'message' => "Dokumen BC 3.0 Berhasil Dihapus"
+        ]);
+    }
+
+    public function posting()
+    {
+        $id = decrypt($this->request->getVar('id'));
+
+        $this->bc30Model->update($id, ['status_posting' => '1']);
+        return response()->setJSON([
+            'status' => true,
+            'message' => "Dokumen BC 3.0 Berhasil Diposting"
+        ]);
+    }
+
+    public function dropdownSalesOrder()
+    {
+        $tipeSalesOrder = $this->request->getVar('tipe_sales_order');
+        $result = $this->bc30Model->getListSalesOrder(
+            $this->this_company_id,
+            $tipeSalesOrder
+        );
+
+        return response()->setJSON([
+            'data' => $result,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
+    public function getListBarang()
+    {
+        $tipeSalesOrder = $this->request->getVar('tipe_sales_order');
+        $salesOrderId = $this->request->getVar('sales_order_id');
+
+        if (empty($tipeSalesOrder) || empty($salesOrderId)) {
+            return response()->setJSON([
+                'data' => [],
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        }
+        $result = $this->bc30Model->getListBarang(
+            $salesOrderId,
+            $tipeSalesOrder
+        );
+
+        return response()->setJSON([
+            'data' => $result,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
+    public function generateNomorAju()
+    {
+        $ceisaSetting = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
+        $kodeDokumenbc40Static = $this->metaDataModel->where('name', "Kode BC30 Static")->first();
+
+        $kodeKantorStatic = $ceisaSetting['kode_kantor_pabean'];
+        $tanggalAju = date('Ymd');
+        $sequenceNoUrutPengajuan = "";
+
+        $bc30Last = $this->bc30Model->orderBy('createdAt', "DESC")->limit(1)->first();
+
+        if ($bc30Last == null) {
+            $sequenceNoUrutPengajuan = "000001";
+        } else {
+            if ($bc30Last['no_aju'] == null) {
+                $sequenceNoUrutPengajuan = "000001";
+            } else {
+                // Buatkan auto increment
+                $arrNo = explode('-', $bc30Last['no_aju']);
+                $lastNomor = $arrNo[3];
+                // lakukan increment
+                $nextNomor = str_pad((int)$lastNomor + 1, strlen($lastNomor), '0', STR_PAD_LEFT);
+                $sequenceNoUrutPengajuan = $nextNomor;
+            }
+        }
+
+        return $kodeDokumenbc40Static['value'] . '-' . $kodeKantorStatic . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan;
     }
 }

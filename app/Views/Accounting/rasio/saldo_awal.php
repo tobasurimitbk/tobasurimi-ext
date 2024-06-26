@@ -10,21 +10,20 @@
                 <thead class="thead-dark">
                     <tr>
                         <th style="text-align: center;" rowspan="2">No</th>
-                        <th style="text-align: center;" colspan="5">Data Saldo Awal</th>
+                        <th style="text-align: center;" colspan="4">Data Saldo Akhir</th>
                     </tr>
                     <tr>
                         <th style="text-align: center;">Spesifikasi</th>
                         <th style="text-align: center;">Qty</th>
-                        <th style="text-align: center;">Harga Total</th>
-                        <th style="text-align: center;">Harga Satuan</th>
                         <th style="text-align: center;">Satuan</th>
+                        <th style="text-align: center;">Harga Total</th>
                     </tr>
                 </thead>
                 <tbody class="body-detail-table-saldo-awal">
                 </tbody>
                 <tfoot style="background: #ffffff !important;" class="tfoot-detail-table-saldo-awal" id="tfoot-detail-table-saldo-awal">
                     <tr>
-                        <td colspan="12" style="text-align: center;">
+                        <td colspan="6" style="text-align: center;">
                             Tidak Ada Barang
                         </td>
                     </tr>

@@ -99,7 +99,9 @@ class MetadataModel extends Model
     public function getByName(string $name): array
     {
         return $this->asObject()
-            ->where('name', $name)->findAll();
+            ->where('name', $name)
+            ->whereNotIn('value', ["BC 3.0"])
+            ->findAll();
     }
 
     public function getBCUsed($po_used)
