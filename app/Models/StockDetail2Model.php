@@ -326,6 +326,8 @@ class StockDetail2Model extends Model
     public function getStockListWithBCDocNoGroup($stockID, $isAdjusment = false)
     {
         $selectQry = '
+            stock.barang1_id,
+            stock.barang2_id,
             suppliers.name AS supplier_name,
             stock_details2.id,
             stock_details2.bc_id,
@@ -354,6 +356,7 @@ class StockDetail2Model extends Model
                 ->select($selectQry)
                 ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
                 ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+                ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
                 ->where('stock_details2.stock_id', $stockID)
                 ->groupBy('stock_details2.stock_id')
                 ->orderBy('stock_details.createdAt', "ASC")
@@ -363,6 +366,7 @@ class StockDetail2Model extends Model
                 ->select($selectQry)
                 ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
                 ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+                ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
                 ->where('stock_details2.stock_id', $stockID)
                 ->groupBy('stock_details2.stock_id')
                 ->having('stok_total >', 0)

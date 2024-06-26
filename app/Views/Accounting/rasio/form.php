@@ -33,7 +33,7 @@
                             <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataDivisi as $d) : ?>
-                                    <option value="<?= $d['id'] ?>" <?= !empty($rasio) && $rasio->department_id == $d['id'] ? "selected" : "" ?>>
+                                    <option value="<?= $d['id'] ?>" <?= !empty($rasio) && $rasio->divisi_id == $d['id'] ? "selected" : "" ?>>
                                         <?= $d['divisi']; ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -41,13 +41,13 @@
                             <label for="floatingInput" style="z-index: 1;">Departemen</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Warehouse</label>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
@@ -69,7 +69,7 @@
                                 if (!empty($kategoriBarangAkun)) {
                                     foreach ($kategoriBarangAkun as $kategoriBarang) {
                                 ?>
-                                        <option value="<?= $kategoriBarang->id; ?>"><?= $kategoriBarang->description; ?></option>
+                                        <option value="<?= $kategoriBarang->id; ?>" <?= !empty($rasio) && $rasio->kategori_barang_id == $kategoriBarang->id ? "selected" : "" ?>><?= $kategoriBarang->description; ?></option>
                                 <?php
                                     }
                                 }
@@ -646,7 +646,6 @@
                     if (res.status) {
                         list_items_saldo_awal = [];
                         list_items_saldo_awal = res.data;
-                        console.log(res.data);
                         drawTableSaldoAwal();
                     } else {
                         stopLoading()
@@ -1425,10 +1424,6 @@
         }
     }
 
-    $('#select-item-btn').click(function() {
-        drawTableRasioAkhir(list_items_barang_jadi);
-    });
-
     const drawTableRasio = function() {
         $('.body-table-rasio').empty();
         $('.tfoot-rasio').empty();
@@ -1523,11 +1518,29 @@
         let no = 1;
 
         // Retrieve and parse input values
-        const amount = $('#hargaTotalPenerimaan').val() ? parseFloat($('#hargaTotalPenerimaan').val().replace(/Rp|\./g, "")) : 0;
-        const qtyTotalPenerimaan = $('#qtyTotalPenerimaan').val() ? parseFloat($('#qtyTotalPenerimaan').val().replace(/Rp|\./g, "")) : 0;
-        const biayaSubsidi = $('#biayaSubsidi').val() ? parseFloat($('#biayaSubsidi').val().replace(/Rp|\./g, "")) : 0;
-        const biayaLain = $('#biayaLain').val() ? parseFloat($('#biayaLain').val().replace(/Rp|\./g, "")) : 0;
-        const biayaKopek = $('#biayaKopek').val() ? parseFloat($('#biayaKopek').val().replace(/Rp|\./g, "")) : 0;
+        // const amount = $('#hargaTotalPenerimaan').val() ? parseFloat($('#hargaTotalPenerimaan').val().replace(/Rp|\./g, "")) : 0;
+        // const qtyTotalPenerimaan = $('#qtyTotalPenerimaan').val() ? parseFloat($('#qtyTotalPenerimaan').val().replace(/Rp|\./g, "")) : 0;
+        // const biayaSubsidi = $('#biayaSubsidi').val() ? parseFloat($('#biayaSubsidi').val().replace(/Rp|\./g, "")) : 0;
+        // const biayaLain = $('#biayaLain').val() ? parseFloat($('#biayaLain').val().replace(/Rp|\./g, "")) : 0;
+        // const biayaKopek = $('#biayaKopek').val() ? parseFloat($('#biayaKopek').val().replace(/Rp|\./g, "")) : 0;
+
+
+
+        var amount = 0;
+        var qtyTotalPenerimaan = 0;
+        var biayaSubsidi = 0;
+        var biayaLain = 0;
+        var biayaKopek = 0;
+
+        list_items_barang_digunakan.map((item, index) => {
+            // counting total
+            // totalQtyPO += item.totalQtyPO !== undefined ? item.totalQtyPO : 0;
+            // totalHargaPO += item.totalHargaPO !== undefined ? item.totalHargaPO : 0;
+            // hargaSatuanPO += item.hargaSatuanPO !== undefined ? item.hargaSatuanPO : 0;
+            qtyTotalPenerimaan += item.totalQtyLPB !== undefined ? item.totalQtyLPB : 0;
+            amount += item.totalHargaLPB !== undefined ? item.totalHargaLPB : 0;
+            // hargaSatuanLPB += item.hargaSatuanLPB !== undefined ? item.hargaSatuanLPB : 0;
+        });
 
         const hargaTotalPenerimaan = amount + biayaSubsidi + biayaLain + biayaKopek;
 
@@ -1550,11 +1563,13 @@
             });
 
             data.forEach((item, index) => {
+
                 let calculatedHargaTotal = 0;
                 let itemHargaTotal = 0;
                 const totalQtyAll = parseFloat(qtyTotalPenerimaan);
                 const rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyAll) * 100;
                 const rasioTanpaManual = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyTanpaManual) * 100;
+
 
                 if (isNaN(totalHargaTotalManual)) {
                     calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan)) * (rasio / 100);
@@ -1823,15 +1838,15 @@
                 var hargaTotal = $(".harga-total").val();
                 var hargaTotalPenerimaan = $(".hargaTotalPenerimaan").val();
 
-                var formatedHargaTotal = parseFloat(hargaTotal.replace(/Rp|\./g, ""));
-                var formatedHargaTotalPenerimaan = parseFloat(hargaTotalPenerimaan.replace(/Rp|\./g, ""));
+                // var formatedHargaTotal = parseFloat(hargaTotal.replace(/Rp|\./g, ""));
+                // var formatedHargaTotalPenerimaan = parseFloat(hargaTotalPenerimaan.replace(/Rp|\./g, ""));
 
 
-                console.log(formatedHargaTotal);
-                console.log(formatedHargaTotalPenerimaan);
-                if (formatedHargaTotal != formatedHargaTotalPenerimaan) {
-                    isValid = false;
-                }
+                console.log(hargaTotal);
+                console.log(hargaTotalPenerimaan);
+                // if (formatedHargaTotal != formatedHargaTotalPenerimaan) {
+                //     isValid = false;
+                // }
 
                 $.each(list_items_barang_jadi, function(i, v) {
                     var qtyBarang = $('input[data-index="' + i + '"].jumlah-barang');
@@ -1845,38 +1860,37 @@
                     list_items_barang_jadi[i].rasio = rasioBarangVal;
                     list_items_barang_jadi[i].harga = hargaBarangVal;
                 });
-                console.log(list_items_barang_jadi);
 
-                $.each(list_items_barang_digunakan_material_2, function(i, v) {
-                    list_items_barang_jadi_material_2.forEach((item2, index2) => {
-                        var qtyBarang = $('input[data-index="' + i + '"][data-index2="' + index2 + '"].qty-material2');
-                        var hargaSatuan = $('input[data-index="' + i + '"][data-index2="' + index2 + '"].harga-satuan-material2');
-                        var hargaTotal = $('input[data-index="' + i + '"][data-index2="' + index2 + '"].harga-material2');
+                // $.each(list_items_barang_digunakan_material_2, function(i, v) {
+                //     list_items_barang_jadi_material_2.forEach((item2, index2) => {
+                //         var qtyBarang = $('input[data-index="' + i + '"][data-index2="' + index2 + '"].qty-material2');
+                //         var hargaSatuan = $('input[data-index="' + i + '"][data-index2="' + index2 + '"].harga-satuan-material2');
+                //         var hargaTotal = $('input[data-index="' + i + '"][data-index2="' + index2 + '"].harga-material2');
 
-                        var qtyBarangVal = parseFloat(qtyBarang.val().replace(/\./g, ""));
-                        var hargaSatuanVal = parseFloat(hargaSatuan.val().replace(/Rp|\./g, ""));
-                        var hargaTotalVal = parseFloat(hargaTotal.val().replace(/Rp|\./g, ""));
+                //         var qtyBarangVal = parseFloat(qtyBarang.val().replace(/\./g, ""));
+                //         var hargaSatuanVal = parseFloat(hargaSatuan.val().replace(/Rp|\./g, ""));
+                //         var hargaTotalVal = parseFloat(hargaTotal.val().replace(/Rp|\./g, ""));
 
-                        var id_production = qtyBarang.data('id_production');
-                        var id_production_detail = qtyBarang.data('id_production_detail');
-                        var barang1_id_production = qtyBarang.data('barang1_id_production');
-                        var barang2_id_production = qtyBarang.data('barang2_id_production');
+                //         var id_production = qtyBarang.data('id_production');
+                //         var id_production_detail = qtyBarang.data('id_production_detail');
+                //         var barang1_id_production = qtyBarang.data('barang1_id_production');
+                //         var barang2_id_production = qtyBarang.data('barang2_id_production');
 
-                        if (!list_items_barang_digunakan_material_2[i].inputData) {
-                            list_items_barang_digunakan_material_2[i].inputData = {};
-                        }
+                //         if (!list_items_barang_digunakan_material_2[i].inputData) {
+                //             list_items_barang_digunakan_material_2[i].inputData = {};
+                //         }
 
-                        list_items_barang_digunakan_material_2[i].inputData[index2] = {
-                            id_production: id_production,
-                            id_production_detail: id_production_detail,
-                            barang1_id_production: barang1_id_production,
-                            barang2_id_production: barang2_id_production,
-                            qty_input: qtyBarangVal,
-                            hargaSatuan_input: hargaSatuanVal,
-                            totalHarga_input: hargaTotalVal
-                        };
-                    });
-                });
+                //         list_items_barang_digunakan_material_2[i].inputData[index2] = {
+                //             id_production: id_production,
+                //             id_production_detail: id_production_detail,
+                //             barang1_id_production: barang1_id_production,
+                //             barang2_id_production: barang2_id_production,
+                //             qty_input: qtyBarangVal,
+                //             hargaSatuan_input: hargaSatuanVal,
+                //             totalHarga_input: hargaTotalVal
+                //         };
+                //     });
+                // });
 
                 $.each(list_items_labor_cost, function(i, v) {
                     list_items_title_cost.forEach((item2, index2) => {
@@ -1996,6 +2010,8 @@
                             data.append("items_digunakan", JSON.stringify(list_items_barang_digunakan));
                             data.append("items_jadi", JSON.stringify(list_items_barang_jadi));
                             data.append("items_digunakan_material_2", JSON.stringify(list_items_barang_digunakan_material_2));
+                            data.append("saldo_awal", JSON.stringify(list_items_saldo_awal));
+                            data.append("saldo_akhir", JSON.stringify(list_items_saldo_akhir));
                             data.append("labor_cost", JSON.stringify(list_items_labor_cost));
                             data.append("overhead_cost", JSON.stringify(list_items_overhead_cost));
                             data.append("fixed_cost", JSON.stringify(list_items_fixed_cost));
