@@ -324,7 +324,7 @@ class BC30 extends BaseController
     public function generateNomorAju()
     {
         $ceisaSetting = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
-        $kodeDokumenbc40Static = $this->metaDataModel->where('name', "Kode BC30 Static")->first();
+        $kodeDokumenbc30Static = $this->metaDataModel->where('name', "Kode BC30 Static")->first();
 
         $kodeKantorStatic = $ceisaSetting['kode_kantor_pabean'];
         $tanggalAju = date('Ymd');
@@ -347,6 +347,6 @@ class BC30 extends BaseController
             }
         }
 
-        return $kodeDokumenbc40Static['value'] . '-' . $kodeKantorStatic . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan;
+        return $kodeDokumenbc30Static['value'] . '-' . $kodeKantorStatic . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan;
     }
 }
