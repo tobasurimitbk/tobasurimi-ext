@@ -183,6 +183,8 @@ class MaterialRequest extends BaseController
                     $value->barang_type_text = "Bahan Scrap";
                 } elseif ($value->barang_type == "bahan_modal") {
                     $value->barang_type_text = "Bahan Modal";
+                } elseif ($value->barang_type == "bahan_setengah_jadi") {
+                    $value->barang_type_text = "Bahan Setengah Jadi";
                 }
             }
             $data["dataMaterialRequests"] = $dataMaterialRequests;
