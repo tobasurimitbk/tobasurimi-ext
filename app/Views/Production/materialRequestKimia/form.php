@@ -1301,7 +1301,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "<?= base_url("material-request-kimia/delete"); ?>",
+                        url: "<?= base_url("material-request-kimia/delete-detail"); ?>",
                         data: {
                             id: iddetail,
                         },

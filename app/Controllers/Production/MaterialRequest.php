@@ -720,12 +720,23 @@ class MaterialRequest extends BaseController
         return;
     }
 
+    public function deleteMRDetail()
+    {
+        $id = ($this->request->getVar('id'));
+        $this->materialRequestDetailsModel->delete($id);
+        // $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
+
+        return response()->setJSON([
+            'message' => "Material Request Berhasil Dihapus",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
     public function deleteMR()
     {
         $id = decrypt($this->request->getVar('id'));
-        // var_dump($id);
-        // exit;
-        $this->materialRequestDetailsModel->delete($id);
+        $this->materialRequestModel->delete($id);
         // $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
 
         return response()->setJSON([

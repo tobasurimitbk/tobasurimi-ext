@@ -1300,7 +1300,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "<?= base_url("material-request-penolong/delete"); ?>",
+                        url: "<?= base_url("material-request-penolong/delete-detail"); ?>",
                         data: {
                             id: iddetail,
                         },

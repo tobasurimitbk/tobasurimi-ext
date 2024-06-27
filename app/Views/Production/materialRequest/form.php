@@ -1680,7 +1680,7 @@
             ));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahan(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanSetengahJadi(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
             `
             ));
             table.find('tbody').append(newRow);
@@ -1880,7 +1880,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "<?= base_url("material-request/delete"); ?>",
+                        url: "<?= base_url("material-request/delete-detail"); ?>",
                         data: {
                             id: iddetail,
                         },
@@ -1940,7 +1940,67 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "<?= base_url("material-request/delete"); ?>",
+                        url: "<?= base_url("material-request/delete-detail"); ?>",
+                        data: {
+                            id: iddetail,
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        location.reload();
+                                    })
+                            }
+                        },
+                    });
+                }
+            })
+        }
+    }
+
+    function deleteDetailBahanSetengahJadi(id, iddetail) {
+        if (id) {
+            var indexToRemove = -1;
+            for (var i = 0; i < listStockSelectedBahanSetengahJadi.length; i++) {
+                if (listStockSelectedBahanSetengahJadi[i].id == id) {
+                    indexToRemove = i;
+                    break;
+                }
+            }
+            if (indexToRemove !== -1) {
+                listStockSelectedBahanSetengahJadi.splice(indexToRemove, 1);
+                drawTableSelectedItemBahanSetengahJadi(listStockSelectedBahanSetengahJadi);
+            }
+        }
+        if (iddetail) {
+            console.log(iddetail);
+            Swal.fire({
+                icon: 'question',
+                title: 'Yakin akan di hapus?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "<?= base_url("material-request/delete-detail"); ?>",
                         data: {
                             id: iddetail,
                         },
@@ -2000,7 +2060,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "<?= base_url("material-request/delete"); ?>",
+                        url: "<?= base_url("material-request/delete-detail"); ?>",
                         data: {
                             id: iddetail,
                         },
