@@ -149,7 +149,15 @@ class MaterialRequest extends BaseController
             ->find();
 
         $data = [
-            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->where('description', "bahan_baku")->orWhere('description', "bahan_penolong")->orWhere('description', "bahan_jadi")->orWhere('description', "bahan_scrap")->findAll(),
+            'tipeBarang' => $this->metaDataModel
+                ->where('deletedAt', null)
+                ->where('name', "Kategori Barang")
+                ->where('description', "bahan_baku")
+                ->orWhere('description', "bahan_penolong")
+                ->orWhere('description', "bahan_jadi")
+                ->orWhere('description', "bahan_scrap")
+                ->orWhere('description', "bahan_setengah_jadi")
+                ->findAll(),
             "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
@@ -714,12 +722,14 @@ class MaterialRequest extends BaseController
 
     public function deleteMR()
     {
-        $id = ($this->request->getVar('id'));
+        $id = decrypt($this->request->getVar('id'));
+        // var_dump($id);
+        // exit;
         $this->materialRequestDetailsModel->delete($id);
         // $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
 
         return response()->setJSON([
-            'message' => "Bahan Berhasil Dihapus",
+            'message' => "Material Request Berhasil Dihapus",
             'token' => csrf_hash(),
             'status' => true
         ]);

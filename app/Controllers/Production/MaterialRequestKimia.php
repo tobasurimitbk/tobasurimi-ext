@@ -683,12 +683,12 @@ class MaterialRequestKimia extends BaseController
 
     public function deleteMR()
     {
-        $id = ($this->request->getVar('id'));
+        $id = decrypt($this->request->getVar('id'));
         $this->materialRequestDetailsModel->delete($id);
         // $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
 
         return response()->setJSON([
-            'message' => "Bahan Berhasil Dihapus",
+            'message' => "Material Request Berhasil Dihapus",
             'token' => csrf_hash(),
             'status' => true
         ]);
