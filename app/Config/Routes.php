@@ -562,6 +562,25 @@ $routes->post('/customer-ekspor/save', 'Master\Customer::saveCustomer', ['filter
 $routes->post('/customer-ekspor/update', 'Master\Customer::updateCustomer', ['filter' => 'Auth']);
 $routes->post('/customer-ekspor/delete', 'Master\Customer::deleteCustomer', ['filter' => 'Auth']);
 
+// SALES LAIN
+$routes->get('order-form-lain', 'PenjualanLain\SalesOrderLain::index', ['filter' => 'Auth']);
+$routes->get('order-form-lain/id/(:segment)', 'PenjualanLain\SalesOrderLain::detail/$1', ['filter' => 'Auth']);
+$routes->get('order-form-lain/print/(:segment)', 'PenjualanLain\SalesOrderLain::print/$1', ['filter' => 'Auth']);
+$routes->get('order-form-lain/all', 'PenjualanLain\SalesOrderLain::all', ['filter' => 'Auth']);
+$routes->get('order-form-lain/create', 'PenjualanLain\SalesOrderLain::create', ['filter' => 'Auth']);
+$routes->post('order-form-lain/save', 'PenjualanLain\SalesOrderLain::createAction', ['filter' => 'Auth']);
+$routes->post('order-form-lain/update', 'PenjualanLain\SalesOrderLain::updateAction', ['filter' => 'Auth']);
+$routes->post('order-form-lain/delete', 'PenjualanLain\SalesOrderLain::delete', ['filter' => 'Auth']);
+$routes->post('order-form-lain/posting', 'PenjualanLain\SalesOrderLain::posting', ['filter' => 'Auth']);
+$routes->post('order-form-lain/unposting', 'PenjualanLain\SalesOrderLain::unPosting', ['filter' => 'Auth']);
+
+$routes->get('order-form-lain/list-sales-order-detail', 'PenjualanLain\SalesOrderLain::getListSalesOrderDetail', ['filter' => 'Auth']);
+$routes->get('order-form-lain/list-stock-init', 'PenjualanLain\SalesOrderLain::dropdownListBarang', ['filter' => 'Auth']);
+$routes->get('order-form-lain/list-stock-dokumen-bc', 'PenjualanLain\SalesOrderLain::getListStockByStockID', ['filter' => 'Auth']);
+$routes->get('order-form-lain/list-satuan-konversi', 'PenjualanLain\SalesOrderLain::dropdownSatuanOrder', ['filter' => 'Auth']);
+$routes->get('order-form-lain/list-customer', 'PenjualanLain\SalesOrderLain::dropdownListCustomer', ['filter' => 'Auth']);
+$routes->get('order-form-lain/hitung-konversi', 'PenjualanLain\SalesOrderLain::hitungKonversi', ['filter' => 'Auth']);
+$routes->get('order-form-lain/get-no', 'PenjualanLain\SalesOrderLain::getSalesOrderLainNo', ['filter' => 'Auth']);
 
 // PRODUKSI
 // Production Result
