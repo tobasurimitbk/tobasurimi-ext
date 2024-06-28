@@ -245,7 +245,9 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="body-table" style="text-align: center;">
-                                                -->
+                                                <tr style="color: whitesmoke;">
+                                                    <td colspan="10">Tidak Ada Pembayaran</td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -269,8 +271,9 @@
 
                                         </thead>
                                         <tbody class="body-table" id="body-table-panjar" style="cursor: pointer;">
-
-
+                                            <tr style="color: whitesmoke;">
+                                                <td colspan="7" style="text-align: center;">Tidak ada Panjar</td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>

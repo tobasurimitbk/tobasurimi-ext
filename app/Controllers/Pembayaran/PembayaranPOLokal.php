@@ -999,31 +999,26 @@ class PembayaranPOLokal extends BaseController
     public function generatePaymentNoBP()
     {
         $localPOPaymentBPModel = new LocalPOPaymentBPModel();
-        $paymentDate = $this->request->getVar("payment_date");
+
 
         $paymentNo = "BP/";
+        $month = date('m');
+        $year = date('Y');
 
-        if (!empty($paymentDate)) {
-            $paymentDataFormated = date_format(date_create_from_format("d/m/Y", $paymentDate), "Y-m-d");
-            $month = date('m', strtotime($paymentDataFormated));
-            $year = date('Y', strtotime($paymentDataFormated));
-            $numberTemplate = $paymentNo . "$year/$month/";
-            $lastData = $localPOPaymentBPModel->asObject()
-                ->like('payment_no', $numberTemplate, 'after')
-                ->orderBy('createdAt', 'DESC')
-                ->first();
+        $numberTemplate = $paymentNo . "$year/$month/";
+        $lastData = $localPOPaymentBPModel->asObject()
+            ->like('payment_no', $numberTemplate, 'after')
+            ->orderBy('createdAt', 'DESC')
+            ->first();
 
-            $paymentNo = "{$numberTemplate}/001";
+        $paymentNo = "{$numberTemplate}001";
 
-            if (!empty($lastData)) {
-                $exploded = explode('/', $lastData->payment_no);
-                $lastIncrement = (int)$exploded[3] + 1;
+        if (!empty($lastData)) {
+            $exploded = explode('/', $lastData->payment_no);
+            $lastIncrement = (int)$exploded[3] + 1;
 
-                $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
-                $paymentNo = $numberTemplate . $paddedNumber;
-            }
-        } else {
-            $paymentNo = "";
+            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+            $paymentNo = $numberTemplate . $paddedNumber;
         }
 
         return response()->setJSON([
