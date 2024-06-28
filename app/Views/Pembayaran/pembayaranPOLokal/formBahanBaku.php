@@ -245,7 +245,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="body-table" style="text-align: center;">
-
+                                                -->
                                             </tbody>
                                         </table>
                                     </div>
@@ -946,7 +946,7 @@
         table.find('tbody').append(newRow);
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>Potongan / Diskon</b></td>'));
+        newRow.append($('<td style="text-align:right;" colspan="6"><b>POTONGAN/DISKON</b></td>'));
         newRow.append(($('<td </td>')));
         newRow.append(($('<td </td>')));
         newRow.append(($('<td </td>')));
@@ -1038,7 +1038,7 @@
         table.find('tbody').append(newRow);
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>Potongan / Diskon</b></td>'));
+        newRow.append($('<td style="text-align:right;" colspan="6"><b>POTONGAN/DISKON</b></td>'));
         newRow.append(($('<td </td>')));
         newRow.append(($('<td </td>')));
         newRow.append(($('<td </td>')));
@@ -1157,8 +1157,8 @@
                 tablePanjar.find('tbody').append(newRow);
             })
         } else {
-            var newRow = $('<tr>');
-            newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Panjar</td>'));
+            var newRow = $('<tr style="color:whitesmoke;">');
+            newRow.append($('<td colspan="8" style="text-align:center;">Tidak Ada Panjar</td>'));
             tablePanjar.find('tbody').append(newRow);
         }
 
@@ -1197,12 +1197,12 @@
 
             });
             if (!found) {
-                var newRow = $('<tr>');
+                var newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Panjar</td>'));
                 tablePanjar.find('tbody').append(newRow);
             }
         } else {
-            var newRow = $('<tr>');
+            var newRow = $('<tr style="color:whitesmoke;">');
             newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Panjar</td>'));
             tablePanjar.find('tbody').append(newRow);
         }
