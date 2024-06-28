@@ -660,7 +660,7 @@ class LocalPOPaymentModel extends Model
     {
 
         $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
-        $localPOPaymentPanjarModel = new localPOPaymentPanjarModel();
+        $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
 
 
         $condition = [
