@@ -135,6 +135,7 @@ class TandaTerimaFakturModel extends Model
 
     public function getListTandaTerimaFakturNotProcessed($supplierID, $divisiID)
     {
+        $localPOPaymentBPModel = new LocalPOPaymentBPModel();
         $condition = [
             'tanda_terima_faktur.supplier_id' => $supplierID,
             'tanda_terima_faktur.divisi_id' => $divisiID,
@@ -143,13 +144,23 @@ class TandaTerimaFakturModel extends Model
         $tandaTerimaFakturModel = new TandaTerimaFakturModel();
         $res = $tandaTerimaFakturModel
             ->select('tanda_terima_faktur.id, tanda_terima_faktur.faktur_no, tanda_terima_faktur.nominal_faktur')
-            ->join('local_po_payment_bp', 'local_po_payment_bp.tanda_terima_faktur_id = tanda_terima_faktur.id',  'LEFT')
             ->where($condition)
-            ->groupBy('tanda_terima_faktur.id')
-            ->having('tanda_terima_faktur.nominal_faktur > SUM(local_po_payment_bp.amount)')
             ->orderBy('tanda_terima_faktur.id', 'ASC')
             ->findAll();
 
+        $list = [];
+
+        foreach ($res as $r) {
+            $selectQry = "sum(amount) as amount, tanda_terima_faktur_id";
+            $totalPembayaran = $localPOPaymentBPModel
+                ->select($selectQry)
+                ->where('local_po_payment_bp.tanda_terima_faktur_id', $r['id'])
+                ->groupBy('local_po_payment_bp.tanda_terima_faktur_id')
+                ->first();
+            if (intval($r['nominal_faktur']) > intval($totalPembayaran['amount'])) {
+                array_push($list, $r);
+            }
+        }
         // SELECT tanda_terima_faktur.id, tanda_terima_faktur.faktur_no, tanda_terima_faktur.nominal_faktur, sum(local_po_payment_bp.amount) as total_amount FROM `tanda_terima_faktur`
         // LEFT JOIN local_po_payment_bp ON local_po_payment_bp.tanda_terima_faktur_id = tanda_terima_faktur.id
         // WHERE tanda_terima_faktur.supplier_id = 4 AND tanda_terima_faktur.divisi_id = 41 AND tanda_terima_faktur.deletedAt is NULL
@@ -158,7 +169,7 @@ class TandaTerimaFakturModel extends Model
         // tanda_terima_faktur.nominal_faktur > total_amount
 
 
-        return $res;
+        return $list;
     }
 
     public function getListPenerimaanBarangLokalBPNotProcessed($supplierID, $divisiID)
