@@ -29,6 +29,7 @@ use App\Models\PenerimaanBarangModel;
 use App\Models\ProductionResultDetailModel;
 use App\Models\ProductionResultModel;
 use App\Models\RasioBahanPenolongModel;
+use App\Models\RasioBarangDigunakanAlokasiModel;
 use App\Models\RasioBarangDigunakanModel;
 use App\Models\RasioBarangJadiModel;
 use App\Models\RasioCostModel;
@@ -62,6 +63,7 @@ class RasioController extends BaseController
     protected $amPurchaseOrderDetailModel;
     protected $rasioModel;
     protected $rasioBarangDigunakanModel;
+    protected $rasioBarangDigunakanAlokasiModel;
     protected $rasioBarangJadiModel;
     protected $rasioBarangPenolongModel;
     protected $rasioCostModel;
@@ -104,6 +106,7 @@ class RasioController extends BaseController
         $this->amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->rasioModel = new RasioModel();
         $this->rasioBarangDigunakanModel = new RasioBarangDigunakanModel();
+        $this->rasioBarangDigunakanAlokasiModel = new RasioBarangDigunakanAlokasiModel();
         $this->rasioBarangJadiModel = new RasioBarangJadiModel();
         $this->rasioBarangPenolongModel = new RasioBahanPenolongModel();
         $this->rasioCostModel = new RasioCostModel();
@@ -196,6 +199,7 @@ class RasioController extends BaseController
 
 
             $barang_digunakan = json_decode($this->request->getVar("items_digunakan"));
+            $barang_digunakan_alokasi = json_decode($this->request->getVar("items_digunakan_alokasi"));
             $barang_jadi = json_decode($this->request->getVar("items_jadi"));
             $barang_digunakan_material_2 = json_decode($this->request->getVar("items_digunakan_material_2"));
             $saldo_awal = json_decode($this->request->getVar("saldo_awal"));
@@ -205,12 +209,32 @@ class RasioController extends BaseController
             $fixed_cost = json_decode($this->request->getVar("fixed_cost"));
 
             // var_dump($saldo_awal);
-            // var_dump($saldo_akhir);
+            // var_dump($barang_digunakan_alokasi);
             // exit;
             $id = $this->rasioModel->insert($data);
 
             foreach ($barang_digunakan as $s) {
                 $this->rasioBarangDigunakanModel->insert([
+                    'rasio_id' => $id,
+                    'barang1_id' => $s->barang1_id,
+                    'barang2_id' => $s->barang2_id,
+                    'barang_name' => $s->barang_name,
+                    'spesifikasi' => $s->spesifikasi,
+                    'qty_po' => $s->totalQtyPO ?? 0,
+                    'harga_po_total' => $s->totalHargaPO ?? 0,
+                    'harga_po_satuan' => $s->hargaSatuanPO ?? 0,
+                    'satuan_po' => $s->satuanPO  ?? "-",
+                    'qty_lpb' => $s->totalQtyLPB ?? 0,
+                    'harga_lpb_total' => $s->totalHargaLPB ?? 0,
+                    'harga_lpb_satuan' => $s->hargaSatuanLPB ?? 0,
+                    'satuan_lpb' => $s->satuanLPB ?? "-",
+                    'no_dokumen' => $s->no_dokumen,
+                    'stock_dokumen' => $s->stock_dokumen,
+                ]);
+            }
+
+            foreach ($barang_digunakan_alokasi as $s) {
+                $this->rasioBarangDigunakanAlokasiModel->insert([
                     'rasio_id' => $id,
                     'barang1_id' => $s->barang1_id,
                     'barang2_id' => $s->barang2_id,
@@ -421,6 +445,7 @@ class RasioController extends BaseController
         $id = decrypt($id);
         $subAkunsModel = $this->subAkunModel->asObject()->findAll();
         $rasioModel = $this->rasioModel->asObject()->find($id);
+        $rasioBarangDigunakanAlokasiModel = $this->rasioBarangDigunakanAlokasiModel->asObject()->where('rasio_id', $id)->findAll();
         $rasioBarangDigunakanModel = $this->rasioBarangDigunakanModel->asObject()->where('rasio_id', $id)->findAll();
         $rasioBarangJadiModel = $this->rasioBarangJadiModel->asObject()->where('rasio_id', $id)->findAll();
         $rasioBarangPenolongModel = $this->rasioBarangPenolongModel->asObject()->where('rasio_id', $id)->findAll();
@@ -436,6 +461,7 @@ class RasioController extends BaseController
             "subAkuns" => $subAkunsModel,
             'kategoriBarangAkun' => $this->metadataModel->asObject()->where('name', 'kategori_barang_akun')->findAll(),
             "rasio" => $rasioModel,
+            // "rasioBarangDigunakanAlokasi" => $rasioBarangDigunakanAlokasiModel,
             "rasioBarangDigunakan" => $rasioBarangDigunakanModel,
             "rasioBarangJadi" => $rasioBarangJadiModel,
             "rasioBarangPenolong" => $rasioBarangPenolongModel,
