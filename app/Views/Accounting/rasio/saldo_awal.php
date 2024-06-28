@@ -10,7 +10,7 @@
                 <thead class="thead-dark">
                     <tr>
                         <th style="text-align: center;" rowspan="2">No</th>
-                        <th style="text-align: center;" colspan="4">Data Saldo Akhir</th>
+                        <th style="text-align: center;" colspan="4">Data Saldo Awal</th>
                     </tr>
                     <tr>
                         <th style="text-align: center;">Spesifikasi</th>
