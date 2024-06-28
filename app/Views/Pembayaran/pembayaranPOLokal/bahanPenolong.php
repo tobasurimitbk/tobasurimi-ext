@@ -88,14 +88,14 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("pembayaran-po-lokal/all"); ?>",
+            url: "<?= base_url("pembayaran-po-lokal-bp/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
                 data.dueDate = $(".dueDate").val();
                 data.paymentDate = $(".paymentDate").val();
                 data.status_posting = $(".status_posting").val();
-                data.type_po = "Bahan Penolong";
+                // data.type_po = "Bahan Penolong";
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -237,7 +237,8 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const r= table.row(this).data();
-            location.replace(`<?= base_url("pembayaran-po-lokal-bp/id/"); ?>${data.id}`);
+            console.log("clicked");
+            location.replace(`<?= base_url("pembayaran-po-lokal-bp/id/"); ?>${r.id}`);
         });
     });
     const print = function(url) {
