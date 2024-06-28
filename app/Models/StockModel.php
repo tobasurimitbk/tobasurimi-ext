@@ -673,7 +673,7 @@ class StockModel extends Model
             ->where('stock.tipe_barang', $type_barang)
             ->where('stock.divisi_id', $divisi_id)
             ->where('stock.warehouse_id', $warehouse_id)
-            ->like('barang_master.barang_name', '%' . "UDANG" . '%')
+            // ->like('barang_master.barang_name', '%' . "UDANG" . '%')
             ->orderBy('barang_master.kode_barang', "ASC")
             ->findAll();
 
@@ -687,7 +687,7 @@ class StockModel extends Model
             ->where('stock.tipe_barang', $type_barang)
             ->where('stock.divisi_id', $divisi_id)
             ->where('stock.warehouse_id', $warehouse_id)
-            ->like('barang_master.barang_name', '%' . "KEPITING" . '%')
+            // ->like('barang_master.barang_name', '%' . "KEPITING" . '%')
             ->orderBy('barang_master.kode_barang', "ASC")
             ->findAll();
 
@@ -744,6 +744,62 @@ class StockModel extends Model
                 ->where('barang_master_spesifikasi.deletedAt', null)
                 ->where('barang_master.deletedAt', null)
                 ->where($addCondition)
+                ->orderBy('barang_master.kode_barang', "ASC")
+                ->findAll();
+        }
+
+        return $dataResult;
+    }
+
+    public function getBarangAndStockConditionWithoutWarehouse($type_barang, $divisi_id, $addCondition = null)
+    {
+        if ($type_barang == "kemasan") {
+            // LIST KEMASAN
+            $selectQry = "
+                stock.id AS stock_id,
+                kemasan.id AS barang_id,
+                kemasan.id AS spesifikasi_id,
+                UPPER(kemasan.name) AS barang,
+                kemasan.kode AS kode_barang,
+                satuans.kode_satuan
+            ";
+
+            $dataResult = $this->asArray()->select($selectQry)
+                ->join('kemasan', 'kemasan.id = stock.kemasan_id')
+                ->join('satuans', 'satuans.id = kemasan.satuan_id', 'left')
+                ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+                ->where('stock.tipe_barang', $type_barang)
+                ->where('stock.divisi_id', $divisi_id)
+                // ->where('stock.warehouse_id', $warehouse_id)
+                ->where('stock.deletedAt', null)
+                ->where('kemasan.deletedAt', null)
+                // ->where($addCondition)
+                ->orderBy('kemasan.kode', "ASC")
+                ->findAll();
+        } else {
+            // LIST BARANG
+            $selectQry = "
+                stock.id AS stock_id,
+                stock.barang1_id AS barang_id,
+                stock.barang2_id AS spesifikasi_id,
+                CONCAT(UPPER(barang_master.barang_name), '-', UPPER(barang_master_spesifikasi.spesifikasi)) AS barang,
+                barang_master.kode_barang,
+                satuans.kode_satuan,
+                parent_barang.parent_name
+            ";
+
+            $dataResult = $this->asArray()->select($selectQry)
+                ->join('barang_master', 'barang_master.id = stock.barang1_id')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
+                ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+                ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
+                ->where('stock.tipe_barang', $type_barang)
+                ->where('stock.divisi_id', $divisi_id)
+                // ->where('stock.warehouse_id', $warehouse_id)
+                ->where('stock.deletedAt', null)
+                ->where('barang_master_spesifikasi.deletedAt', null)
+                ->where('barang_master.deletedAt', null)
+                // ->where($addCondition)
                 ->orderBy('barang_master.kode_barang', "ASC")
                 ->findAll();
         }

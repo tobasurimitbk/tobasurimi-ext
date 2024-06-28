@@ -116,8 +116,8 @@
                     if (status != 1) {
                         return `
                                 <div class="mt-0">
-                                    <button class="btn btn-primary detail-material-request">
-                                        <i class="fa fa-info fa-sm" aria-hidden="true"></i>
+                                    <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash">
+                                        <i class="fa fa-trash"></i>
                                     </button>
                                     <button class="btn btn-warning">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -131,9 +131,6 @@
                         if (request_status == "waiting") {
                             return `
                                     <div class="mt-0">
-                                        <button class="btn btn-primary detail-material-request">
-                                            <i class="fa fa-info fa-sm" aria-hidden="true"></i>
-                                        </button>
                                         <button class="btn btn-warning">
                                             <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                         </button>
@@ -142,9 +139,6 @@
                         } else {
                             return `
                                     <div class="mt-0">
-                                        <button class="btn btn-primary detail-material-request">
-                                            <i class="fa fa-info fa-sm" aria-hidden="true"></i>
-                                        </button>
                                         <button class="btn btn-warning">
                                             <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                         </button>
@@ -177,9 +171,9 @@
             table.ajax.reload();
         })
 
-        $('#dataTable tbody').on('click', '.detail-material-request', function() {
+        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             // Get the data associated with the clicked row
-            const data = table.row($(this).closest('tr')).data();
+            const data = table.row(this).data();
 
             // Redirect to the detail page using the data ID
             if (data) {
@@ -213,61 +207,6 @@
                     },
                     complete: function() {
                         stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                })
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            })
-                        }
-                    },
-                    onError: function(response) {
-                        csrf.val(response.token);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Data Gagal Disimpan, coba Lagi',
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
-                });
-            }
-        })
-    }
-
-    const closePO = function(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Yakin akan Close PO?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Close',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                $.ajax({
-                    url: "<?= base_url("po-lokal-bahan-baku/close-po"); ?>",
-                    data: {
-                        id: id
-                    },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                     },
                     method: "POST",
                     dataType: "json",
@@ -356,6 +295,67 @@
                             title: 'Data Gagal Dihapus, coba Lagi',
                             confirmButtonColor: '#4e73df',
                         })
+                    }
+                });
+            }
+        })
+    }
+
+    // delete
+    function handleDelete(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+
+                setLoading()
+                $.ajax({
+                    url: "<?= base_url("material-request/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            stopLoading()
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Dihapus, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
                     }
                 });
             }

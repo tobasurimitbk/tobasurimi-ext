@@ -11,10 +11,16 @@ use App\Models\Sub_AkunsModel;
 use App\Models\AccountDivisisModel;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\AMPurchaseOrderModel;
+use App\Models\BarangMasterModel;
+use App\Models\BarangMasterSpesifikasiModel;
+use App\Models\BiayaKepitingDetailModel;
+use App\Models\BiayaKepitingGajiModel;
 use App\Models\BiayaKepitingModel;
+use App\Models\BiayaUdangDetailModel;
 use App\Models\BiayaUdangModel;
 use App\Models\JasaVendorInModel;
 use App\Models\JurnalUmumModel;
+use App\Models\KemasanModel;
 use App\Models\KursModel;
 use App\Models\MaterialRequestPenolongDetailsModel;
 use App\Models\MaterialRequestsPenolongModel;
@@ -27,11 +33,16 @@ use App\Models\RasioBarangDigunakanModel;
 use App\Models\RasioBarangJadiModel;
 use App\Models\RasioCostModel;
 use App\Models\RasioModel;
+use App\Models\RasioSaldoAkhirModel;
+use App\Models\RasioSaldoAwalModel;
 use App\Models\RMImportPODetailModel;
 use App\Models\RMImportPOModel;
 use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\RMPurchaseOrderModel;
+use App\Models\SatuansModel;
 use App\Models\SettingCostingModel;
+use App\Models\StockDetail2Model;
+use App\Models\StockModel;
 
 class RasioController extends BaseController
 {
@@ -61,8 +72,19 @@ class RasioController extends BaseController
     protected $metadataModel;
     protected $kursModel;
     protected $biayaUdangModel;
+    protected $biayaUdangDetailModel;
     protected $biayaKepitingModel;
+    protected $biayaKepitingDetailModel;
+    protected $biayaKepitingGajiModel;
     protected $jasaVendorInModel;
+    protected $stockModel;
+    protected $stockDetail2Model;
+    protected $barangMasterModel;
+    protected $barangMasterSpesifikasiModel;
+    protected $satuanModel;
+    protected $kemasanModel;
+    protected $rasioSaldoAwalModel;
+    protected $rasioSaldoAkhirModel;
 
     public function __construct()
     {
@@ -92,8 +114,19 @@ class RasioController extends BaseController
         $this->metadataModel = new MetadataModel();
         $this->kursModel = new KursModel();
         $this->biayaUdangModel = new BiayaUdangModel();
+        $this->biayaUdangDetailModel = new BiayaUdangDetailModel();
         $this->biayaKepitingModel = new BiayaKepitingModel();
+        $this->biayaKepitingDetailModel = new BiayaKepitingDetailModel();
+        $this->biayaKepitingGajiModel = new BiayaKepitingGajiModel();
         $this->jasaVendorInModel = new JasaVendorInModel();
+        $this->stockModel = new StockModel();
+        $this->stockDetail2Model = new StockDetail2Model();
+        $this->barangMasterModel = new BarangMasterModel();
+        $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $this->satuanModel = new SatuansModel();
+        $this->kemasanModel = new KemasanModel();
+        $this->rasioSaldoAwalModel = new RasioSaldoAwalModel();
+        $this->rasioSaldoAkhirModel = new RasioSaldoAkhirModel();
     }
 
     public function index()
@@ -161,14 +194,20 @@ class RasioController extends BaseController
                 "harga_average_po_bp" => $this->request->getVar("hargaSatuanPembelian_material_2") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("hargaSatuanPembelian_material_2")), 2, '.', '') : 0,
             ];
 
-            $id = $this->rasioModel->insert($data);
 
             $barang_digunakan = json_decode($this->request->getVar("items_digunakan"));
             $barang_jadi = json_decode($this->request->getVar("items_jadi"));
             $barang_digunakan_material_2 = json_decode($this->request->getVar("items_digunakan_material_2"));
+            $saldo_awal = json_decode($this->request->getVar("saldo_awal"));
+            $saldo_akhir = json_decode($this->request->getVar("saldo_akhir"));
             $labor_cost = json_decode($this->request->getVar("labor_cost"));
             $overhead_cost = json_decode($this->request->getVar("overhead_cost"));
             $fixed_cost = json_decode($this->request->getVar("fixed_cost"));
+
+            // var_dump($saldo_awal);
+            // var_dump($saldo_akhir);
+            // exit;
+            $id = $this->rasioModel->insert($data);
 
             foreach ($barang_digunakan as $s) {
                 $this->rasioBarangDigunakanModel->insert([
@@ -300,6 +339,66 @@ class RasioController extends BaseController
                 }
             }
 
+            foreach ($saldo_awal as $s) {
+                $this->rasioSaldoAwalModel->insert([
+                    'rasio_id' => $id,
+                    'barang1_id' => $s->barang1_id,
+                    'barang2_id' => $s->barang2_id,
+                    'supplier_name' => $s->supplier_name,
+                    'bc_id' => $s->bc_id,
+                    'stock_detail_id' => $s->stock_detail_id,
+                    'no_aju' => $s->no_aju,
+                    'stock_id' => $s->stock_id,
+                    'stock_dokumen' => $s->stock_dokumen,
+                    'no_dokumen_2' => $s->no_dokumen_2,
+                    'supplier_id' => $s->supplier_id,
+                    'harga_umum' => $s->harga_umum ?? 0,
+                    'harga_harian' => $s->harga_harian ?? 0,
+                    'harga_bulanan' => $s->harga_bulanan ?? 0,
+                    'no_po' => $s->no_po,
+                    'no_dokumen_1' => $s->no_dokumen_1,
+                    'stock_date' => $s->stock_date,
+                    'sumber' => $s->sumber,
+                    'stok_total' => $s->stok_total,
+                    'bc_type' => $s->bc_type,
+                    'satuan' => $s->satuan,
+                    'barang' => $s->barang,
+                    'type_barang' => $s->type_barang,
+                    'type_barang_text' => $s->type_barang_text,
+                    'stok_produksi' => $s->stok_produksi ?? 0,
+                ]);
+            }
+
+            foreach ($saldo_akhir as $s) {
+                $this->rasioSaldoAkhirModel->insert([
+                    'rasio_id' => $id,
+                    'barang1_id' => $s->barang1_id,
+                    'barang2_id' => $s->barang2_id,
+                    'supplier_name' => $s->supplier_name,
+                    'bc_id' => $s->bc_id,
+                    'stock_detail_id' => $s->stock_detail_id,
+                    'no_aju' => $s->no_aju,
+                    'stock_id' => $s->stock_id,
+                    'stock_dokumen' => $s->stock_dokumen,
+                    'no_dokumen_2' => $s->no_dokumen_2,
+                    'supplier_id' => $s->supplier_id,
+                    'harga_umum' => $s->harga_umum ?? 0,
+                    'harga_harian' => $s->harga_harian ?? 0,
+                    'harga_bulanan' => $s->harga_bulanan ?? 0,
+                    'no_po' => $s->no_po,
+                    'no_dokumen_1' => $s->no_dokumen_1,
+                    'stock_date' => $s->stock_date,
+                    'sumber' => $s->sumber,
+                    'stok_total' => $s->stok_total,
+                    'bc_type' => $s->bc_type,
+                    'satuan' => $s->satuan,
+                    'barang' => $s->barang,
+                    'type_barang' => $s->type_barang,
+                    'type_barang_text' => $s->type_barang_text,
+                    'stok_produksi' => $s->stok_produksi ?? 0,
+                ]);
+            }
+
             return response()->setJSON([
                 "id"      => encrypt($id),
                 "status"  => true,
@@ -335,13 +434,14 @@ class RasioController extends BaseController
         $data = [
             'dataDivisi' => $this->divisisModel->getDivisiAccess(),
             "subAkuns" => $subAkunsModel,
+            'kategoriBarangAkun' => $this->metadataModel->asObject()->where('name', 'kategori_barang_akun')->findAll(),
             "rasio" => $rasioModel,
             "rasioBarangDigunakan" => $rasioBarangDigunakanModel,
             "rasioBarangJadi" => $rasioBarangJadiModel,
             "rasioBarangPenolong" => $rasioBarangPenolongModel,
             "rasioCost" => $rasioCostModel,
         ];
-        // var_dump($data);
+        // var_dump($rasioModel);
         // exit;
         return view('Accounting/rasio/form', $data);
     }
@@ -461,31 +561,211 @@ class RasioController extends BaseController
                 $poBBImport = $this->rmImportPOModel->where('po_no', $stockDokumen)->first();
                 $poBP = $this->amPurchaseOrderModel->where('po_no', $stockDokumen)->first();
                 $jasaVendorIn = $this->jasaVendorInModel->where('no_penerimaan_surat_jalan', $stockDokumen)->first();
-
-                if ($jasaVendorIn) {
-                    // Ensure $jasaVendorIn['id'] is wrapped in an array for whereIn
-                    $biayaVendorUdang = $this->biayaUdangModel
-                        ->select('biaya_udang.*, biaya_udang_detail.*')
-                        ->join('biaya_udang_detail', 'biaya_udang_detail.biaya_udang_id = biaya_udang.id', 'left')
-                        ->whereIn('biaya_udang.multiple_jasa_vendor_in_id', [$jasaVendorIn['id']])
-                        ->first();
-                    $biayaVendorKepiting = $this->biayaKepitingModel
-                        ->select('biaya_kepiting.*, biaya_kepiting_detail.*')
-                        ->join('biaya_kepiting_detail', 'biaya_kepiting_detail.biaya_kepiting_id = biaya_kepiting.id', 'left')
-                        // ->join('biaya_kepiting_gaji', 'biaya_kepiting_gaji.biaya_kepiting_id = biaya_kepiting.id', 'left')
-                        ->where('biaya_kepiting.jasa_vendor_in_id', $jasaVendorIn['id'])
-                        ->first();
-
-                    if ($biayaVendorUdang) {
-                        var_dump($biayaVendorUdang);
-                    }
-
-                    if ($biayaVendorKepiting) {
-                        var_dump($biayaVendorKepiting);
-                    }
-                }
-
                 $penerimaanBarang = $this->penerimaanBarangModel->where('no_penerimaan_barang', $value['no_dokumen'])->first();
+
+                // if ($jasaVendorIn) {
+                //     // Ensure $jasaVendorIn['id'] is wrapped in an array for whereIn
+                //     $biayaVendorUdang = $this->biayaUdangModel
+                //         ->whereIn('biaya_udang.multiple_jasa_vendor_in_id', [$jasaVendorIn['id']])
+                //         ->first();
+                //     $biayaVendorKepiting = $this->biayaKepitingModel
+                //         ->where('biaya_kepiting.jasa_vendor_in_id', $jasaVendorIn['id'])
+                //         ->first();
+
+                //     if ($biayaVendorUdang) {
+                //         var_dump($biayaVendorUdang);
+                //     }
+
+                //     if ($biayaVendorKepiting) {
+                //         $biayaKepitingDetail = $this->biayaKepitingDetailModel
+                //             ->where('barang_master_id', $value['barang1_id'])
+                //             ->where('barang_master_spesifikasi_id', $value['barang2_id'])
+                //             ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //             ->first();
+                //         if ($biayaKepitingDetail['jumbo']) {
+                //             $upahKopekKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('jumbo !=', 0)
+                //                 ->where('jenis', 'Upah Kopek')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $komisiKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('jumbo !=', 0)
+                //                 ->where('jenis', 'Komisi / Kg Daging')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $bonusKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('jumbo !=', 0)
+                //                 ->where('jenis', 'Bonus / Kg Daging')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $tambahanKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('jumbo !=', 0)
+                //                 ->where('jenis', 'Tamb. Upah Kopek Ex. Lump')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $biayaKepitingDetail['upah_kopek'] = $upahKopekKepiting['jumbo'] ?? 0;
+                //             $biayaKepitingDetail['komisi'] = $komisiKepiting['jumbo'] ?? 0;
+                //             $biayaKepitingDetail['bonus'] = $bonusKepiting['jumbo'] ?? 0;
+                //             $biayaKepitingDetail['tambahan'] = $tambahanKepiting['jumbo'] ?? 0;
+                //         } else if ($biayaKepitingDetail['ex_lump']) {
+                //             $upahKopekKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('ex_lump !=', 0)
+                //                 ->where('jenis', 'Upah Kopek')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $komisiKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('ex_lump !=', 0)
+                //                 ->where('jenis', 'Komisi / Kg Daging')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $bonusKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('ex_lump !=', 0)
+                //                 ->where('jenis', 'Bonus / Kg Daging')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $tambahanKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('ex_lump !=', 0)
+                //                 ->where('jenis', 'Tamb. Upah Kopek Ex. Lump')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $biayaKepitingDetail['upah_kopek'] = $upahKopekKepiting['ex_lump'] ?? 0;
+                //             $biayaKepitingDetail['komisi'] = $komisiKepiting['ex_lump'] ?? 0;
+                //             $biayaKepitingDetail['bonus'] = $bonusKepiting['ex_lump'] ?? 0;
+                //             $biayaKepitingDetail['tambahan'] = $tambahanKepiting['ex_lump'] ?? 0;
+                //         } else if ($biayaKepitingDetail['lump']) {
+                //             $upahKopekKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('lump !=', 0)
+                //                 ->where('jenis', 'Upah Kopek')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $komisiKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('lump !=', 0)
+                //                 ->where('jenis', 'Komisi / Kg Daging')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $bonusKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('lump !=', 0)
+                //                 ->where('jenis', 'Bonus / Kg Daging')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $tambahanKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('lump !=', 0)
+                //                 ->where('jenis', 'Tamb. Upah Kopek Ex. Lump')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $biayaKepitingDetail['upah_kopek'] = $upahKopekKepiting['lump'] ?? 0;
+                //             $biayaKepitingDetail['komisi'] = $komisiKepiting['lump'] ?? 0;
+                //             $biayaKepitingDetail['bonus'] = $bonusKepiting['lump'] ?? 0;
+                //             $biayaKepitingDetail['tambahan'] = $tambahanKepiting['lump'] ?? 0;
+                //         } else if ($biayaKepitingDetail['special']) {
+                //             $upahKopekKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('special !=', 0)
+                //                 ->where('jenis', 'Upah Kopek')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $komisiKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('special !=', 0)
+                //                 ->where('jenis', 'Komisi / Kg Daging')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $bonusKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('special !=', 0)
+                //                 ->where('jenis', 'Bonus / Kg Daging')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $tambahanKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('special !=', 0)
+                //                 ->where('jenis', 'Tamb. Upah Kopek Ex. Lump')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $biayaKepitingDetail['upah_kopek'] = $upahKopekKepiting['special'] ?? 0;
+                //             $biayaKepitingDetail['komisi'] = $komisiKepiting['special'] ?? 0;
+                //             $biayaKepitingDetail['bonus'] = $bonusKepiting['special'] ?? 0;
+                //             $biayaKepitingDetail['tambahan'] = $tambahanKepiting['special'] ?? 0;
+                //         } else if ($biayaKepitingDetail['claw']) {
+                //             $upahKopekKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('claw !=', 0)
+                //                 ->where('jenis', 'Upah Kopek')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $komisiKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('claw !=', 0)
+                //                 ->where('jenis', 'Komisi / Kg Daging')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $bonusKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('claw !=', 0)
+                //                 ->where('jenis', 'Bonus / Kg Daging')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $tambahanKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('claw !=', 0)
+                //                 ->where('jenis', 'Tamb. Upah Kopek Ex. Lump')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $biayaKepitingDetail['upah_kopek'] = $upahKopekKepiting['claw'] ?? 0;
+                //             $biayaKepitingDetail['komisi'] = $komisiKepiting['claw'] ?? 0;
+                //             $biayaKepitingDetail['bonus'] = $bonusKepiting['claw'] ?? 0;
+                //             $biayaKepitingDetail['tambahan'] = $tambahanKepiting['claw'] ?? 0;
+                //         } else if ($biayaKepitingDetail['mh']) {
+                //             $upahKopekKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('mh !=', 0)
+                //                 ->where('jenis', 'Upah Kopek')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $komisiKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('mh !=', 0)
+                //                 ->where('jenis', 'Komisi / Kg Daging')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $bonusKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('mh !=', 0)
+                //                 ->where('jenis', 'Bonus / Kg Daging')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $tambahanKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('mh !=', 0)
+                //                 ->where('jenis', 'Tamb. Upah Kopek Ex. Lump')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $biayaKepitingDetail['upah_kopek'] = $upahKopekKepiting['mh'] ?? 0;
+                //             $biayaKepitingDetail['komisi'] = $komisiKepiting['mh'] ?? 0;
+                //             $biayaKepitingDetail['bonus'] = $bonusKepiting['mh'] ?? 0;
+                //             $biayaKepitingDetail['tambahan'] = $tambahanKepiting['mh'] ?? 0;
+                //         } else if ($biayaKepitingDetail['cf']) {
+                //             $upahKopekKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('cf !=', 0)
+                //                 ->where('jenis', 'Upah Kopek')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $komisiKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('cf !=', 0)
+                //                 ->where('jenis', 'Komisi / Kg Daging')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $bonusKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('cf !=', 0)
+                //                 ->where('jenis', 'Bonus / Kg Daging')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $tambahanKepiting = $this->biayaKepitingGajiModel
+                //                 ->where('cf !=', 0)
+                //                 ->where('jenis', 'Tamb. Upah Kopek Ex. Lump')
+                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
+                //                 ->first();
+                //             $biayaKepitingDetail['upah_kopek'] = $upahKopekKepiting['cf'] ?? 0;
+                //             $biayaKepitingDetail['komisi'] = $komisiKepiting['cf'] ?? 0;
+                //             $biayaKepitingDetail['bonus'] = $bonusKepiting['cf'] ?? 0;
+                //             $biayaKepitingDetail['tambahan'] = $tambahanKepiting['cf'] ?? 0;
+                //         }
+                //         var_dump($biayaKepitingDetail);
+                //     }
+                //     $value['totalQtyKopek'] = $totalQty;
+                //     $value['totalHargaKopek'] = $totalHarga;
+                //     $value['hargaSatuanKopek'] = $hargaSatuan;
+                //     $value['satuanKopek'] = $satuanPO;
+                // }
+
                 if ($poBBLokal) {
                     $totalQty = 0;
                     $totalHarga = 0;
@@ -510,6 +790,7 @@ class RasioController extends BaseController
                     $value['hargaSatuanPO'] = $hargaSatuan;
                     $value['satuanPO'] = $satuanPO;
                 }
+
                 if ($poBBImport) {
                     $totalQty = 0;
                     $totalHarga = 0;
@@ -598,7 +879,7 @@ class RasioController extends BaseController
                 }
             }
 
-            exit;
+            // exit;
 
             if ($productionResultDataTitle) {
                 return response()->setJSON([
@@ -807,6 +1088,122 @@ class RasioController extends BaseController
                 'status' => false
             ]);
         }
+    }
+
+    public function getSaldoAkhir()
+    {
+        $dataResults = [];
+        $data = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
+            "bahan_baku",
+            $this->request->getVar('divisi_id')
+        );
+        foreach ($data as $value) {
+            $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
+                $value['stock_id']
+            );
+            $stock = $this->stockModel->find($value['stock_id']);
+            if ($stock['kemasan_id'] == 0) {
+                $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
+                $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
+                $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+                $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
+            } else {
+                $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
+                $satuan = $this->satuanModel->find($kemasan['satuan_id']);
+                $barangName = $kemasan['name'];
+            }
+            for ($i = 0; $i < count($dataResult); $i++) {
+                $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
+
+                $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
+                $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
+                $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+                $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
+                $dataResult[$i]['barang'] = strtoupper($barangName);
+                $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+                $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+                $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
+                $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
+                $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
+            }
+
+            // Merge current dataResult into dataResults
+            $dataResults = array_merge($dataResults, $dataResult);
+        }
+        // var_dump($dataResults);
+        return response()->setJSON([
+            'data' => $dataResults,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
+    public function getSaldoAwal()
+    {
+        $monthData = $this->request->getVar('bulan');
+        list($month, $year) = explode('/', $monthData);
+        $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        $conditionProduction = [
+            'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+            'divisi_id' => $this->request->getVar('divisi_id'),
+        ];
+        $kursValue = 1;
+        $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
+
+        $dataResults = [];
+        $dataStockModel = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
+            "bahan_baku",
+            $this->request->getVar('divisi_id')
+        );
+
+        foreach ($dataStockModel as $value) {
+            $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
+                $value['stock_id']
+            );
+            $stock = $this->stockModel->find($value['stock_id']);
+            if ($stock['kemasan_id'] == 0) {
+                $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
+                $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
+                $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+                $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
+            } else {
+                $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
+                $satuan = $this->satuanModel->find($kemasan['satuan_id']);
+                $barangName = $kemasan['name'];
+            }
+            for ($i = 0; $i < count($dataResult); $i++) {
+                $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
+
+                $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
+                $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
+                $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+                $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
+                $dataResult[$i]['barang'] = strtoupper($barangName);
+                $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+                $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+                $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
+                $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
+                $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
+
+                // Initialize stok_produksi to 0
+                $dataResult[$i]['stok_produksi'] = 0;
+
+                foreach ($productionResultDataTitle as $valueProductionResultData) {
+                    if ($valueProductionResultData['stock_id'] == $dataResult[$i]['stock_id']) {
+                        $dataResult[$i]['stok_produksi'] = $valueProductionResultData['qty'];
+                        break; // Exit the loop once a match is found
+                    }
+                }
+            }
+
+            // Merge current dataResult into dataResults
+            $dataResults = array_merge($dataResults, $dataResult);
+        }
+        return response()->setJSON([
+            'data' => $dataResults,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
     }
 
     public function formatHarga($harga)

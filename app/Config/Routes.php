@@ -562,6 +562,25 @@ $routes->post('/customer-ekspor/save', 'Master\Customer::saveCustomer', ['filter
 $routes->post('/customer-ekspor/update', 'Master\Customer::updateCustomer', ['filter' => 'Auth']);
 $routes->post('/customer-ekspor/delete', 'Master\Customer::deleteCustomer', ['filter' => 'Auth']);
 
+// SALES LAIN
+$routes->get('order-form-lain', 'PenjualanLain\SalesOrderLain::index', ['filter' => 'Auth']);
+$routes->get('order-form-lain/id/(:segment)', 'PenjualanLain\SalesOrderLain::detail/$1', ['filter' => 'Auth']);
+$routes->get('order-form-lain/print/(:segment)', 'PenjualanLain\SalesOrderLain::print/$1', ['filter' => 'Auth']);
+$routes->get('order-form-lain/all', 'PenjualanLain\SalesOrderLain::all', ['filter' => 'Auth']);
+$routes->get('order-form-lain/create', 'PenjualanLain\SalesOrderLain::create', ['filter' => 'Auth']);
+$routes->post('order-form-lain/save', 'PenjualanLain\SalesOrderLain::createAction', ['filter' => 'Auth']);
+$routes->post('order-form-lain/update', 'PenjualanLain\SalesOrderLain::updateAction', ['filter' => 'Auth']);
+$routes->post('order-form-lain/delete', 'PenjualanLain\SalesOrderLain::delete', ['filter' => 'Auth']);
+$routes->post('order-form-lain/posting', 'PenjualanLain\SalesOrderLain::posting', ['filter' => 'Auth']);
+$routes->post('order-form-lain/unposting', 'PenjualanLain\SalesOrderLain::unPosting', ['filter' => 'Auth']);
+
+$routes->get('order-form-lain/list-sales-order-detail', 'PenjualanLain\SalesOrderLain::getListSalesOrderDetail', ['filter' => 'Auth']);
+$routes->get('order-form-lain/list-stock-init', 'PenjualanLain\SalesOrderLain::dropdownListBarang', ['filter' => 'Auth']);
+$routes->get('order-form-lain/list-stock-dokumen-bc', 'PenjualanLain\SalesOrderLain::getListStockByStockID', ['filter' => 'Auth']);
+$routes->get('order-form-lain/list-satuan-konversi', 'PenjualanLain\SalesOrderLain::dropdownSatuanOrder', ['filter' => 'Auth']);
+$routes->get('order-form-lain/list-customer', 'PenjualanLain\SalesOrderLain::dropdownListCustomer', ['filter' => 'Auth']);
+$routes->get('order-form-lain/hitung-konversi', 'PenjualanLain\SalesOrderLain::hitungKonversi', ['filter' => 'Auth']);
+$routes->get('order-form-lain/get-no', 'PenjualanLain\SalesOrderLain::getSalesOrderLainNo', ['filter' => 'Auth']);
 
 // PRODUKSI
 // Production Result
@@ -592,6 +611,7 @@ $routes->get('/material-request/details/(:segment)', 'Production\MaterialRequest
 $routes->get('/material-request/create', 'Production\MaterialRequest::createView', ['filter' => 'Auth']);
 $routes->get('/material-request/all', 'Production\MaterialRequest::all', ['filter' => 'Auth']);
 $routes->post('/material-request/delete', 'Production\MaterialRequest::deleteMR', ['filter' => 'Auth']);
+$routes->post('/material-request/delete-detail', 'Production\MaterialRequest::deleteMRDetail', ['filter' => 'Auth']);
 $routes->get('/material-request/data-detail-material', 'Production\MaterialRequest::allDetailMaterialRequest', ['filter' => 'Auth']);
 $routes->post('/material-request/save', 'Production\MaterialRequest::create', ['filter' => 'Auth']);
 $routes->post('/material-request/update', 'Production\MaterialRequest::update', ['filter' => 'Auth']);
@@ -604,6 +624,7 @@ $routes->get('/material-request-penolong/details/(:segment)', 'Production\Materi
 $routes->get('/material-request-penolong/create', 'Production\MaterialRequestPenolong::createView', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/all', 'Production\MaterialRequestPenolong::all', ['filter' => 'Auth']);
 $routes->post('/material-request-penolong/delete', 'Production\MaterialRequestPenolong::deleteMR', ['filter' => 'Auth']);
+$routes->post('/material-request-penolong/delete-detail', 'Production\MaterialRequestPenolong::deleteMRDetail', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/data-detail-material', 'Production\MaterialRequestPenolong::allDetailMaterialRequest', ['filter' => 'Auth']);
 $routes->post('/material-request-penolong/save', 'Production\MaterialRequestPenolong::create', ['filter' => 'Auth']);
 $routes->post('/material-request-penolong/update', 'Production\MaterialRequestPenolong::update', ['filter' => 'Auth']);
@@ -616,6 +637,7 @@ $routes->get('/material-request-kimia/details/(:segment)', 'Production\MaterialR
 $routes->get('/material-request-kimia/create', 'Production\MaterialRequestKimia::createView', ['filter' => 'Auth']);
 $routes->get('/material-request-kimia/all', 'Production\MaterialRequestKimia::all', ['filter' => 'Auth']);
 $routes->post('/material-request-kimia/delete', 'Production\MaterialRequestKimia::deleteMR', ['filter' => 'Auth']);
+$routes->post('/material-request-kimia/delete-detail', 'Production\MaterialRequestKimia::deleteMRDetail', ['filter' => 'Auth']);
 $routes->get('/material-request-kimia/data-detail-material', 'Production\MaterialRequestKimia::allDetailMaterialRequest', ['filter' => 'Auth']);
 $routes->post('/material-request-kimia/save', 'Production\MaterialRequestKimia::create', ['filter' => 'Auth']);
 $routes->post('/material-request-kimia/update', 'Production\MaterialRequestKimia::update', ['filter' => 'Auth']);
@@ -1518,6 +1540,8 @@ $routes->get('/rasio', 'Accounting\Rasio\RasioController::index', ['filter' => '
 $routes->get('/rasio/create', 'Accounting\Rasio\RasioController::createRasio', ['filter' => 'Auth']);
 $routes->get('/rasio/get-barang-jadi', 'Accounting\Rasio\RasioController::getRasioBarangJadi', ['filter' => 'Auth']);
 $routes->get('/rasio/get-barang-digunakan', 'Accounting\Rasio\RasioController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/rasio/get-saldo-akhir', 'Accounting\Rasio\RasioController::getSaldoAkhir', ['filter' => 'Auth']);
+$routes->get('/rasio/get-saldo-awal', 'Accounting\Rasio\RasioController::getSaldoAwal', ['filter' => 'Auth']);
 $routes->get('/rasio/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
 $routes->get('/rasio/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
 $routes->get('/rasio/get-jurnal', 'Accounting\Rasio\RasioController::getDataJurnal', ['filter' => 'Auth']);
@@ -1636,6 +1660,10 @@ $routes->get('/laporan-warehouse/purchase-order/print', 'Laporan\Warehouse\Lapor
 $routes->get('/laporan-warehouse/penerimaan-barang', 'Laporan\Warehouse\LaporanWarehouse::laporanPenerimaanBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-warehouse/penerimaan-barang/all-penerimaan-barang', 'Laporan\Warehouse\LaporanWarehouse::allLaporanPenerimaanBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-warehouse/penerimaan-barang/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanPenerimaanBarang', ['filter' => 'Auth']);
+
+$routes->get('/laporan-warehouse/material-request', 'Laporan\Warehouse\LaporanWarehouse::laporanMaterialRequest', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/material-request/all-material-request', 'Laporan\Warehouse\LaporanWarehouse::allLaporanMaterialRequest', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/material-request/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanMaterialRequest', ['filter' => 'Auth']);
 
 /*
  * --------------------------------------------------------------------

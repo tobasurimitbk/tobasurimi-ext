@@ -13,13 +13,27 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request"); ?>">
                 Batal
             </a>
-            <?php if (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted != 1) { ?>
-                <button class="btn btn-success mr-1" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 1)">
-                    Posting
-                </button>
-                <button class="btn btn-show-form btn-save btn-submit-form mr-1">
-                    Simpan
-                </button>
+            <?php if (isset($dataMaterialRequests)) { ?>
+                <?php if ($dataMaterialRequests->is_posted != 1) { ?>
+                    <?php if (can('Produksi', 'Material Request', 'a')) : ?>
+                        <button class="btn btn-success mr-1" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 1)">
+                            Posting
+                        </button>
+                    <?php endif; ?>
+                    <?php if (can('Produksi', 'Material Request', 'd')) : ?>
+                        <button class="btn btn-hapus delete-parent float-right" onclick="handleDelete('<?= !empty($ids) ? $ids : ''; ?>')">
+                            Hapus
+                        </button>
+                    <?php endif; ?>
+                    <button class="btn btn-show-form btn-save btn-submit-form mr-1">
+                        Simpan
+                    </button>
+                <?php } ?>
+                <?php if (can('Produksi', 'Material Request', 'p')) : ?>
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("material-request/print/"); ?><?= encrypt($dataMaterialRequests->id) ?>')">
+                        Print
+                    </button>
+                <?php endif; ?>
             <?php } else if (!isset($dataMaterialRequests)) { ?>
                 <button class="btn btn-show-form btn-save btn-submit-form mr-1">
                     Simpan
@@ -309,6 +323,37 @@
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
                     <div class="col-md-6">
+                        <label class="form-label font-weight-bold modal-sub-title">Data Barang Setengah Jadi Request</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTableBahanSetengahJadi" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="text-align: center;">No</th>
+                                <th style="text-align: center;">Department</th>
+                                <th style="text-align: center;">Warehouse</th>
+                                <th style="text-align: center;">Tipe Barang</th>
+                                <th style="text-align: center;">Dokumen Pabean</th>
+                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">Tanggal Penerimaan</th>
+                                <th style="text-align: center;">Barang - Spesifikasi</th>
+                                <th style="text-align: center;">Satuan</th>
+                                <th style="text-align: center;">Qty Awal</th>
+                                <th style="text-align: center;">Qty Direquest</th>
+                                <th style="text-align: center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-subtitle-modal">
+                <div class="row mt-3">
+                    <div class="col-md-6">
                         <label class="form-label font-weight-bold modal-sub-title">Data Barang Jadi Request</label>
                     </div>
                 </div>
@@ -349,6 +394,7 @@
     var listStockAsal = [];
     var listStockSelectedBahanBaku = [];
     var listStockSelectedBahan = [];
+    var listStockSelectedBahanSetengahJadi = [];
     var listStockSelectedBahanJadi = [];
 
     let sortDataBarang = "createdAt";
@@ -406,6 +452,31 @@
                     warehouseID: "<?= $materialRequestDetails->warehouse_id ?>",
                     warehouseText: "<?= $materialRequestDetails->warehouse_text ?>"
                 });
+            <?php } else if ($materialRequestDetails->barang_type == "bahan_setengah_jadi") { ?>
+                listStockSelectedBahanSetengahJadi.push({
+                    id_material_request_detail: "<?= $materialRequestDetails->id ?>",
+                    barang: "<?= $materialRequestDetails->nama_barang ?>",
+                    bc_id: "<?= $materialRequestDetails->bc_id ?>",
+                    bc_type: "<?= $materialRequestDetails->ref_no ?>",
+                    departmentID: "<?= $materialRequestDetails->divisi_id ?>",
+                    departmentText: "<?= $materialRequestDetails->divisi_text ?>",
+                    no_aju: "<?= $materialRequestDetails->no_aju ?>",
+                    no_dokumen_1: "-",
+                    no_dokumen_2: "-",
+                    qty: "<?= $materialRequestDetails->qty ?>",
+                    qty2: "<?= $materialRequestDetails->qty2 ?>",
+                    qty_isi: "<?= $materialRequestDetails->qty_isi ?>",
+                    satuan: "<?= $materialRequestDetails->kode_satuan ?>",
+                    stock_date: "<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>",
+                    stock_dokumen: "<?= $materialRequestDetails->stock_dokumen ?>",
+                    stock_id: "<?= $materialRequestDetails->stock_id ?>",
+                    stok_total: "<?= $materialRequestDetails->qty ?>",
+                    supplier_name: "-",
+                    type_barang: "<?= $materialRequestDetails->barang_type ?>",
+                    type_barang_text: "<?= $materialRequestDetails->barang_type_text ?>",
+                    warehouseID: "<?= $materialRequestDetails->warehouse_id ?>",
+                    warehouseText: "<?= $materialRequestDetails->warehouse_text ?>"
+                });
             <?php } else { ?>
                 listStockSelectedBahan.push({
                     id_material_request_detail: "<?= $materialRequestDetails->id ?>",
@@ -437,6 +508,7 @@
         // console.log(listStockSelectedBahanJadi);
         drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
         drawTableSelectedItemBahan(listStockSelectedBahan);
+        drawTableSelectedItemBahanSetengahJadi(listStockSelectedBahanSetengahJadi);
         drawTableSelectedItemBahanJadi(listStockSelectedBahanJadi);
     <?php endif; ?>
     $(document).ready(function() {
@@ -778,7 +850,7 @@
         });
 
         $('.btn-save').click(function() {
-            var listMaterialCheck = [].concat(listStockSelectedBahanBaku, listStockSelectedBahan, listStockSelectedBahanJadi);
+            var listMaterialCheck = [].concat(listStockSelectedBahanBaku, listStockSelectedBahan, listStockSelectedBahanSetengahJadi, listStockSelectedBahanJadi);
 
             if (listMaterialCheck.length == 0) {
                 Swal.fire({
@@ -824,6 +896,20 @@
                         }
                     });
 
+                    $.each(listStockSelectedBahanSetengahJadi, function(i, v) {
+                        var element = $('input[data-id="' + v.id + '"].qty-bahan-request');
+                        var input_user = parseFloat(element.val());
+                        var stok_max = parseFloat(element.data('stok_total'));
+
+                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                            dataError = listStockSelectedBahanSetengahJadi[i];
+                            isValid = false;
+                        } else {
+                            listStockSelectedBahanSetengahJadi[i].qty = stok_max;
+                            listStockSelectedBahanSetengahJadi[i].qty2 = input_user;
+                        }
+                    });
+
                     $.each(listStockSelectedBahanJadi, function(i, v) {
                         var element = $('input[data-id="' + v.id + '"].qty-jadi-isi');
                         var elementRequest = $('input[data-id="' + v.id + '"].qty-jadi-request');
@@ -863,7 +949,7 @@
                             if (result.isConfirmed) {
                                 let id = $('#id').val();
                                 let data = new FormData(document.querySelector(".create-form"));
-                                var listMaterial = [].concat(listStockSelectedBahanBaku, listStockSelectedBahan, listStockSelectedBahanJadi);
+                                var listMaterial = [].concat(listStockSelectedBahanBaku, listStockSelectedBahan, listStockSelectedBahanSetengahJadi, listStockSelectedBahanJadi);
                                 data.append('listMaterial', JSON.stringify(listMaterial));
                                 if (id) {
                                     // UPDATE
@@ -1292,16 +1378,15 @@
                         listStockSelectedBahanJadi.push(listStockAsal[i]);
                     }
                 }
-            } else {
-                if ($.inArray(currentID, dataIds) !== -1) {
-                    var isIDSelected = $.grep(listStockSelectedBahan, function(item) {
+            } else if (listStockAsal[i].type_barang == "bahan_setengah_jadi") {
+                if ($.inArray(currentID, dataIds) == -1) {
+                    var isIDSelected = $.grep(listStockSelectedBahanSetengahJadi, function(item) {
                         return item.id == Number(currentID);
                     }).length > 0;
-
-                    if (!isIDSelected) {
+                    if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
+                        var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
                         listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                         listStockAsal[i].qty = 0;
-                        listStockAsal[i].qty2 = 0;
                         listStockAsal[i].qty_isi = 0;
                         listStockAsal[i].departmentID = departmentID;
                         listStockAsal[i].departmentText = departmentText;
@@ -1311,13 +1396,39 @@
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                         listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
+                        listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
+                        listStockSelectedBahanSetengahJadi.push(listStockAsal[i]);
+                        qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
+                    }
+                }
+            } else {
+                if ($.inArray(currentID, dataIds) == -1) {
+                    var isIDSelected = $.grep(listStockSelectedBahan, function(item) {
+                        return item.id == Number(currentID);
+                    }).length > 0;
+                    if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
+                        var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
+                        listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
+                        listStockAsal[i].qty = 0;
+                        listStockAsal[i].qty_isi = 0;
+                        listStockAsal[i].departmentID = departmentID;
+                        listStockAsal[i].departmentText = departmentText;
+                        listStockAsal[i].warehouseID = warehouseID;
+                        listStockAsal[i].warehouseText = warehouseText;
+                        listStockAsal[i].departmentTujuanID = departmentTujuanID;
+                        listStockAsal[i].departmentTujuanText = departmentTujuanText;
+                        listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
+                        listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
+                        listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
                         listStockSelectedBahan.push(listStockAsal[i]);
+                        qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                     }
                 }
             }
         });
         drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
         drawTableSelectedItemBahan(listStockSelectedBahan);
+        drawTableSelectedItemBahanSetengahJadi(listStockSelectedBahanSetengahJadi);
         drawTableSelectedItemBahanJadi(listStockSelectedBahanJadi);
     }
 
@@ -1409,6 +1520,29 @@
                                 qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                             }
                         }
+                    } else if (listStockAsal[i].type_barang == "bahan_setengah_jadi") {
+                        if ($.inArray(currentID, dataIds) == -1) {
+                            var isIDSelected = $.grep(listStockSelectedBahanSetengahJadi, function(item) {
+                                return item.id == Number(currentID);
+                            }).length > 0;
+                            if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
+                                var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
+                                listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
+                                listStockAsal[i].qty = 0;
+                                listStockAsal[i].qty_isi = 0;
+                                listStockAsal[i].departmentID = departmentID;
+                                listStockAsal[i].departmentText = departmentText;
+                                listStockAsal[i].warehouseID = warehouseID;
+                                listStockAsal[i].warehouseText = warehouseText;
+                                listStockAsal[i].departmentTujuanID = departmentTujuanID;
+                                listStockAsal[i].departmentTujuanText = departmentTujuanText;
+                                listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
+                                listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
+                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
+                                listStockSelectedBahanSetengahJadi.push(listStockAsal[i]);
+                                qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
+                            }
+                        }
                     } else {
                         if ($.inArray(currentID, dataIds) == -1) {
                             var isIDSelected = $.grep(listStockSelectedBahan, function(item) {
@@ -1438,6 +1572,7 @@
         }
         drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
         drawTableSelectedItemBahan(listStockSelectedBahan);
+        drawTableSelectedItemBahanSetengahJadi(listStockSelectedBahanSetengahJadi);
         drawTableSelectedItemBahanJadi(listStockSelectedBahanJadi);
     }
 
@@ -1513,6 +1648,69 @@
         });
 
         selectedItemTableBahanBaku.draw();
+    }
+
+    function drawTableSelectedItemBahanSetengahJadi(data) {
+        if ($.fn.DataTable.isDataTable('#selectedItemTableBahanSetengahJadi')) {
+            $('#selectedItemTableBahanSetengahJadi').DataTable().clear().draw();
+            selectedItemTableBahanSetengahJadi.destroy();
+        }
+        const table = $('#selectedItemTableBahanSetengahJadi');
+        var no = 1;
+        $.each(data, function(i, v) {
+            var newRow = $('<tr>');
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+               ${no++} 
+            `
+            ));
+            newRow.append($('<td style="text-align: center;">').text(v.departmentText));
+            newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
+            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
+            newRow.append($('<td style="text-align: center;">').text(v.bc_type));
+            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(v.stock_date));
+            newRow.append($('<td style="text-align: center;">').text(v.barang));
+            newRow.append($('<td style="text-align: center;">').text(v.satuan));
+            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty2}">
+            `
+            ));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanSetengahJadi(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+            `
+            ));
+            table.find('tbody').append(newRow);
+        });
+
+        selectedItemTableBahanSetengahJadi = $('#selectedItemTableBahanSetengahJadi').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: false,
+            serverSide: false,
+            ordering: true,
+            order: [],
+            fixedHeader: true,
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+        selectedItemTableBahanSetengahJadi.draw();
     }
 
     function drawTableSelectedItemBahan(data) {
@@ -1682,7 +1880,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "<?= base_url("material-request/delete"); ?>",
+                        url: "<?= base_url("material-request/delete-detail"); ?>",
                         data: {
                             id: iddetail,
                         },
@@ -1742,7 +1940,67 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "<?= base_url("material-request/delete"); ?>",
+                        url: "<?= base_url("material-request/delete-detail"); ?>",
+                        data: {
+                            id: iddetail,
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        location.reload();
+                                    })
+                            }
+                        },
+                    });
+                }
+            })
+        }
+    }
+
+    function deleteDetailBahanSetengahJadi(id, iddetail) {
+        if (id) {
+            var indexToRemove = -1;
+            for (var i = 0; i < listStockSelectedBahanSetengahJadi.length; i++) {
+                if (listStockSelectedBahanSetengahJadi[i].id == id) {
+                    indexToRemove = i;
+                    break;
+                }
+            }
+            if (indexToRemove !== -1) {
+                listStockSelectedBahanSetengahJadi.splice(indexToRemove, 1);
+                drawTableSelectedItemBahanSetengahJadi(listStockSelectedBahanSetengahJadi);
+            }
+        }
+        if (iddetail) {
+            console.log(iddetail);
+            Swal.fire({
+                icon: 'question',
+                title: 'Yakin akan di hapus?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "<?= base_url("material-request/delete-detail"); ?>",
                         data: {
                             id: iddetail,
                         },
@@ -1802,7 +2060,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "<?= base_url("material-request/delete"); ?>",
+                        url: "<?= base_url("material-request/delete-detail"); ?>",
                         data: {
                             id: iddetail,
                         },
@@ -1832,6 +2090,67 @@
                 }
             })
         }
+    }
+
+    // delete
+    function handleDelete(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+
+                setLoading()
+                $.ajax({
+                    url: "<?= base_url("material-request/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            stopLoading()
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Dihapus, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
+                    }
+                });
+            }
+        })
     }
 
     function preventNegativeInput(inputElement) {

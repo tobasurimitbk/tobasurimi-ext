@@ -408,6 +408,13 @@
         allowClear: true
     }).change(function() {});
 
+    $("#tanggal").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
     $('#warehouse_id').select2({
         placeholder: "Pilih Warehouse",
         theme: "bootstrap-5",

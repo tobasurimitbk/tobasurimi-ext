@@ -9,7 +9,7 @@ use Dompdf\Dompdf;
 use App\Models\CompaniesModel;
 use App\Models\SalesOrderModel;
 use App\Models\CustomerModel;
-use App\Models\BarangMasterModel;
+
 use App\Models\WarehousesModel;
 use App\Models\DetailStockBarang;
 use App\Models\StockDetailModel;
@@ -32,6 +32,13 @@ use App\Models\RMImportPOModel;
 use App\Models\RMImportPODetailModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\BCPurchaseOrderModel;
+use App\Models\PenerimaanMutasiGlobalModel;
+use App\Models\PenerimaanMutasiModel;
+use App\Models\BarangMasterModel;
+use App\Models\KemasanModel;
+use App\Models\StockDetail2Model;
+use App\Models\MaterialRequestsModel;
+use App\Models\MaterialRequestsPenolongModel;
 use Error;
 use ErrorException;
 
@@ -66,6 +73,14 @@ class LaporanWarehouse extends BaseController
     protected $rmImportPOModel;
     protected $penerimaanBarangModel;
     protected $bcPurchaseOrderModel;
+    protected $penerimaanMutasiGlobalModel;
+    protected $penerimaanMutasiModel;
+    protected $barangMasterModel;
+    protected $kemasanModel;
+    protected $stockDetail2Model;
+    protected $materialRequestModel;
+    protected $materialRequestPenolongModel;
+
 
     private $userId;
 
@@ -100,6 +115,13 @@ class LaporanWarehouse extends BaseController
         $this->rmImportPOModel = new RMImportPOModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->bcPurchaseOrderModel = new BCPurchaseOrderModel();
+        $this->penerimaanMutasiGlobalModel = new PenerimaanMutasiGlobalModel();
+        $this->penerimaanMutasiModel = new PenerimaanMutasiModel();
+        $this->barangMasterModel = new BarangMasterModel();
+        $this->kemasanModel = new KemasanModel();
+        $this->stockDetail2Model = new StockDetail2Model();
+        $this->materialRequestModel = new MaterialRequestsModel();
+        $this->materialRequestPenolongModel = new MaterialRequestsPenolongModel();
 
         $this->userId = session()->get("login")->user_id;
     }
@@ -1033,7 +1055,7 @@ class LaporanWarehouse extends BaseController
 
             echo json_encode($data);
             return;
-        } elseif ($filter_bc_type  == "No Pabean") {
+        } elseif ($filter_bc_type  == "Non Pabean") {
             $penerimaanBarang = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportNoPabean($addCondition, $pageSize, $offset);
 
             // var_dump($penerimaanBarang['data']);
@@ -1088,7 +1110,7 @@ class LaporanWarehouse extends BaseController
 
                 array_push($dataAllPenerimaanBarang, [
                     "no"                => $no++,
-                    "bc_type"     => "No Pabean",
+                    "bc_type"     => "Non Pabean",
                     "tanggal_bc"         =>  $data->lpb_date,
                     "no_daftar"    => "-",
                     "no_aju"    => "-",
@@ -1108,6 +1130,170 @@ class LaporanWarehouse extends BaseController
 
 
 
+
+            $data = [
+                "draw"            => intval($this->request->getGet("draw")),
+                "recordsTotal"    => $penerimaanBarang['totalData'],
+                "recordsFiltered" => $penerimaanBarang['totalFilteredData'],
+                'data'      => $dataAllPenerimaanBarang,
+                "payload" => $payload,
+
+            ];
+
+            echo json_encode($data);
+            return;
+        } elseif ($filter_bc_type  == "BC 2.7") {
+            $penerimaanBarang = $this->penerimaanMutasiGlobalModel->getPenerimaanBarangListReportBc27($addCondition, $pageSize, $offset);
+
+            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+            $dataAllPenerimaanBarang = [];
+
+            // var_dump($penerimaanBarang['data']);
+            // die();
+
+            foreach ($penerimaanBarang['data'] as $data) {
+
+
+                if ($data->tipe_barang == 'kemasan') {
+                    // Kemasan
+                    $kemasan = $this->kemasanModel->find($data->kemasan_id);
+                    $satuan = $this->satuanModel->find($kemasan['satuan_id'])['kode_satuan'];
+                    $barang = $kemasan['name'];
+                    $kodeBarang = $kemasan['kode'];
+                } else {
+                    // Barang
+                    $barangSpesifikasi = $this->barangMasterModel
+                        ->select("barang_master_spesifikasi.satuan_1, CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS barang, barang_master.kode_barang")
+                        ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                        ->where('barang_master_spesifikasi.id', $data->barang2_id)
+                        ->where('barang_master_spesifikasi.barang_master_id', $data->barang1_id)
+                        ->first();
+                    $satuan = $this->satuanModel->find($barangSpesifikasi['satuan_1'])['kode_satuan'];
+                    $barang = $barangSpesifikasi['barang'];
+                    $kodeBarang = $barangSpesifikasi['kode_barang'];
+                }
+
+                $stockListDetailAsal = $this->stockDetail2Model->getStockListDetail(
+                    $data->stock_id_asal,
+                    $data->bc_id_asal,
+                    $data->no_aju_asal,
+                    $data->stock_dokumen_asal,
+                );
+
+                $getRmPo = $this->rmPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getAmPo = $this->amPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getRmImportPo = $this->rmImportPOModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+
+                if (!empty($getRmPo)) {
+                    $po_date = $getRmPo['po_date'];
+                } elseif (!empty($getAmPo)) {
+                    $po_date = $getAmPo['po_date'];
+                } elseif (!empty($getRmImportPo)) {
+                    $po_date = $getRmImportPo['po_date'];
+                }
+
+
+                array_push($dataAllPenerimaanBarang, [
+                    "no"                => $no++,
+                    "bc_type"     => "BC 2.7",
+                    "tanggal_bc"         =>  $data->tanggal_bc,
+                    "no_daftar"    => $data->no_daftar,
+                    "no_aju"    => $data->no_aju,
+                    "no_penerimaan_barang"    => $data->penerimaan_mutasi_no,
+                    "tanggal_lpb"    => $data->tanggal,
+                    "po_no"    => !empty($stockListDetailAsal['no_po']) ? $stockListDetailAsal['no_po'] : "",
+                    "po_date"    => !empty($po_date) ? $po_date  : "",
+                    "divisi"    => $data->divisi_penerima,
+                    "kode_barang"       => $kodeBarang,
+                    "nama_barang_dok"    => $barang,
+                    "kode_satuan"    => $satuan,
+                    "qty"    => !empty($data->qty) ? $data->qty : 0,
+                    "jml_masuk"    => $data->jml_masuk,
+
+                ]);
+            }
+
+            $data = [
+                "draw"            => intval($this->request->getGet("draw")),
+                "recordsTotal"    => $penerimaanBarang['totalData'],
+                "recordsFiltered" => $penerimaanBarang['totalFilteredData'],
+                'data'      => $dataAllPenerimaanBarang,
+                "payload" => $payload,
+
+            ];
+
+            echo json_encode($data);
+            return;
+        } elseif ($filter_bc_type  == "PPB KB") {
+            $penerimaanBarang = $this->penerimaanMutasiModel->getPenerimaanBarangListReportPPBKB($addCondition, $pageSize, $offset);
+
+            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+            $dataAllPenerimaanBarang = [];
+
+            // var_dump($penerimaanBarang['data']);
+            // die();
+
+            foreach ($penerimaanBarang['data'] as $data) {
+
+
+                if ($data->tipe_barang == 'kemasan') {
+                    // Kemasan
+                    $kemasan = $this->kemasanModel->find($data->kemasan_id);
+                    $satuan = $this->satuanModel->find($kemasan['satuan_id'])['kode_satuan'];
+                    $barang = $kemasan['name'];
+                    $kodeBarang = $kemasan['kode'];
+                } else {
+                    // Barang
+                    $barangSpesifikasi = $this->barangMasterModel
+                        ->select("barang_master_spesifikasi.satuan_1, CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS barang, barang_master.kode_barang")
+                        ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                        ->where('barang_master_spesifikasi.id', $data->barang2_id)
+                        ->where('barang_master_spesifikasi.barang_master_id', $data->barang1_id)
+                        ->first();
+                    $satuan = $this->satuanModel->find($barangSpesifikasi['satuan_1'])['kode_satuan'];
+                    $barang = $barangSpesifikasi['barang'];
+                    $kodeBarang = $barangSpesifikasi['kode_barang'];
+                }
+
+                $stockListDetailAsal = $this->stockDetail2Model->getStockListDetail(
+                    $data->stock_id_asal,
+                    $data->bc_id_asal,
+                    $data->no_aju_asal,
+                    $data->stock_dokumen_asal,
+                );
+
+                $getRmPo = $this->rmPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getAmPo = $this->amPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getRmImportPo = $this->rmImportPOModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+
+                if (!empty($getRmPo)) {
+                    $po_date = $getRmPo['po_date'];
+                } elseif (!empty($getAmPo)) {
+                    $po_date = $getAmPo['po_date'];
+                } elseif (!empty($getRmImportPo)) {
+                    $po_date = $getRmImportPo['po_date'];
+                }
+
+
+                array_push($dataAllPenerimaanBarang, [
+                    "no"                => $no++,
+                    "bc_type"     => "PPB KB",
+                    "tanggal_bc"         =>  $data->tanggal_bc,
+                    "no_daftar"    => $data->no_daftar,
+                    "no_aju"    => $data->no_ppbkb,
+                    "no_penerimaan_barang"    => $data->penerimaan_mutasi_no,
+                    "tanggal_lpb"    => $data->tanggal,
+                    "po_no"    => !empty($stockListDetailAsal['no_po']) ? $stockListDetailAsal['no_po'] : "",
+                    "po_date"    => !empty($po_date) ? $po_date  : "",
+                    "divisi"    => $data->divisi_penerima,
+                    "kode_barang"       => $kodeBarang,
+                    "nama_barang_dok"    => $barang,
+                    "kode_satuan"    => $satuan,
+                    "qty"    => !empty($data->qty) ? $data->qty : 0,
+                    "jml_masuk"    => $data->jml_masuk,
+
+                ]);
+            }
 
             $data = [
                 "draw"            => intval($this->request->getGet("draw")),
@@ -1411,7 +1597,7 @@ class LaporanWarehouse extends BaseController
                 'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
 
             ];
-        } elseif ($filter_bc_type  == "No Pabean") {
+        } elseif ($filter_bc_type  == "Non Pabean") {
             $penerimaanBarang = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportNoPabean($addCondition);
 
             // var_dump($penerimaanBarang['data']);
@@ -1466,7 +1652,7 @@ class LaporanWarehouse extends BaseController
 
                 array_push($dataAllPenerimaanBarang, [
                     "no"                => $no++,
-                    "bc_type"     => "No Pabean",
+                    "bc_type"     => "Non Pabean",
                     "tanggal_bc"         =>  $data->lpb_date,
                     "no_daftar"    => "-",
                     "no_aju"    => "-",
@@ -1494,6 +1680,162 @@ class LaporanWarehouse extends BaseController
                 'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
 
             ];
+        } elseif ($filter_bc_type  == "BC 2.7") {
+            $penerimaanBarang = $this->penerimaanMutasiGlobalModel->getPenerimaanBarangListReportBc27PDF($addCondition);
+
+            $no = 1;
+            $dataAllPenerimaanBarang = [];
+
+
+            foreach ($penerimaanBarang['data'] as $data) {
+
+
+                if ($data->tipe_barang == 'kemasan') {
+                    // Kemasan
+                    $kemasan = $this->kemasanModel->find($data->kemasan_id);
+                    $satuan = $this->satuanModel->find($kemasan['satuan_id'])['kode_satuan'];
+                    $barang = $kemasan['name'];
+                    $kodeBarang = $kemasan['kode'];
+                } else {
+                    // Barang
+                    $barangSpesifikasi = $this->barangMasterModel
+                        ->select("barang_master_spesifikasi.satuan_1, CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS barang, barang_master.kode_barang")
+                        ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                        ->where('barang_master_spesifikasi.id', $data->barang2_id)
+                        ->where('barang_master_spesifikasi.barang_master_id', $data->barang1_id)
+                        ->first();
+                    $satuan = $this->satuanModel->find($barangSpesifikasi['satuan_1'])['kode_satuan'];
+                    $barang = $barangSpesifikasi['barang'];
+                    $kodeBarang = $barangSpesifikasi['kode_barang'];
+                }
+
+                $stockListDetailAsal = $this->stockDetail2Model->getStockListDetail(
+                    $data->stock_id_asal,
+                    $data->bc_id_asal,
+                    $data->no_aju_asal,
+                    $data->stock_dokumen_asal,
+                );
+
+                $getRmPo = $this->rmPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getAmPo = $this->amPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getRmImportPo = $this->rmImportPOModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+
+                if (!empty($getRmPo)) {
+                    $po_date = $getRmPo['po_date'];
+                } elseif (!empty($getAmPo)) {
+                    $po_date = $getAmPo['po_date'];
+                } elseif (!empty($getRmImportPo)) {
+                    $po_date = $getRmImportPo['po_date'];
+                }
+
+
+                array_push($dataAllPenerimaanBarang, [
+                    "no"                => $no++,
+                    "bc_type"     => "BC 2.7",
+                    "tanggal_bc"         =>  date('Y-m-d', strtotime($data->tanggal_bc)),
+                    "no_daftar"    => $data->no_daftar,
+                    "no_aju"    => $data->no_aju,
+                    "no_penerimaan_barang"    => $data->penerimaan_mutasi_no,
+                    "tanggal_lpb"    => $data->tanggal,
+                    "po_no"    => !empty($stockListDetailAsal['no_po']) ? $stockListDetailAsal['no_po'] : "",
+                    "po_date"    => !empty($po_date) ? $po_date  : "",
+                    "divisi"    => $data->divisi_penerima,
+                    "kode_barang"       => $kodeBarang,
+                    "nama_barang_dok"    => $barang,
+                    "kode_satuan"    => $satuan,
+                    "qty"    => !empty($data->qty) ? $data->qty : 0,
+                    "jml_masuk"    => $data->jml_masuk,
+
+                ]);
+            }
+
+            $data = [
+
+                'dataAllPenerimaanBarang' => $dataAllPenerimaanBarang,
+                'no' => 1,
+                'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+                'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+                'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
+
+            ];
+        } elseif ($filter_bc_type  == "PPB KB") {
+            $penerimaanBarang =  $penerimaanBarang = $this->penerimaanMutasiModel->getPenerimaanBarangListReportPPBKBPDF($addCondition);
+
+            $no = 1;
+            $dataAllPenerimaanBarang = [];
+
+
+            foreach ($penerimaanBarang['data'] as $data) {
+
+
+                if ($data->tipe_barang == 'kemasan') {
+                    // Kemasan
+                    $kemasan = $this->kemasanModel->find($data->kemasan_id);
+                    $satuan = $this->satuanModel->find($kemasan['satuan_id'])['kode_satuan'];
+                    $barang = $kemasan['name'];
+                    $kodeBarang = $kemasan['kode'];
+                } else {
+                    // Barang
+                    $barangSpesifikasi = $this->barangMasterModel
+                        ->select("barang_master_spesifikasi.satuan_1, CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS barang, barang_master.kode_barang")
+                        ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                        ->where('barang_master_spesifikasi.id', $data->barang2_id)
+                        ->where('barang_master_spesifikasi.barang_master_id', $data->barang1_id)
+                        ->first();
+                    $satuan = $this->satuanModel->find($barangSpesifikasi['satuan_1'])['kode_satuan'];
+                    $barang = $barangSpesifikasi['barang'];
+                    $kodeBarang = $barangSpesifikasi['kode_barang'];
+                }
+
+                $stockListDetailAsal = $this->stockDetail2Model->getStockListDetail(
+                    $data->stock_id_asal,
+                    $data->bc_id_asal,
+                    $data->no_aju_asal,
+                    $data->stock_dokumen_asal,
+                );
+
+                $getRmPo = $this->rmPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getAmPo = $this->amPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getRmImportPo = $this->rmImportPOModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+
+                if (!empty($getRmPo)) {
+                    $po_date = $getRmPo['po_date'];
+                } elseif (!empty($getAmPo)) {
+                    $po_date = $getAmPo['po_date'];
+                } elseif (!empty($getRmImportPo)) {
+                    $po_date = $getRmImportPo['po_date'];
+                }
+
+
+                array_push($dataAllPenerimaanBarang, [
+                    "no"                => $no++,
+                    "bc_type"     => "PPB KB",
+                    "tanggal_bc"         =>  $data->tanggal_bc,
+                    "no_daftar"    => $data->no_daftar,
+                    "no_aju"    => $data->no_ppbkb,
+                    "no_penerimaan_barang"    => $data->penerimaan_mutasi_no,
+                    "tanggal_lpb"    => $data->tanggal,
+                    "po_no"    => !empty($stockListDetailAsal['no_po']) ? $stockListDetailAsal['no_po'] : "",
+                    "po_date"    => !empty($po_date) ? $po_date  : "",
+                    "divisi"    => $data->divisi_penerima,
+                    "kode_barang"       => $kodeBarang,
+                    "nama_barang_dok"    => $barang,
+                    "kode_satuan"    => $satuan,
+                    "qty"    => !empty($data->qty) ? $data->qty : 0,
+                    "jml_masuk"    => $data->jml_masuk,
+
+                ]);
+            }
+
+            $data = [
+
+                'dataAllPenerimaanBarang' => $dataAllPenerimaanBarang,
+                'no' => 1,
+                'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+                'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+                'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
+
+            ];
         }
 
 
@@ -1503,6 +1845,195 @@ class LaporanWarehouse extends BaseController
 
         // load HTML content
         $domPdf->loadHtml(view('Laporan/Warehouse/LaporanPenerimaanBarang/print', $data));
+
+        // (optional) setup the paper size and orientation
+        $domPdf->setPaper('legal', 'landscape');
+
+        // render html as PDF
+        $domPdf->render();
+
+        // output the generated pdf
+        $domPdf->stream($fileName, array("Attachment" => false));
+
+        exit();
+        // return view('Supplier/supplierBahanBaku/print');
+    }
+
+
+
+    public function laporanMaterialRequest()
+    {
+        return view('Laporan/Warehouse/LaporanMaterialRequest/index');
+    }
+
+    public function allLaporanMaterialRequest()
+    {
+        $pageSize = $this->request->getGet("length");
+        $currentPage = ($this->request->getGet("start") / $this->request->getGet("length")) + 1;
+        $offset = $currentPage - 1;
+
+        $payload = [
+            "pageSize"      => $pageSize,
+            "currentPage"   => $currentPage,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+
+        $addCondition = [
+            "dateStart"        => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"        => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "company_id"        => $this->this_company_id,
+            "filter_tipe_barang" => $this->request->getGet("filter_tipe_barang"),
+        ];
+
+        $filter_tipe_barang        = $this->request->getGet("filter_tipe_barang");
+
+        if ($filter_tipe_barang == "bahan_penolong") {
+            $dataMaterialRequest = $this->materialRequestPenolongModel->getAllMaterialRequestPenolongReport($addCondition, $pageSize, $offset);
+        } else {
+            $dataMaterialRequest = $this->materialRequestModel->getAllMaterialRequestReport($addCondition, $pageSize, $offset);
+        }
+
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $dataAllMaterialRequest = [];
+
+        foreach ($dataMaterialRequest['data'] as $data) {
+
+            if ($data->tipe_barang == 'kemasan') {
+                // Kemasan
+                $kemasan = $this->kemasanModel->find($data->kemasan_id);
+                $satuan = $this->satuanModel->find($kemasan['satuan_id'])['kode_satuan'];
+                $barang = $kemasan['name'];
+                $kodeBarang = $kemasan['kode'];
+            } else {
+                // Barang
+                $barangSpesifikasi = $this->barangMasterModel
+                    ->select("barang_master_spesifikasi.satuan_1, CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS barang, barang_master.kode_barang")
+                    ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                    ->where('barang_master_spesifikasi.id', $data->barang2_id)
+                    ->where('barang_master_spesifikasi.barang_master_id', $data->barang1_id)
+                    ->first();
+                $satuan = $this->satuanModel->find($barangSpesifikasi['satuan_1'])['kode_satuan'];
+                $barang = $barangSpesifikasi['barang'];
+                $kodeBarang = $barangSpesifikasi['kode_barang'];
+            }
+
+            array_push($dataAllMaterialRequest, [
+                "no"                => $no++,
+                "wo_no"         => $data->wo_no,
+                "req_no"         => $data->req_no,
+                "request_date"    => $data->request_date,
+                "divisi"    => $data->divisi,
+                "kode_barang"    => $kodeBarang,
+                "nama_barang"    => $data->nama_barang,
+                "qty2"    => $data->qty2,
+                "satuan"    => $data->satuan,
+                "ref_no"    => $data->ref_no,
+
+            ]);
+        }
+
+
+
+        $data = [
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $dataMaterialRequest['totalData'],
+            "recordsFiltered" => $dataMaterialRequest['totalFilteredData'],
+            'data'      => $dataAllMaterialRequest,
+            "payload" => $payload,
+
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function exportPDFLaporanMaterialRequest()
+    {
+
+        $addCondition = [
+            "dateStart"        => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"        => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "company_id"        => $this->this_company_id,
+            "filter_tipe_barang" => $this->request->getGet("filter_tipe_barang"),
+        ];
+
+
+        $filter_tipe_barang        = $this->request->getGet("filter_tipe_barang");
+
+        if ($filter_tipe_barang == "bahan_penolong") {
+            $dataMaterialRequest = $this->materialRequestPenolongModel->getAllMaterialRequestPenolongReport($addCondition);
+        } else {
+            $dataMaterialRequest = $this->materialRequestModel->getAllMaterialRequestReport($addCondition);
+        }
+
+
+        $no =  1;
+        $dataAllMaterialRequest = [];
+
+        foreach ($dataMaterialRequest['data'] as $data) {
+
+            if ($data->tipe_barang == 'kemasan') {
+                // Kemasan
+                $kemasan = $this->kemasanModel->find($data->kemasan_id);
+                $satuan = $this->satuanModel->find($kemasan['satuan_id'])['kode_satuan'];
+                $barang = $kemasan['name'];
+                $kodeBarang = $kemasan['kode'];
+            } else {
+                // Barang
+                $barangSpesifikasi = $this->barangMasterModel
+                    ->select("barang_master_spesifikasi.satuan_1, CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS barang, barang_master.kode_barang")
+                    ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                    ->where('barang_master_spesifikasi.id', $data->barang2_id)
+                    ->where('barang_master_spesifikasi.barang_master_id', $data->barang1_id)
+                    ->first();
+                $satuan = $this->satuanModel->find($barangSpesifikasi['satuan_1'])['kode_satuan'];
+                $barang = $barangSpesifikasi['barang'];
+                $kodeBarang = $barangSpesifikasi['kode_barang'];
+            }
+
+            array_push($dataAllMaterialRequest, [
+                "no"                => $no++,
+                "wo_no"         => $data->wo_no,
+                "req_no"         => $data->req_no,
+                "request_date"    => $data->request_date,
+                "divisi"    => $data->divisi,
+                "kode_barang"    => $kodeBarang,
+                "nama_barang"    => $data->nama_barang,
+                "qty2"    => $data->qty2,
+                "satuan"    => $data->satuan,
+                "ref_no"    => $data->ref_no,
+
+            ]);
+        }
+
+
+        $data = [
+            'no' => 1,
+            'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            'dataAllMaterialRequest'      => $dataAllMaterialRequest,
+            'filter_tipe_barang' =>  $this->request->getGet("filter_tipe_barang"),
+
+
+        ];
+
+
+
+
+        $domPdf = new Dompdf();
+
+        $fileName = 'Laporan Material Request Ekspor';
+
+        // load HTML content
+        $domPdf->loadHtml(view('Laporan/Warehouse/LaporanMaterialRequest/print', $data));
 
         // (optional) setup the paper size and orientation
         $domPdf->setPaper('legal', 'landscape');

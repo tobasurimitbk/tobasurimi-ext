@@ -75,3 +75,8 @@
         </div>
     </div>
 </div>
+<script>
+    $('#select-item-btn').click(function() {
+        drawTableRasioAkhir(list_items_barang_jadi);
+    });
+</script>
