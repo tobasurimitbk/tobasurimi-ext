@@ -157,7 +157,7 @@ class TandaTerimaFakturModel extends Model
                 ->where('local_po_payment_bp.tanda_terima_faktur_id', $r['id'])
                 ->groupBy('local_po_payment_bp.tanda_terima_faktur_id')
                 ->first();
-            if (intval($r['nominal_faktur']) > intval($totalPembayaran['amount'])) {
+            if (intval($r['nominal_faktur']) > intval($totalPembayaran['amount']) || $totalPembayaran == "") {
                 array_push($list, $r);
             }
         }
