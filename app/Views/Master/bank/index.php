@@ -165,10 +165,10 @@
         }
     });
 
-    $('#kode_bank').mask('AAAAAAAA');
-    $('#name').mask('AAAAAAAAAAAAAAAAAAAA');
-    $('#atas_nama').mask('AAAAAAAAAAAAAAAAAAAA');
-    $('#no_rekening').mask('0000000000000000');
+    // $('#kode_bank').mask('AAAAAAAA');
+    // $('#name').mask('AAAAAAAAAAAAAAAAAAAA');
+    // $('#atas_nama').mask('AAAAAAAAAAAAAAAAAAAA');
+    // $('#no_rekening').mask('0000000000000000');
 
     $(document).ready(function() {
         var validator = $(".create-form").validate({

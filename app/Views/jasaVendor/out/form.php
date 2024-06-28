@@ -394,6 +394,14 @@
         <?php endif; ?>
     <?php endif; ?>
 
+
+    $("#tanggal").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
     $('#vendor_id').select2({
         placeholder: "Pilih Vendor",
         theme: "bootstrap-5",

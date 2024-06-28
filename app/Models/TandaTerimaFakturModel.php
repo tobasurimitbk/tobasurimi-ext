@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use PHPUnit\TextUI\XmlConfiguration\Group;
 
 class TandaTerimaFakturModel extends Model
 {
@@ -134,21 +135,41 @@ class TandaTerimaFakturModel extends Model
 
     public function getListTandaTerimaFakturNotProcessed($supplierID, $divisiID)
     {
+        $localPOPaymentBPModel = new LocalPOPaymentBPModel();
         $condition = [
             'tanda_terima_faktur.supplier_id' => $supplierID,
             'tanda_terima_faktur.divisi_id' => $divisiID,
-            'local_po_payments.tanda_terima_faktur_id' => null,
             'tanda_terima_faktur.deletedAt' => null
         ];
         $tandaTerimaFakturModel = new TandaTerimaFakturModel();
         $res = $tandaTerimaFakturModel
-            ->select('tanda_terima_faktur.id, tanda_terima_faktur.faktur_no')
-            ->join('local_po_payments', 'local_po_payments.tanda_terima_faktur_id = tanda_terima_faktur.id',  'LEFT')
+            ->select('tanda_terima_faktur.id, tanda_terima_faktur.faktur_no, tanda_terima_faktur.nominal_faktur')
             ->where($condition)
-            ->orderBy('tanda_terima_faktur.id', "ASC")
+            ->orderBy('tanda_terima_faktur.id', 'ASC')
             ->findAll();
 
-        return $res;
+        $list = [];
+
+        foreach ($res as $r) {
+            $selectQry = "sum(amount) as amount, tanda_terima_faktur_id";
+            $totalPembayaran = $localPOPaymentBPModel
+                ->select($selectQry)
+                ->where('local_po_payment_bp.tanda_terima_faktur_id', $r['id'])
+                ->groupBy('local_po_payment_bp.tanda_terima_faktur_id')
+                ->first();
+            if (intval($r['nominal_faktur']) > intval($totalPembayaran['amount']) || $totalPembayaran == "") {
+                array_push($list, $r);
+            }
+        }
+        // SELECT tanda_terima_faktur.id, tanda_terima_faktur.faktur_no, tanda_terima_faktur.nominal_faktur, sum(local_po_payment_bp.amount) as total_amount FROM `tanda_terima_faktur`
+        // LEFT JOIN local_po_payment_bp ON local_po_payment_bp.tanda_terima_faktur_id = tanda_terima_faktur.id
+        // WHERE tanda_terima_faktur.supplier_id = 4 AND tanda_terima_faktur.divisi_id = 41 AND tanda_terima_faktur.deletedAt is NULL
+        // GROUP BY local_po_payment_bp.tanda_terima_faktur_id
+        // HAVING 
+        // tanda_terima_faktur.nominal_faktur > total_amount
+
+
+        return $list;
     }
 
     public function getListPenerimaanBarangLokalBPNotProcessed($supplierID, $divisiID)
@@ -222,7 +243,12 @@ class TandaTerimaFakturModel extends Model
 
     public function getByID($tandaTerimaFakturID)
     {
-        $res = $this->where('id', $tandaTerimaFakturID)->first();
+        $res = $this
+            ->select('tanda_terima_faktur.*, sum(local_po_payment_bp.amount) as total_amount,  local_po_payment_bp.amount,
+            tanda_terima_faktur.nominal_faktur - SUM(local_po_payment_bp.amount) AS sisa')
+            ->join('local_po_payment_bp', 'local_po_payment_bp.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left')
+            ->where('tanda_terima_faktur.id', $tandaTerimaFakturID)
+            ->first();
         return $res;
     }
 

@@ -88,6 +88,7 @@ class TandaTerimaFakturDetailModel extends Model
             ];
         }
 
+
         return $result;
     }
 }

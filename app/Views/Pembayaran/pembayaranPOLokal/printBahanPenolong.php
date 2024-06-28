@@ -90,7 +90,8 @@
             <tr>
                 <td>Jatuh Tempo</td>
                 <td>:</td>
-                <td><?= date('d/m/Y', strtotime($detail['pembayaranDetail']['due_date'])); ?></td>
+                <td><?= date('d/m/Y', strtotime($detail['pembayaranDetail']['jatuh_tempo'])); ?></td>
+
             </tr>
             <tr>
                 <td>Nominal Pembayaran</td>
@@ -157,21 +158,10 @@
                 </td>
                 <td><?= " " . number_format($detail['tandaTerimaSupplier']['nominal_faktur'], 2, ',', '.')  ?></td>
             </tr>
-            <tr>
-                <td colspan="6" style="text-align: right;">
-                    Pajak Dipungut Negara (<?= $tax_dipungut_negara['taxType'] ?>)
-                </td>
-                <td><?= " " . number_format($tax_dipungut_negara['taxAmt'], 2, ',', '.')  ?></td>
-            </tr>
-            <tr>
-                <td colspan="6" style="text-align: right;">
-                    Pajak Dikembalikan Lagi (<?= $tax_dikembalikan_lagi['taxType'] ?>)
-                </td>
-                <td><?= " " . number_format($tax_dikembalikan_lagi['taxAmt'], 2, ',', '.')  ?></td>
-            </tr>
+
             <?php
             $pphNilai = $detail['pembayaranDetail']['status_pph'] ? 0.0025 : 0;
-            $pphResult = $pphNilai * ($detail['tandaTerimaSupplier']['nominal_faktur'] + $tax_dipungut_negara['taxAmt']);
+            $pphResult = $pphNilai * ($detail['tandaTerimaSupplier']['nominal_faktur']);
             ?>
             <tr>
                 <td colspan="6" style="text-align: right;">
@@ -180,14 +170,59 @@
                 <td><?= " " . number_format($pphResult, 2, ',', '.')  ?></td>
             </tr>
             <tr>
+                <td colspan="6" style="text-align:right;">
+                    Potongan Panjar
+                </td>
+                <td>
+                    <?= " " . number_format($detail['totalpanjar'], 2, ',', '.') ?>
+                </td>
+            </tr>
+            <tr>
                 <td colspan="6" style="text-align: right;">
                     Sub Total
                 </td>
-                <td><?= " " . number_format($pphResult + ($detail['tandaTerimaSupplier']['nominal_faktur'] + $tax_dipungut_negara['taxAmt']), 2, ',', '.')  ?></td>
+                <td><?= " " . number_format($detail['pembayaranDetail']['amount'], 2, ',', '.')  ?></td>
             </tr>
         </tbody>
     </table>
 
+    <h6>
+        Rincian Panjar
+    </h6>
+    <table width="100%" border="1" id="dashed-border-table" style="margin-top:-20px">
+        <thead>
+            <tr>
+                <th style="text-align: center;">No</th>
+                <th style="text-align: center;">No. Panjar</th>
+                <th style="text-align: center;">Payment Date</th>
+
+                <th style="text-align: center;">Bayar Panjar </th>
+
+
+            </tr>
+        </thead>
+
+        <tbody>
+            <?php $no = 1; ?>
+
+            <?php if (!empty($detail['panjar'])) :  ?>
+
+                <?php foreach ($detail['panjar'] as $p) : ?>
+                    <tr>
+                        <td> <?= $no++; ?> </td>
+                        <td> <?= $p['no_panjar']; ?></td>
+                        <td> <?= $p['payment_date']; ?></td>
+                        <td> <?= number_format($p['bayar_panjar'], 2); ?></td>
+
+                    <?php endforeach; ?>
+                <?php else : ?>
+                    <tr>
+                        <td colspan="5">Tidak ada Pembayaran Panjar</td>
+                    </tr>
+
+                <?php endif; ?>
+        </tbody>
+    </table>
 
 </body>
 
