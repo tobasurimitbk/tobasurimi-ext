@@ -271,11 +271,15 @@
             <table class="w-100">
                 <tr>
                     <td class="txt-underline txt-bold">PO LOKAL BAHAN BAKU</td>
-                    <td colspan="2">NO. NOTA : <?= $dataPO->po_no ?></td>
+                    <td colspan="2"></td>
                     <td class="txt-bold txt-right txt-underline">Tanggal: <?= $dataPO->po_date ? date("d/m/Y", strtotime($dataPO->po_date)) : ""; ?></td>
                 </tr>
             </table>
             <table>
+                <tr>
+                    <td>No. Nota</td>
+                    <td>: <?= $dataPO->po_no ?></td>
+                </tr>
                 <tr>
                     <td>Supplier</td>
                     <td>: <?= $dataPO->supplierName ?></td>
@@ -385,7 +389,7 @@
                 <div style="padding: 0.5rem">
                     Kwitansi<br>
                     No. PO : <?= $dataPO->po_no ?><br>
-                    Tanggal: <?= $dataPO->po_date ? date("d-m-Y", strtotime($dataPO->po_date)) : ""; ?>
+
                 </div>
             </div>
             <table class="w-100 mt-05">
@@ -434,6 +438,7 @@
 
             <div class="w-100">
                 <div class="txt-right">
+                    <div>Medan, <?= $dataPO->po_date ? date("d-m-Y", strtotime($dataPO->po_date)) : ""; ?></div>
                     <div>Yang Menerima</div>
                     <div class="mt-2">(<?= $dataPO->supplierName ?>)</div>
                 </div>
@@ -500,7 +505,7 @@
 
             <div class="w-100">
                 <div class="txt-right">
-                    <div> Medan, <?= $dataPO->po_date ? date("d-M-Y", strtotime($dataPO->po_date)) : ""; ?></div>
+                    <div> Medan, <?= $dataPO->po_date ? date("d-m-Y", strtotime($dataPO->po_date)) : ""; ?></div>
                     <div>Yang Menerima</div>
                     <div class="mt-2">(<?= $dataPO->supplierName ?>)</div>
                 </div>

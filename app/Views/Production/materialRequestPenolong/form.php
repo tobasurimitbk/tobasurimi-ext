@@ -13,13 +13,27 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request-penolong"); ?>">
                 Batal
             </a>
-            <?php if (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted != 1) { ?>
-                <button class="btn btn-success mr-1" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 1)">
-                    Posting
-                </button>
-                <button class="btn btn-show-form btn-save btn-submit-form mr-1">
-                    Simpan
-                </button>
+            <?php if (isset($dataMaterialRequests)) { ?>
+                <?php if ($dataMaterialRequests->is_posted != 1) { ?>
+                    <?php if (can('Produksi', 'Material Request Penolong', 'a')) : ?>
+                        <button class="btn btn-success mr-1" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 1)">
+                            Posting
+                        </button>
+                    <?php endif; ?>
+                    <?php if (can('Produksi', 'Material Request Penolong', 'd')) : ?>
+                        <button class="btn btn-hapus delete-parent float-right" onclick="handleDelete('<?= !empty($ids) ? $ids : ''; ?>')">
+                            Hapus
+                        </button>
+                    <?php endif; ?>
+                    <button class="btn btn-show-form btn-save btn-submit-form mr-1">
+                        Simpan
+                    </button>
+                <?php } ?>
+                <?php if (can('Produksi', 'Material Request Penolong', 'p')) : ?>
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("material-request-penolong/print/"); ?><?= encrypt($dataMaterialRequests->id) ?>')">
+                        Print
+                    </button>
+                <?php endif; ?>
             <?php } else if (!isset($dataMaterialRequests)) { ?>
                 <button class="btn btn-show-form btn-save btn-submit-form mr-1">
                     Simpan
@@ -1286,7 +1300,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "<?= base_url("material-request-penolong/delete"); ?>",
+                        url: "<?= base_url("material-request-penolong/delete-detail"); ?>",
                         data: {
                             id: iddetail,
                         },
@@ -1316,6 +1330,67 @@
                 }
             })
         }
+    }
+
+    // delete
+    function handleDelete(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+
+                setLoading()
+                $.ajax({
+                    url: "<?= base_url("material-request-penolong/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            stopLoading()
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Dihapus, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
+                    }
+                });
+            }
+        })
     }
 
     function preventNegativeInput(inputElement) {

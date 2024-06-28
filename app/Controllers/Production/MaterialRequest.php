@@ -149,7 +149,15 @@ class MaterialRequest extends BaseController
             ->find();
 
         $data = [
-            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->where('description', "bahan_baku")->orWhere('description', "bahan_penolong")->orWhere('description', "bahan_jadi")->orWhere('description', "bahan_scrap")->findAll(),
+            'tipeBarang' => $this->metaDataModel
+                ->where('deletedAt', null)
+                ->where('name', "Kategori Barang")
+                ->where('description', "bahan_baku")
+                ->orWhere('description', "bahan_penolong")
+                ->orWhere('description', "bahan_jadi")
+                ->orWhere('description', "bahan_scrap")
+                ->orWhere('description', "bahan_setengah_jadi")
+                ->findAll(),
             "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
@@ -183,6 +191,8 @@ class MaterialRequest extends BaseController
                     $value->barang_type_text = "Bahan Scrap";
                 } elseif ($value->barang_type == "bahan_modal") {
                     $value->barang_type_text = "Bahan Modal";
+                } elseif ($value->barang_type == "bahan_setengah_jadi") {
+                    $value->barang_type_text = "Bahan Setengah Jadi";
                 }
             }
             $data["dataMaterialRequests"] = $dataMaterialRequests;
@@ -710,14 +720,27 @@ class MaterialRequest extends BaseController
         return;
     }
 
-    public function deleteMR()
+    public function deleteMRDetail()
     {
         $id = ($this->request->getVar('id'));
         $this->materialRequestDetailsModel->delete($id);
         // $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
 
         return response()->setJSON([
-            'message' => "Bahan Berhasil Dihapus",
+            'message' => "Material Request Berhasil Dihapus",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
+    public function deleteMR()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->materialRequestModel->delete($id);
+        // $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
+
+        return response()->setJSON([
+            'message' => "Material Request Berhasil Dihapus",
             'token' => csrf_hash(),
             'status' => true
         ]);
