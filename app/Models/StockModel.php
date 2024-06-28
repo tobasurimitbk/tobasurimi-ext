@@ -673,7 +673,7 @@ class StockModel extends Model
             ->where('stock.tipe_barang', $type_barang)
             ->where('stock.divisi_id', $divisi_id)
             ->where('stock.warehouse_id', $warehouse_id)
-            ->like('barang_master.barang_name', '%' . "UDANG" . '%')
+            // ->like('barang_master.barang_name', '%' . "UDANG" . '%')
             ->orderBy('barang_master.kode_barang', "ASC")
             ->findAll();
 
@@ -687,7 +687,7 @@ class StockModel extends Model
             ->where('stock.tipe_barang', $type_barang)
             ->where('stock.divisi_id', $divisi_id)
             ->where('stock.warehouse_id', $warehouse_id)
-            ->like('barang_master.barang_name', '%' . "KEPITING" . '%')
+            // ->like('barang_master.barang_name', '%' . "KEPITING" . '%')
             ->orderBy('barang_master.kode_barang', "ASC")
             ->findAll();
 
