@@ -5,6 +5,8 @@ namespace App\Controllers\PenjualanLain;
 use App\Controllers\BaseController;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
+use App\Models\BC25Model;
+use App\Models\BC41Model;
 use App\Models\CompaniesModel;
 use App\Models\CustomerModel;
 use App\Models\DivisisModel;
@@ -14,6 +16,7 @@ use App\Models\SalesOrderLainDetailModel;
 use App\Models\SalesOrderLainModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
+use App\Models\StockDetailModel;
 use App\Models\StockModel;
 use Dompdf\Dompdf;
 
@@ -26,6 +29,7 @@ class SalesOrderLain extends BaseController
     protected $metaDataModel;
     protected $divisiModel;
     protected $stockModel;
+    protected $stockDetailModel;
     protected $stockDetail2Model;
     protected $barangMasterModel;
     protected $barangMasterSpesifikasiModel;
@@ -33,6 +37,8 @@ class SalesOrderLain extends BaseController
     protected $satuanModel;
     protected $customerModel;
     protected $companyModel;
+    protected $bc25Model;
+    protected $bc41Model;
     protected $dompdf;
 
     public function __construct()
@@ -44,6 +50,7 @@ class SalesOrderLain extends BaseController
         $this->metaDataModel = new MetadataModel();
         $this->divisiModel = new DivisisModel();
         $this->stockModel = new StockModel();
+        $this->stockDetailModel = new StockDetailModel();
         $this->stockDetail2Model = new StockDetail2Model();
         $this->barangMasterModel = new BarangMasterModel();
         $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
@@ -51,6 +58,8 @@ class SalesOrderLain extends BaseController
         $this->satuanModel = new SatuansModel();
         $this->customerModel = new CustomerModel();
         $this->companyModel = new CompaniesModel();
+        $this->bc25Model = new BC25Model();
+        $this->bc41Model = new BC41Model();
         $this->dompdf = new Dompdf();
     }
 
@@ -107,6 +116,9 @@ class SalesOrderLain extends BaseController
                 $data->dokumen_pengeluaran = $bc['value'];
             }
 
+            $bc25 = $this->bc25Model->where('sales_order_lain_id', $data->id)->first();
+            $bc41 = $this->bc41Model->where('sales_order_lain_id', $data->id)->first();
+
             array_push($dataResult, [
                 "no" => $no++,
                 "id" => encrypt($data->id),
@@ -120,7 +132,7 @@ class SalesOrderLain extends BaseController
                 "total_barang" => $totalItem,
                 "total_harga" => number_format($data->total_harga, 2),
                 "status_posting" => $data->status_posting,
-                "status_used" => false
+                "status_used" => (($data->bc_id === "0" && $data->status_posting === "1") ? false : (($bc25 == null && $bc41) == null)) ? false : true
             ]);
         }
 
@@ -315,6 +327,68 @@ class SalesOrderLain extends BaseController
     public function posting()
     {
         $id = decrypt($this->request->getVar('id'));
+        $salesOrderLain = $this->salesOrderLainModel->find($id);
+        $salesOrderLainList = $this->salesOrderLainDetailModel->where('sales_order_lain_id', $id)->findAll();
+
+        if ($salesOrderLain['bc_id'] === "0") {
+            foreach ($salesOrderLainList as $s) {
+                $stock = $this->stockModel->find($s['stock_id']);
+                $qty = $s['qty_konversi'];
+
+                if ($stock['tipe_barang'] == "kemasan") {
+                    $barang2_id = $stock['kemasan_id'];
+                } else {
+                    $barang2_id = $stock['barang2_id'];
+                }
+
+                // BARANG LAMA
+                $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
+                    $s['stock_id'],
+                    $s['bc_id'],
+                    $s['no_aju'],
+                    $s['stock_dokumen']
+                );
+
+                $stok = $this->stockModel->insertStok(
+                    $salesOrderLain['company_id'],
+                    $salesOrderLain['warehouse_id'],
+                    $salesOrderLain['divisi_id'],
+                    $stock['tipe_barang'],
+                    $stock['barang1_id'],
+                    $barang2_id,
+                    ($qty * -1),
+                );
+
+                // DETAIL
+                $stokDetail = $this->stockDetailModel->insertStokDetail(
+                    $stok,
+                    $qty,
+                    "Out",
+                    date('Y-m-d'),
+                    $this->this_user_id,
+                    "PENJUALAN",
+                    $salesOrderLain['no_sales_order'],
+                    $salesOrderLain['keterangan'],
+                );
+
+                // SUB DETAIL
+                $this->stockDetail2Model->insertStokDetail2(
+                    $s['bc_id'],
+                    $stok,
+                    $stokDetail,
+                    $qty,
+                    $s['no_aju'],
+                    $salesOrderLain['no_sales_order'],
+                    $s['stock_dokumen'],
+                    $stockOldDetail['supplier_id'],
+                    $s['total_harga'],
+                    null,
+                    null,
+                    $stockOldDetail['no_po']
+                );
+            }
+        }
+
         $this->salesOrderLainModel->update($id, ['status_posting' => '1']);
 
         return response()->setJSON([

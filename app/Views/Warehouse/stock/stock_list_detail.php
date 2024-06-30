@@ -859,7 +859,7 @@
             <div class="row mt-3">
                 <div class="col mb-3">
                     <div class="alert alert-secondary">
-                        <label class="form-label font-weight-bold text-black lable-title">DATA PENGELUARAN BARANG DARI SALES LOKAL / EXPORT</label>
+                        <label class="form-label font-weight-bold text-black lable-title">DATA PENGELUARAN BARANG DARI SALES LOKAL / EXPORT / LAINNYA</label>
                     </div>
                 </div>
             </div>
@@ -912,6 +912,7 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSortPembelian('stock_details2.no_aju')">Dokumen</th>
+                                <th>Dokumen Referensi</th>
                                 <th onclick="changeSortPembelian('stock_details.tanggal')">Tanggal</th>
                                 <th>Barang - Spesifikasi</th>
                                 <th>Tipe Pengeluaran</th>
@@ -926,7 +927,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="7"></td>
+                                <td colspan="8"></td>
                                 <td style="float: right;"><b>TOTAL</b></td>
                                 <td><b><?= ($total['totalPenjualan']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
                             </tr>
@@ -1989,6 +1990,12 @@
             {
                 data: "dokumen",
                 className: "text-center"
+            },
+            {
+                data: "dokumen_referensi",
+                className: "text-center",
+                searchable: false,
+                sortable: false
             },
             {
                 data: "tanggal",

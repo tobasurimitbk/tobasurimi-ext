@@ -1314,6 +1314,38 @@ $routes->group('bea-cukai-ppbkb', ['filter' => 'Auth'], function ($routes) {
     $routes->get('get-no', 'BeaCukai\PPBKB::getNo');
 });
 
+// BC 2.5
+$routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'BeaCukai\BC25::index');
+    $routes->get('create', 'BeaCukai\BC25::create');
+    $routes->get('all', 'BeaCukai\BC25::all');
+    $routes->get('online', 'BeaCukai\BC25::online');
+    $routes->get('download-response', 'BeaCukai\BC40::downloadResponPdf');
+    $routes->get('all-online', 'BeaCukai\BC25::allOnline');
+    $routes->get('id/(:segment)', 'BeaCukai\BC25::detail/$1');
+    $routes->post('save', 'BeaCukai\BC25::createAction');
+    $routes->post('update', 'BeaCukai\BC25::updateAction');
+    $routes->post('delete', 'BeaCukai\BC25::delete');
+    $routes->post('posting', 'BeaCukai\BC25::posting');
+    $routes->get('check-no-aju', 'BeaCukai\BC25::checkNoAju');
+});
+
+// BC 4.1
+$routes->group('bea-cukai-bc-41', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'BeaCukai\BC41::index');
+    $routes->get('create', 'BeaCukai\BC41::create');
+    $routes->get('all', 'BeaCukai\BC41::all');
+    $routes->get('online', 'BeaCukai\BC41::online');
+    $routes->get('download-response', 'BeaCukai\BC40::downloadResponPdf');
+    $routes->get('all-online', 'BeaCukai\BC41::allOnline');
+    $routes->get('id/(:segment)', 'BeaCukai\BC41::detail/$1');
+    $routes->post('save', 'BeaCukai\BC41::createAction');
+    $routes->post('update', 'BeaCukai\BC41::updateAction');
+    $routes->post('delete', 'BeaCukai\BC41::delete');
+    $routes->post('posting', 'BeaCukai\BC41::posting');
+    $routes->get('check-no-aju', 'BeaCukai\BC41::checkNoAju');
+});
+
 // HUMAN RESOURCE
 // JAM KERJA KARYAWAN
 $routes->get('/employee/jam-kerja/(:segment)', 'HR\EmployeeJamKerja::index/$1', ['filter' => 'Auth']);

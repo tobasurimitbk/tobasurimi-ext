@@ -5,7 +5,9 @@ namespace App\Controllers\Inventori;
 use App\Controllers\BaseController;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
+use App\Models\BC25Model;
 use App\Models\BC30Model;
+use App\Models\BC41Model;
 use App\Models\DivisisModel;
 use App\Models\KemasanModel;
 use App\Models\MetadataModel;
@@ -32,6 +34,8 @@ class StokHistori extends BaseController
     protected $parentBarangModel;
     protected $warehouseModel;
     protected $bc30Model;
+    protected $bc25Model;
+    protected $bc41Model;
 
     public function __construct()
     {
@@ -49,6 +53,8 @@ class StokHistori extends BaseController
         $this->parentBarangModel = new ParentBarangModel();
         $this->warehouseModel = new WarehousesModel();
         $this->bc30Model = new BC30Model();
+        $this->bc25Model = new BC25Model();
+        $this->bc41Model = new BC41Model();
     }
 
     public function index()
@@ -96,7 +102,8 @@ class StokHistori extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($dataQry['data'] as $data) {
-
+            // NO AJU REFERENSI
+            $data->no_aju_referensi = $data->no_aju;
             $in_out = $data->status == "In" ? "(+)" : "(-)";
 
             if ($data->sumber == "LPB" || $data->sumber == "JASA VENDOR") {
@@ -116,6 +123,7 @@ class StokHistori extends BaseController
                     ->join('sales_order', 'sales_order.id = bc_30.sales_order_id', 'left')
                     ->join('stuffing_lokal', 'stuffing_lokal.sales_order_id = sales_order.id', 'left')
                     ->where('stuffing_lokal.no_stuffing', $data->no_dokumen2)
+                    ->where('bc_30.company_id', $this->this_company_id)
                     ->first();
 
                 $bc30Internasional = $this->bc30Model
@@ -123,6 +131,21 @@ class StokHistori extends BaseController
                     ->join('sales_order_export', 'sales_order_export.sales_order_export_id = bc_30.sales_order_id', 'left')
                     ->join('stuffing_internasional', 'stuffing_internasional.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
                     ->where('stuffing_internasional.no_stuffing', $data->no_dokumen2)
+                    ->where('bc_30.company_id', $this->this_company_id)
+                    ->first();
+
+                $bc25 = $this->bc25Model
+                    ->select('bc_25.no_aju, sales_order_lain.bc_id')
+                    ->join('sales_order_lain', 'sales_order_lain.id = bc_25.sales_order_lain_id', 'left')
+                    ->where('sales_order_lain.no_sales_order', $data->no_dokumen2)
+                    ->where('bc_25.company_id', $this->this_company_id)
+                    ->first();
+
+                $bc41 = $this->bc41Model
+                    ->select('bc_41.no_aju, sales_order_lain.bc_id')
+                    ->join('sales_order_lain', 'sales_order_lain.id = bc_41.sales_order_lain_id', 'left')
+                    ->where('sales_order_lain.no_sales_order', $data->no_dokumen2)
+                    ->where('bc_41.company_id', $this->this_company_id)
                     ->first();
 
                 if ($bc30Lokal != null) {
@@ -135,6 +158,16 @@ class StokHistori extends BaseController
                     $dokumenBC = $this->metaDataModel->find($bc30Internasional['bc_type']);
                     $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
                     $data->no_aju = $bc30Internasional['no_aju'];
+                } elseif ($bc25 != null) {
+                    // BEA CUKAI 2.5
+                    $dokumenBC = $this->metaDataModel->find($bc25['bc_id']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc25['no_aju'];
+                } elseif ($bc41 != null) {
+                    // BEA CUKAI 4.1
+                    $dokumenBC = $this->metaDataModel->find($bc41['bc_id']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc41['no_aju'];
                 } else {
                     // BELUM DIBUAT SAMA SEKALI DOKUMEN BC 3.O NYA
                     $dokumenBC = $this->metaDataModel->find($data->bc_id);
@@ -144,6 +177,10 @@ class StokHistori extends BaseController
                 $dokumenBC = $this->metaDataModel->find($data->bc_id);
                 $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
             }
+
+            // REFERENSI
+            $dokumenBCReferensi = $this->metaDataModel->find($data->bc_id);
+            $bcNameReferensi = $dokumenBCReferensi == null ? "NON PABEAN" : $dokumenBCReferensi['value'];
 
             if ($data->kemasan_id == 0) {
                 // BARANG
@@ -164,6 +201,7 @@ class StokHistori extends BaseController
                 if ($barangMasterSpesifikasi != null && $barangMaster != null && $parentBarang != null) {
                     array_push($dataResult, [
                         "no" => $no++,
+                        "supplier_name" => $data->supplier_name == null ? "-" : strtoupper($data->supplier_name),
                         'parent_type' => $parentBarang != null ? strtoupper(str_replace('_', ' ', $parentBarang['parent_type'])) : '',
                         'parent_name' => $parentBarang != null ? $parentBarang['parent_name'] : '',
                         'kode_barang' => $barangMaster['kode_barang'] ?? '',
@@ -171,6 +209,7 @@ class StokHistori extends BaseController
                         "divisi" => $divisi != null ? strtoupper($divisi['divisi']) : '',
                         "warehouse" => $warehouse != null ? strtoupper($warehouse['warehouse_name']) : '',
                         "dokumen_pabean" => $bcName . " / " . $data->no_aju,
+                        "dokumen_referensi" => $bcNameReferensi . " / " . $data->no_aju_referensi,
                         "sumber" => $data->sumber,
                         "tanggal" => date('d/m/Y - H:i:s', strtotime($data->createdAt)),
                         "dokumen" => $no_dokumen,
@@ -193,6 +232,7 @@ class StokHistori extends BaseController
                 if ($kemasan != null && $parentBarang != null) {
                     array_push($dataResult, [
                         "no" => $no++,
+                        "supplier_name" => $data->supplier_name == null ? "-" : strtoupper($data->supplier_name),
                         'parent_type' => $parentBarang != null ? strtoupper(str_replace('_', ' ', $parentBarang['parent_type'])) : '',
                         'parent_name' => $parentBarang != null ? $parentBarang['parent_name'] : '',
                         'kode_barang' => $kemasan['kode'] ?? '',
@@ -200,6 +240,7 @@ class StokHistori extends BaseController
                         "divisi" => $divisi != null ? strtoupper($divisi['divisi']) : '',
                         "warehouse" => $warehouse != null ? strtoupper($warehouse['warehouse_name']) : '',
                         "dokumen_pabean" => $bcName . " / " . $data->no_aju,
+                        "dokumen_referensi" => $bcNameReferensi . " / " . $data->no_aju_referensi,
                         "sumber" => $data->sumber,
                         "tanggal" => date('d/m/Y - H:i:s', strtotime($data->createdAt)),
                         "dokumen" => $no_dokumen,
