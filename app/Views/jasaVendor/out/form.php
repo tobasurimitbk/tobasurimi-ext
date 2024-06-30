@@ -97,7 +97,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Nomor Kontainer" value="<?= !empty($jasaVendorOut) ? $jasaVendorOut['no_kontainer'] : '' ?>" class="form-control no_kontainer" id="no_kontainer" name="no_kontainer" aria-label="Floating label select example" />
-                            <label for="floatingInput" style="z-index: 1;">Nomor Kontainer</label>
+                            <label for="floatingInput" style="z-index: 1;">Nomor Kontainer (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -474,9 +474,6 @@
             vendor_id: {
                 required: true
             },
-            no_kontainer: {
-                required: true
-            },
             divisi_id: {
                 required: true
             },
@@ -490,9 +487,6 @@
             },
             vendor_id: {
                 required: "Vendor wajib diisi"
-            },
-            no_kontainer: {
-                required: "No kontainer wajib diisi"
             },
             keterangan: {
                 required: "Keterangan wajib diisi"

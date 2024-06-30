@@ -244,8 +244,8 @@ class StockModel extends Model
             ];
 
             $qryKemasanRes = $kemasanModel
-                ->select('kemasan.*, satuans.kode_satuan, satuans.nama_satuan')
-                ->join('satuans', 'satuans.id = kemasan.satuan_id')
+                ->select('kemasan.*, satuans.kode_satuan, satuans.nama_satuan, satuans.kode_satuan')
+                ->join('satuans', 'satuans.id = kemasan.satuan_id', 'left')
                 ->where($condition)
                 ->findAll();
 
@@ -259,6 +259,7 @@ class StockModel extends Model
                     'spesifikasi_name' => strtoupper($k['name']),
                     'kode_barang' => $k['kode'],
                     'nama_satuan' => $k['nama_satuan'],
+                    'kode_satuan' => $k['kode_satuan']
                 ];
             }
         } else {
@@ -275,13 +276,14 @@ class StockModel extends Model
                 barang_master.kode_barang,
                 barang_master_spesifikasi.id AS spesifikasi_id,
                 barang_master_spesifikasi.spesifikasi,
-                satuans.nama_satuan
+                satuans.nama_satuan,
+                satuans.kode_satuan
             ";
 
             $qryBarangMaster = $barangMasterModel
                 ->select($selectQryBarang)
-                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id')
-                ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
                 ->where($condition)
                 ->findAll();
 
@@ -294,6 +296,7 @@ class StockModel extends Model
                     'spesifikasi_name' => strtoupper($b['spesifikasi']),
                     'kode_barang' => $b['kode_barang'],
                     'nama_satuan' => $b['nama_satuan'],
+                    'kode_satuan' => $b['kode_satuan']
                 ];
             }
         }
@@ -805,5 +808,36 @@ class StockModel extends Model
         }
 
         return $dataResult;
+    }
+
+    public function initStockBarang($companyId, $divisiId, $warehouseId, $tipeBarang, $barang2Id)
+    {
+        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($barang2Id);
+
+        $stok = $this->getStokMaster(
+            $companyId,
+            $warehouseId,
+            $divisiId,
+            $tipeBarang,
+            $barangMasterSpesifikasi['barang_master_id'],
+            $barang2Id
+        );
+
+
+        if ($stok == null) {
+            $stok = $this->insertStok(
+                $companyId,
+                $warehouseId,
+                $divisiId,
+                $tipeBarang,
+                $barangMasterSpesifikasi['barang_master_id'],
+                $barang2Id,
+                0
+            );
+            return $stok;
+        } else {
+            return $stok['id'];
+        }
     }
 }
