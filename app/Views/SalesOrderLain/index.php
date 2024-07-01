@@ -186,15 +186,25 @@
                     `
                     } else {
                         var res = '';
-                        if (status_used == '0') {
-                            res += `
+                        <?php if (can('Penjualan Lain', 'Order Form', 'ua')) : ?>
+                            if (status_used == '0') {
+                                res += `
                         <?php if (can('Penjualan Lain', 'Order Form', 'ua')) : ?>
                                 <button data-toggle="tooltip" title="Un-Posting" onclick="unPosting('${id}')" class="btn btn-danger posting-spp">
                                     <i class="fa-solid fa-ban"></i>    
                                 </button>
                             <?php endif; ?>
                         `;
-                        }
+                            }
+                        <?php endif; ?>
+                        <?php if (can('Penjualan Lain', 'Order Form', 'p')) : ?>
+                            res += `
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-lain/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            `;
+                        <?php endif; ?>
+
                         return res;
 
                     }

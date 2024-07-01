@@ -381,6 +381,9 @@ class StockDetail2Model extends Model
 
         $selectQry = '
             suppliers.name AS supplier_name,
+            stock.barang1_id,
+            stock.barang2_id,
+            stock.kemasan_id,
             stock_details2.id,
             stock_details2.bc_id,
             stock_details2.stock_detail_id,
@@ -404,7 +407,8 @@ class StockDetail2Model extends Model
 
         $dataQry = $this->asArray()
             ->select($selectQry)
-            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id', 'left')
+            ->join('stock', 'stock.id = stock_details.stock_id', 'left')
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
             ->where('stock_details2.stock_id', $stockID)
             ->where('stock_details2.bc_id', $bcID)

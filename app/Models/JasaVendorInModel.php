@@ -157,6 +157,7 @@ class JasaVendorInModel extends Model
                 $result[] = [
                     'jasa_vendor_out_detail_id' => $j['id'],
                     'jasa_vendor_out_id' => $j['jasa_vendor_out_id'],
+                    'barang1_id' => $stockListOutDetail != null ? $stockListOutDetail['barang1_id'] : 0,
                     'stock_out_id' => $j['stock_out_id'],
                     'stock_date' => $stockListOutDetail != null ? date('d/m/Y', strtotime($stockListOutDetail['stock_date'])) : "-",
                     'tipe_barang' => $stockBarangOut != null ? strtoupper(str_replace('_', ' ', $stockBarangOut['tipe_barang'])) : "",
@@ -177,6 +178,7 @@ class JasaVendorInModel extends Model
                     $result[] = [
                         'jasa_vendor_out_detail_id' => $j['id'],
                         'jasa_vendor_out_id' => $j['jasa_vendor_out_id'],
+                        'barang1_id' => $stockListOutDetail != null ? $stockListOutDetail['barang1_id'] : 0,
                         'stock_out_id' => (string)$j['stock_out_id'],
                         'stock_date' => $stockListOutDetail != null ? date('d/m/Y', strtotime($stockListOutDetail['stock_date'])) : "-",
                         'tipe_barang' => $stockBarangOut != null ? strtoupper(str_replace('_', ' ', $stockBarangOut['tipe_barang'])) : "",
@@ -199,6 +201,7 @@ class JasaVendorInModel extends Model
                                 $stockBarangIn = $stockModel->find($k['stock_in_id']);
                                 $barangIn = self::getDetailBarang($stockBarangIn);
                                 array_push($result[$i]['list_barang_masuk'], [
+                                    'barang1_id' => $stockListOutDetail != null ? $stockListOutDetail['barang1_id'] : 0, // YANG OUT
                                     'barang_name_in' => $barangIn != null ? strtoupper($barangIn['barang']) : '-',
                                     'jasa_vendor_out_detail_id' => $k['jasa_vendor_out_detail_id'],
                                     'kode_barang_in' => $barangIn != null ? strtoupper($barangIn['kode_barang']) : '-',
@@ -207,7 +210,8 @@ class JasaVendorInModel extends Model
                                     'qty_bersih' => $k['qty_bersih'],
                                     'qty_kotor' => $k['qty_kotor'],
                                     'stock_in_id' => $k['stock_in_id'],
-                                    'stock_out_id' => $result[$i]['stock_out_id']
+                                    'stock_out_id' => $result[$i]['stock_out_id'],
+                                    'spesifikasi_in_id' => $k['spesifikasi_in_id'],
                                 ]);
                             }
                         }
@@ -220,10 +224,10 @@ class JasaVendorInModel extends Model
         $listBarangMasukGrouped = [];
         foreach ($result as $r) {
             foreach ($r['list_barang_masuk'] as $k) {
-                $stockOutId = $k['stock_out_id'];
+                $barang1Id = $k['barang1_id'];
                 $stockInId = $k['stock_in_id'];
-                if (!isset($listBarangMasukGrouped[$stockOutId][$stockInId])) {
-                    $listBarangMasukGrouped[$stockOutId][$stockInId] = [
+                if (!isset($listBarangMasukGrouped[$barang1Id][$stockInId])) {
+                    $listBarangMasukGrouped[$barang1Id][$stockInId] = [
                         'barang_name_in' => $k['barang_name_in'],
                         'jasa_vendor_out_detail_id' => $k['jasa_vendor_out_detail_id'],
                         'kode_barang_in' => $k['kode_barang_in'],
@@ -231,46 +235,48 @@ class JasaVendorInModel extends Model
                         'stock_dokumen' => $k['stock_dokumen'],
                         'stock_in_id' => $k['stock_in_id'],
                         'stock_out_id' => $k['stock_out_id'],
+                        'spesifikasi_in_id' => $k['spesifikasi_in_id'],
                         'qty_kotor' => 0,
                         'qty_bersih' => 0
                     ];
                 }
-                $listBarangMasukGrouped[$stockOutId][$stockInId]['qty_kotor'] += $k['qty_kotor'];
-                $listBarangMasukGrouped[$stockOutId][$stockInId]['qty_bersih'] += $k['qty_bersih'];
+                $listBarangMasukGrouped[$barang1Id][$stockInId]['qty_kotor'] += $k['qty_kotor'];
+                $listBarangMasukGrouped[$barang1Id][$stockInId]['qty_bersih'] += $k['qty_bersih'];
             }
         }
 
         $resultGroup = [];
 
         foreach ($result as $item) {
-            $stock_out_id = $item['stock_out_id'];
-            if (!isset($resultGroup[$stock_out_id])) {
-                $resultGroup[$stock_out_id] = [];
+            $barang1Id = $item['barang1_id'];
+            if (!isset($resultGroup[$barang1Id])) {
+                $resultGroup[$barang1Id] = [];
             }
-            $resultGroup[$stock_out_id][] = $item;
+            $resultGroup[$barang1Id][] = $item;
         }
 
         $dataGroup = [];
 
-        foreach ($resultGroup as $stock_out_id => $items) {
+        foreach ($resultGroup as $barang1Id => $items) {
             // SUM QTY
             $qtyTotal = 0;
             foreach ($items as $i) {
                 $qtyTotal += $i['qty_out'];
             }
+            $barangArr = explode("-", $items[0]['barang_out']);
             $groupData = [
-                "stock_out_id" => (string)$stock_out_id,
+                "barang1_id" => $barang1Id,
                 "tipe_barang" => $items[0]['tipe_barang'],
                 "kode_barang_out" => $items[0]['kode_barang_out'],
-                "barang_out" => $items[0]['barang_out'],
+                "barang_out" => count($barangArr) == 0 ? "-" : $barangArr[0],
                 "qty_out" => $qtyTotal,
                 "satuan_out" => $items[0]['satuan_out'],
                 "list_barang_masuk" => [],
             ];
             $dataGroup[] = $groupData;
 
-            if (isset($listBarangMasukGrouped[$stock_out_id])) {
-                foreach ($listBarangMasukGrouped[$stock_out_id] as $stockInId => $listBarangMasuk) {
+            if (isset($listBarangMasukGrouped[$barang1Id])) {
+                foreach ($listBarangMasukGrouped[$barang1Id] as $barang1Id => $listBarangMasuk) {
                     $dataGroup[count($dataGroup) - 1]['list_barang_masuk'][] = $listBarangMasuk;
                 }
             }
@@ -287,7 +293,7 @@ class JasaVendorInModel extends Model
         $barangMasterModel = new BarangMasterModel();
 
         $barang = $barangMasterModel
-            ->select("CONCAT(barang_master.barang_name, '-', barang_master_spesifikasi.spesifikasi) AS barang, satuans.kode_satuan, barang_master.kode_barang")
+            ->select("CONCAT(barang_master.barang_name, '-', barang_master_spesifikasi.spesifikasi) AS barang, satuans.kode_satuan, barang_master.kode_barang, barang_master_spesifikasi.barang_master_id AS barang1_id")
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->where('barang_master_spesifikasi.id', $stock['barang2_id'])

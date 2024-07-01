@@ -6,8 +6,10 @@ use App\Controllers\BaseController;
 use App\Models\AdjusmentModel;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
+use App\Models\BC25Model;
 use App\Models\BC27Model;
 use App\Models\BC30Model;
+use App\Models\BC41Model;
 use App\Models\DivisisModel;
 use App\Models\KemasanModel;
 use App\Models\MetadataModel;
@@ -53,6 +55,8 @@ class StokList extends BaseController
     protected $mutasiModel;
     protected $mutasiGlobalModel;
     protected $bc30Model;
+    protected $bc25Model;
+    protected $bc41Model;
 
     public function __construct()
     {
@@ -80,6 +84,8 @@ class StokList extends BaseController
         $this->mutasiModel = new MutasiModel();
         $this->mutasiGlobalModel = new MutasiGlobalModel();
         $this->bc30Model = new BC30Model();
+        $this->bc25Model = new BC25Model();
+        $this->bc41Model = new BC41Model();
     }
 
     public function index()
@@ -1719,6 +1725,8 @@ class StokList extends BaseController
 
         foreach ($dataQry['data'] as $data) {
 
+            // NO AJU REFERENSI
+            $data->no_aju_referensi = $data->no_aju;
             // TEMPELKAN SAJA NO BC 3.0 JIKA PENJUALAN
             if ($data->sumber == "PENJUALAN") {
                 $bc30Lokal = $this->bc30Model
@@ -1738,6 +1746,22 @@ class StokList extends BaseController
                     ->where('stuffing_internasional.no_stuffing', $data->no_dokumen2)
                     ->first();
 
+                $bc25 = $this->bc25Model
+                    ->select('bc_25.no_aju, sales_order_lain.bc_id, customers.name AS customer_name')
+                    ->join('sales_order_lain', 'sales_order_lain.id = bc_25.sales_order_lain_id', 'left')
+                    ->join('customers', 'customers.id = sales_order_lain.customer_id', 'left')
+                    ->where('sales_order_lain.no_sales_order', $data->no_dokumen2)
+                    ->where('bc_25.company_id', $this->this_company_id)
+                    ->first();
+
+                $bc41 = $this->bc41Model
+                    ->select('bc_41.no_aju, sales_order_lain.bc_id, customers.name AS customer_name')
+                    ->join('sales_order_lain', 'sales_order_lain.id = bc_41.sales_order_lain_id', 'left')
+                    ->join('customers', 'customers.id = sales_order_lain.customer_id', 'left')
+                    ->where('sales_order_lain.no_sales_order', $data->no_dokumen2)
+                    ->where('bc_41.company_id', $this->this_company_id)
+                    ->first();
+
                 if ($bc30Lokal != null) {
                     // STUFFING LOKAL BC 3.0 SUDAH DIBUAT
                     $dokumenBC = $this->metaDataModel->find($bc30Lokal['bc_type']);
@@ -1752,6 +1776,22 @@ class StokList extends BaseController
                     $data->no_aju = $bc30Internasional['no_aju'];
                     $data->customer_name = $bc30Internasional['customer_name'];
                     $data->tipe_sales_order = $bc30Internasional['tipe_sales_order'];
+                } elseif ($bc25 != null) {
+                    // BEA CUKAI 2.5
+                    $dokumenBC = $this->metaDataModel->find($bc25['bc_id']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc25['no_aju'];
+                    $data->customer_name = $bc25['customer_name'];
+                    $data->tipe_sales_order = "-";
+                    $data->no_dokumen2 = "-"; // STUFFING NO GA ADA
+                } elseif ($bc41 != null) {
+                    // BEA CUKAI 4.1
+                    $dokumenBC = $this->metaDataModel->find($bc41['bc_id']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc41['no_aju'];
+                    $data->customer_name = $bc41['customer_name'];
+                    $data->tipe_sales_order = "-";
+                    $data->no_dokumen2 = "-"; // STUFFING NO GA ADA
                 } else {
                     // BELUM DIBUAT SAMA SEKALI DOKUMEN BC 3.O NYA
                     $dokumenBC = $this->metaDataModel->find($data->bc_id);
@@ -1766,6 +1806,9 @@ class StokList extends BaseController
                 $data->tipe_sales_order = "-";
             }
 
+            // REFERENSI
+            $dokumenBCReferensi = $this->metaDataModel->find($data->bc_id);
+            $bcNameReferensi = $dokumenBCReferensi == null ? "NON PABEAN" : $dokumenBCReferensi['value'];
 
             $in_out = $data->status == "In" ? "(+)" : "(-)";
 
@@ -1781,6 +1824,7 @@ class StokList extends BaseController
                     "no" => $no++,
                     "tanggal" => date('d/m/Y', strtotime($data->stock_date)),
                     "dokumen" => $bcName . " / " . $data->no_aju,
+                    "dokumen_referensi" => $bcNameReferensi . " / " . $data->no_aju_referensi,
                     "supplier_name" => $data->supplier_name,
                     "no_dokumen1" => $data->no_dokumen1,
                     "no_dokumen2" => $data->no_dokumen2,
@@ -1799,6 +1843,7 @@ class StokList extends BaseController
                     "no" => $no++,
                     "tanggal" => date('d/m/Y', strtotime($data->stock_date)),
                     "dokumen" => $bcName . " / " . $data->no_aju,
+                    "dokumen_referensi" => $bcNameReferensi . " / " . $data->no_aju_referensi,
                     "supplier_name" => $data->supplier_name,
                     "no_dokumen1" => $data->no_dokumen1,
                     "no_dokumen2" => $data->no_dokumen2,

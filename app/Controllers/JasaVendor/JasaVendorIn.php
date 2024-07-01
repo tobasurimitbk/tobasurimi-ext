@@ -246,11 +246,20 @@ class JasaVendorIn extends BaseController
             // LIST BARANG MASUK
             foreach ($b->list_barang_masuk as $c) {
                 if ($c->qty_bersih != 0) {
+                    $stockInId = $this->stockModel->initStockBarang(
+                        $this->this_company_id,
+                        $this->request->getVar('divisi_id'),
+                        $this->request->getVar('warehouse_id'),
+                        "bahan_baku",
+                        $c->spesifikasi_in_id
+                    );
+
                     $this->jasaVendorInDetailModel->insert([
                         'jasa_vendor_in_id' => $id,
                         'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
                         'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id,
-                        'stock_in_id' => $c->stock_in_id,
+                        'spesifikasi_in_id' => $c->spesifikasi_in_id,
+                        'stock_in_id' => $stockInId,
                         'bc_in_id' => $b->bc_id,
                         'no_aju_in' => $b->no_aju,
                         'stock_dokumen' => $b->stock_dokumen,
@@ -313,11 +322,21 @@ class JasaVendorIn extends BaseController
             // LIST BARANG MASUK
             foreach ($b->list_barang_masuk as $c) {
                 if ($c->qty_bersih != 0) {
+                    // INIT STOCK BARANG
+                    $stockInId = $this->stockModel->initStockBarang(
+                        $this->this_company_id,
+                        $this->request->getVar('divisi_id'),
+                        $this->request->getVar('warehouse_id'),
+                        "bahan_baku",
+                        $c->spesifikasi_in_id
+                    );
+
                     $this->jasaVendorInDetailModel->insert([
                         'jasa_vendor_in_id' => $id,
                         'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
                         'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id,
-                        'stock_in_id' => $c->stock_in_id,
+                        'spesifikasi_in_id' => $c->spesifikasi_in_id,
+                        'stock_in_id' => $stockInId,
                         'bc_in_id' => $b->bc_id,
                         'no_aju_in' => $b->no_aju,
                         'stock_dokumen' => $b->stock_dokumen,
@@ -459,27 +478,24 @@ class JasaVendorIn extends BaseController
 
     public function dropdownListBarangMasuk()
     {
-        $stockID = $this->request->getVar('stock_out_id');
-        $response = array();
-        if (!empty($stockID)) {
-            $data = $this->stockModel->getBarangRebusAndStock(
-                $this->request->getVar('type_barang'),
-                $this->request->getVar('divisi_id'),
-                $this->request->getVar('warehouse_id')
+        $typeBarang = $this->request->getVar('type_barang');
+        if (!empty($typeBarang)) {
+            $data =  $this->stockModel->getListMasterBarang(
+                $this->this_company_id,
+                $typeBarang
             );
-
-            foreach ($data as $d) {
-                if ($d['stock_id'] != $stockID) {
-                    array_push($response, $d);
-                }
-            }
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => true,
+                'data' => []
+            ]);
         }
-
-        return response()->setJSON([
-            'token' => csrf_hash(),
-            'status' => true,
-            'data' => $response
-        ]);
     }
 
     public function dropdownDivisi()

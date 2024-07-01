@@ -60,6 +60,8 @@ class TandaTerimaFakturModel extends Model
 
     public function getInvoiceList($condition, $addCondition, $limit = 10, $offset = 0)
     {
+        $localPOPaymentBPModel = new LocalPOPaymentBPModel();
+
         $availableSort = [
             'receive_date'  => 'tanda_terima_faktur.receive_date',
             'divisi_id' => 'tanda_terima_faktur.divisi_id',
@@ -108,6 +110,8 @@ class TandaTerimaFakturModel extends Model
             $tandaTerimaQry->groupEnd();
         }
 
+
+
         $totalData = $tandaTerimaQry->countAllResults(false);
         $totalFilteredData = $tandaTerimaQry->countAllResults(false);
         $data = $tandaTerimaQry->orderBy($sort, $sortType)->findAll($limit, $offset);
@@ -122,13 +126,29 @@ class TandaTerimaFakturModel extends Model
     public function getTandaTerimaFakturInPembayaran($tandaTerimaFakturID)
     {
         $condition = [
-            'local_po_payments.tanda_terima_faktur_id' => $tandaTerimaFakturID,
-            'local_po_payments.deletedAt' => null
+            'local_po_payment_bp.tanda_terima_faktur_id' => $tandaTerimaFakturID,
+            'local_po_payment_bp.deletedAt' => null
         ];
-        $localPoPaymentModel = new LocalPOPaymentModel();
-        $res = $localPoPaymentModel
+        $localPoPaymentBPModel = new LocalPOPaymentBPModel();
+        $res = $localPoPaymentBPModel
             ->where($condition)
             ->first();
+
+
+        return $res;
+    }
+
+    public function getAllTandaTerimaFakturInPembayaran($tandaTerimaFakturID)
+    {
+        $condition = [
+            'local_po_payment_bp.tanda_terima_faktur_id' => $tandaTerimaFakturID,
+            'local_po_payment_bp.deletedAt' => null
+        ];
+        $localPoPaymentBPModel = new LocalPOPaymentBPModel();
+        $res = $localPoPaymentBPModel
+            ->where($condition)
+            ->findAll();
+
 
         return $res;
     }
@@ -157,7 +177,7 @@ class TandaTerimaFakturModel extends Model
                 ->where('local_po_payment_bp.tanda_terima_faktur_id', $r['id'])
                 ->groupBy('local_po_payment_bp.tanda_terima_faktur_id')
                 ->first();
-            if (intval($r['nominal_faktur']) > intval($totalPembayaran['amount']) || $totalPembayaran == "") {
+            if ($totalPembayaran === null || intval($r['nominal_faktur']) > intval($totalPembayaran['amount'])) {
                 array_push($list, $r);
             }
         }

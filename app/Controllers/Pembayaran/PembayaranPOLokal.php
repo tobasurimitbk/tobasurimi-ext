@@ -1067,10 +1067,10 @@ class PembayaranPOLokal extends BaseController
 
     public function posting()
     {
-        $localPOPaymentModel = new LocalPOPaymentModel();
+        $localPOPaymentBPModel = new LocalPOPaymentBPModel();
 
         $id = decrypt($this->request->getVar('id'));
-        $localPOPaymentModel->update($id, ['status_posting' => '1']);
+        $localPOPaymentBPModel->update($id, ['status_posting' => '1']);
         // $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL");
 
         return response()->setJSON([

@@ -66,11 +66,12 @@
                         <tr>
                             <th>No</th>
                             <th>Tipe Barang</th>
-                            <!-- <th onclick="changeSort('parent_barang.parent_name')">Kategori</th> -->
+                            <th onclick="changeSort('stock_details2.supplier_id')">Supplier</th>
                             <th onclick="changeSort('barang_master.barang_name')">Barang</th>
                             <th onclick="changeSort('divisis.divisi')">Departemen</th>
                             <th onclick="changeSort('warehouses.warehouse_name')">Warehouse</th>
                             <th onclick="changeSort('stock_details2.bc_id')">Dokumen Pabean</th>
+                            <th onclick="changeSort('stock_details2.bc_id')">Dokumen Referensi</th>
                             <th onclick="changeSort('stock_details.sumber')">Sumber</th>
                             <th onclick="changeSort('stock_details.no_dokumen')">Dokumen</th>
                             <th onclick="changeSort('stock_details2.tanggal')">Tanggal</th>
@@ -150,11 +151,10 @@
                 className: "text-center",
                 orderable: false
             },
-            // {
-            //     data: "parent_name",
-            //     className: "text-center",
-            //     orderable: false
-            // },
+            {
+                data: "supplier_name",
+                className: "text-center",
+            },
             // {
             //     data: "kode_barang",
             //     className: "text-center",
@@ -179,6 +179,11 @@
             {
                 data: "dokumen_pabean",
                 className: "text-center"
+            },
+            {
+                data: "dokumen_referensi",
+                className: "text-center",
+                orderable: false
             },
             {
                 data: "sumber",
