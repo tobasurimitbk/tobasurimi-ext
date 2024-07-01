@@ -471,4 +471,16 @@ class TandaTerimaSupBB extends BaseController
             'status' => true
         ]);
     }
+
+    public function historyPembayaran()
+    {
+        $tandaTerimaFakturid = decrypt($this->request->getVar('id'));
+
+        $history = $this->tandaTerimaFakturModel->getAllTandaTerimaFakturInPembayaran($tandaTerimaFakturid);
+        foreach ($history as &$h) {
+            $h['payment_date'] = date('d/m/Y', strtotime($h['payment_date']));
+            $h['amount'] = number_format($h['amount'], 2);
+        }
+        return response()->setJSON($history);
+    }
 }

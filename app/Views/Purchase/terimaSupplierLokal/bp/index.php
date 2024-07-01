@@ -66,7 +66,41 @@
         </div>
     </div>
 </section>
+<!-- history modal -->
+<div class="modal fade" id="historiModal" tabindex="-1" role="dialog" aria-labelledby="historiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="historiModalLabel">Histori Pembayaran Bahan Penolong</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-inside table-borderd nowrap table-hover-tobasurimi dataTable2" style="width: 100%;" id="tableHistori">
+                        <thead>
+                            <tr>
+                                <td style="width: 10px;text-align: center;color:#E7323A;font-weight:bold;">No</td>
+                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Nomor Pembayaran</td>
+                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Tanggal Pembayaran</td>
+                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Jumlah</td>
 
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     let sort = "receive_date";
     let sortType = "desc";
@@ -150,11 +184,17 @@
                     let is_used = row.is_used;
                     if (is_used) {
                         return `
-                        <div class="mt-0">
+                        
+                        
+                    <div class="mt-0">
+                            <button  data-toggle="tooltip" title="Histori Pembayaran" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </button>
                             <button class="btn btn-warning btn-print" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
-                        </div>
+                    <div>
+                        
                     `
                     } else {
                         return `
@@ -262,6 +302,43 @@
                     },
                 });
             }
+        });
+    }
+
+    function displayHistory(id) {
+        // console.log(id);
+        $.ajax({
+            url: "<?= base_url("/tanda-terima-faktur-lokal-bp/history-pembayaran"); ?>",
+            data: {
+                id: id
+            },
+            method: "GET",
+            success: function(response) {
+                console.log(response);
+
+                const table = $('#tableHistori');
+                var no = 1;
+
+                table.find('tbody').empty();
+                if (response.length > 0) {
+
+                    $.each(response, function(i, v) {
+                        var newRow = $('<tr>');
+                        newRow.append($('<td style="text-align:center;">').text(no++));
+                        newRow.append($('<td style="text-align:center;">').text(v.payment_no));
+                        newRow.append($('<td style="text-align:center;">').text(v.payment_date));
+                        newRow.append($('<td style="text-align:center;">').text(v.amount));
+
+                        table.find('tbody').append(newRow);
+                    });
+                } else {
+                    var newRow = $('<tr>');
+                    newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Pembayaran</td>'));
+                    table.find('tbody').append(newRow);
+                }
+                $('#historiModal').modal('show');
+
+            },
         });
     }
 </script>

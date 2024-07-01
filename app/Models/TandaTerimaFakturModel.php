@@ -134,6 +134,22 @@ class TandaTerimaFakturModel extends Model
             ->where($condition)
             ->first();
 
+
+        return $res;
+    }
+
+    public function getAllTandaTerimaFakturInPembayaran($tandaTerimaFakturID)
+    {
+        $condition = [
+            'local_po_payment_bp.tanda_terima_faktur_id' => $tandaTerimaFakturID,
+            'local_po_payment_bp.deletedAt' => null
+        ];
+        $localPoPaymentBPModel = new LocalPOPaymentBPModel();
+        $res = $localPoPaymentBPModel
+            ->where($condition)
+            ->findAll();
+
+
         return $res;
     }
 

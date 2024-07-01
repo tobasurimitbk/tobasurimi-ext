@@ -316,6 +316,7 @@ $routes->get('/tanda-terima-faktur-lokal-bp/daftar-penerimaan-barang', 'Purchase
 $routes->post('/tanda-terima-faktur-lokal-bp/create', 'Purchase\TandaTerimaSupBB::createAction', ['filter' => 'Auth']);
 $routes->post('/tanda-terima-faktur-lokal-bp/update', 'Purchase\TandaTerimaSupBB::updateAction', ['filter' => 'Auth']);
 $routes->post('/tanda-terima-faktur-lokal-bp/delete', 'Purchase\TandaTerimaSupBB::delete', ['filter' => 'Auth']);
+$routes->get('/tanda-terima-faktur-lokal-bp/history-pembayaran', 'Purchase\TandaTerimaSupBB::historyPembayaran', ['filter' => 'Auth']);
 $routes->post('/tanda-terima-faktur-lokal-bp/delete/daftar-penerimaan', 'Purchase\TandaTerimaSupBB::deleteDetailTandaTerimaFaktur', ['filter' => 'Auth']);
 
 
