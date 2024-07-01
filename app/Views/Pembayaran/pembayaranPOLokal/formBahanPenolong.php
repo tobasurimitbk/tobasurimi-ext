@@ -831,7 +831,7 @@
         newRow10.append($('<td style="text-align:right;" colspan="6"><b>Input Pembayaran</b></td>'));
         newRow10.append($('<td>').html(
             `
-                        <input  <?= $detail['pembayaranDetail']['status_posting'] == 1 ? 'readonly' : '' ?>  oninput="limitInputBayar(this,${Number(paymentDetail.amount) + Number(detail.sisa)})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="${formatRupiah(paymentDetail.amount) }" name = "nominal_pembayaran" style="height:40px">
+                        <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  oninput="limitInputBayar(this,${Number(paymentDetail.amount) + Number(detail.sisa)})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="${formatRupiah(paymentDetail.amount) }" name = "nominal_pembayaran" style="height:40px">
                     `
         ));
         table.find('tbody').append(newRow10);
