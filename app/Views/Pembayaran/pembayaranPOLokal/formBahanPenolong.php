@@ -212,7 +212,9 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="body-table" style="text-align: center;">
-
+                                                <tr style="color: whitesmoke;">
+                                                    <td colspan="10">Tidak Ada Pembayaran</td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -234,8 +236,9 @@
                                         </tr>
                                     </thead>
                                     <tbody class="body-table" id="body-table-panjar" style="cursor: pointer;">
-
-
+                                        <tr style="color: whitesmoke;">
+                                            <td colspan="7" style="text-align: center;">Tidak ada Panjar</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -828,7 +831,7 @@
         newRow10.append($('<td style="text-align:right;" colspan="6"><b>Input Pembayaran</b></td>'));
         newRow10.append($('<td>').html(
             `
-                        <input   oninput="limitInputBayar(this,${Number(paymentDetail.amount) + Number(detail.sisa)})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="${paymentDetail.amount}" name = "nominal_pembayaran" style="height:40px">
+                        <input  <?= $detail['pembayaranDetail']['status_posting'] == 1 ? 'readonly' : '' ?>  oninput="limitInputBayar(this,${Number(paymentDetail.amount) + Number(detail.sisa)})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="${formatRupiah(paymentDetail.amount) }" name = "nominal_pembayaran" style="height:40px">
                     `
         ));
         table.find('tbody').append(newRow10);

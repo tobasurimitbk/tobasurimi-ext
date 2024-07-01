@@ -60,7 +60,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? '' : '' ?> name="bank_id" id="bank_id">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""; ?> name="bank_id" id="bank_id">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($bankList as $b) : ?>
                                     <option <?= !empty($detail) ? ($detail['pembayaranDetail']['bank_id'] == $b->id ? 'selected' : '') : '' ?> value="<?= $b->id ?>"><?= strtoupper($b->kode_bank) ?></option>
@@ -73,7 +73,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_date']))  . '"' : '' ?>>
+                                    <input autocomplete="one-time-code" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_date']))  . '"' : '' ?>>
                                     <label for="floatingInput">Tanggal Pembayaran</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -84,7 +84,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating  form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? '' : '' ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                            <select <?= !empty($detail) ? 'disabled' : '' ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($divisi as $d) : ?>
                                     <option <?= !empty($detail) ? ($detail['pembayaranDetail']['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
@@ -166,7 +166,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? '' : '' ?> class="form-select " name="payment_method" id="payment_method">
+                            <select <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> class="form-select " name="payment_method" id="payment_method">
                                 <option disabled selected value="">Pilih Metode Pembayaran</option>
                                 <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Cash" ? 'selected' : '') : '' ?> value="Cash">Cash</option>
                                 <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Debit" ? 'selected' : '') : '' ?> value="Debit">Debit</option>
@@ -178,13 +178,13 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($detail) ? '' : '' ?> name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
+                            <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? '' : '' ?> name="akun_kas" id="akun_kas">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="akun_kas" id="akun_kas">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($subsAkuns as $subs) : ?>
                                     <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_kas'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
@@ -928,11 +928,11 @@
             newRow.append($('<td style="text-align:center;">').text(v.barang));
             newRow.append($('<td style="text-align:center;">').text(v.total_order));
             newRow.append($('<td style="text-align:center;">').text(v.total_diterima));
-            newRow.append($('<td style="text-align:center;">').text(v.total_tagihan));
-            newRow.append($('<td style="text-align:center;">').text(v.sisa_pembayaran));
+            newRow.append($('<td style="text-align:center;">').text(formatRupiah(v.total_tagihan)));
+            newRow.append($('<td style="text-align:center;">').text(formatRupiah(v.sisa_pembayaran)));
             newRow.append($('<td>').html(
                 `
-                        <input   oninput="limitInputBayar(this, ${v.total_number + v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="${v.total_number}" name = "pembayaran" style="height:40px">
+                        <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> oninput="limitInputBayar(this, ${v.total_number + v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="${formatRupiah (v.total_number)}" name = "pembayaran" style="height:40px">
                                 `
             ));
             table.find('tbody').append(newRow);
@@ -944,7 +944,7 @@
         newRow.append(($('<td </td>')));
         newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:right;" ><b>' +
-            '<input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="' + data.total_pembayaran + '" name = "total_pembayaran"  readonly>' +
+            '<input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="' + formatRupiah(data.total_pembayaran) + '" name = "total_pembayaran"  readonly>' +
             '</b></td>'));
         table.find('tbody').append(newRow);
 
@@ -966,7 +966,7 @@
         newRow.append(($('<td </td>')));
         newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:center;"><b>' +
-            '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value="' + data.total_bayar_panjar + ' " name = "total_pembayaran_panjar" readonly>' +
+            '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value="' + formatRupiah(data.total_bayar_panjar) + ' " name = "total_pembayaran_panjar" readonly>' +
             '</b></td>'));
 
         table.find('tbody').append(newRow);
@@ -975,10 +975,10 @@
         newRow.append($('<td style="text-align:right;" colspan="6"><b>GRAND TOTAL</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' + data.total_order + '</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' + data.total_diterima + '</b></td>'));
-        newRow.append($('<td style="text-align:center;"><b>' + data.total_tagihan + '</b></td>'));
+        newRow.append($('<td style="text-align:center;"><b>' + formatRupiah(data.total_tagihan) + '</b></td>'));
         newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:center;"><b>' +
-            '<input autocomplete="one-time-code" data-id=""  class="form-control grand-total" type="text" value="' + data.total_akhir + '" name = "grand_total"  readonly>' +
+            '<input autocomplete="one-time-code" data-id=""  class="form-control grand-total" type="text" value="' + formatRupiah(data.total_akhir) + '" name = "grand_total"  readonly>' +
             '</b></td>'));
 
         table.find('tbody').append(newRow);
@@ -1090,7 +1090,6 @@
         if (angka === null) {
             angka = 0;
         }
-
         angka = angka.toString();
         angka = angka.replace(/\./g, ',');
         angka = angka.replace(/[^\d,]/g, '');
@@ -1099,7 +1098,14 @@
         var desimal = parts[1] || '00';
         var reverse = ribuan.toString().split('').reverse().join('');
         var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return "Rp. " + ribuanFormatted + ',' + desimal;
+        return ribuanFormatted + ',' + desimal;
+    }
+
+    function convertRupiahToNumber($rupiah) {
+        $angka = str_replace('.', '', $rupiah);
+        $angkaArray = explode(',', $angka);
+        $angkaTanpaKoma = $angkaArray[0];
+        return $angkaTanpaKoma;
     }
 
 
@@ -1154,7 +1160,7 @@
 
                 newRow.append($('<td>').html(
                     `
-                        <input  class="form-control bayar_panjar" oninput="limitInputBayar(this, ${v.sisa_panjar_number})" autocomplete="one-time-code" data-id="${v.id}"  class="form-control" type="text" value="${v.bayar_panjar}" name = "bayar_panjar" style="height:40px">
+                        <input<?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?>  class="form-control bayar_panjar" oninput="limitInputBayar(this, ${v.sisa_panjar_number})" autocomplete="one-time-code" data-id="${v.id}"  class="form-control" type="text" value="${v.bayar_panjar}" name = "bayar_panjar" style="height:40px">
                             `
                 ));
                 tablePanjar.find('tbody').append(newRow);
