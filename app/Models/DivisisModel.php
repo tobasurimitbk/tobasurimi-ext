@@ -180,8 +180,10 @@ class DivisisModel extends Model
     public function getAccountKasForJurnal($divisionID)
     {
         $select =   "divisis.*,
-                    account_divisis.ap_id,
-                    account_divisis.ar_id,";
+                    account_divisis.coa_kas_id,
+                    account_divisis.coa_piutang_id,
+                    account_divisis.coa_gaji_id,
+                    account_divisis.coa_hpp_id,";
         return $this->asObject()
             ->select($select)
             ->join('account_divisis', 'divisis.id = account_divisis.divisis_id', 'left')

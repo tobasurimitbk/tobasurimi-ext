@@ -458,8 +458,8 @@ class JurnalUmum extends BaseController
 
                         // start inisialisasi account
                         foreach ($dataDepartment as $value) {
-                            $KasAP = $value->ap_id;
-                            $KasAR = $value->ar_id;
+                            $KasAP = $value->coa_kas_id;
+                            $KasAR = $value->coa_piutang_id;
                         }
                         foreach ($dataSupplier as $value) {
                             foreach ($dataAccountSupplier as $valueAccount) {
@@ -611,8 +611,8 @@ class JurnalUmum extends BaseController
 
                     // start inisialisasi account
                     foreach ($dataDepartment as $value) {
-                        $KasAP = $value->ap_id;
-                        $KasAR = $value->ar_id;
+                        $KasAP = $value->coa_kas_id;
+                        $KasAR = $value->coa_piutang_id;
                     }
                     foreach ($dataSupplier as $value) {
                         foreach ($dataAccountSupplier as $valueAccount) {
