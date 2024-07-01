@@ -109,7 +109,7 @@ class LocalPOPaymentBPModel extends Model
         $tandaTerimaFakturModel = new TandaTerimaFakturModel();
         $supplierModel = new SupplierModel();
         $companyModel = new CompaniesModel();
-        $localPOPaymentPanjarModel = new localPOPaymentPanjarModel();
+        $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
 
         $condition = [
             'local_po_payment_bp.id'            => $id,

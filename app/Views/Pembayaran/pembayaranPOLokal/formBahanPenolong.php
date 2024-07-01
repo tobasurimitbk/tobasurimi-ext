@@ -1078,12 +1078,12 @@
 
             });
             if (!found) {
-                var newRow = $('<tr>');
+                var newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Panjar</td>'));
                 tablePanjar.find('tbody').append(newRow);
             }
         } else {
-            var newRow = $('<tr>');
+            var newRow = $('<tr style="color:whitesmoke;">');
             newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Panjar</td>'));
             tablePanjar.find('tbody').append(newRow);
         }
