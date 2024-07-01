@@ -44,15 +44,19 @@ class AccountDepartmentController extends BaseController
             $this->accountDivisisModel->update($getDataAccountDivisis['id'], [
                 'divisis_id' => $divisisId,
                 'company_id' => $this->this_company_id,
-                'ap_id' => $this->request->getVar('akun_ap_id'),
-                'ar_id' => $this->request->getVar('akun_ar_id')
+                'coa_kas_id' => $this->request->getVar('akun_ap_id'),
+                'coa_piutang_id' => $this->request->getVar('akun_ar_id'),
+                'coa_gaji_id' => $this->request->getVar('akun_gaji_id'),
+                'coa_hpp_id' => $this->request->getVar('akun_hpp_id'),
             ]);
         } else {
             $this->accountDivisisModel->insert([
                 'divisis_id' => $divisisId,
                 'company_id' => $this->this_company_id,
-                'ap_id' => $this->request->getVar('akun_ap_id'),
-                'ar_id' => $this->request->getVar('akun_ar_id')
+                'coa_kas_id' => $this->request->getVar('akun_ap_id'),
+                'coa_piutang_id' => $this->request->getVar('akun_ar_id'),
+                'coa_gaji_id' => $this->request->getVar('akun_gaji_id'),
+                'coa_hpp_id' => $this->request->getVar('akun_hpp_id'),
             ]);
         }
 
@@ -101,6 +105,8 @@ class AccountDepartmentController extends BaseController
         $Sub_AkunsModel = new Sub_AkunsModel();
         $dataNamaAP = "";
         $dataNamaAR = "";
+        $dataNamaGaji = "";
+        $dataNamaHPP = "";
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
@@ -117,23 +123,35 @@ class AccountDepartmentController extends BaseController
             // var_dump($res);
             // exit;
             foreach ($subAkunsModel as $datas) {
-                if ($data['ap_id'] == $datas->id) {
+                if ($data['coa_kas_id'] == $datas->id) {
                     $dataNamaAP = $datas->no_sub;
-                } elseif ($data['ap_id'] == NULL) {
+                } elseif ($data['coa_kas_id'] == NULL) {
                     $dataNamaAP = "-";
                 }
-                if ($data['ar_id'] == $datas->id) {
+                if ($data['coa_piutang_id'] == $datas->id) {
                     $dataNamaAR = $datas->no_sub;
-                } elseif ($data['ar_id'] == NULL) {
+                } elseif ($data['coa_piutang_id'] == NULL) {
                     $dataNamaAR = "-";
+                }
+                if ($data['coa_gaji_id'] == $datas->id) {
+                    $dataNamaGaji = $datas->no_sub;
+                } elseif ($data['coa_gaji_id'] == NULL) {
+                    $dataNamaGaji = "-";
+                }
+                if ($data['coa_hpp_id'] == $datas->id) {
+                    $dataNamaHPP = $datas->no_sub;
+                } elseif ($data['coa_hpp_id'] == NULL) {
+                    $dataNamaHPP = "-";
                 }
             }
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => $data['id'],
                 "parent_name"           => $data['divisi'],
-                "ap_id"                 => $dataNamaAP,
-                "ar_id"                 => $dataNamaAR,
+                "coa_kas_id"            => $dataNamaAP,
+                "coa_piutang_id"        => $dataNamaAR,
+                "coa_gaji_id"           => $dataNamaGaji,
+                "coa_hpp_id"            => $dataNamaHPP,
             ]);
         }
 

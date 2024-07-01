@@ -1215,6 +1215,8 @@ class RasioController extends BaseController
                 $dataResult[$i]['stok_produksi'] = 0;
 
                 foreach ($productionResultDataTitle as $valueProductionResultData) {
+                    var_dump("value : " . $valueProductionResultData);
+                    var_dump("result : " . $dataResult);
                     if ($valueProductionResultData['stock_id'] == $dataResult[$i]['stock_id']) {
                         $dataResult[$i]['stok_produksi'] = $valueProductionResultData['qty'];
                         break; // Exit the loop once a match is found
@@ -1225,6 +1227,7 @@ class RasioController extends BaseController
             // Merge current dataResult into dataResults
             $dataResults = array_merge($dataResults, $dataResult);
         }
+        exit;
         return response()->setJSON([
             'data' => $dataResults,
             'token' => csrf_hash(),

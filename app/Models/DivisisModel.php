@@ -140,8 +140,10 @@ class DivisisModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "divisis.*,
-                    account_divisis.ap_id,
-                    account_divisis.ar_id,";
+                    account_divisis.coa_kas_id,
+                    account_divisis.coa_piutang_id,
+                    account_divisis.coa_gaji_id,
+                    account_divisis.coa_hpp_id,";
 
         $divisisDataQry = $this->asArray()
             ->select($selectQry)

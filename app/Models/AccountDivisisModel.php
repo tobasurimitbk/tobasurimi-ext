@@ -13,14 +13,8 @@ class AccountDivisisModel extends Model
     protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
-    protected $protectFields    = true;
-    protected $allowedFields    = [
-        'divisis_id',
-        'company_id',
-        'ap_id',
-        'ar_id',
-        'deleted_at',
-    ];
+    protected $protectFields    = false;
+    protected $allowedFields    = [];
 
     // Dates
     protected $useTimestamps = false;
