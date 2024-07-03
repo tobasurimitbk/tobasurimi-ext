@@ -72,12 +72,27 @@ class ProductionResultModel extends Model
 
         $totalData = $productionResDataQry->countAllResults(false);
 
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $productionResDataQry->groupStart();
+        }
+
         if ($addCondition['search']) {
-            $productionResDataQry->groupStart()
+            $productionResDataQry
                 ->like('production_results.pr_no', $addCondition['search'], 'after')
                 ->orLike('work_orders.wo_no', $addCondition['search'], 'after')
-                ->orLike('barang_master.nama_barang', $addCondition['search'], 'after')
-                ->groupEnd();
+                ->orLike('barang_master.nama_barang', $addCondition['search'], 'after');
+        }
+
+        if ($addCondition['dateStart']) {
+            $productionResDataQry->where('production_results.receive_date >=', $addCondition['dateStart']);
+        }
+
+        if ($addCondition['dateEnd']) {
+            $productionResDataQry->where('production_results.receive_date <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $productionResDataQry->groupEnd();
         }
 
         $totalFilteredData = $productionResDataQry->countAllResults(false);

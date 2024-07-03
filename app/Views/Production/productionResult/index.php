@@ -13,7 +13,23 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
-                <div class="col-md-5 mb-3">
+                <div class="col-md-4 mb-3">
+                    <div class="input-group">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="input-group">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir" value="">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Kode Produksi / Kode Penerimaan / Nama Barang" value="" />
                 </div>
             </div>
@@ -23,11 +39,13 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('wo_no')" class="sort">Kode Penerimaan</th>
+                                <th onclick="changeSort('wo_no')" class="sort">Kode Hasil Produksi</th>
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Produksi</th>
+                                <th onclick="changeSort('tanggal_hasil_barang')" class="sort">Tanggal Hasil Produksi</th>
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('nama_barang')" class="sort">Action</th>
+                                <th onclick="changeSort('qty_barang')" class="sort">Qty Produksi</th>
+                                <th class="sort">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -68,6 +86,8 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
+                data.dateStart = $(".dateStart").val();
+                data.dateEnd = $(".dateEnd").val();
                 data.sort = sort;
                 data.sortType = sortType;
             },
@@ -99,11 +119,19 @@
                 className: "text-center"
             },
             {
+                data: "receive_date",
+                className: "text-center"
+            },
+            {
                 data: "barangCode",
                 className: "text-center"
             },
             {
                 data: "barangName",
+                className: "text-center"
+            },
+            {
+                data: "qty_hasil",
                 className: "text-center"
             },
             {
@@ -117,8 +145,8 @@
                     if (status != 1) {
                         return `
                                 <div class="mt-0">
-                                    <button class="btn btn-primary detail-result">
-                                        <i class="fa fa-info fa-sm" aria-hidden="true"></i>
+                                    <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash">
+                                        <i class="fa fa-trash"></i>
                                     </button>
                                     <button class="btn btn-warning">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -131,9 +159,6 @@
                     } else {
                         return `
                                 <div class="mt-0">
-                                    <button class="btn btn-primary detail-result">
-                                        <i class="fa fa-info fa-sm" aria-hidden="true"></i>
-                                    </button>
                                     <button class="btn btn-warning">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                     </button>
@@ -159,14 +184,25 @@
 
     $(document).ready(function() {
 
+        $(".dateStart, .dateEnd").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        });
+
         $(".dataTable_info").addClass("pt-0");
 
         $(".search").keyup(function() {
             table.ajax.reload();
+        });
+
+        $(".dateStart, .dateEnd").change(function() {
+            table.ajax.reload();
         })
 
-        $('.dataTable tbody').on('click', '.detail-result', function() {
-            const data = table.row($(this).closest('tr')).data();
+        $('.dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+            const data = table.row(this).data();
             if (data) {
                 location.replace(`<?= base_url("production-result/details/"); ?>${data.id}`);
             }
@@ -241,6 +277,67 @@
                             title: 'Data Gagal Disimpan, coba Lagi',
                             confirmButtonColor: '#4e73df',
                         })
+                    }
+                });
+            }
+        })
+    }
+
+    // delete
+    function handleDelete(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+
+                setLoading()
+                $.ajax({
+                    url: "<?= base_url("production-result/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            stopLoading()
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Dihapus, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
                     }
                 });
             }

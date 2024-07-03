@@ -80,6 +80,8 @@ class ProductionResult extends BaseController
         ];
         $addCondition = [
             "search"    => $this->request->getGet("search"),
+            "dateStart"    =>  $this->request->getGet("dateStart") ? date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getGet("dateStart")))) : "",
+            "dateEnd"    =>  $this->request->getGet("dateEnd") ? date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getGet("dateEnd")))) : "",
             "sort"      => $this->request->getGet("sort"),
             "sortType"  => $this->request->getGet("sortType")
         ];
@@ -91,7 +93,13 @@ class ProductionResult extends BaseController
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-        foreach ($productionResultData['data'] as $data) {
+        foreach ($productionResultData['data'] as &$data) {
+            $qtyHasilProduksi = 0;
+            $productionResDetailData = $this->productionResultDetailModel->where('production_result_id', $data->id)->where('type', 'JADI')->findAll();
+            foreach ($productionResDetailData as $value) {
+                $qtyHasilProduksi += (float) $value['qty_isi'];
+            }
+            $data->qtyHasilProduksi = $qtyHasilProduksi;
             array_push($dataSupplier, [
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
@@ -100,7 +108,8 @@ class ProductionResult extends BaseController
                 "barangCode"    => $data->barangCode,
                 "barangName"    => $data->barangName,
                 "is_posted"    => $data->is_posted,
-                "receive_date"  => $data->receives_date
+                "receive_date"  => $data->receives_date,
+                "qty_hasil"  => $data->qtyHasilProduksi,
             ]);
         }
 
@@ -926,5 +935,22 @@ class ProductionResult extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function deletePR()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->productionResultModel->delete($id);
+        $resultDetail = $this->productionResultDetailModel->where('production_result_id', $id)->findAll();
+        foreach ($resultDetail as $value) {
+            $this->productionResultDetailModel->delete($value['id']);
+        }
+        // $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
+
+        return response()->setJSON([
+            'message' => "Hasil Produksi Berhasil Dihapus",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
     }
 }
