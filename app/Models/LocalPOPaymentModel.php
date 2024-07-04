@@ -813,8 +813,6 @@ class LocalPOPaymentModel extends Model
 
         $result = [];
 
-
-
         foreach ($penerimaanAll as $i => $p) {
             $selectQryLocalPO = "SUM(total) as total_dibayar";
             $totalPoPayment = $localPoPaymentDetail

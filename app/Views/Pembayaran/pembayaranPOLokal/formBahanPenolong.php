@@ -325,9 +325,7 @@
                 status_pph: {
                     required: true
                 },
-                bayar_panjar: {
-                    digits: true
-                }
+
             },
             messages: {
                 no_bukti_pembayaran: {
@@ -360,9 +358,7 @@
                 status_pph: {
                     required: "Pilih status pph"
                 },
-                bayar_panjar: {
-                    digits: "harus berupa angka"
-                }
+
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -450,7 +446,7 @@
 
             $.each(listPanjar, function(i, v) {
                 var element = $('input[data-id="' + v.id + '"].bayar_panjar');
-                var input_user = (element.val());
+                var input_user = convertRupiahToNumber(element.val());
                 listPanjar[i].bayar_panjar = input_user;
             });
 
@@ -460,7 +456,7 @@
                 $.each(listPanjar, function(i, v) {
                     console.log(v.panjar_id);
                     var element = $('input[data-id="' + v.panjar_id + '"].bayar_panjar');
-                    var input_user = (element.val());
+                    var input_user = convertRupiahToNumber(element.val());
                     console.log(input_user);
                     listPanjar[i].bayar_panjar = input_user;
                 });
@@ -503,7 +499,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = `<?= base_url("pembayaran-po-lokal-bp/id/"); ?>` + response.id;
+                                                window.location.href = `<?= base_url("pembayaran-po-lokal-bp"); ?>`;
                                             })
                                     } else {
                                         Swal.fire({
@@ -696,7 +692,7 @@
                 newRow9.append($('<td style="text-align:right;" colspan="6"><b>Input Pembayaran</b></td>'));
                 newRow9.append($('<td>').html(
                     `
-                        <input   oninput="limitInputBayar(this,${subTotal})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="" name = "nominal_pembayaran" style="height:40px">
+                        <input onchange="this.value = formatRupiah(this.value)" oninput="limitInputBayar(this,${subTotal})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="" name = "nominal_pembayaran" style="height:40px">
                     `
                 ));
                 table.find('tbody').append(newRow9);
@@ -728,7 +724,7 @@
                 sisa_panjar = Number(v.total_panjar) - Number(v.total_pembayaran.total_bayar_panjar);
                 newRow.append($('<td>').html(
                     `
-                            <input  class="form-control bayar_panjar" oninput="limitInputBayar(this, ${Number(v.bayar_panjar) + Number(sisa_panjar) })" autocomplete="one-time-code" data-id="${v.panjar_id}" type="text" value="${v.bayar_panjar}" name = "bayar_panjar" style="height:40px">
+                            <input  onchange="this.value = formatRupiah(this.value)" class="form-control bayar_panjar" oninput="limitInputBayar(this, ${Number(v.bayar_panjar) + Number(sisa_panjar) })" autocomplete="one-time-code" data-id="${v.panjar_id}" type="text" value="${v.bayar_panjar}" name = "bayar_panjar" style="height:40px">
                                 `
                 ));
                 newRow.append($('<td>').text((sisa_panjar)));
@@ -822,7 +818,7 @@
 
         var newRow9 = $('<tr>');
         newRow9.append($('<td style="text-align:right;" colspan="6"><b>Sisa Pembayaran</b></td>'));
-        newRow9.append($(`<td style="text-align:center;"><b>${detail.sisa} </b></td>`));
+        newRow9.append($(`<td style="text-align:center;"><b>${formatRupiah(detail.sisa)} </b></td>`));
 
         table.find('tbody').append(newRow9);
 
@@ -831,7 +827,7 @@
         newRow10.append($('<td style="text-align:right;" colspan="6"><b>Input Pembayaran</b></td>'));
         newRow10.append($('<td>').html(
             `
-                        <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  oninput="limitInputBayar(this,${Number(paymentDetail.amount) + Number(detail.sisa)})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="${formatRupiah(paymentDetail.amount) }" name = "nominal_pembayaran" style="height:40px">
+                        <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = formatRupiah(this.value)" oninput="limitInputBayar(this,${Number(paymentDetail.amount) + Number(detail.sisa)})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="${formatRupiah(paymentDetail.amount) }" name = "nominal_pembayaran" style="height:40px">
                     `
         ));
         table.find('tbody').append(newRow10);
@@ -1019,6 +1015,16 @@
         return "" + ribuanFormatted + ',' + desimal;
     }
 
+    function convertRupiahToNumber(rupiah) {
+        if (rupiah == "") {
+            return 0;
+        } else {
+            var withoutDot = rupiah.replace(/\./g, '');
+            var numberWithDot = withoutDot.replace(',', '.');
+            return parseFloat(numberWithDot);
+        }
+    }
+
     $('#supplier_id').change(function() {
         var supplierId = $('#supplier_id option:selected').val();
         $.ajax({
@@ -1070,7 +1076,7 @@
 
                     newRow.append($('<td>').html(
                         `
-                        <input  class="form-control bayar_panjar" oninput="limitInputBayar(this, ${v.sisa_panjar_number})" autocomplete="one-time-code" data-id="${v.id}"  class="form-control" type="text" value="" name = "bayar_panjar" style="height:40px">
+                        <input  class="form-control bayar_panjar" onchange="this.value = formatRupiah(this.value)" oninput="limitInputBayar(this, ${v.sisa_panjar_number})" autocomplete="one-time-code" data-id="${v.id}" type="text" value="" name = "bayar_panjar" style="height:40px">
                             `
                     ));
                     tablePanjar.find('tbody').append(newRow);

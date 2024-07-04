@@ -124,37 +124,95 @@
                 <td>Qty</td>
                 <td>Unit</td>
                 <td>Total</td>
+                <td>Input Harga</td>
             </tr>
         </thead>
         <tbody>
             <?php $no = 1; ?>
-            <?php $payment_amt_total = 0; ?>
+            <?php $payment_amt_total = 0;
+            $user_payment_total = 0;
+            $pph_result = 0; ?>
             <?php foreach ($poList as $p) : ?>
                 <tr>
                     <td><?= $no++; ?></td>
                     <td><?= date('d/m/Y', strtotime($p['tgl_po'])) ?></td>
                     <td><?= $p['po_no'] ?></td>
-                    <td><?= $p['barang'] ?></td>
-                    <td><?= $p['qty'] ?></td>
+                    <td><?= $p['nama_barang'] ?></td>
+                    <td><?= $p['qty_order'] ?></td>
                     <td><?= $p['kode_satuan'] ?></td>
-                    <td><?= number_format($p['total'], 2) ?></td>
+                    <td><?= number_format($p['total_harga_number'], 2) ?></td>
+                    <td><?= number_format($p['input_user'], 2) ?></td>
                 </tr>
-                <?php $payment_amt_total += $p['total']; ?>
+                <?php $payment_amt_total += $p['total_harga_number']; ?>
+                <?php $user_payment_total += $p['input_user']; ?>
             <?php endforeach; ?>
 
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="6" style="text-align: right;">Total Tagihan</td>
+                <td colspan="6" style="text-align: right;">Total</td>
                 <td><?= number_format($payment_amt_total, 2) ?></td>
+                <td><?= number_format($user_payment_total, 2) ?></td>
             </tr>
             <tr>
-                <td colspan="6" style="text-align: right;">Total Dibayar</td>
+                <td colspan="7" style="text-align: right;">Pajak Penghasilan (2.5 %) (+)</td>
+                <td>
+                    <?= $detail['status_pph'] == "1" ?  number_format($user_payment_total * (2.5 / 100), 2) : number_format(0, 2); ?>
+
+                </td>
+            </tr>
+            <tr>
+                <td colspan="7" style="text-align: right;">Potongan Panjar</td>
+                <td><?= number_format($total_bayar_panjar, 2) ?></td>
+            </tr>
+            <tr>
+                <td colspan="7" style="text-align: right;">Total Dibayar</td>
                 <td><?= number_format($detail['payment_amt'], 2) ?></td>
+
             </tr>
         </tfoot>
 
     </table>
+
+
+    <h6>
+        Rincian Panjar
+    </h6>
+    <table width="100%" border="1" id="dashed-border-table" style="margin-top: -20px;">
+        <thead>
+            <tr>
+                <th style="text-align: center;">No</th>
+                <th style="text-align: center;">No. Panjar</th>
+                <th style="text-align: center;">Payment Date</th>
+                <th style="text-align: center;">Bayar Panjar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php $no = 1; ?>
+            <?php if (!empty($panjar_list)) : ?>
+                <?php foreach ($panjar_list as $p) : ?>
+                    <tr>
+                        <td><?= $no++; ?></td>
+                        <td><?= $p['no_panjar']; ?></td>
+                        <td><?= $p['payment_date']; ?></td>
+                        <td><?= number_format($p['bayar_panjar'], 2); ?></td>
+                    </tr>
+
+                <?php endforeach; ?>
+                <tr>
+                    <td colspan="3" style="text-align: right;">Potongan Panjar</td>
+                    <td><?= number_format($total_bayar_panjar, 2) ?></td>
+                </tr>
+            <?php else : ?>
+                <tr>
+                    <td colspan="4" style="text-align: center;">Tidak ada Pembayaran Panjar</td>
+                </tr>
+            <?php endif; ?>
+
+        </tbody>
+    </table>
+
+
 
 
 </body>

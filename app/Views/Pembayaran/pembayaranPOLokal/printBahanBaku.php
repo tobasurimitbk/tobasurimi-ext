@@ -127,9 +127,9 @@
                 <th style="text-align: center;">Tanggal PO</th>
                 <th style="text-align: center;">No PO</th>
                 <th style="text-align: center;">Barang</th>
-       
+
                 <th style="text-align: center;">Total Diterima</th>
-        
+
                 <th style="text-align: center;">Total Dibayar</th>
 
             </tr>
@@ -144,24 +144,24 @@
                     <td><?= date('d/m/Y', strtotime($d['tanggal_PO'])) ?></td>
                     <td><?= $d['po_no'] ?></td>
                     <td><?= $d['barang'] ?></td>
-              
+
                     <td><?= $d['total_diterima'] ?></td>
-                  
-                    <td><?= number_format($d['total'] ,2)?></td>
+
+                    <td><?= number_format($d['total'], 2) ?></td>
                 </tr>
             <?php endforeach; ?>
             <tr>
                 <td colspan="6" style="text-align: right;">
                     Total Pembayaran
                 </td>
-             
+
                 <td style="text-align: center;">
                     <b><?= $detail['itemList']['total_diterima']; ?></b>
                 </td>
                 <td style="text-align: center;">
-                    <b><?= number_format( $detail['itemList']['total_pembayaran'],2);?></b>
+                    <b><?= number_format($detail['itemList']['total_pembayaran'], 2); ?></b>
                 </td>
-           
+
             </tr>
             <!-- <tr>
                 <td colspan="6" style="text-align: right;">
@@ -182,11 +182,11 @@
                 <td style="text-align: center;">
 
                 </td>
-       
+
                 <td style="text-align: center;">
                     <b><?= number_format($detail['pembayaranDetail']['potongan_harga'] ?? 0, 2)  ?></b>
                 </td>
-         
+
             </tr>
             <tr>
                 <td colspan="6" style="text-align: right;">
@@ -195,9 +195,9 @@
                 <td>
 
                 </td>
-                <td><b><?= number_format( $detail['itemList']['total_bayar_panjar'],2) ; ?></b></td>
+                <td><b><?= number_format($detail['itemList']['total_bayar_panjar'], 2); ?></b></td>
             </tr>
-   
+
             <tr>
                 <td colspan="6" style="text-align: right;">
                     Total Bayar
@@ -205,7 +205,7 @@
                 <td>
 
                 </td>
-                <td><b><?= number_format( $detail['itemList']['total_akhir'],2) ; ?></b></td>
+                <td><b><?= number_format($detail['itemList']['total_akhir'], 2); ?></b></td>
             </tr>
 
         </tbody>
@@ -220,32 +220,32 @@
                 <th style="text-align: center;">No</th>
                 <th style="text-align: center;">No. Panjar</th>
                 <th style="text-align: center;">Payment Date</th>
-              
+
                 <th style="text-align: center;">Bayar Panjar </th>
-        
+
 
             </tr>
         </thead>
 
         <tbody>
             <?php $no = 1; ?>
-            
-            <?php if(!empty($detail['panjar'])) :  ?>
-                
-                <?php foreach($detail['panjar'] as $p): ?>
-                   <tr>
-                        <td> <?=  $no++; ?> </td>
-                        <td> <?=  $p['no_panjar'] ; ?></td>
-                        <td> <?=  $p['payment_date'] ;?></td> 
-                        <td> <?=  number_format($p['bayar_panjar'],2) ;?></td>
-                
-                <?php endforeach; ?>
+
+            <?php if (!empty($detail['panjar'])) :  ?>
+
+                <?php foreach ($detail['panjar'] as $p) : ?>
+                    <tr>
+                        <td> <?= $no++; ?> </td>
+                        <td> <?= $p['no_panjar']; ?></td>
+                        <td> <?= $p['payment_date']; ?></td>
+                        <td> <?= number_format($p['bayar_panjar'], 2); ?></td>
+
+                    <?php endforeach; ?>
                 <?php else : ?>
                     <tr>
                         <td colspan="5">Tidak ada Pembayaran Panjar</td>
                     </tr>
-                    
-            <?php endif; ?>
+
+                <?php endif; ?>
         </tbody>
     </table>
 
