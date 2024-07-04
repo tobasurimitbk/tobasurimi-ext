@@ -424,6 +424,12 @@
             dropdownParent: $('#add_modal')
         });
 
+        $('#metode_pembayaran').select2({
+            placeholder: "Pilih Metode Pembayaran",
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal')
+        });
+
         $('#valas').select2({
             placeholder: "Pilih Mata Uang",
             theme: "bootstrap-5",

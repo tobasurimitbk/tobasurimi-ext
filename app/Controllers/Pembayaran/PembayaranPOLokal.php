@@ -931,15 +931,35 @@ class PembayaranPOLokal extends BaseController
     }
 
 
-    public function delete()
+    public function deleteBB()
     {
         $id = decrypt($this->request->getVar('id'));
         $localPOPaymentModel = new LocalPOPaymentModel();
+        $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
+        $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
 
         $localPOPaymentModel->where('id', $id)->delete();
+        $localPOPaymentDetailModel->where('local_po_payment_id', $id)->delete();
+        $localPOPaymentPanjarModel->where('local_po_payment_id', $id)->where('type', 'BB')->delete();
 
         return response()->setJSON([
-            'message' => "Pembayaran lokal bahan penolong berhasil dihapus",
+            'message' => "Pembayaran lokal bahan baku berhasil dihapus",
+            'status' => true
+        ]);
+    }
+
+    public function deleteBP()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $localPOPaymentBPModel = new LocalPOPaymentBPModel();;
+        $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
+
+        $localPOPaymentBPModel->where('id', $id)->delete();
+
+        $localPOPaymentPanjarModel->where('local_po_payment_id', $id)->where('type', 'BP')->delete();
+
+        return response()->setJSON([
+            'message' => "Pembayaran lokal bahan baku berhasil dihapus",
             'status' => true
         ]);
     }

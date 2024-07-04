@@ -49,7 +49,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control name" id="total_panjar" name="total_panjar" placeholder="Nama" oninput="preventNegativeInput(this)">
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="total_panjar" name="total_panjar" placeholder="Nama" oninput="preventNegativeInput(this)" onchange="this.value = formatRupiah(this.value)">
                                 <label for="floatingInput">Total Panjar</label>
                             </div>
                         </div>
@@ -107,7 +107,7 @@
                     </div>
                 </div>
                 <div class="col mb-4">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="pencarian" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
             <div class="row">
@@ -320,7 +320,7 @@
         rules: {
             total_panjar: {
                 required: true,
-                digits: true
+
             },
             payment_date: {
                 required: true
@@ -333,7 +333,7 @@
         messages: {
             total_panjar: {
                 required: "total panjar wajib diisi",
-                digits: "total panjar harus berupa nomor"
+
             },
             payment_date: {
                 required: "date have to be selected"
@@ -490,6 +490,19 @@
         validator.resetForm();
         validator.reset();
     });
+
+    $('#tipe_supplier').select2({
+        placeholder: "Pilih Tipe Supplier",
+        theme: "bootstrap-5",
+    });
+
+    $('#supplier_id').select2({
+        placeholder: "Pilih Tipe Supplier",
+        theme: "bootstrap-5",
+    });
+
+
+
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
@@ -785,6 +798,28 @@
 
             },
         });
+    }
+
+    function formatRupiah(angka) {
+        var formatter = new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR'
+        });
+        var parsedNumber = parseFloat(angka);
+        if (isNaN(parsedNumber)) {
+            return "0,00";
+        }
+        return formatter.format(parsedNumber).replace('Rp', '').trim();
+    }
+
+    function convertRupiahToNumber(rupiah) {
+        if (rupiah == "") {
+            return 0;
+        } else {
+            var withoutDot = rupiah.replace(/\./g, '');
+            var numberWithDot = withoutDot.replace(',', '.');
+            return parseFloat(numberWithDot);
+        }
     }
 </script>
 
