@@ -1131,7 +1131,6 @@
 
     function updateSubTotal(newSubtotal) {
         var countSubTotal = newSubtotal;
-
         return countSubTotal;
     }
 </script>

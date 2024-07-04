@@ -632,8 +632,8 @@ class LocalPOPaymentModel extends Model
             $p['total_tagihan'] = $totalTagihan;
             if ($totalPoPayment != null) {
                 if ($p['total_tagihan'] > $totalPoPayment['total_dibayar']) {
-                    $p['total_tagihan'] -= $totalPoPayment['total_dibayar'];
-                    if ($p['total_tagihan'] > 0) {
+                    $penerimaanBulanAll[$i]['sisa_pembayaran'] = $p['total_tagihan'] - $totalPoPayment['total_dibayar'];
+                    if ($penerimaanBulanAll[$i]['sisa_pembayaran'] > 0) {
 
                         $penerimaanBulanAll[$i]['total_tagihan'] = toRupiah($p['total_tagihan']);
                         $penerimaanBulanAll[$i]['total_tagihan_number'] = $p['total_tagihan'];
@@ -666,7 +666,8 @@ class LocalPOPaymentModel extends Model
         $condition = [
             'local_po_payments.id' => $pembayaranId,
             'local_po_payments.company_id' => $companyId,
-            'local_po_payments.deletedAt'  => null
+            'local_po_payments.deletedAt'  => null,
+            'local_po_payment_details.deletedAt ' => null
         ];
 
         $selectQry = " penerimaan_barang_detail.id AS penerimaan_barang_detail_id,penerimaan_barang.id AS penerimaan_barang_id, 
@@ -709,6 +710,7 @@ class LocalPOPaymentModel extends Model
                 ->where('penerimaan_barang_id', $p['penerimaan_barang_id'])
                 ->where('penerimaan_barang_detail_id', $p['penerimaan_barang_detail_id'])
                 ->where('type_bayar', $p['type_bayar'])
+                ->where('local_po_payment_details.deletedAt', null)
                 ->groupBy('penerimaan_barang_detail_id')
                 ->groupBy('penerimaan_barang_id')
                 ->first();
@@ -827,8 +829,8 @@ class LocalPOPaymentModel extends Model
             $p['total_tagihan'] = $totalTagihan;
             if ($totalPoPayment != null) {
                 if ($p['total_tagihan'] > $totalPoPayment['total_dibayar']) {
-                    $p['total_tagihan'] -= $totalPoPayment['total_dibayar'];
-                    if ($p['total_tagihan'] > 0) {
+                    $penerimaanAll[$i]['sisa_pembayaran'] = $p['total_tagihan'] - $totalPoPayment['total_dibayar'];
+                    if ($penerimaanAll[$i]['sisa_pembayaran'] > 0) {
                         $penerimaanAll[$i]['tanggal_LPB'] = date('d/m/Y', \strtotime($p['tanggal_LPB']));
                         $penerimaanAll[$i]['total_tagihan'] = toRupiah($p['total_tagihan']);
                         $penerimaanAll[$i]['total_tagihan_number'] = $p['total_tagihan'];
@@ -848,7 +850,6 @@ class LocalPOPaymentModel extends Model
                 array_push($result, $penerimaanAll[$i]);
             }
         }
-
 
         return $result;
     }

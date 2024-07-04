@@ -272,13 +272,6 @@ class PembayaranPOImport extends BaseController
 
     public function savePembayaranPOImport()
     {
-        // if (formatter($this->request->getVar('payment_amt'), "CURR_TO_INT") < formatter($this->request->getVar('payment_amt'), "CURR_TO_INT")) {
-        //     return response()->setJSON([
-        //         'status' => false,
-        //         'message' => "Total bayar tidak boleh melebihi sisa bayar",
-        //         'token' => csrf_hash()
-        //     ]);
-        // }
 
 
         $first = $this->importPOPaymentModel->where('payment_no', $this->request->getVar('no_pembayaran'))->where('company_id', $this->this_company_id)->first();
@@ -292,6 +285,21 @@ class PembayaranPOImport extends BaseController
         }
         $pembayaranList = json_decode($this->request->getVar('pembayaranList'));
         $panjarList     = json_decode($this->request->getVar('panjarList'));
+        $allEmpty = true;
+        foreach ($pembayaranList as $item) {
+            if (!empty($item->pembayaran_user_input)) {
+                $allEmpty = false;
+                break;
+            }
+        }
+
+        if ($allEmpty) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => "Pembayaran Kosong",
+                'token' => csrf_hash()
+            ]);
+        }
 
 
         $id = $this->importPOPaymentModel->insert([
@@ -363,7 +371,7 @@ class PembayaranPOImport extends BaseController
         $this->importPOPaymentModel->update($id, [
             'company_id' => $this->this_company_id,
             'divisi_id' => $this->request->getVar('divisi_id'),
-            'payment_no' => $this->request->getVar('no_pembayaran'),
+            // 'payment_no' => $this->request->getVar('no_pembayaran'),
             'supplier_id' => $this->request->getVar('supplier_id'),
             'po_type' => $this->request->getVar('po_type'),
             'po_id' => decrypt($this->request->getVar('import_po')),
@@ -719,6 +727,7 @@ class PembayaranPOImport extends BaseController
 
         // $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         $total_harga_semua = 0;
+
         foreach ($poList as $data) {
             $entry = [
                 "detail_id"         => encrypt($data->id),
