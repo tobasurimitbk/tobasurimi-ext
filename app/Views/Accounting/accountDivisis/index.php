@@ -19,8 +19,8 @@
                             <tr>
                                 <th>No.</th>
                                 <th>Department</th>
-                                <th>Akun Pembelian</th>
-                                <th>Akun Penjualan</th>
+                                <th>Akun Kas</th>
+                                <th>Akun Piutang</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -68,7 +68,7 @@
                                             }
                                             ?>
                                         </select>
-                                        <label for="floatingInput">AP</label>
+                                        <label for="floatingInput">Akun Kas</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -85,7 +85,47 @@
                                             }
                                             ?>
                                         </select>
-                                        <label for="floatingInput">AR</label>
+                                        <label for="floatingInput">Akun Piutang</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select akun_gaji_id" name="akun_gaji_id" id="akun_gaji_id">
+                                            <option value="" data-code=""></option>
+                                            <?php
+                                            if (!empty($subAkuns)) {
+                                                foreach ($subAkuns as $sub_ar) {
+                                            ?>
+                                                    <option value="<?= $sub_ar->id; ?>"><?= $sub_ar->no_sub; ?> <?= $sub_ar->nama_sub; ?></option>
+                                            <?php
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                        <label for="floatingInput">Akun Gaji</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select akun_hpp_id" name="akun_hpp_id" id="akun_hpp_id">
+                                            <option value="" data-code=""></option>
+                                            <?php
+                                            if (!empty($subAkuns)) {
+                                                foreach ($subAkuns as $sub_ar) {
+                                            ?>
+                                                    <option value="<?= $sub_ar->id; ?>"><?= $sub_ar->no_sub; ?> <?= $sub_ar->nama_sub; ?></option>
+                                            <?php
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                        <label for="floatingInput">Akun HPP</label>
                                     </div>
                                 </div>
                             </div>
@@ -145,10 +185,10 @@
                 data: "parent_name",
                 className: "text-center",
             }, {
-                data: "ap_id",
+                data: "coa_kas_id",
                 className: "text-center",
             }, {
-                data: "ar_id",
+                data: "coa_piutang_id",
                 className: "text-center",
             }, ],
             columnDefs: [{
@@ -200,8 +240,10 @@
                         console.log(res);
                         $("#id").val(id);
                         $("#parentName").val(res.data.divisi);
-                        $("#akun_ap_id").val(res.data.ap_id).change();
-                        $("#akun_ar_id").val(res.data.ar_id).change();
+                        $("#akun_ap_id").val(res.data.coa_kas_id).change();
+                        $("#akun_ar_id").val(res.data.coa_piutang_id).change();
+                        $("#akun_gaji_id").val(res.data.coa_gaji_id).change();
+                        $("#akun_hpp_id").val(res.data.coa_hpp_id).change();
                         $('.add-modal').modal('show');
                     } else {
                         Swal.fire({
@@ -326,21 +368,21 @@
     }
 
     // Akun AR
-    $('.akun_ar_id').select2({
+    $('.akun_ar_id, .akun_ap_id, .akun_gaji_id, .akun_hpp_id').select2({
         placeholder: "",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
     })
 
     //CSS SELECT2 FLOATING LABEL
-    $('.akun_ar_id')
+    $('.akun_ar_id, .akun_ap_id, .akun_gaji_id, .akun_hpp_id')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.akun_ar_id')
+    $('.akun_ar_id, .akun_ap_id, .akun_gaji_id, .akun_hpp_id')
         .parent('div')
         .children('span')
         .children('span')
@@ -348,38 +390,38 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.akun_ar_id')
+    $('.akun_ar_id, .akun_ap_id, .akun_gaji_id, .akun_hpp_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');
 
     // Akun AP
-    $('.akun_ap_id').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
-    })
+    // $('.akun_ap_id').select2({
+    //     placeholder: "",
+    //     theme: "bootstrap-5",
+    //     dropdownParent: $(".add-modal .modal-content")
+    // })
 
-    //CSS SELECT2 FLOATING LABEL
-    $('.akun_ap_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+    // //CSS SELECT2 FLOATING LABEL
+    // $('.akun_ap_id')
+    //     .parent('div')
+    //     .children('span')
+    //     .children('span')
+    //     .children('span')
+    //     .css('height', ' calc(3.5rem + 2px)');
 
-    $('.akun_ap_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+    // $('.akun_ap_id')
+    //     .parent('div')
+    //     .children('span')
+    //     .children('span')
+    //     .children('span')
+    //     .children('span')
+    //     .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.akun_ap_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+    // $('.akun_ap_id')
+    //     .parent('div')
+    //     .find('label')
+    //     .css('z-index', '1');
 </script>
 
 <?= $this->endSection(); ?>

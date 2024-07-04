@@ -601,6 +601,7 @@ $routes->get('/production-result/list-work-order', 'Production\ProductionResult:
 $routes->get('/production-result/list-material-request', 'Production\ProductionResult::getListMaterialRequestByID', ['filter' => 'Auth']);
 $routes->get('/production-result/material-request', 'Production\ProductionResult::getListMaterialRequestByWOID', ['filter' => 'Auth']);
 $routes->post('/production-result/update-status', 'Production\ProductionResult::updateStatusPostedProductionResult', ['filter' => 'Auth']);
+$routes->post('/production-result/delete', 'Production\ProductionResult::deletePR', ['filter' => 'Auth']);
 
 // Rencana Produksi
 $routes->get('/work-order', 'Production\WorkOrder::index', ['filter' => 'Auth']);

@@ -14,13 +14,33 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("production-result"); ?>">
                 Batal
             </a>
-            <?php if (isset($data) && $data->is_posted != 1) { ?>
-                <button class="btn btn-success mr-1" onclick="posting('<?= !empty($data) ? encrypt($data->id) : ''; ?>', 1)">
+            <?php if (isset($data)) { ?>
+                <!-- <button class="btn btn-success mr-1" onclick="posting('<?= !empty($data) ? encrypt($data->id) : ''; ?>', 1)">
                     Posting
                 </button>
                 <button class="btn btn-show-form btn-save btn-submit-form mr-1" type="button">
                     Simpan
-                </button>
+                </button> -->
+                <?php if ($data->is_posted != 1) { ?>
+                    <?php if (can('Produksi', 'Hasil Produksi', 'a')) : ?>
+                        <button class="btn btn-success mr-1" onclick="posting('<?= !empty($data) ? encrypt($data->id) : ''; ?>', 1)">
+                            Posting
+                        </button>
+                    <?php endif; ?>
+                    <?php if (can('Produksi', 'Hasil Produksi', 'd')) : ?>
+                        <button class="btn btn-hapus delete-parent float-right" onclick="handleDelete('<?= !empty($data) ? encrypt($data->id) : ''; ?>', 1)">
+                            Hapus
+                        </button>
+                    <?php endif; ?>
+                    <button class="btn btn-show-form btn-save btn-submit-form mr-1">
+                        Simpan
+                    </button>
+                <?php } ?>
+                <?php if (can('Produksi', 'Hasil Produksi', 'p')) : ?>
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("production-result/print/"); ?><?= !empty($data) ? encrypt($data->id) : ''; ?>')">
+                        Print
+                    </button>
+                <?php endif; ?>
             <?php } else if (!isset($data)) { ?>
                 <button class="btn btn-show-form btn-save btn-submit-form mr-1" type="button">
                     Simpan
@@ -1735,6 +1755,67 @@
                             title: 'Data Gagal Disimpan, coba Lagi',
                             confirmButtonColor: '#4e73df',
                         })
+                    }
+                });
+            }
+        })
+    }
+
+    // delete
+    function handleDelete(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+
+                setLoading()
+                $.ajax({
+                    url: "<?= base_url("production-result/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            stopLoading()
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    window.location.href = "<?= base_url('production-result') ?>"
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Dihapus, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
                     }
                 });
             }
