@@ -1,149 +1,18 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
-<div class="modal fade" id="generateModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Generate Payroll</h5>
-            </div>
-            <div class="modal-body">
-                <?= csrf_field() ?>
-                <ul class="nav nav-tabs" id="myTab" role="tablist" style="margin-top: -20px;">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#global" type="button" role="tab" aria-controls="home" aria-selected="true">Global (Seluruh Karyawan)</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#single" type="button" role="tab" aria-controls="profile" aria-selected="false">Personal (Per Karyawan)</button>
-                    </li>
-                </ul>
-                <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="global" role="tabpanel" aria-labelledby="home-tab">
-                        <form id="formGenerateGlobal" role="form" method="POST">
-                            <div class="row mb-2">
-                                <div class="col-md-12">
-                                    <div class="form-floating mt-1">
-                                        <input value="<?= $year . '-' . $month ?>" readonly autocomplete="one-time-code" name="monthYearGlobal" type="month" required class="form-control target">
-                                        <label>Periode Absensi</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-floating mt-3">
-                                        <select class="form-select" id="divisionGlobalID" name="divisionGlobalID" aria-label="Floating label select example">
-                                            <option value="">
-                                                Cari Departemen
-                                            </option>
-                                            <option value="ALL">
-                                                Semua Departemen
-                                            </option>
-                                            <?php foreach ($divisi as $d) : ?>
-                                                <option value="<?= $d['id'] ?>">
-                                                    <?= $d['divisi']; ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <label for="floatingInput">Cari Departemen</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating mt-3">
-                                        <input value="<?= $startDate ?>" autocomplete="one-time-code" name="startDateGlobal" type="text" required class="form-control target input-picker startDate">
-                                        <label for="floatingInput">Mulai</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating mt-3">
-                                        <input value="<?= $endDate ?>" autocomplete="one-time-code" name="finishDateGlobal" type="text" required class="form-control target input-picker endDate">
-                                        <label for="floatingInput">Selesai </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-submit-form" id="globalGenerateBtn">Generate</button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="tab-pane fade" id="single" role="tabpanel" aria-labelledby="profile-tab">
-                        <form id="formGeneratePersonal">
-                            <div class="row mb-2">
-                                <div class="col-md-12 mt-3">
-                                    <div class="form-floating mt-1">
-                                        <input value="<?= $year . '-' . $month ?>" readonly autocomplete="one-time-code" name="monthYearPersonal" type="month" required class="form-control target">
-                                        <label>Periode Absensi</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 mt-3">
-                                    <div class="form-floating">
-                                        <select class="form-select" id="divisionID" name="filterDivisiID" aria-label="Floating label select example">
-                                            <option value="">
-                                                Cari Departemen
-                                            </option>
-                                            <?php foreach ($divisi as $d) : ?>
-                                                <option value="<?= $d['id'] ?>">
-                                                    <?= $d['divisi']; ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <label for="floatingInput">Cari Departemen</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 mt-3">
-                                    <div class="form-floating">
-                                        <select class="form-select" id="employeeID" name="filterEmployeeID" aria-label="Floating label select example">
-                                            <option value="">
-                                                Cari Berdasarkan Nama Karyawan
-                                            </option>
-                                        </select>
-                                        <label for="floatingInput">Cari Berdasarkan Nama Karyawan</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating mt-3">
-                                        <input value="<?= $startDate ?>" autocomplete="one-time-code" name="startDatePersonal" type="text" required class="form-control target input-picker startDate">
-                                        <label for="floatingInput">Mulai</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating mt-3">
-                                        <input value="<?= $endDate ?>" autocomplete="one-time-code" name="finishDatePersonal" type="text" required class="form-control target input-picker endDate">
-                                        <label for="floatingInput">Selesai</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-submit-form" id="singleGenerateBtn">Generate</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Payroll</h1>
+        <h1>Ambil Gaji</h1>
         <div class="col-button-tambah-spp">
             <?= csrf_field() ?>
-            <a id="generate" class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" data-bs-target="#generateModal" href="#" style="margin-right: 10px;">
-                Generate
-            </a>
-            <?php if ($isGenerate) : ?>
-                <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fa-solid fa-print"></i> Print
-                </button>
-                <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/division/' . $year . '-' . $month) ?>')">Daftar Upah</button></li>
-                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/detail/' . $year . '-' . $month) ?>')">Slip Gaji</button></li>
-                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/summary/' . $year . '-' . $month) ?>')">Summary</button></li>
-                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/potongan/' . $year . '-' . $month) ?>')">Daftar Potongan</button></li>
-                </ul>
-            <?php endif; ?>
+            <button class="btn btn-show-form btn-save float-right btn-submit-form " style="margin-right: 10px;">
+                Simpan
+            </button>
+
         </div>
     </div>
 
@@ -152,7 +21,7 @@
 
             <div class="row justify-content-end row-col-page-list-attendance">
                 <div class="col-6 mb-0">
-                    <form action="<?= base_url('payroll') ?>" class="kt-form kt-form--fit kt-margin-b-20" method="GET">
+                    <form action="<?= base_url('ambil-gaji') ?>" class="kt-form kt-form--fit kt-margin-b-20" method="GET">
                         <select name="month" required id="month">
                             <?php for ($i = 1; $i <= 12; $i++) : ?>
                                 <?php
@@ -172,9 +41,9 @@
                                 <option value="<?= $i; ?>" <?= $checked; ?>><?= $i; ?></option>
                             <?php endfor ?>
                         </select>
-                        <button type="submit" class="btn btn-primary btn-brand--icon" id="kt_search" onclick="printReport();">
+                        <button type="submit" class="btn btn-primary btn-brand--icon" id="kt_search">
                             <span>
-                                <i class="la la-print"></i>
+                                <i class=" la la-print"></i>
                                 <span>Cari</span>
                             </span>
                         </button>
@@ -257,6 +126,7 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
+                                <th></th>
                                 <th>No</th>
                                 <th onclick="changeSort('employees.name')" class="sort">Nama Lengkap</th>
                                 <th onclick="changeSort('divisis.divisi')" class="sort">Departemen</th>
@@ -282,6 +152,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+    var listChecked = [];
     let sort = "nomor";
     let sortType = "desc";
     $('#loadingSpinner').hide();
@@ -301,17 +172,18 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("payroll/all"); ?>",
+            url: "<?= base_url("/ambil-gaji/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.divisi_id = $("#filterDivisiID").val();
+                data.bagian_id = $("#filterBagianID").val()
                 data.employee_id = $("#filterEmployeeID").val();
-                data.bagian_id = $("#filterBagianID").val();
                 data.golongan = $("select[name='filterGolongan']").val();
                 data.year = "<?= $year ?>";
                 data.month = "<?= $month; ?>";
                 data.sort = sort;
                 data.sortType = sortType;
+
             }
         },
         // scrollX: true,
@@ -324,6 +196,19 @@
         display: "stripe",
         searching: false,
         columns: [{
+                data: "null",
+                className: "text-center",
+                sortable: false,
+                width: "5%",
+                render: function(data, type, row) {
+
+                    var checkboxHTML = '<div class="form-check">' +
+                        '<input data-id="' + row.id + '" autocomplete="one-time-code" class="form-check-input child is-ambil" type="checkbox"' + (row.isAmbil === "1" ? 'style="display:none" ' : '') + '>' +
+                        '</div>';
+                    return checkboxHTML;
+                }
+            },
+            {
                 data: "no",
                 className: "text-center",
                 sortable: false,
@@ -388,6 +273,9 @@
                 }
             }
         ],
+        initComplete: function(settings, json) {
+            listChecked = json.data;
+        },
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -434,6 +322,7 @@
     $("select[name='filterGolongan']").change(function() {
         table.ajax.reload();
     });
+
 
     // if on change divisi
     $('#employeeID').attr('disabled', true);
@@ -549,6 +438,70 @@
             });
         }
     });
+    $(".btn-submit-form").click(function() {
+        $.each(listChecked, function(i, v) {
+            var element = $('input[data-id="' + v.id + '"].is-ambil');
+            var isChecked = element.prop('checked');
+            listChecked[i].isChecked = isChecked ? '1' : '0';
+        });
+        console.log(listChecked);
+        var id = $('.id').val();
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
+        Swal.fire({
+            icon: 'question',
+            title: 'Simpan Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let formData = new FormData();
+                formData.append("checkList", JSON.stringify(listChecked));
+                $.ajax({
+                    url: "<?= base_url("/ambil-gaji/check-ambil-gaji"); ?>",
+                    data: formData,
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    window.location.reload();
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            });
+                        }
+                    },
+                });
+
+            }
+        })
+
+
+    })
+
 
     // Generate Single
     $('#singleGenerateBtn').click(function(e) {
@@ -661,10 +614,10 @@
     });
 
     // Get and Show
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        const data = table.row(this).data();
-        location.replace(`<?= base_url("payroll/id"); ?>/${data.id}`);
-    });
+    // $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+    //     const data = table.row(this).data();
+    //     location.replace(`<?= base_url("payroll/id"); ?>/${data.id}`);
+    // });
     // function helper
     function formatRupiah(angka) {
         var reverse = angka.toString().split('').reverse().join('');
@@ -674,29 +627,29 @@
     }
 
     // select2 divisi
+    $("#filterBagianID").select2({
+        placeholder: "Cari Bagian",
+        theme: "bootstrap-5",
+        allowClear: true,
+    });
+    $("#filterDivisiID").select2({
+        placeholder: "Cari Departemen",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+
     $("#divisionGlobalID").select2({
         placeholder: "Cari Departemen",
         theme: "bootstrap-5",
         allowClear: true,
-        dropdownParent: $('#generateModal')
-    });
 
-    $("#filterDivisiID").select2({
-        placeholder: "Cari Bagian",
-        theme: "bootstrap-5",
-        allowClear: true,
-    })
-    $("#filterBagianID").select2({
-        placeholder: "Cari Department",
-        theme: "bootstrap-5",
-        allowClear: true,
-    })
+    });
 
     $("select[name='filterEmployeeID']").select2({
         placeholder: "Cari Berdasarkan Karyawan",
         theme: "bootstrap-5",
         allowClear: true,
-        dropdownParent: $('#generateModal')
+
     });
 
     $("select[name='filterDivisiID']").on('change', function(e) {

@@ -89,4 +89,12 @@ class BagianModel extends Model
             'sortType'          => $sortType
         ];
     }
+
+    public function get_by_company_id($company_id)
+    {
+        $requete = "SELECT * FROM bagian WHERE bagian.deletedAt is null and company_id='" . $company_id . "'";
+        //echo $requete;
+        $query = $this->db->query($requete);
+        return $query->getResultArray();
+    }
 }

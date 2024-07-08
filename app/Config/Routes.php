@@ -353,6 +353,11 @@ $routes->post('/rekap-faktur/update', 'Purchase\RekapFaktur::updateRekap', ['fil
 $routes->post('/rekap-faktur/delete', 'Purchase\RekapFaktur::deleteRekap', ['filter' => 'Auth']);
 
 // PEMBAYARAN
+//ambil gaji
+$routes->get('/ambil-gaji', 'Pembayaran\AmbilGaji::index', ['filter' => 'Auth']);
+$routes->get('/ambil-gaji/all', 'Pembayaran\AmbilGaji::getAllAmbilGaji', ['filter' => 'Auth']);
+$routes->post('/ambil-gaji/check-ambil-gaji', 'Pembayaran\AmbilGaji::checkIsAmbil', ['filter' => 'Auth']);
+
 // PEMBAYARAN PO LOKAL BP
 $routes->get('/pembayaran-po-lokal-bp', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBP', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBP', ['filter' => 'Auth']);

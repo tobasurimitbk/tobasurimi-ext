@@ -357,7 +357,18 @@ class LocalPOPaymentModel extends Model
         );
 
 
+        // foreach ($result['pembayaranDetail']['multiple_lpb_no'] as $index => $value) {
+        //     // Assuming you want to set 'lpb_no' as a nested key with index as value
+        //     $result['pembayaranDetail']['multiple_lpb_no']['lpb_no'][$index] = $value;
+        // }
 
+        // $result['pembayaranDetail']['multiple_lpb_no']['id'] = [];
+
+        // for ($i = 0; $i < count($result['pembayaranDetail']['multiple_lpb_id']); $i++) {
+        //     $result['pembayaranDetail']['multiple_lpb_no']['id'][$i] =  $result['pembayaranDetail']['multiple_lpb_id'][$i];
+        // }
+        // var_dump($result['pembayaranDetail']['multiple_lpb_no']);
+        // die;
 
         $total_order = 0;
         $total_diterima = 0;
@@ -701,8 +712,8 @@ class LocalPOPaymentModel extends Model
 
         foreach ($paymentDetail as $i => $p) {
             $paymentDetail[$i]['total_number'] = intval($p['total']);
-            $penerimaanAll[$i]['tanggal_LPB'] = date('d/m/Y', \strtotime($p['tanggal_LPB']));
-            $penerimaanAll[$i]['tanggal_PO'] = date('d/m/Y', \strtotime($p['tanggal_PO']));
+            $paymentDetail[$i]['tanggal_LPB'] = date('d/m/Y', \strtotime($p['tanggal_LPB']));
+            $paymentDetail[$i]['tanggal_PO'] = date('d/m/Y', \strtotime($p['tanggal_PO']));
 
             $selectQryLocalPO = "SUM(total) as total_dibayar";
             $totalPOPayment = $localPOPaymentDetailModel
@@ -744,6 +755,7 @@ class LocalPOPaymentModel extends Model
                 $total_pembayaran += intval($p['total']);
             }
         }
+
 
         $panjarList = $localPOPaymentPanjarModel
             ->select('*, no_panjar')
