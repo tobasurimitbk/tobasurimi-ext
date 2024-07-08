@@ -1407,6 +1407,7 @@ $routes->post('/tunjangan/delete', 'Master\Tunjangan::deleteTunjangan', ['filter
 // payroll
 $routes->get('/payroll', 'HR\Payroll::payroll', ['filter' => 'Auth']);
 $routes->get('/payroll/all', 'HR\Payroll::getAllPayRoll', ['filter' => 'Auth']);
+$routes->get('/payroll/getBagian', 'HR\Payroll::getBagian', ['filter' => 'Auth']);
 $routes->post('/payroll/generate-global', 'HR\Payroll::generateGlobalPayroll', ['filter' => 'Auth']);
 $routes->post('/payroll/generate-single', 'HR\Payroll::generateSinglePayroll', ['filter' => 'Auth']);
 $routes->get('/payroll/id/(:segment)', 'HR\Payroll::detailPayrollView/$1', ['filter' => 'Auth']);

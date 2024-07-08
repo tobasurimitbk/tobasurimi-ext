@@ -85,11 +85,6 @@
                             <option value="">
                                 Cari Bagian
                             </option>
-                            <?php foreach ($bagian as $b) : ?>
-                                <option value="<?= $b['id'] ?>">
-                                    <?= $b['nama_bagian']; ?>
-                                </option>
-                            <?php endforeach; ?>
 
                         </select>
                         <label for="floatingInput">Cari Bagian</label>
@@ -692,6 +687,36 @@
         });
 
     });
+    $('#filterDivisiID').change(function() {
+        var divisi = $('#filterDivisiID option:selected').val();
+        $.ajax({
+            url: `<?= base_url('/payroll/getBagian'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                divisi: divisi,
+            },
+            dataType: "json",
+            success: function(res) {
+                // APPEND TO DROPDOWN
+                console.log(res);
+                appendDropdownBagian(res.data);
+            }
+        });
+    });
+
+    function appendDropdownBagian(data) {
+        $("#filterBagianID").empty()
+        $("#filterBagianID").append(`<option value=""></option>`)
+        data.forEach(function(item) {
+            $("#filterBagianID").append(`<option value="${item.id}">${item.nama_bagian}</option>`)
+        })
+    }
 
     $('.form-select')
         .parent('div')

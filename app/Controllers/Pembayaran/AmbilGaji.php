@@ -55,7 +55,7 @@ class AmbilGaji extends BaseController
             'golongan' => $golonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
         ];
 
-        return view('Pembayaran/AmbilGaji/index', $data);
+        return view('Pembayaran/ambilGaji/index', $data);
     }
 
     public function getAllAmbilGaji()

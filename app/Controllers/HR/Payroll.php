@@ -702,4 +702,22 @@ class Payroll extends BaseController
 
         exit(0);
     }
+
+    public function getBagian()
+    {
+        $bagianModel = new BagianModel();
+
+        $divisi = $this->request->getVar('divisi');
+        $data = $bagianModel
+            ->select("*")
+            ->where("division_id", $divisi)
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        return response()->setJSON([
+            'data' => $data,
+            'status' => true
+        ]);
+    }
 }
