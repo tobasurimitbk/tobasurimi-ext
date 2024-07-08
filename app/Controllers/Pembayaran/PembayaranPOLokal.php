@@ -169,12 +169,12 @@ class PembayaranPOLokal extends BaseController
                 if ($p->bayar_panjar != '') {
 
                     if (intval($p->bayar_panjar) != 0) {
-                        $insertPanjar = $localPOPaymentPanjarModel->insert([
+                        $localPOPaymentPanjarModel->insert([
                             "company_id" => $this->this_company_id,
                             "local_po_payment_id" => $id,
                             "type" => "BP",
                             "panjar_id" => $p->id,
-                            "bayar_panjar" => $p->bayar_panjar
+                            "bayar_panjar" => repairDouble($p->bayar_panjar)
 
                         ]);
                     }
@@ -230,13 +230,18 @@ class PembayaranPOLokal extends BaseController
                 'status_posting' => '0'
             ]);
 
+            $localPOPaymentPanjarModel->where('import_po_payment_id', $id)->where('type', 'BP')->delete();
+
             foreach ($panjarList as $p) {
                 if ($p->bayar_panjar != '') {
 
                     if (intval($p->bayar_panjar) != 0) {
-                        $insertPanjar = $localPOPaymentPanjarModel->update($p->id, [
-
-                            "bayar_panjar" => intval($p->bayar_panjar)
+                        $localPOPaymentPanjarModel->insert([
+                            "company_id" => $this->this_company_id,
+                            "local_po_payment_id" => $id,
+                            "type" => "BP",
+                            "panjar_id" => $p->id,
+                            "bayar_panjar" => repairDouble($p->bayar_panjar)
 
                         ]);
                     }
@@ -366,7 +371,7 @@ class PembayaranPOLokal extends BaseController
                         "local_po_payment_id" => $id,
                         "type"  => "BB",
                         "panjar_id" => $p->id,
-                        "bayar_panjar" => $p->bayar_panjar
+                        "bayar_panjar" => repairDouble($p->bayar_panjar)
                     ]);
                 }
             }
@@ -450,6 +455,7 @@ class PembayaranPOLokal extends BaseController
 
         $total_pembayaran = $this->request->getVar('total_pembayaran');
 
+
         if ($total_pembayaran < 0) {
             return response()->setJSON([
                 'token' => csrf_hash(),
@@ -486,10 +492,17 @@ class PembayaranPOLokal extends BaseController
             'akun_selisih' => $this->request->getVar('akun_selisih')
         ]);
 
+        $localPOPaymentPanjarModel->where('local_po_payment_id', $id)->where('type', 'BB')->delete();
+
         foreach ($panjarList as $p) {
+
             if (isset($p->bayar_panjar) && intval($p->bayar_panjar) !=  0) {
-                $insertPanjar = $localPOPaymentPanjarModel->update($p->id, [
-                    "bayar_panjar" => $p->bayar_panjar
+                $insertPanjar = $localPOPaymentPanjarModel->insert([
+                    "company_id" => $this->this_company_id,
+                    "local_po_payment_id" => $id,
+                    "type"  => "BB",
+                    "panjar_id" => $p->id,
+                    "bayar_panjar" => repairDouble($p->bayar_panjar)
                 ]);
             }
         }
@@ -574,6 +587,7 @@ class PembayaranPOLokal extends BaseController
                 ->join('local_po_payment_details', 'local_po_payment_details.penerimaan_barang_id = penerimaan_barang.id')
                 ->join('local_po_payments', 'local_po_payments.id = local_po_payment_details.local_po_payment_id')
                 ->where('local_po_payments.id', $data->id)
+                ->where('local_po_payment_details.deletedAt', null)
                 ->findAll();
 
             $resultlpb = [];
@@ -955,7 +969,6 @@ class PembayaranPOLokal extends BaseController
         $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
 
         $localPOPaymentBPModel->where('id', $id)->delete();
-
         $localPOPaymentPanjarModel->where('local_po_payment_id', $id)->where('type', 'BP')->delete();
 
         return response()->setJSON([

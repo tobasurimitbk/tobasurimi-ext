@@ -242,7 +242,7 @@
                                             </thead>
                                             <tbody id="body-table" style="text-align: center;">
                                                 <tr style="color: whitesmoke;">
-                                                    <td colspan="10">Tidak Ada Pembayaran</td>
+                                                    <td colspan="11">Tidak Ada Pembayaran</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -494,6 +494,11 @@
         theme: "bootstrap-5"
     });
 
+    $('#payment_method').select2({
+        placeholder: "Pilih akun kredit",
+        theme: "bootstrap-5"
+    })
+
     $('#divisi_id').select2({
         placeholder: "Pilih Departemen",
         theme: "bootstrap-5"
@@ -593,46 +598,62 @@
 
         if (id) {
             // UPDATE
-            let formData = new FormData(document.querySelector(".create-form"));
-            formData.append("poIDList", JSON.stringify(listPoID));
-            formData.append("poNoList", JSON.stringify(listPoNo));
-            formData.append("panjarList", JSON.stringify(listPanjar));
-            formData.append("pembayaranList", JSON.stringify(listPembayaran));
-            $.ajax({
+            if ($(".create-form").valid()) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let formData = new FormData(document.querySelector(".create-form"));
+                        formData.append("poIDList", JSON.stringify(listPoID));
+                        formData.append("poNoList", JSON.stringify(listPoNo));
+                        formData.append("panjarList", JSON.stringify(listPanjar));
+                        formData.append("pembayaranList", JSON.stringify(listPembayaran));
+                        $.ajax({
 
-                url: "<?= base_url("pembayaran-po-lokal-bb/update"); ?>",
-                data: formData,
-                beforeSend: function(xhr) {
-                    setLoading();
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                },
-                complete: function() {
-                    stopLoading();
-                },
-                method: "POST",
-                dataType: "json",
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    csrf.val(response.token);
-                    if (response.status) {
-                        Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            })
-                            .then(() => {
-                                window.location.href = `<?= base_url("pembayaran-po-lokal-bb/id/"); ?>` + response.id;
-                            })
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
+                            url: "<?= base_url("pembayaran-po-lokal-bb/update"); ?>",
+                            data: formData,
+                            beforeSend: function(xhr) {
+                                setLoading();
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            window.location.href = `<?= base_url("pembayaran-po-lokal-bb/id/"); ?>` + response.id;
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    });
+                                }
+                            },
                         });
+
                     }
-                },
-            });
+                })
+            }
 
         } else {
             // CREATE

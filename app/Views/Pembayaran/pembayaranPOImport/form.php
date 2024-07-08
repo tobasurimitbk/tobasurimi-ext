@@ -1127,7 +1127,7 @@
             newRow.append($('<td>').text(v.nama_barang));
             newRow.append($('<td>').text(v.qty_order));
             newRow.append($('<td>').text(v.total_harga));
-            newRow.append($('<td>').text(v.sisa_pembayaran));
+            newRow.append($('<td>').text(formatRupiah(v.sisa_pembayaran)));
             newRow.append($('<td>').html(
                 `
                 <div class="input-group d-flex align-items-center">

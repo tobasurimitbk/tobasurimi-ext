@@ -358,6 +358,7 @@ class LocalPOPaymentModel extends Model
 
 
 
+
         $total_order = 0;
         $total_diterima = 0;
         $total_tagihan = 0;
@@ -828,6 +829,7 @@ class LocalPOPaymentModel extends Model
             $totalTagihan = ($p['harga_harian'] + $p['harga']) * $p['total_diterima'];
             $p['total_tagihan'] = $totalTagihan;
             if ($totalPoPayment != null) {
+
                 if ($p['total_tagihan'] > $totalPoPayment['total_dibayar']) {
                     $penerimaanAll[$i]['sisa_pembayaran'] = $p['total_tagihan'] - $totalPoPayment['total_dibayar'];
                     if ($penerimaanAll[$i]['sisa_pembayaran'] > 0) {
@@ -843,6 +845,7 @@ class LocalPOPaymentModel extends Model
                 }
             } else {
 
+                $penerimaanAll[$i]['sisa_pembayaran'] = $totalTagihan;
                 $penerimaanAll[$i]['tanggal_LPB'] = date('d/m/Y', \strtotime($p['tanggal_LPB']));
                 $penerimaanAll[$i]['total_tagihan'] = toRupiah($p['total_tagihan']);
                 $penerimaanAll[$i]['total_tagihan_number'] = $p['total_tagihan'];

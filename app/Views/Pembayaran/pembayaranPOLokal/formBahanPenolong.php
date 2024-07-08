@@ -69,7 +69,7 @@
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" class="form-control input-picker due_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'disabled value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_date']))  . '"' : '' ?>>
+                                <input autocomplete="one-time-code" class="form-control input-picker due_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> value="<?= !empty($detail) ? date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_date'])) : '' ?>">
                                 <label for="floatingInput">Tanggal Pembayaran</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
@@ -79,7 +79,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="supplier_id" id="supplier_id">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="supplier_id" id="supplier_id">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($suppliers as $supplier) : ?>
                                     <option <?= !empty($detail) ? ($detail['pembayaranDetail']['supplier_id'] == $supplier->id ? 'selected' : '') : '' ?> value="<?= $supplier->id ?>"><?= strtoupper($supplier->name) ?></option>
@@ -92,7 +92,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? 'disabled' : '' ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                            <select <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($divisi as $d) : ?>
                                     <option <?= !empty($detail) ? ($detail['pembayaranDetail']['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
@@ -105,7 +105,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="tanda_terima_supplier" id="tanda_terima_supplier">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="tanda_terima_supplier" id="tanda_terima_supplier">
                                 <option value=""></option>
                                 <?php if (!empty($detail)) : ?>
                                     <option value="<?= $detail['tandaTerimaSupplier']['id'] ?>" selected>
@@ -118,7 +118,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? 'disabled' : '' ?> class="form-select " name="payment_method" id="payment_method">
+                            <select <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select " name="payment_method" id="payment_method">
                                 <option disabled selected value=""></option>
                                 <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "bank" ? 'selected' : '') : '' ?> value="Bank">BANK</option>
                                 <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "cash" ? 'selected' : '') : '' ?> value="Cash">CASH</option>
@@ -144,7 +144,7 @@
                     </div> -->
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? 'disabled' : '' ?> class="form-select status_pph" name="status_pph" id="status_pph">
+                            <select <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select status_pph" name="status_pph" id="status_pph">
                                 <option <?= !empty($detail) ? ($detail['pembayaranDetail']['status_pph'] == "1" ? 'selected' : '') : '' ?> value="1">PPH 2.5 %</option>
                                 <option <?= !empty($detail) ? ($detail['pembayaranDetail']['status_pph'] == "0" ? 'selected' : '') : 'selected' ?> value="0">TIDAK ADA</option>
                             </select>
@@ -153,13 +153,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($detail) ? 'disabled' : '' ?> name="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
+                            <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_kas" id="akun_kas">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="akun_kas" id="akun_kas">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($subsAkuns as $subs) : ?>
                                     <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_kas'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
@@ -170,7 +170,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? 'disabled' : '' ?> name="akun_selisih" id="akun_selisih">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="akun_selisih" id="akun_selisih">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($subsAkuns as $subs) : ?>
                                     <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_selisih'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
@@ -227,7 +227,7 @@
                                     <thead class="thead-dark">
                                         <tr>
                                             <th>No</th>
-                                            <th onclick="changeSort('no_panjar')">No. Panjar</th>
+                                            <th onclick="changeSort(' no_panjar')">No. Panjar</th>
                                             <th onclick="changeSort('payment_date')">Payment Date</th>
                                             <th onclick="changeSort('payment_amount')">Total Panjar</th>
                                             <th>Bayar Panjar </th>
@@ -446,7 +446,7 @@
 
             $.each(listPanjar, function(i, v) {
                 var element = $('input[data-id="' + v.id + '"].bayar_panjar');
-                var input_user = convertRupiahToNumber(element.val());
+                var input_user = (element.val());
                 listPanjar[i].bayar_panjar = input_user;
             });
 
@@ -456,7 +456,7 @@
                 $.each(listPanjar, function(i, v) {
                     console.log(v.panjar_id);
                     var element = $('input[data-id="' + v.panjar_id + '"].bayar_panjar');
-                    var input_user = convertRupiahToNumber(element.val());
+                    var input_user = (element.val());
                     console.log(input_user);
                     listPanjar[i].bayar_panjar = input_user;
                 });
@@ -720,14 +720,14 @@
                 newRow.append($('<td style="width: 10px;">').text(no++));
                 newRow.append($('<td>').text(v.no_panjar));
                 newRow.append($('<td>').text((v.payment_date)));
-                newRow.append($('<td>').text((v.total_panjar)));
+                newRow.append($('<td>').text((formatRupiah(v.total_panjar))));
                 sisa_panjar = Number(v.total_panjar) - Number(v.total_pembayaran.total_bayar_panjar);
                 newRow.append($('<td>').html(
                     `
-                            <input  onchange="this.value = formatRupiah(this.value)" class="form-control bayar_panjar" oninput="limitInputBayar(this, ${Number(v.bayar_panjar) + Number(sisa_panjar) })" autocomplete="one-time-code" data-id="${v.panjar_id}" type="text" value="${v.bayar_panjar}" name = "bayar_panjar" style="height:40px">
+                            <input  onchange="this.value = formatRupiah(this.value)" class="form-control bayar_panjar" oninput="limitInputBayar(this, ${Number(v.bayar_panjar) + Number(sisa_panjar) })" autocomplete="one-time-code" data-id="${v.panjar_id}" type="text" value="${formatRupiah(v.bayar_panjar) }" name = "bayar_panjar" style="height:40px">
                                 `
                 ));
-                newRow.append($('<td>').text((sisa_panjar)));
+                newRow.append($('<td>').text((formatRupiah(sisa_panjar))));
 
                 tablePanjar.find('tbody').append(newRow);
             })
@@ -795,7 +795,7 @@
         var newRow8 = $('<tr>');
         newRow8.append($('<td style="text-align:right;" colspan="6"><b>Potongan Panjar</b></td>'));
         newRow8.append($('<td style="text-align:center;"><b>' +
-            '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value="' + Number(form_total_bayar_panjar) + '" name = "total_pembayaran_panjar" readonly>' +
+            '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value="' + formatRupiah(form_total_bayar_panjar) + '" name = "total_pembayaran_panjar" readonly>' +
             '</b></td>'));
         table.find('tbody').append(newRow8);
 
@@ -1117,9 +1117,9 @@
     function updateTotalBayarPanjar() {
         var sum = 0;
         $(".bayar_panjar").each(function() {
-            sum += +$(this).val();
+            sum += convertRupiahToNumber($(this).val());
         });
-        $(".total-bayar-panjar").val(sum);
+        $(".total-bayar-panjar").val(formatRupiah(sum));
         return sum;
     }
 

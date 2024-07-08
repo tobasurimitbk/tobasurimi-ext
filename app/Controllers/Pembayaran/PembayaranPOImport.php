@@ -393,14 +393,14 @@ class PembayaranPOImport extends BaseController
         ]);
 
         $this->importPOPaymentDetailModel->where('import_po_payment_id', $id)->delete();
+
         foreach ($pembayaranList as $l) {
             if (intval($l->pembayaran_user_input != 0) && isset($l->pembayaran_user_input)) {
-
                 $this->importPOPaymentDetailModel->insert([
                     "import_po_payment_id" => $id,
-                    "purchase_id"          => intval($l->id),
-                    "purchase_detail_id"   => intval($l->detail_id),
-                    "amount"                => intval($l->pembayaran_user_input),
+                    "purchase_id"          => decrypt($l->id),
+                    "purchase_detail_id"   => decrypt($l->detail_id),
+                    "amount"               => intval($l->pembayaran_user_input),
                 ]);
             }
         }
@@ -420,10 +420,14 @@ class PembayaranPOImport extends BaseController
         //         $this->importPOPaymentDetailModel->set($set)->where($condition)->update();
         //     }
         // }
+        $this->localPOPaymentPanjarModel->where('local_po_payment_id', $id)->where('type', 'INTERNASIONAL')->delete();
         foreach ($panjarList as $p) {
-
             if (isset($p->bayar_panjar) && intval($p->bayar_panjar) !=  0) {
-                $updatePanjar = $this->localPOPaymentPanjarModel->update($p->id, [
+                $insertPanjar = $this->localPOPaymentPanjarModel->insert([
+                    "company_id" => $this->this_company_id,
+                    "local_po_payment_id" => $id,
+                    "type"  => "INTERNASIONAL",
+                    "panjar_id" => $p->id,
                     "bayar_panjar" => $p->bayar_panjar
                 ]);
             }
@@ -712,13 +716,15 @@ class PembayaranPOImport extends BaseController
             // BB
             $condition = [
                 'rm_import_po_details.deletedAt' => null,
-                'rm_import_po_details.rm_import_po_id' => decrypt($this->request->getVar('po_id'))
+                'rm_import_po_details.rm_import_po_id' => decrypt($this->request->getVar('po_id')),
+
             ];
         } else {
             // BP
             $condition = [
                 'am_purchase_order_details.deletedAt' => null,
-                'am_purchase_order_details.am_purchase_order_id' => decrypt($this->request->getVar('po_id'))
+                'am_purchase_order_details.am_purchase_order_id' => decrypt($this->request->getVar('po_id')),
+
             ];
         }
 
