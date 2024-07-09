@@ -359,6 +359,8 @@ $routes->get('/ambil-gaji/all', 'Pembayaran\AmbilGaji::getAllAmbilGaji', ['filte
 $routes->post('/ambil-gaji/check-ambil-gaji', 'Pembayaran\AmbilGaji::checkIsAmbil', ['filter' => 'Auth']);
 //ambil pinjaman karyawan
 $routes->get('/ambil-pinjaman-karyawan', 'Pembayaran\AmbilPinjamanKaryawan::index', ['filter' => 'Auth']);
+$routes->get('/ambil-pinjaman-karyawan/all', 'Pembayaran\AmbilPinjamanKaryawan::getAllAmbilPinjamanKaryawan', ['filter' => 'Auth']);
+$routes->post('/ambil-pinjaman-karyawan/check-ambil-pinjaman', 'Pembayaran\AmbilPinjamanKaryawan::checkIsAmbil', ['filter' => 'Auth']);
 // PEMBAYARAN PO LOKAL BP
 $routes->get('/pembayaran-po-lokal-bp', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBP', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBP', ['filter' => 'Auth']);
