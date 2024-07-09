@@ -121,7 +121,7 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th></th>
+                                <th style="text-align: center;"><input type="checkbox" id="parent"></th>
                                 <th>No</th>
                                 <th onclick="changeSort('employees.name')" class="sort">Nama Lengkap</th>
                                 <th onclick="changeSort('divisis.divisi')" class="sort">Departemen</th>
@@ -133,7 +133,8 @@
                                 <th>Total Gaji & Lembur</th>
                                 <th>Total Pengurangan Gaji</th>
                                 <th>Gaji Diterima</th>
-                                <th>Action</th>
+                                <th>Status</th>
+                                <th>Print</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -147,7 +148,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    var listChecked = [];
+    var listEmployee = [];
     let sort = "nomor";
     let sortType = "desc";
     $('#loadingSpinner').hide();
@@ -251,6 +252,10 @@
                 className: "text-center"
             },
             {
+                data: "status",
+                className: "text-center"
+            },
+            {
                 data: "id",
                 className: "text-center actions",
                 searchable: false,
@@ -269,7 +274,7 @@
             }
         ],
         initComplete: function(settings, json) {
-            listChecked = json.data;
+            listEmployee = json.data;
         },
         columnDefs: [{
             defaultContent: "-",
@@ -434,66 +439,87 @@
         }
     });
     $(".btn-submit-form").click(function() {
-        $.each(listChecked, function(i, v) {
-            var element = $('input[data-id="' + v.id + '"].is-ambil');
-            var isChecked = element.prop('checked');
-            listChecked[i].isChecked = isChecked ? '1' : '0';
-        });
-        console.log(listChecked);
-        var id = $('.id').val();
-        const csrfToken = '<?= csrf_token() ?>';
-        const csrf = $(`[name="${csrfToken}"]`);
-        Swal.fire({
-            icon: 'question',
-            title: 'Simpan Data?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let formData = new FormData();
-                formData.append("checkList", JSON.stringify(listChecked));
-                $.ajax({
-                    url: "<?= base_url("/ambil-gaji/check-ambil-gaji"); ?>",
-                    data: formData,
-                    beforeSend: function(xhr) {
-                        setLoading();
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            Swal.fire({
-                                    icon: 'success',
+        listChecked = [];
+        var checkedCheckboxes = $(".child:checked");
+        var dataIds = checkedCheckboxes.map(function() {
+            return $(this).data("id");
+        }).get();;
+        if (dataIds.length == 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Cheklist minimal satu data ',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            });
+        } else {
+
+            $.each(listEmployee, function(i, v) {
+                if ($.inArray((v.id), dataIds) !== -1) {
+                    var targetInputElement = $('input[data-id="' + v.id + '"].is-ambil');
+                    var targetValue = targetInputElement.prop('checked');
+                    var isChecked = targetValue ? '1' : '0';
+                    listChecked.push({
+                        id: v.id,
+                        isChecked: isChecked,
+                    });
+                }
+            });
+
+            var id = $('.id').val();
+            const csrfToken = '<?= csrf_token() ?>';
+            const csrf = $(`[name="${csrfToken}"]`);
+            Swal.fire({
+                icon: 'question',
+                title: 'Simpan Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let formData = new FormData();
+                    formData.append("checkList", JSON.stringify(listChecked));
+                    $.ajax({
+                        url: "<?= base_url("/ambil-gaji/check-ambil-gaji"); ?>",
+                        data: formData,
+                        beforeSend: function(xhr) {
+                            setLoading();
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        window.location.reload();
+                                    })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    window.location.reload();
-                                })
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            });
-                        }
-                    },
-                });
+                                });
+                            }
+                        },
+                    });
 
-            }
-        })
+                }
+            })
 
+        }
 
     })
 
@@ -751,6 +777,10 @@
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
+    });
+
+    $('#parent').click(function() {
+        $('.child:not(:disabled)').prop('checked', this.checked);
     });
 
 

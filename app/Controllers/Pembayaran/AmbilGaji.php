@@ -121,7 +121,8 @@ class AmbilGaji extends BaseController
                 "totalGajiLembur" => "Rp " . number_format($p->nominal_uang_gaji + $p->nominal_uang_lembur, 2, ',', '.'),
                 "totalPenguranganGaji" => "Rp " . number_format($p->nominal_pengurangan_gaji, 2, ',', '.'),
                 "sisaGaji" => "Rp " . number_format($p->nominal_gaji_diterima, 2, ',', '.'),
-                "isAmbil" => $p->isAmbil
+                "isAmbil" => $p->isAmbil,
+                "status"  => $p->isAmbil == '1' ? 'sudah' : 'belum'
             ]);
         }
 
@@ -151,7 +152,7 @@ class AmbilGaji extends BaseController
                 ]);
             }
             return response()->setJSON([
-                'message' => "ambil gaji sukses",
+                'message' => "Pengambilan Gaji Sukses",
                 'status' => true,
                 'token' => csrf_hash(),
 
