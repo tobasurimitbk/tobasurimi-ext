@@ -22,20 +22,24 @@
                             Posting
                         </button>
                     <?php endif; ?>
+                    <?php if (can('Pembayaran', 'Lokal BP', 'u')) : ?>
+                        <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                            Update
+                        </button>
+                    <?php endif; ?>
                 <?php endif; ?>
                 <?php if (can('Pembayaran', 'Lokal BP', 'p')) : ?>
                     <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bp/print/' . encrypt($detail['pembayaranDetail']['id']) ?? '') ?>">
                         <i class="fa-solid fa-print"></i> Print
                     </a>
                 <?php endif; ?>
-                <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                    Simpan
-                </button>
 
             <?php else : ?>
-                <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                    Simpan
-                </button>
+                <?php if (can('Pembayaran', 'Lokal BP', 'c')) : ?>
+                    <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                        Simpan
+                    </button>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
     </div>

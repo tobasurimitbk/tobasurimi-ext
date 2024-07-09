@@ -9,9 +9,11 @@
                 Batal
             </a>
             <?php if (empty($paymentData)) : ?>
-                <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                    Simpan
-                </button>
+                <?php if (can('Pembayaran', 'Internasional', 'c')) : ?>
+                    <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                        Simpan
+                    </button>
+                <?php endif; ?>
             <?php else : ?>
                 <?php if ($paymentData['status_posting'] == "0") : ?>
                     <?php if (can('Pembayaran', 'Internasional', 'd')) : ?>
@@ -31,7 +33,7 @@
                     <?php endif; ?>
                     <?php if (can('Pembayaran', 'Internasional', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                            Simpan
+                            Update
                         </button>
                     <?php endif; ?>
                 <?php else : ?>

@@ -10,7 +10,7 @@
         <div class="col-button-tambah-spp">
             <?= csrf_field() ?>
             <button class="btn btn-show-form btn-save float-right btn-submit-form " style="margin-right: 10px;">
-                Simpan
+                Ambil Gaji
             </button>
 
         </div>
@@ -133,7 +133,7 @@
                                 <th>Total Gaji & Lembur</th>
                                 <th>Total Pengurangan Gaji</th>
                                 <th>Gaji Diterima</th>
-                                <th>Status</th>
+                                <th>Status Pengambilan</th>
                                 <th>Print</th>
                             </tr>
                         </thead>
@@ -252,7 +252,25 @@
             },
             {
                 data: "status",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+
+                    let htmlRes = '';
+
+                    if (data === 'sudah') {
+                        htmlRes += `
+                            <div class="text-success">
+                                Sudah Diambil
+                            </div>`
+                    } else {
+                        htmlRes += `
+                            <div class="text-danger">
+                                Belum Diambil
+                            </div>`
+                    }
+
+                    return htmlRes;
+                }
             },
             {
                 data: "id",

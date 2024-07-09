@@ -10,7 +10,7 @@
         <div class="col-button-tambah-spp">
             <?= csrf_field() ?>
             <button class="btn btn-show-form btn-save float-right btn-submit-form " style="margin-right: 10px;">
-                Simpan
+                Ambil Pinjaman
             </button>
 
         </div>
@@ -278,7 +278,27 @@
             },
             {
                 data: "status_pengambilan",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+
+                    let htmlRes = '';
+
+                    if (data == 'Sudah') {
+                        htmlRes += `
+                            <div class="text-success">
+                                Sudah Diambil
+                            </div>`
+                    } else {
+
+                        htmlRes += `
+                            <div class="text-danger">
+                                Belum Diambil
+                            </div>`
+
+                    }
+
+                    return htmlRes;
+                }
             },
         ],
 

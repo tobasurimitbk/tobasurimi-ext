@@ -20,9 +20,11 @@
                             Posting
                         </button>
                     <?php endif; ?>
-                    <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                        Simpan
-                    </button>
+                    <?php if (can('Pembayaran', 'Lokal BB', 'u')) : ?>
+                        <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                            Update
+                        </button>
+                    <?php endif; ?>
                 <?php endif; ?>
 
 
@@ -33,9 +35,11 @@
                 <?php endif; ?>
 
             <?php else : ?>
-                <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                    Simpan
-                </button>
+                <?php if (can('Pembayaran', 'Lokal BB', 'c')) : ?>
+                    <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                        Simpan
+                    </button>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
     </div>

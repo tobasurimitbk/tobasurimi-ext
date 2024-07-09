@@ -60,8 +60,12 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
-                <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
-                <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
+                <?php if (can('Pembayaran', 'Panjar Supplier', 'c')) : ?>
+                    <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
+                <?php endif; ?>
+                <?php if (can('Pembayaran', 'Panjar Supplier', 'd')) : ?>
+                    <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -491,10 +495,10 @@
         validator.reset();
     });
 
-    $('#tipe_supplier').select2({
-        placeholder: "Pilih Tipe Supplier",
-        theme: "bootstrap-5",
-    });
+    // $('#tipe_supplier').select2({
+    //     placeholder: "Pilih Tipe Supplier",
+    //     theme: "bootstrap-5",
+    // });
 
     $('#supplier_id').select2({
         placeholder: "Pilih Tipe Supplier",
@@ -538,9 +542,30 @@
                         $("#tipe_supplier").val(res.data.type);
                         $("#supplier_id").val(res.data.supplier_id);
                         $("#payment_date").val(res.data.payment_date);
-                        $("#total_panjar").val(res.data.total_panjar);
+                        $("#total_panjar").val(formatRupiah(res.data.total_panjar));
                         $("#sisa_panjar").val(res.data.fax);
                         $(".add-modal").modal("show");
+                        if (res.data.is_posted === "1") {
+
+                            $("#no_panjar").prop("disabled", true);
+                            $("#payment_date").prop("disabled", true);
+                            $("#tipe_supplier").prop("disabled", true);
+                            $("#supplier_id").prop("disabled", true);
+                            $("#total_panjar").prop("disabled", true);
+                        }
+
+                        $('.modal').on('hidden.bs.modal', function() {
+                            enableFields();
+                        });
+
+                        function enableFields() {
+                            $("#no_panjar").prop("disabled", false);
+                            $("#payment_date").prop("disabled", false);
+                            $("#tipe_supplier").prop("disabled", false);
+                            $("#supplier_id").prop("disabled", false);
+                            $("#total_panjar").prop("disabled", false);
+                        }
+
                     } catch (error) {
                         console.log(error);
                     }

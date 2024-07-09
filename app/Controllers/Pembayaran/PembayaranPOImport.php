@@ -229,7 +229,10 @@ class PembayaranPOImport extends BaseController
 
         $responseData = [];
 
-        $condition = [];
+        $condition = [
+            'import_po_payments.company_id' => $this->this_company_id,
+            'import_po_payments.deletedAt'  => null
+        ];
         $addCondition = [
             "startDate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastDate"  => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",

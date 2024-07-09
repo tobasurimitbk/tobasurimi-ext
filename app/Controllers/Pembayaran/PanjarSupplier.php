@@ -159,8 +159,7 @@ class PanjarSupplier extends BaseController
                     "supplier_id"   => $this->request->getVar('supplier_id'),
                     "no_panjar"     => $this->request->getPost("no_panjar"),
                     "payment_date"  => $this->request->getVar("payment_date"),
-                    "total_panjar"  => intval($this->request->getVar("total_panjar")),
-                    "sisa_panjar"   => intval($this->request->getVar("total_panjar")),
+                    "total_panjar"  => repairDouble($this->request->getVar("total_panjar")),
                 ];
             }
 
@@ -331,6 +330,7 @@ class PanjarSupplier extends BaseController
             echo json_encode($data);
             return;
         }
+
         $data = [
             "status"    => true,
             "supplier" => $this->supplierModel->getSupplierByType($panjarSupplierData->type), // GET SUPPLIER DETAIL
