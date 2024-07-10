@@ -6,7 +6,6 @@ use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Controllers\BaseController;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
-use App\Models\BarangModel;
 use App\Models\DivisisModel;
 use App\Models\KemasanModel;
 use App\Models\MaterialRequestDetailsModel;
@@ -152,7 +151,6 @@ class MaterialRequest extends BaseController
                 ->orWhere('description', "bahan_scrap")
                 ->orWhere('description', "bahan_setengah_jadi")
                 ->findAll(),
-            "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
             "dataWarehouse" => $dataWarehouse,
