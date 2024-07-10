@@ -7,7 +7,7 @@
         <h1 class="title-name">Material Request Gudang</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-warehouse"); ?>">
-                Batal
+                Kembali
             </a>
         </div>
     </div>

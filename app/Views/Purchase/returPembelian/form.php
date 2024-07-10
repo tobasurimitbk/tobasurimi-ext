@@ -6,7 +6,7 @@
         <h1 class="title-name">Tambah Retur</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("retur-barang"); ?>">
-                Batal
+                Kembali
             </a>
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan

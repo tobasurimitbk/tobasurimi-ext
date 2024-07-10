@@ -12,7 +12,7 @@
         <h1 class="title-name"><?= !empty($dataPOLokal) ? "Update PO Lokal Bahan Baku" : "Tambah PO Lokal Bahan Baku" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-lokal-bahan-baku"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($dataPOLokal)) : ?>
 
@@ -911,7 +911,7 @@
                             showCancelButton: true,
                             reverseButtons: true,
                             confirmButtonText: 'Simpan',
-                            cancelButtonText: 'Batal',
+                            cancelButtonText: 'Kembali',
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 const csrf = $(`[name="${csrfToken}"]`);
@@ -1031,7 +1031,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: status_posting == '0' ? 'Unposting' : 'Posting',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
@@ -1086,7 +1086,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Iya',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -1133,7 +1133,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);

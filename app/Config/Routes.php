@@ -36,7 +36,7 @@ $routes->post('/login', 'Setting\Auth::doLogin');
 $routes->get('/logout', 'Setting\Auth::doLogout');
 
 $routes->get('/change-company', 'Setting\User::changeCompany');
-
+$routes->get('/dashboard/toggle', 'Dashboard\Dashboard::toggleSidebar', ['filter' => 'Auth']);
 // 403 ROUTE
 $routes->get('/403', function () {
     return view('errors/html/error_403');

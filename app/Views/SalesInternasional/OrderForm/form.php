@@ -7,7 +7,7 @@
         <h1 class="title-name">Order Form Internasional</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("order-form-internasional"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($dataSalesExport)) { ?>
                 <?php if ($dataSalesExport->status === "NEW") { ?>
@@ -320,7 +320,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Posting',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -378,7 +378,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Unposting',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -479,7 +479,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);

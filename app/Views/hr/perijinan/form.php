@@ -13,7 +13,7 @@
         <h1 class="title-name"><?= !empty($data) ? "Ubah" : "Tambah"; ?> Form Perizinan</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("form-perijinan"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($formPerijinan)) : ?>
                 <a href="#" class="btn btn-hapus delete-parent float-right delete-perizinan" data-kode="<?= $formPerijinan['kode'] ?>">
@@ -261,7 +261,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -372,7 +372,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             setLoading()
             // csrf

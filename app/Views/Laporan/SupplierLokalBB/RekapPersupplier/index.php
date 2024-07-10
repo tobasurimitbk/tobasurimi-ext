@@ -13,7 +13,7 @@
         </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-supplier-lokal-bb"); ?>">
-                Batal
+                Kembali
             </a>
         </div>
     </div>

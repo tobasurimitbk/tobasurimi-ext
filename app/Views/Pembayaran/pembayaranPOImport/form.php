@@ -6,7 +6,7 @@
         <h1 class="title-name"><?= (!empty($paymentData) ? 'Update Pembayaran PO Import' : 'Tambah Pembayaran PO Import') ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-po-import"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (empty($paymentData)) : ?>
                 <?php if (can('Pembayaran', 'Internasional', 'c')) : ?>
@@ -754,7 +754,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const data = $(".create-form").serializeArray();
@@ -900,7 +900,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 var formData = new FormData();
@@ -943,7 +943,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Posting',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);

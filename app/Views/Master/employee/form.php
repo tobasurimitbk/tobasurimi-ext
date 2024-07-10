@@ -6,7 +6,7 @@
         <h1 id="title"><?= $title ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right root-form-view" href="<?= base_url("employee"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($data)) : ?>
                 <?php if (can('Personalia', 'Karyawan', 'd')) : ?>
@@ -603,7 +603,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -696,7 +696,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);

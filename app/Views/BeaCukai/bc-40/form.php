@@ -167,7 +167,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 let data = new FormData(document.querySelector(".create-form"));
                 data.append('listData', JSON.stringify(listDataSelected));
