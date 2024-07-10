@@ -26,6 +26,7 @@ class PinjamanKaryawanModel extends Model
         'is_boleh_minjam',
         'status_pinjaman',
         'nominal',
+        'is_ambil',
         'deletedAt'
     ];
 
@@ -99,6 +100,7 @@ class PinjamanKaryawanModel extends Model
         if ($addCondition['employees.tipe']) {
             $pinjamanQry->like('employees.tipe', $addCondition['employees.tipe']);
         }
+
 
         if ($addCondition['employee_id'] || $addCondition['divisi_id'] || $addCondition['employees.tipe']) {
             $pinjamanQry->groupEnd();

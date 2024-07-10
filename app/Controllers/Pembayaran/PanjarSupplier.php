@@ -6,7 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\PanjarSupplierModel;
 use App\Models\SupplierModel;
 use App\Models\LocalPOPaymentPanjarModel;
- 
+
 
 
 class PanjarSupplier extends BaseController
@@ -35,9 +35,8 @@ class PanjarSupplier extends BaseController
         $data = [
             'noPanjar' => $this->panjarSupplierModel->getNumber($this->this_company_id)
         ];
-        
-        return view('Pembayaran/pembayaranPanjarSupplier/index', $data);
 
+        return view('Pembayaran/pembayaranPanjarSupplier/index', $data);
     }
 
     public function dropdownSupplierByType()
@@ -61,11 +60,11 @@ class PanjarSupplier extends BaseController
                 "payment_date" => [
                     "rules" => "required"
                 ],
-                "supplier_id" =>[
+                "supplier_id" => [
                     "rules" => "required"
                 ],
                 "total_panjar" => [
-                    "rules" => "required|integer"
+                    "rules" => "required"
                 ],
             ];
             if (!$this->validate($rules)) {
@@ -80,13 +79,13 @@ class PanjarSupplier extends BaseController
             }
 
             $insertData = [
-                
+
                 "company_id"    => $this->this_company_id,
                 "supplier_id"   => $this->request->getVar('supplier_id'),
                 "no_panjar"     => $this->request->getPost("no_panjar"),
                 "payment_date"  => $this->request->getVar("payment_date"),
-                "total_panjar"  => intval($this->request->getVar("total_panjar")),
-     
+                "total_panjar"  => repairDouble($this->request->getVar("total_panjar")),
+
             ];
 
             $insert = $this->panjarSupplierModel->insert($insertData);
@@ -119,12 +118,12 @@ class PanjarSupplier extends BaseController
             echo json_encode($data);
             return;
         }
-
     }
 
 
 
-    public function updatePanjarSupplier(){
+    public function updatePanjarSupplier()
+    {
         try {
             $rules = [
                 "no_panjar" => [
@@ -133,14 +132,14 @@ class PanjarSupplier extends BaseController
                 "payment_date" => [
                     "rules" => "required"
                 ],
-                "supplier_id" =>[
+                "supplier_id" => [
                     "rules" => "required"
                 ],
                 "total_panjar" => [
-                    "rules" => "required|integer"
+                    "rules" => "required"
                 ],
             ];
-            
+
             if (!$this->validate($rules)) {
                 $errorList = $this->validator->getErrors();
                 $data = [
@@ -152,23 +151,20 @@ class PanjarSupplier extends BaseController
                 return;
             }
 
-            if($this->validate($rules)){
+            if ($this->validate($rules)) {
                 $id = decrypt($this->request->getPost("id"));
                 $payload = [
-                    
+
                     "company_id" => $this->this_company_id,
                     "supplier_id"   => $this->request->getVar('supplier_id'),
                     "no_panjar"     => $this->request->getPost("no_panjar"),
                     "payment_date"  => $this->request->getVar("payment_date"),
-                    "total_panjar"  => intval($this->request->getVar("total_panjar")),
-                    "sisa_panjar"   => intval($this->request->getVar("total_panjar")),
+                    "total_panjar"  => repairDouble($this->request->getVar("total_panjar")),
                 ];
-
-
             }
-          
 
-            if($payload){
+
+            if ($payload) {
                 $this->panjarSupplierModel->update($id, $payload);
                 $data = [
                     "status" => true,
@@ -177,12 +173,9 @@ class PanjarSupplier extends BaseController
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
-                
-                return;
-                
-            }
 
-            
+                return;
+            }
         } catch (\Exception $e) {
             $data = [
                 "status" => false,
@@ -191,10 +184,11 @@ class PanjarSupplier extends BaseController
             ];
             echo json_encode($data);
             return;
-        }        
+        }
     }
-    
-    public function updateStatusPanjarSupplier(){
+
+    public function updateStatusPanjarSupplier()
+    {
         $id = decrypt($this->request->getVar('id'));
         $status = $this->request->getVar('status');
 
@@ -207,11 +201,11 @@ class PanjarSupplier extends BaseController
             "message" => "Status Posting Berhasil Diudpdate",
             "token" => csrf_hash()
         ]);
-
     }
 
 
-    public function deletePanjarSupplier(){
+    public function deletePanjarSupplier()
+    {
         try {
             if (is_numeric($this->request->getPost('id'))) {
                 $id = $this->request->getPost("id");
@@ -248,7 +242,8 @@ class PanjarSupplier extends BaseController
         }
     }
 
-    public function allPanjarSupplier(){
+    public function allPanjarSupplier()
+    {
         $payload = [
             "pageSize"      => $this->request->getGet("length"),
             "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -284,16 +279,16 @@ class PanjarSupplier extends BaseController
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-        
+
         foreach ($supplierData['data'] as $data) {
 
             $bayar_panjar = $this->localPOPaymentPanjarModel
-            ->where('panjar_id', $data->id)
-            ->findAll();
-            
+                ->where('panjar_id', $data->id)
+                ->findAll();
+
             $total_bayar_panjar = 0;
 
-            foreach($bayar_panjar as $b){
+            foreach ($bayar_panjar as $b) {
                 $total_bayar_panjar += $b['bayar_panjar'];
             }
             array_push($dataSupplier, [
@@ -301,9 +296,9 @@ class PanjarSupplier extends BaseController
                 "id"            => encrypt($data->id),
                 "no_panjar"     => $data->no_panjar,
                 "supplier"      => $data->name,
-                "payment_date"  => date('d/m/Y', strtotime($data->payment_date)) ,
+                "payment_date"  => date('d/m/Y', strtotime($data->payment_date)),
                 "total_panjar"  => number_format($data->total_panjar, 2),
-                "sisa_panjar"   => number_format(($data->total_panjar)-$total_bayar_panjar, 2),
+                "sisa_panjar"   => number_format(($data->total_panjar) - $total_bayar_panjar, 2),
                 "is_posted"     => $data->is_posted
             ]);
         }
@@ -319,11 +314,11 @@ class PanjarSupplier extends BaseController
     }
 
 
-    public function getByIdPanjarSupplier($id){
-        if(is_numeric($id)){
+    public function getByIdPanjarSupplier($id)
+    {
+        if (is_numeric($id)) {
             $id = $id;
-        }
-        else{
+        } else {
             $id = decrypt($id);
         }
         $panjarSupplierData = $this->panjarSupplierModel->getPanjarSupplierbyID($id);
@@ -335,6 +330,7 @@ class PanjarSupplier extends BaseController
             echo json_encode($data);
             return;
         }
+
         $data = [
             "status"    => true,
             "supplier" => $this->supplierModel->getSupplierByType($panjarSupplierData->type), // GET SUPPLIER DETAIL
@@ -345,7 +341,8 @@ class PanjarSupplier extends BaseController
         return;
     }
 
-    public function dropDownHistoryPembayaranPanjar(){
+    public function dropDownHistoryPembayaranPanjar()
+    {
         $id = decrypt($this->request->getVar('id'));
 
         $historyPembayaranPanjarData = $this->localPOPaymentPanjarModel->getPembayaranPanjarDetailsbyPanjarId($id);
@@ -362,12 +359,11 @@ class PanjarSupplier extends BaseController
         $data = [
             "status"    => true,
             "data"      => $historyPembayaranPanjarData,
-            'panjar_detail' =>$panjarDetail
-            
+            'panjar_detail' => $panjarDetail
+
         ];
 
-        
+
         return response()->setJSON($data);
-        
     }
 }

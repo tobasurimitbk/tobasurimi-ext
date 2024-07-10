@@ -6,7 +6,7 @@
         <h1 class="title-name"><?= !empty($bc27) ? "Update Dokumen BC 2.7" : "Tambah Dokumen BC 2.7" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right root-form-view" href="<?= base_url("bea-cukai-bc-27"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($bc27)) : ?>
                 <?php if ($bc27['status_posting'] == "0") : ?>
@@ -192,7 +192,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3 btn-discard-modal" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3 btn-discard-modal" data-bs-dismiss="modal">Kembali</button>
                     <?php if (!empty($bc27)) : ?>
                         <?php if ($bc27['status_posting'] === "0") : ?>
                             <button type="button" class="btn btn-submit-form" id="ubahNoAjuButton">Simpan</button>
@@ -345,7 +345,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Ya',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector(".create-form"));
@@ -569,7 +569,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Ya',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 var id = $('#id').val();
@@ -619,7 +619,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Ya',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 var id = $('#id').val();

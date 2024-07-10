@@ -59,7 +59,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Batal</button>
+                                <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Kembali</button>
                                 <button type="submit" class="btn btn-submit-form" id="globalGenerateBtn">Generate</button>
                             </div>
                         </form>
@@ -112,7 +112,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Batal</button>
+                                <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Kembali</button>
                                 <button type="submit" class="btn btn-submit-form" id="singleGenerateBtn">Generate</button>
                             </div>
                         </form>
@@ -195,7 +195,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-start mb-3">
-                <div class="col-md-4">
+                <div class="col-sm-3">
                     <div class="form-floating mt-1">
                         <select class="form-select" name="filterDivisiID" id="filterDivisiID" aria-label="Floating label select example">
                             <option value="">
@@ -210,7 +210,19 @@
                         <label for="floatingInput">Cari Departemen</label>
                     </div>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-3">
+                    <div class="form-floating mt-1">
+                        <select class="form-select" name="filterBagianID" id="filterBagianID" aria-label="Floating label select example">
+                            <option value="">
+                                Cari Bagian
+                            </option>
+
+
+                        </select>
+                        <label for="floatingInput">Cari Bagian</label>
+                    </div>
+                </div>
+                <div class="col-sm-3">
                     <div class="form-floating">
                         <select class="form-select" name="filterGolongan" aria-label="Floating label select example">
                             <option value="">
@@ -225,7 +237,7 @@
                         <label for="floatingInput">Cari Tipe / Golongan</label>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-sm-3">
                     <div class="form-floating mt-1">
                         <select class="form-select" name="filterEmployeeID" id="filterEmployeeID" aria-label="Floating label select example">
                             <option value="">
@@ -290,6 +302,7 @@
             data: function(data) {
                 data.divisi_id = $("#filterDivisiID").val();
                 data.employee_id = $("#filterEmployeeID").val();
+                data.bagian_id = $("#filterBagianID").val();
                 data.golongan = $("select[name='filterGolongan']").val();
                 data.year = "<?= $year ?>";
                 data.month = "<?= $month; ?>";
@@ -399,6 +412,9 @@
     $("#filterEmployeeID").change(function() {
         table.ajax.reload();
     });
+    $("#filterBagianID").change(function() {
+        table.ajax.reload();
+    });
 
     // Generate Modal Show
     $('#generate').click(function(e) {
@@ -469,7 +485,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData();
@@ -579,7 +595,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 // append to form
                 if (result.isConfirmed) {
@@ -654,18 +670,29 @@
     }
 
     // select2 divisi
-    $("select[name='filterDivisiID'], #divisionGlobalID").select2({
+    $("#divisionGlobalID").select2({
         placeholder: "Cari Departemen",
         theme: "bootstrap-5",
         allowClear: true,
         dropdownParent: $('#generateModal')
     });
 
+    $("#filterDivisiID").select2({
+        placeholder: "Cari Department",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+    $("#filterBagianID").select2({
+        placeholder: "Cari Bagian",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+
     $("select[name='filterEmployeeID']").select2({
         placeholder: "Cari Berdasarkan Karyawan",
         theme: "bootstrap-5",
         allowClear: true,
-        dropdownParent: $('#generateModal')
+
     });
 
     $("select[name='filterDivisiID']").on('change', function(e) {
@@ -708,6 +735,37 @@
         });
 
     });
+
+    $('#filterDivisiID').change(function() {
+        var divisi = $('#filterDivisiID option:selected').val();
+        $.ajax({
+            url: `<?= base_url('/payroll/getBagian'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                divisi: divisi,
+            },
+            dataType: "json",
+            success: function(res) {
+                // APPEND TO DROPDOWN
+                console.log(res);
+                appendDropdownBagian(res.data);
+            }
+        });
+    });
+
+    function appendDropdownBagian(data) {
+        $("#filterBagianID").empty()
+        $("#filterBagianID").append(`<option value=""></option>`)
+        data.forEach(function(item) {
+            $("#filterBagianID").append(`<option value="${item.id}">${item.nama_bagian}</option>`)
+        })
+    }
 
     $('.form-select')
         .parent('div')

@@ -12,7 +12,7 @@
         <h1 class="title-name">Tambah Dokumen BC 2.3</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("bea-cukai-bc-23"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($dataBC)) {
                 if ($dataBC->status_posting === "Belum Posting") {

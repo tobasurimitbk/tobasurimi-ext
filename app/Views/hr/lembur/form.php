@@ -6,7 +6,7 @@
         <h1 class="title-name"><?= (!empty($lemburDetail)) ? "Detail" : "Simpan" ?> Lembur</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("lembur"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($lemburDetail)) : ?>
                 <?php if (can('Personalia', 'Form Lembur', 'd')) : ?>
@@ -462,7 +462,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -627,7 +627,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 setLoading()
                 // csrf

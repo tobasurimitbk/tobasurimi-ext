@@ -236,7 +236,7 @@
         });
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const r= table.row(this).data();
+            const r = table.row(this).data();
             console.log("clicked");
             location.replace(`<?= base_url("pembayaran-po-lokal-bp/id/"); ?>${r.id}`);
         });
@@ -255,7 +255,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 var formData = new FormData();
@@ -295,7 +295,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);

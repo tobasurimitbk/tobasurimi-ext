@@ -59,7 +59,7 @@ class BC41 extends BaseController
             'akunCeisa' => $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first(),
         ];
 
-        return view('BeaCukai/bc-41/index', $data);
+        return view('BeaCukai/BC-41/index', $data);
     }
 
     public function online()
@@ -68,7 +68,7 @@ class BC41 extends BaseController
             'baseUrl' => $this->metaDataModel->where('name', "Base Url BC")->first()['value']
         ];
 
-        return view('BeaCukai/bc-41/online', $data);
+        return view('BeaCukai/BC-41/online', $data);
     }
 
     public function allOnline()
@@ -163,7 +163,7 @@ class BC41 extends BaseController
             'salesOrderLain' => $this->bc41Model->getListSalesOrderLain()
         ];
 
-        return view('BeaCukai/bc-41/form', $data);
+        return view('BeaCukai/BC-41/form', $data);
     }
 
     public function createAction()
@@ -214,7 +214,7 @@ class BC41 extends BaseController
             'bc41' => $bc41
         ];
 
-        return view('BeaCukai/bc-41/form', $data);
+        return view('BeaCukai/BC-41/form', $data);
     }
 
     public function checkNoAju()

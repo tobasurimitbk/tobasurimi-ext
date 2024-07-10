@@ -264,7 +264,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Posting',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
@@ -320,7 +320,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);

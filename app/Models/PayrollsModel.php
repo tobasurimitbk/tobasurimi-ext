@@ -43,7 +43,8 @@ class PayrollsModel extends Model
         'nominal_gaji_diterima',
         'start_date',
         'end_date',
-        'isPosted'
+        'isPosted',
+        'isAmbil'
     ];
 
     // Dates
@@ -102,12 +103,16 @@ class PayrollsModel extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['employee_id'] || $addCondition['divisi_id'] || $addCondition['tipe']) {
+        if ($addCondition['employee_id'] || $addCondition['divisi_id'] || $addCondition['tipe'] ||  $addCondition['bagian_id']) {
             $dataQry->groupStart();
         }
 
         if ($addCondition['employee_id']) {
             $dataQry->like('employees.id', $addCondition['employee_id']);
+        }
+
+        if ($addCondition['bagian_id']) {
+            $dataQry->like('employees.bagian_id', $addCondition['bagian_id']);
         }
 
         if ($addCondition['divisi_id']) {
@@ -118,7 +123,7 @@ class PayrollsModel extends Model
             $dataQry->where('employees.tipe', $addCondition['tipe']);
         }
 
-        if ($addCondition['employee_id'] || $addCondition['divisi_id'] || $addCondition['tipe']) {
+        if ($addCondition['employee_id'] || $addCondition['divisi_id'] || $addCondition['tipe'] ||  $addCondition['bagian_id']) {
             $dataQry->groupEnd();
         }
 

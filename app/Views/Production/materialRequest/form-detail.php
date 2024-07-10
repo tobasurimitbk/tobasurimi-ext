@@ -7,7 +7,7 @@
         <h1 class="title-name">Request Info</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request"); ?>">
-                Batal
+                Kembali
             </a>
             <?= csrf_field() ?>
             <?php
@@ -262,7 +262,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Posting',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({

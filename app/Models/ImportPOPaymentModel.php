@@ -127,33 +127,25 @@ class ImportPOPaymentModel extends Model
         ];
     }
 
-    public function getPuchaseOrderList($condition, $addCondition, $limit = 10, $offset = 0)
+    public function getPuchaseOrderList($condition, $addCondition)
     {
         $selectQry = "barang_master.kode_barang, barang_master.barang_name, barang_master_spesifikasi.spesifikasi,satuans.kode_satuan";
-        $joinTable = $addCondition['po_type'] == "BAKU" ? 'rm_import_po_details' : 'am_purchase_order_details';
+        $joinTableDetails = $addCondition['po_type'] == "BAKU" ? 'rm_import_po_details' : 'am_purchase_order_details';
+        $joinTable = $addCondition['po_type'] == "BAKU" ? 'rm_import_pos' : 'am_purchase_orders';
         $orderField = $addCondition['po_type'] == "BAKU" ? 'rm_import_po_details.createdAt' : 'am_purchase_order_details.createdAt';
         $table = $addCondition['po_type'] == "BAKU" ? 'rm_import_po_details' : 'am_purchase_order_details';
 
         $poDataQry = $this->db->table($table)
-            ->select("$joinTable.*, $selectQry")
+            ->select("$joinTableDetails.*, $selectQry")
             ->where($condition)
-            ->join('barang_master', "$joinTable.barang_id = barang_master.id", 'left')
-            ->join('barang_master_spesifikasi', "$joinTable.spesifikasi_id = barang_master_spesifikasi.id", 'left')
-            ->join('satuans', "satuans.id = $joinTable.unit", 'left')
-            ->orderBy($orderField, "DESC");
+            ->join('barang_master', "$joinTableDetails.barang_id = barang_master.id", 'left')
+            ->join('barang_master_spesifikasi', "$joinTableDetails.spesifikasi_id = barang_master_spesifikasi.id", 'left')
+            ->join('satuans', "satuans.id = $joinTableDetails.unit", 'left')
+            ->orderBy($orderField, "DESC")
+            ->get()
+            ->getResult();
 
-        $totalData = $poDataQry->countAllResults(false);
-        $totalFilteredData = $poDataQry->countAllResults(false);
-
-        $data = $poDataQry->get($limit, $offset)->getResult();
-
-        return [
-            'data'              => $data,
-            'totalData'         => $totalData,
-            'totalFilteredData' => $totalFilteredData,
-            'sort'              => $orderField,
-            'sortType'          => "DESC"
-        ];
+        return $poDataQry;
     }
 
     public function getRiwayatPembayaranList($condition, $limit = 10, $offset = 0)

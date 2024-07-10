@@ -137,7 +137,7 @@ class SalesOrderLain extends BaseController
                 "total_barang" => $totalItem,
                 "total_harga" => number_format($data->total_harga, 2),
                 "status_posting" => $data->status_posting,
-                "status_used" => (($data->bc_id === "0" && $data->status_posting === "1") ? false : (($bc25 == null && $bc41) == null)) ? false : true
+                "status_used" => (($data->bc_id == "0" && $data->status_posting === "1") ? false : (($bc25 == null && $bc41 == null))) ? false : true
             ]);
         }
 

@@ -36,7 +36,7 @@ $routes->post('/login', 'Setting\Auth::doLogin');
 $routes->get('/logout', 'Setting\Auth::doLogout');
 
 $routes->get('/change-company', 'Setting\User::changeCompany');
-
+$routes->get('/dashboard/toggle', 'Dashboard\Dashboard::toggleSidebar', ['filter' => 'Auth']);
 // 403 ROUTE
 $routes->get('/403', function () {
     return view('errors/html/error_403');
@@ -353,6 +353,14 @@ $routes->post('/rekap-faktur/update', 'Purchase\RekapFaktur::updateRekap', ['fil
 $routes->post('/rekap-faktur/delete', 'Purchase\RekapFaktur::deleteRekap', ['filter' => 'Auth']);
 
 // PEMBAYARAN
+//ambil gaji
+$routes->get('/ambil-gaji', 'Pembayaran\AmbilGaji::index', ['filter' => 'Auth']);
+$routes->get('/ambil-gaji/all', 'Pembayaran\AmbilGaji::getAllAmbilGaji', ['filter' => 'Auth']);
+$routes->post('/ambil-gaji/check-ambil-gaji', 'Pembayaran\AmbilGaji::checkIsAmbil', ['filter' => 'Auth']);
+//ambil pinjaman karyawan
+$routes->get('/ambil-pinjaman-karyawan', 'Pembayaran\AmbilPinjamanKaryawan::index', ['filter' => 'Auth']);
+$routes->get('/ambil-pinjaman-karyawan/all', 'Pembayaran\AmbilPinjamanKaryawan::getAllAmbilPinjamanKaryawan', ['filter' => 'Auth']);
+$routes->post('/ambil-pinjaman-karyawan/check-ambil-pinjaman', 'Pembayaran\AmbilPinjamanKaryawan::checkIsAmbil', ['filter' => 'Auth']);
 // PEMBAYARAN PO LOKAL BP
 $routes->get('/pembayaran-po-lokal-bp', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBP', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBP', ['filter' => 'Auth']);
@@ -361,6 +369,7 @@ $routes->get('/pembayaran-po-lokal-bp/get-item-list/(:segment)', 'Pembayaran\Pem
 $routes->post('/pembayaran-po-lokal-bp/generate-no-pembayaran', 'Pembayaran\PembayaranPOLokal::generatePaymentNoBP', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bp/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBPAction', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bp/update', 'Pembayaran\PembayaranPOLokal::updatePembayaranPOLokalBPAction', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-lokal-bp/delete', 'Pembayaran\PembayaranPOLokal::deleteBP', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/id/(:segment)', 'Pembayaran\PembayaranPOLokal::getPembayaranPOLokalBP/$1', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/print/(:segment)', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBPPrint/$1', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bp/posting', 'Pembayaran\PembayaranPOLokal::posting', ['filter' => 'Auth']);
@@ -380,6 +389,7 @@ $routes->post('/pembayaran-po-lokal-bb/get-list-po-no-paid', 'Pembayaran\Pembaya
 $routes->get('/pembayaran-po-lokal-bb/get-list-po-paid', 'Pembayaran\PembayaranPOLokal::getListBarangLPBPaidBB', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bb/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBBAction', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bb/update', 'Pembayaran\PembayaranPOLokal::updatePembayaranPOLokalBBAction', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-lokal-bb/delete', 'Pembayaran\PembayaranPOLokal::deleteBB', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bb/id/(:segment)', 'Pembayaran\PembayaranPOLokal::getPembayaranPOLokalBB/$1', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bb/print/(:segment)', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBBPrint/$1', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bb/posting', 'Pembayaran\PembayaranPOLokal::posting', ['filter' => 'Auth']);
@@ -404,7 +414,8 @@ $routes->post('/pembayaran-po-import/update', 'Pembayaran\PembayaranPOImport::up
 $routes->post('/pembayaran-po-import/delete', 'Pembayaran\PembayaranPOImport::deletePembayaranPOImport', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-import/generate-no-pembayaran', 'Pembayaran\PembayaranPOImport::getNomorPembayaran', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-import/po-belum-lunas', 'Pembayaran\PembayaranPOImport::listPembayaranPOBelumLunas', ['filter' => 'Auth']);
-$routes->get('/pembayaran-po-import/all-po', 'Pembayaran\PembayaranPOImport::allPO', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-import/get-item-list/(:segment)', 'Pembayaran\PembayaranPOImport::listPembayaranPOImport/$1', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-import/all-po', 'Pembayaran\PembayaranPOImport::allPO', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/all-riwayat-pembayaran', 'Pembayaran\PembayaranPOImport::allRiwayatPembayaran', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-import/posting', 'Pembayaran\PembayaranPOImport::posting', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/print/(:segment)', 'Pembayaran\PembayaranPOImport::print/$1', ['filter' => 'Auth']);
@@ -1330,6 +1341,51 @@ $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
     $routes->post('delete', 'BeaCukai\BC25::delete');
     $routes->post('posting', 'BeaCukai\BC25::posting');
     $routes->get('check-no-aju', 'BeaCukai\BC25::checkNoAju');
+    // HEADER
+    $routes->get('id/header/(:segment)', 'BeaCukai\BC25::header/$1');
+    $routes->post('id/header', 'BeaCukai\BC25::updateHeader');
+    // ENTITAS
+    $routes->get('id/entitas/(:segment)', 'BeaCukai\BC25::entitas/$1');
+    $routes->post('id/entitas', 'BeaCukai\BC25::updateEntitas');
+    // DOKUMEN
+    $routes->get('id/dokumen/(:segment)', 'BeaCukai\BC25::dokumen/$1');
+    $routes->post('id/dokumen', 'BeaCukai\BC25::updateDokumen');
+    $routes->post('id/dokumen/delete', 'BeaCukai\BC25::deleteDokumen');
+    // PENGANGKUT
+    $routes->get('id/pengangkut/(:segment)', 'BeaCukai\BC25::pengangkut/$1');
+    $routes->post('id/pengangkut', 'BeaCukai\BC25::pengangkutUpdate');
+    // KEMASAN & PETI KEMASAN
+    $routes->get('id/kemasan-peti-kemas/(:segment)', 'BeaCukai\BC25::kemasanPetiKemas/$1');
+    $routes->post('id/kemasan-peti-kemas/kemasan', 'BeaCukai\BC25::kemasanUpdate');
+    $routes->post('id/kemasan-peti-kemas/kemasan/delete', 'BeaCukai\BC25::deleteKemasan');
+    $routes->post('id/kemasan-peti-kemas/kontainer', 'BeaCukai\BC25::kontainerUpdate');
+    $routes->post('id/kemasan-peti-kemas/kontainer/delete', 'BeaCukai\BC25::deleteKontainer');
+    // TRANSAKSI
+    $routes->get('id/transaksi/(:segment)', 'BeaCukai\BC25::transaksi/$1');
+    $routes->post('id/transaksi', 'BeaCukai\BC25::transaksiUpdate');
+    // BARANG
+    $routes->get('id/barang/(:segment)', 'BeaCukai\BC25::barang/$1');
+    $routes->get('id/barang/(:segment)/(:segment)', 'BeaCukai\BC25::barangDetail/$1/$2');
+    $routes->post('id/barang', 'BeaCukai\BC25::barangDetailUpdate');
+    // BARANG DOKUMEN
+    $routes->post('id/barang/dokumen-create', 'BeaCukai\BC25::createDokumenBarangDetail');
+    $routes->post('id/barang/dokumen-delete', 'BeaCukai\BC25::deleteDokumenBarangDetail');
+    // BARANG PUNGUTAN
+    $routes->post('id/barang/pungutan-create', 'BeaCukai\BC25::createPungutanDetailBarang');
+    $routes->post('id/barang/pungutan-delete', 'BeaCukai\BC25::deletePungutanDetailBarang');
+    // BAHAN BAKU
+    $routes->post('id/barang/bahan-baku-create', 'BeaCukai\BC25::bahanBakuUpdate');
+    $routes->post('id/barang/bahan-baku-delete', 'BeaCukai\BC25::bahanBakuDelete');
+    // PUNGUTAN
+    $routes->get('id/pungutan/(:segment)', 'BeaCukai\BC25::pungutan/$1');
+    // PERYATAAN
+    $routes->get('id/pernyataan/(:segment)', 'BeaCukai\BC25::pernyataan/$1');
+    $routes->post('id/pernyataan', 'BeaCukai\BC25::pernyataanUpdate');
+    // KIRIM CEISA
+    $routes->get('api/kirim-dokumen/(:segment)', 'BeaCukai\BC25::kirimCeisa/$1');
+    // DROPDOWN
+    $routes->get('list-bahan-baku-asal', 'BeaCukai\BC25::dropdownBahanBakuAsal');
+    $routes->get('list-payload-barang', 'BeaCukai\BC25::dropdownDetailPayload');
 });
 
 // BC 4.1
@@ -1399,6 +1455,7 @@ $routes->post('/tunjangan/delete', 'Master\Tunjangan::deleteTunjangan', ['filter
 // payroll
 $routes->get('/payroll', 'HR\Payroll::payroll', ['filter' => 'Auth']);
 $routes->get('/payroll/all', 'HR\Payroll::getAllPayRoll', ['filter' => 'Auth']);
+$routes->get('/payroll/getBagian', 'HR\Payroll::getBagian', ['filter' => 'Auth']);
 $routes->post('/payroll/generate-global', 'HR\Payroll::generateGlobalPayroll', ['filter' => 'Auth']);
 $routes->post('/payroll/generate-single', 'HR\Payroll::generateSinglePayroll', ['filter' => 'Auth']);
 $routes->get('/payroll/id/(:segment)', 'HR\Payroll::detailPayrollView/$1', ['filter' => 'Auth']);

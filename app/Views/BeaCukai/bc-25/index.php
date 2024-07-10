@@ -74,6 +74,7 @@
                                 <th onclick="changeSort('bc_25.no_aju')" class="sort" style="text-align: center;">No Aju / Daftar</th>
                                 <th onclick="changeSort('bc_25.createdAt')" class="sort" style="text-align: center;">Tanggal BC 2.5</th>
                                 <th onclick="changeSort('bc_25.status_posting')" style="text-align: center;">Status Posting</th>
+                                <th onclick="changeSort('bc_25.status_dokumen')" style="text-align: center;">Status Dokumen</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
@@ -179,6 +180,39 @@
                 }
             },
             {
+                data: "status_dokumen",
+                className: "text-center",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let htmlRes = '';
+
+                    if (row.status_dokumen == "BELUM DIBUAT") {
+                        htmlRes += `
+                        <div class="text-danger">
+                            BELUM DIBUAT
+                        </div>`
+                    } else if (row.status_dokumen == "BELUM LENGKAP") {
+                        htmlRes += `
+                        <div class="text-warning">
+                            BELUM LENGKAP
+                        </div>`
+                    } else if (row.status_dokumen == "SUDAH KIRIM") {
+                        htmlRes += `
+                        <div class="text-success">
+                            SUDAH KIRIM
+                        </div>`
+                    } else if (row.status_dokumen == "SIAP KIRIM") {
+                        htmlRes += `
+                        <div class="text-primary">
+                            SIAP KIRIM
+                        </div>`
+                    }
+
+                    return htmlRes;
+                }
+            },
+            {
                 data: "id",
                 className: "text-center actions",
                 searchable: false,
@@ -204,6 +238,14 @@
                     } else {
                         htmlRes += `
 
+                            `;
+                    }
+
+                    if (row.status_dokumen === "SIAP KIRIM") {
+                        htmlRes += `
+                                <button data-toggle="tooltip" title="Kirim Ke Ceisa" onclick="kirimCeisaAction('${row.id}')" class="btn btn-info kirim-ceisa-parent">
+                                    <i class="fa fa-upload fa-sm" aria-hidden="true"></i>
+                                </button>
                             `;
                     }
 
@@ -263,7 +305,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Ya',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 var formData = new FormData();
@@ -310,7 +352,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Ya',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 var formData = new FormData();
@@ -340,6 +382,52 @@
                             }).then((result) => {
                                 table.ajax.reload();
                             });
+                        }
+                    }
+                })
+            }
+        })
+    }
+
+    function kirimCeisaAction(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Posting BC 4.0 ke aplikasi Ceisa Bea Cukai ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `<?= base_url("bea-cukai-bc-25/api/kirim-dokumen/"); ?>` + id,
+                    method: "GET",
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    success: function(res) {
+                        if (res.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                table.ajax.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            })
                         }
                     }
                 })

@@ -1736,25 +1736,7 @@ class BC23 extends BaseController
     {
         $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
         $beacukaiApi = new BeaCukaiApi($this->akunCeisa['username'], $this->akunCeisa['password']);
-
-        $bc23Data = $this->bc23Model->get($bcPurchaseOrderID);
-
-        $bc23Kontainer = $this->bcKontainerModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
-        $bc23Barang = $this->bcBarangModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
-        $bc23Entitas = $this->bcEntitasModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
-        $bc23Kemasan = $this->bcKemasanModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
-        $bc23Dokumen = $this->bcDokumenModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
-        $bc23Pengangkut = $this->bcPengangkutModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
-
-        $payload = $beacukaiApi->payloadTempleateKirimBC23(
-            $bc23Data,
-            $bc23Kontainer,
-            $bc23Barang,
-            $bc23Entitas,
-            $bc23Kemasan,
-            $bc23Dokumen,
-            $bc23Pengangkut
-        );
+        $payload = $this->generatePayload($bcPurchaseOrderID);
 
         $res = $beacukaiApi->kirimDokumenBC($payload, false);
 
@@ -1777,6 +1759,32 @@ class BC23 extends BaseController
             'message' => "Dokumen BC 2.3 Berhasil Diposting",
             'res' => $res
         ]);
+    }
+
+    public function generatePayload($bcPurchaseOrderID)
+    {
+        $beacukaiApi = new BeaCukaiApi($this->akunCeisa['username'], $this->akunCeisa['password']);
+
+        $bc23Data = $this->bc23Model->get($bcPurchaseOrderID);
+
+        $bc23Kontainer = $this->bcKontainerModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
+        $bc23Barang = $this->bcBarangModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
+        $bc23Entitas = $this->bcEntitasModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
+        $bc23Kemasan = $this->bcKemasanModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
+        $bc23Dokumen = $this->bcDokumenModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
+        $bc23Pengangkut = $this->bcPengangkutModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
+
+        $payload = $beacukaiApi->payloadTempleateKirimBC23(
+            $bc23Data,
+            $bc23Kontainer,
+            $bc23Barang,
+            $bc23Entitas,
+            $bc23Kemasan,
+            $bc23Dokumen,
+            $bc23Pengangkut
+        );
+
+        return $payload;
     }
 
     // POSTING BEA CUKAI PO

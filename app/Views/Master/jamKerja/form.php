@@ -6,7 +6,7 @@
         <h1 class="title-name"><?= !empty($jamKerja) ? "Update" : "Tambah"; ?> Jam Kerja</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("jam-kerja"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (empty($jamKerja)) : ?>
                 <?php if (can('Master Data', 'Jam Kerja', 'c')) : ?>
@@ -243,7 +243,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
 
                 if (result.isConfirmed) {
@@ -357,7 +357,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Ya',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);

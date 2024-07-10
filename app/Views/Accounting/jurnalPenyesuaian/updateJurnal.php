@@ -9,7 +9,7 @@
         <div class="section-header">
             <h1>Update Jurnal</h1>
             <button class="btn btn-discard btn-cancel mr-5" onclick="kembaliJurnal()">
-                Batal
+                Kembali
             </button>
             <button class="btn btn-show-form btn-add">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Update Jurnal

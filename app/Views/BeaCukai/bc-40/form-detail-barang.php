@@ -29,7 +29,7 @@
                         Simpan
                     </a>
                     <a class="btn btn-danger float-right" href="<?= base_url('bea-cukai-bc-40/id/barang/' . encrypt($bcPo['id'])) ?>" style="margin-right: 8px;">
-                        Batal
+                        Kembali
                     </a>
                 </div>
 
@@ -799,7 +799,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Ya',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-pungutan"));
@@ -853,7 +853,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Ya',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-barang-dokumen"));
@@ -911,7 +911,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Ya',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData();
@@ -963,7 +963,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Ya',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData();
@@ -1014,7 +1014,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);

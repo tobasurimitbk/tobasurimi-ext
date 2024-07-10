@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-lg main-navbar">
     <form class="form-inline mr-auto">
         <ul class="navbar-nav mr-3">
-            <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg"><i class="fas fa-bars"></i></a></li>
+            <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg sidebar"><i class="fas fa-bars"></i></a></li>
             <!-- <li><a href="#" data-toggle="search" class="nav-link nav-link-lg d-sm-none"><i class="fas fa-search"></i></a></li> -->
         </ul>
         <div class="search-element">
@@ -90,7 +90,7 @@
                 <button class="btn btn-discard" onclick="hideLogoutForm()">Cancel</button>
                 <a class="btn btn-logout-form" href="<?= base_url("logout"); ?>">Logout</a>
             </div>
-            
+
         </div>
     </div>
 </div>
@@ -120,4 +120,14 @@
             }
         })
     }
+
+    $('a[data-toggle="sidebar"]').on('click', function() {
+
+        console.log('Sidebar toggle link clicked');
+        $.ajax({
+            url: "<?= base_url("/dashboard/toggle"); ?>",
+            method: "GET",
+        });
+
+    });
 </script>

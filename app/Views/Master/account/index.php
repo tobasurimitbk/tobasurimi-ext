@@ -40,7 +40,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form-kategori btn-discard mr-2">Batal</button>
+                <button type="button" class="btn btn-hide-form-kategori btn-discard mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-form-kategori">Simpan</button>
                 <button type="button" class="btn btn-discard delete-btn delete-btn-kategori">Hapus</button>
             </div>
@@ -87,7 +87,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form-header btn-discard mr-2">Batal</button>
+                <button type="button" class="btn btn-hide-form-header btn-discard mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-form-header">Simpan</button>
                 <button type="button" class="btn btn-discard delete-btn delete-btn-header">Hapus</button>
             </div>
@@ -158,7 +158,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form-sub btn-discard mr-2">Batal</button>
+                <button type="button" class="btn btn-hide-form-sub btn-discard mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-form-sub">Simpan</button>
                 <button type="button" class="btn btn-discard delete-btn delete-btn-sub">Hapus</button>
             </div>
@@ -1100,7 +1100,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
@@ -1219,7 +1219,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
@@ -1338,7 +1338,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
@@ -1457,7 +1457,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -1521,7 +1521,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -1585,7 +1585,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);

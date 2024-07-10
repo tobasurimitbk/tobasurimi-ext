@@ -11,7 +11,7 @@
         <?php } ?>
         <div class="col-button-tambah-spp text-right">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request-penolong"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (isset($dataMaterialRequests)) { ?>
                 <?php if ($dataMaterialRequests->is_posted != 1) { ?>
@@ -716,7 +716,7 @@
                             showCancelButton: true,
                             reverseButtons: true,
                             confirmButtonText: 'Simpan',
-                            cancelButtonText: 'Batal',
+                            cancelButtonText: 'Kembali',
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 let id = $('#id').val();
@@ -959,7 +959,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Posting',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
@@ -1296,7 +1296,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
@@ -1342,7 +1342,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);

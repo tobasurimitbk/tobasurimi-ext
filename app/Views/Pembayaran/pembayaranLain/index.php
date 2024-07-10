@@ -123,7 +123,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form">Simpan</button>
             </div>
         </div>
@@ -424,6 +424,12 @@
             dropdownParent: $('#add_modal')
         });
 
+        $('#metode_pembayaran').select2({
+            placeholder: "Pilih Metode Pembayaran",
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal')
+        });
+
         $('#valas').select2({
             placeholder: "Pilih Mata Uang",
             theme: "bootstrap-5",
@@ -536,7 +542,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
@@ -641,7 +647,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 var formData = new FormData();
@@ -731,7 +737,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);

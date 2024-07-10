@@ -39,6 +39,7 @@ class Payroll extends BaseController
         $payrollModel = new PayrollsModel();
         $divisiModel = new DivisisModel();
         $golonganModel = new GolonganModel();
+        $bagianModel = new BagianModel();
 
         $startDate = date('d/m/Y', strtotime("{$year}-{$month}-01 -1 month +22 days"));
         $endDate = date('d/m/Y', strtotime("{$year}-{$month}-01  +20 days"));
@@ -53,6 +54,7 @@ class Payroll extends BaseController
             'startDate' => $startDate,
             'endDate' => $endDate,
             'divisi' => $divisiModel->get_by_company_id($this->this_company_id),
+            'bagian' => $bagianModel->get_by_company_id($this->this_company_id),
             'isGenerate' => ($isGenerate == 0) ? false : true,
             'golongan' => $golonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
         ];
@@ -68,9 +70,9 @@ class Payroll extends BaseController
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "divisi_id"          => $this->request->getGet("divisi_id"),
+            "bagian_id"     => $this->request->getGet("bagian_id"),
             "employee_id"        => $this->request->getGet("employee_id"),
         ];
-
         // Bulan, Tahun
         $month = $this->request->getGet('month');
         $year = $this->request->getGet('year');
@@ -85,6 +87,7 @@ class Payroll extends BaseController
 
         $addCondition = [
             "divisi_id"          => $this->request->getGet("divisi_id"),
+            "bagian_id"          => $this->request->getGet("bagian_id"),
             "employee_id"        => $this->request->getGet("employee_id"),
             "tipe"               => $this->request->getGet("golongan")
         ];
@@ -698,5 +701,23 @@ class Payroll extends BaseController
         $dompdf->stream("Daftar Potongan ", array("Attachment" => false));
 
         exit(0);
+    }
+
+    public function getBagian()
+    {
+        $bagianModel = new BagianModel();
+
+        $divisi = $this->request->getVar('divisi');
+        $data = $bagianModel
+            ->select("*")
+            ->where("division_id", $divisi)
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        return response()->setJSON([
+            'data' => $data,
+            'status' => true
+        ]);
     }
 }

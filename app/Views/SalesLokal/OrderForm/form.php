@@ -8,7 +8,7 @@
         <h1 class="title-name"><?= !empty($data) ? "Ubah" : "Tambah"; ?> Penjualan Lokal</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("order-form-lokal"); ?>">
-                Batal
+                Kembali
             </a>
 
             <?php if (!empty($data)) : ?>
@@ -356,7 +356,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
+                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
                 <!-- <button type="button" class="btn btn-discard delete-btn delete-detail delete-form">Hapus</button> -->
             </div>
@@ -503,7 +503,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard mr-2 btn-discard-customer" id="btn-discard-customer">Batal</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2 btn-discard-customer" id="btn-discard-customer">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-customer">Simpan</button>
             </div>
         </div>
@@ -573,7 +573,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard btn-discard-master-barang mr-2">Batal</button>
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-master-barang mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-form-master-barang">Simpan</button>
             </div>
         </div>
@@ -743,7 +743,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Hapus',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
@@ -1364,7 +1364,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
@@ -1515,7 +1515,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
@@ -1823,7 +1823,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
@@ -2075,7 +2075,7 @@
                             showCancelButton: true,
                             reverseButtons: true,
                             confirmButtonText: 'Simpan',
-                            cancelButtonText: 'Batal',
+                            cancelButtonText: 'Kembali',
                         }).then(result => {
                             if (result.isConfirmed) {
                                 no = no + 1;

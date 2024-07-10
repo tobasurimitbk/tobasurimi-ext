@@ -13,6 +13,8 @@ use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\Sub_AkunsModel;
+use App\Models\ImportPOPaymentDetailModel;
+use App\Models\LocalPOPaymentPanjarModel;
 use Dompdf\Dompdf;
 
 class PembayaranPOImport extends BaseController
@@ -21,6 +23,7 @@ class PembayaranPOImport extends BaseController
     protected $this_company_id;
     protected $supplierModel;
     protected $importPOPaymentModel;
+    protected $importPOPaymentDetailModel;
     protected $kursModel;
     protected $rmImportPOModel; // Import BB
     protected $amPurchaseOrderModel; // Import BP - Lokal BP
@@ -28,6 +31,7 @@ class PembayaranPOImport extends BaseController
     protected $jurnalController;
     protected $divisiModel;
     protected $companyModel;
+    protected $localPOPaymentPanjarModel;
     protected $dompdf;
 
 
@@ -37,6 +41,7 @@ class PembayaranPOImport extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->supplierModel = new SupplierModel();
         $this->importPOPaymentModel = new ImportPOPaymentModel();
+        $this->importPOPaymentDetailModel = new ImportPOPaymentDetailModel();
         $this->kursModel = new KursModel();
         $this->rmImportPOModel = new RMImportPOModel();
         $this->amPurchaseOrderModel = new AMPurchaseOrderModel();
@@ -44,6 +49,7 @@ class PembayaranPOImport extends BaseController
         $this->jurnalController = new JurnalUmum();
         $this->divisiModel = new DivisisModel();
         $this->companyModel = new CompaniesModel();
+        $this->localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -101,6 +107,112 @@ class PembayaranPOImport extends BaseController
         return view('Pembayaran/pembayaranPOImport/form', $data);
     }
 
+    public function listPembayaranPOImport($id)
+    {
+        $id = decrypt($id);
+        $detailPembayaran = $this->importPOPaymentModel->asArray()->find($id);
+        $addCondition = [
+            'po_type' => $detailPembayaran['po_type'] == "BAHAN BAKU" ? "BAKU" : "PENOLONG",
+        ];
+
+        if ($addCondition['po_type'] == "BAKU") {
+
+            $condition = [
+                'rm_import_po_details.deletedAt' => null,
+                'rm_import_po_details.rm_import_po_id' => $detailPembayaran['po_id']
+            ];
+        } else {
+            // BP
+            $condition = [
+                'am_purchase_order_details.deletedAt' => null,
+                'am_purchase_order_details.am_purchase_order_id' => $detailPembayaran['po_id']
+            ];
+        }
+
+        $poList = $this->importPOPaymentModel->getPuchaseOrderList($condition, $addCondition);
+        $responseData = [];
+        foreach ($poList as $data) {
+            $entry = [
+                "detail_id"         => $data->id,
+                "kode_barang"       => $data->kode_barang,
+                "nama_barang"       => $data->barang_name . ' - ' . $data->spesifikasi,
+                "qty_order"         => number_format($data->qty),
+                "total_harga"       => number_format($data->total),
+                "total_harga_number" => intval($data->total),
+            ];
+            $addCondition['po_type'] == "BAKU" ? $entry["id"] = $data->rm_import_po_id : $entry["id"] = $data->am_purchase_order_id;
+            array_push($responseData, $entry);
+        }
+        //to find all pembayaran
+        foreach ($responseData as $r => $i) {
+            $condition = [
+                'purchase_detail_id'   => $i['detail_id']
+            ];
+            $selectQry = "sum(amount) as totalPaid";
+            $totalPaidAmount = $this->importPOPaymentDetailModel
+                ->select($selectQry)
+                ->where($condition)
+                ->groupBy('purchase_detail_id')
+                ->first();
+            $responseData[$r]['sisa_pembayaran'] = $i['total_harga_number'] - intval($totalPaidAmount['totalPaid']);
+        }
+        //find the pembayaran in the specific form
+        foreach ($responseData as $r => $i) {
+            $condition = [
+                'purchase_detail_id'   => $i['detail_id'],
+                'import_po_payment_id' => $id
+            ];
+            $paidAmount = $this->importPOPaymentDetailModel
+                ->select("amount")
+                ->where($condition)
+                ->first();
+
+            $responseData[$r]['input_user'] = intval($paidAmount['amount']);
+        }
+
+        $panjarList = $this->localPOPaymentPanjarModel
+            ->select('*, no_panjar')
+            ->join("import_po_payments", 'local_po_payment_panjar.local_po_payment_id = import_po_payments.id')
+            ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
+            ->where('import_po_payments.deletedAt', null)
+            ->where('import_po_payments.id', $id)
+            ->where('type', 'INTERNASIONAL')
+            ->findAll();
+
+
+
+        foreach ($panjarList as $i => $p) {
+            $panjarList[$i]['bayar_panjar_number'] = intval($p['bayar_panjar']);
+            $panjarList[$i]['total_panjar_number'] = intval($p['total_panjar']);
+            $panjarList[$i]['total_bayar_panjar_number'] = intval($this->localPOPaymentPanjarModel
+                ->getTotalPembayaranPanjar($p['panjar_id'], "INTERNASIONAL")['total_bayar_panjar']);
+            $panjarList[$i]['sisa_panjar'] = $panjarList[$i]['total_panjar_number'] - $panjarList[$i]['total_bayar_panjar_number'];
+        }
+
+        $total_bayar_panjar = 0;
+        foreach ($panjarList as $p) {
+            $total_bayar_panjar += intval($p['bayar_panjar']);
+        }
+
+        $statusPph = $this->importPOPaymentModel->select("status_pph")->find($id);
+        $currency = $this->importPOPaymentModel->select("currency")->find($id);
+        $panjarPaid = $this->localPOPaymentPanjarModel
+            ->select("sum(bayar_panjar) as total_paid")
+            ->where('company_id', $this->this_company_id)
+            ->where('local_po_payment_id', $id)
+            ->where('type', 'INTERNASIONAL')
+            ->first();
+
+        return response()->setJson([
+            'token' => csrf_hash(),
+            'data'  => $responseData,
+            'panjar_data' => $panjarList,
+            'panjar_paid' => intval($panjarPaid['total_paid']),
+            'status_pph' => $statusPph,
+            'currency'   => $currency['currency']
+        ]);
+    }
+
     public function allPembayaranPOImport()
     {
         $importPOPaymentModel = new ImportPOPaymentModel();
@@ -117,7 +229,10 @@ class PembayaranPOImport extends BaseController
 
         $responseData = [];
 
-        $condition = [];
+        $condition = [
+            'import_po_payments.company_id' => $this->this_company_id,
+            'import_po_payments.deletedAt'  => null
+        ];
         $addCondition = [
             "startDate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastDate"  => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
@@ -160,13 +275,7 @@ class PembayaranPOImport extends BaseController
 
     public function savePembayaranPOImport()
     {
-        if (formatter($this->request->getVar('payment_amt'), "CURR_TO_INT") < formatter($this->request->getVar('payment_amt'), "CURR_TO_INT")) {
-            return response()->setJSON([
-                'status' => false,
-                'message' => "Total bayar tidak boleh melebihi sisa bayar",
-                'token' => csrf_hash()
-            ]);
-        }
+
 
         $first = $this->importPOPaymentModel->where('payment_no', $this->request->getVar('no_pembayaran'))->where('company_id', $this->this_company_id)->first();
 
@@ -177,18 +286,35 @@ class PembayaranPOImport extends BaseController
                 'token' => csrf_hash()
             ]);
         }
+        $pembayaranList = json_decode($this->request->getVar('pembayaranList'));
+        $panjarList     = json_decode($this->request->getVar('panjarList'));
+        $allEmpty = true;
+        foreach ($pembayaranList as $item) {
+            if (!empty($item->pembayaran_user_input)) {
+                $allEmpty = false;
+                break;
+            }
+        }
+
+        if ($allEmpty) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => "Pembayaran Kosong",
+                'token' => csrf_hash()
+            ]);
+        }
+
 
         $id = $this->importPOPaymentModel->insert([
             'company_id' => $this->this_company_id,
             'divisi_id' => $this->request->getVar('divisi_id'),
             'payment_no' => $this->request->getVar('no_pembayaran'),
-            'payment_type' => $this->request->getVar('tipe_pembayaran'),
             'supplier_id' => $this->request->getVar('supplier_id'),
             'po_type' => $this->request->getVar('po_type'),
             'po_id' => decrypt($this->request->getVar('import_po')),
             'voucher_no' => $this->request->getVar('voucher_no'),
             'currency' => $this->request->getVar('currency'),
-            'payment_amt' => formatter($this->request->getVar('payment_amt'), "CURR_TO_INT"),
+            'payment_amt' => repairDouble($this->request->getVar('grand_total')),
             'current_exchange_rate' => formatter($this->request->getVar('current_exchange_rate'), "CURR_TO_INT"),
             'payment_date' =>  $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("payment_date")))) : "",
             'termin' => $this->request->getVar('termin'),
@@ -202,6 +328,30 @@ class PembayaranPOImport extends BaseController
             'akun_selisih' => $this->request->getVar('akun_selisih'),
             'status_pph' => $this->request->getVar('status_pph')
         ]);
+        foreach ($pembayaranList as $l) {
+            if (intval($l->pembayaran_user_input != 0) && isset($l->pembayaran_user_input)) {
+
+                $this->importPOPaymentDetailModel->insert([
+                    "import_po_payment_id" => $id,
+                    "purchase_id"          => intval(decrypt($l->id)),
+                    "purchase_detail_id"   => intval(decrypt($l->detail_id)),
+                    "amount"                => intval($l->pembayaran_user_input),
+                ]);
+            }
+        }
+        foreach ($panjarList as $p) {
+
+            if (isset($p->bayar_panjar) && intval($p->bayar_panjar) !=  0) {
+                $insertPanjar = $this->localPOPaymentPanjarModel->insert([
+                    "company_id" => $this->this_company_id,
+                    "local_po_payment_id" => $id,
+                    "type"  => "INTERNASIONAL",
+                    "panjar_id" => $p->id,
+                    "bayar_panjar" => $p->bayar_panjar
+                ]);
+            }
+        }
+
 
         return response()->setJSON([
             'id' => encrypt($id),
@@ -213,32 +363,78 @@ class PembayaranPOImport extends BaseController
 
     public function updatePembayaranPOImport()
     {
-        if (formatter($this->request->getVar('payment_amt'), "CURR_TO_INT") < formatter($this->request->getVar('payment_amt'), "CURR_TO_INT")) {
-            return response()->setJSON([
-                'status' => false,
-                'message' => "Total bayar tidak boleh melebihi sisa bayar",
-                'token' => csrf_hash()
-            ]);
-        }
+
 
         $id = decrypt($this->request->getVar('id'));
+        $pembayaranList = json_decode($this->request->getVar('pembayaranList'));
+        $panjarList     = json_decode($this->request->getVar('panjarList'));
+
+
+
         $this->importPOPaymentModel->update($id, [
-            'no_invoice' => $this->request->getVar('no_invoice'),
-            'invoice_emkl' => $this->request->getVar('invoice_emkl'),
-            'no_aju' => $this->request->getVar('no_aju'),
+            'company_id' => $this->this_company_id,
+            'divisi_id' => $this->request->getVar('divisi_id'),
+            // 'payment_no' => $this->request->getVar('no_pembayaran'),
+            'supplier_id' => $this->request->getVar('supplier_id'),
+            'po_type' => $this->request->getVar('po_type'),
+            'po_id' => decrypt($this->request->getVar('import_po')),
+            'voucher_no' => $this->request->getVar('voucher_no'),
+            'currency' => $this->request->getVar('currency'),
+            'payment_amt' => repairDouble($this->request->getVar('grand_total')),
             'current_exchange_rate' => formatter($this->request->getVar('current_exchange_rate'), "CURR_TO_INT"),
             'payment_date' =>  $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("payment_date")))) : "",
             'termin' => $this->request->getVar('termin'),
             'payment_method' => $this->request->getVar('payment_method'),
-            'voucher_no' => $this->request->getVar('voucher_no'),
             'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
             'note' => $this->request->getVar('note'),
+            'no_invoice' => $this->request->getVar('no_invoice'),
+            'invoice_emkl' => $this->request->getVar('invoice_emkl'),
+            'no_aju' => $this->request->getVar('no_aju'),
             'akun_kas' => $this->request->getVar('akun_kas'),
             'akun_selisih' => $this->request->getVar('akun_selisih'),
             'status_pph' => $this->request->getVar('status_pph')
-
         ]);
 
+        $this->importPOPaymentDetailModel->where('import_po_payment_id', $id)->delete();
+
+        foreach ($pembayaranList as $l) {
+            if (intval($l->pembayaran_user_input != 0) && isset($l->pembayaran_user_input)) {
+                $this->importPOPaymentDetailModel->insert([
+                    "import_po_payment_id" => $id,
+                    "purchase_id"          => decrypt($l->id),
+                    "purchase_detail_id"   => decrypt($l->detail_id),
+                    "amount"               => intval($l->pembayaran_user_input),
+                ]);
+            }
+        }
+
+
+        // foreach ($pembayaranList as $l) {
+        //     if (intval($l->pembayaran_user_input != 0) && isset($l->pembayaran_user_input)) {
+        //         $set = [
+
+        //             'amount'               => $l->pembayaran_user_input
+        //         ];
+        //         $condition = [
+        //             'import_po_payment_id' => $id,
+        //             'purchase_id'          => $l->id,
+        //             'purchase_detail_id'   => $l->detail_id,
+        //         ];
+        //         $this->importPOPaymentDetailModel->set($set)->where($condition)->update();
+        //     }
+        // }
+        $this->localPOPaymentPanjarModel->where('local_po_payment_id', $id)->where('type', 'INTERNASIONAL')->delete();
+        foreach ($panjarList as $p) {
+            if (isset($p->bayar_panjar) && intval($p->bayar_panjar) !=  0) {
+                $insertPanjar = $this->localPOPaymentPanjarModel->insert([
+                    "company_id" => $this->this_company_id,
+                    "local_po_payment_id" => $id,
+                    "type"  => "INTERNASIONAL",
+                    "panjar_id" => $p->id,
+                    "bayar_panjar" => $p->bayar_panjar
+                ]);
+            }
+        }
         return response()->setJSON([
             'message' => "Pembayaran berhasil diupdate",
             'status' => true,
@@ -249,6 +445,11 @@ class PembayaranPOImport extends BaseController
     public function deletePembayaranPOImport()
     {
         $this->importPOPaymentModel->delete(decrypt($this->request->getVar('id')));
+        $this->importPOPaymentDetailModel->where('import_po_payment_id', decrypt($this->request->getVar('id')))->delete();
+        $this->localPOPaymentPanjarModel->where('local_po_payment_id',  decrypt($this->request->getVar('id')))
+            ->where('type', 'INTERNASIONAl')
+            ->delete();
+
         return response()->setJSON([
             'message' => "Pembayaran berhasil dihapus",
             'status' => true,
@@ -299,20 +500,66 @@ class PembayaranPOImport extends BaseController
             $poDetail = $this->amPurchaseOrderModel->find($detail['po_id']);
         }
 
-        $poList = $this->importPOPaymentModel->getPuchaseOrderList($condition, $addCondition, 1000, 0);
-        $result = array();
-        foreach ($poList['data'] as $p) {
-            array_push($result, [
-                'barang' => $p->barang_name . ' - ' . $p->spesifikasi,
-                'qty' => $p->qty,
-                'total' => $p->total,
-                'po_no' => $poDetail['po_no'],
-                'tgl_po' => $poDetail['po_date'],
-                'kode_satuan' => $p->kode_satuan
-            ]);
+        $poList = $this->importPOPaymentModel->getPuchaseOrderList($condition, $addCondition);
+        $responseData = [];
+        foreach ($poList as $p) {
+            $entry = [
+                "detail_id"         => $p->id,
+                "tgl_po"            => $poDetail['po_date'],
+                'po_no'             => $poDetail['po_no'],
+                "kode_barang"       => $p->kode_barang,
+                "nama_barang"       => $p->barang_name . ' - ' . $p->spesifikasi,
+                'kode_satuan'       => $p->kode_satuan,
+                "qty_order"         => number_format($p->qty),
+                "total_harga"       => number_format($p->total),
+                "total_harga_number" => intval($p->total),
+
+            ];
+            $addCondition['po_type'] == "BAKU" ? $entry["id"] = $p->rm_import_po_id : $entry["id"] = $p->am_purchase_order_id;
+            array_push($responseData, $entry);
         }
 
-        $data['poList'] = $result;
+        //find the pembayaran in the specific form
+        foreach ($responseData as $r => $i) {
+            $condition = [
+                'purchase_detail_id'   => $i['detail_id'],
+                'import_po_payment_id' => $id
+            ];
+            $paidAmount = $this->importPOPaymentDetailModel
+                ->select("amount")
+                ->where($condition)
+                ->first();
+
+            $responseData[$r]['input_user'] = intval($paidAmount['amount']);
+        }
+        $panjarList = $this->localPOPaymentPanjarModel
+            ->select('*, no_panjar')
+            ->join("import_po_payments", 'local_po_payment_panjar.local_po_payment_id = import_po_payments.id')
+            ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
+            ->where('import_po_payments.deletedAt', null)
+            ->where('import_po_payments.id', $id)
+            ->where('type', 'INTERNASIONAL')
+            ->findAll();
+
+
+
+        foreach ($panjarList as $i => $p) {
+            $panjarList[$i]['bayar_panjar_number'] = intval($p['bayar_panjar']);
+            $panjarList[$i]['total_panjar_number'] = intval($p['total_panjar']);
+            $panjarList[$i]['total_bayar_panjar_number'] = intval($this->localPOPaymentPanjarModel
+                ->getTotalPembayaranPanjar($p['panjar_id'], "INTERNASIONAL")['total_bayar_panjar']);
+            $panjarList[$i]['sisa_panjar'] = $panjarList[$i]['total_panjar_number'] - $panjarList[$i]['total_bayar_panjar_number'];
+        }
+
+        $total_bayar_panjar = 0;
+        foreach ($panjarList as $p) {
+            $total_bayar_panjar += intval($p['bayar_panjar']);
+        }
+
+
+        $data['poList'] = $responseData;
+        $data['panjar_list'] = $panjarList;
+        $data['total_bayar_panjar'] = $total_bayar_panjar;
 
         $this->dompdf->loadHtml(view('Pembayaran/pembayaranPOImport/print', $data));
         $this->dompdf->setPaper('A4', 'portrait');
@@ -329,6 +576,8 @@ class PembayaranPOImport extends BaseController
         $year = date('Y');
         $romanMonth = romanMonthNumber($month);
         $numberTemplate = "PAY/IM/$romanMonth/$year/";
+
+
 
         $lastData = $this->importPOPaymentModel->asObject()
             ->like('payment_no', $numberTemplate, 'after')
@@ -360,24 +609,35 @@ class PembayaranPOImport extends BaseController
         $poList = $this->getPOList($supplierID ?? 0, $poType ?? "", $divisiID);
         $poListBelumLunas = [];
 
-        foreach ($poList as $p) {
-            $totalBayar = $this->importPOPaymentModel->select('SUM(payment_amt) AS total_dibayar')
-                ->where('po_id', $p->id)
-                ->where('deletedAt', null)
-                ->findAll();
 
-            if ($totalBayar[0]['total_dibayar'] < $p->total) {
+        foreach ($poList as $p) {
+            $condition = [
+                'purchase_id' => $p->id,
+                // 'purchase_detail_id' => $p->detail_id,
+                'import_po_payments.deletedAt' => null,
+                'import_po_payments.po_type' => $this->request->getVar('po_type')
+            ];
+            $totalBayar = $this->importPOPaymentDetailModel->select('SUM(amount) AS total_dibayar')
+                ->join('import_po_payments', 'import_po_payments.id = import_po_payment_detail.import_po_payment_id')
+                ->where($condition)
+                ->first();
+
+
+            if (intval($totalBayar['total_dibayar']) < $p->total || $totalBayar['total_dibayar'] == null) {
                 $nilaiKurs = $this->kursModel->getKursCurrent($p->currency_id, $p->po_date);
                 $poListBelumLunas[] = [
                     'id' => encrypt($p->id),
                     'po_no' => $p->po_no,
                     'total_bayar' => number_format($p->total),
-                    'sisa_bayar' => number_format($p->total - $totalBayar[0]['total_dibayar']),
+                    // 'sisa_bayar' => number_format($p->total - $totalBayar['total_dibayar']),
                     'valas' => $p->currency,
                     'kurs' => number_format($nilaiKurs == null ? 0 : $nilaiKurs['nilai_kurs']),
                 ];
             }
         }
+
+        $poListBelumLunas = array_unique($poListBelumLunas, SORT_REGULAR);
+
 
         return response()->setJSON([
             'data' => $poListBelumLunas,
@@ -445,13 +705,9 @@ class PembayaranPOImport extends BaseController
 
     public function allPO()
     {
-        $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-        ];
+        $statusPph = $this->request->getVar('status_pph');
+
+        $pphNilai = $statusPph == '1' ? 0.0025 : 0;
 
         $responseData = [];
 
@@ -463,42 +719,56 @@ class PembayaranPOImport extends BaseController
             // BB
             $condition = [
                 'rm_import_po_details.deletedAt' => null,
-                'rm_import_po_details.rm_import_po_id' => decrypt($this->request->getVar('po_id'))
+                'rm_import_po_details.rm_import_po_id' => decrypt($this->request->getVar('po_id')),
+
             ];
         } else {
             // BP
             $condition = [
                 'am_purchase_order_details.deletedAt' => null,
-                'am_purchase_order_details.am_purchase_order_id' => decrypt($this->request->getVar('po_id'))
+                'am_purchase_order_details.am_purchase_order_id' => decrypt($this->request->getVar('po_id')),
+
             ];
         }
 
-        $limit = $this->request->getGet("length");
-        $offset = $this->request->getGet("start");
-        $poList = $this->importPOPaymentModel->getPuchaseOrderList($condition, $addCondition, $limit, $offset);
+        $poList = $this->importPOPaymentModel->getPuchaseOrderList($condition, $addCondition);
 
-        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-        foreach ($poList['data'] as $data) {
-            array_push($responseData, [
-                "no"                => $no++,
-                "id"                => encrypt($data->id),
+        // $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $total_harga_semua = 0;
+
+        foreach ($poList as $data) {
+            $entry = [
+                "detail_id"         => encrypt($data->id),
                 "kode_barang"       => $data->kode_barang,
                 "nama_barang"       => $data->barang_name . ' - ' . $data->spesifikasi,
                 "qty_order"         => number_format($data->qty),
                 "total_harga"       => number_format($data->total),
-            ]);
+                "total_harga_number" => intval($data->total),
+            ];
+            $addCondition['po_type'] == "BAKU" ? $entry["id"] = encrypt($data->rm_import_po_id) : $entry["id"] = encrypt($data->am_purchase_order_id);
+            array_push($responseData, $entry);
         }
 
-        $data = [
-            "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $poList['totalData'],
-            "recordsFiltered"   => $poList['totalFilteredData'],
-            "data"              => $responseData,
-            "payload"           => $payload
-        ];
+        foreach ($responseData as $r => $i) {
+            $condition = [
+                'purchase_detail_id'   => decrypt($i['detail_id'])
+            ];
+            $selectQry = "sum(amount) as totalPaid";
+            $totalPaidAmount = $this->importPOPaymentDetailModel
+                ->select($selectQry)
+                ->where($condition)
+                ->groupBy('purchase_detail_id')
+                ->first();
+            if ($totalPaidAmount != null) {
+                $responseData[$r]['sisa_pembayaran'] = $i['total_harga_number'] - intval($totalPaidAmount['totalPaid']);
+            } else {
+                $responseData[$r]['sisa_pembayaran'] = $i['total_harga_number'];
+            }
+        }
 
-        return response()->setJSON($data);
+
+        return json_encode($responseData);
     }
 
     private function getPOList($supplierId, $poType, $divisiId): array
@@ -511,11 +781,12 @@ class PembayaranPOImport extends BaseController
 
         if ($poType == 'BAKU') {
             $rmImportPOModel = new RMImportPOModel();
-            $selectQry = "rm_import_pos.*,
+            $selectQry = "rm_import_pos.*, rm_import_po_details.id as detail_id,
                       metadata.value AS currency, rm_import_pos.currency AS currency_id";
 
             $poData = $rmImportPOModel->asObject()
                 ->select($selectQry)
+                ->join('rm_import_po_details', 'rm_import_po_details.rm_import_po_id = rm_import_pos.id')
                 ->join('metadata', 'metadata.id = rm_import_pos.currency')
                 ->where($condition)
                 ->where('division_id', $divisiId)
@@ -524,11 +795,12 @@ class PembayaranPOImport extends BaseController
             return $poData;
         } else if ($poType == 'PENOLONG') {
             $aMPurchaseOrderModel = new AMPurchaseOrderModel();
-            $selectQry = "am_purchase_orders.*,
+            $selectQry = "am_purchase_orders.*, am_purchase_order_details.id as detail_id,
                       metadata.value AS currency, am_purchase_orders.currency AS currency_id";
 
             $poData = $aMPurchaseOrderModel->asObject()
                 ->select($selectQry)
+                ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id')
                 ->join('metadata', 'metadata.id = am_purchase_orders.currency')
                 ->where($condition)
                 ->where('division_id', $divisiId)

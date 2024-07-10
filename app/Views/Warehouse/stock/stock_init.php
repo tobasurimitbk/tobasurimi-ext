@@ -7,7 +7,7 @@
         <?php if (can("Inventori", "Stok List", "c")) : ?>
             <div class="col-button-tambah-spp">
                 <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("stock-list"); ?>">
-                    Batal
+                    Kembali
                 </a>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                     Simpan
@@ -414,7 +414,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         var data = new FormData(document.querySelector(".create-form"));

@@ -279,7 +279,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Ya',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 var formData = new FormData();
@@ -326,7 +326,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Ya',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 var formData = new FormData();
