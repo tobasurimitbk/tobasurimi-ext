@@ -163,9 +163,6 @@
                     <div class="btn-group dropend">
                         <button class="btn dropdown-toggle p-3" style="background-color: #E02B35; color: white; width:160px; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-barcode"></i> Products
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-                                99
-                            </span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <?php if (can('Master Barang', 'Bahan Baku', 'r')) : ?>
