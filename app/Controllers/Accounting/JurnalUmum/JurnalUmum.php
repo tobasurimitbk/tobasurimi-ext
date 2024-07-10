@@ -25,6 +25,8 @@ use App\Models\LocalPOPaymentDetailModel;
 use App\Models\ImportPOPaymentModel;
 use App\Models\KursModel;
 use App\Models\PenerimaanBarangModel;
+use App\Models\SalesOrderLainDetailModel;
+use App\Models\SalesOrderLainModel;
 use Exception;
 
 class JurnalUmum extends BaseController
@@ -56,6 +58,9 @@ class JurnalUmum extends BaseController
     protected $metadataModel;
     protected $kursModel;
 
+    protected $salesOrderLainModel;
+    protected $salesOrderLainDetailModel;
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
@@ -84,6 +89,9 @@ class JurnalUmum extends BaseController
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->metadataModel = new MetadataModel();
         $this->kursModel = new KursModel();
+
+        $this->salesOrderLainModel = new SalesOrderLainModel();
+        $this->salesOrderLainDetailModel = new SalesOrderLainDetailModel();
     }
 
     public function index()
@@ -433,7 +441,7 @@ class JurnalUmum extends BaseController
                         $kodeTransaksi = "";
                         $idTransaksi = "";
 
-                        $dataDepartment = $this->divisionModel->getAccountKasForJurnal($dataBB->division_id);
+                        $dataDepartment = $this->divisionModel->getAccountKasForJurnal($dataBB->division_id, $dataBB->company_id);
                         $dataSupplier = $this->supplierModel->getSupplierForJurnal($dataBB->supplier_id);
                         $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
                         $dataAccountBarang = $this->accountBarangModel->getAccountBarangForJurnal();
@@ -586,7 +594,7 @@ class JurnalUmum extends BaseController
                     $kodeTransaksi = "";
                     $idTransaksi = "";
 
-                    $dataDepartment = $this->divisionModel->getAccountKasForJurnal($dataBP->division_id);
+                    $dataDepartment = $this->divisionModel->getAccountKasForJurnal($dataBP->division_id, $dataBP->company_id);
                     $dataSupplier = $this->supplierModel->getSupplierForJurnal($dataBP->supplier_id);
                     $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
                     $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
@@ -1094,5 +1102,46 @@ class JurnalUmum extends BaseController
             );
         }
         $this->jurnalUmumModel->insertJurnalBatch($result);
+    }
+
+
+    public function insertDataPenjualan($poID, $typePenjualan = ['LAIN', 'LOKAL', 'INTERNASIONAL'])
+    {
+        $kasDepartment = "";
+        $piutangDepartment = "";
+        $gajiDepartment = "";
+        $hppDepartment = "";
+        // $dataSupplier = $this->supplierModel->getSupplierForJurnal($dataBP->supplier_id);
+        // $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
+        // $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
+        // $dataAccountBarang = $this->accountBarangModel->getAccountBarangForJurnal();
+
+        if ($typePenjualan == 'LAIN') {
+            $salesOrderLain = $this->salesOrderLainModel->find($poID);
+            if ($salesOrderLain) {
+                $dataDepartment = $this->divisionModel->getAccountKasForJurnal($salesOrderLain['divisi_id'], $salesOrderLain['company_id']);
+                $salesOrderLainDetail = $this->salesOrderLainDetailModel->where('sales_order_lain_id', $poID)->findAll();
+
+                foreach ($dataDepartment as $value) {
+                    $kasDepartment = $value->coa_kas_id;
+                    $piutangDepartment = $value->coa_piutang_id;
+                    $gajiDepartment = $value->coa_gaji_id;
+                    $hppDepartment = $value->coa_hpp_id;
+                }
+
+                foreach ($salesOrderLainDetail as $value) {
+                    # code...
+                }
+            }
+        } elseif ($typePenjualan == "LOKAL") {
+            # code...
+        } elseif ($typePenjualan == "INTERNASIONAL") {
+            # code...
+        }
+
+        var_dump($kasDepartment);
+        var_dump($piutangDepartment);
+        var_dump($gajiDepartment);
+        var_dump($hppDepartment);
     }
 }

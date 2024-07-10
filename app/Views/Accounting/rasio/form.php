@@ -99,7 +99,7 @@
                         <li class="nav-item">
                             <a class="nav-link nav-link-raw-material-i" id="rawISaldoAkhir" href="#saldo_akhir">Saldo Stock Akhir</a>
                         </li>
-                        <!-- <li class="nav-item">
+                        <li class="nav-item">
                             <a class="nav-link nav-link-raw-material-i" id="rawISaldoAdjustment" href="#saldo_adjustment">Saldo Adjustment</a>
                         </li>
                         <li class="nav-item">
@@ -110,7 +110,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link nav-link-raw-material-i" id="rawISaldoKopek" href="#saldo_kopek">Saldo Kopek</a>
-                        </li> -->
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link nav-link-raw-material-i" id="rawIBahanJadi" href="#bahan_jadi">Bahan Jadi</a>
                         </li>
@@ -306,6 +306,10 @@
     let list_items_barang_digunakan_alokasi = [];
     let list_items_saldo_awal = [];
     let list_items_saldo_akhir = [];
+    let list_items_saldo_adjusment = [];
+    let list_items_saldo_jual = [];
+    let list_items_saldo_trimming = [];
+    let list_items_saldo_kopek = [];
 
     let list_items_barang_jadi_material_2 = [];
     let list_items_barang_digunakan_material_2 = [];
@@ -654,6 +658,78 @@
                     }
                 },
             });
+            $.ajax({
+                url: `<?= base_url('rasio/get-saldo-adjusment'); ?>`,
+                method: "GET",
+                data: {
+                    divisi_id: department_id,
+                    bulan: bulan,
+                    kategori: kategori,
+                },
+                dataType: "json",
+                success: function(res) {
+                    stopLoading()
+                    if (res.status) {
+                        list_items_saldo_adjusment = [];
+                        list_items_saldo_adjusment = res.data;
+                        drawTableSaldoAdjusmentAnalisa();
+                        drawTableSaldoAdjusmentSample();
+                        drawTableSaldoAdjusmentBonus();
+                        drawTableSaldoAdjusmentLainnya();
+                    } else {
+                        stopLoading()
+                        list_items_saldo_adjusment = [];
+                        drawTableSaldoAdjusmentAnalisa();
+                        drawTableSaldoAdjusmentSample();
+                        drawTableSaldoAdjusmentBonus();
+                        drawTableSaldoAdjusmentLainnya();
+                    }
+                },
+            });
+            $.ajax({
+                url: `<?= base_url('rasio/get-saldo-jual'); ?>`,
+                method: "GET",
+                data: {
+                    divisi_id: department_id,
+                    bulan: bulan,
+                    kategori: kategori,
+                },
+                dataType: "json",
+                success: function(res) {
+                    stopLoading()
+                    if (res.status) {
+                        list_items_saldo_jual = [];
+                        list_items_saldo_jual = res.data;
+                        drawTableSaldoJual();
+                    } else {
+                        stopLoading()
+                        list_items_saldo_jual = [];
+                        drawTableSaldoJual();
+                    }
+                },
+            });
+            $.ajax({
+                url: `<?= base_url('rasio/get-saldo-trimming'); ?>`,
+                method: "GET",
+                data: {
+                    divisi_id: department_id,
+                    bulan: bulan,
+                    kategori: kategori,
+                },
+                dataType: "json",
+                success: function(res) {
+                    stopLoading()
+                    if (res.status) {
+                        list_items_saldo_trimming = [];
+                        list_items_saldo_trimming = res.data;
+                        drawTableSaldoTrimming();
+                    } else {
+                        stopLoading()
+                        list_items_saldo_trimming = [];
+                        drawTableSaldoTrimming();
+                    }
+                },
+            });
         }
     }
 
@@ -859,12 +935,14 @@
                 row += '<tr style="color:whitesmoke;text-align: center;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
-                row += '<td>' + (item.totalQtyPO !== undefined ? parseFloat(item.totalQtyPO).toLocaleString() : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.totalQtyPO !== undefined ? parseFloat(item.totalQtyPO).toLocaleString() : 0) + '</td>';
                 row += '<td>' + (item.totalHargaPO !== undefined ? formatRupiah(parseFloat(item.totalHargaPO)) : formatRupiah(0)) + '</td>';
                 row += '<td>' + (item.hargaSatuanPO !== undefined ? formatRupiah(item.hargaSatuanPO) : formatRupiah(0)) + '</td>';
                 row += '<td>' + (item.satuanPO !== undefined ? item.satuanPO : strip) + '</td>';
-                row += '<td>' + (item.totalQtyLPB !== undefined ? item.totalQtyLPB.toLocaleString() : formatRupiah(0)) + '</td>';
-                row += '<td>' + (item.totalHargaLPB !== undefined ? formatRupiah(item.totalHargaLPB) : formatRupiah(0)) + '</td>';
+                row += '<td>' +
+                    '<input class="form-control qty-lpb text-center" oninput="preventNegativeInput(this)" type="text" data-index="' + index + '" value="' + (item.totalQtyLPB !== undefined ? item.totalQtyLPB.toLocaleString() : 0) + '">' +
+                    '</td>';
+                row += '<td class="totalHargaLPB">' + (item.totalHargaLPB !== undefined ? formatRupiah(item.totalHargaLPB) : formatRupiah(0)) + '</td>';
                 row += '<td>' + (item.hargaSatuanLPB !== undefined ? formatRupiah(item.hargaSatuanLPB) : formatRupiah(0)) + '</td>';
                 row += '<td>' + (item.satuanLPB !== undefined ? item.satuanLPB : strip) + '</td>';
                 row += '</tr>';
@@ -879,6 +957,27 @@
             $('.hargaSatuanPenerimaan').val(formatRupiah(hargaSatuanLPB));
 
             $('.body-detail-table').append(row);
+
+            $('.qty-lpb').on('input', function() {
+                var rowIndex = $(this).data('index');
+                var newQty = parseFloat($(this).val().replace(/,/g, '')) || 0;
+                var hargaSatuan = list_items_barang_digunakan[rowIndex].hargaSatuanLPB;
+                var newTotalHarga = newQty * hargaSatuan;
+
+                // Update the item in the list
+                list_items_barang_digunakan[rowIndex].totalQtyLPB = newQty;
+                list_items_barang_digunakan[rowIndex].totalHargaLPB = newTotalHarga;
+
+                // Update the totalHargaLPB cell in the table
+                $(this).closest('tr').find('.totalHargaLPB').text(formatRupiah(newTotalHarga));
+
+                // Recalculate the totals and update the footer
+                totalQtyLPB = list_items_barang_digunakan.reduce((acc, item) => acc + (item.totalQtyLPB || 0), 0);
+                totalHargaLPB = list_items_barang_digunakan.reduce((acc, item) => acc + (item.totalHargaLPB || 0), 0);
+
+                $('.qtyTotalPenerimaan').val(totalQtyLPB.toLocaleString());
+                $('.hargaTotalPenerimaan').val(formatRupiah(totalHargaLPB));
+            });
         }
     }
 
@@ -1048,6 +1147,268 @@
                 no++;
             });
             $('.body-detail-table-saldo-awal').append(row);
+        }
+    }
+
+    const drawTableSaldoAdjusmentAnalisa = function() {
+        $('.body-detail-table-saldo-adjust-analisa').empty();
+        $('.tfoot-detail-table-saldo-adjust-analisa').empty();
+        var row = '';
+        var rowFooter = '';
+        var no = 1;
+        var strip = "-";
+        if (list_items_saldo_adjusment.length === 0) {
+            row += '<tr><td colspan="6" class="text-center">Data Barang Tidak Ada</td></tr>';
+
+            $('.tfoot-detail-table-saldo-adjust-analisa').append(row);
+        } else {
+            var hargaUmum = 0;
+            var hargaHarian = 0;
+            var hargaBulanan = 0;
+            var stok = 0;
+            var stokProduksi = 0;
+            var totalHarga = 0;
+            list_items_saldo_adjusment.map((item, index) => {
+                // counting total
+                if (item.tipe_adjusment == "ANALISA") {
+                    hargaUmum += item.harga_umum !== null ? parseFloat(item.harga_umum) : 0;
+                    hargaHarian += item.harga_harian !== null ? parseFloat(item.harga_harian) : 0;
+                    hargaBulanan += item.harga_bulanan !== null ? parseFloat(item.harga_bulanan) : 0;
+                    stok = item.qty !== null ? parseFloat(item.qty) : 0;
+                    // stokProduksi = item.stok_produksi !== null ? parseFloat(item.stok_produksi) : 0;
+                    totalStok = stok;
+                    totalHarga = (hargaUmum + hargaHarian + hargaBulanan) * totalStok;
+                    // end counting
+                    row += '<tr style="color:whitesmoke;text-align: center;">';
+                    row += '<td>' + no + '</td>';
+                    row += '<td>' + item.barang + '</td>';
+                    row += '<td>' + (totalStok !== 0 ? parseFloat(totalStok).toLocaleString() : formatRupiah(0)) + '</td>';
+                    row += '<td>' + (item.satuan !== undefined ? item.satuan : strip) + '</td>';
+                    row += '<td>' + (totalHarga !== 0 ? formatRupiah(parseFloat(totalHarga)) : formatRupiah(0)) + '</td>';
+                    row += '</tr>';
+                    no++;
+                } else {
+                    row += '<tr style="color:whitesmoke;text-align: center;"><td colspan="6" class="text-center">Data Barang Tidak Ada</td></tr>';
+                }
+            });
+            $('.body-detail-table-saldo-adjust-analisa').append(row);
+        }
+    }
+
+    const drawTableSaldoAdjusmentSample = function() {
+        $('.body-detail-table-saldo-adjust-sample').empty();
+        $('.tfoot-detail-table-saldo-adjust-sample').empty();
+        var row = '';
+        var rowFooter = '';
+        var no = 1;
+        var strip = "-";
+        if (list_items_saldo_adjusment.length === 0) {
+            row += '<tr><td colspan="6" class="text-center">Data Barang Tidak Ada</td></tr>';
+
+            $('.tfoot-detail-table-saldo-adjust-sample').append(row);
+        } else {
+            var hargaUmum = 0;
+            var hargaHarian = 0;
+            var hargaBulanan = 0;
+            var stok = 0;
+            var stokProduksi = 0;
+            var totalHarga = 0;
+            list_items_saldo_adjusment.map((item, index) => {
+                // counting total
+                if (item.tipe_adjusment == "SAMPLE") {
+                    hargaUmum += item.harga_umum !== null ? parseFloat(item.harga_umum) : 0;
+                    hargaHarian += item.harga_harian !== null ? parseFloat(item.harga_harian) : 0;
+                    hargaBulanan += item.harga_bulanan !== null ? parseFloat(item.harga_bulanan) : 0;
+                    stok = item.qty !== null ? parseFloat(item.qty) : 0;
+                    // stokProduksi = item.stok_produksi !== null ? parseFloat(item.stok_produksi) : 0;
+                    totalStok = stok;
+                    totalHarga = (hargaUmum + hargaHarian + hargaBulanan) * totalStok;
+                    // end counting
+                    row += '<tr style="color:whitesmoke;text-align: center;">';
+                    row += '<td>' + no + '</td>';
+                    row += '<td>' + item.barang + '</td>';
+                    row += '<td>' + (totalStok !== 0 ? parseFloat(totalStok).toLocaleString() : formatRupiah(0)) + '</td>';
+                    row += '<td>' + (item.satuan !== undefined ? item.satuan : strip) + '</td>';
+                    row += '<td>' + (totalHarga !== 0 ? formatRupiah(parseFloat(totalHarga)) : formatRupiah(0)) + '</td>';
+                    row += '</tr>';
+                    no++;
+                } else {
+                    row += '<tr style="color:whitesmoke;text-align: center;"><td colspan="6" class="text-center">Data Barang Tidak Ada</td></tr>';
+                }
+            });
+            $('.body-detail-table-saldo-adjust-sample').append(row);
+        }
+    }
+
+    const drawTableSaldoAdjusmentBonus = function() {
+        $('.body-detail-table-saldo-adjust-bonus').empty();
+        $('.tfoot-detail-table-saldo-adjust-bonus').empty();
+        var row = '';
+        var rowFooter = '';
+        var no = 1;
+        var strip = "-";
+        if (list_items_saldo_adjusment.length === 0) {
+            row += '<tr><td colspan="6" class="text-center">Data Barang Tidak Ada</td></tr>';
+
+            $('.tfoot-detail-table-saldo-adjust-bonus').append(row);
+        } else {
+            var hargaUmum = 0;
+            var hargaHarian = 0;
+            var hargaBulanan = 0;
+            var stok = 0;
+            var stokProduksi = 0;
+            var totalHarga = 0;
+            list_items_saldo_adjusment.map((item, index) => {
+                // counting total
+                if (item.tipe_adjusment == "BONUS") {
+                    hargaUmum += item.harga_umum !== null ? parseFloat(item.harga_umum) : 0;
+                    hargaHarian += item.harga_harian !== null ? parseFloat(item.harga_harian) : 0;
+                    hargaBulanan += item.harga_bulanan !== null ? parseFloat(item.harga_bulanan) : 0;
+                    stok = item.qty !== null ? parseFloat(item.qty) : 0;
+                    // stokProduksi = item.stok_produksi !== null ? parseFloat(item.stok_produksi) : 0;
+                    totalStok = stok;
+                    totalHarga = (hargaUmum + hargaHarian + hargaBulanan) * totalStok;
+                    // end counting
+                    row += '<tr style="color:whitesmoke;text-align: center;">';
+                    row += '<td>' + no + '</td>';
+                    row += '<td>' + item.barang + '</td>';
+                    row += '<td>' + (totalStok !== 0 ? parseFloat(totalStok).toLocaleString() : formatRupiah(0)) + '</td>';
+                    row += '<td>' + (item.satuan !== undefined ? item.satuan : strip) + '</td>';
+                    row += '<td>' + (totalHarga !== 0 ? formatRupiah(parseFloat(totalHarga)) : formatRupiah(0)) + '</td>';
+                    row += '</tr>';
+                    no++;
+                } else {
+                    row += '<tr style="color:whitesmoke;text-align: center;"><td colspan="6" class="text-center">Data Barang Tidak Ada</td></tr>';
+                }
+            });
+            $('.body-detail-table-saldo-adjust-bonus').append(row);
+        }
+    }
+
+    const drawTableSaldoAdjusmentLainnya = function() {
+        $('.body-detail-table-saldo-adjust-lainnya').empty();
+        $('.tfoot-detail-table-saldo-adjust-lainnya').empty();
+        var row = '';
+        var rowFooter = '';
+        var no = 1;
+        var strip = "-";
+        if (list_items_saldo_adjusment.length === 0) {
+            row += '<tr><td colspan="6" class="text-center">Data Barang Tidak Ada</td></tr>';
+
+            $('.tfoot-detail-table-saldo-adjust-lainnya').append(row);
+        } else {
+            var hargaUmum = 0;
+            var hargaHarian = 0;
+            var hargaBulanan = 0;
+            var stok = 0;
+            var stokProduksi = 0;
+            var totalHarga = 0;
+            list_items_saldo_adjusment.map((item, index) => {
+                // counting total
+                if (item.tipe_adjusment == "LAINNYA") {
+                    hargaUmum += item.harga_umum !== null ? parseFloat(item.harga_umum) : 0;
+                    hargaHarian += item.harga_harian !== null ? parseFloat(item.harga_harian) : 0;
+                    hargaBulanan += item.harga_bulanan !== null ? parseFloat(item.harga_bulanan) : 0;
+                    stok = item.qty !== null ? parseFloat(item.qty) : 0;
+                    // stokProduksi = item.stok_produksi !== null ? parseFloat(item.stok_produksi) : 0;
+                    totalStok = stok;
+                    totalHarga = (hargaUmum + hargaHarian + hargaBulanan) * totalStok;
+                    // end counting
+                    row += '<tr style="color:whitesmoke;text-align: center;">';
+                    row += '<td>' + no + '</td>';
+                    row += '<td>' + item.barang + '</td>';
+                    row += '<td>' + (totalStok !== 0 ? parseFloat(totalStok).toLocaleString() : formatRupiah(0)) + '</td>';
+                    row += '<td>' + (item.satuan !== undefined ? item.satuan : strip) + '</td>';
+                    row += '<td>' + (totalHarga !== 0 ? formatRupiah(parseFloat(totalHarga)) : formatRupiah(0)) + '</td>';
+                    row += '</tr>';
+                    no++;
+                } else {
+                    row += '<tr style="color:whitesmoke;text-align: center;"><td colspan="6" class="text-center">Data Barang Tidak Ada</td></tr>';
+                }
+            });
+            $('.body-detail-table-saldo-adjust-lainnya').append(row);
+        }
+    }
+
+    const drawTableSaldoJual = function() {
+        $('.body-detail-table-saldo-jual').empty();
+        $('.tfoot-detail-table-saldo-jual').empty();
+        var row = '';
+        var rowFooter = '';
+        var no = 1;
+        var strip = "-";
+        if (list_items_saldo_jual.length === 0) {
+            row += '<tr><td colspan="6" class="text-center">Data Barang Tidak Ada</td></tr>';
+
+            $('.tfoot-detail-table-saldo-jual').append(row);
+        } else {
+            var hargaUmum = 0;
+            var hargaHarian = 0;
+            var hargaBulanan = 0;
+            var stok = 0;
+            var stokProduksi = 0;
+            var totalHarga = 0;
+            list_items_saldo_jual.map((item, index) => {
+                // counting total
+                hargaUmum += item.harga_umum !== null ? parseFloat(item.harga_umum) : 0;
+                hargaHarian += item.harga_harian !== null ? parseFloat(item.harga_harian) : 0;
+                hargaBulanan += item.harga_bulanan !== null ? parseFloat(item.harga_bulanan) : 0;
+                stok = item.qty !== null ? parseFloat(item.qty) : 0;
+                // stokProduksi = item.stok_produksi !== null ? parseFloat(item.stok_produksi) : 0;
+                totalStok = stok + stokProduksi;
+                totalHarga = (hargaUmum + hargaHarian + hargaBulanan) * totalStok;
+                // end counting
+                row += '<tr style="color:whitesmoke;text-align: center;">';
+                row += '<td>' + no + '</td>';
+                row += '<td>' + item.barang + '</td>';
+                row += '<td>' + (totalStok !== 0 ? parseFloat(totalStok).toLocaleString() : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.satuan !== undefined ? item.satuan : strip) + '</td>';
+                row += '<td>' + (totalHarga !== 0 ? formatRupiah(parseFloat(totalHarga)) : formatRupiah(0)) + '</td>';
+                row += '</tr>';
+                no++;
+            });
+            $('.body-detail-table-saldo-jual').append(row);
+        }
+    }
+
+    const drawTableSaldoTrimming = function() {
+        $('.body-detail-table-saldo-trimming').empty();
+        $('.tfoot-detail-table-saldo-trimming').empty();
+        var row = '';
+        var rowFooter = '';
+        var no = 1;
+        var strip = "-";
+        if (list_items_saldo_trimming.length === 0) {
+            row += '<tr><td colspan="6" class="text-center">Data Barang Tidak Ada</td></tr>';
+
+            $('.tfoot-detail-table-saldo-trimming').append(row);
+        } else {
+            var hargaUmum = 0;
+            var hargaHarian = 0;
+            var hargaBulanan = 0;
+            var stok = 0;
+            var stokProduksi = 0;
+            var totalHarga = 0;
+            list_items_saldo_trimming.map((item, index) => {
+                // counting total
+                hargaUmum += item.harga_umum !== null ? parseFloat(item.harga_umum) : 0;
+                hargaHarian += item.harga_harian !== null ? parseFloat(item.harga_harian) : 0;
+                hargaBulanan += item.harga_bulanan !== null ? parseFloat(item.harga_bulanan) : 0;
+                stok = item.stok_total !== null ? parseFloat(item.stok_total) : 0;
+                stokProduksi = item.stok_produksi !== null ? parseFloat(item.stok_produksi) : 0;
+                totalStok = stok + stokProduksi;
+                totalHarga = (hargaUmum + hargaHarian + hargaBulanan) * totalStok;
+                // end counting
+                row += '<tr style="color:whitesmoke;text-align: center;">';
+                row += '<td>' + no + '</td>';
+                row += '<td>' + item.barang + '</td>';
+                row += '<td>' + (totalStok !== 0 ? parseFloat(totalStok).toLocaleString() : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.satuan !== undefined ? item.satuan : strip) + '</td>';
+                row += '<td>' + (totalHarga !== 0 ? formatRupiah(parseFloat(totalHarga)) : formatRupiah(0)) + '</td>';
+                row += '</tr>';
+                no++;
+            });
+            $('.body-detail-table-saldo-trimming').append(row);
         }
     }
 
@@ -1564,8 +1925,6 @@
 
             data.forEach((item, index) => {
 
-                console.log(item);
-
                 let calculatedHargaTotal = 0;
                 let itemHargaTotal = 0;
                 const totalQtyAll = parseFloat(item.totalQtyAll);
@@ -1903,6 +2262,12 @@
                     if (list_items_saldo_awal.length != 0) {
                         drawTableSaldoAwal();
                     }
+                    if (list_items_saldo_adjusment.length != 0) {
+                        drawTableSaldoAdjusmentAnalisa();
+                        drawTableSaldoAdjusmentSample();
+                        drawTableSaldoAdjusmentBonus();
+                        drawTableSaldoAdjusmentLainnya();
+                    }
                 },
                 error: function() {
                     $('#content').html('<div class="alert alert-danger" role="alert">Failed to load content.</div>');
@@ -1970,10 +2335,6 @@
 
                 // var formatedHargaTotal = parseFloat(hargaTotal.replace(/Rp|\./g, ""));
                 // var formatedHargaTotalPenerimaan = parseFloat(hargaTotalPenerimaan.replace(/Rp|\./g, ""));
-
-
-                console.log(hargaTotal);
-                console.log(hargaTotalPenerimaan);
                 // if (formatedHargaTotal != formatedHargaTotalPenerimaan) {
                 //     isValid = false;
                 // }

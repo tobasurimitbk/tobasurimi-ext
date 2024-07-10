@@ -177,7 +177,7 @@ class DivisisModel extends Model
         ];
     }
 
-    public function getAccountKasForJurnal($divisionID)
+    public function getAccountKasForJurnal($divisionID, $companyID)
     {
         $select =   "divisis.*,
                     account_divisis.coa_kas_id,
@@ -188,7 +188,9 @@ class DivisisModel extends Model
             ->select($select)
             ->join('account_divisis', 'divisis.id = account_divisis.divisis_id', 'left')
             ->where('divisis.id', $divisionID)
+            ->where('account_divisis.company_id', $companyID)
             ->where('divisis.deletedAt', null)
+            ->where('account_divisis.deleted_at', null)
             ->findAll();
     }
 

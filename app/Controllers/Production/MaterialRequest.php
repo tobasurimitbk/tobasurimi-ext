@@ -28,7 +28,6 @@ class MaterialRequest extends BaseController
 {
     protected $token;
     protected $this_company_id;
-    protected $barangModel;
     protected $satuanModel;
     protected $workOrdersModel;
     protected $workOrderDetailsModel;
@@ -56,7 +55,6 @@ class MaterialRequest extends BaseController
         $this->this_user_id = session()->get("login")->user_id;
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->barangModel = new BarangModel();
         $this->satuanModel = new SatuansModel();
         $this->workOrdersModel = new WorkOrdersModel();
         $this->workOrderDetailsModel = new WorkOrderDetailsModel();
@@ -88,8 +86,6 @@ class MaterialRequest extends BaseController
 
     public function createView()
     {
-        //Get Barang
-        $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
 
         //Get Satuan
         $dataSatuan = $this->satuanModel->asObject()->find();
@@ -116,7 +112,7 @@ class MaterialRequest extends BaseController
 
         $data = [
             'tipeBarang' => $dataTipeBarang,
-            "dataBarang" => $dataBarang,
+            // "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
             "dataWarehouse" => $dataWarehouse,
@@ -130,8 +126,6 @@ class MaterialRequest extends BaseController
     {
         $ids = $id;
         $id = decrypt($id);
-        //Get Barang
-        $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
 
         //Get Satuan
         $dataSatuan = $this->satuanModel->asObject()->find();

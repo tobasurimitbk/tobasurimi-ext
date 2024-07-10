@@ -1581,6 +1581,9 @@ $routes->get('/rasio/get-barang-jadi', 'Accounting\Rasio\RasioController::getRas
 $routes->get('/rasio/get-barang-digunakan', 'Accounting\Rasio\RasioController::getRasioBarangDigunakan', ['filter' => 'Auth']);
 $routes->get('/rasio/get-saldo-akhir', 'Accounting\Rasio\RasioController::getSaldoAkhir', ['filter' => 'Auth']);
 $routes->get('/rasio/get-saldo-awal', 'Accounting\Rasio\RasioController::getSaldoAwal', ['filter' => 'Auth']);
+$routes->get('/rasio/get-saldo-adjusment', 'Accounting\Rasio\RasioController::getSaldoAdjusment', ['filter' => 'Auth']);
+$routes->get('/rasio/get-saldo-jual', 'Accounting\Rasio\RasioController::getSaldoJual', ['filter' => 'Auth']);
+$routes->get('/rasio/get-saldo-trimming', 'Accounting\Rasio\RasioController::getSaldoTrimming', ['filter' => 'Auth']);
 $routes->get('/rasio/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
 $routes->get('/rasio/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
 $routes->get('/rasio/get-jurnal', 'Accounting\Rasio\RasioController::getDataJurnal', ['filter' => 'Auth']);

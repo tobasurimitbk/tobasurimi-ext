@@ -2,6 +2,7 @@
 
 namespace App\Controllers\PenjualanLain;
 
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Controllers\BaseController;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
@@ -41,6 +42,8 @@ class SalesOrderLain extends BaseController
     protected $bc41Model;
     protected $dompdf;
 
+    protected $jurnalUmumController;
+
     public function __construct()
     {
         $this->this_user_id = session()->get("login")->user_id;
@@ -61,6 +64,8 @@ class SalesOrderLain extends BaseController
         $this->bc25Model = new BC25Model();
         $this->bc41Model = new BC41Model();
         $this->dompdf = new Dompdf();
+
+        $this->jurnalUmumController = new JurnalUmum();
     }
 
     public function index()
@@ -330,6 +335,8 @@ class SalesOrderLain extends BaseController
         $salesOrderLain = $this->salesOrderLainModel->find($id);
         $salesOrderLainList = $this->salesOrderLainDetailModel->where('sales_order_lain_id', $id)->findAll();
 
+        $this->jurnalUmumController->insertDataPenjualan($id, "LAIN");
+        exit;
         if ($salesOrderLain['bc_id'] === "0") {
             foreach ($salesOrderLainList as $s) {
                 $stock = $this->stockModel->find($s['stock_id']);
