@@ -6,151 +6,156 @@
     <div class="section-header">
         <h1>Dashboard</h1>
     </div>
-    <div class="container-fluid">
-        <div class="row ">
-            <div class="col-sm-1 mr-4 ml-4 mt-3">
-                <div class="btn-group dropend">
-                    <button class="btn dropdown-toggle p-3" style="background-color: #E02B35; color: white; width:160px; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-store"></i> <span>Purchase</span>
-                        <?php if (!empty($jumlah_pembayaran)) : ?>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-                                <?= !empty($jumlah_pembayaran) ? $jumlah_pembayaran : "-" ?>
-                            </span>
-                        <?php endif; ?>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="<?= base_url("po-lokal-bahan-baku"); ?>">PO Lokal Bahan Baku </a></li>
-                        <li><a class="dropdown-item" href="<?= base_url("po-lokal-bahan-penolong"); ?>">PO Lokal Bahan Penolong</a></li>
-                        <li><a class="dropdown-item" href="<?= base_url("po-import-bahan-baku"); ?>">PO Import Bahan Baku</a></li>
-                        <li><a class="dropdown-item" href="<?= base_url("po-import-bahan-penolong"); ?>">PO Import Bahan Penolong</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-sm-1 mr-4 ml-4 mt-3">
-                <div class="btn-group dropend">
-                    <button class="btn dropdown-toggle p-3" style="background-color: #E02B35; color: white; width:160px; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-barcode"></i> Sales
-                        <?php if (!empty($jumlah_sales_bulan_ini)) : ?>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-                                <?= !empty($jumlah_sales_bulan_ini) ? $jumlah_sales_bulan_ini : "-" ?>
-                            </span>
-                        <?php endif; ?>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="<?= base_url("order-form-lokal"); ?>">Penjualan Lokal</a></li>
-                        <li><a class="dropdown-item" href="<?= base_url("order-form-internasional"); ?>">Penjualan Expor</a></li>
-                        <li><a class="dropdown-item" href="<?= base_url("order-form-lain"); ?>">Penjualan Lain</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="col-sm-1 mr-4 ml-4 mt-3">
-                <a href="<?= base_url("laporan-warehouse"); ?>" class="btn p-3" style="background-color: #E02B35; color: white; width:160px">
-                    <i class="fas fa-truck"></i> Material Req.
-                    <?php if (!empty($jumlah_sales_bulan_ini)) : ?>
-                        <span class=" position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-                            <?= !empty($jumlah_sales_bulan_ini) ? $jumlah_sales_bulan_ini : "-" ?>
-                        </span>
-                    <?php endif; ?>
-                </a>
-            </div>
-            <div class="col-sm-1 mr-4 ml-4 mt-3">
-                <a href="<?= base_url("work-order"); ?>" class="btn p-3" style="background-color: #E02B35; color: white; width:160px">
-                    <i class="fas fa-play"></i> Production
-                    <?php if (!empty($jumlah_sales_bulan_ini)) : ?>
-                        <span class=" position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-                            <?= !empty($jumlah_sales_bulan_ini) ? $jumlah_sales_bulan_ini : "-" ?>
-                        </span>
-                    <?php endif; ?>
-                </a>
-            </div>
-
-            <div class="col-sm-1 mr-4 ml-4 mt-3">
-                <div class="btn-group dropend">
-                    <button class="btn dropdown-toggle p-3" style="background-color: #E02B35; color: white; width:160px; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-truck"></i> Jasa Vendor
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-                            99+
-                        </span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="<?= base_url("proses-rebus"); ?>">Proses Rebus</a></li>
-                        <li><a class="dropdown-item" href="<?= base_url("jasa-vendor-out"); ?>">Barang Keluar </a></li>
-                        <li><a class="dropdown-item" href="<?= base_url("jasa-vendor-in"); ?>">Barang Masuk</a></li>
-                        <li><a class="dropdown-item" href="<?= base_url("biaya-udang"); ?>">Biaya Udang</a></li>
-                        <li><a class="dropdown-item" href="<?= base_url('biaya-kepiting'); ?>">Biaya Kepiting</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-sm-1 mr-4 ml-4 mt-3">
-                <a href="<?= base_url("kurs"); ?>" class="btn p-3" style="background-color: #E02B35; color: white; width:160px">
-                    <i class="fas fa-bar-chart"></i> Kurs
-                    <?php if (!empty($jumlah_sales_bulan_ini)) : ?>
-                        <span class=" position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-                            <?= !empty($jumlah_sales_bulan_ini) ? $jumlah_sales_bulan_ini : "-" ?>
-                        </span>
-                    <?php endif; ?>
-                </a>
-            </div>
-
-            <div class="col-sm-1 mr-4 ml-4 mt-3">
-                <a href="<?= base_url("user");  ?>" class="btn p-3" style="background-color: #E02B35; color: white; width:160px">
-                    <i class="fas fa-users"></i> Users
-                    <?php if (!empty($jumlah_sales_bulan_ini)) : ?>
-                        <span class=" position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-                            <?= !empty($jumlah_sales_bulan_ini) ? $jumlah_sales_bulan_ini : "-" ?>
-                        </span>
-                    <?php endif; ?>
-                </a>
-            </div>
-
-            <div class="col-sm-1 mr-4 ml-4 mt-3">
-                <div class="btn-group dropend">
-                    <button class="btn dropdown-toggle p-3" style="background-color: #E02B35; color: white; width:160px; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-barcode"></i> Products
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-                            99+
-                        </span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-sm-1 mr-4 ml-4 mt-3">
-                <a href="<?= base_url("customer");  ?>" class="btn p-3" style="background-color: #E02B35; color: white; width:160px">
-                    <i class="fas fa-address-book"></i> Customer
-                    <?php if (!empty($jumlah_sales_bulan_ini)) : ?>
-                        <span class=" position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-                            <?= !empty($jumlah_sales_bulan_ini) ? $jumlah_sales_bulan_ini : "-" ?>
-                        </span>
-                    <?php endif; ?>
-                </a>
-            </div>
-            <div class="col-sm-1 mr-4 ml-4 mt-3">
-                <div class="btn-group dropend">
-                    <button class="btn dropdown-toggle p-3" style="background-color: #E02B35; color: white; width:160px; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-info"></i> Info
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-                            99+
-                        </span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">WA</a></li>
-                        <li><a class="dropdown-item" href="#">AnotWher action</a></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                </div>
-            </div>
-
-
+    <div class="card">
+        <div class="card-header text-black text-bold">
+            <b>MENU CEPAT</b>
         </div>
+        <div class="card-body">
+            <div class="row" style="margin-top: -20px;">
+                <div class="col-sm-1 mr-4 ml-4 mt-3">
+                    <div class="btn-group dropend">
+                        <button class="btn dropdown-toggle p-3" style="background-color: #E02B35; color: white; width:160px; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-store"></i> <span>Purchase</span>
+                            <?php if (!empty($jumlah_pembayaran)) : ?>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                                    <?= !empty($jumlah_pembayaran) ? $jumlah_pembayaran : "-" ?>
+                                </span>
+                            <?php endif; ?>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="<?= base_url("po-lokal-bahan-baku"); ?>">PO Lokal Bahan Baku </a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("po-lokal-bahan-penolong"); ?>">PO Lokal Bahan Penolong</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("po-import-bahan-baku"); ?>">PO Import Bahan Baku</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("po-import-bahan-penolong"); ?>">PO Import Bahan Penolong</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-sm-1 mr-4 ml-4 mt-3">
+                    <div class="btn-group dropend">
+                        <button class="btn dropdown-toggle p-3" style="background-color: #E02B35; color: white; width:160px; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-barcode"></i> Sales
+                            <?php if (!empty($jumlah_sales_bulan_ini)) : ?>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                                    <?= !empty($jumlah_sales_bulan_ini) ? $jumlah_sales_bulan_ini : "-" ?>
+                                </span>
+                            <?php endif; ?>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="<?= base_url("order-form-lokal"); ?>">Penjualan Lokal</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("order-form-internasional"); ?>">Penjualan Expor</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("order-form-lain"); ?>">Penjualan Lain</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-sm-1 mr-4 ml-4 mt-3">
+                    <div class="btn-group">
+                        <a href="<?= base_url("laporan-warehouse"); ?>" class="btn p-3" style="background-color: #E02B35; color: white; width:160px">
+                            <i class="fas fa-truck"></i> Material Req.
+                            <?php if (!empty($jumlah_sales_bulan_ini)) : ?>
+                                <span class=" position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                                    <?= !empty($jumlah_sales_bulan_ini) ? $jumlah_sales_bulan_ini : "-" ?>
+                                </span>
+                            <?php endif; ?>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-sm-1 mr-4 ml-4 mt-3">
+                    <div class="btn-group">
+                        <a href="<?= base_url("work-order"); ?>" class="btn p-3" style="background-color: #E02B35; color: white; width:160px">
+                            <i class="fas fa-play"></i> Production
+                            <?php if (!empty($jumlah_sales_bulan_ini)) : ?>
+                                <span class=" position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                                    <?= !empty($jumlah_sales_bulan_ini) ? $jumlah_sales_bulan_ini : "-" ?>
+                                </span>
+                            <?php endif; ?>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-sm-1 mr-4 ml-4 mt-3">
+                    <div class="btn-group dropend">
+                        <button class="btn dropdown-toggle p-3" style="background-color: #E02B35; color: white; width:160px; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-truck"></i> Jasa Vendor
+
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="<?= base_url("proses-rebus"); ?>">Proses Rebus</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("jasa-vendor-out"); ?>">Barang Keluar </a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("jasa-vendor-in"); ?>">Barang Masuk</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("biaya-udang"); ?>">Biaya Udang</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url('biaya-kepiting'); ?>">Biaya Kepiting</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-sm-1 mr-4 ml-4 mt-3">
+                    <div class="btn-group">
+                        <a href="<?= base_url("kurs"); ?>" class="btn p-3" style="background-color: #E02B35; color: white; width:160px">
+                            <div class="text-center">
+                                <i class="fa-solid fa-dollar-sign fa-lg"></i>
+                                KURS
+                            </div>
+
+                            <?php if (!empty($jumlah_sales_bulan_ini)) : ?>
+                                <span class=" position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                                    <?= !empty($jumlah_sales_bulan_ini) ? $jumlah_sales_bulan_ini : "-" ?>
+                                </span>
+                            <?php endif; ?>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-sm-1 mr-4 ml-4 mt-3">
+                    <div class="btn-group">
+                        <a href="<?= base_url("user");  ?>" class="btn p-3" style="background-color: #E02B35; color: white; width:160px">
+                            <i class="fas fa-users"></i> Users
+                            <?php if (!empty($jumlah_sales_bulan_ini)) : ?>
+                                <span class=" position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                                    <?= !empty($jumlah_sales_bulan_ini) ? $jumlah_sales_bulan_ini : "-" ?>
+                                </span>
+                            <?php endif; ?>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-sm-1 mr-4 ml-4 mt-3">
+                    <div class="btn-group dropend">
+                        <button class="btn dropdown-toggle p-3" style="background-color: #E02B35; color: white; width:160px; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-barcode"></i> Products
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                                99
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-sm-1 mr-4 ml-4 mt-3">
+                    <div class="btn-group">
+                        <a href="<?= base_url("customer");  ?>" class="btn p-3" style="background-color: #E02B35; color: white; width:160px">
+                            <i class="fas fa-address-book"></i> Customer
+                            <?php if (!empty($jumlah_sales_bulan_ini)) : ?>
+                                <span class=" position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                                    <?= !empty($jumlah_sales_bulan_ini) ? $jumlah_sales_bulan_ini : "-" ?>
+                                </span>
+                            <?php endif; ?>
+                        </a>
+                    </div>
+                </div>
 
 
 
-        <!-- <div class="col-12" style="overflow-x: auto; white-space: nowrap; padding: 10px;">
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- <div class="col-12" style="overflow-x: auto; white-space: nowrap; padding: 10px;">
             <a href="http://202.162.198.46:7089/rak/tf" class="btn bg-orange d-lg-none" target="_blank">
                 <i class="fa fa-share"></i> Transfer Antar Rak
             </a>
@@ -211,7 +216,7 @@
         </div> -->
 
 
-        <!-- <div class="row mt-4">
+    <!-- <div class="row mt-4">
             <div class="col-md-9">
                 <div class="card">
                     <div class="card-header">
@@ -365,7 +370,7 @@
             </div>
 
         </div> -->
-        <!-- <div class="row">
+    <!-- <div class="row">
             <div class="col-lg-3 col-md-6 col-sm-6 col-12">
                 <div class="card card-statistic-1">
                     <div class="card-icon bg-danger">
@@ -427,7 +432,6 @@
                 </div>
             </div>
         </div> -->
-    </div>
 </section>
 
 
