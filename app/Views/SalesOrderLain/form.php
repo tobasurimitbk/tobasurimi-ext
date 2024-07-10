@@ -6,7 +6,7 @@
         <h1><?= empty($salesOrderLain) ? "Tambah Order Form Lain" : "Update Order Form Lain" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("order-form-lain"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($salesOrderLain)) : ?>
                 <?php if ($salesOrderLain['status_posting'] == "0") : ?>
@@ -384,7 +384,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard btn-discard-detail mr-2">Batal</button>
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-detail mr-2">Kembali</button>
                 <?php if (!empty($salesOrderLain)) : ?>
                     <?php if ($salesOrderLain['status_posting'] != '1') : ?>
                         <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
@@ -773,7 +773,7 @@
                         showCancelButton: true,
                         reverseButtons: true,
                         confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
+                        cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             var id = $('#id').val();
@@ -1340,7 +1340,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
@@ -1384,7 +1384,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);

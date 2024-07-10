@@ -7,7 +7,7 @@
         <h1 class="title-name">Tambah Material Request Kimia</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request-kimia"); ?>">
-                Batal
+                Kembali
             </a>
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan
@@ -810,7 +810,7 @@
                             showCancelButton: true,
                             reverseButtons: true,
                             confirmButtonText: 'Simpan',
-                            cancelButtonText: 'Batal',
+                            cancelButtonText: 'Kembali',
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 let id = $('#id').val();

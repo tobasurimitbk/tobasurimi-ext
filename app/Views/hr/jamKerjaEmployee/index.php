@@ -168,7 +168,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard btn-discard-modal mr-2">Batal</button>
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-modal mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
             </div>
         </div>
@@ -267,7 +267,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 var data = new FormData(document.querySelector(".form-update-jam-kerja"));
                 $.ajax({

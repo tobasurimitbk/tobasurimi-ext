@@ -7,7 +7,7 @@
         <h1 class="title-name"><?= !empty($poDetail) ? "Update PO Lokal Bahan Penolong" : "Tambah PO Lokal Bahan Penolong" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-lokal-bahan-penolong"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($poDetail)) : ?>
                 <?php if (!$poDetail['is_posted']) : ?>
@@ -705,7 +705,7 @@
                         showCancelButton: true,
                         reverseButtons: true,
                         confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
+                        cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             var id = $('#id').val();
@@ -781,7 +781,7 @@
                         showCancelButton: true,
                         reverseButtons: true,
                         confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
+                        cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             var poDate = $('#po_date').val();
@@ -1143,7 +1143,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData();
@@ -1193,7 +1193,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: status == '0' ? 'Unposting' : 'Posting',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData();
@@ -1252,7 +1252,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData();

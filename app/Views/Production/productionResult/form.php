@@ -12,7 +12,7 @@
         <?php endif; ?>
         <div class="col-button-tambah-spp text-right">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("production-result"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (isset($data)) { ?>
                 <!-- <button class="btn btn-success mr-1" onclick="posting('<?= !empty($data) ? encrypt($data->id) : ''; ?>', 1)">
@@ -486,7 +486,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard btn-discard-add-barang mr-2">Batal</button>
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-add-barang mr-2">Kembali</button>
                 <button type="button" class="btn btn-submit-form btn-add-barang">Simpan</button>
             </div>
         </div>
@@ -949,7 +949,7 @@
                         showCancelButton: true,
                         reverseButtons: true,
                         confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
+                        cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const csrf = $(`[name="${csrfToken}"]`);
@@ -1711,7 +1711,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Posting',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
@@ -1771,7 +1771,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);

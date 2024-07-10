@@ -6,7 +6,7 @@
         <h1><?= empty($penerimaanMutasiGlobal) ? "Tambah Penerimaan Mutasi BC 2.7" : "Update Penerimaan Mutasi BC 2.7" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-mutasi/global"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($penerimaanMutasiGlobal)) : ?>
                 <?php if ($penerimaanMutasiGlobal['status_posting'] == "0") : ?>
@@ -294,7 +294,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard btn-discard-barang-masuk mr-2">Batal</button>
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-barang-masuk mr-2">Kembali</button>
                 <?php if (!empty($penerimaanMutasiGlobal)) : ?>
                     <?php if ($penerimaanMutasiGlobal['status_posting'] != '1') : ?>
                         <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
@@ -515,7 +515,7 @@
                         showCancelButton: true,
                         reverseButtons: true,
                         confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
+                        cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             let id = $('#id').val();
@@ -881,7 +881,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
@@ -931,7 +931,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);

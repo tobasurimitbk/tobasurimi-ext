@@ -6,7 +6,7 @@
         <h1><?= empty($jasaVendorIn) ? "Tambah Jasa Vendor Barang Masuk" : "Update Jasa Vendor Barang Masuk" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("jasa-vendor-in"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($jasaVendorIn)) : ?>
                 <?php if ($jasaVendorIn['status_posting'] == "0") : ?>
@@ -324,7 +324,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard btn-discard-barang-masuk mr-2">Batal</button>
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-barang-masuk mr-2">Kembali</button>
                 <?php if (!empty($jasaVendorIn)) : ?>
                     <?php if ($jasaVendorIn['status_posting'] != '1') : ?>
                         <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
@@ -615,7 +615,7 @@
                         showCancelButton: true,
                         reverseButtons: true,
                         confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
+                        cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             let id = $('#id').val();
@@ -1156,7 +1156,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
@@ -1206,7 +1206,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);

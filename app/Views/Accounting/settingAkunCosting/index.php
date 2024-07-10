@@ -143,7 +143,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
                 <button type="button" class="btn btn-submit-form" onclick="submitData()">Simpan</button>
             </div>
         </div>

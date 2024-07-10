@@ -207,7 +207,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     let data = new FormData(document.querySelector(".create-form"));

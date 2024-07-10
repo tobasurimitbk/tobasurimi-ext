@@ -7,7 +7,7 @@
         <h1 class="title-name"><?= !empty($dataWorkOrders) ? "Detail Work Order" : "Tambah Work Order"; ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("work-order"); ?>">
-                Batal
+                Kembali
             </a>
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan
@@ -189,7 +189,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
+                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-detail" onclick="submitDetailForm()">Simpan</button>
             </div>
         </div>
@@ -479,7 +479,7 @@
                         showCancelButton: true,
                         reverseButtons: true,
                         confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
+                        cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $('#warehouse_id').prop('disabled', false);
@@ -800,7 +800,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Hapus',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({

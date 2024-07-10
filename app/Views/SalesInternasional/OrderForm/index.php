@@ -69,7 +69,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
+                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Kembali</button>
                 <button type="button" onclick="updateStatus('NEW', 'NEW')" class="btn btn-submit-form btn-submit-detail">Un Posting</button>
             </div>
         </div>
@@ -256,7 +256,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);

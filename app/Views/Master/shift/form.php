@@ -8,7 +8,7 @@
         <h1 class="title-name"><?= !empty($data) ? "Ubah" : "Tambah"; ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("shift"); ?>">
-                Batal
+                Kembali
             </a>
 
             <button class="btn btn-show-form btn-save float-right btn-submit">
@@ -138,7 +138,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);

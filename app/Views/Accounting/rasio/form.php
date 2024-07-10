@@ -6,7 +6,7 @@
         <h1><?= empty($jasaVendorOut) ? "Tambah Rasio" : "Update Rasio" ?></h1>
         <div class="col-button-tambah-spp text-right">
             <a class="btn btn-hide-form btn-discard" href="<?= base_url("rasio"); ?>">
-                Batal
+                Kembali
             </a>
             <button class="btn btn-show-form btn-save btn-submit-parent">
                 Simpan
@@ -2131,7 +2131,7 @@
                         showCancelButton: true,
                         reverseButtons: true,
                         confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
+                        cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const csrf = $(`[name="${csrfToken}"]`);

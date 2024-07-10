@@ -6,7 +6,7 @@
         <h1><?= empty($penerimaanMutasi) ? "Tambah Penerimaan Mutasi PPBKB" : "Update Penerimaan Mutasi PPBKB" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-mutasi"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($penerimaanMutasi)) : ?>
                 <?php if ($penerimaanMutasi['status_posting'] == "0") : ?>
@@ -328,7 +328,7 @@
                         showCancelButton: true,
                         reverseButtons: true,
                         confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
+                        cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             let id = $('#id').val();
@@ -587,7 +587,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
@@ -637,7 +637,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);

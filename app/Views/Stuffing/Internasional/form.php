@@ -6,7 +6,7 @@
         <h1><?= empty($stuffingInternasional) ? "Tambah Pengeluaran Internasional" : "Update Pengeluaran Internasional" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pengeluaran-internasional"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($stuffingInternasional)) : ?>
                 <?php if ($stuffingInternasional['status_posting'] == "0") : ?>
@@ -342,7 +342,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-kemasan btn-discard mr-3">Batal</button>
+                <button type="button" class="btn btn-hide-kemasan btn-discard mr-3">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-kemasan">Simpan</button>
                 <!-- <button type="button" class="btn btn-discard delete-btn delete-detail delete-form">Hapus</button> -->
             </div>
@@ -775,7 +775,7 @@
                         showCancelButton: true,
                         reverseButtons: true,
                         confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
+                        cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             let id = $('#id').val();
@@ -1437,7 +1437,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
@@ -1487,7 +1487,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
@@ -1685,7 +1685,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
@@ -1744,7 +1744,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);

@@ -7,7 +7,7 @@
     <div class="section-header">
         <h1 class="title-name"><?= !empty($data) ? "Ubah" : "Tambah"; ?> Return Barang</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("return-barang-sales"); ?>">Batal</a>
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("return-barang-sales"); ?>">Kembali</a>
             <?php if (!empty($data)) : ?>
                 <button class="btn btn-hapus delete-parent float-right btn-delete">
                     Hapus
@@ -266,7 +266,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
@@ -334,7 +334,7 @@
                         showCancelButton: true,
                         reverseButtons: true,
                         confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
+                        cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const csrf = $(`[name="${csrfToken}"]`);

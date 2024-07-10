@@ -446,7 +446,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Batal</button>
+                                <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Kembali</button>
                                 <button type="submit" class="btn btn-submit-form" id="globalGenerateBtn">Generate</button>
                             </div>
                         </form>
@@ -499,7 +499,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Batal</button>
+                                <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Kembali</button>
                                 <button type="submit" class="btn btn-submit-form" id="singleGenerateBtn">Generate</button>
                             </div>
                         </form>
@@ -596,7 +596,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form btn-discard btn-discard-update mr-3">Batal</button>
+                    <button type="button" class="btn btn-hide-form btn-discard btn-discard-update mr-3">Kembali</button>
                     <button type="submit" class="btn btn-submit-form">Simpan</button>
                 </div>
             </form>
@@ -643,7 +643,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3" id="hideModalTriwulan">Batal</button>
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3" id="hideModalTriwulan">Kembali</button>
                     <button type="submit" class="btn btn-submit-form" id="printBtnTriwulan">Print</button>
                 </div>
             </form>
@@ -689,7 +689,7 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard mr-3" id="btn-discard-2">Batal</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-3" id="btn-discard-2">Kembali</button>
             </div>
             </form>
         </div>
@@ -755,7 +755,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     // append to form
                     if (result.isConfirmed) {
@@ -862,7 +862,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // append to form
@@ -1074,7 +1074,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     // set variable

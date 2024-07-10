@@ -6,7 +6,7 @@
         <h1 class="title-name"><?= !empty($dataPenerimaanBarang) ? "Update Penerimaan Barang Lokal Bahan Penolong" : "Tambah Penerimaan Barang Lokal Bahan Penolong" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-barang-lokal-bp"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($dataPenerimaanBarang)) : ?>
                 <?php if (can('Warehouse', 'P. Barang Lokal BP', 'p')) : ?>
@@ -343,7 +343,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-detail btn-discard mr-2">Batal</button>
+                <button type="button" class="btn btn-hide-detail btn-discard mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
             </div>
         </div>
@@ -690,7 +690,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
@@ -1026,7 +1026,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -1076,7 +1076,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);

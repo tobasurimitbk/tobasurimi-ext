@@ -7,7 +7,7 @@
         <h1 class="title-name">Tambah PO Import Bahan Penolong</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-import-bahan-penolong"); ?>">
-                Batal
+                Kembali
             </a>
 
             <?php if (!empty($dataPOImport)) { ?>
@@ -450,7 +450,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
+                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
             </div>
         </div>
@@ -951,7 +951,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Close',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -1011,7 +1011,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -1074,7 +1074,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     let new_list_items = []
@@ -1221,7 +1221,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Posting',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -1292,7 +1292,7 @@
                         showCancelButton: true,
                         reverseButtons: true,
                         confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
+                        cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const csrf = $(`[name="${csrfToken}"]`);

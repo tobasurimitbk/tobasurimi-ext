@@ -7,7 +7,7 @@
         <h1 class="title-name">Tambah</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("rekap-faktur"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($rekapData) && $rekapData->is_posted === false) : ?>
                 <button class="btn btn-success posting-rekap">Posting</button>
@@ -198,7 +198,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Posting',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     // const csrf = $(`[name="${csrfToken}"]`);
@@ -269,7 +269,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -331,7 +331,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const id = $(".id").val();

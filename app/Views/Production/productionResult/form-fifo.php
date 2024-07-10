@@ -12,7 +12,7 @@
         <?php endif; ?>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("production-result"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (isset($data) && $data->is_posted != 1) { ?>
                 <button class="btn btn-success float-right" onclick="posting('<?= !empty($data) ? encrypt($data->id) : ''; ?>', 1)">
@@ -851,7 +851,7 @@
                         showCancelButton: true,
                         reverseButtons: true,
                         confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
+                        cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const csrf = $(`[name="${csrfToken}"]`);
@@ -1716,7 +1716,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Posting',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({

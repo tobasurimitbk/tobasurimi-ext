@@ -7,7 +7,7 @@
         <h1 class="title-name">Tambah SPP</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("spp"); ?>">
-                Batal
+                Kembali
             </a>
             <?php if (!empty($dataSPP)) { ?>
                 <?php if ($dataSPP->is_posted === "0") { ?>
@@ -238,7 +238,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
+                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-detail" onclick="submitDetailForm()">Simpan</button>
             </div>
         </div>
@@ -404,7 +404,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
                 <button type="button" class="btn btn-submit-form btn-submit-form-barang" id="btn-submit-form-barang">Simpan</button>
             </div>
         </div>
@@ -657,7 +657,7 @@
                     showCancelButton: true,
                     reverseButtons: true,
                     confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         let id = $(".id").val();
@@ -839,7 +839,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
@@ -1048,7 +1048,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: status == '0' ? 'Unposting' : 'Posting',
-            cancelButtonText: 'Batal',
+            cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
@@ -1160,7 +1160,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -1220,7 +1220,7 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -1541,7 +1541,7 @@
                         showCancelButton: true,
                         reverseButtons: true,
                         confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
+                        cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             let id = $('input[name="id"]').val();
@@ -1791,7 +1791,7 @@
                         showCancelButton: true,
                         reverseButtons: true,
                         confirmButtonText: 'Hapus',
-                        cancelButtonText: 'Batal',
+                        cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const csrf = $(`[name="${csrfToken}"]`);
