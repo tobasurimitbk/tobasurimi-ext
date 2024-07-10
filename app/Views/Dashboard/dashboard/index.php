@@ -23,10 +23,11 @@
                             <?php endif; ?>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="<?= base_url("po-lokal-bahan-baku"); ?>">PO Lokal Bahan Baku </a></li>
-                            <li><a class="dropdown-item" href="<?= base_url("po-lokal-bahan-penolong"); ?>">PO Lokal Bahan Penolong</a></li>
-                            <li><a class="dropdown-item" href="<?= base_url("po-import-bahan-baku"); ?>">PO Import Bahan Baku</a></li>
-                            <li><a class="dropdown-item" href="<?= base_url("po-import-bahan-penolong"); ?>">PO Import Bahan Penolong</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("spp"); ?>">SPP</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("po-lokal-bahan-baku"); ?>">PO LOKAL BB </a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("po-lokal-bahan-penolong"); ?>">PO LOKAL BP</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("po-import-bahan-baku"); ?>">PO IMPORT BB</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("po-import-bahan-penolong"); ?>">PO IMPORT BP</a></li>
                         </ul>
                     </div>
                 </div>
@@ -41,9 +42,9 @@
                             <?php endif; ?>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="<?= base_url("order-form-lokal"); ?>">Penjualan Lokal</a></li>
-                            <li><a class="dropdown-item" href="<?= base_url("order-form-internasional"); ?>">Penjualan Expor</a></li>
-                            <li><a class="dropdown-item" href="<?= base_url("order-form-lain"); ?>">Penjualan Lain</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("order-form-lokal"); ?>">PENJUALAN LOKAL</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("order-form-internasional"); ?>">PENJUALAN EXPOR</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("order-form-lain"); ?>">PENJUALAN LAIN</a></li>
                         </ul>
                     </div>
                 </div>
@@ -80,11 +81,11 @@
 
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="<?= base_url("proses-rebus"); ?>">Proses Rebus</a></li>
-                            <li><a class="dropdown-item" href="<?= base_url("jasa-vendor-out"); ?>">Barang Keluar </a></li>
-                            <li><a class="dropdown-item" href="<?= base_url("jasa-vendor-in"); ?>">Barang Masuk</a></li>
-                            <li><a class="dropdown-item" href="<?= base_url("biaya-udang"); ?>">Biaya Udang</a></li>
-                            <li><a class="dropdown-item" href="<?= base_url('biaya-kepiting'); ?>">Biaya Kepiting</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("proses-rebus"); ?>">PROSES REBUS</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("jasa-vendor-out"); ?>">BARANG KELUAR </a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("jasa-vendor-in"); ?>">BARANG MASUK</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("biaya-udang"); ?>">BIAYA UDANG</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url('biaya-kepiting'); ?>">BIAYA KEPITING</a></li>
                         </ul>
                     </div>
                 </div>
@@ -127,9 +128,13 @@
                             </span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#">Action</a></li>
-                            <li><a class="dropdown-item" href="#">Another action</a></li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("barang-bahan-baku");  ?>">BAHAN BAKU</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("barang-bahan-penolong");  ?>">BAHAN PENOLONG</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("barang-bahan-jadi");  ?>">BAHAN JADI</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("barang-scrap");  ?>">BAHAN SCRAP</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("barang-modal");  ?>">BAHAN MODAL</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("barang-setengah-jadi");  ?>">BAHAN SETENGAH JADI</a></li>
+                            <li><a class="dropdown-item" href="<?= base_url("kemasan");  ?>">KEMANASAN</a></li>
                         </ul>
                     </div>
                 </div>
