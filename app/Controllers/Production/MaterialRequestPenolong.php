@@ -6,7 +6,6 @@ use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Controllers\BaseController;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
-use App\Models\BarangModel;
 use App\Models\DivisisModel;
 use App\Models\KemasanModel;
 use App\Models\MaterialRequestDetailsModel;
@@ -30,7 +29,6 @@ class MaterialRequestPenolong extends BaseController
 {
     protected $token;
     protected $this_company_id;
-    protected $barangModel;
     protected $satuanModel;
     protected $workOrdersModel;
     protected $workOrderDetailsModel;
@@ -58,7 +56,6 @@ class MaterialRequestPenolong extends BaseController
         $this->this_user_id = session()->get("login")->user_id;
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->barangModel = new BarangModel();
         $this->satuanModel = new SatuansModel();
         $this->workOrdersModel = new WorkOrdersModel();
         $this->workOrderDetailsModel = new WorkOrderDetailsModel();
@@ -90,8 +87,6 @@ class MaterialRequestPenolong extends BaseController
 
     public function createView()
     {
-        //Get Barang
-        $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
 
         //Get Satuan
         $dataSatuan = $this->satuanModel->asObject()->find();
@@ -115,7 +110,6 @@ class MaterialRequestPenolong extends BaseController
 
         $data = [
             'tipeBarang' => $dataTipeBarang,
-            "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
             "dataWarehouse" => $dataWarehouse,
@@ -129,8 +123,6 @@ class MaterialRequestPenolong extends BaseController
     {
         $ids = $id;
         $id = decrypt($id);
-        //Get Barang
-        $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
 
         //Get Satuan
         $dataSatuan = $this->satuanModel->asObject()->find();
@@ -149,7 +141,6 @@ class MaterialRequestPenolong extends BaseController
 
         $data = [
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->where('description', "bahan_penolong")->findAll(),
-            "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
             "dataWarehouse" => $dataWarehouse,
@@ -667,8 +658,6 @@ class MaterialRequestPenolong extends BaseController
     public function deleteMRDetail()
     {
         $id = ($this->request->getVar('id'));
-        var_dump($id);
-        exit;
         $this->materialRequestDetailsModel->delete($id);
         // $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
 

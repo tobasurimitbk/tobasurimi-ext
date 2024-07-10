@@ -5,7 +5,6 @@ namespace App\Controllers\Production;
 use App\Controllers\BaseController;
 use App\Controllers\Master\Divisi;
 use App\Models\BarangMasterModel;
-use App\Models\BarangModel;
 use App\Models\DivisisModel;
 use App\Models\MaterialRequestDetailsModel;
 use App\Models\MaterialRequestsModel;
@@ -24,7 +23,6 @@ class ProductionResult extends BaseController
 {
     private $this_company_id;
     protected $this_user_id;
-    private $barangModel;
     private $barangMasterModel;
     private $productionResultModel;
     private $productionResultDetailModel;
@@ -42,8 +40,7 @@ class ProductionResult extends BaseController
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->this_user_id = session()->get("login")->user_id;
-        $this->barangModel = new BarangModel();
+        $this->this_user_id = session()->get("login")->user_id;;
         $this->barangMasterModel = new BarangMasterModel();
         $this->productionResultModel = new ProductionResultModel();
         $this->productionResultDetailModel = new ProductionResultDetailModel();
