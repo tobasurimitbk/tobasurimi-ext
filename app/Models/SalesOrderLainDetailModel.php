@@ -68,11 +68,15 @@ class SalesOrderLainDetailModel extends Model
                 $satuan = $satuanModel->find($barangMasterSpesifikasi['satuan_1']);
                 $satuanId = $barangMasterSpesifikasi['satuan_1'];
                 $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
+                $barangMasterName = $barangMaster['barang_name'];
+                $kodeBarang = $barangMaster['kode_barang'];
             } else {
                 $kemasan = $kemasanModel->find($stock['kemasan_id']);
                 $satuan = $satuanModel->find($kemasan['satuan_id']);
                 $satuanId = $kemasan['satuan_id'];
                 $barangName = $kemasan['name'];
+                $barangMasterName = $kemasan['name'];
+                $kodeBarang = $kemasan['kode'];
             }
 
             $bcType = $metaDataModel->find($stockList['bc_id']);
@@ -89,6 +93,8 @@ class SalesOrderLainDetailModel extends Model
             $stockList['stok_total'] = ($stockList['stok_total']);
             $stockList['satuan_id'] = $satuanId;
             // TAMBAHAN
+            $stockList['kode_barang'] = $kodeBarang;
+            $stockList['barang_master_name'] = $barangMasterName;
             $stockList['satuan_order_id'] = $s['satuan_order_id'];
             $stockList['satuan_order_text'] = $satuanOrder['kode_satuan'];
             $stockList['qty_order'] = $s['qty_order'];

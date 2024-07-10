@@ -6,7 +6,6 @@ use App\Controllers\BaseController;
 use App\Models\AdjusmentDetailModel;
 use App\Models\AdjusmentModel;
 use App\Models\BarangMasterModel;
-use App\Models\BarangMasterSalesSpesifikasiModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\DivisisModel;
 use App\Models\KemasanModel;

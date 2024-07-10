@@ -1526,11 +1526,34 @@ class BC40 extends BaseController
 
         $beacukaiApi = new BeaCukaiApi($username, $password);
 
-        $bc40Data = $this->bc40Model->get($bcPurchaseOrderID);
+        $payload = $this->generatePayload($bcPurchaseOrderID);
 
-        // if ($bc40Data == null) {
-        //     return redirect()->to('bea-cukai-bc-40');
-        // }
+        $res = $beacukaiApi->kirimDokumenBC($payload, false);
+        if ($res['status'] == false) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => "Gagal Kirim Ceisa Karena : " . $res['message'],
+            ]);
+        }
+        // UPDATE STATUS
+        $this->bc40Model->set('status_dokumen', "Sudah Kirim")->where('bc_purchase_order_id', $bcPurchaseOrderID)->update();
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'message' => "Dokumen BC 4.O Berhasil Dikirim Ke Ceisa",
+            'res' => $res,
+        ]);
+    }
+
+    public function generatePayload($bcPurchaseOrderID)
+    {
+        $username = ($this->akunCeisa == null ? "" : $this->akunCeisa['username']);
+        $password = ($this->akunCeisa == null ? "" : $this->akunCeisa['password']);
+
+        $beacukaiApi = new BeaCukaiApi($username, $password);
+        $bc40Data = $this->bc40Model->get($bcPurchaseOrderID);
 
         $bc23Kontainer = $this->bcKontainerModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
         $bc23Barang = $this->bcBarangModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->findAll();
@@ -1551,26 +1574,7 @@ class BC40 extends BaseController
             $bcBarangTarif
         );
 
-        // return \response()->setJSON($payload);
-
-        // return response()->setJSON($payload);
-        $res = $beacukaiApi->kirimDokumenBC($payload, false);
-        if ($res['status'] == false) {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'status' => false,
-                'message' => "Gagal Kirim Ceisa Karena : " . $res['message'],
-            ]);
-        }
-        // UPDATE STATUS
-        $this->bc40Model->set('status_dokumen', "Sudah Kirim")->where('bc_purchase_order_id', $bcPurchaseOrderID)->update();
-
-        return response()->setJSON([
-            'token' => csrf_hash(),
-            'status' => true,
-            'message' => "Dokumen BC 4.O Berhasil Dikirim Ke Ceisa",
-            'res' => $res,
-        ]);
+        return $payload;
     }
 
     // POSTING BEA CUKAI PO

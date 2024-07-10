@@ -40,6 +40,40 @@ class BCPurchaseOrderModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
+    public function findByNoAjuOrDaftar($tipe, $search, $companyId)
+    {
+        $data = [];
+        if ($tipe == "IMPORT") {
+            // JOIN BC 2.3
+            $dataResult = $this->select('bc_purchase_order.id, bc_purchase_order.no_daftar, bc_23.no_aju')
+                ->join('bc_23', 'bc_23.bc_purchase_order_id = bc_purchase_order.id', 'left')
+                ->where('bc_purchase_order.company_id', $companyId)
+                ->like('bc_purchase_order.no_daftar', '%' . $search . '%')
+                ->orLike('bc_23.no_aju', '%' . $search . '%')
+                ->limit(10)
+                ->findAll();
+        } else {
+            // JOIN BC 4.0
+            $dataResult = $this->select('bc_purchase_order.id, bc_purchase_order.no_daftar, bc_40.no_aju')
+                ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_purchase_order.id', 'left')
+                ->where('bc_purchase_order.company_id', $companyId)
+                ->like('bc_purchase_order.no_daftar', '%' . $search . '%')
+                ->orLike('bc_40.no_aju', '%' . $search . '%')
+                ->limit(10)
+                ->findAll();
+        }
+
+        foreach ($dataResult as $d) {
+            $noDaftar = $d['no_daftar'] == null ? "-" : $d['no_daftar'];
+            array_push($data, [
+                'id' => $d['id'],
+                'text' => $d['no_aju'] . " / " . $noDaftar
+            ]);
+        }
+
+        return $data;
+    }
+
     public function findDetail($bcPurchaseOrderID)
     {
         $data = $this->select('suppliers.name AS supplier_name, bc_purchase_order.*')

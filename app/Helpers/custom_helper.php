@@ -385,3 +385,12 @@ function splitStokDokumen2($string)
 
    return $result;
 }
+
+
+function getDateFromNomorAju($noAju)
+{
+   $tanggal = substr($noAju, 14, 8);
+   $formattedDate = substr($tanggal, 0, 4) . '-' . substr($tanggal, 4, 2) . '-' . substr($tanggal, 6, 2);
+
+   return $formattedDate;
+}

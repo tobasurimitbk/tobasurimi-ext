@@ -1341,6 +1341,51 @@ $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
     $routes->post('delete', 'BeaCukai\BC25::delete');
     $routes->post('posting', 'BeaCukai\BC25::posting');
     $routes->get('check-no-aju', 'BeaCukai\BC25::checkNoAju');
+    // HEADER
+    $routes->get('id/header/(:segment)', 'BeaCukai\BC25::header/$1');
+    $routes->post('id/header', 'BeaCukai\BC25::updateHeader');
+    // ENTITAS
+    $routes->get('id/entitas/(:segment)', 'BeaCukai\BC25::entitas/$1');
+    $routes->post('id/entitas', 'BeaCukai\BC25::updateEntitas');
+    // DOKUMEN
+    $routes->get('id/dokumen/(:segment)', 'BeaCukai\BC25::dokumen/$1');
+    $routes->post('id/dokumen', 'BeaCukai\BC25::updateDokumen');
+    $routes->post('id/dokumen/delete', 'BeaCukai\BC25::deleteDokumen');
+    // PENGANGKUT
+    $routes->get('id/pengangkut/(:segment)', 'BeaCukai\BC25::pengangkut/$1');
+    $routes->post('id/pengangkut', 'BeaCukai\BC25::pengangkutUpdate');
+    // KEMASAN & PETI KEMASAN
+    $routes->get('id/kemasan-peti-kemas/(:segment)', 'BeaCukai\BC25::kemasanPetiKemas/$1');
+    $routes->post('id/kemasan-peti-kemas/kemasan', 'BeaCukai\BC25::kemasanUpdate');
+    $routes->post('id/kemasan-peti-kemas/kemasan/delete', 'BeaCukai\BC25::deleteKemasan');
+    $routes->post('id/kemasan-peti-kemas/kontainer', 'BeaCukai\BC25::kontainerUpdate');
+    $routes->post('id/kemasan-peti-kemas/kontainer/delete', 'BeaCukai\BC25::deleteKontainer');
+    // TRANSAKSI
+    $routes->get('id/transaksi/(:segment)', 'BeaCukai\BC25::transaksi/$1');
+    $routes->post('id/transaksi', 'BeaCukai\BC25::transaksiUpdate');
+    // BARANG
+    $routes->get('id/barang/(:segment)', 'BeaCukai\BC25::barang/$1');
+    $routes->get('id/barang/(:segment)/(:segment)', 'BeaCukai\BC25::barangDetail/$1/$2');
+    $routes->post('id/barang', 'BeaCukai\BC25::barangDetailUpdate');
+    // BARANG DOKUMEN
+    $routes->post('id/barang/dokumen-create', 'BeaCukai\BC25::createDokumenBarangDetail');
+    $routes->post('id/barang/dokumen-delete', 'BeaCukai\BC25::deleteDokumenBarangDetail');
+    // BARANG PUNGUTAN
+    $routes->post('id/barang/pungutan-create', 'BeaCukai\BC25::createPungutanDetailBarang');
+    $routes->post('id/barang/pungutan-delete', 'BeaCukai\BC25::deletePungutanDetailBarang');
+    // BAHAN BAKU
+    $routes->post('id/barang/bahan-baku-create', 'BeaCukai\BC25::bahanBakuUpdate');
+    $routes->post('id/barang/bahan-baku-delete', 'BeaCukai\BC25::bahanBakuDelete');
+    // PUNGUTAN
+    $routes->get('id/pungutan/(:segment)', 'BeaCukai\BC25::pungutan/$1');
+    // PERYATAAN
+    $routes->get('id/pernyataan/(:segment)', 'BeaCukai\BC25::pernyataan/$1');
+    $routes->post('id/pernyataan', 'BeaCukai\BC25::pernyataanUpdate');
+    // KIRIM CEISA
+    $routes->get('api/kirim-dokumen/(:segment)', 'BeaCukai\BC25::kirimCeisa/$1');
+    // DROPDOWN
+    $routes->get('list-bahan-baku-asal', 'BeaCukai\BC25::dropdownBahanBakuAsal');
+    $routes->get('list-payload-barang', 'BeaCukai\BC25::dropdownDetailPayload');
 });
 
 // BC 4.1
