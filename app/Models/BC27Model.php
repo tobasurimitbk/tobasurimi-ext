@@ -48,7 +48,6 @@ class BC27Model extends Model
             'bc_27.no_daftar'                        => 'bc_27.no_daftar',
             'bc_27.company_tujuan_id'                => 'bc_27.company_tujuan_id',
             'mutasi_global.no_mutasi'                => 'mutasi_global.no_mutasi',
-            'bc_27.bc_no_lokal'                      => 'bc_27.bc_no_lokal',
             'bc_27.createdAt'                        => 'bc_27.createdAt',
             'bc_27.no_aju'                           => 'bc_27.no_aju',
             'bc_27.status_posting'                   => 'bc_27.status_posting',
@@ -93,10 +92,6 @@ class BC27Model extends Model
             $bcDataQry->like('no_aju', $addCondition['noAju'])->orLike('no_daftar', $addCondition['noAju']);
         }
 
-        if ($addCondition['noBC27']) {
-            $bcDataQry->like('bc_no_lokal', $addCondition['noBC27']);
-        }
-
         if ($addCondition['statusPosting'] || $addCondition['noAju'] || $addCondition['noBC27'] && (empty($addCondition['mulaiTanggalBC27']) && empty($addCondition['selesaiTanggalBC27']))) {
             $bcDataQry->groupEnd();
         }
@@ -137,39 +132,5 @@ class BC27Model extends Model
             ->where('bc_27.id', $id)
             ->first();
         return $result;
-    }
-
-    public function getNo($bln, $thn, $last_day)
-    {
-        $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
-
-        $builder = $this->db->table('bc_27');
-        $builder->select('bc_no_lokal');
-        $builder->orderBy('bc_no_lokal', 'DESC');
-        $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")->where('createdAt <=', $last_day . " 23:59:59");
-        $builder->where('deletedAt', null);
-        $builder->like('bc_no_lokal', $lastStr);
-        $query = $builder->get();
-
-        $kode = 'TOBA/BC27';
-
-        $lastNumber = '1';
-
-        if (!empty($query->getResultArray())) {
-            foreach ($query->getResultArray() as $string) {
-                $explode = explode('/', $string['bc_no_lokal']);
-                $number = intval($explode[2]);
-
-                if ($number > $lastNumber) {
-                    $lastNumber = $number;
-                }
-            }
-            $lastNumber++;
-        }
-
-        $formattedlastNumber = sprintf("%02d", $lastNumber);
-        $generatedNo = $kode . '/' . $formattedlastNumber . '/' . $lastStr;
-
-        return $generatedNo;
     }
 }

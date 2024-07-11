@@ -205,7 +205,6 @@ class BC23 extends BaseController
             array_push($dataBeaCukai, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->bc_purchase_order_id),
-                "bc_no_lokal"           => $data->bc_no_lokal,
                 "tanggal_bc_23"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
                 "no_aju"                => ($data->no_aju == "" ? "-" : $data->no_aju) . " / " . ($data->no_daftar == "" ? "-" : $data->no_daftar),
                 "po_type"               => $data->po_type,
@@ -299,7 +298,6 @@ class BC23 extends BaseController
             // insert
             $this->bc23Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'bc_no_lokal' => $this->bc23Model->getNo(date('m'), date('Y'), $last_day),
                 'no_aju' => $this->generateNomorAju(),
 
                 'kode_pelabuhan_bongkar' => $this->request->getVar('header_pelabuhan_bongkar'),
@@ -315,14 +313,6 @@ class BC23 extends BaseController
                 'kode_kantor' => decrypt($this->request->getVar('header_kantor_pabean_pengawas')),
                 'kode_tujuan_tpb' => decrypt($this->request->getVar('header_kode_tujuan_tpb')),
             ]);
-
-
-            if ($lastData['bc_no_lokal'] == null) {
-                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $this->bc23Model->update($lastData['id'], [
-                    'bc_no_lokal' => $this->bc23Model->getNo(date('m'), date('Y'), $last_day),
-                ]);
-            }
 
             if ($lastData['no_aju'] == null) {
                 $this->bc23Model->update($lastData['id'], [
@@ -590,7 +580,6 @@ class BC23 extends BaseController
             // insert
             $this->bc23Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'bc_no_lokal' => $this->bc23Model->getNo(date('m'), date('Y'), $last_day),
                 'no_aju' => $this->generateNomorAju(),
                 'no_bc_11' => $this->request->getVar('bc_11_no_bc_11'),
                 'tanggal_bc_11' => $this->request->getVar('bc_11_tanggal_bc_11') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('bc_11_tanggal_bc_11')), "Y-m-d") : "",
@@ -995,7 +984,6 @@ class BC23 extends BaseController
             // insert
             $this->bc23Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'bc_no_lokal' => $this->bc23Model->getNo(date('m'), date('Y'), $last_day),
                 'no_aju' => $this->generateNomorAju(),
 
                 'kode_valuta' => decrypt($this->request->getVar('harga_kode_valuta')),
@@ -1460,7 +1448,6 @@ class BC23 extends BaseController
             $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
             $this->bc23Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'bc_no_lokal' => $this->bc23Model->getNo(date('m'), date('Y'), $last_day),
                 'no_aju' => $this->generateNomorAju(),
                 'nilai_barang' => $hargaTotal
             ]);
@@ -1605,7 +1592,6 @@ class BC23 extends BaseController
             // insert
             $this->bc23Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'bc_no_lokal' => $this->bc23Model->getNo(date('m'), date('Y'), $last_day),
                 'no_aju' => $this->generateNomorAju(),
 
                 'nama_ttd' => $this->request->getVar('pernyatan_nama'),
@@ -1694,7 +1680,6 @@ class BC23 extends BaseController
             $this->bc23Model->insert([
                 'no_aju' => $noAju,
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'bc_no_lokal' => $this->bc23Model->getNo(date('m'), date('Y'), $last_day),
             ]);
         } else {
             $this->bc23Model->set('no_aju', $noAju)
@@ -1798,7 +1783,6 @@ class BC23 extends BaseController
             // insert
             $this->bc23Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'bc_no_lokal' => $this->bc23Model->getNo(date('m'), date('Y'), $last_day),
                 'no_aju' => $this->generateNomorAju(),
             ]);
         }
