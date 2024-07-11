@@ -533,7 +533,7 @@
             processData: false,
             contentType: false,
             success: function(response) {
-                console.log(response);
+
                 listPembayaran = [];
                 listPembayaran = response.data;
 
@@ -1281,7 +1281,7 @@
                 appendPanjarAmount(res.data);
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                console.log(textStatus, errorThrown);
+
             }
         });
     });

@@ -654,7 +654,7 @@ class LocalPOPaymentModel extends Model
                     }
                 }
             } else {
-
+                $penerimaanBulanAll[$i]['sisa_pembayaran'] = $totalTagihan;
                 $penerimaanBulanAll[$i]['tanggal_LPB'] = date('d/m/Y', \strtotime($p['tanggal_LPB']));
                 $penerimaanBulanAll[$i]['total_tagihan'] = toRupiah($p['total_tagihan']);
                 $penerimaanBulanAll[$i]['total_tagihan_number'] = $p['total_tagihan'];
