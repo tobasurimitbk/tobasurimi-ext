@@ -1462,7 +1462,7 @@
                 totalStokTotal += parseFloat(v.stok_total);
             });
             // deleteByStockID(stockID);
-            if (qtyMutasiFifo > totalStokTotal) {
+            if (qtyMutasiFifo > parseFloat(totalStokTotal.toFixed(2))) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Terjadi Kesalahan : Stok barang tidak cukup !',
