@@ -1192,8 +1192,7 @@ class BC40 extends BaseController
         $tarifFasilitas = ($this->request->getVar('barang_detail_tarif_fasilitas'));
         $tarifFasilitas = ($tarifFasilitas == 0) ? 1 : $tarifFasilitas;
 
-        $nilaiBayar100 = $bc40Barang['harga_ekspor'] * ($nilaiTarif / 100);
-        $nilaiBayar = $nilaiBayar100 / $tarifFasilitas;
+        $nilaiBayar = ($bc40Barang['harga_ekspor'] * (($nilaiTarif / 100) / ($tarifFasilitas / 100)));
 
 
         $this->bcBarangTarifModel->insert([
