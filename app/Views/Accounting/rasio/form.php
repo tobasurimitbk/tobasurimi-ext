@@ -942,8 +942,8 @@
                 row += '<td>' +
                     '<input class="form-control qty-lpb text-center" oninput="preventNegativeInput(this)" type="text" data-index="' + index + '" value="' + (item.totalQtyLPB !== undefined ? item.totalQtyLPB.toLocaleString() : 0) + '">' +
                     '</td>';
-                row += '<td class="totalHargaLPB">' + (item.totalHargaLPB !== undefined ? formatRupiah(item.totalHargaLPB) : formatRupiah(0)) + '</td>';
-                row += '<td>' + (item.hargaSatuanLPB !== undefined ? formatRupiah(item.hargaSatuanLPB) : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.totalHargaLPB !== undefined ? formatRupiah(item.totalHargaLPB) : formatRupiah(0)) + '</td>';
+                row += '<td class="totalHargaLPB">' + (item.hargaSatuanLPB !== undefined ? formatRupiah(item.hargaSatuanLPB) : formatRupiah(0)) + '</td>';
                 row += '<td>' + (item.satuanLPB !== undefined ? item.satuanLPB : strip) + '</td>';
                 row += '</tr>';
                 no++;
@@ -961,22 +961,22 @@
             $('.qty-lpb').on('input', function() {
                 var rowIndex = $(this).data('index');
                 var newQty = parseFloat($(this).val().replace(/,/g, '')) || 0;
-                var hargaSatuan = list_items_barang_digunakan[rowIndex].hargaSatuanLPB;
-                var newTotalHarga = newQty * hargaSatuan;
+                var totalHargaLPB = list_items_barang_digunakan[rowIndex].totalHargaLPB;
+                var newHargaSatuan = totalHargaLPB / newQty;
 
                 // Update the item in the list
                 list_items_barang_digunakan[rowIndex].totalQtyLPB = newQty;
-                list_items_barang_digunakan[rowIndex].totalHargaLPB = newTotalHarga;
+                list_items_barang_digunakan[rowIndex].hargaSatuanLPB = newHargaSatuan;
 
                 // Update the totalHargaLPB cell in the table
-                $(this).closest('tr').find('.totalHargaLPB').text(formatRupiah(newTotalHarga));
+                $(this).closest('tr').find('.totalHargaLPB').text(formatRupiah(newHargaSatuan));
 
                 // Recalculate the totals and update the footer
                 totalQtyLPB = list_items_barang_digunakan.reduce((acc, item) => acc + (item.totalQtyLPB || 0), 0);
-                totalHargaLPB = list_items_barang_digunakan.reduce((acc, item) => acc + (item.totalHargaLPB || 0), 0);
+                totalhargaSatuanLPB = list_items_barang_digunakan.reduce((acc, item) => acc + (item.hargaSatuanLPB || 0), 0);
 
                 $('.qtyTotalPenerimaan').val(totalQtyLPB.toLocaleString());
-                $('.hargaTotalPenerimaan').val(formatRupiah(totalHargaLPB));
+                $('.hargaSatuanPenerimaan').val(formatRupiah(totalhargaSatuanLPB));
             });
         }
     }

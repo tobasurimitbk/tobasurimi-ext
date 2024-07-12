@@ -223,10 +223,10 @@ class RasioController extends BaseController
             $overhead_cost = json_decode($this->request->getVar("overhead_cost"));
             $fixed_cost = json_decode($this->request->getVar("fixed_cost"));
 
-            var_dump($barang_digunakan);
-            var_dump($barang_digunakan_alokasi);
-            var_dump($barang_jadi);
-            exit;
+            // var_dump($barang_digunakan);
+            // var_dump($barang_digunakan_alokasi);
+            // var_dump($barang_jadi);
+            // exit;
             $id = $this->rasioModel->insert($data);
 
             foreach ($barang_digunakan as $s) {
@@ -1241,6 +1241,8 @@ class RasioController extends BaseController
             // Merge current dataResult into dataResults
             $dataResults = array_merge($dataResults, $dataResult);
         }
+        // var_dump($productionResultDataTitle);
+        // var_dump($dataResults);
         // exit;
         return response()->setJSON([
             'data' => $dataResults,

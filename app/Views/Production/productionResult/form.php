@@ -1222,6 +1222,7 @@
                         $(".kode_barang_filling").empty();
                         $(".kode_barang_filling").append(`<option data-divisi_id="" data-warehouse_id="" data-barang_name_master="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
                         res.data.forEach(function(item) {
+                            console.log(item);
                             if (item.ref_no == "NON PABEAN") {
                                 var new_ref_no = item.ref_no;
                             } else {
