@@ -1368,7 +1368,7 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    table.ajax.reload()
+                                    window.location.href = "<?= base_url('material-request-penolong') ?>"
                                 })
                         } else {
                             Swal.fire({
