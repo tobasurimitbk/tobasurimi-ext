@@ -216,12 +216,16 @@ class RasioController extends BaseController
             $barang_digunakan_material_2 = json_decode($this->request->getVar("items_digunakan_material_2"));
             $saldo_awal = json_decode($this->request->getVar("saldo_awal"));
             $saldo_akhir = json_decode($this->request->getVar("saldo_akhir"));
+            $saldo_adjustment = json_decode($this->request->getVar("saldo_adjustment"));
+            $saldo_jual = json_decode($this->request->getVar("saldo_jual"));
+            $saldo_trimming = json_decode($this->request->getVar("saldo_trimming"));
             $labor_cost = json_decode($this->request->getVar("labor_cost"));
             $overhead_cost = json_decode($this->request->getVar("overhead_cost"));
             $fixed_cost = json_decode($this->request->getVar("fixed_cost"));
 
-            // var_dump($saldo_awal);
-            // var_dump($barang_digunakan_alokasi);
+            // var_dump($saldo_adjustment);
+            // var_dump($saldo_jual);
+            // var_dump($saldo_trimming);
             // exit;
             $id = $this->rasioModel->insert($data);
 

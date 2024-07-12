@@ -1912,6 +1912,7 @@
             let rasioTotal = 0;
             let totalHargaRasio = 0;
             let totalTotalHargaRasio = 0;
+            let totalTotalHargaSatuan = 0;
 
             let totalHargaTotalManual = 0;
             let totalQtyTanpaManual = 0;
@@ -1927,6 +1928,7 @@
 
                 let calculatedHargaTotal = 0;
                 let itemHargaTotal = 0;
+                let hargaSatuan = 0;
                 const totalQtyAll = parseFloat(item.totalQtyAll);
                 const rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyAll) * 100;
                 const rasioTanpaManual = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyTanpaManual) * 100;
@@ -1945,6 +1947,12 @@
                     }
                 }
 
+                if (item.harga_satuan == 0 || item.harga_satuan == undefined) {
+                    hargaSatuan = (parseFloat(calculatedHargaTotal) / parseFloat(item.qtyTotal));
+                } else {
+                    hargaSatuan = (parseFloat(item.harga_satuan));
+                }
+
                 rasioTotal += rasio;
                 totalTotalHargaRasio += itemHargaTotal;
 
@@ -1955,10 +1963,16 @@
                     <td>${item.barang_name} - ${item.spesifikasi}</td>
                     <td>${item.kode_satuan}</td>
                     <td>
+                        <input class="form-control filling-weight-barang text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty2}">
+                    </td>
+                    <td>
                         <input class="form-control jumlah-barang text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qtyTotal}">
                     </td>
                     <td>
                         <input class="form-control rasio text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${rasio.toFixed(2)}%">
+                    </td>
+                    <td>
+                        <input class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${formatRupiah(hargaSatuan)}">
                     </td>
                     <td>
                         <input class="form-control harga text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 || item.harga_total == undefined ? formatRupiah(calculatedHargaTotal) : formatRupiah(item.harga_total)}">
@@ -1969,12 +1983,15 @@
 
             rowFooter += `
             <tr>
-                <td colspan="4"></td>
+                <td colspan="5"></td>
                 <td>
                     <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${data.reduce((sum, item) => sum + parseFloat(item.qtyTotal), 0)}">
                 </td>
                 <td>
                     <input class="form-control rasio-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${rasioTotal.toFixed(2)}%">
+                </td>
+                <td>
+                    <input class="form-control harga-total-satuan text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${formatRupiah(totalTotalHargaRasio)}">
                 </td>
                 <td>
                     <input class="form-control harga-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${formatRupiah(totalTotalHargaRasio)}">
@@ -2268,6 +2285,12 @@
                         drawTableSaldoAdjusmentBonus();
                         drawTableSaldoAdjusmentLainnya();
                     }
+                    if (list_items_saldo_jual.length != 0) {
+                        drawTableSaldoJual();
+                    }
+                    if (list_items_saldo_trimming.length != 0) {
+                        drawTableSaldoTrimming();
+                    }
                 },
                 error: function() {
                     $('#content').html('<div class="alert alert-danger" role="alert">Failed to load content.</div>');
@@ -2504,6 +2527,9 @@
                             data.append("items_digunakan_material_2", JSON.stringify(list_items_barang_digunakan_material_2));
                             data.append("saldo_awal", JSON.stringify(list_items_saldo_awal));
                             data.append("saldo_akhir", JSON.stringify(list_items_saldo_akhir));
+                            data.append("saldo_adjustment", JSON.stringify(list_items_saldo_adjusment));
+                            data.append("saldo_jual", JSON.stringify(list_items_saldo_jual));
+                            data.append("saldo_trimming", JSON.stringify(list_items_saldo_trimming));
                             data.append("labor_cost", JSON.stringify(list_items_labor_cost));
                             data.append("overhead_cost", JSON.stringify(list_items_overhead_cost));
                             data.append("fixed_cost", JSON.stringify(list_items_fixed_cost));

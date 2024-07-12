@@ -57,8 +57,10 @@
                         <th style="text-align: center;">Kode Barang</th>
                         <th style="text-align: center;">Nama Barang</th>
                         <th style="text-align: center;">Satuan</th>
+                        <th style="text-align: center;">Filling Weight</th>
                         <th style="text-align: center;">Jumlah Barang</th>
                         <th style="text-align: center;">Rasio</th>
+                        <th style="text-align: center;">Harga Satuan</th>
                         <th style="text-align: center;">Total</th>
                     </tr>
                 </thead>
