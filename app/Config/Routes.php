@@ -35,8 +35,9 @@ $routes->get('/', 'Setting\Auth::login');
 $routes->post('/login', 'Setting\Auth::doLogin');
 $routes->get('/logout', 'Setting\Auth::doLogout');
 
+
 $routes->get('/change-company', 'Setting\User::changeCompany');
-$routes->get('/dashboard/toggle', 'Dashboard\Dashboard::toggleSidebar', ['filter' => 'Auth']);
+
 // 403 ROUTE
 $routes->get('/403', function () {
     return view('errors/html/error_403');
@@ -44,6 +45,30 @@ $routes->get('/403', function () {
 
 // DASHBOARD
 $routes->get('/dashboard', 'Dashboard\Dashboard::dashboard', ['filter' => 'Auth']);
+$routes->get('/dashboard/toggle', 'Dashboard\Dashboard::toggleSidebar', ['filter' => 'Auth']);
+$routes->get('/dashboard/get-number-bc', 'Dashboard\Dashboard::getNumberBC', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc23/', 'Dashboard\RekapBeaCukai::rekapBC23', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc23/all', 'Dashboard\RekapBeaCukai::rekapBC23all', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc23/exportsheet', 'Dashboard\RekapBeaCukai::rekapBC23Sheet', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc25/', 'Dashboard\RekapBeaCukai::rekapBC25', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc25/all', 'Dashboard\RekapBeaCukai::rekapBC25all', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc25/exportsheet', 'Dashboard\RekapBeaCukai::rekapBC25Sheet', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc27/', 'Dashboard\RekapBeaCukai::rekapBC27', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc27/all', 'Dashboard\RekapBeaCukai::rekapBC27all', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc27/exportsheet', 'Dashboard\RekapBeaCukai::rekapBC27Sheet', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc30/', 'Dashboard\RekapBeaCukai::rekapBC30', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc30/all', 'Dashboard\RekapBeaCukai::rekapBC30all', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc30/exportsheet', 'Dashboard\RekapBeaCukai::rekapBC30Sheet', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc40/', 'Dashboard\RekapBeaCukai::rekapBC40', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc40/all', 'Dashboard\RekapBeaCukai::rekapBC40all', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc40/exportsheet', 'Dashboard\RekapBeaCukai::rekapBC40Sheet', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc41/', 'Dashboard\RekapBeaCukai::rekapBC41', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc41/all', 'Dashboard\RekapBeaCukai::rekapBC41all', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-bc41/exportsheet', 'Dashboard\RekapBeaCukai::rekapBC41Sheet', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-ppbkb/', 'Dashboard\RekapBeaCukai::rekapPPBKB', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-ppbkb/all', 'Dashboard\RekapBeaCukai::rekapPPBKBall', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-dokumen-ppbkb/exportsheet', 'Dashboard\RekapBeaCukai::rekapPPBKBSheet', ['filter' => 'Auth']);
+
 
 // MASTER DATA
 // EMPLOYEE
