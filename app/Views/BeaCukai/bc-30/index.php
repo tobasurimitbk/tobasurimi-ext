@@ -22,7 +22,7 @@
         <?= csrf_field() ?>
         <div class="card-body">
             <div class="row justify-content-start row-col-spp">
-                <div class="col-md-3 mb-3">
+                <div class="col-md-2 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC30" id="mulaiTanggalBC30" name="mulaiTanggalBC30" placeholder="Mulai Tanggal BC 3.0 Dibuat">
@@ -31,7 +31,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
+                <div class="col-md-2 mb-3">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC30" id="selesaiTanggalBC30" name="selesaiTanggalBC30" placeholder="Selesai Tanggal BC 3.0 Dibuat">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -39,22 +39,22 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
+                <div class="col-md-2 mb-3">
                     <select name="statusPosting" class="form-select statusPosting" id="statusPosting">
                         <option selected value="ALL">STATUS POSTING : SEMUA</option>
                         <option value="SUDAH POSTING">STATUS POSTING : SUDAH POSTING</option>
                         <option value="BELUM POSTING">STATUS POSTING : BELUM POSTING</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 3.0 / No Daftar" value="" />
-                </div>
-                <div class="col-md-3 mb-3">
+                <div class="col-md-2 mb-3">
                     <select name="tipeSalesOrder" class="form-select tipeSalesOrder" id="tipeSalesOrder">
                         <option value="ALL" selected>TIPE PENGELUARAN : SEMUA</option>
                         <option value="LOKAL">LOKAL</option>
                         <option value="INTERNASIONAL">INTERNASIONAL</option>
                     </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 3.0 / No Daftar" value="" />
                 </div>
             </div>
             <?php if ($akunCeisa == null) : ?>

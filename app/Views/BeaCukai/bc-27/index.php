@@ -47,9 +47,6 @@
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control noBC27 search form-out-search" placeholder="Cari Nomor BC 2.7" value="" />
-                </div>
-                <div class="col-md-3 mb-3">
                     <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 2.7 / No Daftar" value="" />
                 </div>
             </div>
@@ -75,7 +72,6 @@
                                 <th onclick="changeSort('mutasi_global.warehouse_asal_id')" class="sort" style="text-align: center;">Warehouse Asal</th>
                                 <th onclick="changeSort('bc_27.company_tujuan_id')" class="sort" style="text-align: center;">Company Tujuan</th>
                                 <th onclick="changeSort('mutasi_global.no_mutasi')" class="sort" style="text-align: center;">No Mutasi</th>
-                                <th onclick="changeSort('bc_27.bc_no_lokal')" class="sort" style="text-align: center;">No BC 2.7</th>
                                 <th onclick="changeSort('bc_27.createdAt')" class="sort" style="text-align: center;">Tanggal BC 2.7</th>
                                 <th onclick="changeSort('bc_27.no_aju')" class="sort" style="text-align: center;">No Aju BC 2.7 / No Daftar</th>
                                 <th onclick="changeSort('bc_27.status_posting')" style="text-align: center;">Status Posting</th>
@@ -120,7 +116,6 @@
                 data.selesaiTanggalBC27 = $('.selesaiTanggalBC27').val();
                 data.statusPosting = $('.statusPosting').val();
                 data.noAju = $('.noAju').val();
-                data.noBC27 = $('.noBC27').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -158,10 +153,6 @@
             {
                 data: "no_mutasi",
                 className: "text-center",
-            },
-            {
-                data: "bc_no_lokal",
-                className: "text-center"
             },
             {
                 data: "tanggal_bc_27",
@@ -266,7 +257,7 @@
         table.ajax.reload();
     });
 
-    $('.noBC27, .noAju, .noDaftar').keyup(function() {
+    $('.noAju, .noDaftar').keyup(function() {
         table.ajax.reload();
     });
 

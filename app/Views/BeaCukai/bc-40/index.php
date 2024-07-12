@@ -88,7 +88,6 @@
                             <tr>
                                 <th style="text-align: center;">No</th>
                                 <th onclick="changeSort('bc_purchase_order.supplier_id')" class="sort" style="text-align: center;">Supplier</th>
-                                <th onclick="changeSort('bc_40.bc_no_lokal')" class="sort" style="text-align: center;">No BC 4.0</th>
                                 <th onclick="changeSort('bc_40.createdAt')" class="sort" style="text-align: center;">Tanggal BC 4.0</th>
                                 <th onclick="changeSort('bc_40.no_aju')" class="sort" style="text-align: center;">No Aju BC 4.0 / No Daftar</th>
                                 <th onclick="changeSort('bc_purchase_order.po_type')" style="text-align: center;">Jenis PO</th>
@@ -207,10 +206,6 @@
             {
                 data: "supplier_name",
                 className: "text-center"
-            },
-            {
-                data: "bc_no_lokal",
-                className: "text-center",
             },
             {
                 data: "tanggal_bc_40",

@@ -213,7 +213,6 @@ class BC40 extends BaseController
             array_push($dataBeaCukai, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->bc_purchase_order_id),
-                "bc_no_lokal"           => $data->bc_no_lokal,
                 "tanggal_bc_40"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
                 "no_aju"                => ($data->no_aju == "" ? "-" : $data->no_aju) . " / " . ($data->no_daftar == "" ? "-" : $data->no_daftar),
                 "po_type"               => $data->po_type,
@@ -373,7 +372,6 @@ class BC40 extends BaseController
             // insert
             $this->bc40Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'bc_no_lokal' => $this->bc40Model->getNo(date('m'), date('Y'), $last_day),
                 'no_aju' => $this->generateNomorAju(),
 
                 'kode_kantor' => decrypt($this->request->getVar('header_kantor_pabean')),
@@ -387,13 +385,6 @@ class BC40 extends BaseController
                 'kode_jenis_tpb' => decrypt($this->request->getVar('header_kode_jenis_tpb')),
                 'kode_tujuan_pengiriman' => decrypt($this->request->getVar('header_kode_tujuan_pengiriman'))
             ]);
-
-            if ($lastData['bc_no_lokal'] == null) {
-                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $this->bc40Model->update($lastData['id'], [
-                    'bc_no_lokal' => $this->bc40Model->getNo(date('m'), date('Y'), $last_day),
-                ]);
-            }
 
             if ($lastData['no_aju'] == null) {
                 $this->bc40Model->update($lastData['id'], [
@@ -911,11 +902,8 @@ class BC40 extends BaseController
         $lastData = $this->bc40Model->get($bcPurchaseOrderID);
         if ($lastData == null) {
             // insert
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-            // insert
             $this->bc40Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'bc_no_lokal' => $this->bc40Model->getNo(date('m'), date('Y'), $last_day),
                 'no_aju' => $this->generateNomorAju(),
 
                 // 'harga_penyerahan' => convertRupiahToNumber($this->request->getVar('harga_nilai_pabean')),
@@ -1424,11 +1412,9 @@ class BC40 extends BaseController
         $lastData = $this->bc40Model->get($bcPurchaseOrderID);
 
         if ($lastData == null) {
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
             // insert
             $this->bc40Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'bc_no_lokal' => $this->bc40Model->getNo(date('m'), date('Y'), $last_day),
                 'no_aju' => $this->generateNomorAju(),
 
                 'nama_ttd' => $this->request->getVar('pernyatan_nama'),
@@ -1478,7 +1464,6 @@ class BC40 extends BaseController
             $this->bc40Model->insert([
                 'no_aju' => $noAju,
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'bc_no_lokal' => $this->bc40Model->getNo(date('m'), date('Y'), $last_day),
             ]);
         } else {
             $this->bc40Model
@@ -1588,7 +1573,6 @@ class BC40 extends BaseController
             // insert
             $this->bc40Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'bc_no_lokal' => $this->bc40Model->getNo(date('m'), date('Y'), $last_day),
                 'no_aju' => $this->generateNomorAju(),
             ]);
         }

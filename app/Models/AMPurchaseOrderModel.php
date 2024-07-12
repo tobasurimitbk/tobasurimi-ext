@@ -430,7 +430,7 @@ class AMPurchaseOrderModel extends Model
         ];
     }
 
-    public function historiHargaPOBahanPenolongFirst($barangID, $spesifikasiBarangID = null, $poType, $companyID)
+    public function historiHargaPOBahanPenolongFirst($barangID, $spesifikasiBarangID, $poType, $companyID)
     {
         $condition = [
             "am_purchase_orders.company_id"  => $companyID,
