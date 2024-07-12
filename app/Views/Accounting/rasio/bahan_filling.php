@@ -33,9 +33,9 @@
         </div>
     </div>
 </div>
-<div class="row">
+<!-- <div class="row">
     <div class="col mb-3">
-        <label class="form-label font-weight-bold lable-title">Data Total Proses Ulang Barang</label>
+        <label class="form-label font-weight-bold lable-title">Data Barang Filling</label>
     </div>
 </div>
 <div class="row mb-2">
@@ -57,4 +57,4 @@
             <label for="floatingInput" style="z-index: 1;">Rata-rata Harga Satuan</label>
         </div>
     </div>
-</div>
+</div> -->
