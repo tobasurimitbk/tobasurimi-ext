@@ -2365,13 +2365,16 @@
                 $.each(list_items_barang_jadi, function(i, v) {
                     var qtyBarang = $('input[data-index="' + i + '"].jumlah-barang');
                     var rasioBarang = $('input[data-index="' + i + '"].rasio');
+                    var hargaSatuanBarang = $('input[data-index="' + i + '"].harga-satuan');
                     var hargaBarang = $('input[data-index="' + i + '"].harga');
                     var qtyBarangVal = parseFloat(qtyBarang.val());
                     var rasioBarangVal = parseFloat(rasioBarang.val());
+                    var hargaSatuanBarangVal = parseFloat(hargaSatuanBarang.val().replace(/Rp|\./g, ""));
                     var hargaBarangVal = parseFloat(hargaBarang.val().replace(/Rp|\./g, ""));
 
                     list_items_barang_jadi[i].qty = qtyBarangVal;
                     list_items_barang_jadi[i].rasio = rasioBarangVal;
+                    list_items_barang_jadi[i].harga_satuan = hargaSatuanBarangVal;
                     list_items_barang_jadi[i].harga = hargaBarangVal;
                 });
 

@@ -223,10 +223,10 @@ class RasioController extends BaseController
             $overhead_cost = json_decode($this->request->getVar("overhead_cost"));
             $fixed_cost = json_decode($this->request->getVar("fixed_cost"));
 
-            // var_dump($saldo_adjustment);
-            // var_dump($saldo_jual);
-            // var_dump($saldo_trimming);
-            // exit;
+            var_dump($barang_digunakan);
+            var_dump($barang_digunakan_alokasi);
+            var_dump($barang_jadi);
+            exit;
             $id = $this->rasioModel->insert($data);
 
             foreach ($barang_digunakan as $s) {
