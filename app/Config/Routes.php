@@ -1427,6 +1427,43 @@ $routes->group('bea-cukai-bc-41', ['filter' => 'Auth'], function ($routes) {
     $routes->post('delete', 'BeaCukai\BC41::delete');
     $routes->post('posting', 'BeaCukai\BC41::posting');
     $routes->get('check-no-aju', 'BeaCukai\BC41::checkNoAju');
+    // HEADER
+    $routes->get('id/header/(:segment)', 'BeaCukai\BC41::header/$1');
+    $routes->post('id/header', 'BeaCukai\BC41::updateHeader');
+    // ENTITAS
+    $routes->get('id/entitas/(:segment)', 'BeaCukai\BC41::entitas/$1');
+    $routes->post('id/entitas', 'BeaCukai\BC41::updateEntitas');
+    // DOKUMEN
+    $routes->get('id/dokumen/(:segment)', 'BeaCukai\BC41::dokumen/$1');
+    $routes->post('id/dokumen', 'BeaCukai\BC41::updateDokumen');
+    $routes->post('id/dokumen/delete', 'BeaCukai\BC41::deleteDokumen');
+    // PENGANGKUT
+    $routes->get('id/pengangkut/(:segment)', 'BeaCukai\BC41::pengangkut/$1');
+    $routes->post('id/pengangkut', 'BeaCukai\BC41::pengangkutUpdate');
+    // KEMASAN & PETI KEMASAN
+    $routes->get('id/kemasan-peti-kemas/(:segment)', 'BeaCukai\BC41::kemasanPetiKemas/$1');
+    $routes->post('id/kemasan-peti-kemas/kemasan', 'BeaCukai\BC41::kemasanUpdate');
+    $routes->post('id/kemasan-peti-kemas/kemasan/delete', 'BeaCukai\BC41::deleteKemasan');
+    $routes->post('id/kemasan-peti-kemas/kontainer', 'BeaCukai\BC41::kontainerUpdate');
+    $routes->post('id/kemasan-peti-kemas/kontainer/delete', 'BeaCukai\BC41::deleteKontainer');
+    // TRANSAKSI
+    $routes->get('id/transaksi/(:segment)', 'BeaCukai\BC41::transaksi/$1');
+    $routes->post('id/transaksi', 'BeaCukai\BC41::transaksiUpdate');
+    // BARANG
+    $routes->get('id/barang/(:segment)', 'BeaCukai\BC41::barang/$1');
+    $routes->get('id/barang/(:segment)/(:segment)', 'BeaCukai\BC41::barangDetail/$1/$2');
+    $routes->post('id/barang', 'BeaCukai\BC41::barangDetailUpdate');
+    // BAHAN BAKU
+    $routes->post('id/barang/bahan-baku-create', 'BeaCukai\BC41::bahanBakuUpdate');
+    $routes->post('id/barang/bahan-baku-delete', 'BeaCukai\BC41::bahanBakuDelete');
+    // PUNGUTAN
+    $routes->get('id/pungutan/(:segment)', 'BeaCukai\BC41::pungutan/$1');
+    $routes->post('id/pungutan', 'BeaCukai\BC41::pungutanUpdate');
+    // PERYATAAN
+    $routes->get('id/pernyataan/(:segment)', 'BeaCukai\BC41::pernyataan/$1');
+    $routes->post('id/pernyataan', 'BeaCukai\BC41::pernyataanUpdate');
+    // KIRIM CEISA
+    $routes->get('api/kirim-dokumen/(:segment)', 'BeaCukai\BC41::kirimCeisa/$1');
 });
 
 // HUMAN RESOURCE

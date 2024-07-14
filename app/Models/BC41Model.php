@@ -50,7 +50,9 @@ class BC41Model extends Model
             'customers.name' => 'customers.name',
             'bc_41.no_aju' => 'bc_41.no_aju',
             'bc_41.createdAt' => 'bc_41.createdAt',
-            'bc_41.status_posting' => 'bc_41.status_posting'
+            'bc_41.status_posting' => 'bc_41.status_posting',
+            'bc_41.status_dokumen' => 'bc_41.status_dokumen'
+
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -189,5 +191,197 @@ class BC41Model extends Model
         }
 
         return $result;
+    }
+
+    public function detailBarang($bcId, $kodeBarang, $salesOrderLainId)
+    {
+        $listBarang = $this->barang($salesOrderLainId);
+        $payload = json_decode($this->find($bcId)['payload']);
+        $result = null;
+        // dd($kodeBarang, $bcId, $salesOrderLainId);
+
+        foreach ($listBarang as $l) {
+            if ($kodeBarang == $l['kode_barang']) {
+                $result = [
+                    'barangDetail' => $l,
+                    'bcDetail' => null
+                ];
+            }
+        }
+
+
+        foreach ($payload->barang as $b) {
+            if ($b->kodeBarang == $result['barangDetail']['kode_barang']) {
+                $result['bcDetail'] = $b;
+            }
+        }
+
+        return $result;
+    }
+
+    public function barang($salesOrderLainId)
+    {
+        $salesOrderLainDetailModel = new SalesOrderLainDetailModel();
+        $detailBarang = $salesOrderLainDetailModel->detail($salesOrderLainId);
+
+        $result = [];
+
+        foreach ($detailBarang as $item) {
+            $key = $item['barang1_id'] . '-' . $item['kemasan_id'];
+            if (!isset($result[$key])) {
+                $result[$key] = $item;
+                $result[$key]['total_harga'] = (int)$item['total_harga'];
+                $result[$key]['qty_konversi'] = (int)$item['qty_konversi'];
+            } else {
+                $result[$key]['total_harga'] += (int)$item['total_harga'];
+                $result[$key]['qty_konversi'] += (int)$item['qty_konversi'];
+            }
+        }
+
+        return array_values($result);
+    }
+
+    public function isCompleteFormHeader($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($payload->kodeTujuanPengiriman != "") {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormEntitas($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->entitas) != 0) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormDokumen($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->dokumen) != 0) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormPengangkut($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->pengangkut) != 0) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormPetiKemas($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->kemasan) != 0) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormTransaksi($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($payload->bruto != 0) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormBarang($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->barang) != 0) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormPungutan($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($payload->kodeLokasiBayar != "") {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormPernyataan($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($payload->namaTtd != "") {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
     }
 }

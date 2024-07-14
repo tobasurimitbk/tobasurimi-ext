@@ -12,18 +12,18 @@
     <div class="root-form-view">
         <div class="card">
             <div class="card-header" style="font-weight: bold; color:black;">
-                BC 2.5 - PEMBERITAHUAN IMPOR BARANG DARI TEMPAT PENIMBUNAN BERIKAT
+                BC 4.1 - PEMBERITAHUAN PENGELUARAN KEMBALI BARANG ASAL TEMPAT LAIN DALAM DAERAH PABEAN DARI TEMPAT PENIMBUNAN BERIKAT
             </div>
             <div class="card-body">
                 <?php include_once('nav.php') ?>
                 <?= csrf_field() ?>
                 <form id="form-pengangkut">
-                    <input type="hidden" name="id" value="<?= encrypt($bc25['id']) ?>" class="id" id="id">
+                    <input type="hidden" name="id" value="<?= encrypt($bc41['id']) ?>" class="id" id="id">
                     <label class="form-label font-weight-bold lable-title mt-4 mb-2">
                         Pengangkutan
                     </label>
                     <div class="row">
-                        <div class="col-sm-4">
+                        <div class="col-sm-6">
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
                                     <input value="<?= count($payload->pengangkut) != 0 ? $payload->pengangkut[0]->namaPengangkut : "" ?>" id="pengangkut_nama_pengangkut" name="pengangkut_nama_pengangkut" type="text" class="form-control pengangkut_nama_pengangkut" placeholder="">
@@ -31,26 +31,11 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-6">
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
                                     <input value="<?= count($payload->pengangkut) != 0 ? $payload->pengangkut[0]->nomorPengangkut : "" ?>" id="pengangkut_nomor_pengangkut" name="pengangkut_nomor_pengangkut" type="text" class="form-control pengangkut_nomor_pengangkut" placeholder="">
                                     <label>Nomor Pengangkut</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="mt-1">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select pengangkut_kode_cara_angkut" id="pengangkut_kode_cara_angkut" name="pengangkut_kode_cara_angkut" aria-label="Floating label select example">
-                                        <option value=""></option>
-                                        <?php foreach ($pengangkut as $p) : ?>
-                                            <option <?= (count($payload->pengangkut) == 0 ? "" : ($payload->pengangkut[0]->kodeCaraAngkut == $p['description'] ? 'selected' : ''))  ?> value="<?= $p['description'] ?>">
-                                                <?= $p['description'] . " - " . $p['value'] ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <label style="z-index: 1;">Kode Cara Angkut</label>
                                 </div>
                             </div>
                         </div>
@@ -95,9 +80,6 @@
             pengangkut_nomor_pengangkut: {
                 required: true
             },
-            pengangkut_kode_cara_angkut: {
-                required: true
-            },
         },
         messages: {
             pengangkut_nama_pengangkut: {
@@ -105,9 +87,6 @@
             },
             pengangkut_nomor_pengangkut: {
                 required: "Nomor pengangkut wajib diisi"
-            },
-            pengangkut_kode_cara_angkut: {
-                required: "Kode cara angkut wajib diisi"
             },
         },
         errorElement: 'span',
@@ -148,9 +127,9 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-pengangkut"));
-                    formData.append("id", "<?= encrypt($bc25['id']) ?>");
+                    formData.append("id", "<?= encrypt($bc41['id']) ?>");
                     $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-25/id/pengangkut"); ?>",
+                        url: "<?= base_url("bea-cukai-bc-41/id/pengangkut"); ?>",
                         data: formData,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());

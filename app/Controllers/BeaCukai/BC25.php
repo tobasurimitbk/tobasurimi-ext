@@ -1578,17 +1578,14 @@ class BC25 extends BaseController
         session()->setFlashdata('isCompleteFormPungutan', $isCompleteFormBarang);
         session()->setFlashdata('isCompleteFormPernyataan', $isCompleteFormPernyataan);
 
-        $bc25 = $this->bc25Model->find($id);
-        if ($bc25['status_posting'] === "0") {
-            if (
-                $isCompleteFormPernyataan && $isCompleteFormHeader && $isCompleteFormEntitas &&
-                $isCompleteFormEntitas && $isCompleteFormDokumen && $isCompleteFormPengangkut &&
-                $isCompleteFormPetiKemas && $isCompleteFormTransaksi && $isCompleteFormBarang
-            ) {
-                $this->bc25Model->set('status_dokumen', "Siap Kirim")->where('id', $id)->update();
-            } else {
-                $this->bc25Model->set('status_dokumen', "Belum Lengkap")->where('id', $id)->update();
-            }
+        if (
+            $isCompleteFormPernyataan && $isCompleteFormHeader && $isCompleteFormEntitas &&
+            $isCompleteFormEntitas && $isCompleteFormDokumen && $isCompleteFormPengangkut &&
+            $isCompleteFormPetiKemas && $isCompleteFormTransaksi && $isCompleteFormBarang
+        ) {
+            $this->bc25Model->set('status_dokumen', "Siap Kirim")->where('id', $id)->update();
+        } else {
+            $this->bc25Model->set('status_dokumen', "Belum Lengkap")->where('id', $id)->update();
         }
     }
 }
