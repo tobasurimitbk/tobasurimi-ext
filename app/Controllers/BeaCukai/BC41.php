@@ -421,7 +421,7 @@ class BC41 extends BaseController
             'payload' => json_decode($bc41['payload'])
         ];
 
-        return view('BeaCukai/bc-41/form-header', $data);
+        return view('BeaCukai/BC-41/form-header', $data);
     }
 
     public function updateHeader()
@@ -506,7 +506,7 @@ class BC41 extends BaseController
             'payload' => json_decode($this->bc41Model->find($id)['payload'])
         ];
 
-        return view('BeaCukai/bc-41/form-entitas', $data);
+        return view('BeaCukai/BC-41/form-entitas', $data);
     }
 
     public function updateEntitas()
@@ -592,7 +592,7 @@ class BC41 extends BaseController
             'dokumen' => $dokumen,
         ];
 
-        return view('BeaCukai/bc-41/form-dokumen', $data);
+        return view('BeaCukai/BC-41/form-dokumen', $data);
     }
 
     public function updateDokumen()
@@ -654,7 +654,7 @@ class BC41 extends BaseController
             'payload' => $payload,
         ];
 
-        return view('BeaCukai/bc-41/form-pengangkut', $data);
+        return view('BeaCukai/BC-41/form-pengangkut', $data);
     }
 
     public function pengangkutUpdate()
@@ -747,7 +747,7 @@ class BC41 extends BaseController
             'dataKontainer' => $dataKontainer,
         ];
 
-        return view('BeaCukai/bc-41/form-kemasan-peti-kemas', $data);
+        return view('BeaCukai/BC-41/form-kemasan-peti-kemas', $data);
     }
 
     public function kemasanUpdate()
@@ -852,7 +852,7 @@ class BC41 extends BaseController
             'hargaPerolehanTotal' => $hargaPerolehanTotal,
         ];
 
-        return view('BeaCukai/bc-41/form-transaksi', $data);
+        return view('BeaCukai/BC-41/form-transaksi', $data);
     }
 
     public function transaksiUpdate()
@@ -913,7 +913,7 @@ class BC41 extends BaseController
             'barang' => $this->bc41Model->barang($bc41['sales_order_lain_id'])
         ];
 
-        return view('BeaCukai/bc-41/form-barang', $data);
+        return view('BeaCukai/BC-41/form-barang', $data);
     }
 
     public function barangDetail($id, $kodeBarang)
@@ -991,7 +991,7 @@ class BC41 extends BaseController
             ]);
         }
 
-        return view('BeaCukai/bc-41/form-detail-barang', $data);
+        return view('BeaCukai/BC-41/form-detail-barang', $data);
     }
 
     public function barangDetailUpdate()
@@ -1144,7 +1144,7 @@ class BC41 extends BaseController
             'payload' => json_decode($bc41['payload'])
         ];
 
-        return view('BeaCukai/bc-41/form-pungutan', $data);
+        return view('BeaCukai/BC-41/form-pungutan', $data);
     }
 
     public function pungutanUpdate()
