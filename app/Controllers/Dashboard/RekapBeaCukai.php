@@ -33,6 +33,7 @@ use App\Models\MutasiGlobalModel;
 use App\Models\MutasiGlobalDetailModel;
 use App\Models\MutasiModel;
 use App\Models\MutasiDetailModel;
+use App\Models\SalesOrderExportDetailModel;
 use PDO;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -106,7 +107,7 @@ class RekapBeaCukai extends BaseController
 
 
             $dataLPB = $penerimaanBarangDetailModel
-                ->select('count(id) as jumlah_barang, sum(sub_total) as total_barang')
+                ->select('count(id) as jumlah_barang, sum(jml_masuk) as total_barang')
                 ->whereIn('penerimaan_barang_id', $lpbidArr)
                 ->first();
 
@@ -233,7 +234,7 @@ class RekapBeaCukai extends BaseController
 
         foreach ($bcDataQry as $d) {
             $dataSalesOrderLainDetail = $salesOrderLainDetailModel
-                ->select('count(id) as jumlah_barang, sum(total_harga) as total_barang')
+                ->select('count(id) as jumlah_barang, sum(qty_order) as total_barang')
                 ->where('sales_order_lain_id', $d['sales_order_lain_id'])
                 ->first();
             $dataSalesOrderLain = $salesOrderLainModel
@@ -339,6 +340,7 @@ class RekapBeaCukai extends BaseController
         $bc27Model = new BC27Model();
         $mutasiGlobalModel = new MutasiGlobalModel();
         $mutasiGlobalDetailModel = new MutasiGlobalDetailModel();
+        $companiesModel = new CompaniesModel();
 
         $condition = [
             "bc_27.company_asal_id"  => $this->this_company_id,
@@ -377,10 +379,23 @@ class RekapBeaCukai extends BaseController
                 ->select('stock_dokumen')
                 ->where('mutasi_global_id', $d['mutasi_global_id'])
                 ->findAll();
+
+            $dataPengirim = $companiesModel
+                ->select('company as pengirim')
+                ->where('id', $d['company_asal_id'])
+                ->first();
+            $dataPenerima = $companiesModel
+                ->select('company as penerima')
+                ->where('id', $d['company_tujuan_id'])
+                ->first();
+
+
             $stockDokumenArr = [];
             foreach ($dataDokumen as $data) {
                 array_push($stockDokumenArr, $data['stock_dokumen']);
             }
+
+
             $stockDokumenArr = array_unique($stockDokumenArr);
             $stringStockDokumen = implode(" ", $stockDokumenArr);
 
@@ -390,6 +405,8 @@ class RekapBeaCukai extends BaseController
                 'no_stock_dokumen' => $stringStockDokumen,
                 'no_dokumen' => $d['no_daftar'],
                 'tgl_dokumen' => date('d/m/Y', strtotime($d['createdAt'])),
+                'pengirim' => $dataPengirim['pengirim'],
+                'penerima' => $dataPenerima['penerima'],
                 'jumlah_barang' => $dataMutasiGlobalDetail['jumlah_barang'],
                 'total_barang' => number_format($dataMutasiGlobalDetail['total_barang'], 2)
 
@@ -475,6 +492,8 @@ class RekapBeaCukai extends BaseController
         $bc30Model = new BC30Model();
         $salesOrderModel = new SalesOrderModel();
         $salesOrderDetailModel = new SalesOrderDetailModel();
+        $salesOrderExportModel = new SalesOrderExportModel();
+        $salesOrderExportDetailModel = new SalesOrderExportDetailModel();
 
 
         $condition = [
@@ -494,26 +513,55 @@ class RekapBeaCukai extends BaseController
         $list = [];
 
         foreach ($bcDataQry as $d) {
-            $dataSalesOrder = $salesOrderModel
-                ->select('no_po, no_sales_order, customers.name')
-                ->join('customers', 'customers.id = sales_order.id_customer')
-                ->where('sales_order.id', $d['sales_order_id'])
-                ->first();
+            $noSalesOrder = "";
+            $noStuffing = "";
+            $jumlahBarang = "";
+            $totalBarang = "";
+            $penerima = "";
+            if ($d['tipe_sales_order'] == "INTERNASIONAL") {
+                $dataSalesOrderExport = $salesOrderExportModel
+                    ->select('sales_order_export_no, no_stuffing, company')
+                    ->join('stuffing_internasional', 'sales_order_export.sales_order_export_id = stuffing_internasional.sales_order_export_id')
+                    ->join('companies', 'companies.id = sales_order_export.company_id')
+                    ->where('sales_order_export.sales_order_export_id', $d['sales_order_id'])
+                    ->first();
+                $dataSalesOrderExportDetail = $salesOrderExportDetailModel
+                    ->select('count(*) as jumlah_barang, sum(qty) as total_barang')
+                    ->where('sales_order_export_id', $d['sales_order_id'])
+                    ->first();
+                $noSalesOrder = $dataSalesOrderExport['sales_order_export_no'];
+                $noStuffing = $dataSalesOrderExport['no_stuffing'];
+                $penerima = $dataSalesOrderExport['company'];
+                $jumlahBarang = $dataSalesOrderExportDetail['jumlah_barang'];
+                $totalBarang = $dataSalesOrderExportDetail['total_barang'];
+            } elseif ($d['tipe_sales_order'] == "LOKAL") {
+                $dataSalesOrder = $salesOrderModel
+                    ->select('no_sales_order, customers.name, no_stuffing')
+                    ->join('stuffing_lokal', 'stuffing_lokal.sales_order_id = sales_order.id')
+                    ->join('customers', 'customers.id = sales_order.id_customer')
+                    ->where('sales_order.id', $d['sales_order_id'])
+                    ->first();
+                $dataSalesOrderDetail = $salesOrderDetailModel
+                    ->select('count(*) as jumlah_barang, sum(qty) as total_barang')
+                    ->where('id_sales_order', $d['sales_order_id'])
+                    ->first();
+                $noSalesOrder = $dataSalesOrder['no_sales_order'];
+                $noStuffing = $dataSalesOrder['no_stuffing'];
+                $penerima = $dataSalesOrder['name'];
+                $jumlahBarang = $dataSalesOrderDetail['jumlah_barang'];
+                $totalBarang = $dataSalesOrderDetail['total_barang'];
+            }
 
-            $dataSalesOrderDetail = $salesOrderDetailModel
-                ->select('count(id) as jumlah_barang, sum(harga_barang) as total_barang')
-                ->where('id_sales_order', $d['sales_order_id'])
-                ->first();
             array_push($list, [
                 'tipe_sales_order' => $d['tipe_sales_order'],
-                'no_sales_order' => $dataSalesOrder['no_sales_order'],
+                'no_sales_order' => $noSalesOrder,
                 'no_aju' => $d['no_aju'],
                 'no_dokumen' => $d['no_daftar'],
                 'tgl_dokumen' => date('d/m/Y', strtotime($d['createdAt'])),
-                'no_po' => $dataSalesOrder['no_po'],
-                'customer_nama' => $dataSalesOrder['name'],
-                'jumlah_barang' => $dataSalesOrderDetail['jumlah_barang'],
-                'total_barang' => number_format($dataSalesOrderDetail['total_barang'], 2)
+                'no_stuffing' => $noStuffing,
+                'penerima' => $penerima,
+                'jumlah_barang' => $jumlahBarang,
+                'total_barang' => number_format($totalBarang, 2)
             ]);
         }
 
@@ -635,7 +683,7 @@ class RekapBeaCukai extends BaseController
 
 
             $dataLPB = $penerimaanBarangDetailModel
-                ->select('count(id) as jumlah_barang, sum(sub_total) as total_barang')
+                ->select('count(id) as jumlah_barang, sum(jml_masuk) as total_barang')
                 ->whereIn('penerimaan_barang_id', $lpbidArr)
                 ->first();
 
@@ -764,7 +812,7 @@ class RekapBeaCukai extends BaseController
 
         foreach ($bcDataQry as $d) {
             $dataSalesOrderLainDetail = $salesOrderLainDetailModel
-                ->select('count(id) as jumlah_barang, sum(total_harga) as total_barang')
+                ->select('count(id) as jumlah_barang, sum(qty_order) as total_barang')
                 ->where('sales_order_lain_id', $d['sales_order_lain_id'])
                 ->first();
             $dataSalesOrderLain = $salesOrderLainModel
@@ -894,6 +942,20 @@ class RekapBeaCukai extends BaseController
                 ->select('no_mutasi')
                 ->where('id', $d['mutasi_id'])
                 ->first();
+            $dataAsal = $mutasiModel
+                ->select('divisi, warehouse_name')
+                ->join('divisis', 'divisis.id = mutasi.divisi_asal_id')
+                ->join('warehouses', 'warehouses.id = mutasi.warehouse_asal_id')
+                ->where('mutasi.id', $d['mutasi_id'])
+                ->first();
+            $dataTujuan = $mutasiModel
+                ->select('divisi, warehouse_name')
+                ->join('divisis', 'divisis.id = mutasi.divisi_tujuan_id')
+                ->join('warehouses', 'warehouses.id = mutasi.warehouse_tujuan_id')
+                ->where('mutasi.id', $d['mutasi_id'])
+                ->first();
+
+
             $dataMutasiDetail = $mutasiDetailModel
                 ->select('count(id) as jumlah_barang, sum(qty) as total_barang')
                 ->where('mutasi_id', $d['mutasi_id'])
@@ -916,6 +978,8 @@ class RekapBeaCukai extends BaseController
                 'no_dokumen' => $d['no_daftar'],
                 'tgl_dokumen' => date('d/m/Y', strtotime($d['createdAt'])),
                 'jumlah_barang' => $dataMutasiDetail['jumlah_barang'],
+                'asal' => $dataAsal['divisi'] . " / " . $dataAsal['warehouse_name'],
+                'tujuan' => $dataTujuan['divisi'] . " / " . $dataAsal['warehouse_name'],
                 'total_barang' => number_format($dataMutasiDetail['total_barang'], 2)
             ]);
         }

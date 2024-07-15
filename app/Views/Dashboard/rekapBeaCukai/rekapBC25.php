@@ -33,15 +33,15 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr style="text-align: center;">
-                                <th>No</th>
-                                <th>No Sales Order</th>
-                                <th>No Aju</th>
-                                <th>No Daftar</th>
-                                <th>Tgl Dokumen</th>
+                                <th style="text-align:center;">No</th>
+                                <th style="text-align:center;">No Sales Order</th>
+                                <th style="text-align:center;">No Aju</th>
+                                <th style="text-align:center;">No Daftar</th>
+                                <th style="text-align:center;">Tgl Dokumen</th>
                                 <!-- <th>No Penerimaan Barang</th> -->
-                                <th>Customer</th>
-                                <th>Jumlah Barang (Termasuk Spek)</th>
-                                <th>Nilai Barang</th>
+                                <th style="text-align:center;">Customer</th>
+                                <th style="text-align:center;">Jumlah Barang </th>
+                                <th style="text-align:center;">Total Barang</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">

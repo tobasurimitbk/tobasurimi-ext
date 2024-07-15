@@ -243,7 +243,7 @@
         </div>
         <div class="row p-3">
             <div class="col-sm-8">
-                <!-- <div class="card-header text-black text-bold">
+                <div class="card-body text-black text-bold">
                     <div class="row">
                         <div class="col-sm-3">
                             <span class="m-0" style="vertical-align: middle; font-size: 25px; "><i class="fas fa-th text-sm mr-2" style="font-size: 25px;"></i> Work In Progress </span>
@@ -260,7 +260,7 @@
                                 </div>
                                 <div class="col-sm-5">
                                     <div class="input-group mb-3">
-                                        <input autocomplete="one-time-code" class="form-control input-picker p-4 dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Pembayaran">
+                                        <input autocomplete="one-time-code" class="form-control input-picker p-4 searchCode" id="searchCode" name="searchCode" placeholder="Mulai Tanggal Pembayaran">
                                         <div class="input-group-prepend group-prepend-password align-items-center">
                                             <i style="cursor: pointer; z-index: 99;  margin-left: -30px; border: 0px" class="fa fa-search icon-form"></i>
                                         </div>
@@ -295,7 +295,7 @@
                             </table>
                         </div>
                     </div>
-                </div> -->
+                </div>
             </div>
             <div class="col-sm-4">
                 <div class="card-header bg-danger text-white text-bold">
@@ -364,6 +364,59 @@
 
 </section>
 <script>
+    // const table = $('.dataTable').DataTable({
+    //     dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+    //     processing: true,
+    //     serverSide: true,
+    //     ordering: true,
+    //     order: [
+    //         [1, 'asc']
+    //     ],
+
+    //     fixedHeader: true,
+    //     lengthMenu: [
+    //         [25],
+    //         [25],
+    //     ],
+    //     pageLength: 25,
+    //     ajax: {
+    //         url: "<?= base_url(""); ?>",
+    //         dataSrc: "data",
+    //         data: function(data) {
+    //             data.search = $(".search").val();
+    //             data.startDate = $(".startDate").val();
+    //             data.paymentDate = $(".paymentDate").val();
+    //             // data.type_po = "Bahan Baku";
+    //             data.type_bayar = $(".type_bayar").val();
+    //             data.status_posting = $(".status_posting").val();
+    //             data.sort = sort;
+    //             data.sortType = sortType;
+    //         }
+    //     },
+    //     // scrollX: true,
+    //     "initComplete": function(settings, json) {
+    //         $('.dataTables_length').empty();
+    //         $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+    //         $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+    //     },
+    //     //responsive: true,
+    //     display: "stripe",
+    //     searching: false,
+    //     columns: [],
+    //     columnDefs: [{
+    //         defaultContent: "-",
+    //         targets: "_all"
+    //     }],
+    //     language: {
+    //         emptyTable: "Tidak Ada Data",
+    //         lengthMenu: "Show _MENU_ entries",
+    //         paginate: {
+    //             previous: '<i class="fa fa-angle-left"></i>',
+    //             next: '<i class="fa fa-angle-right"></i>'
+    //         }
+    //     }
+    // });
+
     $(document).ready(function() {
         var currentDate = new Date();
         var formattedDate = (currentDate.getMonth() + 1).toString().padStart(2, '0') + '/' + currentDate.getFullYear();

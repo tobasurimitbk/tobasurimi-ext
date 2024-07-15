@@ -39,10 +39,10 @@
                                 <th style="text-align:center;">No Aju</th>
                                 <th style="text-align:center;">No Daftar</th>
                                 <th style="text-align:center;">Tgl Dokumen</th>
-                                <th style="text-align:center;">No PO</th>
-                                <th style="text-align:center;">Customer</th>
+                                <th style="text-align:center;">No Stuffing</th>
+                                <th style="text-align:center;">Penerima</th>
                                 <th style="text-align:center;">Jumlah Barang</th>
-                                <th style="text-align:center;">Nilai Barang</th>
+                                <th style="text-align:center;">Total Barang</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
@@ -105,8 +105,8 @@
                         newRow.append($('<td style="text-align:center;">').text(v.no_aju));
                         newRow.append($('<td style="text-align:center;">').text(v.no_dokumen));
                         newRow.append($('<td style="text-align:center;">').text(v.tgl_dokumen))
-                        newRow.append($('<td style="text-align:center;">').text(v.no_po))
-                        newRow.append($('<td style="text-align:center;">').text(v.customer_nama));
+                        newRow.append($('<td style="text-align:center;">').text(v.no_stuffing))
+                        newRow.append($('<td style="text-align:center;">').text(v.penerima));
                         newRow.append($('<td style="text-align:center;">').text(v.jumlah_barang + " Barang"));
                         newRow.append($('<td style="text-align:center;">').text(v.total_barang));
                         table.find('tbody').append(newRow);

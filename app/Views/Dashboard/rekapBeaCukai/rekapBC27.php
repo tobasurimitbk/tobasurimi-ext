@@ -33,13 +33,16 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr style="text-align: center;">
-                                <th>No</th>
-                                <th>No Mutasi</th>
-                                <th>No Dokumen</th>
-                                <th>No Aju</th>
-                                <th>No Daftar</th>
-                                <th>Tgl Dokumen</th>
-                                <th>Jumlah Barang</th>
+                                <th style="text-align:center;">No</th>
+                                <th style="text-align:center;">No Mutasi</th>
+                                <th style="text-align:center;">No Dokumen</th>
+                                <th style="text-align:center;">No Aju</th>
+                                <th style="text-align:center;">No Daftar</th>
+                                <th style="text-align:center;">Tgl Dokumen</th>
+                                <th style="text-align:center;">Pengirim</th>
+                                <th style="text-align:center;">Penerima</th>
+                                <th style="text-align:center;">Jumlah Barang</th>
+                                <th style="text-align:center;">Total Barang</th>
 
                             </tr>
                         </thead>
@@ -103,13 +106,16 @@
                         newRow.append($('<td style="text-align:center;">').text(v.no_aju));
                         newRow.append($('<td style="text-align:center;">').text(v.no_dokumen));
                         newRow.append($('<td style="text-align:center;">').text(v.tgl_dokumen));
+                        newRow.append($('<td style="text-align:center;">').text(v.pengirim));
+                        newRow.append($('<td style="text-align:center;">').text(v.penerima));
                         newRow.append($('<td style="text-align:center;">').text(v.jumlah_barang + " Barang"));
+                        newRow.append($('<td style="text-align:center;">').text(v.total_barang));
 
                         table.find('tbody').append(newRow);
                     });
                 } else {
                     var newRow = $('<tr style="border: none">');
-                    newRow.append($('<td colspan ="7"  style="text-align:center;">').text("Tidak ada Dokumen Bea Cukai"));
+                    newRow.append($('<td colspan ="9"  style="text-align:center;">').text("Tidak ada Dokumen Bea Cukai"));
                     table.find('tbody').append(newRow);
                 }
 

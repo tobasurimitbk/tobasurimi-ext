@@ -41,7 +41,7 @@
                                 <!-- <th>No Penerimaan Barang</th> -->
                                 <th style="text-align:center;">Customer</th>
                                 <th style="text-align:center;">Jumlah Barang</th>
-                                <th style="text-align:center;">Nilai Barang</th>
+                                <th style="text-align:center;">Total Barang</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">

@@ -40,6 +40,8 @@
                                 <th style="text-align:center;">No Aju</th>
                                 <th style="text-align:center;">No Daftar</th>
                                 <th style="text-align:center;">Tgl Dokumen</th>
+                                <th style="text-align:center;">Asal Divisi/Warehouse</th>
+                                <th style="text-align:center;">Tujuan Divisi/Warehouse</th>
                                 <th style="text-align:center;">Jumlah Barang </th>
 
                             </tr>
@@ -104,7 +106,8 @@
                         newRow.append($('<td style="text-align:center;">').text(v.no_aju));
                         newRow.append($('<td style="text-align:center;">').text(v.no_dokumen));
                         newRow.append($('<td style="text-align:center;">').text(v.tgl_dokumen));
-
+                        newRow.append($('<td style="text-align:center;">').text(v.asal));
+                        newRow.append($('<td style="text-align:center;">').text(v.tujuan));
                         newRow.append($('<td style="text-align:center;">').text(v.jumlah_barang + " Barang"));
 
                         table.find('tbody').append(newRow);

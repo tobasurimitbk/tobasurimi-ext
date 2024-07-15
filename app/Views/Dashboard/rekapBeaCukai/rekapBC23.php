@@ -41,8 +41,8 @@
                                 <th style="text-align:center;">Tgl Dokumen</th>
                                 <th style="text-align:center;">No Penerimaan Barang</th>
                                 <th style="text-align:center;">Supplier</th>
-                                <th style="text-align:center;">Jumlah Barang (Termasuk Spek)</th>
-                                <th style="text-align:center;">Nilai Barang</th>
+                                <th style="text-align:center;">Jumlah Barang </th>
+                                <th style="text-align:center;">Total Barang</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
