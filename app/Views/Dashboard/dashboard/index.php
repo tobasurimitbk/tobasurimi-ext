@@ -243,7 +243,7 @@
         </div>
         <div class="row p-3">
             <div class="col-sm-8">
-                <div class="card-body text-black text-bold">
+                <!-- <div class="card-body text-black text-bold">
                     <div class="row">
                         <div class="col-sm-3">
                             <span class="m-0" style="vertical-align: middle; font-size: 25px; "><i class="fas fa-th text-sm mr-2" style="font-size: 25px;"></i> Work In Progress </span>
@@ -295,7 +295,7 @@
                             </table>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="col-sm-4">
                 <div class="card-header bg-danger text-white text-bold">

@@ -1177,6 +1177,9 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->post('create', 'BeaCukai\BC40::createPurchaseOrderAction');
     $routes->post('po/update', 'BeaCukai\BC40::updatePurchaseOrderAction/$1');
     $routes->post('posting', 'BeaCukai\BC23::posting');
+    $routes->get('bc-23-outstanding-all', 'BeaCukai\BC23::allOutstanding');
+    $routes->get('bc-23-outstanding', 'BeaCukai\BC23::viewOutstanding');
+    $routes->get('bc-23-outstanding-export', 'BeaCukai\BC23::OutstandingSheet');
 
     // HEADER
     $routes->get('id/header/(:segment)', 'BeaCukai\BC23::createHeaderView/$1');

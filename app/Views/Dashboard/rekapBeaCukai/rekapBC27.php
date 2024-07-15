@@ -115,7 +115,7 @@
                     });
                 } else {
                     var newRow = $('<tr style="border: none">');
-                    newRow.append($('<td colspan ="9"  style="text-align:center;">').text("Tidak ada Dokumen Bea Cukai"));
+                    newRow.append($('<td colspan ="10"  style="text-align:center;">').text("Tidak ada Dokumen Bea Cukai"));
                     table.find('tbody').append(newRow);
                 }
 
@@ -148,7 +148,7 @@
                 });
                 const link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
-                link.download = 'Rekap_BC2.7_' + date + '.xlsx';
+                link.download = 'Rekap_BC_2.7_' + date + '.xlsx';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);

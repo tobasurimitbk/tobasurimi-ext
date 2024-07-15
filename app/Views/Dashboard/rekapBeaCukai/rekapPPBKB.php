@@ -43,6 +43,7 @@
                                 <th style="text-align:center;">Asal Divisi/Warehouse</th>
                                 <th style="text-align:center;">Tujuan Divisi/Warehouse</th>
                                 <th style="text-align:center;">Jumlah Barang </th>
+                                <th style="text-align:center;">Total Barang </th>
 
                             </tr>
                         </thead>

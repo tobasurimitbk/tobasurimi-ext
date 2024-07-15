@@ -9,7 +9,6 @@
             <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="" onclick="exportSheet(event)">
                 <i class="fa-solid fa-print"></i> Export
             </a>
-
             <a class="btn btn-hide-form btn-discard float-right " href="<?= base_url("dashboard"); ?>">
                 Kembali
             </a>
@@ -147,7 +146,7 @@
                 });
                 const link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
-                link.download = 'Rekap_BC2.3_' + date + '.xlsx';
+                link.download = 'Rekap_BC_2.3_' + date + '.xlsx';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);

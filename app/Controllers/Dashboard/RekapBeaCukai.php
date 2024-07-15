@@ -145,7 +145,7 @@ class RekapBeaCukai extends BaseController
             ->setCellValue('G1', 'No Penerimaan Barang')
             ->setCellValue('H1', 'Supplier')
             ->setCellValue('I1', 'Jumlah Barang (Termasuk Spek)')
-            ->setCellValue('J1', 'Nilai Barang');
+            ->setCellValue('J1', 'Total Barang');
 
         $no = 1;
         $column = 2;
@@ -431,7 +431,11 @@ class RekapBeaCukai extends BaseController
             ->setCellValue('D1', 'No Aju')
             ->setCellValue('E1', 'No Daftar')
             ->setCellValue('F1', 'Tgl Dokumen')
-            ->setCellValue('G1', 'Jumlah Barang');
+            ->setCellValue('G1', 'Pengirim')
+            ->setCellValue('H1', 'Penerima')
+            ->setCellValue('I1', 'Jumlah Barang')
+            ->setCellValue('J1', 'Total Barang');
+
 
 
         $no = 1;
@@ -446,13 +450,16 @@ class RekapBeaCukai extends BaseController
                 ->setCellValue('D' . $column,  $l->no_aju)
                 ->setCellValue('E' . $column,  $l->no_dokumen)
                 ->setCellValue('F' . $column,  $l->tgl_dokumen)
-                ->setCellValue('G' . $column,  $l->jumlah_barang);
+                ->setCellValue('G' . $column,  $l->pengirim)
+                ->setCellValue('H' . $column,  $l->penerima)
+                ->setCellValue('I' . $column,  $l->jumlah_barang)
+                ->setCellValue('J' . $column,  $l->total_barang);
 
             $column++;
         }
         $writer = new Xlsx($spreadsheet);
-        $filename = 'Rekap BC23';
-        foreach (range('A', 'G') as $columnID) {
+        $filename = 'Rekap BC27';
+        foreach (range('A', 'J') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
 
@@ -582,10 +589,10 @@ class RekapBeaCukai extends BaseController
             ->setCellValue('D1', 'No Aju')
             ->setCellValue('E1', 'No Daftar')
             ->setCellValue('F1', 'Tgl Dokumen')
-            ->setCellValue('G1', 'No Po')
-            ->setCellValue('H1', 'Customer')
+            ->setCellValue('G1', 'No Stuffing')
+            ->setCellValue('H1', 'Penerima')
             ->setCellValue('I1', 'Jumlah Barang')
-            ->setCellValue('J1', 'Nilai Barang');
+            ->setCellValue('J1', 'Total Barang');
 
         $no = 1;
         $column = 2;
@@ -599,8 +606,8 @@ class RekapBeaCukai extends BaseController
                 ->setCellValue('D' . $column,  $l->no_aju)
                 ->setCellValue('E' . $column,  $l->no_dokumen)
                 ->setCellValue('F' . $column,  $l->tgl_dokumen)
-                ->setCellValue('G' . $column,  $l->no_po)
-                ->setCellValue('H' . $column,  $l->customer_nama)
+                ->setCellValue('G' . $column,  $l->no_stuffing)
+                ->setCellValue('H' . $column,  $l->penerima)
                 ->setCellValue('I' . $column,  $l->jumlah_barang)
                 ->setCellValue('J' . $column,  $l->total_barang);
 
@@ -721,7 +728,7 @@ class RekapBeaCukai extends BaseController
             ->setCellValue('G1', 'No Penerimaan Barang')
             ->setCellValue('H1', 'Penerima')
             ->setCellValue('I1', 'Jumlah Barang')
-            ->setCellValue('J1', 'Nilai Barang');
+            ->setCellValue('J1', 'Total Barang');
 
         $no = 1;
         $column = 2;
@@ -849,7 +856,7 @@ class RekapBeaCukai extends BaseController
             ->setCellValue('E1', 'Tgl Dokumen')
             ->setCellValue('F1', 'Customer')
             ->setCellValue('G1', 'Jumlah Barang')
-            ->setCellValue('H1', 'Nilai Barang');
+            ->setCellValue('H1', 'Total Barang');
 
 
         $no = 1;
@@ -1001,7 +1008,10 @@ class RekapBeaCukai extends BaseController
             ->setCellValue('D1', 'No Aju')
             ->setCellValue('E1', 'No Daftar')
             ->setCellValue('F1', 'Tgl Dokumen')
-            ->setCellValue('G1', 'Jumlah Barang');
+            ->setCellValue('G1', 'Asal Divisi/Warehouse')
+            ->setCellValue('H1', 'Tujuan Divisi/Warehouse')
+            ->setCellValue('I1', 'Jumlah Barang')
+            ->setCellValue('J1', 'Total Barang');
 
         $no = 1;
         $column = 2;
@@ -1015,13 +1025,16 @@ class RekapBeaCukai extends BaseController
                 ->setCellValue('D' . $column,  $l->no_aju)
                 ->setCellValue('E' . $column,  $l->no_dokumen)
                 ->setCellValue('F' . $column,  $l->tgl_dokumen)
-                ->setCellValue('G' . $column,  $l->jumlah_barang);
+                ->setCellValue('G' . $column,  $l->asal)
+                ->setCellValue('H' . $column,  $l->tujuan)
+                ->setCellValue('I' . $column,  $l->jumlah_barang)
+                ->setCellValue('J' . $column,  $l->total_barang);
 
             $column++;
         }
         $writer = new Xlsx($spreadsheet);
         $filename = 'Rekap BC23';
-        foreach (range('A', 'H') as $columnID) {
+        foreach (range('A', 'J') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
 

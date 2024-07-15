@@ -144,7 +144,7 @@
                 });
                 const link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
-                link.download = 'Rekap_BC2.5_' + date + '.xlsx';
+                link.download = 'Rekap_BC_2.5_' + date + '.xlsx';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
