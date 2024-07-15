@@ -863,50 +863,50 @@
                 if ($('.create-form').valid()) {
                     var isValid = true;
                     var dataError = null;
+                    console.log(listStockSelectedBahanBaku);
 
                     $.each(listStockSelectedBahanBaku, function(i, v) {
-                        var element = $('input[data-id="' + v.id + '"].qty-baku-request');
-                        // var elementSortir = $('input[data-id="' + v.id + '"].qty-baku-sortir');
-                        var input_user = parseFloat(element.val());
-                        // var input_user_sortir = parseFloat(elementSortir.val());
-                        var stok_max = parseFloat(element.data('stok_total'));
-
                         // if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0 || input_user_sortir > stok_max || isNaN(input_user_sortir) || input_user_sortir == undefined || input_user_sortir == 0 || input_user_sortir > input_user) {
-                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                        if (listStockSelectedBahanBaku[i].qty2 > listStockSelectedBahanBaku[i].stok_total || isNaN(listStockSelectedBahanBaku[i].qty2) || listStockSelectedBahanBaku[i].qty2 == undefined || listStockSelectedBahanBaku[i].qty2 == 0) {
                             dataError = listStockSelectedBahanBaku[i];
                             isValid = false;
-                        } else {
-                            listStockSelectedBahanBaku[i].qty = stok_max;
-                            listStockSelectedBahanBaku[i].qty2 = input_user;
-                            // listStockSelectedBahanBaku[i].qty_isi = input_user_sortir;
                         }
                     });
 
                     $.each(listStockSelectedBahan, function(i, v) {
-                        var element = $('input[data-id="' + v.id + '"].qty-bahan-request');
-                        var input_user = parseFloat(element.val());
-                        var stok_max = parseFloat(element.data('stok_total'));
+                        // var element = $('input[data-id="' + v.id + '"].qty-bahan-request');
+                        // var input_user = parseFloat(element.val());
+                        // var stok_max = parseFloat(element.data('stok_total'));
 
-                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                        // if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                        //     dataError = listStockSelectedBahan[i];
+                        //     isValid = false;
+                        // } else {
+                        //     listStockSelectedBahan[i].qty = stok_max;
+                        //     listStockSelectedBahan[i].qty2 = input_user;
+                        // }
+                        if (listStockSelectedBahan[i].qty2 > listStockSelectedBahan[i].stok_total || isNaN(listStockSelectedBahan[i].qty2) || listStockSelectedBahan[i].qty2 == undefined || listStockSelectedBahan[i].qty2 == 0) {
                             dataError = listStockSelectedBahan[i];
                             isValid = false;
-                        } else {
-                            listStockSelectedBahan[i].qty = stok_max;
-                            listStockSelectedBahan[i].qty2 = input_user;
                         }
                     });
 
                     $.each(listStockSelectedBahanSetengahJadi, function(i, v) {
-                        var element = $('input[data-id="' + v.id + '"].qty-bahan-request');
-                        var input_user = parseFloat(element.val());
-                        var stok_max = parseFloat(element.data('stok_total'));
+                        // var element = $('input[data-id="' + v.id + '"].qty-bahan-request');
+                        // var input_user = parseFloat(element.val());
+                        // var stok_max = parseFloat(element.data('stok_total'));
 
-                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                        // if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+                        //     dataError = listStockSelectedBahanSetengahJadi[i];
+                        //     isValid = false;
+                        // } else {
+                        //     listStockSelectedBahanSetengahJadi[i].qty = stok_max;
+                        //     listStockSelectedBahanSetengahJadi[i].qty2 = input_user;
+                        // }
+                        // if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0 || input_user_sortir > stok_max || isNaN(input_user_sortir) || input_user_sortir == undefined || input_user_sortir == 0 || input_user_sortir > input_user) {
+                        if (listStockSelectedBahanSetengahJadi[i].qty2 > listStockSelectedBahanSetengahJadi[i].stok_total || isNaN(listStockSelectedBahanSetengahJadi[i].qty2) || listStockSelectedBahanSetengahJadi[i].qty2 == undefined || listStockSelectedBahanSetengahJadi[i].qty2 == 0) {
                             dataError = listStockSelectedBahanSetengahJadi[i];
                             isValid = false;
-                        } else {
-                            listStockSelectedBahanSetengahJadi[i].qty = stok_max;
-                            listStockSelectedBahanSetengahJadi[i].qty2 = input_user;
                         }
                     });
 
@@ -926,7 +926,6 @@
                             listStockSelectedBahanJadi[i].qty_isi = input_user_request;
                         }
                     });
-                    console.log(listStockSelectedBahanBaku);
 
                     if (!isValid) {
                         Swal.fire({
@@ -1342,7 +1341,7 @@
 
                     if (!isIDSelected) {
                         listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                        listStockAsal[i].qty = 0;
+                        listStockAsal[i].qty = parseFloat(listStockAsal[i].stok_total);
                         listStockAsal[i].qty2 = 0;
                         listStockAsal[i].qty_isi = 0;
                         listStockAsal[i].departmentID = departmentID;
@@ -1607,7 +1606,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty2}">
+                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" data-index="${i}" class="form-control" type="text" value="${v.qty2}">
             `
             ));
             // newRow.append($('<td style="text-align: center;">').html(
@@ -1648,6 +1647,15 @@
         });
 
         selectedItemTableBahanBaku.draw();
+
+        // Tambahkan event listener untuk mengikuti perubahan nilai qty-barang-jadi
+        $('.qty-baku-request').on('input change', function() {
+            var index = $(this).data('index'); // Dapatkan indeks item dari atribut data-index
+            var stok_max = $(this).data('stok_total');
+            var input_user = $(this).val();
+
+            listStockSelectedBahanBaku[index].qty2 = input_user;
+        });
     }
 
     function drawTableSelectedItemBahanSetengahJadi(data) {
@@ -1675,7 +1683,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty2}">
+                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" data-index="${i}" class="form-control" type="text" value="${v.qty2}">
             `
             ));
             newRow.append($('<td style="text-align: center;">').html(
@@ -1711,6 +1719,15 @@
         });
 
         selectedItemTableBahanSetengahJadi.draw();
+
+        // Tambahkan event listener untuk mengikuti perubahan nilai qty-barang-jadi
+        $('.qty-bahan-request').on('input change', function() {
+            var index = $(this).data('index'); // Dapatkan indeks item dari atribut data-index
+            var stok_max = $(this).data('stok_total');
+            var input_user = $(this).val();
+
+            listStockSelectedBahanSetengahJadi[index].qty2 = input_user;
+        });
     }
 
     function drawTableSelectedItemBahan(data) {
@@ -1738,7 +1755,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty2}">
+                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" data-index="${i}" class="form-control" type="text" value="${v.qty2}">
             `
             ));
             newRow.append($('<td style="text-align: center;">').html(
@@ -1774,6 +1791,15 @@
         });
 
         selectedItemTableBahan.draw();
+
+        // Tambahkan event listener untuk mengikuti perubahan nilai qty-barang-jadi
+        $('.qty-bahan-request').on('input change', function() {
+            var index = $(this).data('index'); // Dapatkan indeks item dari atribut data-index
+            var stok_max = $(this).data('stok_total');
+            var input_user = $(this).val();
+
+            listStockSelectedBahan[index].qty2 = input_user;
+        });
     }
 
     function drawTableSelectedItemBahanJadi(data) {
