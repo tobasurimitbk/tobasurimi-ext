@@ -109,6 +109,7 @@
                         newRow.append($('<td style="text-align:center;">').text(v.asal));
                         newRow.append($('<td style="text-align:center;">').text(v.tujuan));
                         newRow.append($('<td style="text-align:center;">').text(v.jumlah_barang + " Barang"));
+                        newRow.append($('<td style="text-align:center;">').text(v.total_barang));
 
                         table.find('tbody').append(newRow);
                     });
