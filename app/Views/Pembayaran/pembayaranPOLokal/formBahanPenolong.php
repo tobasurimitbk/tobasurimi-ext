@@ -609,7 +609,7 @@
             dataType: "json",
             success: function(res) {
                 const table = $('#dataTable');
-                // detail append
+
                 var detail = res.detail;
                 var dateSplit = detail.jatuh_tempo.split('-');
                 var subTotal = Number(detail.nominal_faktur) + Number(res.tax_dipungut_negara.taxAmt) + Number(res.pph) - Number(detail.total_amount);

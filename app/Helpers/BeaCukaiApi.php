@@ -780,7 +780,7 @@ class BeaCukaiApi
                     'jumlahSatuan' => 0,
                     'kodeFasilitasTarif' => $bt['kode_fasilitas_tarif'],
                     'kodeSatuanBarang' => $bt['kode_satuan_barang'],
-                    'nilaiBayar' => (float)$bt['nilai_bayar'],
+                    'nilaiBayar' => roundNumber($bt['nilai_bayar'], 0.01),
                     'nilaiFasilitas' => 0,
                     'nilaiSudahDilunasi' => 0,
                     'seriBarang' => (int)$bt['seri_barang'],

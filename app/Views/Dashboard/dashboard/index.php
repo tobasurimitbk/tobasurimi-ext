@@ -1,6 +1,38 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
+<!-- 
+<div class="modal add-modal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><label class="title-name"></label></h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table nowrap table-hover-tobasurimi dataTableBC" id="dataTableBC" width="100%" cellspacing="0">
+                            <thead class="thead-dark" id="head-table">
+
+                            </thead>
+                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div> -->
+
+
+
+
+
+
+
+
 <section class="section">
 
     <div class="section-header">
@@ -209,21 +241,119 @@
 
             </div>
         </div>
-        <div class="row">
+        <div class="row p-3">
             <div class="col-sm-8">
-                <div class="card-header text-black text-bold">
-                    <b>POSISI BARANG WORK IN PROGRESS (WIP)</b>
+                <!-- <div class="card-body text-black text-bold">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <span class="m-0" style="vertical-align: middle; font-size: 25px; "><i class="fas fa-th text-sm mr-2" style="font-size: 25px;"></i> Work In Progress </span>
+                        </div>
+                        <div class="col-sm-9">
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="input-group mb-3">
+                                        <input autocomplete="one-time-code" class="form-control input-picker p-4 dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Pembayaran">
+                                        <div class="input-group-prepend group-prepend-password align-items-center">
+                                            <i style="cursor: pointer; z-index: 99;  margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5">
+                                    <div class="input-group mb-3">
+                                        <input autocomplete="one-time-code" class="form-control input-picker p-4 searchCode" id="searchCode" name="searchCode" placeholder="Mulai Tanggal Pembayaran">
+                                        <div class="input-group-prepend group-prepend-password align-items-center">
+                                            <i style="cursor: pointer; z-index: 99;  margin-left: -30px; border: 0px" class="fa fa-search icon-form"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type="button" class="btn btn-lg bg-warning dropdown-toggle float-right  ml-4 p-3" data-toggle="dropdown" aria-expanded="false"><i class="fas fa-download mr-1"></i> Export
+                                    </button>
+                                    <ul class="dropdown-menu text-xs" style="">
+                                        <li class="dropdown-item" id="excel" onclick="actionExport('Excel')">Excel</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
 
-                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Production Date</th>
+                                        <th>Production Code</th>
+                                        <th>QTY order</th>
+                                        <th>Finish Good</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> -->
             </div>
             <div class="col-sm-4">
-                <div class="card-header text-black text-bold">
+                <div class="card-header bg-danger text-white text-bold">
                     <b>DATA DOKUMEN BEA CUKAI</b>
                 </div>
-                <div class="card-body">
+                <div class="card-body bg-danger" style="margin-top: -20px; margin-bottom: -20px;">
+                    <div class="input-group input-group-password align-items-center">
+                        <input autocomplete="one-time-code" class="form-control input-picker p-4 dateBC" id="dateBC" name="dateBC" placeholder="Pilih Tanggal" value="">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99;  margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body border" style="margin-top: 20px">
+                    <div class="row">
+                        <ul class="nav flex-column col-6">
+                            <li class="nav-item">
+                                <a href="#" onclick="showDetails('bc23')" class="nav-link text-info text-sm ">
+                                    <b>BC 2.3 <span id="bc23" class="float-right">0</span></b>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" onclick="showDetails('bc25')" class="nav-link text-info text-sm">
+                                    <b>BC 2.5 <span id="bc25" class="float-right">0</span></b>
+                                </a>
+                            </li>
 
+                            <li class="nav-item">
+                                <a href="#" onclick="showDetails('bc27')" class="nav-link text-info text-sm">
+                                    <b>BC 2.7 <span id="bc27" class="float-right">0</span></b>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="#" onclick="showDetails('bc30')" class="nav-link text-info text-sm">
+                                    <b>BC 3.0 <span id="bc30" class="float-right">0</span></b>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" onclick="showDetails('bc40')" class="nav-link text-info text-sm">
+                                    <b>BC 4.0 <span id="bc40" class="float-right">0</span></b>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <ul class="nav flex-column col-6">
+                            <li class="nav-item">
+                                <a href="#" onclick="showDetails('bc41')" class="nav-link text-info text-sm">
+                                    <b>BC 4.1 <span id="bc41" class="float-right">0</span></b>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" onclick="showDetails('ppbkb')" class="nav-link text-info text-sm">
+                                    <b>PPBKB <span id="ppbkb" class="float-right">0</span></b>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -233,6 +363,123 @@
 
 
 </section>
+<script>
+    // const table = $('.dataTable').DataTable({
+    //     dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+    //     processing: true,
+    //     serverSide: true,
+    //     ordering: true,
+    //     order: [
+    //         [1, 'asc']
+    //     ],
+
+    //     fixedHeader: true,
+    //     lengthMenu: [
+    //         [25],
+    //         [25],
+    //     ],
+    //     pageLength: 25,
+    //     ajax: {
+    //         url: "<?= base_url(""); ?>",
+    //         dataSrc: "data",
+    //         data: function(data) {
+    //             data.search = $(".search").val();
+    //             data.startDate = $(".startDate").val();
+    //             data.paymentDate = $(".paymentDate").val();
+    //             // data.type_po = "Bahan Baku";
+    //             data.type_bayar = $(".type_bayar").val();
+    //             data.status_posting = $(".status_posting").val();
+    //             data.sort = sort;
+    //             data.sortType = sortType;
+    //         }
+    //     },
+    //     // scrollX: true,
+    //     "initComplete": function(settings, json) {
+    //         $('.dataTables_length').empty();
+    //         $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+    //         $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+    //     },
+    //     //responsive: true,
+    //     display: "stripe",
+    //     searching: false,
+    //     columns: [],
+    //     columnDefs: [{
+    //         defaultContent: "-",
+    //         targets: "_all"
+    //     }],
+    //     language: {
+    //         emptyTable: "Tidak Ada Data",
+    //         lengthMenu: "Show _MENU_ entries",
+    //         paginate: {
+    //             previous: '<i class="fa fa-angle-left"></i>',
+    //             next: '<i class="fa fa-angle-right"></i>'
+    //         }
+    //     }
+    // });
+
+    $(document).ready(function() {
+        var currentDate = new Date();
+        var formattedDate = (currentDate.getMonth() + 1).toString().padStart(2, '0') + '/' + currentDate.getFullYear();
+        $("#dateBC").val(formattedDate);
+        dataBC();
+    })
+
+    $(".dateStart").datepicker({
+        todayHighlight: true,
+        format: "mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true,
+        minViewMode: "months"
+    });
+    $("#dateBC").datepicker({
+        todayHighlight: true,
+        format: "mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true,
+        minViewMode: "months"
+    });
+
+    $('#dateBC').change(function() {
+        console.log($("#dateBC").val());
+        dataBC();
+    });
+
+    function dataBC() {
+
+        var formData = new FormData();
+        var date_BC = $("#dateBC").val();
+
+        $.ajax({
+
+            url: "<?= base_url('/dashboard/get-number-bc'); ?>",
+            data: {
+                dateBC: date_BC
+            },
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                $("#bc23").text(res.bc23);
+                $("#bc25").text(res.bc25);
+                $("#bc27").text(res.bc27);
+                $("#bc30").text(res.bc30);
+                $("#bc40").text(res.bc40);
+                $("#bc41").text(res.bc41);
+                $("#ppbkb").text(res.ppbkb);
+
+            },
+        });
+    }
+
+
+    function showDetails(bc) {
+        var bcName = bc;
+        // var date_BC = $("#dateBC").val();
+        // var formattedBCDate = date_BC.replace('/', '-');
+
+        location.href = "<?= base_url('dashboard/list-dokumen-') ?>" + bc;
+
+    }
+</script>
 
 
 <?= $this->endSection(); ?>
