@@ -539,17 +539,42 @@ class ProductionResult extends BaseController
             $barangScrap = json_decode($this->request->getVar("scrap"));
             $barangFilling = json_decode($this->request->getVar("filling"));
 
+            $productionResData = $this->productionResultModel->find($productionResID);
+
             foreach ($barangJadi as $bj) {
                 $qty = isset($bj->qty_jadi) ? (float) $bj->qty_jadi : (float) $bj->qty;
-                if ($qty && $qty != 0) {
+                // var_dump($bj);
+                if (isset($bj->production_result_detail_id)) {
+                    if ($qty && $qty != 0) {
+                        $datasbj = [
+                            "qty" => (float) $qty,
+                            "qty2" => (float) $bj->berat_isi_jadi,
+                            "qty_isi" => (float) $bj->qty_isi_jadi,
+                        ];
+                        $this->productionResultDetailModel->update($bj->production_result_detail_id, $datasbj);
+                    }
+                } else {
                     $datasbj = [
+                        "production_result_id" => $productionResID,
+                        "barang1_id" => $bj->barang1_id,
+                        "barang2_id" => $bj->barang2_id,
+                        "warehouse_id" => $bj->warehouse_id,
+                        "divisi_id" => $bj->divisi_id,
+                        "bc_id" => 0,
+                        "stock_dokumen" => $productionResData['pr_no'],
+                        "stock_id" => 0,
+                        "no_aju" => "-",
+                        "barang_type" => $bj->type_barang,
+                        "type" => "JADI",
+                        "no_ref" => "NON PABEAN",
                         "qty" => (float) $qty,
                         "qty2" => (float) $bj->berat_isi_jadi,
                         "qty_isi" => (float) $bj->qty_isi_jadi,
                     ];
-                    $this->productionResultDetailModel->update($bj->production_result_detail_id, $datasbj);
+                    $this->productionResultDetailModel->insert($datasbj);
                 }
             }
+            // exit;
 
             foreach ($barangDigunakan as $bd) {
                 $qty = (float) $bd->qty;
