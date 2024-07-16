@@ -592,6 +592,68 @@
                 });
             <?php endforeach; ?>
             drawTableBarangFilling();
+            $.ajax({
+                url: `<?= base_url('production-result/list-work-order'); ?>`,
+                method: "GET",
+                data: {
+                    kode_produksi: '<?= $data->work_order_id ?>',
+                },
+                dataType: "json",
+                success: function(res) {
+                    list_items_barang_jadi = [];
+                    list_items_barang_scrap = [];
+                    list_items_barang_digunakan = [];
+                    $(".kode_barang_add").empty();
+                    $(".kode_barang_add").append(`<option 
+                        data-detail_work_order="" 
+                        data-barang1_id="" 
+                        data-barang2_id="" 
+                        data-barang_name="" 
+                        data-kode_barang="" 
+                        data-kode_satuan="" 
+                        data-nama_barang="" 
+                        data-warehouse_id="" 
+                        data-divisi_id="" 
+                        data-note="" 
+                        data-qty="" 
+                        data-qty2="" 
+                        data-qty_isi="" 
+                        data-type_barang="" 
+                        data-type_barang_text="" 
+                        data-unit="" 
+                        value=""></option>`);
+
+                    res.data.forEach(function(item) {
+                        // Push each item into the list_items_barang_jadi array
+                        $(".kode_barang_add").append(`<option 
+                            data-barang_detail_id="${getID()}" 
+                            data-detail_work_order="${item.id}" 
+                            data-barang1_id="${item.barang1_id}" 
+                            data-barang2_id="${item.barang2_id}" 
+                            data-barang_name="${item.barang_name + " - " + item.spesifikasi}" 
+                            
+                            data-kode_barang="${item.kode_barang}" 
+                            data-kode_satuan="${item.kode_satuan}" 
+                            data-nama_barang="${item.nama_barang}" 
+                            data-warehouse_id="${item.warehouse_id}" 
+                            
+                            data-divisi_id="${item.divisi_id}" 
+                            data-note="${item.note}" 
+                            data-qty="${0}" 
+                            data-qty2="${0}" 
+                            
+                            data-qty_isi="${0}" 
+                            data-type_barang="${item.type_barang}" 
+                            data-type_barang_text="${item.type_barang_text}" 
+                            data-unit="${item.unit}" 
+                            
+                            value="${item.kode_barang}">(${item.kode_barang}) ${item.barang_name + " - " + item.spesifikasi}</option>`);
+                    });
+                    $(".kode_barang_add").val("").change();
+                    // drawTableBarangJadi();
+                    stopLoading();
+                }
+            });
         <?php endif; ?>
         // Departemen
         $('.kondisi_barang').select2({
