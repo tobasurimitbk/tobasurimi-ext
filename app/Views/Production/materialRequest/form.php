@@ -289,6 +289,11 @@
                     </table>
                 </div>
             </div>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <label class="form-label font-weight-bold total-bahan-baku-request">Total Bahan Baku Request : <span class="nilai-total-bahan-baku-request">0</span></label>
+                </div>
+            </div>
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
                     <div class="col-md-6">
@@ -318,6 +323,11 @@
                         <tbody class="body-table">
                         </tbody>
                     </table>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <label class="form-label font-weight-bold total-barang-scrap-request">Total Barang Scrap Request : <span class="nilai-total-barang-scrap-request">0</span></label>
                 </div>
             </div>
             <div class="col-subtitle-modal">
@@ -351,6 +361,11 @@
                     </table>
                 </div>
             </div>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <label class="form-label font-weight-bold total-barang-setengah-jadi-request">Total Barang Setengah Jadi Request : <span class="nilai-total-barang-setengah-jadi-request">0</span></label>
+                </div>
+            </div>
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
                     <div class="col-md-6">
@@ -381,6 +396,11 @@
                         <tbody class="body-table">
                         </tbody>
                     </table>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <label class="form-label font-weight-bold total-barang-jadi-request">Total Barang Jadi Request : <span class="nilai-total-barang-jadi-request">0</span></label>
                 </div>
             </div>
         </div>
@@ -911,19 +931,15 @@
                     });
 
                     $.each(listStockSelectedBahanJadi, function(i, v) {
-                        var element = $('input[data-id="' + v.id + '"].qty-jadi-isi');
-                        var elementRequest = $('input[data-id="' + v.id + '"].qty-jadi-request');
-                        var input_user = parseFloat(element.val());
-                        var input_user_request = parseFloat(elementRequest.val());
-                        var stok_max = parseFloat(element.data('stok_total'));
+                        // var element = $('input[data-id="' + v.id + '"].qty-jadi-isi');
+                        // var elementRequest = $('input[data-id="' + v.id + '"].qty-jadi-request');
+                        // var input_user = parseFloat(element.val());
+                        // var input_user_request = parseFloat(elementRequest.val());
+                        // var stok_max = parseFloat(element.data('stok_total'));
 
-                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0 || isNaN(input_user_request) || input_user_request == undefined || input_user_request == 0) {
+                        if (listStockSelectedBahanJadi[i].qty2 > listStockSelectedBahanJadi[i].qty || isNaN(listStockSelectedBahanJadi[i].qty2) || listStockSelectedBahanJadi[i].qty2 == undefined || listStockSelectedBahanJadi[i].qty2 == 0 || isNaN(listStockSelectedBahanJadi[i].qty_isi) || listStockSelectedBahanJadi[i].qty_isi == undefined || listStockSelectedBahanJadi[i].qty_isi == 0) {
                             dataError = listStockSelectedBahanJadi[i];
                             isValid = false;
-                        } else {
-                            listStockSelectedBahanJadi[i].qty = stok_max;
-                            listStockSelectedBahanJadi[i].qty2 = input_user;
-                            listStockSelectedBahanJadi[i].qty_isi = input_user_request;
                         }
                     });
 
@@ -1588,13 +1604,10 @@
         }
         const table = $('#selectedItemTableBahanBaku');
         var no = 1;
+        var totalQtyRequest = 0;
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-               ${no++} 
-            `
-            ));
+            newRow.append($('<td style="text-align: center;">').html(`${no++}`));
             newRow.append($('<td style="text-align: center;">').text(v.departmentText));
             newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
@@ -1604,22 +1617,15 @@
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" data-index="${i}" class="form-control" type="text" value="${v.qty2}">
-            `
-            ));
-            // newRow.append($('<td style="text-align: center;">').html(
-            //     `
-            //     <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-sortir" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" class="form-control" type="text" value="${v.qty_isi}">
-            // `
-            // ));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanBaku(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-            `
-            ));
+            newRow.append($('<td style="text-align: center;">').html(`
+            <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" data-index="${i}" type="text" value="${v.qty2}">
+        `));
+            newRow.append($('<td style="text-align: center;">').html(`
+            <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanBaku(${v.id}, ${v.id_material_request_detail})"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+        `));
             table.find('tbody').append(newRow);
+            parseFloat(v.qty2)
+            totalQtyRequest += parseFloat(v.qty2) || 0; // Ensure the value is a number
         });
 
         selectedItemTableBahanBaku = $('#selectedItemTableBahanBaku').DataTable({
@@ -1629,7 +1635,7 @@
             ordering: true,
             order: [],
             fixedHeader: true,
-            "initComplete": function(settings, json) {
+            initComplete: function(settings, json) {
                 $('.dataTables_length').empty();
                 $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
                 $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
@@ -1647,15 +1653,25 @@
         });
 
         selectedItemTableBahanBaku.draw();
+        updateTotalQtyRequest();
 
-        // Tambahkan event listener untuk mengikuti perubahan nilai qty-barang-jadi
+        // Add event listener for input changes
         $('.qty-baku-request').on('input change', function() {
-            var index = $(this).data('index'); // Dapatkan indeks item dari atribut data-index
+            var index = $(this).data('index');
             var stok_max = $(this).data('stok_total');
             var input_user = $(this).val();
 
             listStockSelectedBahanBaku[index].qty2 = input_user;
+            updateTotalQtyRequest();
         });
+    }
+
+    function updateTotalQtyRequest() {
+        var totalQty = 0;
+        $.each(listStockSelectedBahanBaku, function(i, v) {
+            totalQty += parseFloat(listStockSelectedBahanBaku[i].qty2) || 0;
+        });
+        $('.nilai-total-bahan-baku-request').text(totalQty.toFixed(2));
     }
 
     function drawTableSelectedItemBahanSetengahJadi(data) {
@@ -1665,6 +1681,7 @@
         }
         const table = $('#selectedItemTableBahanSetengahJadi');
         var no = 1;
+        var totalQtyRequest = 0;
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align: center;">').html(
@@ -1692,6 +1709,8 @@
             `
             ));
             table.find('tbody').append(newRow);
+            parseFloat(v.qty2)
+            totalQtyRequest += parseFloat(v.qty2) || 0;
         });
 
         selectedItemTableBahanSetengahJadi = $('#selectedItemTableBahanSetengahJadi').DataTable({
@@ -1719,6 +1738,7 @@
         });
 
         selectedItemTableBahanSetengahJadi.draw();
+        updateTotalQtyRequestSetengahJadi();
 
         // Tambahkan event listener untuk mengikuti perubahan nilai qty-barang-jadi
         $('.qty-bahan-request').on('input change', function() {
@@ -1726,8 +1746,18 @@
             var stok_max = $(this).data('stok_total');
             var input_user = $(this).val();
 
+            updateTotalQtyRequestSetengahJadi();
+
             listStockSelectedBahanSetengahJadi[index].qty2 = input_user;
         });
+    }
+
+    function updateTotalQtyRequestSetengahJadi() {
+        var totalQty = 0;
+        $.each(listStockSelectedBahanSetengahJadi, function(i, v) {
+            totalQty += parseFloat(listStockSelectedBahanSetengahJadi[i].qty2) || 0;
+        });
+        $('.nilai-total-barang-setengah-jadi-request').text(totalQty.toFixed(2));
     }
 
     function drawTableSelectedItemBahan(data) {
@@ -1737,6 +1767,7 @@
         }
         const table = $('#selectedItemTableBahan');
         var no = 1;
+        var totalQtyRequest = 0;
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align: center;">').html(
@@ -1764,6 +1795,8 @@
             `
             ));
             table.find('tbody').append(newRow);
+            parseFloat(v.qty2)
+            totalQtyRequest += parseFloat(v.qty2) || 0;
         });
 
         selectedItemTableBahan = $('#selectedItemTableBahan').DataTable({
@@ -1791,6 +1824,7 @@
         });
 
         selectedItemTableBahan.draw();
+        updateTotalQtyRequestScrap()
 
         // Tambahkan event listener untuk mengikuti perubahan nilai qty-barang-jadi
         $('.qty-bahan-request').on('input change', function() {
@@ -1799,7 +1833,16 @@
             var input_user = $(this).val();
 
             listStockSelectedBahan[index].qty2 = input_user;
+            updateTotalQtyRequestScrap()
         });
+    }
+
+    function updateTotalQtyRequestScrap() {
+        var totalQty = 0;
+        $.each(listStockSelectedBahan, function(i, v) {
+            totalQty += parseFloat(listStockSelectedBahan[i].qty2) || 0;
+        });
+        $('.nilai-total-barang-scrap-request').text(totalQty.toFixed(2));
     }
 
     function drawTableSelectedItemBahanJadi(data) {
@@ -1809,6 +1852,7 @@
         }
         const table = $('#selectedItemTableBahanJadi');
         var no = 1;
+        var totalQtyRequest = 0;
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align: center;">').html(
@@ -1827,7 +1871,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-jadi-isi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty2}">
+                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-jadi-isi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" data-index="${i}" class="form-control" type="text" value="${v.qty2}">
             `
             ));
             newRow.append($('<td style="text-align: center;">').html(
@@ -1841,6 +1885,8 @@
             `
             ));
             table.find('tbody').append(newRow);
+            parseFloat(v.qty2)
+            totalQtyRequest += parseFloat(v.qty2) || 0;
         });
 
         selectedItemTableBahanJadi = $('#selectedItemTableBahanJadi').DataTable({
@@ -1868,6 +1914,27 @@
         });
 
         selectedItemTableBahanJadi.draw();
+        updateTotalQtyRequestJadi()
+
+        // Tambahkan event listener untuk mengikuti perubahan nilai qty-barang-jadi
+        $('.qty-jadi-isi, .qty-jadi-request').on('input change', function() {
+            var index = $('.qty-jadi-isi').data('index'); // Dapatkan indeks item dari atribut data-index
+            var stok_max = $('.qty-jadi-isi').data('stok_total');
+            var input_user = $('.qty-jadi-isi').val();
+            var input_user_request = $('.qty-jadi-request').val();
+
+            listStockSelectedBahanJadi[index].qty2 = input_user;
+            listStockSelectedBahanJadi[index].qty_isi = input_user_request;
+            updateTotalQtyRequestJadi()
+        });
+    }
+
+    function updateTotalQtyRequestJadi() {
+        var totalQty = 0;
+        $.each(listStockSelectedBahanJadi, function(i, v) {
+            totalQty += parseFloat(listStockSelectedBahanJadi[i].qty2) || 0;
+        });
+        $('.nilai-total-barang-jadi-request').text(totalQty.toFixed(2));
     }
 
     function getIDListDataSelected() {
