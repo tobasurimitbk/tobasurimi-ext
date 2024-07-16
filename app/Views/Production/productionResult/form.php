@@ -504,7 +504,7 @@
 
     $(document).ready(function() {
         <?php if (isset($data)) : ?>
-            $(".kode_produksi").val('<?= $data->work_order_id ?>').change();
+            // $(".kode_produksi").val('<?= $data->work_order_id ?>').change();
             $(".wo_no").val('<?= $dataWorkOrder[0]->wo_no ?>').change();
             $(".barang_jadi").val('<?= $dataWorkOrder[0]->nama_barang ?>');
             $(".standart_production").val('<?= $dataWorkOrder[0]->standart_production ?>');
@@ -512,10 +512,10 @@
             $(".warehouse_id_order").val('<?= $dataWorkOrder[0]->warehouse_id ?>');
             $(".req_no").val('<?= $dataMaterialRequestNo ?>');
             $("#date_request").val('<?= $dataMaterialRequestDate ?>');
-            list_items_barang_jadi = [];
-            list_items_barang_digunakan = [];
-            list_items_barang_scrap = [];
-            list_items_barang_filling = [];
+            // list_items_barang_jadi = [];
+            // list_items_barang_digunakan = [];
+            // list_items_barang_scrap = [];
+            // list_items_barang_filling = [];
             <?php foreach ($dataResultBarangJadi as $key => $bj) : ?>
                 list_items_barang_jadi.push({
                     'production_result_detail_id': '<?= $bj->id; ?>',
@@ -986,7 +986,7 @@
         $(".btn-save").click(function() {
             var listMaterialCheck = [].concat(list_items_barang_digunakan, list_items_barang_jadi, list_items_barang_filling);
 
-            // console.log(listMaterialCheck);
+            // console.log(list_items_barang_jadi);
             if (list_items_barang_jadi.length == 0) {
                 Swal.fire({
                     icon: 'error',
@@ -1575,7 +1575,7 @@
             $('.tfoot').append(row);
         } else {
             list_items_barang_jadi.map((item, index) => {
-                console.log(item);
+                // console.log(item);
                 row += '<tr style="color:whitesmoke;text-align: center;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.kode_barang + '</td>';
@@ -1730,7 +1730,9 @@
     }
 
     const deleteRowDetailJadi = function(id, iddetail) {
-        if (id) {
+        console.log(id);
+        console.log(iddetail);
+        if (id && iddetail == "undefined") {
             const indexToRemove = list_items_barang_jadi.findIndex(item => item.barang_detail_id === id);
             console.log(id);
             console.log(indexToRemove);
@@ -1739,8 +1741,7 @@
             }
             drawTableBarangJadi();
         }
-        if (iddetail) {
-            // console.log(iddetail);
+        if (iddetail && id == "undefined") {
             Swal.fire({
                 icon: 'question',
                 title: 'Yakin akan di hapus?',
@@ -1752,6 +1753,7 @@
                 cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
                     $.ajax({
                         url: "<?= base_url("production-result/delete-detail"); ?>",
                         data: {

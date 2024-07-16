@@ -288,6 +288,11 @@
                     </table>
                 </div>
             </div>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <label class="form-label font-weight-bold total-barang-request">Total Barang Request : <span class="nilai-total-barang-request">0</span></label>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -1226,7 +1231,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty2}">
+                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" data-index="${i}" class="form-control" type="text" value="${v.qty2}">
             `
             ));
             newRow.append($('<td style="text-align: center;">').html(
@@ -1262,6 +1267,25 @@
         });
 
         selectedItemTableBahan.draw();
+        updateTotalQtyRequest()
+
+        // Tambahkan event listener untuk mengikuti perubahan nilai qty-barang-jadi
+        $('.qty-bahan-request').on('input change', function() {
+            var index = $(this).data('index'); // Dapatkan indeks item dari atribut data-index
+            var stok_max = $(this).data('stok_total');
+            var input_user = $(this).val();
+
+            listStockSelectedBahan[index].qty2 = input_user;
+            updateTotalQtyRequest()
+        });
+    }
+
+    function updateTotalQtyRequest() {
+        var totalQty = 0;
+        $.each(listStockSelectedBahan, function(i, v) {
+            totalQty += parseFloat(listStockSelectedBahan[i].qty2) || 0;
+        });
+        $('.nilai-total-barang-request').text(totalQty.toFixed(2));
     }
 
     function getIDListDataSelected() {

@@ -958,7 +958,7 @@ class ProductionResult extends BaseController
         // $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
 
         return response()->setJSON([
-            'message' => "Hasil Produksi Berhasil Dihapus",
+            'message' => "Detail Hasil Produksi Berhasil Dihapus",
             'token' => csrf_hash(),
             'status' => true
         ]);
