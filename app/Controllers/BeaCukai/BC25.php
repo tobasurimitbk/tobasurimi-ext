@@ -1588,4 +1588,34 @@ class BC25 extends BaseController
             $this->bc25Model->set('status_dokumen', "Belum Lengkap")->where('id', $id)->update();
         }
     }
+
+    public function viewOutstanding()
+    {
+        return view('BeaCukai/bc-25/bc25outstanding');
+    }
+
+    public function allOutstanding()
+    {
+        $salesOrderLainUsed = $this->bc25Model
+            ->select('sales_order_lain_id')
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+        $salesOrderLainAll = $this->salesOrderLainModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
+
+        $allSalesOrderLainIdArr = [];
+        $salesOrderLainIdUsedArr = [];
+        $salesOrderLainIdNotUsedArr = [];
+
+        foreach ($salesOrderLainUsed as $s) {
+            array_push($salesOrderLainIdUsedArr, $s['sales_order_lain_id']);
+        }
+        foreach ($salesOrderLainAll as $p) {
+            array_push($allSalesOrderLainIdArr, $p['id']);
+        }
+
+        $salesOrderLainIdNotUsedArr = array_diff($allSalesOrderLainIdArr, $salesOrderLainIdUsedArr);
+        var_dump($salesOrderLainIdNotUsedArr);
+        die;
+    }
 }

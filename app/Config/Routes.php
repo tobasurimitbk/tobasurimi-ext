@@ -1177,6 +1177,8 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->post('create', 'BeaCukai\BC40::createPurchaseOrderAction');
     $routes->post('po/update', 'BeaCukai\BC40::updatePurchaseOrderAction/$1');
     $routes->post('posting', 'BeaCukai\BC23::posting');
+
+    // OUTSTANDING
     $routes->get('bc-23-outstanding-all', 'BeaCukai\BC23::allOutstanding');
     $routes->get('bc-23-outstanding', 'BeaCukai\BC23::viewOutstanding');
     $routes->get('bc-23-outstanding-export', 'BeaCukai\BC23::OutstandingSheet');
@@ -1250,6 +1252,11 @@ $routes->group('bea-cukai-bc-40/', ['filter' => 'Auth'], function ($routes) {
     $routes->post('create', 'BeaCukai\BC40::createPurchaseOrderAction');
     $routes->post('po/update', 'BeaCukai\BC40::updatePurchaseOrderAction/$1');
     $routes->post('posting', 'BeaCukai\BC40::posting');
+
+    // OUTSTANDING
+    $routes->get('bc-40-outstanding-all', 'BeaCukai\BC40::allOutstanding');
+    $routes->get('bc-40-outstanding', 'BeaCukai\BC40::viewOutstanding');
+    $routes->get('bc-40-outstanding-export', 'BeaCukai\BC40::OutstandingSheet');
 
     // FORM PURCHASE ORDER
     // HEADER
@@ -1414,6 +1421,10 @@ $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
     // DROPDOWN
     $routes->get('list-bahan-baku-asal', 'BeaCukai\BC25::dropdownBahanBakuAsal');
     $routes->get('list-payload-barang', 'BeaCukai\BC25::dropdownDetailPayload');
+    // OUTSTANDING
+    $routes->get('bc-25-outstanding-all', 'BeaCukai\BC25::allOutstanding');
+    $routes->get('bc-25-outstanding', 'BeaCukai\BC25::viewOutstanding');
+    $routes->get('bc-25-outstanding-export', 'BeaCukai\BC25::OutstandingSheet');
 });
 
 // BC 4.1
