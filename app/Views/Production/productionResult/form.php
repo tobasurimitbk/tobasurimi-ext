@@ -600,9 +600,6 @@
                 },
                 dataType: "json",
                 success: function(res) {
-                    list_items_barang_jadi = [];
-                    list_items_barang_scrap = [];
-                    list_items_barang_digunakan = [];
                     $(".kode_barang_add").empty();
                     $(".kode_barang_add").append(`<option 
                         data-detail_work_order="" 
@@ -994,14 +991,16 @@
                     confirmButtonColor: '#4e73df',
                     confirmButtonText: 'Ok'
                 });
-            } else if (list_items_barang_digunakan.length == 0) {
+            }
+            if (list_items_barang_digunakan.length == 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Barang digunakan tidak boleh kosong !',
                     confirmButtonColor: '#4e73df',
                     confirmButtonText: 'Ok'
                 });
-            } else {
+            }
+            if (listMaterialCheck.length != 0) {
                 if ($(".create-form").valid()) {
                     Swal.fire({
                         icon: 'question',
