@@ -950,4 +950,17 @@ class ProductionResult extends BaseController
             'status' => true
         ]);
     }
+
+    public function deletePRDetail()
+    {
+        $id = ($this->request->getVar('id'));
+        $this->productionResultDetailModel->delete($id);
+        // $this->workOrderDetailsModel->where('work_order_id', $id)->delete();
+
+        return response()->setJSON([
+            'message' => "Hasil Produksi Berhasil Dihapus",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
 }

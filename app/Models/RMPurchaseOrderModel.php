@@ -882,4 +882,36 @@ class RMPurchaseOrderModel extends Model
             ];
         }
     }
+
+    public function getPOBBCondition($divisi_id, $po_date, $kategori_id)
+    {
+
+        $selectQry = "
+            barang_master.barang_name AS barangName, 
+            barang_master_spesifikasi.spesifikasi AS spekName, 
+            rm_purchase_orders.subsidi_langsung AS subsidi,
+            rm_purchase_order_details.daily_price AS dppHarian,
+            rm_purchase_order_details.monthly_price AS dppBulanan,
+            rm_purchase_order_details.general_price AS dppUmum,
+            rm_purchase_order_details.qty AS qtyPO,
+            rm_purchase_orders.pph AS poPPH,
+            satuans.nama_satuan AS satuanName, 
+        ";
+
+        $poBBLokalData = $this->asObject()
+            ->select($selectQry)
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('barang_master', 'rm_purchase_order_details.barang1_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'rm_purchase_order_details.barang2_id = barang_master_spesifikasi.id', 'left')
+            ->join('account_barang', 'rm_purchase_order_details.barang1_id = account_barang.barang_master_id', 'left')
+            ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+            ->where('rm_purchase_orders.divisi_id', $divisi_id)
+            ->where('rm_purchase_orders.is_posted', '1')
+            ->like('rm_purchase_orders.po_date', date('Y-m', strtotime($po_date)))
+            ->where('account_barang.kategori_id', $kategori_id)
+            ->where('account_barang.divisi_id', $divisi_id)
+            ->findAll();
+
+        return $poBBLokalData;
+    }
 }

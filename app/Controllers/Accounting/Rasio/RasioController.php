@@ -587,14 +587,31 @@ class RasioController extends BaseController
     public function getRasioBarangDigunakan()
     {
         if (!empty($this->request->getVar('bulan'))) {
+            $dataResultPO = [];
             $monthData = $this->request->getVar('bulan');
             list($month, $year) = explode('/', $monthData);
+
             $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+            $divisiID = $this->request->getVar('department');
+            $kategoriID = $this->request->getVar('kategori');
+
             $conditionProduction = [
                 'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
                 'divisi_id' => $this->request->getVar('department'),
             ];
             $kursValue = 1;
+            $poBBLokal = $this->rmPurchaseOrderModel
+                ->getPOBBCondition($divisiID, $convertedDate, $kategoriID);
+            $poBBImport = $this->rmImportPOModel
+                ->where('division_id', $this->request->getVar('department'))
+                ->where('is_posted', '1')
+                ->like('po_date', date('Y-m', strtotime($convertedDate)))
+                ->findAll();
+            $dataResultPO  = array_merge($dataResultPO, $poBBLokal, $poBBImport);
+            var_dump($poBBLokal);
+            var_dump($poBBImport);
+            var_dump($dataResultPO);
+            exit;
             $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
 
             foreach ($productionResultDataTitle as &$value) {
@@ -1235,6 +1252,8 @@ class RasioController extends BaseController
                         $dataResult[$i]['stok_produksi'] = $valueProductionResultData['qty'];
                         break;
                     }
+                    var_dump($dataResult);
+                    var_dump($valueProductionResultData);
                 }
             }
 
@@ -1243,7 +1262,7 @@ class RasioController extends BaseController
         }
         // var_dump($productionResultDataTitle);
         // var_dump($dataResults);
-        // exit;
+        exit;
         return response()->setJSON([
             'data' => $dataResults,
             'token' => csrf_hash(),

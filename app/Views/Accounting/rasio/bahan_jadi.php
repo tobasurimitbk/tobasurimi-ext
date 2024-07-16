@@ -58,7 +58,8 @@
                         <th style="text-align: center;">Nama Barang</th>
                         <th style="text-align: center;">Satuan</th>
                         <th style="text-align: center;">Filling Weight</th>
-                        <th style="text-align: center;">Jumlah Barang</th>
+                        <th style="text-align: center;">Jumlah Barang (KG)</th>
+                        <th style="text-align: center;">Jumlah Barang </th>
                         <th style="text-align: center;">Rasio</th>
                         <th style="text-align: center;">Harga Satuan</th>
                         <th style="text-align: center;">Total</th>
@@ -68,7 +69,7 @@
                 </tbody>
                 <tfoot style="background: #ffffff !important;" class="tfoot-rasio-akhir" id="tfoot-rasio-akhir">
                     <tr>
-                        <td colspan="7" style="text-align: center;">
+                        <td colspan="10" style="text-align: center;">
                             Tidak Ada Barang
                         </td>
                     </tr>

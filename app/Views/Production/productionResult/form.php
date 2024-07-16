@@ -272,6 +272,7 @@
                                                         <th>Qty Hasil</th>
                                                         <th>Berat Isi</th>
                                                         <th>Qty dalam KG</th>
+                                                        <th></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="body-table-barang-jadi" id="body-table-barang-jadi">
@@ -517,7 +518,6 @@
             list_items_barang_filling = [];
             <?php foreach ($dataResultBarangJadi as $key => $bj) : ?>
                 list_items_barang_jadi.push({
-                    'barang_detail_id': getID(),
                     'production_result_detail_id': '<?= $bj->id; ?>',
                     'barang1_id': '<?= $bj->barang1_id; ?>',
                     'barang2_id': '<?= $bj->barang2_id; ?>',
@@ -924,7 +924,7 @@
         $(".btn-save").click(function() {
             var listMaterialCheck = [].concat(list_items_barang_digunakan, list_items_barang_jadi, list_items_barang_filling);
 
-            console.log(listMaterialCheck);
+            // console.log(listMaterialCheck);
             if (list_items_barang_jadi.length == 0) {
                 Swal.fire({
                     icon: 'error',
@@ -1222,7 +1222,7 @@
                         $(".kode_barang_filling").empty();
                         $(".kode_barang_filling").append(`<option data-divisi_id="" data-warehouse_id="" data-barang_name_master="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
                         res.data.forEach(function(item) {
-                            console.log(item);
+                            // console.log(item);
                             if (item.ref_no == "NON PABEAN") {
                                 var new_ref_no = item.ref_no;
                             } else {
@@ -1512,7 +1512,8 @@
             `;
             $('.tfoot').append(row);
         } else {
-            list_items_barang_jadi.map((item, index) => { // Tambahkan parameter index untuk mengetahui posisi item
+            list_items_barang_jadi.map((item, index) => {
+                console.log(item);
                 row += '<tr style="color:whitesmoke;text-align: center;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.kode_barang + '</td>';
@@ -1528,6 +1529,9 @@
                     '</td>';
                 row += '<td>' + `
         <input class="form-control qty-berat-barang-jadi" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qty_isi}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>` +
+                    '</td>';
+                row += '<td>' + `
+        <button type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteRowDetailJadi('${item.barang_detail_id}', '${item.production_result_detail_id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>` +
                     '</td>';
 
                 no++;
@@ -1660,6 +1664,62 @@
                 no++;
             });
             $('.body-table-barang-filling').append(row);
+        }
+    }
+
+    const deleteRowDetailJadi = function(id, iddetail) {
+        if (id) {
+            const indexToRemove = list_items_barang_jadi.findIndex(item => item.barang_detail_id === id);
+            console.log(id);
+            console.log(indexToRemove);
+            if (indexToRemove !== -1) {
+                list_items_barang_jadi.splice(indexToRemove, 1);
+            }
+            drawTableBarangJadi();
+        }
+        if (iddetail) {
+            // console.log(iddetail);
+            Swal.fire({
+                icon: 'question',
+                title: 'Yakin akan di hapus?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Kembali',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "<?= base_url("production-result/delete-detail"); ?>",
+                        data: {
+                            id: iddetail,
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        location.reload();
+                                    })
+                            }
+                        },
+                    });
+                }
+            })
         }
     }
 

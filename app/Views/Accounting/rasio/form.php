@@ -1966,6 +1966,9 @@
                         <input class="form-control filling-weight-barang text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty2}">
                     </td>
                     <td>
+                        <input class="form-control jumlah-barang-berat text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty_isi}">
+                    </td>
+                    <td>
                         <input class="form-control jumlah-barang text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qtyTotal}">
                     </td>
                     <td>
@@ -1986,6 +1989,9 @@
                 <td colspan="5"></td>
                 <td>
                     <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${data.reduce((sum, item) => sum + parseFloat(item.qtyTotal), 0)}">
+                </td>
+                <td>
+                    <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${data.reduce((sum, item) => sum + parseFloat(item.qty_isi), 0)}">
                 </td>
                 <td>
                     <input class="form-control rasio-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${rasioTotal.toFixed(2)}%">
