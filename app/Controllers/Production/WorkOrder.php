@@ -3,7 +3,7 @@
 namespace App\Controllers\Production;
 
 use App\Controllers\BaseController;
-use App\Models\BarangModel;
+// use App\Models\BarangModel;
 use App\Models\DivisisModel;
 use App\Models\MaterialRequestDetailsModel;
 use App\Models\MaterialRequestsModel;
@@ -33,7 +33,7 @@ class WorkOrder extends BaseController
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->barangModel = new BarangModel();
+        // $this->barangModel = new BarangModel();
         $this->satuanModel = new SatuansModel();
         $this->workOrdersModel = new WorkOrdersModel();
         $this->workOrderDetailsModel = new WorkOrderDetailsModel();
@@ -53,7 +53,7 @@ class WorkOrder extends BaseController
     public function createView()
     {
         //Get Barang
-        $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
+        // $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
 
         //Get Satuan
         $dataSatuan = $this->satuanModel->asObject()->find();
@@ -62,7 +62,7 @@ class WorkOrder extends BaseController
         $dataDivisi = $this->divisiModel->asObject()->where('company_id', $this->this_company_id)->find();
 
         $data = [
-            "dataBarang" => $dataBarang,
+            // "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
             "dataWarehouse" => $dataWarehouse,
@@ -75,7 +75,7 @@ class WorkOrder extends BaseController
     {
         $id = decrypt($id);
         //Get Barang
-        $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
+        // $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
 
         //Get Satuan
         $dataSatuan = $this->satuanModel->asObject()->find();
@@ -84,7 +84,7 @@ class WorkOrder extends BaseController
         $dataDivisi = $this->divisiModel->asObject()->where('company_id', $this->this_company_id)->find();
 
         $data = [
-            "dataBarang" => $dataBarang,
+            // "dataBarang" => $dataBarang,
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
             "dataWarehouse" => $dataWarehouse,
