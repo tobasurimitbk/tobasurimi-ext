@@ -66,6 +66,7 @@ class TipeBarang extends BaseController
                 'divisi_id' => $divisiId,
                 'ap_id' => $this->request->getVar('akun_ap_id'),
                 'ar_id' => $this->request->getVar('akun_ar_id'),
+                'pemakaian_id' => $this->request->getVar('akun_pemakaian_id'),
                 'kategori_id' => $this->request->getVar('kategori'),
             ]);
         } else {
@@ -75,6 +76,7 @@ class TipeBarang extends BaseController
                 'divisi_id' => $divisiId,
                 'ap_id' => $this->request->getVar('akun_ap_id'),
                 'ar_id' => $this->request->getVar('akun_ar_id'),
+                'pemakaian_id' => $this->request->getVar('akun_pemakaian_id'),
                 'kategori_id' => $this->request->getVar('kategori'),
             ]);
         }
@@ -90,7 +92,7 @@ class TipeBarang extends BaseController
         $id = $this->request->getVar('id');
         $divisiId = $this->request->getVar('divisi_id');
         $dataAccountBarang = $this->barangMasterModel
-            ->select('barang_master.*,account_barang.divisi_id,account_barang.ar_id,account_barang.ap_id,account_barang.kategori_id')
+            ->select('barang_master.*,account_barang.divisi_id,account_barang.ar_id,account_barang.ap_id,account_barang.kategori_id,account_barang.pemakaian_id')
             ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
             ->where('barang_master.id', $id)
             ->where('divisi_id', $divisiId)

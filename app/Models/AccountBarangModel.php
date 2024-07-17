@@ -19,6 +19,7 @@ class AccountBarangModel extends Model
         'company_id',
         'ap_id',
         'ar_id',
+        'pemakaian_id',
         'kategori_id',
         'divisi_id',
         'deleted_at',

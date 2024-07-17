@@ -302,6 +302,7 @@
 
     let list_items_barang_jadi = [];
     let list_items_barang_digunakan = [];
+    let list_items_barang_pembelian = [];
     let list_items_barang_digunakan_ulang = [];
     let list_items_barang_digunakan_alokasi = [];
     let list_items_saldo_awal = [];
@@ -330,6 +331,7 @@
         list_items_barang_jadi = [];
         list_items_barang_jadi_material_2 = [];
         list_items_barang_digunakan = [];
+        list_items_barang_pembelian = [];
         list_items_barang_digunakan_material_2 = [];
         list_items_labor_cost = [];
         list_items_title_cost = [];
@@ -349,6 +351,7 @@
         list_items_barang_jadi = [];
         list_items_barang_jadi_material_2 = [];
         list_items_barang_digunakan = [];
+        list_items_barang_pembelian = [];
         list_items_barang_digunakan_material_2 = [];
         list_items_labor_cost = [];
         list_items_title_cost = [];
@@ -383,6 +386,7 @@
         list_items_barang_jadi = [];
         list_items_barang_jadi_material_2 = [];
         list_items_barang_digunakan = [];
+        list_items_barang_pembelian = [];
         list_items_barang_digunakan_material_2 = [];
         list_items_labor_cost = [];
         list_items_title_cost = [];
@@ -548,15 +552,22 @@
                     stopLoading()
                     if (res.status) {
                         list_items_barang_digunakan = [];
+                        list_items_barang_pembelian = [];
                         let no = 0;
                         // Iterate over each item in the response data
+                        res.dataResultPO.forEach(function(item) {
+                            list_items_barang_pembelian.push(item);
+                        });
                         res.data.forEach(function(item) {
                             list_items_barang_digunakan.push(item);
                         });
+                        drawTablePembelian();
                         drawTableDigunakan();
                     } else {
                         stopLoading()
                         list_items_barang_digunakan = [];
+                        list_items_barang_pembelian = [];
+                        drawTablePembelian();
                         drawTableDigunakan();
                     }
                 },
@@ -573,7 +584,7 @@
                 success: function(res) {
                     stopLoading()
                     if (res.status) {
-                        list_items_barang_digunakan = [];
+                        list_items_barang_digunakan_ulang = [];
                         let no = 0;
                         // Iterate over each item in the response data
                         res.data.forEach(function(item) {
@@ -893,14 +904,14 @@
         }
     }
 
-    const drawTableDigunakan = function() {
+    const drawTablePembelian = function() {
         $('.body-detail-table').empty();
         $('.tfoot-detail-table').empty();
         var row = '';
         var rowFooter = '';
         var no = 1;
         var strip = "-";
-        if (list_items_barang_digunakan.length === 0) {
+        if (list_items_barang_pembelian.length === 0) {
             var totalQtyPO = 0;
             var totalHargaPO = 0;
             var hargaSatuanPO = 0;
@@ -923,7 +934,7 @@
             var totalQtyLPB = 0;
             var totalHargaLPB = 0;
             var hargaSatuanLPB = 0;
-            list_items_barang_digunakan.map((item, index) => {
+            list_items_barang_pembelian.map((item, index) => {
                 // counting total
                 totalQtyPO += item.totalQtyPO !== undefined ? item.totalQtyPO : 0;
                 totalHargaPO += item.totalHargaPO !== undefined ? item.totalHargaPO : 0;
@@ -961,23 +972,61 @@
             $('.qty-lpb').on('input', function() {
                 var rowIndex = $(this).data('index');
                 var newQty = parseFloat($(this).val().replace(/,/g, '')) || 0;
-                var totalHargaLPB = list_items_barang_digunakan[rowIndex].totalHargaLPB;
+                var totalHargaLPB = list_items_barang_pembelian[rowIndex].totalHargaLPB;
                 var newHargaSatuan = totalHargaLPB / newQty;
 
                 // Update the item in the list
-                list_items_barang_digunakan[rowIndex].totalQtyLPB = newQty;
-                list_items_barang_digunakan[rowIndex].hargaSatuanLPB = newHargaSatuan;
+                list_items_barang_pembelian[rowIndex].totalQtyLPB = newQty;
+                list_items_barang_pembelian[rowIndex].hargaSatuanLPB = newHargaSatuan;
 
                 // Update the totalHargaLPB cell in the table
                 $(this).closest('tr').find('.totalHargaLPB').text(formatRupiah(newHargaSatuan));
 
                 // Recalculate the totals and update the footer
-                totalQtyLPB = list_items_barang_digunakan.reduce((acc, item) => acc + (item.totalQtyLPB || 0), 0);
-                totalhargaSatuanLPB = list_items_barang_digunakan.reduce((acc, item) => acc + (item.hargaSatuanLPB || 0), 0);
+                totalQtyLPB = list_items_barang_pembelian.reduce((acc, item) => acc + (item.totalQtyLPB || 0), 0);
+                totalhargaSatuanLPB = list_items_barang_pembelian.reduce((acc, item) => acc + (item.hargaSatuanLPB || 0), 0);
 
                 $('.qtyTotalPenerimaan').val(totalQtyLPB.toLocaleString());
                 $('.hargaSatuanPenerimaan').val(formatRupiah(totalhargaSatuanLPB));
             });
+        }
+    }
+
+    const drawTableDigunakan = function() {
+        $('.body-detail-table-digunakan').empty();
+        $('.tfoot-detail-table-digunakan').empty();
+        var row = '';
+        var rowFooter = '';
+        var no = 1;
+        var strip = "-";
+        if (list_items_barang_digunakan.length === 0) {
+            row += '<tr><td colspan="6" class="text-center">Data Barang Tidak Ada</td></tr>';
+            $('.tfoot-detail-table-digunakan').append(row);
+        } else {
+            var totalQtyPO = 0;
+            var totalHargaPO = 0;
+            var hargaSatuanPO = 0;
+            var totalQtyLPB = 0;
+            var totalHargaLPB = 0;
+            var hargaSatuanLPB = 0;
+            list_items_barang_digunakan.map((item, index) => {
+                // counting total
+                totalQtyPO += item.totalQtyPO !== undefined ? item.totalQtyPO : 0;
+                totalHargaPO += item.totalHargaPO !== undefined ? item.totalHargaPO : 0;
+                hargaSatuanPO += item.hargaSatuanPO !== undefined ? item.hargaSatuanPO : 0;
+                // end counting
+                row += '<tr style="color:whitesmoke;text-align: center;">';
+                row += '<td>' + no + '</td>';
+                row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
+                row += '<td>' + (item.totalQtyPO !== undefined ? parseFloat(item.totalQtyPO).toLocaleString() : 0) + '</td>';
+                row += '<td>' + (item.totalHargaPO !== undefined ? formatRupiah(parseFloat(item.totalHargaPO)) : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.hargaSatuanPO !== undefined ? formatRupiah(item.hargaSatuanPO) : formatRupiah(0)) + '</td>';
+                row += '<td>' + (item.satuanPO !== undefined ? item.satuanPO : strip) + '</td>';
+                row += '</tr>';
+                no++;
+            });
+
+            $('.body-detail-table-digunakan').append(row);
         }
     }
 
@@ -2272,6 +2321,9 @@
                     $('#content').html(response);
                     if (list_items_barang_digunakan.length != 0) {
                         drawTableDigunakan();
+                    }
+                    if (list_items_barang_pembelian.length != 0) {
+                        drawTablePembelian();
                     }
                     if (list_items_barang_digunakan_alokasi.length != 0) {
                         drawTableDigunakanAlokasi(list_items_barang_digunakan_alokasi);

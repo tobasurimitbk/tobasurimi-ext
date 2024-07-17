@@ -890,12 +890,15 @@ class RMPurchaseOrderModel extends Model
             barang_master.barang_name AS barangName, 
             barang_master_spesifikasi.spesifikasi AS spekName, 
             rm_purchase_orders.subsidi_langsung AS subsidi,
-            rm_purchase_order_details.daily_price AS dppHarian,
-            rm_purchase_order_details.monthly_price AS dppBulanan,
-            rm_purchase_order_details.general_price AS dppUmum,
+            rm_purchase_order_details.daily_price AS price1,
+            rm_purchase_order_details.monthly_price AS price2,
+            rm_purchase_order_details.general_price AS price3,
             rm_purchase_order_details.qty AS qtyPO,
+            rm_purchase_order_details.barang1_id AS barang1_id,
+            rm_purchase_order_details.barang2_id AS barang2_id,
             rm_purchase_orders.pph AS poPPH,
-            satuans.nama_satuan AS satuanName, 
+            satuans.kode_satuan AS satuanName, 
+            rm_purchase_orders.po_no AS po_no,
         ";
 
         $poBBLokalData = $this->asObject()

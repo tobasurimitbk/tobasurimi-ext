@@ -112,7 +112,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select akun_ap_id" name="akun_ap_id" id="akun_ap_id">
                                     <option value=""></option>
@@ -133,7 +133,7 @@
                                 <?php endif; ?>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select akun_ar_id" name="akun_ar_id" id="akun_ar_id">
                                     <option value="" data-code=""></option>
@@ -150,7 +150,26 @@
                                 <label for="floatingInput">Akun Penjualan</label>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select akun_pemakaian_id" name="akun_pemakaian_id" id="akun_pemakaian_id">
+                                    <option value="" data-code=""></option>
+                                    <?php
+                                    if (!empty($subAkuns)) {
+                                        foreach ($subAkuns as $sub_ar) {
+                                    ?>
+                                            <option value="<?= $sub_ar->id; ?>"><?= $sub_ar->no_sub; ?> <?= $sub_ar->nama_sub; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Akun Pemakaian</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select kategori" name="kategori" id="kategori">
                                     <option value="" data-code=""></option>
@@ -168,7 +187,6 @@
                             </div>
                         </div>
                     </div>
-
                 </form>
             </div>
             <div class="modal-footer">
@@ -298,10 +316,12 @@
                         if (res.data != null) {
                             $("#akun_ap_id").val(res.data.ap_id).change();
                             $("#akun_ar_id").val(res.data.ar_id).change();
+                            $("#akun_pemakaian_id").val(res.data.pemakaian_id).change();
                             $("#kategori").val(res.data.kategori_id).change();
                         } else {
                             $("#akun_ap_id").val(null).change();
                             $("#akun_ar_id").val(null).change();
+                            $("#akun_pemakaian_id").val(null).change();
                             $("#kategori").val(null).change();
                         }
                         $("#parentName").val(parentName);
@@ -346,8 +366,8 @@
                 akun_ar_id: {
                     required: "Akun Penjualan Wajib Diisi"
                 },
-                kategori: {
-                    required: "Kategori Barang Wajib Diisi"
+                akun_pemakaian_id: {
+                    required: "Akun Pemakaian Wajib Diisi"
                 },
             },
             errorElement: 'span',
@@ -488,14 +508,14 @@
         .css('z-index', '1');
 
     //CSS SELECT2 FLOATING LABEL
-    $('.akun_ar_id, .akun_ap_id, .kategori')
+    $('.akun_ar_id, .akun_ap_id, .kategori, .akun_pemakaian_id')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.akun_ar_id, .akun_ap_id, .kategori')
+    $('.akun_ar_id, .akun_ap_id, .kategori, .akun_pemakaian_id')
         .parent('div')
         .children('span')
         .children('span')
@@ -503,13 +523,19 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.akun_ar_id, .akun_ap_id, .kategori')
+    $('.akun_ar_id, .akun_ap_id, .kategori, .akun_pemakaian_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');
 
     // Akun AR
     $('.akun_ar_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
+    })
+
+    $('.akun_pemakaian_id').select2({
         placeholder: "",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")

@@ -280,22 +280,25 @@ class RMImportPOModel extends Model
         $selectQry = "
             barang_master.barang_name AS barangName, 
             barang_master_spesifikasi.spesifikasi AS spekName, 
-            rm_import_pos.subsidi_langsung AS subsidi,
-            rm_import_po_details.daily_price AS dppHarian,
-            rm_import_po_details.monthly_price AS dppBulanan,
-            rm_import_po_details.general_price AS dppUmum,
+            rm_import_pos.potongan_harga AS subsidi,
+            rm_import_po_details.price AS price1,
+            rm_import_po_details.total AS totalPrice,
+            rm_import_po_details.disc AS disc,
+            rm_import_po_details.additional_cost AS additional_cost,
             rm_import_po_details.qty AS qtyPO,
-            rm_import_pos.pph AS poPPH,
-            satuans.nama_satuan AS satuanName, 
+            rm_import_po_details.barang_id AS barang1_id,
+            rm_import_po_details.spesifikasi_id AS barang2_id,
+            satuans.kode_satuan AS satuanName, 
+            rm_import_pos.po_no AS po_no,
         ";
 
         $poBBImportData = $this->asObject()
             ->select($selectQry)
-            ->join('rm_import_po_details', 'rm_import_po_details.rm_purchase_order_id = rm_import_pos.id', 'left')
+            ->join('rm_import_po_details', 'rm_import_po_details.rm_import_po_id = rm_import_pos.id', 'left')
             ->join('barang_master', 'rm_import_po_details.barang_id = barang_master.id', 'left')
             ->join('barang_master_spesifikasi', 'rm_import_po_details.spesifikasi_id = barang_master_spesifikasi.id', 'left')
-            ->join('account_barang', 'rm_import_po_details.barang1_id = account_barang.barang_master_id', 'left')
-            ->join('satuans', 'satuans.id = rm_import_po_details.satuan_id', 'left')
+            ->join('account_barang', 'rm_import_po_details.barang_id = account_barang.barang_master_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->where('rm_import_pos.division_id', $divisi_id)
             ->where('rm_import_pos.is_posted', '1')
             ->like('rm_import_pos.po_date', date('Y-m', strtotime($po_date)))
