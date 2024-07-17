@@ -956,7 +956,7 @@
 
         var newRow1 = $('<tr>');
         newRow1.append($('<td style="text-align:right;" colspan="8">').text('Total'));
-        newRow1.append($('<td style="text-align: center;">').text(stockTotal));
+        newRow1.append($('<td style="text-align: center;">').text(stockTotal.toFixed(2)));
         newRow1.append($('<td style="text-align: center;">').text(qtyTotal));
         table.find('tbody').append(newRow1);
 

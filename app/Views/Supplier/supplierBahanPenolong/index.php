@@ -86,7 +86,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)" onchange="this.value = formatNpwp(this.value)">
+                                <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)" onkeyup="this.value = formatNpwp(this.value.replace(/\D/g, ''))">
                                 <label for="floatingInput">NPWP (Opsional)</label>
                             </div>
                         </div>
