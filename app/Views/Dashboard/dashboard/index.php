@@ -302,7 +302,7 @@
                     <b>DATA DOKUMEN BEA CUKAI</b>
                 </div>
                 <div class="card-body bg-danger" style="margin-top: -20px; margin-bottom: -20px;">
-                    <div class="input-group input-group-password align-items-center">
+                    <div class="input-group input-group-password align-items-center" id="dateBCPicker">
                         <input autocomplete="one-time-code" class="form-control input-picker p-4 dateBC" id="dateBC" name="dateBC" placeholder="Pilih Tanggal" value="">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99;  margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
@@ -310,50 +310,110 @@
                     </div>
                 </div>
                 <div class="card-body border" style="margin-top: 20px">
-                    <div class="row">
-                        <ul class="nav flex-column col-6">
-                            <li class="nav-item">
-                                <a href="#" onclick="showDetails('bc23')" class="nav-link text-info text-sm ">
-                                    <b>BC 2.3 <span id="bc23" class="float-right">0</span></b>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" onclick="showDetails('bc25')" class="nav-link text-info text-sm">
-                                    <b>BC 2.5 <span id="bc25" class="float-right">0</span></b>
-                                </a>
-                            </li>
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Rekap BC</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Outstanding BC</button>
+                        </li>
 
-                            <li class="nav-item">
-                                <a href="#" onclick="showDetails('bc27')" class="nav-link text-info text-sm">
-                                    <b>BC 2.7 <span id="bc27" class="float-right">0</span></b>
-                                </a>
-                            </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                            <div class="row">
+                                <ul class="nav flex-column col-6">
+                                    <li class="nav-item">
+                                        <a href="#" onclick="showDetails('bc23')" class="nav-link text-info text-sm ">
+                                            <b>BC 2.3 <span id="bc23" class="float-right">0</span></b>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" onclick="showDetails('bc25')" class="nav-link text-info text-sm">
+                                            <b>BC 2.5 <span id="bc25" class="float-right">0</span></b>
+                                        </a>
+                                    </li>
 
-                            <li class="nav-item">
-                                <a href="#" onclick="showDetails('bc30')" class="nav-link text-info text-sm">
-                                    <b>BC 3.0 <span id="bc30" class="float-right">0</span></b>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" onclick="showDetails('bc40')" class="nav-link text-info text-sm">
-                                    <b>BC 4.0 <span id="bc40" class="float-right">0</span></b>
-                                </a>
-                            </li>
-                        </ul>
+                                    <li class="nav-item">
+                                        <a href="#" onclick="showDetails('bc27')" class="nav-link text-info text-sm">
+                                            <b>BC 2.7 <span id="bc27" class="float-right">0</span></b>
+                                        </a>
+                                    </li>
 
-                        <ul class="nav flex-column col-6">
-                            <li class="nav-item">
-                                <a href="#" onclick="showDetails('bc41')" class="nav-link text-info text-sm">
-                                    <b>BC 4.1 <span id="bc41" class="float-right">0</span></b>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" onclick="showDetails('ppbkb')" class="nav-link text-info text-sm">
-                                    <b>PPBKB <span id="ppbkb" class="float-right">0</span></b>
-                                </a>
-                            </li>
-                        </ul>
+                                    <li class="nav-item">
+                                        <a href="#" onclick="showDetails('bc30')" class="nav-link text-info text-sm">
+                                            <b>BC 3.0 <span id="bc30" class="float-right">0</span></b>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" onclick="showDetails('bc40')" class="nav-link text-info text-sm">
+                                            <b>BC 4.0 <span id="bc40" class="float-right">0</span></b>
+                                        </a>
+                                    </li>
+                                </ul>
+
+                                <ul class="nav flex-column col-6">
+                                    <li class="nav-item">
+                                        <a href="#" onclick="showDetails('bc41')" class="nav-link text-info text-sm">
+                                            <b>BC 4.1 <span id="bc41" class="float-right">0</span></b>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" onclick="showDetails('ppbkb')" class="nav-link text-info text-sm">
+                                            <b>PPBKB <span id="ppbkb" class="float-right">0</span></b>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                            <div class="row">
+                                <ul class="nav flex-column col-6">
+                                    <li class="nav-item">
+                                        <a href="<?= base_url("bea-cukai-bc-23/bc-23-outstanding");  ?>" class="nav-link text-info text-sm ">
+                                            <b>BC 2.3 <span id="bc-23-outstanding" class="float-right">0</span></b>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?= base_url("bea-cukai-bc-25/bc-25-outstanding");  ?>" class="nav-link text-info text-sm">
+                                            <b>BC 2.5 <span id="bc-25-outstanding" class="float-right">0</span></b>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="<?= base_url("bea-cukai-bc-27/bc-27-outstanding");  ?>" class="nav-link text-info text-sm">
+                                            <b>BC 2.7 <span id="bc-27-outstanding" class="float-right">0</span></b>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="<?= base_url("bea-cukai-bc-30/bc-30-outstanding");  ?>" class="nav-link text-info text-sm">
+                                            <b>BC 3.0 <span id="bc-30-outstanding" class="float-right">0</span></b>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?= base_url("bea-cukai-bc-40/bc-40-outstanding");  ?>" class="nav-link text-info text-sm">
+                                            <b>BC 4.0 <span id="bc-40-outstanding" class="float-right">0</span></b>
+                                        </a>
+                                    </li>
+                                </ul>
+
+                                <ul class="nav flex-column col-6">
+                                    <li class="nav-item">
+                                        <a href="<?= base_url("bea-cukai-bc-41/bc-41-outstanding");  ?>" class="nav-link text-info text-sm">
+                                            <b>BC 4.1 <span id="bc-41-outstanding" class="float-right">0</span></b>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="<?= base_url('bea-cukai-ppbkb/ppbkb-outstanding') ?>" class="nav-link text-info text-sm">
+                                            <b>PPBKB <span id="ppbkb-outstanding" class="float-right">0</span></b>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -421,7 +481,27 @@
         var currentDate = new Date();
         var formattedDate = (currentDate.getMonth() + 1).toString().padStart(2, '0') + '/' + currentDate.getFullYear();
         $("#dateBC").val(formattedDate);
+        $('#profile-tab').click(function() {
+            $('#dateBCPicker').hide();
+        });
+        $('#home-tab').click(function() {
+            $('#dateBCPicker').show();
+        });
+
+
+
         dataBC();
+        var BCarr = ['bc-23', 'bc-25', 'bc-27', 'bc-30', 'bc-40', 'bc-41', 'ppbkb'];
+        BCarr.forEach(function(bc) {
+            $.ajax({
+                url: "<?= base_url(); ?>bea-cukai-" + bc + "/" + bc + "-outstanding-all",
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $('#' + bc + '-outstanding').text(res.length);
+                },
+            });
+        });
     })
 
     $(".dateStart").datepicker({

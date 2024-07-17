@@ -17,6 +17,8 @@ use App\Models\StockDetailModel;
 use App\Models\StockModel;
 use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class PPBKB extends BaseController
 {
@@ -434,5 +436,136 @@ class PPBKB extends BaseController
             'token' => csrf_hash(),
             'status' => true
         ]);
+    }
+    public function viewOutstanding()
+    {
+        return view('BeaCukai/ppbkb/ppbkboutstanding');
+    }
+
+    public function allOutstanding()
+    {
+        $mutasiUsed = $this->ppbkbModel
+            ->select('mutasi_id')
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+        $mutasiAll = $this->mutasiModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
+        $allmutasiIdArr = [];
+        $mutasiIdUsedArr = [];
+        $mutasiIdNotUsedArr = [];
+
+        foreach ($mutasiUsed as $m) {
+            array_push($mutasiIdUsedArr, $m['mutasi_id']);
+        }
+        foreach ($mutasiAll as $i) {
+            array_push($allmutasiIdArr, $i['id']);
+        }
+
+        $mutasiIdNotUsedArr = array_diff($allmutasiIdArr, $mutasiIdUsedArr);
+        $list = [];
+        foreach ($mutasiIdNotUsedArr as $id) {
+            $data = $this->mutasiModel
+                ->select('
+                    mutasi.id as mutasi_id,
+                    no_mutasi,
+                    divisi_asal_id,
+                    divisi_tujuan_id,
+                    warehouse_asal_id,
+                    warehouse_tujuan_id,
+                    tanggal')
+                ->where('id', $id)
+                ->first();
+            $divisiAwal = $this->divisiModel
+                ->select('divisi')
+                ->where('id', $data['divisi_asal_id'])
+                ->first();
+            $divisiTujuan = $this->divisiModel
+                ->select('divisi')
+                ->where('id', $data['divisi_tujuan_id'])
+                ->first();
+            $warehouseAwal = $this->warehouseModel
+                ->select('warehouse_name')
+                ->where('id', $data['warehouse_asal_id'])
+                ->first();
+            $warehouseTujuan = $this->warehouseModel
+                ->select('warehouse_name')
+                ->where('id', $data['warehouse_tujuan_id'])
+                ->first();
+            $countDetail = $this->mutasiDetailModel
+                ->select('count(*) as jumlah_barang')
+                ->where('mutasi_id', $id)
+                ->first();
+            $detailMutasi = $this->mutasiDetailModel
+                ->where('mutasi_id', $id)
+                ->findAll();
+            $nilaiBarang = 0;
+            foreach ($detailMutasi as $dm) {
+                $stockListDetail = $this->stockDetail2Model
+                    ->getStockListDetail($dm['stock_id'], $dm['bc_id'], $dm['no_aju'], $dm['stock_dokumen']);
+                $nilaiBarang = intval($stockListDetail['harga_harian']) + intval($stockListDetail['harga_umum']) + intval($stockListDetail['harga_bulanan']);
+            }
+
+
+            if ($data != null) {
+                array_push($list, [
+                    'id' => $data['mutasi_id'],
+                    'no_mutasi' => $data['no_mutasi'],
+                    'divisi_awal' => $divisiAwal['divisi'],
+                    'warehouse_awal' => $warehouseAwal['warehouse_name'],
+                    'divisi_tujuan' => $divisiTujuan['divisi'],
+                    'warehouse_tujuan' => $warehouseTujuan['warehouse_name'],
+                    'tanggal' => date("d/m/Y", strtotime($data['tanggal'])),
+                    'jumlah_barang' => $countDetail['jumlah_barang'],
+                    'total_harga' => number_format($nilaiBarang, 2)
+                ]);
+            }
+        }
+        return json_encode($list);
+    }
+    public function OutstandingSheet()
+    {
+        $list = json_decode($this->allOutstanding());
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'No.')
+            ->setCellValue('B1', 'No Mutasi ')
+            ->setCellValue('C1', 'Divisi / Warehouse Asal ')
+            ->setCellValue('D1', 'Divisi / Warehouse Tujuan ')
+            ->setCellValue('E1', 'Tanggal')
+            ->setCellValue('F1', 'Jumlah Barang')
+            ->setCellValue('G1', 'Nilai Barang');
+
+        $no = 1;
+        $column = 2;
+
+        foreach ($list as $l) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $column, $no++)
+                ->setCellValue('B' . $column,  $l->no_mutasi)
+                ->setCellValue('C' . $column,  $l->divisi_awal . " / " . $l->warehouse_awal)
+                ->setCellValue('D' . $column,  $l->divisi_tujuan . " / " . $l->warehouse_tujuan)
+                ->setCellValue('E' . $column,  $l->tanggal)
+                ->setCellValue('F' . $column,  $l->jumlah_barang)
+                ->setCellValue('G' . $column,  $l->total_harga);
+            $column++;
+        }
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Rekap PPBKB';
+        foreach (range('A', 'K') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Laporan-Outstanding-PPBKB';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
     }
 }

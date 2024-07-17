@@ -4,15 +4,21 @@
 <section class="section">
     <div class="section-header">
         <h1>Dokumen PPBKB</h1>
-        <?php if ($akunCeisa != null) : ?>
-            <?php if ($akunCeisa['status_integrasi']) : ?>
-                <?php if (can("Bea Cukai", "PPBKB", "c")) : ?>
-                    <a href="<?= base_url('bea-cukai-ppbkb/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
-                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        <div class="col-button-tambah-spp">
+            <?php if ($akunCeisa != null) : ?>
+                <?php if ($akunCeisa['status_integrasi']) : ?>
+                    <a href="<?= base_url('bea-cukai-ppbkb/ppbkb-outstanding') ?>" class="btn btn-save float-right" type="button">
+                        <i class="fa fa-ship fa-sm" aria-hidden="true"></i>
+                        Outstanding
                     </a>
+                    <?php if (can("Bea Cukai", "PPBKB", "c")) : ?>
+                        <a href="<?= base_url('bea-cukai-ppbkb/create') ?>" type="button" class="btn btn-success float-right">
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                        </a>
+                    <?php endif; ?>
                 <?php endif; ?>
             <?php endif; ?>
-        <?php endif; ?>
+        </div>
     </div>
     <div class="card">
         <?= csrf_field() ?>

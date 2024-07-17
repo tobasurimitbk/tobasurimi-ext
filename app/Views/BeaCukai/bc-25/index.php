@@ -4,19 +4,26 @@
 <section class="section">
     <div class="section-header">
         <h1>Dokumen BC 2.5</h1>
-        <?php if ($akunCeisa != null) : ?>
-            <?php if ($akunCeisa['status_integrasi']) : ?>
-                <a href="<?= base_url('bea-cukai-bc-25/online') ?>" class="btn btn-discard btn-dropdown-export float-right" type="button">
-                    <i class="fa fa-upload fa-sm" aria-hidden="true"></i>
-                    Status Respon
-                </a>
-                <?php if (can("Bea Cukai", "BC 2.5", "c")) : ?>
-                    <a href="<?= base_url('bea-cukai-bc-25/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
-                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+
+        <div class="col-button-tambah-spp">
+            <?php if ($akunCeisa != null) : ?>
+                <?php if ($akunCeisa['status_integrasi']) : ?>
+                    <a href="<?= base_url('bea-cukai-bc-25/online') ?>" class="btn btn-discard btn-dropdown-export float-right" type="button">
+                        <i class="fa fa-upload fa-sm" aria-hidden="true"></i>
+                        Status Respon
                     </a>
+                    <a href="<?= base_url('bea-cukai-bc-25/bc-25-outstanding') ?>" class="btn btn-save float-right" type="button">
+                        <i class="fa fa-ship fa-sm" aria-hidden="true"></i>
+                        Outstanding
+                    </a>
+                    <?php if (can("Bea Cukai", "BC 2.5", "c")) : ?>
+                        <a href="<?= base_url('bea-cukai-bc-25/create') ?>" type="button" class="btn btn-success float-right">
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                        </a>
+                    <?php endif; ?>
                 <?php endif; ?>
             <?php endif; ?>
-        <?php endif; ?>
+        </div>
     </div>
     <div class="card">
         <?= csrf_field() ?>

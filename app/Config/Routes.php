@@ -1324,6 +1324,11 @@ $routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
 
     $routes->get('list-mutasi-global', 'BeaCukai\BC27::dropdownMutasiGlobal');
     $routes->get('list-barang-mutasi', 'BeaCukai\BC27::getListMutasiDetail');
+
+    // OUTSTANDING
+    $routes->get('bc-27-outstanding-all', 'BeaCukai\BC27::allOutstanding');
+    $routes->get('bc-27-outstanding', 'BeaCukai\BC27::viewOutstanding');
+    $routes->get('bc-27-outstanding-export', 'BeaCukai\BC27::OutstandingSheet');
 });
 
 // BC 3.0
@@ -1343,6 +1348,11 @@ $routes->group('bea-cukai-bc-30', ['filter' => 'Auth'], function ($routes) {
 
     $routes->get('list-barang', 'BeaCukai\BC30::getListBarang');
     $routes->get('list-sales-order', 'BeaCukai\BC30::dropdownSalesOrder');
+
+    // OUTSTANDING
+    $routes->get('bc-30-outstanding-all', 'BeaCukai\BC30::allOutstanding');
+    $routes->get('bc-30-outstanding', 'BeaCukai\BC30::viewOutstanding');
+    $routes->get('bc-30-outstanding-export', 'BeaCukai\BC30::OutstandingSheet');
 });
 
 // PPBKB
@@ -1361,6 +1371,11 @@ $routes->group('bea-cukai-ppbkb', ['filter' => 'Auth'], function ($routes) {
     $routes->get('list-no-ijin-tpb', 'BeaCukai\PPBKB::dropdownNoIjinTPB');
     $routes->get('list-barang-mutasi', 'BeaCukai\PPBKB::getListMutasiDetail');
     $routes->get('get-no', 'BeaCukai\PPBKB::getNo');
+
+    // OUTSTANDING
+    $routes->get('ppbkb-outstanding-all', 'BeaCukai\PPBKB::allOutstanding');
+    $routes->get('ppbkb-outstanding', 'BeaCukai\PPBKB::viewOutstanding');
+    $routes->get('ppbkb-outstanding-export', 'BeaCukai\PPBKB::OutstandingSheet');
 });
 
 // BC 2.5
@@ -1442,6 +1457,11 @@ $routes->group('bea-cukai-bc-41', ['filter' => 'Auth'], function ($routes) {
     $routes->post('delete', 'BeaCukai\BC41::delete');
     $routes->post('posting', 'BeaCukai\BC41::posting');
     $routes->get('check-no-aju', 'BeaCukai\BC41::checkNoAju');
+
+    // OUTSTANDING
+    $routes->get('bc-41-outstanding-all', 'BeaCukai\BC41::allOutstanding');
+    $routes->get('bc-41-outstanding', 'BeaCukai\BC41::viewOutstanding');
+    $routes->get('bc-41-outstanding-export', 'BeaCukai\BC41::OutstandingSheet');
     // HEADER
     $routes->get('id/header/(:segment)', 'BeaCukai\BC41::header/$1');
     $routes->post('id/header', 'BeaCukai\BC41::updateHeader');

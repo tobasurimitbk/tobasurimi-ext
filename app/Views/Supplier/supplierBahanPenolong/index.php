@@ -86,7 +86,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)">
+                                <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)" onkeyup="this.value = formatNpwp(this.value.replace(/\D/g, ''))">
                                 <label for="floatingInput">NPWP (Opsional)</label>
                             </div>
                         </div>
@@ -598,6 +598,12 @@
             sort = val;
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
+
+    function formatNpwp(value) {
+        if (typeof value === 'string') {
+            return value.replace(/(\d{2})(\d{3})(\d{3})(\d{1})(\d{3})(\d{3})/, '$1.$2.$3.$4-$5.$6');
         }
     }
 </script>

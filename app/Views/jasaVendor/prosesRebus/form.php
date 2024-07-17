@@ -249,7 +249,7 @@
 
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Qty</th>
+                                    <th style="text-align: center;">Sisa Qty</th>
                                     <th style="text-align: center;">Qty Rebus</th>
                                     <th style="text-align: center;">Satuan Rebus</th>
 
