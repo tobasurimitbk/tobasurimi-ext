@@ -158,7 +158,7 @@
                                     <th style="text-align: center;">Mentah</th>
 
                                     <th style="text-align: center;">KG REBUS</th>
-                                    <th style="text-align: center;">KG DAGING FAUZY</th>
+                                    <th style="text-align: center;" class="kg-daging">KG DAGING FAUZY</th>
                                     <th style="text-align: center;">KG DAGING CN</th>
 
                                     <th style="text-align: center;">Kg Daging</th>
@@ -193,6 +193,14 @@
     var listTotal = [];
 
     <?php if (!empty($biayaUdang)) : ?>
+        // detail vendor ganti kg daging
+        var selectedVendor = $('#vendor_id option:selected').text();
+        if (selectedVendor === "") {
+            $(".kg-daging").text("KG DAGING FAUZY");
+        } else {
+            $(".kg-daging").text("KG DAGING " + selectedVendor);
+        }
+
         let arr = $('.multiple_jasa_vendor_in_id').val();
         $.ajax({
             url: `<?= base_url('biaya-udang/list-barang'); ?>`,
@@ -226,6 +234,14 @@
     }).change(function() {
         // DROPDOWN DIVISI
         getListDivisi();
+        //ganti kg daging fauzy sesuai dengan vendor di select
+        var selectedVendor = $('#vendor_id option:selected').text();
+        if (selectedVendor === "") {
+            $(".kg-daging").text("KG DAGING FAUZY");
+        } else {
+            $(".kg-daging").text("KG DAGING " + selectedVendor);
+        }
+
     });
 
     $('#divisi_id').select2({
@@ -610,7 +626,7 @@
                             <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" oninput="preventNegativeInput(this)" data-barang_master_id="${barang_master_id_last}" autocomplete="one-time-code" class="form-control kg_rebus" type="text" value="${tb_harga_last}">
                         `
                     ));
-                    newRow.append($('<td >').text(totalFirst.total_harga.toFixed(2)));
+                    newRow.append($('<td >').text(formatRupiah(totalFirst.total_harga.toFixed(2))));
                     table.find('tbody').append(newRow);
                 }
 

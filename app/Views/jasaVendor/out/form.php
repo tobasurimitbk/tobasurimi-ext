@@ -917,6 +917,8 @@
         var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
         const table = $('#selectedItemTable');
         var no = 1;
+        var qtyTotal = 0;
+        var stockTotal = 0;
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align: center;">').html(
@@ -948,7 +950,15 @@
                 `
             ));
             table.find('tbody').append(newRow);
+            qtyTotal += Number(v.qty);
+            stockTotal += Number(v.stok_total);
         });
+
+        var newRow1 = $('<tr>');
+        newRow1.append($('<td style="text-align:right;" colspan="8">').text('Total'));
+        newRow1.append($('<td style="text-align: center;">').text(stockTotal));
+        newRow1.append($('<td style="text-align: center;">').text(qtyTotal));
+        table.find('tbody').append(newRow1);
 
         selectedItemTable = $('#selectedItemTable').DataTable({
             dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
