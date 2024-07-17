@@ -24,6 +24,7 @@
                         <thead class="thead-dark">
                             <tr style="text-align: center;">
                                 <th style="text-align:center;">No</th>
+                                <th style="text-align:center;">Supplier</th>
                                 <th style="text-align:center;">Tipe PO</th>
                                 <th style="text-align:center;">Tgl PO</th>
                                 <th style="text-align:center;">Tgl LPB </th>
@@ -75,6 +76,7 @@
                     $.each(res, function(i, v) {
                         var newRow = $('<tr style="border: none">');
                         newRow.append($('<td style="text-align:center;">').text(no++));
+                        newRow.append($('<td style="text-align:center;">').text(v.supplier));
                         newRow.append($('<td style="text-align:center;">').text(v.status_penerimaan + " " + v.tipe_bahan));
                         newRow.append($('<td style="text-align:center;">').text(v.po_date));
                         newRow.append($('<td style="text-align:center;">').text(v.lpb_date));

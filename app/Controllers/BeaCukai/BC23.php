@@ -2176,6 +2176,7 @@ class BC23 extends BaseController
                         SUM(penerimaan_barang_detail.qty) AS qty_po,
                         SUM(penerimaan_barang_detail.sub_total) AS sub_total,
                         penerimaan_barang_detail.barang_id,
+                        suppliers.name,
                         rm_import_pos.po_no,
                         rm_import_pos.po_date,
                         barang_master.barang_name,
@@ -2184,6 +2185,7 @@ class BC23 extends BaseController
                     ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                     ->join('rm_import_pos', 'penerimaan_barang_detail.purchase_order_id = rm_import_pos.id', 'left')
                     ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                    ->join('suppliers', 'penerimaan_barang.supplier_id = suppliers.id', 'left')
                     ->where('penerimaan_barang.status_penerimaan', "IMPORT")
                     ->where('penerimaan_barang.id', $tipe['id'])
                     ->where('penerimaan_barang.bc_type', '48')
@@ -2199,6 +2201,7 @@ class BC23 extends BaseController
                 if ($po != null) {
                     foreach ($po as $row) {
                         array_push($list, [
+                            'supplier' => $row['name'],
                             'status_penerimaan' => $row['status_penerimaan'],
                             'tipe_bahan' => $row['tipe_bahan'],
                             'po_date' => date('Y/m/d', strtotime($row['po_date'])),
@@ -2226,6 +2229,7 @@ class BC23 extends BaseController
                     SUM(penerimaan_barang_detail.qty) AS qty_po,
                     SUM(penerimaan_barang_detail.sub_total) AS sub_total,
                     penerimaan_barang_detail.barang_id,
+                    suppliers.name,
                     am_purchase_orders.po_no,
                     am_purchase_orders.po_date,
                     barang_master.barang_name,
@@ -2234,6 +2238,7 @@ class BC23 extends BaseController
                     ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                     ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
                     ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                    ->join('suppliers', 'penerimaan_barang.supplier_id = suppliers.id', 'left')
                     ->where('penerimaan_barang.status_penerimaan', "IMPORT")
                     ->where('penerimaan_barang.id', $tipe['id'])
                     ->where('penerimaan_barang.bc_type', '48')
@@ -2247,6 +2252,7 @@ class BC23 extends BaseController
                 if ($po != null) {
                     foreach ($po as $row) {
                         array_push($list, [
+                            'supplier' => $row['name'],
                             'status_penerimaan' => $row['status_penerimaan'],
                             'tipe_bahan' => $row['tipe_bahan'],
                             'po_date' => $row['po_date'],

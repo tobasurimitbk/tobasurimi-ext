@@ -13,6 +13,9 @@ use App\Models\MutasiGlobalModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PDO;
 
 // META DATA -> jenis_dok_aju
 // BC 2.3 -> 48
@@ -410,5 +413,137 @@ class BC27 extends BaseController
         }
 
         return $kodeDokumenbc40Static['value'] . '-' . $kodeKantorStatic . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan;
+    }
+    public function viewOutstanding()
+    {
+        return view('BeaCukai/BC-27/bc27outstanding');
+    }
+
+    public function allOutstanding()
+    {
+        $mutasiGlobalUsed = $this->bc27Model
+            ->select('mutasi_global_id')
+            ->where('company_asal_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+        $mutasiGlobalAll = $this->mutasiGlobalModel->where('company_asal_id', $this->this_company_id)->where('deletedAt', null)->findAll();
+        $allmutasiGlobalIdArr = [];
+        $mutasiGlobalIdUsedArr = [];
+        $mutasiGlobalIdNotUsedArr = [];
+
+        foreach ($mutasiGlobalUsed as $m) {
+            array_push($mutasiGlobalIdUsedArr, $m['mutasi_global_id']);
+        }
+        foreach ($mutasiGlobalAll as $i) {
+            array_push($allmutasiGlobalIdArr, $i['id']);
+        }
+
+        $mutasiGlobalIdNotUsedArr = array_diff($allmutasiGlobalIdArr, $mutasiGlobalIdUsedArr);
+        $list = [];
+
+        foreach ($mutasiGlobalIdNotUsedArr as $id) {
+            $data = $this->mutasiGlobalModel
+                ->select('
+                    mutasi_global.id as mutasi_id,
+                    no_mutasi,
+                    company_tujuan_id,
+                    company_asal_id,
+                    divisi_asal_id,
+                    divisi,
+                    warehouse_asal_id,
+                    warehouse_name,
+                    tanggal')
+                ->join('divisis', 'divisis.id = mutasi_global.divisi_asal_id')
+                ->join('warehouses', 'warehouses.id = mutasi_global.warehouse_asal_id')
+                ->where('mutasi_global.id', $id)
+                ->first();
+            $company_asal = $this->companyModel
+                ->select('company')
+                ->where('id', $data['company_asal_id'])
+                ->first();
+            $company_tujuan = $this->companyModel
+                ->select('company')
+                ->where('id', $data['company_tujuan_id'])
+                ->first();
+            $detailCount = $this->mutasiGlobalDetailModel
+                ->select('count(*) as jumlah_barang')
+                ->where('mutasi_global_id', $id)
+                ->first();
+            $detailMutasi = $this->mutasiGlobalDetailModel
+                ->where('mutasi_global_id', $id)
+                ->findAll();
+
+            $nilaiBarang = 0;
+            foreach ($detailMutasi as $dm) {
+                $stockListDetail = $this->stockDetail2Model
+                    ->getStockListDetail($dm['stock_id'], $dm['bc_id'], $dm['no_aju'], $dm['stock_dokumen']);
+                $nilaiBarang = intval($stockListDetail['harga_harian']) + intval($stockListDetail['harga_umum']) + intval($stockListDetail['harga_bulanan']);
+            }
+
+
+
+            if ($data != null) {
+                array_push($list, [
+                    'id' => $data['mutasi_id'],
+                    'no_mutasi' => $data['no_mutasi'],
+                    'company_asal' => $company_asal['company'],
+                    'company_tujuan' => $company_tujuan['company'],
+                    'divisi' => $data['divisi'],
+                    'warehouse_name' => $data['warehouse_name'],
+                    'tanggal' => date('d/m/Y', strtotime($data['tanggal'])),
+                    'jumlah_barang' => $detailCount['jumlah_barang'],
+                    'total_harga' => number_format($nilaiBarang, 2)
+                ]);
+            }
+        }
+        return json_encode($list);
+    }
+
+    public function OutstandingSheet()
+    {
+        $list = json_decode($this->allOutstanding());
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'No.')
+            ->setCellValue('B1', 'No Mutasi')
+            ->setCellValue('C1', 'Company Asal')
+            ->setCellValue('D1', 'Company Tujuan')
+            ->setCellValue('E1', 'Divisi / Warehouse Pengeluaran')
+            ->setCellValue('F1', 'Tanggal')
+            ->setCellValue('G1', 'Jumlah Barang')
+            ->setCellValue('H1', 'Nilai Barang');
+        $no = 1;
+        $column = 2;
+
+        foreach ($list as $l) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $column, $no++)
+                ->setCellValue('B' . $column,  $l->no_mutasi)
+                ->setCellValue('C' . $column,  $l->company_asal)
+                ->setCellValue('D' . $column,  $l->company_tujuan)
+                ->setCellValue('E' . $column,  $l->divisi . " / " . $l->warehouse_name)
+                ->setCellValue('F' . $column,  $l->tanggal)
+                ->setCellValue('G' . $column,  $l->jumlah_barang)
+                ->setCellValue('H' . $column,  $l->total_harga);
+            $column++;
+        }
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Rekap BC27';
+        foreach (range('A', 'K') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Laporan-Outstanding-BC-2.7';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
     }
 }

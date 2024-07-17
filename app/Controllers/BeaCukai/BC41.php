@@ -18,6 +18,9 @@ use App\Models\SalesOrderLainModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 // META DATA -> jenis_dok_aju
 // BC 2.3 -> 48
@@ -1277,5 +1280,121 @@ class BC41 extends BaseController
         } else {
             $this->bc41Model->set('status_dokumen', "Belum Lengkap")->where('id', $id)->update();
         }
+    }
+    public function viewOutstanding()
+    {
+        return view('BeaCukai/BC-41/bc41outstanding');
+    }
+
+    public function allOutstanding()
+    {
+        $salesOrderLainUsed = $this->bc41Model
+            ->select('sales_order_lain_id')
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+        $salesOrderLainAll = $this->salesOrderLainModel->where('company_id', $this->this_company_id)->where('deletedAt', null)
+            ->where('bc_id', '54')
+            ->findAll();
+
+
+        $allSalesOrderLainIdArr = [];
+        $salesOrderLainIdUsedArr = [];
+        $salesOrderLainIdNotUsedArr = [];
+
+        foreach ($salesOrderLainUsed as $s) {
+            array_push($salesOrderLainIdUsedArr, $s['sales_order_lain_id']);
+        }
+        foreach ($salesOrderLainAll as $p) {
+            array_push($allSalesOrderLainIdArr, $p['id']);
+        }
+
+
+        $salesOrderLainIdNotUsedArr = array_diff($allSalesOrderLainIdArr, $salesOrderLainIdUsedArr);
+
+        $list = [];
+        foreach ($salesOrderLainIdNotUsedArr as $id) {
+            $sol = $this->salesOrderLainModel
+                ->select('
+                    sales_order_lain.id,
+                    customers.name,
+                    sales_order_lain.no_sales_order,
+                    divisis.divisi,
+                    warehouses.warehouse_name,
+                    sales_order_lain.tanggal
+                ')
+                ->join('customers', 'customers.id = sales_order_lain.customer_id')
+                ->join('divisis', 'divisis.id = sales_order_lain.divisi_id')
+                ->join('warehouses', 'warehouses.id = sales_order_lain.warehouse_id')
+                ->where('sales_order_lain.bc_id', '54')
+                ->where('sales_order_lain.id', $id)
+                ->first();
+
+            $sold = $this->salesOrderLainDetailModel
+                ->select('count(*) as jumlah_barang, sum(total_harga) as total_harga')
+                ->where('sales_order_lain_detail.sales_order_lain_id', $id)
+                ->first();
+            if ($sol != null) {
+                array_push($list, [
+                    'id' => encrypt($sol['id']),
+                    'customer' => $sol['name'],
+                    'no_sales_order' => $sol['no_sales_order'],
+                    'divisi' => $sol['divisi'],
+                    'warehouse_name' => $sol['warehouse_name'],
+                    'tanggal' => date("d/m/Y", strtotime($sol['tanggal'])),
+                    'jumlah_barang' => $sold['jumlah_barang'],
+                    'total_harga' => number_format($sold['total_harga'], 2)
+                ]);
+            }
+        }
+
+        return json_encode($list);
+    }
+
+    public function OutstandingSheet()
+    {
+        $list = json_decode($this->allOutstanding());
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'No.')
+            ->setCellValue('B1', 'Nama Customer')
+            ->setCellValue('C1', 'No Sales Order')
+            ->setCellValue('D1', 'Department / Warehouse Pengeluaran ')
+            ->setCellValue('E1', 'Tanggal')
+            ->setCellValue('F1', 'Jumlah Barang')
+            ->setCellValue('G1', 'Nilai Barang');
+
+        $no = 1;
+        $column = 2;
+
+        foreach ($list as $l) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $column, $no++)
+                ->setCellValue('B' . $column,  $l->customer)
+                ->setCellValue('C' . $column,  $l->no_sales_order)
+                ->setCellValue('D' . $column,  $l->divisi . " / " . $l->warehouse_name)
+                ->setCellValue('E' . $column,  $l->tanggal)
+                ->setCellValue('F' . $column,  $l->jumlah_barang)
+                ->setCellValue('G' . $column,  $l->total_harga);
+            $column++;
+        }
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Rekap BC41';
+        foreach (range('A', 'K') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Laporan-Outstanding-BC-4.1';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
     }
 }

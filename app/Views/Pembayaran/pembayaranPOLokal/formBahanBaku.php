@@ -1124,18 +1124,6 @@
         return ribuanFormatted + ',' + desimal;
     }
 
-    // function formatRupiah(angka) {
-    //     var formatter = new Intl.NumberFormat('id-ID', {
-    //         style: 'currency',
-    //         currency: 'IDR'
-    //     });
-    //     var parsedNumber = parseFloat(angka);
-    //     if (isNaN(parsedNumber)) {
-    //         return "0,00";
-    //     }
-    //     return formatter.format(parsedNumber).replace('Rp', '').trim();
-    // }
-
     function convertRupiahToNumber(rupiah) {
         if (rupiah == "") {
             return 0;
