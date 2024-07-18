@@ -158,8 +158,8 @@
                                     <th style="text-align: center;">Mentah</th>
 
                                     <th style="text-align: center;">KG REBUS</th>
-                                    <th style="text-align: center;" class="kg-daging">KG DAGING FAUZY</th>
-                                    <th style="text-align: center;">KG DAGING CN</th>
+                                    <th style="text-align: center;" class="kg-daging-vendor">KG DAGING VENDOR</th>
+                                    <th style="text-align: center;" class="kg-daging-divisi">KG DAGING DEPARTEMEN</th>
 
                                     <th style="text-align: center;">Kg Daging</th>
                                     <th style="text-align: center;">Ratio</th>
@@ -195,10 +195,18 @@
     <?php if (!empty($biayaUdang)) : ?>
         // detail vendor ganti kg daging
         var selectedVendor = $('#vendor_id option:selected').text();
+        var selectedDivisi = $('#divisi_id option:selected').text();
+
         if (selectedVendor === "") {
-            $(".kg-daging").text("KG DAGING FAUZY");
+            $(".kg-daging-vendor").text("KG DAGING VENDOR");
         } else {
-            $(".kg-daging").text("KG DAGING " + selectedVendor);
+            $(".kg-daging-vendor").text("KG DAGING " + selectedVendor);
+        }
+
+        if (selectedDivisi === "") {
+            $(".kg-daging-divisi").text("KG DAGING DEPARTEMEN");
+        } else {
+            $(".kg-daging-divisi").text("KG DAGING " + selectedDivisi);
         }
 
         let arr = $('.multiple_jasa_vendor_in_id').val();
@@ -237,9 +245,9 @@
         //ganti kg daging fauzy sesuai dengan vendor di select
         var selectedVendor = $('#vendor_id option:selected').text();
         if (selectedVendor === "") {
-            $(".kg-daging").text("KG DAGING FAUZY");
+            $(".kg-daging-vendor").text("KG DAGING");
         } else {
-            $(".kg-daging").text("KG DAGING " + selectedVendor);
+            $(".kg-daging-vendor").text("KG DAGING " + selectedVendor);
         }
 
     });
@@ -253,6 +261,13 @@
         getListJasaVendorIn();
         // AUTO GENERATE NOMOR
         changeStatus();
+        // GANTI KOLOM DEPARTEMEN
+        var selectedDivisi = $("#divisi_id option:selected").text();
+        if (selectedDivisi === "") {
+            $(".kg-daging-divisi").text("KG DAGING DEPARTEMEN");
+        } else {
+            $(".kg-daging-divisi").text("KG DAGING " + selectedDivisi);
+        }
     });
 
 

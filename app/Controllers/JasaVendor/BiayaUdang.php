@@ -314,6 +314,7 @@ class BiayaUdang extends BaseController
             'biayaUdangDetail' => $this->biayaUdangModel->dropdownBarang(json_decode($biayaUdang['multiple_jasa_vendor_in_id']), $id)
         ];
 
+        $data['divisi'] = $this->divisiModel->find($biayaUdang['divisi_id']);
         $data['vendor'] = $this->vendorModel->find($biayaUdang['vendor_id']);
         $data['biayaUdangTotal'] = $this->biayaUdangModel->getBarangDetail(json_decode($biayaUdang['multiple_jasa_vendor_in_id']), $id);
 

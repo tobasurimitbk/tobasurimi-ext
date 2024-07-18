@@ -322,6 +322,10 @@
         table.ajax.reload();
     });
 
+    $('.no_penerimaan_surat_jalan').keyup(function() {
+        table.ajax.reload();
+    });
+
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
         location.replace(`<?= base_url("jasa-vendor-in/id"); ?>/${data.id}`);

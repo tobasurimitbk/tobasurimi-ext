@@ -254,7 +254,7 @@
                     $totalTotal = ($totalTotal == 0) ? 1 : $totalTotal;
                     ?>
                     <tr>
-                        <td colspan="5">Total Upah Kopek</td>
+                        <td colspan="5">Total Upah Kopek / Kg</td>
                         <td><?= number_format(($jumboTotal * $upahKopekJumbo), 2) ?></td>
                         <td><?= number_format(($exLumpTotal * $upahKopekExLump), 2) ?></td>
                         <td><?= number_format(($lumpTotal * $upahKopekLump), 2) ?></td>
@@ -338,7 +338,7 @@
                     <tbody>
                         <?php $no = 1;
                         $totalResult = 0; ?>
-                        <?php foreach ($biayaKepitingDetail as $index => $b) : ?>
+                        <?php foreach ($biayaKepitingBonus as $index => $b) : ?>
 
                             <tr>
                                 <?php $total = 0 ?>

@@ -146,6 +146,7 @@ $routes->get('/account', 'Master\Account::account', ['filter' => 'Auth']);
 
 $routes->get('/kategori-account/all', 'Master\Account::allKategoriAccount', ['filter' => 'Auth']);
 $routes->get('/kategori-account/id/(:segment)', 'Master\Account::getByIdKategoriAccount/$1', ['filter' => 'Auth']);
+$routes->get('/kategori-account/sheet', 'Master\Account::sheetKategoriAccount', ['filter' => 'Auth']);
 $routes->post('/kategori-account/save', 'Master\Account::saveKategoriAccount', ['filter' => 'Auth']);
 $routes->post('/kategori-account/update', 'Master\Account::updateKategoriAccount', ['filter' => 'Auth']);
 $routes->post('/kategori-account/delete', 'Master\Account::deleteKategoriAccount', ['filter' => 'Auth']);
@@ -153,6 +154,7 @@ $routes->post('/kategori-account/delete', 'Master\Account::deleteKategoriAccount
 $routes->get('/header-account/all', 'Master\Account::allHeaderAccount', ['filter' => 'Auth']);
 $routes->get('/header-account/id/(:segment)', 'Master\Account::getByIdHeaderAccount/$1', ['filter' => 'Auth']);
 $routes->post('/header-account/save', 'Master\Account::saveHeaderAccount', ['filter' => 'Auth']);
+$routes->get('/header-account/sheet', 'Master\Account::sheetHeaderAccount', ['filter' => 'Auth']);
 $routes->post('/header-account/update', 'Master\Account::updateHeaderAccount', ['filter' => 'Auth']);
 $routes->post('/header-account/delete', 'Master\Account::deleteHeaderAccount', ['filter' => 'Auth']);
 
@@ -162,6 +164,7 @@ $routes->post('/sub-account/save', 'Master\Account::saveSubAccount', ['filter' =
 $routes->post('/sub-account/update', 'Master\Account::updateSubAccount', ['filter' => 'Auth']);
 $routes->post('/sub-account/update-status', 'Master\Account::updateStatusSubAccount', ['filter' => 'Auth']);
 $routes->post('/sub-account/delete', 'Master\Account::deleteSubAccount', ['filter' => 'Auth']);
+$routes->get('/sub-account/sheet', 'Master\Account::sheetSubAccount', ['filter' => 'Auth']);
 
 // KODE HS
 $routes->get('/hs-code', 'Master\HSCode::hsCode', ['filter' => 'Auth']);
