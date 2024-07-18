@@ -6,6 +6,8 @@ use App\Controllers\BaseController;
 use App\Models\Sub_AkunsModel;
 use App\Models\KategoriAkunsModel;
 use App\Models\HeaderAkunsModel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Account extends BaseController
 {
@@ -367,6 +369,73 @@ class Account extends BaseController
         return;
     }
 
+    public function sheetKategoriAccount()
+    {
+
+        $list = $this->KategoriAkunsModel
+            ->select('kategori_akuns.*, metadata.value as kelompok_akun')
+            ->join('metadata', 'kategori_akuns.kelompok_id = metadata.id', 'left')
+            ->where('kategori_akuns.deletedAt', null)
+            ->where('company_id', $this->this_company_id)
+            ->findAll();
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $headerStyleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+        $dataStyleArray = [
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'No.')
+            ->setCellValue('B1', 'Kelompok Akun')
+            ->setCellValue('C1', 'No. Kategori Akun')
+            ->setCellValue('D1', 'Nama Kategori Akun');
+
+        $sheet->getStyle('A1:D1')->applyFromArray($headerStyleArray);
+
+        $no = 1;
+        $column = 2;
+        foreach ($list as $l) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $column, $no++)
+                ->setCellValue('B' . $column,  $l['kelompok_akun'])
+                ->setCellValue('C' . $column,  $l['no_kategori'])
+                ->setCellValue('D' . $column,  $l['nama_kategori']);
+
+            $sheet->getStyle('A' . $column . ':D' . $column)->applyFromArray($dataStyleArray);
+            $column++;
+        }
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Sheet Kategori Akun';
+        foreach (range('A', 'D') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Laporan-Kategori Akun';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
+    }
+
     public function allHeaderAccount()
     {
         $draw = $this->request->getVar('draw');
@@ -610,6 +679,74 @@ class Account extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function sheetHeaderAccount()
+    {
+
+        $list = $this->HeaderAkunsModel
+            ->select('header_akuns.*,kategori_akuns.nama_kategori')
+            ->join('kategori_akuns', 'kategori_akuns.id = header_akuns.kategori_id', 'left')
+            ->where('header_akuns.deletedAt', null)
+            ->where('header_akuns.company_id', $this->this_company_id)
+            ->findAll();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $headerStyleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+        $dataStyleArray = [
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'No.')
+            ->setCellValue('B1', 'Kategori Akun')
+            ->setCellValue('C1', 'No. Header Akun')
+            ->setCellValue('D1', 'Nama Header Akun');
+
+        $sheet->getStyle('A1:D1')->applyFromArray($headerStyleArray);
+
+        $no = 1;
+        $column = 2;
+        foreach ($list as $l) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $column, $no++)
+                ->setCellValue('B' . $column,  empty($l['nama_kategori']) ? "-" : $l['nama_kategori'])
+                ->setCellValue('C' . $column,  $l['no_header'])
+                ->setCellValue('D' . $column,  $l['nama_header']);
+
+            $sheet->getStyle('A' . $column . ':D' . $column)->applyFromArray($dataStyleArray);
+            $column++;
+        }
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Sheet Header Akun';
+        foreach (range('A', 'D') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Laporan-Header Akun';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
     }
 
     public function allSubAccount()
@@ -918,6 +1055,86 @@ class Account extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function sheetSubAccount()
+    {
+
+        $list = $this->Sub_AkunsModel
+            ->select('sub_akuns.*, kategori_akuns.nama_kategori, m1.value as kelompok_akun, m2.value as akun_coa,
+            header_akuns.no_header, header_akuns.nama_header')
+            ->join('kategori_akuns', 'kategori_akuns.id = sub_akuns.kategori_id', 'left')
+            ->join('header_akuns', 'sub_akuns.header_id = header_akuns.id', 'left')
+            ->join('metadata m1', 'kategori_akuns.kelompok_id = m1.id', 'left')
+            ->join('metadata m2', 'sub_akuns.coa_id = m2.id', 'left')
+            ->where('sub_akuns.deletedAt', null)
+            ->where('sub_akuns.company_id', $this->this_company_id)
+            ->findAll();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $headerStyleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+        $dataStyleArray = [
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'No.')
+            ->setCellValue('B1', 'Kategori Akun')
+            ->setCellValue('C1', 'No. Header Akun')
+            ->setCellValue('D1', 'Header Akun')
+            ->setCellValue('E1', 'No. Sub Akun')
+            ->setCellValue('F1', 'Nama Sub Akun')
+            ->setCellValue('G1', 'COA')
+            ->setCellValue('H1', 'Status');
+
+        $sheet->getStyle('A1:H1')->applyFromArray($headerStyleArray);
+
+        $no = 1;
+        $column = 2;
+        foreach ($list as $l) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $column, $no++)
+                ->setCellValue('B' . $column,  $l['nama_kategori'])
+                ->setCellValue('C' . $column,  $l['no_header'])
+                ->setCellValue('D' . $column,  $l['nama_header'])
+                ->setCellValue('E' . $column,  $l['no_sub'])
+                ->setCellValue('F' . $column,  $l['nama_sub'])
+                ->setCellValue('G' . $column,  $l['akun_coa'])
+                ->setCellValue('H' . $column,  $l['status'] == 'Void' ? 'Tidak Aktif' : 'Aktif');
+
+            $sheet->getStyle('A' . $column . ':H' . $column)->applyFromArray($dataStyleArray);
+            $column++;
+        }
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Sheet Sub Akun';
+        foreach (range('A', 'H') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Laporan-Sub Akun';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
     }
 
     public function dropdownAPAR()

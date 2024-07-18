@@ -190,6 +190,9 @@
                     <div class="collapse-kategori-list show" id="collapseKategoriList">
                         <div class="d-flex float-right mb-3">
                             <input autocomplete="one-time-code" class="form-control search search-kategori form-out-search mr-3" placeholder="Search" />
+                            <a class="btn btn-warning btn-print float-right text-white mr-2 d-flex align-items-center justify-content-center " target="_blank" href=" <?= base_url("/kategori-account/sheet"); ?>">
+                                <i class="fa-solid fa-print mx-2"></i> Export
+                            </a>
                             <button class="btn btn-show-form btn-add float-right btn-show-form-kategori" data-btn="create-modal">
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
@@ -215,6 +218,9 @@
                     <div class="collapse-header-list show" id="collapseHeaderList">
                         <div class="d-flex float-right mb-3">
                             <input autocomplete="one-time-code" class="form-control search cari-header form-out-search mr-3" placeholder="Search" />
+                            <a class="btn btn-warning btn-print float-right text-white mr-2 d-flex align-items-center justify-content-center " target="_blank" href=" <?= base_url("/header-account/sheet"); ?>">
+                                <i class="fa-solid fa-print mx-2"></i> Export
+                            </a>
                             <button class="btn btn-show-form btn-add float-right btn-show-form-header" data-btn="create-modal">
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
@@ -244,6 +250,9 @@
                                 <option value="Aktif">Aktif</option>
                                 <option value="Void">Void</option>
                             </select>
+                            <a class="btn btn-warning btn-print float-right text-white mr-2 d-flex align-items-center justify-content-center " target="_blank" href=" <?= base_url("/sub-account/sheet"); ?>">
+                                <i class="fa-solid fa-print mx-2"></i> Export
+                            </a>
                             <button class="btn btn-show-form btn-add float-right btn-show-form-sub" data-btn="create-modal">
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
