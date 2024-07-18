@@ -254,7 +254,7 @@
                     $totalTotal = ($totalTotal == 0) ? 1 : $totalTotal;
                     ?>
                     <tr>
-                        <td colspan="5">Total Upah Kopek</td>
+                        <td colspan="5">Total Upah Kopek / Kg</td>
                         <td><?= number_format(($jumboTotal * $upahKopekJumbo), 2) ?></td>
                         <td><?= number_format(($exLumpTotal * $upahKopekExLump), 2) ?></td>
                         <td><?= number_format(($lumpTotal * $upahKopekLump), 2) ?></td>

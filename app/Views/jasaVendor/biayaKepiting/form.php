@@ -974,7 +974,7 @@
 
 
                 var newRow3 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-                newRow3.append($('<td style="text-align: center;">').html("<b>TOTAL UPAH KOPEK</b>"));
+                newRow3.append($('<td style="text-align: center;">').html("<b>TOTAL UPAH KOPEK / KG</b>"));
                 newRow3.append($('<td>').text((jumboTotal != 0 ? formatRupiah((jumboTotal * upahKopekJumbo).toFixed(2)) : '0')));
                 newRow3.append($('<td>').text((exLumpTotal != 0 ? formatRupiah((exLumpTotal * upahKopekExLump).toFixed(2)) : '0')));
                 newRow3.append($('<td>').text((lumpTotal != 0 ? formatRupiah((lumpTotal * updahKopekLump).toFixed(2)) : '0')));
