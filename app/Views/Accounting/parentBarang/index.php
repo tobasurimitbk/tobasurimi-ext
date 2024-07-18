@@ -352,7 +352,7 @@
                 akun_ar_id: {
                     required: true
                 },
-                kategori: {
+                akun_pemakaian_id: {
                     required: true
                 },
             },
