@@ -6,7 +6,10 @@ use App\Controllers\BaseController;
 use App\Models\Sub_AkunsModel;
 use App\Models\KategoriAkunsModel;
 use App\Models\HeaderAkunsModel;
+use App\Models\MetadataModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Account extends BaseController
@@ -15,6 +18,7 @@ class Account extends BaseController
     protected $Sub_AkunsModel;
     protected $KategoriAkunsModel;
     protected $HeaderAkunsModel;
+    protected $metaDataModel;
     protected $this_company_id;
 
     public function __construct()
@@ -23,6 +27,7 @@ class Account extends BaseController
         $this->Sub_AkunsModel = new Sub_AkunsModel();
         $this->KategoriAkunsModel = new KategoriAkunsModel();
         $this->HeaderAkunsModel = new HeaderAkunsModel();
+        $this->metaDataModel = new MetadataModel();
         $this->this_company_id = session()->get("login")->this_company_id;
     }
 
@@ -435,6 +440,78 @@ class Account extends BaseController
         $writer->save('php://output');
         die;
     }
+    public function importKategoriAccount()
+    {
+        $rules = [
+            "file" => [
+                'rules' => 'uploaded[file]|ext_in[file,xlsx]',
+                'errors' => [
+                    'uploaded' => 'Tidak ada file yang di-upload.',
+                    'ext_in' => 'File yang di-upload harus berupa file Excel (.xlsx).',
+                ],
+
+            ],
+        ];
+
+        if ($this->validate($rules)) {
+
+            $file = $this->request->getFile('file');
+
+            $spreadsheet = IOFactory::load($file);
+            $worksheet = $spreadsheet->getActiveSheet();
+
+
+            $data = [];
+            $gagalArr = [];
+            $berhasilTotal = 0;
+            $rowIterator = $worksheet->getRowIterator(2);
+            foreach ($rowIterator as $row) {
+                $cellIterator = $row->getCellIterator();
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+                $data[] = $rowData;
+            }
+            for ($i = 0; $i < count($data); $i++) {
+                $kelompok = $this->metaDataModel->where('value', $data[$i][0])
+                    ->where('deletedAt', null)
+                    ->first();
+                $noKategori = $this->KategoriAkunsModel->where('no_kategori', $data[$i][1])->first();
+                if ($data[$i][1] != null) {
+                    if ($noKategori == null) {
+                        // Kategori Akun INSERTED
+                        $this->KategoriAkunsModel->insert([
+                            'company_id' => $this->this_company_id,
+                            'kelompok_id' => $kelompok['id'],
+                            'no_kategori' => $data[$i][1],
+                            'nama_kategori' => $data[$i][2],
+                        ]);
+                        $berhasilTotal++;
+                    } else {
+                        array_push($gagalArr, $data[$i]);
+                    }
+                }
+            }
+
+            $gagalTotal = count($gagalArr);
+
+            return response()->setJSON([
+                'message' => "Berhasil Import : $berhasilTotal Data, Gagal Import : $gagalTotal",
+                'status' => true,
+                'gagal' => $gagalArr,
+                'token' => csrf_hash()
+            ]);
+        } else {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash()
+            ];
+            return response()->setJSON($data);
+        }
+    }
 
     public function allHeaderAccount()
     {
@@ -747,6 +824,80 @@ class Account extends BaseController
 
         $writer->save('php://output');
         die;
+    }
+    public function importHeaderAccount()
+    {
+        $rules = [
+            "file" => [
+                'rules' => 'uploaded[file]|ext_in[file,xlsx]',
+                'errors' => [
+                    'uploaded' => 'Tidak ada file yang di-upload.',
+                    'ext_in' => 'File yang di-upload harus berupa file Excel (.xlsx).',
+                ],
+
+            ],
+        ];
+
+        if ($this->validate($rules)) {
+
+            $file = $this->request->getFile('file');
+
+            $spreadsheet = IOFactory::load($file);
+            $worksheet = $spreadsheet->getActiveSheet();
+
+
+            $data = [];
+            $gagalArr = [];
+            $berhasilTotal = 0;
+            $rowIterator = $worksheet->getRowIterator(2);
+            foreach ($rowIterator as $row) {
+                $cellIterator = $row->getCellIterator();
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+                $data[] = $rowData;
+            }
+
+            for ($i = 0; $i < count($data); $i++) {
+                $kategoriAkun = $this->KategoriAkunsModel->where('nama_kategori', $data[$i][0])
+                    ->where('company_id', $this->this_company_id)
+                    ->where('deletedAt', null)
+                    ->first();
+                $noHeader = $this->HeaderAkunsModel->where('no_header', $data[$i][1])->where('company_id', $this->this_company_id)->first();
+                if ($data[$i][1] != null) {
+                    if ($noHeader == null && $kategoriAkun != null) {
+                        // Header Akun INSERTED
+                        $this->HeaderAkunsModel->insert([
+                            'company_id' => $this->this_company_id,
+                            'kategori_id' => $kategoriAkun['id'],
+                            'no_header' => $data[$i][1],
+                            'nama_header' => $data[$i][2],
+                        ]);
+                        $berhasilTotal++;
+                    } else {
+                        array_push($gagalArr, $data[$i]);
+                    }
+                }
+            }
+
+            $gagalTotal = count($gagalArr);
+
+            return response()->setJSON([
+                'message' => "Berhasil Import : $berhasilTotal Data, Gagal Import : $gagalTotal",
+                'status' => true,
+                'gagal' => $gagalArr,
+                'token' => csrf_hash()
+            ]);
+        } else {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash()
+            ];
+            return response()->setJSON($data);
+        }
     }
 
     public function allSubAccount()
@@ -1135,6 +1286,91 @@ class Account extends BaseController
 
         $writer->save('php://output');
         die;
+    }
+    public function importSubAccount()
+    {
+        $rules = [
+            "file" => [
+                'rules' => 'uploaded[file]|ext_in[file,xlsx]',
+                'errors' => [
+                    'uploaded' => 'Tidak ada file yang di-upload.',
+                    'ext_in' => 'File yang di-upload harus berupa file Excel (.xlsx).',
+                ],
+
+            ],
+        ];
+
+        if ($this->validate($rules)) {
+
+            $file = $this->request->getFile('file');
+
+            $spreadsheet = IOFactory::load($file);
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $data = [];
+            $gagalArr = [];
+            $berhasilTotal = 0;
+            $rowIterator = $worksheet->getRowIterator(2);
+            foreach ($rowIterator as $row) {
+                $cellIterator = $row->getCellIterator();
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+                $data[] = $rowData;
+            }
+
+            for ($i = 0; $i < count($data); $i++) {
+                $headerAkun = $this->HeaderAkunsModel
+                    ->where('no_header',  $data[$i][0])
+                    ->where('company_id', $this->this_company_id)
+                    ->where('deletedAt', null)
+                    ->first();
+                $noSub = $this->Sub_AkunsModel
+                    ->where('no_sub', $data[$i][1])
+                    ->where('company_id', $this->this_company_id)
+                    ->where('deletedAt', null)
+                    ->first();
+                $coa = $this->metaDataModel
+                    ->where('value', $data[$i][3])
+                    ->first();
+                $res_header = $this->HeaderAkunsModel->get_by_id($headerAkun['id']);
+                if ($data[$i][1] != null) {
+                    if ($noSub == null && $headerAkun != null &&  $coa != null) {
+                        // sub Akun INSERTED
+                        $this->Sub_AkunsModel->insert([
+                            "company_id"    => $this->this_company_id,
+                            "header_id" => $headerAkun['id'],
+                            "kategori_id" => $res_header[0]["kategori_id"],
+                            "coa_id" => $coa['id'],
+                            "no_sub" => $data[$i][1],
+                            "nama_sub" => $data[$i][2],
+                            "status" => $data[$i][4] == 'Aktif' ? "Aktif" : "Void"
+                        ]);
+                        $berhasilTotal++;
+                    } else {
+                        array_push($gagalArr, $data[$i]);
+                    }
+                }
+            }
+
+            $gagalTotal = count($gagalArr);
+
+            return response()->setJSON([
+                'message' => "Berhasil Import : $berhasilTotal Data, Gagal Import : $gagalTotal",
+                'status' => true,
+                'gagal' => $gagalArr,
+                'token' => csrf_hash()
+            ]);
+        } else {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash()
+            ];
+            return response()->setJSON($data);
+        }
     }
 
     public function dropdownAPAR()

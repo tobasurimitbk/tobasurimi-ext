@@ -1,6 +1,30 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
+<div class="modal" id="import_excel_modal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title modal-title-import">Import <span class="akun-type"></span> Akun</h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary text-black" role="alert">
+                    UNDUH TEMPLEATE EXCEL <a id="link-import-excel" href="<?= base_url('assets/import/IMPORT_EXCEL_KATEGORI_AKUN.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                </div>
+                <form class="form-excel" method="post">
+                    <div class="form-floating" style="height: 50px;">
+                        <input type="file" name="file" id="file" accept=".xlsx" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-import-excel mr-2">Kembali</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-excel" onclick="importSheet('kategori')">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal add-modal-kategori" id="add_modal_kategori" tabindex="-1">
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
@@ -47,6 +71,7 @@
         </div>
     </div>
 </div>
+
 
 <div class="modal add-modal-header" id="add_modal_header" tabindex="-1">
     <div class="modal-dialog" style="min-width: 900px;">
@@ -188,14 +213,25 @@
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="kategori" role="tabpanel" aria-labelledby="kategori-tab">
                     <div class="collapse-kategori-list show" id="collapseKategoriList">
-                        <div class="d-flex float-right mb-3">
-                            <input autocomplete="one-time-code" class="form-control search search-kategori form-out-search mr-3" placeholder="Search" />
-                            <a class="btn btn-warning btn-print float-right text-white mr-2 d-flex align-items-center justify-content-center " target="_blank" href=" <?= base_url("/kategori-account/sheet"); ?>">
-                                <i class="fa-solid fa-print mx-2"></i> Export
-                            </a>
-                            <button class="btn btn-show-form btn-add float-right btn-show-form-kategori" data-btn="create-modal">
-                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                            </button>
+                        <div class="d-flex justify-content-between mb-3">
+                            <div class="d-flex float-right">
+                                <input autocomplete="one-time-code" class="form-control search search-kategori form-out-search mr-3" placeholder="Search" />
+                            </div>
+                            <div class="d-flex float-right">
+                                <?php if (can('Master Data', 'Kode Akun', 'p')) : ?>
+                                    <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right mr-3" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Import / Export
+                                    </button>
+                                    <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                                        <li><button class="dropdown-item btn-upload-excel-kategori">Import Excel</button></li>
+                                        <li><button class="dropdown-item" onclick="excel('<?= base_url("/kategori-account/sheet"); ?>')">Export Excel</button></li>
+                                    </ul>
+
+                                <?php endif; ?>
+                                <button class="btn btn-show-form btn-add float-right btn-show-form-kategori" data-btn="create-modal">
+                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                                </button>
+                            </div>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-bordered nowrap table-hover-tobasurimi kategoriDataTable" id="kategoriDataTable" width="100%" cellspacing="0">
@@ -216,14 +252,26 @@
                 </div>
                 <div class="tab-pane fade" id="header" role="tabpanel" aria-labelledby="header-tab">
                     <div class="collapse-header-list show" id="collapseHeaderList">
-                        <div class="d-flex float-right mb-3">
-                            <input autocomplete="one-time-code" class="form-control search cari-header form-out-search mr-3" placeholder="Search" />
-                            <a class="btn btn-warning btn-print float-right text-white mr-2 d-flex align-items-center justify-content-center " target="_blank" href=" <?= base_url("/header-account/sheet"); ?>">
-                                <i class="fa-solid fa-print mx-2"></i> Export
-                            </a>
-                            <button class="btn btn-show-form btn-add float-right btn-show-form-header" data-btn="create-modal">
-                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                            </button>
+                        <div class="d-flex justify-content-between mb-3">
+                            <div class="d-flex float-right">
+                                <input autocomplete="one-time-code" class="form-control search cari-header form-out-search mr-3" placeholder="Search" />
+                            </div>
+                            <div class="d-flex float-right">
+                                <?php if (can('Master Data', 'Kode Akun', 'p')) : ?>
+                                    <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right mr-3" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Import / Export
+                                    </button>
+                                    <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                                        <li><button class="dropdown-item btn-upload-excel-header">Import Excel</button></li>
+                                        <li><button class="dropdown-item" onclick="excel('<?= base_url("/header-account/sheet"); ?>')">Export Excel</button></li>
+                                    </ul>
+
+                                <?php endif; ?>
+
+                                <button class="btn btn-show-form btn-add float-right btn-show-form-header" data-btn="create-modal">
+                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                                </button>
+                            </div>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-bordered nowrap table-hover-tobasurimi headerDataTable" id="headerDataTable" width="100%" cellspacing="0">
@@ -244,18 +292,27 @@
                 </div>
                 <div class="tab-pane fade" id="sub" role="tabpanel" aria-labelledby="sub-tab">
                     <div class="collapse-header-list show" id="collapseSubList">
-                        <div class="d-flex float-right mb-3 col-nav-tabs-contents-input-btn">
-                            <input autocomplete="one-time-code" class="form-control search search-sub form-out-search mr-3" placeholder="Search" />
-                            <select class="form-select status status-sub mr-3 form-select-no-title" name="status" id="status" aria-label="Floating label select example">
-                                <option value="Aktif">Aktif</option>
-                                <option value="Void">Void</option>
-                            </select>
-                            <a class="btn btn-warning btn-print float-right text-white mr-2 d-flex align-items-center justify-content-center " target="_blank" href=" <?= base_url("/sub-account/sheet"); ?>">
-                                <i class="fa-solid fa-print mx-2"></i> Export
-                            </a>
-                            <button class="btn btn-show-form btn-add float-right btn-show-form-sub" data-btn="create-modal">
-                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                            </button>
+                        <div class="d-flex justify-content-between mb-3 ">
+                            <div class="d-flex float-right col-nav-tabs-contents-input-btn">
+                                <input autocomplete="one-time-code" class="form-control search search-sub form-out-search mr-3" placeholder="Search" />
+                                <select class="form-select status status-sub mr-3 form-select-no-title" name="status" id="status" aria-label="Floating label select example">
+                                    <option value="Aktif">Aktif</option>
+                                    <option value="Void">Void</option>
+                                </select>
+                            </div>
+                            <div class="d-flex float-right">
+                                <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right mr-3" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Import / Export
+                                </button>
+                                <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                                    <li><button class="dropdown-item btn-upload-excel-sub">Import Excel</button></li>
+                                    <li><button class="dropdown-item" onclick="excel('<?= base_url("/sub-account/sheet"); ?>')">Export Excel</button></li>
+                                </ul>
+
+                                <button class="btn btn-show-form btn-add float-right btn-show-form-sub" data-btn="create-modal">
+                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                                </button>
+                            </div>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-bordered nowrap table-hover-tobasurimi subDataTable" id="subDataTable" width="100%" cellspacing="0">
@@ -1732,6 +1789,117 @@
         } else {
             sortTypeSub = sortTypeSub === "asc" ? "desc" : "asc";
         }
+    }
+
+    $('.btn-upload-excel-kategori').click(function() {
+        $('#file').val(null);
+        $('#import_excel_modal').modal('show');
+        $(".akun-type").text('Kategori')
+        $('.btn-submit-excel').attr('onclick', "importSheet('kategori')");
+
+    });
+
+    $('.btn-upload-excel-header').click(function() {
+        $('#file').val(null);
+        $('#import_excel_modal').modal('show');
+        $(".akun-type").text('Header');
+
+    });
+    $('.btn-upload-excel-sub').click(function() {
+        $('#file').val(null);
+        $('#import_excel_modal').modal('show');
+        $(".akun-type").text('Sub');
+    });
+
+    $('.btn-discard-import-excel').click(function() {
+        $('#import_excel_modal').modal('hide');
+    });
+
+    $('#kategori').click(function() {
+        $('#link-import-excel').attr('href', "<?= base_url('assets/import/IMPORT_EXCEL_KATEGORI_AKUN.xlsx') ?>");
+    });
+    $('#header').click(function() {
+        $('#link-import-excel').attr('href', "<?= base_url('assets/import/IMPORT_EXCEL_HEADER_AKUN.xlsx') ?>");
+    });
+    $('#sub').click(function() {
+        $('#link-import-excel').attr('href', "<?= base_url('assets/import/IMPORT_EXCEL_SUB_AKUN.xlsx') ?>");
+    });
+
+    var validator_excel = $(".form-excel").validate({
+        rules: {
+            file: {
+                required: true
+            },
+        },
+        messages: {
+            file: {
+                required: "File wajib diisi"
+            },
+        },
+    });
+
+
+    function importSheet(TipeAkun) {
+        var tipe_akun = TipeAkun;
+        var baseurl = "<?= base_url(); ?>";
+        console.log(tipe_akun);
+
+        if ($('.form-excel').valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Import Excel?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Kembali',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let csrf = $(`[name="${csrfToken}"]`);
+                    let formData = new FormData(document.querySelector(".form-excel"));
+
+                    $.ajax({
+                        url: baseurl + "/" + tipe_akun + "-account/import",
+                        data: formData,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            }
+                        },
+                    });
+
+                }
+            })
+        }
+
+    }
+    const excel = function(url) {
+        window.open(url);
     }
 </script>
 
