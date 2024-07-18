@@ -93,7 +93,9 @@ class JurnalUmumModel extends Model
             ->join('sub_akuns', 'sub_akuns.id = jurnal_umum.id_coa', 'left')
             ->join('kategori_akuns', 'kategori_akuns.id = sub_akuns.kategori_id', 'left')
             ->join('metadata', 'metadata.id = kategori_akuns.kelompok_id', 'left')
-            ->like('tanggal_jurnal', $where['tanggal_jurnal'])
+            // ->like('tanggal_jurnal', $where['tanggal_jurnal'])
+            ->where('tanggal_jurnal >=', $where['tanggal_awal'])
+            ->where('tanggal_jurnal <=', $where['tanggal_akhir'])
             ->where('jurnal_umum.deletedAt', $where['deletedAt'])
             ->where('jurnal_umum.id_coa', $where['id_coa'])
             ->findAll();

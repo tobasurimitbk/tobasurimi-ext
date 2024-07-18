@@ -883,7 +883,7 @@ class RMPurchaseOrderModel extends Model
         }
     }
 
-    public function getPOBBCondition($divisi_id, $po_date, $kategori_id)
+    public function getPOBBCondition($divisi_id, $po_date_awal, $po_date_akhir, $kategori_id)
     {
 
         $selectQry = "
@@ -910,7 +910,8 @@ class RMPurchaseOrderModel extends Model
             ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
             ->where('rm_purchase_orders.divisi_id', $divisi_id)
             ->where('rm_purchase_orders.is_posted', '1')
-            ->like('rm_purchase_orders.po_date', date('Y-m', strtotime($po_date)))
+            ->where('rm_purchase_orders.po_date >=', date('Y-m-d', strtotime($po_date_awal)))
+            ->where('rm_purchase_orders.po_date <=', date('Y-m-d', strtotime($po_date_akhir)))
             ->where('account_barang.kategori_id', $kategori_id)
             ->where('account_barang.divisi_id', $divisi_id)
             ->findAll();

@@ -551,12 +551,14 @@ class RasioController extends BaseController
 
     public function getRasioBarangJadi()
     {
-        if (!empty($this->request->getVar('bulan'))) {
-            $monthData = $this->request->getVar('bulan');
-            list($month, $year) = explode('/', $monthData);
-            $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        if (!empty($this->request->getVar('tanggal_awal')) && !empty($this->request->getVar('tanggal_akhir'))) {
+            $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+            $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
+            // list($month, $year) = explode('/', $monthData);
+            // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
             $conditionProduction = [
-                'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+                'tanggal_awal' => $tanggal_awal,
+                'tanggal_akhir' => $tanggal_akhir,
                 'divisi_id' => $this->request->getVar('department'),
                 'kategori_id' => $this->request->getVar('kategori'),
             ];
@@ -586,22 +588,34 @@ class RasioController extends BaseController
 
     public function getRasioBarangDigunakan()
     {
-        if (!empty($this->request->getVar('bulan'))) {
+        if (!empty($this->request->getVar('tanggal_awal')) && !empty($this->request->getVar('tanggal_akhir'))) {
+            // if (!empty($this->request->getVar('bulan'))) {
             $dataResultPO = [];
-            $monthData = $this->request->getVar('bulan');
-            list($month, $year) = explode('/', $monthData);
+            $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+            $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
 
-            $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+            // $monthData = $this->request->getVar('bulan');
+            // list($month, $year) = explode('/', $monthData);
+
+            // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
             $divisiID = $this->request->getVar('department');
             $kategoriID = $this->request->getVar('kategori');
 
             $conditionProduction = [
-                'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+                'tanggal_awal' => $tanggal_awal,
+                'tanggal_akhir' => $tanggal_akhir,
                 'divisi_id' => $this->request->getVar('department'),
+                // 'kategori_id' => $this->request->getVar('kategori'),
             ];
+            //     $conditionProduction = [
+            //     'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+            //     'divisi_id' => $this->request->getVar('department'),
+            // ];
+            // var_dump($conditionProduction);
+            // exit;
             $kursValue = 1;
-            $poBBLokal = $this->rmPurchaseOrderModel->getPOBBCondition($divisiID, $convertedDate, $kategoriID);
-            $poBBImport = $this->rmImportPOModel->getPOBBCondition($divisiID, $convertedDate, $kategoriID);
+            $poBBLokal = $this->rmPurchaseOrderModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID);
+            $poBBImport = $this->rmImportPOModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID);
 
             $dataResultPO = array_merge($dataResultPO, $poBBLokal, $poBBImport);
             $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
@@ -1008,12 +1022,16 @@ class RasioController extends BaseController
 
     public function getRasioBarangDigunakanJadi()
     {
-        if (!empty($this->request->getVar('bulan'))) {
-            $monthData = $this->request->getVar('bulan');
-            list($month, $year) = explode('/', $monthData);
-            $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        // if (!empty($this->request->getVar('bulan'))) {
+        if (!empty($this->request->getVar('tanggal_awal')) && !empty($this->request->getVar('tanggal_akhir'))) {
+            // $monthData = $this->request->getVar('bulan');
+            // list($month, $year) = explode('/', $monthData);
+            // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+            $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+            $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
             $conditionProduction = [
-                'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+                'tanggal_awal' => $tanggal_awal,
+                'tanggal_akhir' => $tanggal_akhir,
                 'divisi_id' => $this->request->getVar('department'),
             ];
             $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuJadiWithDetail($conditionProduction);
@@ -1035,12 +1053,16 @@ class RasioController extends BaseController
 
     public function getRasioBarangDigunakanPenolong()
     {
-        if (!empty($this->request->getVar('bulan'))) {
-            $monthData = $this->request->getVar('bulan');
-            list($month, $year) = explode('/', $monthData);
-            $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        if (!empty($this->request->getVar('tanggal_awal')) && !empty($this->request->getVar('tanggal_akhir'))) {
+            // if (!empty($this->request->getVar('bulan'))) {
+            // $monthData = $this->request->getVar('bulan');
+            // list($month, $year) = explode('/', $monthData);
+            // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+            $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+            $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
             $conditionProduction = [
-                'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+                'tanggal_awal' => $tanggal_awal,
+                'tanggal_akhir' => $tanggal_akhir,
                 'divisi_id' => $this->request->getVar('department'),
             ];
             $productionResultDataTitle = $this->materialRequestsPenolongModel->getDataProductionResultBahanPenolongWithDetail($conditionProduction);
@@ -1141,18 +1163,21 @@ class RasioController extends BaseController
 
     public function getCost()
     {
-        $monthData = $this->request->getVar('bulan');
-        $department = $this->request->getVar('department');
-        $id_coa = $this->request->getVar('id_coa');
+        // $monthData = $this->request->getVar('bulan');
+        // $department = $this->request->getVar('department');
+        // $id_coa = $this->request->getVar('id_coa');
 
-        list($month, $year) = explode('/', $monthData);
-        $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        // list($month, $year) = explode('/', $monthData);
+        // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+        $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
 
         $settingCosting = $this->settingCosting->getSettingCosting();
 
         foreach ($settingCosting as &$valueSetting) {
             $condition = [
-                'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+                'tanggal_awal' => $tanggal_awal,
+                'tanggal_akhir' => $tanggal_akhir,
                 'id_coa' => $valueSetting['coa_id'],
             ];
             $jurnalData = $this->jurnalUmumModel->getDataJurnalForCosting($condition);
@@ -1174,15 +1199,18 @@ class RasioController extends BaseController
 
     public function getDataJurnal()
     {
-        $monthData = $this->request->getVar('bulan');
-        $department = $this->request->getVar('department');
+        // $monthData = $this->request->getVar('bulan');
+        // $department = $this->request->getVar('department');
         $id_coa = $this->request->getVar('id_coa');
 
-        list($month, $year) = explode('/', $monthData);
-        $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        // list($month, $year) = explode('/', $monthData);
+        // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+        $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
 
         $condition = [
-            'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+            'tanggal_awal' => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
             'id_coa' => $id_coa,
         ];
         $jurnalData = $this->jurnalUmumModel->getDataJurnalForCosting($condition);
@@ -1250,11 +1278,14 @@ class RasioController extends BaseController
 
     public function getSaldoAwal()
     {
-        $monthData = $this->request->getVar('bulan');
-        list($month, $year) = explode('/', $monthData);
-        $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        // $monthData = $this->request->getVar('bulan');
+        // list($month, $year) = explode('/', $monthData);
+        // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+        $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
         $conditionProduction = [
-            'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+            'tanggal_awal' => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
             'divisi_id' => $this->request->getVar('divisi_id'),
         ];
         $kursValue = 1;
@@ -1313,7 +1344,7 @@ class RasioController extends BaseController
         }
         // var_dump($productionResultDataTitle);
         // var_dump($dataResults);
-        exit;
+        // exit;
         return response()->setJSON([
             'data' => $dataResults,
             'token' => csrf_hash(),
@@ -1323,14 +1354,17 @@ class RasioController extends BaseController
 
     public function getSaldoAdjusment()
     {
-        $monthData = $this->request->getVar('bulan');
-        list($month, $year) = explode('/', $monthData);
-        $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        // $monthData = $this->request->getVar('bulan');
+        // list($month, $year) = explode('/', $monthData);
+        // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+        $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
 
         $adjusment = $this->adjusmentModel
             ->select('adjusment.*, adjusment_detail.*')
             ->join('adjusment_detail', 'adjusment_detail.adjusment_id = adjusment.id', 'left')
-            ->like('adjusment.tanggal', date('Y-m', strtotime($convertedDate)))
+            ->where('adjusment.tanggal >=', $tanggal_awal)
+            ->where('adjusment.tanggal <=', $tanggal_akhir)
             ->where('adjusment.divisi_id', $this->request->getVar('divisi_id'))
             ->where('adjusment.company_id', $this->this_company_id)
             ->where('adjusment.status_posting', "1")
@@ -1368,14 +1402,17 @@ class RasioController extends BaseController
 
     public function getSaldoJual()
     {
-        $monthData = $this->request->getVar('bulan');
-        list($month, $year) = explode('/', $monthData);
-        $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        // $monthData = $this->request->getVar('bulan');
+        // list($month, $year) = explode('/', $monthData);
+        // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+        $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
 
         $mutasi = $this->mutasiModel
             ->select('mutasi.*, mutasi_detail.*')
             ->join('mutasi_detail', 'mutasi_detail.mutasi_id = mutasi.id', 'left')
-            ->like('mutasi.tanggal', date('Y-m', strtotime($convertedDate)))
+            ->where('mutasi.tanggal >=', $tanggal_awal)
+            ->where('mutasi.tanggal <=', $tanggal_akhir)
             ->where('mutasi.divisi_asal_id', $this->request->getVar('divisi_id'))
             ->where('mutasi.company_id', $this->this_company_id)
             ->where('mutasi.status_posting', "1")
@@ -1412,11 +1449,15 @@ class RasioController extends BaseController
 
     public function getSaldoTrimming()
     {
-        $monthData = $this->request->getVar('bulan');
-        list($month, $year) = explode('/', $monthData);
-        $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        // $monthData = $this->request->getVar('bulan');
+        // list($month, $year) = explode('/', $monthData);
+        // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+        $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
         $conditionProduction = [
-            'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+            'tanggal_awal' => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
+            // 'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
             'divisi_id' => $this->request->getVar('divisi_id'),
         ];
         $kursValue = 1;
@@ -1482,11 +1523,14 @@ class RasioController extends BaseController
 
     public function getSaldoKopek()
     {
-        $monthData = $this->request->getVar('bulan');
-        list($month, $year) = explode('/', $monthData);
-        $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        // $monthData = $this->request->getVar('bulan');
+        // list($month, $year) = explode('/', $monthData);
+        // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+        $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+        $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
         $conditionProduction = [
-            'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
+            'tanggal_awal' => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
             'divisi_id' => $this->request->getVar('divisi_id'),
         ];
         $kursValue = 1;

@@ -52,7 +52,20 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= !empty($rasio) ? date('m/Y', strtotime($rasio->bulan)) : "" ?>">
+                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal_awal" id="tanggal_awal" name="tanggal_awal" placeholder="Tanggal Awal Dibuat" value="<?= !empty($rasio) ? date('m/Y', strtotime($rasio->bulan)) : "" ?>">
+                                    <label for="floatingInput">Tanggal Dibuat</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal_akhir" id="tanggal_akhir" name="tanggal_akhir" placeholder="Tanggal Akhir Dibuat" value="<?= !empty($rasio) ? date('m/Y', strtotime($rasio->bulan)) : "" ?>">
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -320,13 +333,11 @@
     let list_items_overhead_cost = [];
     let list_items_fixed_cost = [];
 
-    $("#tanggal").datepicker({
+    $("#tanggal_awal, #tanggal_akhir").datepicker({
         todayHighlight: true,
-        format: "mm/yyyy",
+        format: "dd/mm/yyyy",
         orientation: "bottom auto",
-        autoclose: true,
-        startView: "months",
-        minViewMode: 1
+        autoclose: true
     }).change(function() {
         list_items_barang_jadi = [];
         list_items_barang_jadi_material_2 = [];
@@ -430,16 +441,18 @@
 
     const getDataJurnalSubsidi = function() {
         var department_id = $('#divisi_id').val();
-        var bulan = $('#tanggal').val();
+        var tanggal_awal = $('#tanggal_awal').val();
+        var tanggal_akhir = $('#tanggal_akhir').val();
         var coa_id = $('#akun_coa_subsidi').val();
-        if (department_id && bulan && coa_id) {
+        if (department_id && tanggal_awal && tanggal_akhir && coa_id) {
             setLoading();
             $.ajax({
                 url: `<?= base_url('rasio/get-jurnal'); ?>`,
                 method: "GET",
                 data: {
                     department: department_id,
-                    bulan: bulan,
+                    tanggal_awal: tanggal_awal,
+                    tanggal_akhir: tanggal_akhir,
                     id_coa: coa_id,
                 },
                 dataType: "json",
@@ -465,16 +478,18 @@
     }
     const getDataJurnalLain = function() {
         var department_id = $('#divisi_id').val();
-        var bulan = $('#tanggal').val();
+        var tanggal_awal = $('#tanggal_awal').val();
+        var tanggal_akhir = $('#tanggal_akhir').val();
         var coa_id = $('#akun_coa_biaya').val();
-        if (department_id && bulan && coa_id) {
+        if (department_id && tanggal_awal && tanggal_akhir && coa_id) {
             setLoading();
             $.ajax({
                 url: `<?= base_url('rasio/get-jurnal'); ?>`,
                 method: "GET",
                 data: {
                     department: department_id,
-                    bulan: bulan,
+                    tanggal_awal: tanggal_awal,
+                    tanggal_akhir: tanggal_akhir,
                     id_coa: coa_id,
                 },
                 dataType: "json",
@@ -500,16 +515,18 @@
     }
     const getDataJurnalKopek = function() {
         var department_id = $('#divisi_id').val();
-        var bulan = $('#tanggal').val();
+        var tanggal_awal = $('#tanggal_awal').val();
+        var tanggal_akhir = $('#tanggal_akhir').val();
         var coa_id = $('#akun_coa_kopek').val();
-        if (department_id && bulan && coa_id) {
+        if (department_id && tanggal_awal && tanggal_akhir && coa_id) {
             setLoading();
             $.ajax({
                 url: `<?= base_url('rasio/get-jurnal'); ?>`,
                 method: "GET",
                 data: {
                     department: department_id,
-                    bulan: bulan,
+                    tanggal_awal: tanggal_awal,
+                    tanggal_akhir: tanggal_akhir,
                     id_coa: coa_id,
                 },
                 dataType: "json",
@@ -535,16 +552,18 @@
     }
     const getDataRawMaterialI = function() {
         var department_id = $('#divisi_id').val();
-        var bulan = $('#tanggal').val();
+        var tanggal_awal = $('#tanggal_awal').val();
+        var tanggal_akhir = $('#tanggal_akhir').val();
         var kategori = $('#kategori').val();
-        if (department_id && bulan && kategori) {
+        if (department_id && tanggal_awal && tanggal_akhir && kategori) {
             setLoading();
             $.ajax({
                 url: `<?= base_url('rasio/get-barang-digunakan'); ?>`,
                 method: "GET",
                 data: {
                     department: department_id,
-                    bulan: bulan,
+                    tanggal_awal: tanggal_awal,
+                    tanggal_akhir: tanggal_akhir,
                     kategori: kategori,
                 },
                 dataType: "json",
@@ -577,7 +596,8 @@
                 method: "GET",
                 data: {
                     department: department_id,
-                    bulan: bulan,
+                    tanggal_awal: tanggal_awal,
+                    tanggal_akhir: tanggal_akhir,
                     kategori: kategori,
                 },
                 dataType: "json",
@@ -603,7 +623,8 @@
                 method: "GET",
                 data: {
                     department: department_id,
-                    bulan: bulan,
+                    tanggal_awal: tanggal_awal,
+                    tanggal_akhir: tanggal_akhir,
                     kategori: kategori,
                 },
                 dataType: "json",
@@ -652,7 +673,8 @@
                 method: "GET",
                 data: {
                     divisi_id: department_id,
-                    bulan: bulan,
+                    tanggal_awal: tanggal_awal,
+                    tanggal_akhir: tanggal_akhir,
                     kategori: kategori,
                 },
                 dataType: "json",
@@ -674,7 +696,8 @@
                 method: "GET",
                 data: {
                     divisi_id: department_id,
-                    bulan: bulan,
+                    tanggal_awal: tanggal_awal,
+                    tanggal_akhir: tanggal_akhir,
                     kategori: kategori,
                 },
                 dataType: "json",
@@ -702,7 +725,8 @@
                 method: "GET",
                 data: {
                     divisi_id: department_id,
-                    bulan: bulan,
+                    tanggal_awal: tanggal_awal,
+                    tanggal_akhir: tanggal_akhir,
                     kategori: kategori,
                 },
                 dataType: "json",
@@ -724,7 +748,8 @@
                 method: "GET",
                 data: {
                     divisi_id: department_id,
-                    bulan: bulan,
+                    tanggal_awal: tanggal_awal,
+                    tanggal_akhir: tanggal_akhir,
                     kategori: kategori,
                 },
                 dataType: "json",
@@ -746,16 +771,18 @@
 
     const getDataRawMaterialII = function() {
         var department_id = $('#divisi_id').val();
-        var bulan = $('#tanggal').val();
+        var tanggal_awal = $('#tanggal_awal').val();
+        var tanggal_akhir = $('#tanggal_akhir').val();
         var kategori = $('#kategori').val();
-        if (department_id && bulan && kategori) {
+        if (department_id && tanggal_awal && tanggal_akhir && kategori) {
             setLoading();
             $.ajax({
                 url: `<?= base_url('rasio/get-barang-digunakan-penolong'); ?>`,
                 method: "GET",
                 data: {
                     department: department_id,
-                    bulan: bulan,
+                    tanggal_awal: tanggal_awal,
+                    tanggal_akhir: tanggal_akhir,
                 },
                 dataType: "json",
                 success: function(res) {
@@ -780,7 +807,8 @@
                 method: "GET",
                 data: {
                     department: department_id,
-                    bulan: bulan,
+                    tanggal_awal: tanggal_awal,
+                    tanggal_akhir: tanggal_akhir,
                     kategori: kategori,
                 },
                 dataType: "json",
@@ -818,16 +846,18 @@
 
     const getDataCost = function() {
         var department_id = $('#divisi_id').val();
-        var bulan = $('#tanggal').val();
+        var tanggal_awal = $('#tanggal_awal').val();
+        var tanggal_akhir = $('#tanggal_akhir').val();
         var kategori = $('#kategori').val();
-        if (department_id && bulan && kategori) {
+        if (department_id && tanggal_awal && tanggal_akhir && kategori) {
             setLoading();
             $.ajax({
                 url: `<?= base_url('rasio/get-cost'); ?>`,
                 method: "GET",
                 data: {
                     department: department_id,
-                    bulan: bulan,
+                    tanggal_awal: tanggal_awal,
+                    tanggal_akhir: tanggal_akhir,
                 },
                 dataType: "json",
                 success: function(res) {
