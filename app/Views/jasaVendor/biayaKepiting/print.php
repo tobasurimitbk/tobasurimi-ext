@@ -338,7 +338,7 @@
                     <tbody>
                         <?php $no = 1;
                         $totalResult = 0; ?>
-                        <?php foreach ($biayaKepitingDetail as $index => $b) : ?>
+                        <?php foreach ($biayaKepitingBonus as $index => $b) : ?>
 
                             <tr>
                                 <?php $total = 0 ?>

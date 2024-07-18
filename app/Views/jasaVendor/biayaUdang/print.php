@@ -90,7 +90,7 @@
                 <tr>
                     <td>NAMA VENDOR</td>
                     <td>:</td>
-                    <td><?= $vendor == null ? "-" : strtoupper($vendor['name']) ?></td>
+                    <td><?= $vendor == null ? "-" : strtoupper($vendor != null ? $vendor['name'] : '') ?></td>
                 </tr>
                 <tr>
                     <td>TANGGAL</td>
@@ -122,8 +122,8 @@
                         <th style="text-align: center;">Mentah</th>
 
                         <th style="text-align: center;">KG REBUS</th>
-                        <th style="text-align: center;">KG DAGING FAUZY</th>
-                        <th style="text-align: center;">KG DAGING CN</th>
+                        <th style="text-align: center;">KG DAGING <?= strtoupper($vendor != null ? $vendor['name'] : '') ?></th>
+                        <th style="text-align: center;">KG DAGING <?= strtoupper($divisi != null ? $divisi['divisi'] : '') ?></th>
 
                         <th style="text-align: center;">Kg Daging</th>
                         <th style="text-align: center; width:50px">Ratio</th>

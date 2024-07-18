@@ -394,3 +394,10 @@ function getDateFromNomorAju($noAju)
 
    return $formattedDate;
 }
+function formatNpwp($value)
+{
+   if (is_string($value)) {
+      return preg_replace('/(\d{2})(\d{3})(\d{3})(\d{1})(\d{3})(\d{3})/', '$1.$2.$3.$4-$5.$6', $value);
+   }
+   return $value; // Return the original value if it's not a string
+}

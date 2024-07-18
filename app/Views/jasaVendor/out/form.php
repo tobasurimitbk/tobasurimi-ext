@@ -59,7 +59,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($jasaVendorOut) ? $jasaVendorOut['tanggal'] : $tanggal)); ?>">
+                                    <input <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($jasaVendorOut) ? $jasaVendorOut['tanggal'] : $tanggal)); ?>">
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -231,7 +231,7 @@
                 </div>
                 <div class="col-md-12">
                     <div class="table-responsive" style="margin-top: -10px;">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTable" width="100%" cellspacing="0">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts dataTable" id="selectedItemTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="text-align: center;">#</th>
@@ -242,13 +242,20 @@
                                     <th style="text-align: center;">Tanggal Penerimaan</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Satuan</th>
-                                    <th style="text-align: center;">Qty</th>
+                                    <th style="text-align: center;">Sisa Qty</th>
                                     <th style="text-align: center;">Qty Dikeluarkan</th>
                                     <th style="text-align: center;">Action</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table">
                             </tbody>
+                            <tfoot class="foot-detail-table" id="foot-detail-table">
+                                <tr>
+                                    <td colspan="11" style="text-align: center;">
+                                        Tidak Ada Barang
+                                    </td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -283,30 +290,6 @@
             [100]
         ],
         searching: true,
-        language: {
-            emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
-            }
-        }
-    });
-
-    var selectedItemTable = $('#selectedItemTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        processing: false,
-        serverSide: false,
-        ordering: true,
-        order: [],
-        fixedHeader: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        display: "stripe",
-        searching: false,
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -910,81 +893,70 @@
     }
 
     function drawTableSelectedItem(data) {
-        if ($.fn.DataTable.isDataTable('#selectedItemTable')) {
-            $('#selectedItemTable').DataTable().clear().draw();
-            selectedItemTable.destroy();
-        }
         var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
         const table = $('#selectedItemTable');
         var no = 1;
-        var qtyTotal = 0;
-        var stockTotal = 0;
-        $.each(data, function(i, v) {
-            var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                   ${no++} 
-                `
-            ));
-            newRow.append($('<td style="text-align: center;">').text(v.sumber));
-            newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
-            newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
-            newRow.append($('<td style="text-align: center;">').text(v.bc_type + '/' + v.no_aju));
-            newRow.append($('<td style="text-align: center;">').text(v.stock_date));
-            newRow.append($('<td style="text-align: center;">').text(v.barang));
-            newRow.append($('<td style="text-align: center;">').text(v.satuan));
-            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
-            if (typePengambilanStok == "FIFO") {
-                newRow.append($('<td style="text-align: center;">').text(v.qty));
-            } else {
+        $('.foot-detail-table').empty();
+        $('.body-table').empty();
+
+        if (data.length == 0) {
+            var newRow = '';
+            newRow += `
+                    <tr>
+                        <td colspan="11" style="text-align: center;">
+                            Tidak Ada Barang
+                        </td>
+                    </tr>
+                `;
+            $('.foot-detail-table').append(newRow);
+        } else {
+            var totalQtyKeluar = 0;
+            $.each(data, function(i, v) {
+                var newRow = $('<tr>');
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <input <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-out" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                   ${no++} 
                 `
                 ));
-            }
-
-            newRow.append($('<td style="text-align: center;">').html(
+                newRow.append($('<td style="text-align: center;">').text(v.sumber));
+                newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
+                newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
+                newRow.append($('<td style="text-align: center;">').text(v.bc_type + '/' + v.no_aju));
+                newRow.append($('<td style="text-align: center;">').text(v.stock_date));
+                newRow.append($('<td style="text-align: center;">').text(v.barang));
+                newRow.append($('<td style="text-align: center;">').text(v.satuan));
+                newRow.append($('<td style="text-align: center;">').text(v.stok_total));
+                if (typePengambilanStok == "FIFO") {
+                    newRow.append($('<td style="text-align: center;">').text(v.qty));
+                } else {
+                    newRow.append($('<td style="text-align: center;">').html(
+                        `
+                    <input <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-out" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
                 `
+                    ));
+                }
+
+                newRow.append($('<td style="text-align: center;">').html(
+                    `
                     <button <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
-            ));
+                ));
+                table.find('tbody').append(newRow);
+
+                totalQtyKeluar += Number(v.qty);
+            });
+
+            var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
+            newRow.append($('<td style="text-align: right;" colspan="9">').html("<b>GRAND TOTAL</b>"));
+            newRow.append($('<td>').text(totalQtyKeluar.toFixed(2)));
+            newRow.append($('<td>').text(''));
             table.find('tbody').append(newRow);
-            qtyTotal += Number(v.qty);
-            stockTotal += Number(v.stok_total);
-        });
 
-        var newRow1 = $('<tr>');
-        newRow1.append($('<td style="text-align:right;" colspan="8">').text('Total'));
-        newRow1.append($('<td style="text-align: center;">').text(stockTotal.toFixed(2)));
-        newRow1.append($('<td style="text-align: center;">').text(qtyTotal));
-        table.find('tbody').append(newRow1);
 
-        selectedItemTable = $('#selectedItemTable').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: false,
-            serverSide: false,
-            ordering: true,
-            order: [],
-            fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: true,
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
+        }
 
-        selectedItemTable.draw();
+
+
     }
 
     function deleteDetail(id) {

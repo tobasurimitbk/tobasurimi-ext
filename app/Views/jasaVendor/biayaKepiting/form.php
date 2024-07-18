@@ -250,7 +250,7 @@
 
     var listBarang = [];
     var listPerolehanGaji = [];
-
+    var listBonus = [];
 
     <?php if (!empty($biayaKepiting)) : ?>
         $.ajax({
@@ -265,6 +265,7 @@
                 csrf.val(res.token);
                 listBarang = res.data;
                 listPerolehanGaji = res.dataPerolehanGaji;
+                listBonus = res.dataBonus;
                 drawTable();
             }
         });
@@ -382,8 +383,6 @@
                     var barangClawElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].claw');
                     var barangMhElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].mh');
                     var barangCfElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].cf');
-                    var barangBonusKgElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].kg_bonus');
-                    var barangBonusNominalElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].bonus_nominal');
 
                     if (barangJumboElement.val() === undefined || barangJumboElement.val() === '') {
                         isValidBarangJumbo = false;
@@ -432,20 +431,6 @@
                         dataErrorBarangCf = listBarang[i];
                     } else {
                         listBarang[i].cf = barangCfElement.val();
-                    }
-
-                    if (barangBonusKgElement.val() === undefined || barangBonusKgElement.val() === '') {
-                        isValidBonusKg = false;
-                        dataErrorBonusKg = listBarang[i];
-                    } else {
-                        listBarang[i].kg_bonus = barangBonusKgElement.val();
-                    }
-
-                    if (barangBonusNominalElement.val() === undefined || barangBonusNominalElement.val() === '') {
-                        isValidBonusNominal = false;
-                        dataErrorBonusNominal = listBarang[i];
-                    } else {
-                        listBarang[i].bonus_nominal = barangBonusNominalElement.val();
                     }
                 });
             }
@@ -547,6 +532,26 @@
                 }
             });
 
+            // VALIDASI BONUS
+            $.each(listBonus, function(i, v) {
+                var barangBonusKgElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].kg_bonus');
+                var barangBonusNominalElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].bonus_nominal');
+
+                if (barangBonusKgElement.val() === undefined || barangBonusKgElement.val() === '') {
+                    isValidBonusKg = false;
+                    dataErrorBonusKg = listBonus[i];
+                } else {
+                    listBonus[i].kg_bonus = barangBonusKgElement.val();
+                }
+
+                if (barangBonusNominalElement.val() === undefined || barangBonusNominalElement.val() === '') {
+                    isValidBonusNominal = false;
+                    dataErrorBonusNominal = listBonus[i];
+                } else {
+                    listBonus[i].bonus_nominal = barangBonusNominalElement.val();
+                }
+            });
+
             // ALERT FORM 1
             if (!isValidBarangJumbo) {
                 Swal.fire({
@@ -629,9 +634,11 @@
                         let data = new FormData(document.querySelector(".create-form"));
                         data.append('listBarang', JSON.stringify(listBarang));
                         data.append('listPerolehanGaji', JSON.stringify(listPerolehanGaji));
+                        data.append("listBonus", JSON.stringify(listBonus));
 
                         if (id) {
                             // UPDATE
+                            data.append("jasa_vendor_in_id", $('#jasa_vendor_in_id option:selected').val());
                             $.ajax({
                                 url: "<?= base_url("biaya-kepiting/update"); ?>",
                                 data: data,
@@ -768,6 +775,7 @@
                 csrf.val(res.token);
                 listBarang = res.data;
                 listPerolehanGaji = res.dataPerolehanGaji;
+                listBonus = res.dataBonus;
                 drawTable();
             }
         });
@@ -1004,7 +1012,7 @@
             $('.body-table-3').empty();
             var no = 1;
             var totalBonusResult = 0;
-            $.each(listBarang, function(i, v) {
+            $.each(listBonus, function(i, v) {
                 var totalBonus = 0;
                 var newRow = $('<tr  style="color:whitesmoke;">');
                 totalBonus = parseFloat(v.kg_bonus) * parseFloat(v.bonus_nominal);
@@ -1028,13 +1036,13 @@
                             <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control bonus_nominal" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control bonus_nominal" type="text" value="${v.bonus_nominal}">
                         `
                 ));
-                newRow.append($('<td>').text(totalBonus));
+                newRow.append($('<td>').text(formatRupiah(totalBonus)));
                 table3.find('tbody').append(newRow);
             })
 
             var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
             newRow.append($('<td style="text-align: center;" colspan="5">').html("<b>GRAND TOTAL</b>"));
-            newRow.append($('<td>').text(totalBonusResult.toFixed(2)));
+            newRow.append($('<td>').text(formatRupiah(totalBonusResult.toFixed(2))));
             table3.find('tbody').append(newRow);
 
         }

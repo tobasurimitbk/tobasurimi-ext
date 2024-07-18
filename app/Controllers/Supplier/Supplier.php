@@ -128,7 +128,7 @@ class Supplier extends BaseController
                 "id"            => encrypt($data->id),
                 "name"          => strtoupper($data->name),
                 "address"       => strtoupper($data->address),
-                "no_npwp"       => $data->no_npwp
+                "no_npwp"       => formatNpwp($data->no_npwp)
             ]);
         }
 
@@ -204,7 +204,7 @@ class Supplier extends BaseController
                 "kode" => $this->request->getPost("kode"),
                 "name" => strtoupper($this->request->getVar("name")),
                 "address" => strtoupper($this->request->getVar("address")),
-                "no_npwp" => $this->request->getPost("no_npwp"),
+                "no_npwp" => str_replace(['.', '-'], '',  $this->request->getPost("no_npwp")),
                 "phone" => $this->request->getPost("phone"),
                 "contact_person" => $this->request->getPost("contact_person"),
                 "email" => $this->request->getPost("email"),
@@ -308,7 +308,7 @@ class Supplier extends BaseController
                 $payload = [
                     "name" => strtoupper($this->request->getVar("name")),
                     "address" => strtoupper($this->request->getVar("address")),
-                    "no_npwp" => $this->request->getPost("no_npwp"),
+                    "no_npwp" => str_replace(['.', '-'], '',  $this->request->getPost("no_npwp")),
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),
                     "email" => $this->request->getPost("email"),
@@ -391,7 +391,7 @@ class Supplier extends BaseController
                 "id"            => $data->id,
                 "name"          => strtoupper($data->name),
                 "address"       => strtoupper($data->address),
-                "no_npwp"       => $data->no_npwp,
+                "no_npwp"       => formatNpwp($data->no_npwp),
                 "phone"         => $data->phone
             ]);
         }
@@ -462,7 +462,7 @@ class Supplier extends BaseController
                 "kode" => $this->request->getPost("kode"),
                 "name" => strtoupper($this->request->getVar("name")),
                 "address" => strtoupper($this->request->getVar("address")),
-                "no_npwp" => $this->request->getPost("no_npwp"),
+                "no_npwp" => str_replace(['.', '-'], '',  $this->request->getPost("no_npwp")),
                 "phone" => $this->request->getPost("phone"),
                 "contact_person" => $this->request->getPost("contact_person"),
                 "email" => $this->request->getPost("email"),
@@ -558,7 +558,7 @@ class Supplier extends BaseController
                 $payload = [
                     "name" => strtoupper($this->request->getVar("name")),
                     "address" => strtoupper($this->request->getVar("address")),
-                    "no_npwp" => $this->request->getPost("no_npwp"),
+                    "no_npwp" => str_replace(['.', '-'], '',  $this->request->getPost("no_npwp")),
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),
                     "email" => $this->request->getPost("email"),

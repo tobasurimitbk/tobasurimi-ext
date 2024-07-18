@@ -86,7 +86,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)">
+                                <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)" onkeyup="this.value = formatNpwp(this.value.replace(/\D/g, ''))">
                                 <label for="floatingInput">NPWP (Opsional)</label>
                             </div>
                         </div>
@@ -828,10 +828,10 @@
                 name: {
                     required: true
                 },
-                no_npwp: {
-                    minlength: 15,
-                    maxlength: 15,
-                }
+                // no_npwp: {
+                //     minlength: 15,
+                //     maxlength: 15,
+                // }
             },
             messages: {
                 kode: {
@@ -840,10 +840,10 @@
                 name: {
                     required: "Nama wajib diisi"
                 },
-                no_npwp: {
-                    minlength: "Nomor NPWP minimal 15 angka",
-                    maxlength: "Nomor NPWP maksimal 15 angka",
-                }
+                // no_npwp: {
+                //     minlength: "Nomor NPWP minimal 15 angka",
+                //     maxlength: "Nomor NPWP maksimal 15 angka",
+                // }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -867,7 +867,7 @@
             },
         });
 
-        $(".no_npwp").mask("000000000000000")
+        $(".no_npwp").mask("000000000000000000000")
 
         $(".phone").mask("0000000000000")
 
@@ -958,7 +958,7 @@
                         $(".kode").val(res.data.kode);
                         $(".name").val(res.data.name);
                         $(".address").val(res.data.address);
-                        $(".no_npwp").val(res.data.no_npwp);
+                        $(".no_npwp").val(formatNpwp(res.data.no_npwp));
                         $(".phone").val(res.data.phone);
                         $(".contact_person").val(res.data.contact_person);
                         $(".email").val(res.data.email);
@@ -1174,6 +1174,12 @@
     //     secondTable.ajax.reload()
     //     $(".harga-modal").modal("show")
     // }
+
+    function formatNpwp(value) {
+        if (typeof value === 'string') {
+            return value.replace(/(\d{2})(\d{3})(\d{3})(\d{1})(\d{3})(\d{3})/, '$1.$2.$3.$4-$5.$6');
+        }
+    }
 
     let printLaporan = function(val) {
 

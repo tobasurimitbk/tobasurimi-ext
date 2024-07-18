@@ -291,10 +291,7 @@
                 name: {
                     required: true
                 },
-                no_npwp: {
-                    minlength: 15,
-                    maxlength: 15,
-                }
+
             },
             messages: {
                 kode: {
@@ -303,10 +300,7 @@
                 name: {
                     required: "Nama wajib diisi"
                 },
-                no_npwp: {
-                    minlength: "Nomor NPWP minimal 15 angka",
-                    maxlength: "Nomor NPWP maksimal 15 angka",
-                }
+
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -330,7 +324,7 @@
             },
         });
 
-        $(".no_npwp").mask("000000000000000")
+        $(".no_npwp").mask("000000000000000000000")
 
         $(".phone").mask("0000000000000")
 
@@ -403,7 +397,7 @@
                         $(".kode").val(res.data.kode);
                         $(".name").val(res.data.name);
                         $(".address").val(res.data.address);
-                        $(".no_npwp").val(res.data.no_npwp);
+                        $(".no_npwp").val(formatNpwp(res.data.no_npwp));
                         $(".phone").val(res.data.phone);
                         $(".contact_person").val(res.data.contact_person);
                         $(".email").val(res.data.email);
