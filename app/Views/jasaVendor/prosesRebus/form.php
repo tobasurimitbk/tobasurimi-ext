@@ -622,6 +622,7 @@
             } else {
                 deleteByStockID(stokRebusID);
                 // STOK REBUS OUT
+                var idStockInserted = [];
                 $.each(listStockAsal, function(i, v) {
                     var currentID = Number(v.id);
                     if ($.inArray(currentID, dataIds) == -1) {
@@ -635,24 +636,31 @@
 
                             listStockSelected.push(listStockAsal[i]);
                             qtyRebusFifo = qtyRebusFifo - rebusQty;
+                            // MASUKKAN YANG BARU
+                            idStockInserted.push(listStockAsal[i].id);
                         }
                     }
                 });
                 // STOK HASIL REBUS
-                var lengthStockSelected = listStockSelected.length;
+                var lengthStockSelected = idStockInserted.length;
                 var qtyHasilBagi = qtyHasilRebusFifo / lengthStockSelected;
                 qtyHasilBagi = qtyHasilBagi.toFixed(2);
 
                 $.each(listStockSelected, function(i, v) {
-                    listStockSelected[i].output = {
-                        barang: barangIn.data('barang'),
-                        kode_satuan: barangIn.data('kode_satuan'),
-                        stock_id: barangIn.data('stock_id'),
-                        qty: qtyHasilBagi
+                    if ($.inArray(v.id, idStockInserted) !== -1) { // Cek apakah elemen ditemukan dalam array
+                        listStockSelected[i].output = {
+                            barang: barangIn.data('barang'),
+                            kode_satuan: barangIn.data('kode_satuan'),
+                            stock_id: barangIn.data('stock_id'),
+                            qty: qtyHasilBagi
+                        };
                     }
                 });
 
+
             }
+
+            // console.log(listStockSelected);
             drawTableSelectedItem(listStockSelected);
         }
 
