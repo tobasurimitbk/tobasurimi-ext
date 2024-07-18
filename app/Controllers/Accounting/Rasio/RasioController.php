@@ -1334,8 +1334,8 @@ class RasioController extends BaseController
                         $dataResult[$i]['stok_produksi'] = $valueProductionResultData['qty'];
                         break;
                     }
-                    var_dump($dataResult);
-                    var_dump($valueProductionResultData);
+                    // var_dump($dataResult);
+                    // var_dump($valueProductionResultData);
                 }
             }
 
