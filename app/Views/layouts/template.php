@@ -148,6 +148,10 @@
             if (String.fromCharCode(event.keyCode).match(/[^0-9A-Za-z ]/g)) return false;
             // if (String.fromCharCode(event.keyCode).match(/[^0-9A-Za-z,-_/.() ]/g)) return false;
         }
+
+        $(document).on('select2:open', () => {
+            document.querySelector('.select2-search__field').focus();
+        });
     </script>
     <!-- General JS Scripts -->
     <script src="<?= base_url(); ?>assets/js/popper.min.js?v=<?= time(); ?>"></script>
