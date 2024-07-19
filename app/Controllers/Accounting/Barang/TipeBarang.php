@@ -35,7 +35,7 @@ class TipeBarang extends BaseController
         $Sub_AkunsModel = new Sub_AkunsModel();
 
         $type = "bahan_baku";
-        $subAkunsModel = $Sub_AkunsModel->asObject()->findAll();
+        $subAkunsModel = $Sub_AkunsModel->getAPAR($this->this_company_id);
         $divisi = $this->divisiModel->getDivisiAccess();
 
         if (!empty(@$_GET['type'])) {
@@ -161,6 +161,9 @@ class TipeBarang extends BaseController
                 ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
                 ->where('barang_master.id', $data['id'])
                 ->where('divisi_id', $data['divisi_id'])
+                ->where('barang_master.company_id', $this->this_company_id)
+                ->where('account_barang.deleted_at', null)
+                ->where('barang_master.deletedAt', null)
                 ->first();
 
             // dd($dataAccountBarang);

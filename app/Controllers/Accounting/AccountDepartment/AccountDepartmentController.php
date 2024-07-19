@@ -103,16 +103,16 @@ class AccountDepartmentController extends BaseController
         ];
 
         $Sub_AkunsModel = new Sub_AkunsModel();
-        $dataNamaAP = "";
-        $dataNamaAR = "";
-        $dataNamaGaji = "";
-        $dataNamaHPP = "";
+        $dataNamaAP = "-";
+        $dataNamaAR = "-";
+        $dataNamaGaji = "-";
+        $dataNamaHPP = "-";
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
         $res = $this->divisisModel->getListForAccount($condition, $addCondition, $limit, $offset);
-        $subAkunsModel = $Sub_AkunsModel->asObject()->findAll();
+        $subAkunsModel = $Sub_AkunsModel->getAPAR($this->this_company_id);
 
         $rdata = [];
 
