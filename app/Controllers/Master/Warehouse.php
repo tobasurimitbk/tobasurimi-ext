@@ -112,10 +112,9 @@ class Warehouse extends BaseController
         try {
             $rules = [
                 "code_warehouse" => [
-                    "rules" => "required|is_unique[warehouses.code_warehouse]",
+                    "rules" => "required",
                     'errors' => [
                         'required' => 'Warehouse wajib diisi',
-                        'is_unique' => 'Kode warehouse sudah ada'
                     ]
                 ],
                 "warehouse_name" => [
@@ -156,6 +155,17 @@ class Warehouse extends BaseController
             ];
 
             if ($this->validate($rules)) {
+
+                $first = $this->WarehousesModel->where('company_id', $this->this_company_id)->where('code_warehouse', ($this->request->getVar('code_warehouse')))->first();
+                if ($first != null) {
+                    return response()->setJSON([
+                        'status' => false,
+                        'token' => csrf_hash(),
+                        'message' => "Kode Warehouse " . strtoupper($this->request->getVar('code_warehouse')) . " sudah ada"
+                    ]);
+                }
+
+
                 $values = [
                     "company_id"    => $this->this_company_id,
                     "code_warehouse" => $this->request->getPost("code_warehouse"),
@@ -273,6 +283,7 @@ class Warehouse extends BaseController
 
                 $warehouseSameName = $this->WarehousesModel
                     ->where('code_warehouse', $values['code_warehouse'])
+                    ->where('company_id', $this->this_company_id)
                     ->where('id !=', $id)
                     ->first();
 
