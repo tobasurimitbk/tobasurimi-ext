@@ -28,7 +28,7 @@ class AccountCustomerController extends BaseController
     }
     public function index()
     {
-        $customerModel = $this->CustomerModel->getCustomer();
+        $customerModel = $this->CustomerModel->getCustomer($this->this_company_id);
         $subAkunsModel = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
         foreach ($subAkunsModel as $val) {
             $val->hexid = bin2hex($this->encrypter->encrypt($val->id));

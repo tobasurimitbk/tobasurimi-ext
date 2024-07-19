@@ -177,11 +177,19 @@ class CustomerModel extends Model
         return ($result[0]["total"]) ? $result[0]["total"] : 0;
     }
 
-    public function getCustomer()
+    public function getCustomer($company_id)
     {
-        $arrCondition = [
-            'deletedAt' => null
-        ];
+
+        if ($company_id != "") {
+            $arrCondition = [
+                'deletedAt' => null,
+                'company_id' => $company_id
+            ];
+        } else {
+            $arrCondition = [
+                'deletedAt' => null
+            ];
+        }
 
         $builder = $this->db->table('customers');
         $builder->where($arrCondition);
