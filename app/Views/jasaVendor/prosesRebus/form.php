@@ -1025,6 +1025,8 @@
             table.find('tfoot').append(newRow);
         } else {
             var no = 1;
+            var totalQtyRebus = 0;
+            var totalQtyHasilRebus = 0;
             $.each(data, function(i, v) {
                 var newRow = $('<tr>');
                 newRow.append($('<td style="text-align: center;">').html(
@@ -1074,7 +1076,18 @@
                 `
                 ));
                 table.find('tbody').append(newRow);
+
+                totalQtyRebus += Number(v.qty);
+                totalQtyHasilRebus += Number(v.output.qty);
             });
+
+            var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
+            newRow.append($('<td style="text-align: right;" colspan="8">').html("<b>GRAND TOTAL</b>"));
+            newRow.append($('<td style="text-align: center;">').text(totalQtyRebus));
+            newRow.append($('<td colspan ="2">').text(''));
+            newRow.append($('<td style="text-align: center;">').text(totalQtyHasilRebus));
+            newRow.append($('<td colspan ="2">').text(''));
+            table.find('tbody').append(newRow);
         }
 
     }
