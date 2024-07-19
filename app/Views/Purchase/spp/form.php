@@ -1089,6 +1089,7 @@
     const changeTipeSPP = function() {
         list_items = [];
         drawTable();
+        drawTableDetail();
     }
 
     const drawTable = function() {
