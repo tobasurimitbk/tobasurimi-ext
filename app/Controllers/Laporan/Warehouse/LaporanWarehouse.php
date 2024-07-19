@@ -2047,4 +2047,9 @@ class LaporanWarehouse extends BaseController
         exit();
         // return view('Supplier/supplierBahanBaku/print');
     }
+
+    public function laporanKartuStock()
+    {
+        return view('Laporan/Warehouse/LaporanKartuStock/index');
+    }
 }

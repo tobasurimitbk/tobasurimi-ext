@@ -1867,6 +1867,9 @@ $routes->get('/laporan-warehouse/material-request', 'Laporan\Warehouse\LaporanWa
 $routes->get('/laporan-warehouse/material-request/all-material-request', 'Laporan\Warehouse\LaporanWarehouse::allLaporanMaterialRequest', ['filter' => 'Auth']);
 $routes->get('/laporan-warehouse/material-request/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanMaterialRequest', ['filter' => 'Auth']);
 
+$routes->get('/laporan-warehouse/stock-kartu', 'Laporan\Warehouse\LaporanWarehouse::laporanKartuStock', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/stock-kartu/all-stock-kartu', 'Laporan\Warehouse\LaporanWarehouse::allLaporanKartuStock', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/stock-kartu/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanKartuStock', ['filter' => 'Auth']);
 /*
  * --------------------------------------------------------------------
  * Additional Routing

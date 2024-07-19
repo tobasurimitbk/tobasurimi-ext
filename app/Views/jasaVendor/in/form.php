@@ -947,6 +947,8 @@
 
     function drawTable2(barang1_id, listBarangGroup) {
         var listBarangFirst = null;
+        var totalQtyKotor = 0;
+        var totalQtyBersih = 0;
         const table = $('#dataTable2');
         table.find('tbody').empty();
         table.find('tfoot').empty();
@@ -985,7 +987,17 @@
                 `
                 ));
                 table.find('tbody').append(newRow);
+                totalQtyKotor += v.qty_kotor;
+                totalQtyBersih += v.qty_bersih;
             });
+            var newRow1 = $('<<tr style="color:whitesmoke; background-color:#f2c996;">>');
+            newRow1.append($('<td colspan="4" style="text-align:right"><b>GRAND TOTAL</b></td>'));
+            newRow1.append($('<td class="total-qty-kotor">').text(totalQtyKotor.toFixed(2)));
+            newRow1.append($('<td class="total-qty-bersih">').text(totalQtyBersih.toFixed(2)));
+            newRow1.append($('<td>'));
+            table.find('tbody').append(newRow1);
+
+
         }
     }
 
@@ -1239,6 +1251,21 @@
             }
         })
     }
+    $(document).on("input", ".qty_kotor", function() {
+        var sum = 0;
+        console.log("test");
+        $(".qty_kotor").each(function() {
+            sum += Number($(this).val());
+        });
+        $(".total-qty-kotor").text(sum.toFixed(2));
+    });
+    $(document).on("input", ".qty_bersih", function() {
+        var sum = 0;
+        $(".qty_bersih").each(function() {
+            sum += Number($(this).val());
+        });
+        $(".total-qty-bersih").text(sum.toFixed(2));
+    });
 </script>
 
 <?= $this->endSection(); ?>
