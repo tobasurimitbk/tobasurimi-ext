@@ -312,7 +312,7 @@ class BiayaUdangModel extends Model
             }
 
             $result[$i]['total_harga'] = (float)($result[$i]['kg_daging_total'] * $result[$i]['tb_harga']);
-            $result[$i]['ratio'] = ((float)($result[$i]['kg_rebus_total'] / $result[$i]['kg_daging_total']));
+            $result[$i]['ratio'] = ((float)($result[$i]['kg_daging_total'] / $result[$i]['kg_rebus_total']));
         }
 
         return $result;
