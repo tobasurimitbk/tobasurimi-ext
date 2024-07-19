@@ -1088,8 +1088,8 @@
 
     const changeTipeSPP = function() {
         list_items = [];
-        drawTable();
         drawTableDetail();
+        drawTable();
     }
 
     const drawTable = function() {
@@ -1457,6 +1457,7 @@
 
             list_items_spek.splice(0, list_items_spek.length);
             drawTable();
+            drawTableDetail();
             validator_spek.resetForm();
             validator_spek.reset();
             validator_barang.resetForm();

@@ -90,7 +90,7 @@
                                     <label for="floatingInput">No. PO</label>
                                 </div>
                                 <div <?= !empty($poDetail) ? 'style="display:none;"' : ''; ?> class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 25px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 25px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
