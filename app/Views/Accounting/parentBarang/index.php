@@ -190,8 +190,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
                 <button type="button" class="btn btn-submit-form">Simpan</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
             </div>
         </div>
     </div>
@@ -533,12 +533,16 @@
         placeholder: "",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
+    }).on("select2:open", () => {
+        document.querySelector(".select2-container--open .select2-search__field").focus()
     })
 
     $('.akun_pemakaian_id').select2({
         placeholder: "",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
+    }).on("select2:open", () => {
+        document.querySelector(".select2-container--open .select2-search__field").focus()
     })
 
     // Akun AR
@@ -546,6 +550,8 @@
         placeholder: "",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
+    }).on("select2:open", () => {
+        document.querySelector(".select2-container--open .select2-search__field").focus()
     })
 
     // Akun AP
@@ -553,7 +559,13 @@
         placeholder: "",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
+    }).on("select2:open", () => {
+        document.querySelector(".select2-container--open .select2-search__field").focus()
     })
+
+    // $('.akun_ap_id').on("select2:open", () => {
+    //     document.querySelector(".select2-container--open .select2-search__field").focus()
+    // })
 </script>
 
 <?= $this->endSection(); ?>

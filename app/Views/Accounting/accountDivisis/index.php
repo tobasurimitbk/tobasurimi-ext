@@ -372,6 +372,8 @@
         placeholder: "",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
+    }).on("select2:open", () => {
+        document.querySelector(".select2-container--open .select2-search__field").focus()
     })
 
     //CSS SELECT2 FLOATING LABEL

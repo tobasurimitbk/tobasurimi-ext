@@ -529,6 +529,8 @@
         placeholder: "Pilih Akun AP",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
+    }).on("select2:open", () => {
+        document.querySelector(".select2-container--open .select2-search__field").focus()
     })
 
     // Akun AR
@@ -536,6 +538,8 @@
         placeholder: "Pilih Akun AP",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
+    }).on("select2:open", () => {
+        document.querySelector(".select2-container--open .select2-search__field").focus()
     })
 
     // Akun AP
@@ -543,6 +547,8 @@
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
+    }).on("select2:open", () => {
+        document.querySelector(".select2-container--open .select2-search__field").focus()
     })
 </script>
 

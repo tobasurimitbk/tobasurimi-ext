@@ -278,39 +278,13 @@
             }
         };
 
-        // PROVINCE
-        $('.province_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".detail-modal .modal-content")
-        });
-
-        //CSS SELECT2 FLOATING LABEL
-        $(".province_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".province_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".province_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
         // PROVINCE PARENT
         $('.akun_ap_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal .modal-content")
+        }).on("select2:open", () => {
+            document.querySelector(".select2-container--open .select2-search__field").focus()
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -330,34 +304,6 @@
             .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".akun_ap_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // CITY
-        $('.city_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".detail-modal .modal-content")
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $(".city_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".city_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".city_id")
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -367,6 +313,8 @@
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal .modal-content")
+        }).on("select2:open", () => {
+            document.querySelector(".select2-container--open .select2-search__field").focus()
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -747,6 +695,8 @@
         placeholder: "",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
+    }).on("select2:open", () => {
+        document.querySelector(".select2-container--open .select2-search__field").focus()
     });
 
     $(".module")
