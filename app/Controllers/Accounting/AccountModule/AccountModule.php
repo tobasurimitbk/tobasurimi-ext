@@ -25,7 +25,7 @@ class AccountModule extends BaseController
         $Sub_AkunsModel = new Sub_AkunsModel();
 
         $accountModuleData = $accountModuleModel->asObject()->findAll();
-        $subAkunsModel = $Sub_AkunsModel->asObject()->findAll();
+        $subAkunsModel = $Sub_AkunsModel->getAPAR($this->this_company_id);
 
         $data = [
             "dataAccountModule" => $accountModuleData,
@@ -47,11 +47,11 @@ class AccountModule extends BaseController
 
         $accountModuleModel = new AccountModuleModel();
         $Sub_AkunsModel = new Sub_AkunsModel();
-        $dataNamaAP = "";
-        $dataNamaAR = "";
+        $dataNamaAP = "-";
+        $dataNamaAR = "-";
 
         $accountModuleData = $accountModuleModel->asObject()->findAll();
-        $subAkunsModel = $Sub_AkunsModel->asObject()->findAll();
+        $subAkunsModel = $Sub_AkunsModel->getAPAR($this->this_company_id);
         // $condition = [
         //     "barangs.company_id"  => $this->this_company_id,
         //     "kategori"              => "LOKAL",

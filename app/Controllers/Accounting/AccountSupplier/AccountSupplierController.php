@@ -69,11 +69,13 @@ class AccountSupplierController extends BaseController
         $offset = $this->request->getGet("start");
 
         $res = $this->AccountSupplierModel->getList($condition, $addCondition, $limit, $offset);
-        $subAkunsModel = $this->Sub_AkunsModel->asObject()->findAll();
+        $subAkunsModel = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
 
         $rdata = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $dataNamaAP = "-";
+        $dataNamaAR = "-";
 
 
         foreach ($res['data'] as $data) {
