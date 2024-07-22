@@ -42,9 +42,9 @@
                 <div class="col-md-3">
                     <div class="form-floating spp-ptspp mb-3" style="height: 50px;">
                         <select class="form-select kategori spp_type form-out-search" name="spp_type" id="spp_type" aria-label="Floating label select example">
-                            <option value="">Pilih Tipe SPP</option>
+                            <option value="">PILIH TIPE SPP</option>
                             <?php foreach ($dataSppType as $d) : ?>
-                                <option <?= (!empty($dataSPP) ? ($dataSPP->spp_type == $d['value'] ? 'selected' : '') : '') ?> value="<?= $d['value'] ?>"><?= $d['value'] ?></option>
+                                <option <?= (!empty($dataSPP) ? ($dataSPP->spp_type == $d['value'] ? 'selected' : '') : '') ?> value="<?= $d['value'] ?>"><?= strtoupper($d['value']) ?></option>
                             <?php endforeach; ?>
                         </select>
                         <label for="floatingInput" class="l-spp-ptspp">Tipe SPP</label>

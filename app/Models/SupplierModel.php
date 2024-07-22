@@ -15,6 +15,7 @@ class SupplierModel extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
+        'company_id',
         'kode',
         'name',
         'address',
@@ -147,6 +148,7 @@ class SupplierModel extends Model
     {
         $arrCondition = [
             'deletedAt' => null,
+            'company_id' => session()->get('login')->this_company_id,
             'type' => $type
         ];
 
@@ -161,7 +163,7 @@ class SupplierModel extends Model
         return $results;
     }
 
-    public function generateSupplierCode($type): string
+    public function generateSupplierCode($type, $company_id): string
     {
         $month = idate('m');
         $year = date('y');
@@ -169,6 +171,7 @@ class SupplierModel extends Model
         $numberTemplate = "$type";
 
         $lastData = $this->asObject()
+            ->where('company_id', $company_id)
             ->like('kode', $numberTemplate . '-')
             ->orderBy('createdAt', 'DESC')
             ->first();

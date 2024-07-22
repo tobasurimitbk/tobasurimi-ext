@@ -67,7 +67,7 @@ class PembayaranPOImport extends BaseController
             ->findAll();
         $divisi = $this->divisiModel->getDivisiAccess();
         $data = [
-            'supplierList' => $this->supplierModel->asObject()->where('deletedAt', null)->where('type', "INTERNASIONAL")->orderBy('name', "ASC")->findAll(),
+            'supplierList' => $this->supplierModel->getSupplierByType("INTERNASIONAL"),
             "subsAkuns" => $subAkunsModel,
             'divisi' => $divisi
         ];
@@ -84,7 +84,7 @@ class PembayaranPOImport extends BaseController
             ->findAll();
         $divisi = $this->divisiModel->getDivisiAccess();
         $data = [
-            'supplierList' => $this->supplierModel->asObject()->where('deletedAt', null)->where('type', "INTERNASIONAL")->orderBy('name', "ASC")->findAll(),
+            'supplierList' => $this->supplierModel->getSupplierByType("INTERNASIONAL"),
             'paymentData' => $this->importPOPaymentModel->asArray()->find($id),
             'poDetail' => null,
             'sisaBayar' => 0,
