@@ -84,7 +84,7 @@
                             <select <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "disabled" : '')  : "" ?> class="form-select " name="supplier_id" id="supplier_id">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($supplierList ?? [] as $supplier) : ?>
-                                    <option value="<?= $supplier->id ?>" <?= (!empty($paymentData) && $paymentData['supplier_id'] == $supplier->id) ? 'selected' : '' ?>><?= $supplier->name ?></option>
+                                    <option value="<?= $supplier['id'] ?>" <?= (!empty($paymentData) && $paymentData['supplier_id'] == $supplier['id']) ? 'selected' : '' ?>><?= $supplier['name'] ?></option>
                                 <?php endforeach ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Supplier</label>
@@ -302,7 +302,7 @@
                                         Purchase Order List
                                     </label>
                                     <div class="table-responsive">
-                                        <table class="table table-bordered nowrap table-hover-tobasurimi" id="detailBarang" width="100%" cellspacing="0">
+                                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="detailBarang" width="100%" cellspacing="0">
                                             <thead class="thead-dark">
                                                 <tr style="text-align: center;">
                                                     <th>Kode Barang</th>

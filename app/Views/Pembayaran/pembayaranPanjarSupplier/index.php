@@ -31,9 +31,9 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select tipe_supplier" name="tipe_supplier" id="tipe_supplier">
                                     <option value="" selected></option>
-                                    <option value="INTERNASIONAL">Internasional</option>
-                                    <option value="BAHAN PENOLONG">Bahan Penolong</option>
-                                    <option value="BAHAN BAKU">Bahan Baku</option>
+                                    <option value="INTERNASIONAL">INTERNASIONAL</option>
+                                    <option value="BAHAN PENOLONG">BAHAN PENOLONG</option>
+                                    <option value="BAHAN BAKU">BAHAN BAKU</option>
                                 </select>
                                 <label for="floatingInput">Tipe Supplier</label>
                             </div>
@@ -102,9 +102,9 @@
                 <div class="col-md-3">
                     <div class="form-floating spp-ptspp mb-3" style="height: 50px;">
                         <select class="form-select kategori panjar_status form-out-search" name="panjar_status" id="panjar_status" aria-label="Floating label select example">
-                            <option value="ALL">Status Posting:Semua</option>
-                            <option value="NOT_POSTING">Status Posting:tidak post</option>
-                            <option value="POSTING">Status Posting:post</option>
+                            <option value="ALL">STATUS POSTING:SEMUA</option>
+                            <option value="NOT_POSTING">STATUS POSTING:BELUM POSTING</option>
+                            <option value="POSTING">STATUS POSTING:SUDAH POSTING</option>
 
                         </select>
                         <label for="floatingInput" class="l-spp-ptspp">Status Posting</label>
@@ -495,16 +495,21 @@
         validator.reset();
     });
 
-    // $('#tipe_supplier').select2({
-    //     placeholder: "Pilih Tipe Supplier",
-    //     theme: "bootstrap-5",
-    // });
-
-    $('#supplier_id').select2({
+    $('#tipe_supplier').select2({
         placeholder: "Pilih Tipe Supplier",
         theme: "bootstrap-5",
     });
 
+    $('#supplier_id').select2({
+        placeholder: "Pilih Supplier",
+        theme: "bootstrap-5",
+    });
+
+
+    $("#tipe_supplier, #supplier_id")
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 
 
 

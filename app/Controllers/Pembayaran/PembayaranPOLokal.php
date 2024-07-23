@@ -56,11 +56,7 @@ class PembayaranPOLokal extends BaseController
         $panjarSupplierModel = new PanjarSupplierModel();
         $Sub_AkunsModel = new Sub_AkunsModel();
 
-        $supplierList = $supplierModel->asObject()
-            ->where('deletedAt', null)
-            ->where('type', "BAHAN PENOLONG")
-            ->orderBy('name', "ASC")
-            ->findAll();
+        $supplierList = $supplierModel->getSupplierByType("BAHAN PENOLONG");
 
         $panjarSupplierList = $panjarSupplierModel->asObject()
             ->findAll();
@@ -703,11 +699,7 @@ class PembayaranPOLokal extends BaseController
         $Sub_AkunsModel = new Sub_AkunsModel();
         $pajakTandaTerimaFakturModel = new PajakTandaTerimaFakturModel();
 
-        $supplierList = $supplierModel->asObject()
-            ->where('deletedAt', null)
-            ->where('type', "BAHAN PENOLONG")
-            ->orderBy('name', "ASC")
-            ->findAll();
+        $supplierList = $supplierModel->getSupplierByType("BAHAN PENOLONG");
 
 
         $subAkunsModel = $Sub_AkunsModel->asObject()
@@ -795,12 +787,7 @@ class PembayaranPOLokal extends BaseController
             return redirect()->to('pembayaran-po-lokal-bb');
         }
 
-        $supplierList = $supplierModel->asObject()
-            ->where('deletedAt', null)
-            ->where('type', "BAHAN BAKU")
-            ->orderBy('name', "ASC")
-            ->findAll();
-
+        $supplierList = $supplierModel->getSupplierByType("BAHAN BAKU");
 
         $subAkunsModel = $Sub_AkunsModel->asObject()
             ->where('deletedAt', null)
@@ -917,11 +904,7 @@ class PembayaranPOLokal extends BaseController
         $supplierModel = new SupplierModel();
         $Sub_AkunsModel = new Sub_AkunsModel();
 
-        $supplierList = $supplierModel->asObject()
-            ->where('deletedAt', null)
-            ->where('type', "BAHAN BAKU")
-            ->orderBy('name', "ASC")
-            ->findAll();
+        $supplierList = $supplierModel->getSupplierByType("BAHAN BAKU");
 
         $subAkunsModel = $Sub_AkunsModel->asObject()
             ->where('deletedAt', null)

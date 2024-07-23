@@ -35,10 +35,18 @@ use App\Models\BCPurchaseOrderModel;
 use App\Models\PenerimaanMutasiGlobalModel;
 use App\Models\PenerimaanMutasiModel;
 use App\Models\BarangMasterModel;
+use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\KemasanModel;
+use App\Models\StockModel;
 use App\Models\StockDetail2Model;
 use App\Models\MaterialRequestsModel;
 use App\Models\MaterialRequestsPenolongModel;
+use App\Models\DivisisModel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+
 use Error;
 use ErrorException;
 
@@ -76,10 +84,14 @@ class LaporanWarehouse extends BaseController
     protected $penerimaanMutasiGlobalModel;
     protected $penerimaanMutasiModel;
     protected $barangMasterModel;
+    protected $barangMasterSpesifikasiModel;
     protected $kemasanModel;
+    protected $stockModel;
     protected $stockDetail2Model;
     protected $materialRequestModel;
     protected $materialRequestPenolongModel;
+    protected $divisisModel;
+
 
 
     private $userId;
@@ -118,10 +130,14 @@ class LaporanWarehouse extends BaseController
         $this->penerimaanMutasiGlobalModel = new PenerimaanMutasiGlobalModel();
         $this->penerimaanMutasiModel = new PenerimaanMutasiModel();
         $this->barangMasterModel = new BarangMasterModel();
+        $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->kemasanModel = new KemasanModel();
+        $this->stockModel = new StockModel();
         $this->stockDetail2Model = new StockDetail2Model();
         $this->materialRequestModel = new MaterialRequestsModel();
         $this->materialRequestPenolongModel = new MaterialRequestsPenolongModel();
+        $this->divisisModel = new DivisisModel();
+
 
         $this->userId = session()->get("login")->user_id;
     }
@@ -2021,8 +2037,6 @@ class LaporanWarehouse extends BaseController
             'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
             'dataAllMaterialRequest'      => $dataAllMaterialRequest,
             'filter_tipe_barang' =>  $this->request->getGet("filter_tipe_barang"),
-
-
         ];
 
 
@@ -2050,6 +2064,348 @@ class LaporanWarehouse extends BaseController
 
     public function laporanKartuStock()
     {
-        return view('Laporan/Warehouse/LaporanKartuStock/index');
+        $selectQry = '
+            suppliers.name AS supplier_name,
+            warehouses.warehouse_name,
+            divisis.divisi,
+            stock.tipe_barang,
+            stock.barang1_id,
+            stock.barang2_id,
+            stock.kemasan_id,
+            stock.divisi_id,
+            stock_details2.id,
+            stock_details2.bc_id,
+            stock_details2.stock_detail_id,
+            stock_details2.no_aju,
+            stock_details2.stock_id,
+            stock_details2.stock_dokumen,
+            stock_details2.no_dokumen AS no_dokumen_2,
+            stock_details2.supplier_id,
+            stock_details2.harga_umum,
+            stock_details2.harga_harian,
+            stock_details2.harga_bulanan,
+            stock_details2.no_po,
+            stock_details.no_dokumen AS no_dokumen_1,
+            stock_details.stock_date,
+            stock_details.sumber,
+            (SUM(CASE WHEN stock_details.status = "In" THEN stock_details2.qty ELSE 0 END) - SUM(CASE WHEN stock_details.status = "Out" THEN stock_details2.qty ELSE 0 END)) AS stok_total
+        ';
+
+        $dataQry = $this->stockDetail2Model->asArray()
+            ->select($selectQry)
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+            ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
+            ->join('warehouses', 'warehouses.id = stock.warehouse_id')
+            ->join('divisis', 'divisis.id = stock.divisi_id')
+            ->having('stok_total >', 0)
+            ->orderBy('stock_details.createdAt', 'ASC')
+            ->groupBy(['stock_details2.stock_dokumen', 'stock_details2.bc_id', 'stock_details2.no_aju'])
+            ->findAll();
+        $divisiName = [];
+        $supplier = [];
+        $warehouse = [];
+        foreach ($dataQry as $d) {
+            array_push($divisiName, $d['divisi']);
+            array_push($supplier, $d['supplier_name']);
+            array_push($warehouse, $d['warehouse_name']);
+        }
+
+
+        $data = [
+            'divisi' => array_unique($divisiName),
+            'supplier' => array_unique($supplier),
+            'warehouse' => array_unique($warehouse)
+        ];
+        return view('Laporan/Warehouse/LaporanKartuStock/index', $data);
+    }
+
+    public function AlllaporanKartuStock()
+    {
+        $pageSize = intval($this->request->getVar("length"));
+        $currentPage = (intval($this->request->getVar("start")) / $pageSize) + 1;
+        $offset = ($currentPage - 1) * $pageSize;
+
+
+        $payload = [
+            "pageSize"    => $pageSize,
+            "currentPage" => $currentPage,
+            "search"      => $this->request->getGet("search"),
+            "sort"        => $this->request->getGet("sort"),
+            "sortType"    => $this->request->getGet("sortType"),
+            "dateStart"   => $this->request->getGet("dateStart"),
+            "dateEnd"     => $this->request->getGet("dateEnd")
+        ];
+
+        $addCondition = [
+            "dateStart"  => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"    => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            'tipeBarang' => $this->request->getVar('tipeBarang'),
+            'divisi'     => $this->request->getVar('divisi')  == "null" ? NULL :  $this->request->getVar('divisi'),
+            'warehouse'   => $this->request->getVar('warehouse') == "null" ? NULL : $this->request->getVar('warehouse'),
+            'search'     => $this->request->getVar('search') == "null" ? NULL :  $this->request->getVar('search'),
+            "sort"       => $this->request->getGet("sort"),
+            "sortType"   => $this->request->getGet("sortType"),
+            "company_id" => $this->this_company_id,
+        ];
+
+        $availableSort = [
+            'tipe_barang'           => 'stock.tipe_barang',
+            'department'            => 'divisis.divisi',
+            'warehouse'             => 'warehouses.warehouse_name',
+            'supplier'              => 'suppliers.name',
+            'tanggal_penerimaan'    => 'stock_details.stock_date',
+            'no_dok'                => 'stock_details2.stock_dokumen'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'stock_details2.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+
+
+        $no = ($pageSize * ($currentPage - 1)) + 1;
+
+        $selectQry = '
+            suppliers.name AS supplier_name,
+            warehouses.warehouse_name,
+            divisis.divisi,
+            stock.tipe_barang,
+            stock.barang1_id,
+            stock.barang2_id,
+            stock.kemasan_id,
+            stock.divisi_id,
+            stock_details2.id,
+            stock_details2.bc_id,
+            stock_details2.stock_detail_id,
+            stock_details2.no_aju,
+            stock_details2.stock_id,
+            stock_details2.stock_dokumen,
+            stock_details2.no_dokumen AS no_dokumen_2,
+            stock_details2.supplier_id,
+            stock_details2.harga_umum,
+            stock_details2.harga_harian,
+            stock_details2.harga_bulanan,
+            stock_details2.no_po,
+            stock_details.no_dokumen AS no_dokumen_1,
+            stock_details.stock_date,
+            stock_details.sumber,
+            (SUM(CASE WHEN stock_details.status = "In" THEN stock_details2.qty ELSE 0 END) - SUM(CASE WHEN stock_details.status = "Out" THEN stock_details2.qty ELSE 0 END)) AS stok_total
+        ';
+
+        $dataQry = $this->stockDetail2Model->asArray()
+            ->select($selectQry)
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+            ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
+            ->join('warehouses', 'warehouses.id = stock.warehouse_id')
+            ->join('divisis', 'divisis.id = stock.divisi_id')
+            ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
+            ->join('kemasan', 'kemasan.id = stock.kemasan_id', 'left')
+            ->having('stok_total >', 0)
+            ->orderBy($sort, $sortType)
+            ->groupBy(['stock_details2.stock_dokumen', 'stock_details2.bc_id', 'stock_details2.no_aju']);
+
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['tipeBarang']) || !empty($addCondition['divisi']) || !empty($addCondition['warehouse']) || !empty($addCondition['search'])) {
+            $dataQry->groupStart();
+            if (!empty($addCondition['search'])) {
+                $dataQry
+                    ->like('barang_master.barang_name', $addCondition['search'])
+                    ->orLike('kemasan.name', $addCondition['search'])
+                    ->orLike('barang_master.kode_barang', $addCondition['search'])
+                    ->orLike('kemasan.kode', $addCondition['search']);
+            }
+
+
+
+            if (!empty($addCondition['dateStart'])) {
+                $dataQry->where('stock_details.stock_date >=', $addCondition['dateStart']);
+            }
+            if (!empty($addCondition['dateEnd'])) {
+                $dataQry->where('stock_details.stock_date <=', $addCondition['dateEnd']);
+            }
+            if ($addCondition['tipeBarang'] == "bahan_penolong") {
+                $dataQry->where('stock.tipe_barang', 'bahan_penolong');
+            }
+            if ($addCondition['tipeBarang'] == "bahan_baku") {
+                $dataQry->where('stock.tipe_barang', 'bahan_baku');
+            }
+            if ($addCondition['tipeBarang'] == "kemasan") {
+                $dataQry->where('stock.tipe_barang', 'kemasan');
+            }
+            if (!empty($addCondition['divisi'])) {
+                $dataQry->where('divisis.divisi', $addCondition['divisi']);
+            }
+            if (!empty($addCondition['warehouse'])) {
+                $dataQry->where('warehouses.warehouse_name', $addCondition['warehouse']);
+            }
+            $dataQry->groupEnd();
+        }
+
+        $filteredDataQry = clone $dataQry;
+        $dataQry->groupBy(['stock_details2.stock_dokumen', 'stock_details2.bc_id', 'stock_details2.no_aju']);
+        $totalFilteredRecords = $filteredDataQry->countAllResults(false);
+        $dataResult = $dataQry->findAll($pageSize, $offset);
+        $dataAllKartuStock = [];
+
+
+        foreach ($dataResult as $data) {
+            $namaBarang = "";
+            $spesifikasi = "-";
+            $satuan = "";
+            $kodeBarang = "";
+            $tipe_barang  = "";
+            $sumberBCName = "-";
+
+
+            if (!empty($data['bc_id'])) {
+                $sumberBC = $this->MetaDataModel
+                    ->where('id', $data['bc_id'])
+                    ->where('deletedAt', null)
+                    ->first();
+                $sumberBCName = $sumberBC['value'];
+            }
+
+            if ($data['tipe_barang'] == 'kemasan') {
+                $kemasanData = $this->kemasanModel
+                    ->select('kemasan.*, satuans.nama_satuan')
+                    ->join('satuans', 'satuans.id = kemasan.satuan_id')
+                    ->where('kemasan.id', $data['kemasan_id'])
+                    ->first();
+                $satuan = $kemasanData['nama_satuan'];
+                $namaBarang = $kemasanData['name'];
+                $kodeBarang = $kemasanData['kode'];
+                $tipe_barang = 'KEMASAN';
+            } else {
+                $barangData = $this->barangMasterModel
+                    ->select('barang_master.*')
+                    ->where('barang_master.id', $data['barang1_id'])
+                    ->first();
+                $barangSpesifikasiData = $this->barangMasterSpesifikasiModel
+                    ->select('*')
+                    ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
+                    ->where('barang_master_spesifikasi.id', $data['barang2_id'])
+                    ->first();
+                if ($data['tipe_barang'] == 'bahan_penolong') {
+                    $tipe_barang = "BAHAN PENOLONG";
+                } elseif ($data['tipe_barang'] == 'bahan_baku') {
+                    $tipe_barang = "BAHAN BAKU";
+                }
+
+                $satuan = $barangSpesifikasiData['nama_satuan'];
+                $namaBarang = $barangData['barang_name'];
+                $kodeBarang = $barangData['kode_barang'];
+                $spesifikasi = $barangSpesifikasiData['spesifikasi'];
+            }
+
+
+            $dataAllKartuStock[] = [
+                'no' => $no++,
+                'tipe_barang' => $tipe_barang,
+                'sumber_barang' => $sumberBCName . " / " .  $data['no_aju'],
+                'supplier' => $data['supplier_name'],
+                'warehouse_name' => $data['warehouse_name'],
+                'tanggal_penerimaan' => date('d/m/Y', strtotime($data['stock_date'])),
+                'nomor' => $data['stock_dokumen'],
+                'department' => $data['divisi'],
+                'kode_barang' => $kodeBarang,
+                'nama_barang' => $namaBarang,
+                'spesifikasi' => $spesifikasi,
+                'satuan' => $satuan,
+                'qty' => $data['stok_total']
+            ];
+        }
+
+        $totalRecords = $this->stockDetail2Model->countAllResults();
+
+        $data = [
+            "draw" => intval($this->request->getGet("draw")),
+            'data' => $dataAllKartuStock,
+            'recordsTotal' => $totalRecords,
+            'recordsFiltered' => $totalFilteredRecords,
+            "payload" => $payload,
+
+        ];
+
+
+        return json_encode($data);
+    }
+
+    public function exportSheetLaporanKartuStock()
+    {
+        $jsonList = $this->AlllaporanKartuStock();
+        $list = json_decode($jsonList, true);
+
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $no = 1;
+        $column = 2;
+
+
+        $headerStyleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+        $dataStyleArray = [
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'No.')
+            ->setCellValue('B1', 'Tipe Barang')
+            ->setCellValue('C1', 'Sumber Barang (BC / No Aju)')
+            ->setCellValue('D1', 'Supplier')
+            ->setCellValue('E1', 'Warehouse')
+            ->setCellValue('F1', 'Tanggal Penerimaan')
+            ->setCellValue('G1', 'Nomor')
+            ->setCellValue('H1', 'Department')
+            ->setCellValue('I1', 'Kode Barang')
+            ->setCellValue('J1', 'Nama Barang')
+            ->setCellValue('K1', 'Spesifikasi')
+            ->setCellValue('L1', 'Satuan')
+            ->setCellValue('M1', 'Qty');
+        $sheet->getStyle('A1:M1')->applyFromArray($headerStyleArray);
+        foreach ($list['data'] as $l) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $column, $l['no'])
+                ->setCellValue('B' . $column, $l['tipe_barang'])
+                ->setCellValue('C' . $column, $l['sumber_barang'])
+                ->setCellValue('D' . $column, $l['supplier'])
+                ->setCellValue('E' . $column, $l['warehouse_name'])
+                ->setCellValue('F' . $column, $l['tanggal_penerimaan'])
+                ->setCellValue('G' . $column, $l['nomor'])
+                ->setCellValue('H' . $column, $l['department'])
+                ->setCellValue('I' . $column, $l['kode_barang'])
+                ->setCellValue('J' . $column, $l['nama_barang'])
+                ->setCellValue('K' . $column, $l['spesifikasi'])
+                ->setCellValue('L' . $column, $l['satuan'])
+                ->setCellValue('M' . $column, $l['qty']);
+            $sheet->getStyle('A' . $column . ':M' . $column)->applyFromArray($dataStyleArray);
+            $column++;
+        }
+        $writer = new Xlsx($spreadsheet);
+        foreach (range('A', 'M') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Laporan-Kartu-Stock';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
     }
 }

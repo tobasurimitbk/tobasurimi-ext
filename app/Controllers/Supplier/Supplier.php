@@ -107,6 +107,7 @@ class Supplier extends BaseController
 
         $condition = [
             "suppliers.type"        => "BAHAN BAKU",
+            "company_id" => $this->this_company_id
         ];
         $addCondition = [
             "search"    => $this->request->getGet("search"),
@@ -201,6 +202,7 @@ class Supplier extends BaseController
             }
 
             $insertData = [
+                "company_id" => $this->this_company_id,
                 "kode" => $this->request->getPost("kode"),
                 "name" => strtoupper($this->request->getVar("name")),
                 "address" => strtoupper($this->request->getVar("address")),
@@ -306,6 +308,7 @@ class Supplier extends BaseController
                 $id = decrypt($this->request->getPost("id"));
 
                 $payload = [
+                    "company_id" => $this->this_company_id,
                     "name" => strtoupper($this->request->getVar("name")),
                     "address" => strtoupper($this->request->getVar("address")),
                     "no_npwp" => str_replace(['.', '-'], '',  $this->request->getPost("no_npwp")),
@@ -369,6 +372,7 @@ class Supplier extends BaseController
         ];
 
         $condition = [
+            "suppliers.company_id" => $this->this_company_id,
             "suppliers.type"        => "BAHAN PENOLONG"
         ];
         $addCondition = [
@@ -459,6 +463,7 @@ class Supplier extends BaseController
             }
 
             $insertData = [
+                "company_id" => $this->this_company_id,
                 "kode" => $this->request->getPost("kode"),
                 "name" => strtoupper($this->request->getVar("name")),
                 "address" => strtoupper($this->request->getVar("address")),
@@ -556,6 +561,7 @@ class Supplier extends BaseController
                 $id = $this->request->getPost("id");
 
                 $payload = [
+                    "company_id" => $this->this_company_id,
                     "name" => strtoupper($this->request->getVar("name")),
                     "address" => strtoupper($this->request->getVar("address")),
                     "no_npwp" => str_replace(['.', '-'], '',  $this->request->getPost("no_npwp")),
@@ -609,6 +615,7 @@ class Supplier extends BaseController
         ];
 
         $condition = [
+            "suppliers.company_id" => $this->this_company_id,
             "suppliers.type"        => "INTERNASIONAL"
         ];
         $addCondition = [
@@ -685,6 +692,7 @@ class Supplier extends BaseController
             }
 
             $insertData = [
+                "company_id" => $this->this_company_id,
                 "kode" => $this->request->getPost("kode"),
                 "name" => strtoupper($this->request->getVar("name")),
                 "address" => strtoupper($this->request->getVar("address")),
@@ -762,6 +770,7 @@ class Supplier extends BaseController
                 $id = $this->request->getPost("id");
 
                 $payload = [
+                    "company_id" => $this->this_company_id,
                     "name" => strtoupper($this->request->getVar("name")),
                     "address" => strtoupper($this->request->getVar("address")),
                     "fax" => $this->request->getPost("fax"),
@@ -903,7 +912,7 @@ class Supplier extends BaseController
 
     public function supplierGenerate($type)
     {
-        $response = $this->supplierModel->generateSupplierCode($type);
+        $response = $this->supplierModel->generateSupplierCode($type, $this->this_company_id);
 
         if ($response) {
             $data = [
