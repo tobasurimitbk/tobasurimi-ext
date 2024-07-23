@@ -59,6 +59,7 @@
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
                                 <th>No. PO</th>
+                                <th>No SPP</th>
                                 <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
                                 <th onclick="changeSort('createdAt')">Tanggal</th>
                                 <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
@@ -129,6 +130,12 @@
             },
             {
                 data: "multiple_po_no",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
+                data: "spp_no",
                 className: "text-center",
                 searchable: false,
                 sortable: false
