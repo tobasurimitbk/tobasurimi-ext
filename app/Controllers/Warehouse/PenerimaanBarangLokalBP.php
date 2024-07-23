@@ -420,8 +420,10 @@ class PenerimaanBarangLokalBP extends BaseController
             "dataPenerimaanBarang" => $this->penerimaanBarangModel->where('id', $id)->first(),
             "dataKemasan"   => $dataKemasan,
             "dataDivisi" => $dataDivisi,
-
+            "dataSPP" => []
         ];
+
+        $data['dataSPP'] = $this->amPurchaseOrderModel->getSPP(json_decode($data['dataPenerimaanBarang']['multiple_po_id']));
 
         return view('Warehouse/penerimaanBarangLokal/bahanPenolong/form', $data);
     }

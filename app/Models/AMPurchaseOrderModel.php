@@ -275,6 +275,24 @@ class AMPurchaseOrderModel extends Model
         return $query->getResultArray();
     }
 
+    public function getNoPenerimaanBarangBySPP($po_type, $supplier_id, $spp_id)
+    {
+        $arrCondition = [
+            'deletedAt' => null,
+            'supplier_id' => $supplier_id,
+            'is_posted' => 1,
+            'status_penerimaan' => 0,
+            'po_type' => $po_type,
+            'purchase_request_id' => $spp_id
+        ];
+
+        $builder = $this->db->table('am_purchase_orders');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
+
     public function getNoPOBeaCukai($po_type, $company_id)
     {
         $arrCondition = [
@@ -512,5 +530,15 @@ class AMPurchaseOrderModel extends Model
                 'dataPO' => $res
             ];
         }
+    }
+
+    public function getSPP($multiplePoId)
+    {
+        $result = $this->select('purchase_requests.*')
+            ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
+            ->where('am_purchase_orders.id', $multiplePoId[0])
+            ->findAll();
+
+        return $result;
     }
 }

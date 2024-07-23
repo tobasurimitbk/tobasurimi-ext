@@ -1055,7 +1055,8 @@ $routes->get('/penerimaan-barang-lokal-bp/all', 'Warehouse\PenerimaanBarangLokal
 $routes->get('/penerimaan-barang-lokal-bp/create', 'Warehouse\PenerimaanBarangLokalBP::create', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-lokal-bp/insert', 'Warehouse\PenerimaanBarangLokalBP::createAction', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/generate-po-no', 'Warehouse\PenerimaanBarangLokalBP::generatePONo', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-lokal-bp/get-po', 'Purchase\POLokalBahanPenolong::dropdownPOLokalBahanPenolong', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bp/get-po', 'Purchase\POLokalBahanPenolong::dropdownPOBySpp', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bp/get-spp', 'Purchase\POLokalBahanPenolong::dropdownSPPBahanPenolong', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/list-barang', 'Warehouse\PenerimaanBarangLokalBP::listBarangLPB', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/id/(:segment)', 'Warehouse\PenerimaanBarangLokalBP::update/$1', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-lokal-bp/update', 'Warehouse\PenerimaanBarangLokalBP::updateAction', ['filter' => 'Auth']);
