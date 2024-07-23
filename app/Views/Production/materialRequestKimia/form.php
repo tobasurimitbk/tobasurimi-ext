@@ -692,12 +692,14 @@
                     var isValid = true;
                     var dataError = null;
 
+                    console.log(listStockSelectedBahan);
+
                     $.each(listStockSelectedBahan, function(i, v) {
                         // var element = $('input[data-id="' + v.id + '"].qty-bahan-request');
                         // var input_user = parseFloat(element.val());
                         // var stok_max = parseFloat(element.data('stok_total'));
 
-                        if (listStockSelectedBahan[i].qty2 > listStockSelectedBahan[i].qty || isNaN(listStockSelectedBahan[i].qty2) || listStockSelectedBahan[i].qty2 == undefined || listStockSelectedBahan[i].qty2 == 0) {
+                        if (listStockSelectedBahan[i].qty2 > listStockSelectedBahan[i].stok_total || isNaN(listStockSelectedBahan[i].qty2) || listStockSelectedBahan[i].qty2 == undefined || listStockSelectedBahan[i].qty2 == 0) {
                             dataError = listStockSelectedBahan[i];
                             isValid = false;
                         }
@@ -1239,7 +1241,7 @@
             ));
             table.find('tbody').append(newRow);
             parseFloat(v.qty2)
-            totalQtyRequest += parseFloat(v.qty2) || 0;
+            // totalQtyRequest += parseFloat(v.qty2) || 0;
         });
 
         selectedItemTableBahan = $('#selectedItemTableBahan').DataTable({
