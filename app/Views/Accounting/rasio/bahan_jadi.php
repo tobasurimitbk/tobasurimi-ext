@@ -115,7 +115,16 @@
 </div>
 <script>
     $('#select-item-btn').click(function() {
-        drawTableRasioAkhir(list_items_barang_jadi);
-        drawTableRasioTerhadapBahanBaku(list_items_barang_jadi);
+        if (list_items_barang_digunakan_alokasi.length == 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Data Barang Setelah Alokasi Harus Terisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            });
+        } else {
+            drawTableRasioAkhir(list_items_barang_jadi);
+            drawTableRasioTerhadapBahanBaku(list_items_barang_jadi);
+        }
     });
 </script>

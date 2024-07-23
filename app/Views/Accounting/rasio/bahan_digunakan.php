@@ -267,7 +267,7 @@
 
         var hargaTotalBiaya = biayaSubsidi + biayaLain + biayaKopek;
         var hargaSatuan = 0;
-        list_items_barang_pembelian.forEach((item, index) => {
+        list_items_barang_digunakan.forEach((item, index) => {
             hargaSatuan = parseFloat(item.hargaSatuanPO) + (parseFloat(hargaTotalBiaya) / list_items_barang_pembelian.length);
             totalHarga = parseFloat(item.totalQtyPO) * parseFloat(hargaSatuan);
             list_items_barang_digunakan_alokasi.push({

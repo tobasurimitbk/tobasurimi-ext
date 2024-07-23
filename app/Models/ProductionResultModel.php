@@ -157,23 +157,17 @@ class ProductionResultModel extends Model
         production_result_details.barang1_id,
         production_result_details.barang2_id,
         production_result_details.stock_id,
-        production_result_details.qty,
-        production_result_details.qty2,
-        production_result_details.qty_isi,
-        stock_details2.stock_dokumen AS stock_dokumen2,
-        stock_details.no_dokumen,
+        SUM(production_result_details.qty) AS qty,
+        SUM(production_result_details.qty2) AS qty2,
+        SUM(production_result_details.qty_isi) AS qty_isi,
         production_result_details.stock_dokumen AS stock_dokumen
         ';
 
         $dataQry = $this->asArray()
             ->select($selectQryJadi)
             ->join('production_result_details', 'production_result_details.production_result_id = production_results.id', 'left')
-            ->join('stock_details2', 'stock_details2.stock_dokumen = production_result_details.stock_dokumen', 'left')
-            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id AND stock_details.sumber = "LPB"', 'left')
-            ->join('penerimaan_barang', 'penerimaan_barang.no_penerimaan_barang = stock_details.no_dokumen', 'left')
-            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.barang_id = production_result_details.barang1_id AND penerimaan_barang_detail.spesifikasi_id = production_result_details.barang2_id', 'left')
-            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
+            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->join('work_orders', 'work_orders.id = production_results.work_order_id', 'left')
             // ->like('production_results.receive_date', $where['tanggal_jurnal'])
@@ -187,6 +181,8 @@ class ProductionResultModel extends Model
             ->where('production_results.deletedAt', $where['deletedAt'])
             ->groupBy('production_result_details.stock_dokumen, production_result_details.stock_id')
             ->findAll();
+
+        // var_dump($dataQry);
 
         return $dataQry;
     }

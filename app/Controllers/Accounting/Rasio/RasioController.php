@@ -211,6 +211,7 @@ class RasioController extends BaseController
 
 
             $barang_digunakan = json_decode($this->request->getVar("items_digunakan"));
+            $barang_digunakan_pembelian = json_decode($this->request->getVar("items_digunakan_pembelian"));
             $barang_digunakan_alokasi = json_decode($this->request->getVar("items_digunakan_alokasi"));
             $barang_jadi = json_decode($this->request->getVar("items_jadi"));
             $barang_digunakan_material_2 = json_decode($this->request->getVar("items_digunakan_material_2"));
@@ -246,6 +247,28 @@ class RasioController extends BaseController
                     'satuan_lpb' => $s->satuanLPB ?? "-",
                     'no_dokumen' => $s->no_dokumen,
                     'stock_dokumen' => $s->stock_dokumen,
+                    'type' => "digunakan",
+                ]);
+            }
+
+            foreach ($barang_digunakan_pembelian as $s) {
+                $this->rasioBarangDigunakanModel->insert([
+                    'rasio_id' => $id,
+                    'barang1_id' => $s->barang1_id,
+                    'barang2_id' => $s->barang2_id,
+                    'barang_name' => $s->barang_name,
+                    'spesifikasi' => $s->spesifikasi,
+                    'qty_po' => $s->totalQtyPO ?? 0,
+                    'harga_po_total' => $s->totalHargaPO ?? 0,
+                    'harga_po_satuan' => $s->hargaSatuanPO ?? 0,
+                    'satuan_po' => $s->satuanPO  ?? "-",
+                    'qty_lpb' => $s->totalQtyLPB ?? 0,
+                    'harga_lpb_total' => $s->totalHargaLPB ?? 0,
+                    'harga_lpb_satuan' => $s->hargaSatuanLPB ?? 0,
+                    'satuan_lpb' => $s->satuanLPB ?? "-",
+                    'no_dokumen' => $s->no_dokumen,
+                    'stock_dokumen' => $s->stock_dokumen,
+                    'type' => "pembelian",
                 ]);
             }
 
@@ -675,7 +698,7 @@ class RasioController extends BaseController
                 }
             }
             // Process the matched record
-            // var_dump($dataResultPO);
+            // var_dump($productionResultDataTitle);
 
             // exit;
 
@@ -907,7 +930,7 @@ class RasioController extends BaseController
                         $totalQty += $valuePoBBLokal['qty'];
                         $satuanPO = $valuePoBBLokal['kode_satuan'];
                     }
-                    $totalHarga = $totalQty * $hargaSatuan;
+                    $totalHarga = $value['qty'] * $hargaSatuan;
                     $value['totalQtyPO'] = $value['qty'];
                     $value['totalHargaPO'] = $totalHarga;
                     $value['hargaSatuanPO'] = $hargaSatuan;

@@ -2123,13 +2123,13 @@
         var biayaLain = 0;
         var biayaKopek = 0;
 
-        list_items_barang_digunakan.map((item, index) => {
+        list_items_barang_digunakan_alokasi.map((item, index) => {
             // counting total
             // totalQtyPO += item.totalQtyPO !== undefined ? item.totalQtyPO : 0;
             // totalHargaPO += item.totalHargaPO !== undefined ? item.totalHargaPO : 0;
             // hargaSatuanPO += item.hargaSatuanPO !== undefined ? item.hargaSatuanPO : 0;
-            qtyTotalPenerimaan += item.totalQtyLPB !== undefined ? item.totalQtyLPB : 0;
-            amount += item.totalHargaLPB !== undefined ? item.totalHargaLPB : 0;
+            qtyTotalPenerimaan += item.totalQty !== undefined ? item.totalQty : 0;
+            amount += item.totalHarga !== undefined ? item.totalHarga : 0;
             // hargaSatuanLPB += item.hargaSatuanLPB !== undefined ? item.hargaSatuanLPB : 0;
         });
 
@@ -2613,6 +2613,7 @@
                             setLoading()
                             let data = new FormData(document.querySelector(".create-form"));
                             data.append("items_digunakan", JSON.stringify(list_items_barang_digunakan));
+                            data.append("items_digunakan_pembelian", JSON.stringify(list_items_barang_pembelian));
                             data.append("items_jadi", JSON.stringify(list_items_barang_jadi));
                             data.append("items_digunakan_alokasi", JSON.stringify(list_items_barang_digunakan_alokasi));
                             data.append("items_digunakan_material_2", JSON.stringify(list_items_barang_digunakan_material_2));
