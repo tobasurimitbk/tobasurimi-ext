@@ -1972,17 +1972,19 @@
         var biayaLain = 0;
         var biayaKopek = 0;
 
-        list_items_barang_digunakan.map((item, index) => {
+        list_items_barang_digunakan_alokasi.map((item, index) => {
             // counting total
             // totalQtyPO += item.totalQtyPO !== undefined ? item.totalQtyPO : 0;
             // totalHargaPO += item.totalHargaPO !== undefined ? item.totalHargaPO : 0;
             // hargaSatuanPO += item.hargaSatuanPO !== undefined ? item.hargaSatuanPO : 0;
-            qtyTotalPenerimaan += item.totalQtyLPB !== undefined ? item.totalQtyLPB : 0;
-            amount += item.totalHargaLPB !== undefined ? item.totalHargaLPB : 0;
+            qtyTotalPenerimaan += item.totalQty !== undefined ? item.totalQty : 0;
+            amount += item.totalHarga !== undefined ? item.totalHarga : 0;
             // hargaSatuanLPB += item.hargaSatuanLPB !== undefined ? item.hargaSatuanLPB : 0;
+            // console.log(item);
         });
 
         const hargaTotalPenerimaan = amount + biayaSubsidi + biayaLain + biayaKopek;
+
 
         if (data.length === 0) {
             row += '<tr><td colspan="7" class="text-center">Data Barang Tidak Ada</td></tr>';
@@ -2004,6 +2006,8 @@
             });
 
             data.forEach((item, index) => {
+
+                // console.log(item);
 
                 let calculatedHargaTotal = 0;
                 let itemHargaTotal = 0;
