@@ -1973,21 +1973,15 @@
         var biayaKopek = 0;
 
         list_items_barang_digunakan_alokasi.map((item, index) => {
-            // counting total
-            // totalQtyPO += item.totalQtyPO !== undefined ? item.totalQtyPO : 0;
-            // totalHargaPO += item.totalHargaPO !== undefined ? item.totalHargaPO : 0;
-            // hargaSatuanPO += item.hargaSatuanPO !== undefined ? item.hargaSatuanPO : 0;
             qtyTotalPenerimaan += item.totalQty !== undefined ? item.totalQty : 0;
             amount += item.totalHarga !== undefined ? item.totalHarga : 0;
-            // hargaSatuanLPB += item.hargaSatuanLPB !== undefined ? item.hargaSatuanLPB : 0;
-            // console.log(item);
         });
 
         const hargaTotalPenerimaan = amount + biayaSubsidi + biayaLain + biayaKopek;
 
 
         if (data.length === 0) {
-            row += '<tr><td colspan="7" class="text-center">Data Barang Tidak Ada</td></tr>';
+            row += '<tr><td colspan="12" class="text-center">Data Barang Tidak Ada</td></tr>';
             $('.tfoot-rasio-akhir').append(row);
         } else {
             let rasioTotal = 0;
@@ -1997,6 +1991,7 @@
 
             let totalHargaTotalManual = 0;
             let totalQtyTanpaManual = 0;
+            let totalBhnTersedia = 0;
 
             data.forEach(item => {
                 totalHargaTotalManual += parseFloat(item.harga_total);
@@ -2006,9 +2001,6 @@
             });
 
             data.forEach((item, index) => {
-
-                // console.log(item);
-
                 let calculatedHargaTotal = 0;
                 let itemHargaTotal = 0;
                 let hargaSatuan = 0;
@@ -2030,6 +2022,7 @@
                     }
                 }
 
+
                 if (item.harga_satuan == 0 || item.harga_satuan == undefined) {
                     hargaSatuan = (parseFloat(calculatedHargaTotal) / parseFloat(item.qtyTotal));
                 } else {
@@ -2038,6 +2031,7 @@
 
                 rasioTotal += rasio;
                 totalTotalHargaRasio += itemHargaTotal;
+                totalBhnTersedia += item.hasilWithPersentase;
 
                 row += `
                 <tr style="color:whitesmoke;text-align: center;">
@@ -2046,13 +2040,16 @@
                     <td>${item.barang_name} - ${item.spesifikasi}</td>
                     <td>${item.kode_satuan}</td>
                     <td>
-                        <input class="form-control filling-weight-barang text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty2}">
+                        <input class="form-control jumlah-barang text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qtyTotal}">
                     </td>
                     <td>
                         <input class="form-control jumlah-barang-berat text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty_isi}">
                     </td>
                     <td>
-                        <input class="form-control jumlah-barang text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qtyTotal}">
+                        <input class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.hasilWithPersentase}">
+                    </td>
+                    <td>
+                        <input class="form-control filling-weight-barang text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty2}">
                     </td>
                     <td>
                         <input class="form-control rasio text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${rasio.toFixed(2)}%">
@@ -2063,13 +2060,16 @@
                     <td>
                         <input class="form-control harga text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 || item.harga_total == undefined ? formatRupiah(calculatedHargaTotal) : formatRupiah(item.harga_total)}">
                     </td>
+                    <td>
+                        <input class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 || item.harga_total == undefined ? formatRupiah(calculatedHargaTotal / item.hasilWithPersentase) : formatRupiah(item.harga_total / item.hasilWithPersentase)}">
+                    </td>
                 </tr>`;
                 no++;
             });
 
             rowFooter += `
             <tr>
-                <td colspan="5"></td>
+                <td colspan="4"></td>
                 <td>
                     <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${data.reduce((sum, item) => sum + parseFloat(item.qtyTotal), 0)}">
                 </td>
@@ -2077,14 +2077,17 @@
                     <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${data.reduce((sum, item) => sum + parseFloat(item.qty_isi), 0)}">
                 </td>
                 <td>
+                    <input class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${totalBhnTersedia.toFixed(2)}%">
+                </td>
+                <td></td>
+                <td>
                     <input class="form-control rasio-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${rasioTotal.toFixed(2)}%">
                 </td>
-                <td>
-                    <input class="form-control harga-total-satuan text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${formatRupiah(totalTotalHargaRasio)}">
-                </td>
+                <td></td>
                 <td>
                     <input class="form-control harga-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${formatRupiah(totalTotalHargaRasio)}">
                 </td>
+                <td></td>
             </tr>`;
 
             $('.tfoot-rasio-akhir').append(rowFooter);

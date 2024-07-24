@@ -575,25 +575,55 @@ class RasioController extends BaseController
     public function getRasioBarangJadi()
     {
         if (!empty($this->request->getVar('tanggal_awal')) && !empty($this->request->getVar('tanggal_akhir'))) {
+            // Ambil input tanggal awal dan akhir
             $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
             $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
-            // list($month, $year) = explode('/', $monthData);
-            // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+
+            // Kondisi produksi berdasarkan input
             $conditionProduction = [
                 'tanggal_awal' => $tanggal_awal,
                 'tanggal_akhir' => $tanggal_akhir,
                 'divisi_id' => $this->request->getVar('department'),
                 'kategori_id' => $this->request->getVar('kategori'),
             ];
+
+            // Ambil data hasil produksi dan data BB untuk hasil produksi
             $productionResultDataTitle = $this->productionResultModel->getDataProductionResultWithDetail($conditionProduction);
+            $productionResultDataBBTitle = $this->productionResultModel->getDataBBForResult($conditionProduction);
 
             $totalQtyAll = 0;
-            foreach ($productionResultDataTitle as $value) {
+            foreach ($productionResultDataTitle as &$value) {
                 $totalQtyAll += $value['qtyTotal'];
             }
+
+            $totalSumQtyBB = 0;
             foreach ($productionResultDataTitle as &$value) {
+                $productionResultIds = explode(',', $value['production_result_id']);
+                $productionResultQty = explode(',', $value['qtyProduksi']);
+
+                $oldBarang1ID = "";
+                $oldBarang2ID = "";
+                $persentasePerBarangJadi = round(floatval($value['qtyTotal']) / floatval($totalQtyAll), 2);
+
+                foreach ($productionResultIds as $key => $productionResultId) {
+                    $sumQtyBB = 0;
+                    $oldBarang1ID = $value['barang1_id'];
+                    $oldBarang2ID = $value['barang2_id'];
+                    foreach ($productionResultDataBBTitle as $valueBB) {
+                        $sumQtyBB += $valueBB['qty'];
+                    }
+                }
+                $totalSumQtyBB = $sumQtyBB;
+                $hasilWithPersentase = round($persentasePerBarangJadi * $totalSumQtyBB, 2);
+                // var_dump(floatval($value['qty']));
+                // var_dump(floatval($totalQtyAll));
+                // var_dump($persentasePerBarangJadi);
+                // var_dump($hasilWithPersentase);
+                // var_dump($totalSumQtyBB);
                 $value['totalQtyAll'] = $totalQtyAll;
+                $value['hasilWithPersentase'] = $hasilWithPersentase;
             }
+            // exit;
             if ($productionResultDataTitle) {
                 return response()->setJSON([
                     'data' => $productionResultDataTitle,
@@ -628,7 +658,7 @@ class RasioController extends BaseController
                 'tanggal_awal' => $tanggal_awal,
                 'tanggal_akhir' => $tanggal_akhir,
                 'divisi_id' => $this->request->getVar('department'),
-                // 'kategori_id' => $this->request->getVar('kategori'),
+                'kategori_id' => $this->request->getVar('kategori'),
             ];
             //     $conditionProduction = [
             //     'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),

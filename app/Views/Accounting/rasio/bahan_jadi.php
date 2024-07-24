@@ -57,19 +57,21 @@
                         <th style="text-align: center;">Kode Barang</th>
                         <th style="text-align: center;">Nama Barang</th>
                         <th style="text-align: center;">Satuan</th>
-                        <th style="text-align: center;">Filling Weight</th>
-                        <th style="text-align: center;">Jumlah Barang (KG)</th>
                         <th style="text-align: center;">Jumlah Barang </th>
+                        <th style="text-align: center;">Jumlah Barang (KG)</th>
+                        <th style="text-align: center;">Bhn Tersedia</th>
+                        <th style="text-align: center;">Filling Weight</th>
                         <th style="text-align: center;">Rasio</th>
                         <th style="text-align: center;">Harga Satuan</th>
                         <th style="text-align: center;">Total</th>
+                        <th style="text-align: center;">Harga BB</th>
                     </tr>
                 </thead>
                 <tbody class="body-table-rasio-akhir">
                 </tbody>
                 <tfoot style="background: #ffffff !important;" class="tfoot-rasio-akhir" id="tfoot-rasio-akhir">
                     <tr>
-                        <td colspan="10" style="text-align: center;">
+                        <td colspan="12" style="text-align: center;">
                             Tidak Ada Barang
                         </td>
                     </tr>
