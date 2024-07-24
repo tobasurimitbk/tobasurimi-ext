@@ -394,4 +394,16 @@ class BiayaUdang extends BaseController
             'status' => true
         ]);
     }
+
+    public function autoComplete()
+    {
+        $listBarang = json_decode($_POST['listBarang']);
+        $listBarangTotal = $this->biayaUdangModel->getDataTotalAutoComplete($listBarang);
+        return response()->setJSON([
+            'data' => $listBarang,
+            'dataTotal' => $listBarangTotal,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
 }

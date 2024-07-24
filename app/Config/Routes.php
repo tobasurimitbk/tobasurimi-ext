@@ -900,6 +900,7 @@ $routes->get('/biaya-udang/all', 'JasaVendor\BiayaUdang::all', ['filter' => 'Aut
 $routes->get('/biaya-udang/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/list-divisi', 'JasaVendor\BiayaUdang::dropdownDivisi', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/list-jasa-vendor-in', 'JasaVendor\BiayaUdang::dropdownJasaVendorIn', ['filter' => 'Auth']);
+$routes->post('/biaya-udang/autocomplete', 'JasaVendor\BiayaUdang::autoComplete', ['filter' => 'Auth']);
 // BIAYA KEPITING
 $routes->get('/biaya-kepiting', 'JasaVendor\BiayaKepiting::index', ['filter' => 'Auth']);
 $routes->get('/biaya-kepiting/create', 'JasaVendor\BiayaKepiting::create', ['filter' => 'Auth']);
@@ -913,6 +914,7 @@ $routes->get('/biaya-kepiting/id/(:segment)',  'JasaVendor\BiayaKepiting::detail
 $routes->get('/biaya-kepiting/print/(:segment)',  'JasaVendor\BiayaKepiting::print/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-kepiting/all', 'JasaVendor\BiayaKepiting::all', ['filter' => 'Auth']);
 $routes->post('/biaya-kepiting/posting', 'JasaVendor\BiayaKepiting::posting', ['filter' => 'Auth']);
+$routes->post('/biaya-kepiting/autocomplete', 'JasaVendor\BiayaKepiting::autoComplete', ['filter' => 'Auth']);
 
 // Stuffing Lokal
 $routes->get('/pengeluaran-lokal',  'Stuffing\Lokal::index', ['filter' => 'Auth']);

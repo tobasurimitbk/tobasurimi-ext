@@ -189,6 +189,7 @@
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
 
+    var request;
     var listBarang = [];
     var listTotal = [];
 
@@ -638,7 +639,7 @@
                     newRow.append($('<td>').text(totalFirst.ratio.toFixed(2) + ' %'));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
-                            <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" oninput="preventNegativeInput(this)" data-barang_master_id="${barang_master_id_last}" autocomplete="one-time-code" class="form-control kg_rebus" type="text" value="${tb_harga_last}">
+                            <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" oninput="preventNegativeInput(this)" data-barang_master_id="${barang_master_id_last}" autocomplete="one-time-code" class="form-control kg_rebus" onkeyup="autoComplete()" type="text" value="${tb_harga_last}">
                         `
                     ));
                     newRow.append($('<td >').text(formatRupiah(totalFirst.total_harga.toFixed(2))));
@@ -663,17 +664,17 @@
                 newRow.append($('<td>').text(v.qty_rebus));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                            <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_fauzy" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control kg_fauzy" type="text" value="${v.kg_fauzy}">
+                            <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_fauzy" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control kg_fauzy" onkeyup="autoComplete()" type="text" value="${v.kg_fauzy}">
                         `
                 ));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                            <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_cn" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control kg_cn" type="text" value="${v.kg_cn}">
+                            <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_cn" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control kg_cn" onkeyup="autoComplete()" type="text" value="${v.kg_cn}">
                         `
                 ));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                            <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_daging" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control kg_daging" type="text" value="${v.kg_daging}">
+                            <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_daging" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control kg_daging" onkeyup="autoComplete()" type="text" value="${v.kg_daging}">
                         `
                 ));
                 newRow.append($('<td>').text('-'));
@@ -708,7 +709,7 @@
                     newRow.append($('<td>').text(totalFirst.ratio.toFixed(2) + ' %'));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
-                                <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" data-barang_master_id="${v.barang_master_id}" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control tb_harga" type="text" value="${v.tb_harga}">
+                                <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" data-barang_master_id="${v.barang_master_id}" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control tb_harga" type="text" onkeyup="autoComplete()" value="${v.tb_harga}">
                         `
                     ));
                     newRow.append($('<td >').text(formatRupiah(totalFirst.total_harga.toFixed(2))));
@@ -924,6 +925,56 @@
                 });
             }
         })
+    }
+
+    function autoComplete() {
+        $.each(listBarang, function(i, v) {
+            var tbHargaElement = $('input[data-barang_master_id="' + v.barang_master_id + '"].tb_harga');
+            var kgFauzyElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].kg_fauzy');
+            var kgCnElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].kg_cn');
+            var kgDagingElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].kg_daging');
+            var tanggalPOElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].tanggal_po');
+
+            // assign
+            listBarang[i].tb_harga = tbHargaElement.val();
+            listBarang[i].kg_fauzy = kgFauzyElement.val();
+            listBarang[i].kg_cn = kgCnElement.val();
+            listBarang[i].kg_daging = kgDagingElement.val();
+            listBarang[i].tanggal_po = tanggalPOElement.val();
+        });
+
+        let data = new FormData();
+        data.append('listBarang', JSON.stringify(listBarang));
+
+        if (request) {
+            request.abort();
+        }
+
+        // Lakukan request baru ke server
+        request = $.ajax({
+            url: "<?= base_url('biaya-udang/autocomplete'); ?>",
+            data: data,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(res) {
+                csrf.val(res.token);
+                listBarang = res.data;
+                listTotal = res.dataTotal;
+                drawTable();
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (textStatus !== 'abort') {
+                    // Handle error selain abort
+                    console.error('Error:', textStatus, errorThrown);
+                }
+            }
+        });
+
     }
 
     function formatRupiah(angka) {
