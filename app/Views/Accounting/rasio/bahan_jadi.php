@@ -50,7 +50,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="table-responsive">
-            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="selectedItemTableRasioAkhir" width="100%" border="1" cellspacing="0">
+            <table class="table table-bordered table-hover-tobasurimi dataTable" id="selectedItemTableRasioAkhir" width="100%" border="1" cellspacing="0">
                 <thead class="thead-dark">
                     <tr>
                         <th style="text-align: center;">No</th>
@@ -90,7 +90,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="table-responsive">
-            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="selectedItemTableRasioAkhir" width="100%" border="1" cellspacing="0">
+            <table class="table table-bordered table-hover-tobasurimi dataTable" id="selectedItemTableRasioAkhir" width="100%" border="1" cellspacing="0">
                 <thead class="thead-dark">
                     <tr>
                         <th style="text-align: center;">No</th>
