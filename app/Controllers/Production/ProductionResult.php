@@ -17,6 +17,7 @@ use App\Models\StockModel;
 use App\Models\WarehousesModel;
 use App\Models\WorkOrderDetailsModel;
 use App\Models\WorkOrdersModel;
+use Dompdf\Dompdf;
 use Exception;
 
 class ProductionResult extends BaseController
@@ -987,5 +988,142 @@ class ProductionResult extends BaseController
             'token' => csrf_hash(),
             'status' => true
         ]);
+    }
+
+    public function printProductionResultPDF($id)
+    {
+        $id = decrypt($id);
+        $dompdf = new Dompdf();
+
+
+        //barang sisa digunakan
+        $productionResDetSelectBR = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan";
+        $productionResDetDataBR = $this->productionResultDetailModel->asObject()
+            ->select($productionResDetSelectBR)
+            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->where('production_result_details.type', 'RETURN')
+            ->where('production_result_details.production_result_id', $id)
+            ->findAll();
+        foreach ($productionResDetDataBR as $key => &$value) {
+            if ($value->barang_type == "bahan_baku") {
+                $value->type_barang_text = "Bahan Baku";
+            } elseif ($value->barang_type == "bahan_penolong") {
+                $value->type_barang_text = "Bahan Penolong";
+            } elseif ($value->barang_type == "bahan_jadi") {
+                $value->type_barang_text = "Bahan Jadi";
+            } elseif ($value->barang_type == "bahan_scrap") {
+                $value->type_barang_text = "Bahan Scrap";
+            } elseif ($value->barang_type == "bahan_modal") {
+                $value->type_barang_text = "Bahan Modal";
+            } elseif ($value->barang_type == "bahan_setengah_jadi") {
+                $value->type_barang_text = "Bahan Setengah Jadi";
+            } else {
+                $value->type_barang_text = "Bahan Return";
+            }
+        }
+        //barang jadi
+        $productionResDetSelectBJ = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan";
+        $productionResDetDataBJ = $this->productionResultDetailModel->asObject()
+            ->select($productionResDetSelectBJ)
+            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->where('production_result_details.type', 'JADI')
+            ->where('production_result_details.production_result_id', $id)
+            ->findAll();
+
+        foreach ($productionResDetDataBJ as $key => &$value) {
+            if ($value->barang_type == "bahan_baku") {
+                $value->type_barang_text = "Bahan Baku";
+            } elseif ($value->barang_type == "bahan_penolong") {
+                $value->type_barang_text = "Bahan Penolong";
+            } elseif ($value->barang_type == "bahan_jadi") {
+                $value->type_barang_text = "Bahan Jadi";
+            } elseif ($value->barang_type == "bahan_scrap") {
+                $value->type_barang_text = "Bahan Scrap";
+            } elseif ($value->barang_type == "bahan_modal") {
+                $value->type_barang_text = "Bahan Modal";
+            } elseif ($value->barang_type == "bahan_setengah_jadi") {
+                $value->type_barang_text = "Bahan Setengah Jadi";
+            }
+        }
+
+        //barang scrap
+        $productionResDetSelectBS = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan, warehouses.warehouse_name as warehouse, divisis.divisi as divisi";
+        $productionResDetDataBS = $this->productionResultDetailModel->asObject()
+            ->select($productionResDetSelectBS)
+            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
+            ->join('stock', 'stock.id = production_result_details.stock_id', 'left')
+            ->join('warehouses', 'warehouses.id = stock.warehouse_id', 'left')
+            ->join('divisis', 'divisis.id = stock.divisi_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->where('production_result_details.type', 'SCRAP')
+            ->where('production_result_details.production_result_id', $id)
+            ->findAll();
+        foreach ($productionResDetDataBS as $key => &$value) {
+            if ($value->barang_type == "bahan_baku") {
+                $value->type_barang_text = "Bahan Baku";
+            } elseif ($value->barang_type == "bahan_penolong") {
+                $value->type_barang_text = "Bahan Penolong";
+            } elseif ($value->barang_type == "bahan_jadi") {
+                $value->type_barang_text = "Bahan Jadi";
+            } elseif ($value->barang_type == "bahan_scrap") {
+                $value->type_barang_text = "Bahan Scrap";
+            } elseif ($value->barang_type == "bahan_modal") {
+                $value->type_barang_text = "Bahan Modal";
+            } elseif ($value->barang_type == "bahan_setengah_jadi") {
+                $value->type_barang_text = "Bahan Setengah Jadi";
+            }
+        }
+
+        //barang digunakan
+        $productionResDetSelectBD = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan, warehouses.warehouse_name, divisis.divisi";
+        $productionResDetDataBD = $this->productionResultDetailModel->asObject()
+            ->select($productionResDetSelectBD)
+            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
+            ->join('divisis', 'divisis.id = production_result_details.divisi_id', 'left')
+            ->join('warehouses', 'warehouses.id = production_result_details.warehouse_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->where('production_result_details.production_result_id', $id)
+            ->where('production_result_details.type', 'DIGUNAKAN')
+            ->findAll();
+        foreach ($productionResDetDataBD as $key => &$value) {
+            if ($value->barang_type == "bahan_baku") {
+                $value->type_barang_text = "Bahan Baku";
+            } elseif ($value->barang_type == "bahan_penolong") {
+                $value->type_barang_text = "Bahan Penolong";
+            } elseif ($value->barang_type == "bahan_jadi") {
+                $value->type_barang_text = "Bahan Jadi";
+            } elseif ($value->barang_type == "bahan_scrap") {
+                $value->type_barang_text = "Bahan Scrap";
+            } elseif ($value->barang_type == "bahan_modal") {
+                $value->type_barang_text = "Bahan Modal";
+            } elseif ($value->barang_type == "bahan_setengah_jadi") {
+                $value->type_barang_text = "Bahan Setengah Jadi";
+            }
+        }
+        $data = [
+            'barang_jadi' => $productionResDetDataBJ,
+            'barang_digunakan' => $productionResDetDataBD,
+            'barang_scrap' => $productionResDetDataBS,
+            'barang_sisa' => $productionResDetDataBR
+        ];
+
+
+
+
+
+
+
+        $dompdf->loadHtml(view('Production/productionResult/printProductionResult', $data));
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $dompdf->stream("Print Production Result", array("Attachment" => false));
+
+        exit(0);
     }
 }

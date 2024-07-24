@@ -22,6 +22,7 @@ use App\Models\WarehousesModel;
 use App\Models\WorkOrderDetailsModel;
 use App\Models\WorkOrdersModel;
 use Exception;
+use Dompdf\Dompdf;
 
 class MaterialRequest extends BaseController
 {
@@ -193,8 +194,7 @@ class MaterialRequest extends BaseController
             $data["ids"] = $ids;
         }
 
-        // var_dump($data);
-        // exit;
+
 
         return view('Production/materialRequest/form', $data);
     }
@@ -761,5 +761,60 @@ class MaterialRequest extends BaseController
             'token' => csrf_hash(),
             'status' => true
         ]);
+    }
+
+    public function printMaterialRequestPDF($id)
+    {
+        $id = decrypt($id);
+        $dompdf = new Dompdf();
+
+        $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()->select('material_request_details.*, barang_master.kode_barang, satuans.kode_satuan, warehouses.warehouse_name as warehouse_text, divisis.divisi as divisi_text')
+            ->join('barang_master', 'barang_master.id = material_request_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->join('warehouses', 'warehouses.id = material_request_details.warehouse_id', 'left')
+            ->join('divisis', 'divisis.id = material_request_details.divisi_id', 'left')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
+            ->where('material_request_id', $id)
+            ->where('parent_barang.parent_name !=', "KIMIA")
+            ->where('material_request_details.deletedAt', null)
+            // ->groupBy('material_request_details.barang1_id, material_request_details.barang2_id, material_request_details.stock_tujuan_id')
+            ->get()->getResult();
+        foreach ($dataMaterialRequestDetails as $key => &$value) {
+            if ($value->barang_type == "bahan_baku") {
+                $value->barang_type_text = "Bahan Baku";
+            } elseif ($value->barang_type == "bahan_penolong") {
+                $value->barang_type_text = "Bahan Penolong";
+            } elseif ($value->barang_type == "bahan_jadi") {
+                $value->barang_type_text = "Bahan Jadi";
+            } elseif ($value->barang_type == "bahan_scrap") {
+                $value->barang_type_text = "Bahan Scrap";
+            } elseif ($value->barang_type == "bahan_modal") {
+                $value->barang_type_text = "Bahan Modal";
+            } elseif ($value->barang_type == "bahan_setengah_jadi") {
+                $value->barang_type_text = "Bahan Setengah Jadi";
+            }
+        }
+        $totalQty = 0;
+        $totalQty2 = 0;
+
+        foreach ($dataMaterialRequestDetails as $d) {
+            $totalQty += $d->qty;
+            $totalQty2 += $d->qty2;
+        }
+
+
+        $data  = [
+            'data' => $dataMaterialRequestDetails,
+            'totalQty' => number_format($totalQty, 2),
+            'totalQty2' => number_format($totalQty2, 2)
+        ];
+
+        $dompdf->loadHtml(view('Production/materialRequest/printMaterialRequest', $data));
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $dompdf->stream("Print Material Request", array("Attachment" => false));
+
+        exit(0);
     }
 }

@@ -2257,6 +2257,10 @@
             inputElement.value = numericValue;
         }
     }
+
+    function print(url) {
+        window.open(url);
+    }
 </script>
 
 <?= $this->endSection(); ?>

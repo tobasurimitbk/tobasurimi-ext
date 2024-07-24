@@ -1434,6 +1434,10 @@
             inputElement.value = numericValue;
         }
     }
+
+    const print = function(url) {
+        window.open(url);
+    }
 </script>
 
 <?= $this->endSection(); ?>

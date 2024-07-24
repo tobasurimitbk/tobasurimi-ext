@@ -3,6 +3,7 @@
 namespace App\Controllers\Laporan\Warehouse;
 
 use App\Controllers\BaseController;
+use App\Controllers\BeaCukai\BC27;
 use Config\Services;
 use Dompdf\Dompdf;
 
@@ -42,6 +43,12 @@ use App\Models\StockDetail2Model;
 use App\Models\MaterialRequestsModel;
 use App\Models\MaterialRequestsPenolongModel;
 use App\Models\DivisisModel;
+use App\Models\BC23Model;
+use App\Models\BC25Model;
+use App\Models\BC27Model;
+use App\Models\BC30Model;
+use App\Models\BC40Model;
+use App\Models\BC41Model;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -91,7 +98,12 @@ class LaporanWarehouse extends BaseController
     protected $materialRequestModel;
     protected $materialRequestPenolongModel;
     protected $divisisModel;
-
+    protected $bc23Model;
+    protected $bc25Model;
+    protected $bc27Model;
+    protected $bc30Model;
+    protected $bc40Model;
+    protected $bc41Model;
 
 
     private $userId;
@@ -137,6 +149,12 @@ class LaporanWarehouse extends BaseController
         $this->materialRequestModel = new MaterialRequestsModel();
         $this->materialRequestPenolongModel = new MaterialRequestsPenolongModel();
         $this->divisisModel = new DivisisModel();
+        $this->bc23Model = new BC23Model();
+        $this->bc25Model = new BC25Model();
+        $this->bc27Model = new BC27Model();
+        $this->bc30Model = new BC30Model();
+        $this->bc40Model = new BC40Model();
+        $this->bc41Model = new BC41Model();
 
 
         $this->userId = session()->get("login")->user_id;
@@ -2105,17 +2123,20 @@ class LaporanWarehouse extends BaseController
         $divisiName = [];
         $supplier = [];
         $warehouse = [];
+        $tipe_barang = [];
         foreach ($dataQry as $d) {
             array_push($divisiName, $d['divisi']);
             array_push($supplier, $d['supplier_name']);
             array_push($warehouse, $d['warehouse_name']);
+            array_push($tipe_barang, $d['tipe_barang']);
         }
 
 
         $data = [
             'divisi' => array_unique($divisiName),
             'supplier' => array_unique($supplier),
-            'warehouse' => array_unique($warehouse)
+            'warehouse' => array_unique($warehouse),
+            'tipe_barang' => array_unique($tipe_barang)
         ];
         return view('Laporan/Warehouse/LaporanKartuStock/index', $data);
     }
@@ -2190,8 +2211,11 @@ class LaporanWarehouse extends BaseController
             stock_details.no_dokumen AS no_dokumen_1,
             stock_details.stock_date,
             stock_details.sumber,
-            (SUM(CASE WHEN stock_details.status = "In" THEN stock_details2.qty ELSE 0 END) - SUM(CASE WHEN stock_details.status = "Out" THEN stock_details2.qty ELSE 0 END)) AS stok_total
-        ';
+                (SUM(CASE WHEN stock_details.status = "In" 
+                THEN stock_details2.qty ELSE 0 END) - 
+                SUM(CASE WHEN stock_details.status = "Out" 
+                THEN stock_details2.qty ELSE 0 END)) 
+                AS stok_total';
 
         $dataQry = $this->stockDetail2Model->asArray()
             ->select($selectQry)
@@ -2202,9 +2226,11 @@ class LaporanWarehouse extends BaseController
             ->join('divisis', 'divisis.id = stock.divisi_id')
             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
             ->join('kemasan', 'kemasan.id = stock.kemasan_id', 'left')
+            ->groupBy('stock_details2.bc_id')
+            ->groupBy('stock_details2.stock_id')
+            ->groupBy('stock_details2.no_aju')
             ->having('stok_total >', 0)
-            ->orderBy($sort, $sortType)
-            ->groupBy(['stock_details2.stock_dokumen', 'stock_details2.bc_id', 'stock_details2.no_aju']);
+            ->orderBy($sort, $sortType);
 
         if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['tipeBarang']) || !empty($addCondition['divisi']) || !empty($addCondition['warehouse']) || !empty($addCondition['search'])) {
             $dataQry->groupStart();
@@ -2215,23 +2241,14 @@ class LaporanWarehouse extends BaseController
                     ->orLike('barang_master.kode_barang', $addCondition['search'])
                     ->orLike('kemasan.kode', $addCondition['search']);
             }
-
-
-
             if (!empty($addCondition['dateStart'])) {
                 $dataQry->where('stock_details.stock_date >=', $addCondition['dateStart']);
             }
             if (!empty($addCondition['dateEnd'])) {
                 $dataQry->where('stock_details.stock_date <=', $addCondition['dateEnd']);
             }
-            if ($addCondition['tipeBarang'] == "bahan_penolong") {
-                $dataQry->where('stock.tipe_barang', 'bahan_penolong');
-            }
-            if ($addCondition['tipeBarang'] == "bahan_baku") {
-                $dataQry->where('stock.tipe_barang', 'bahan_baku');
-            }
-            if ($addCondition['tipeBarang'] == "kemasan") {
-                $dataQry->where('stock.tipe_barang', 'kemasan');
+            if (!empty($addCondition['tipeBarang'])) {
+                $dataQry->where('stock.tipe_barang', $addCondition['tipeBarang']);
             }
             if (!empty($addCondition['divisi'])) {
                 $dataQry->where('divisis.divisi', $addCondition['divisi']);
@@ -2242,21 +2259,16 @@ class LaporanWarehouse extends BaseController
             $dataQry->groupEnd();
         }
 
-        $filteredDataQry = clone $dataQry;
-        $dataQry->groupBy(['stock_details2.stock_dokumen', 'stock_details2.bc_id', 'stock_details2.no_aju']);
-        $totalFilteredRecords = $filteredDataQry->countAllResults(false);
+        $totalFilteredRecords = $dataQry->countAllResults(false);
         $dataResult = $dataQry->findAll($pageSize, $offset);
         $dataAllKartuStock = [];
-
 
         foreach ($dataResult as $data) {
             $namaBarang = "";
             $spesifikasi = "-";
             $satuan = "";
             $kodeBarang = "";
-            $tipe_barang  = "";
-            $sumberBCName = "-";
-
+            $sumberBCName = "NON PABEAN";
 
             if (!empty($data['bc_id'])) {
                 $sumberBC = $this->MetaDataModel
@@ -2275,7 +2287,6 @@ class LaporanWarehouse extends BaseController
                 $satuan = $kemasanData['nama_satuan'];
                 $namaBarang = $kemasanData['name'];
                 $kodeBarang = $kemasanData['kode'];
-                $tipe_barang = 'KEMASAN';
             } else {
                 $barangData = $this->barangMasterModel
                     ->select('barang_master.*')
@@ -2286,11 +2297,6 @@ class LaporanWarehouse extends BaseController
                     ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
                     ->where('barang_master_spesifikasi.id', $data['barang2_id'])
                     ->first();
-                if ($data['tipe_barang'] == 'bahan_penolong') {
-                    $tipe_barang = "BAHAN PENOLONG";
-                } elseif ($data['tipe_barang'] == 'bahan_baku') {
-                    $tipe_barang = "BAHAN BAKU";
-                }
 
                 $satuan = $barangSpesifikasiData['nama_satuan'];
                 $namaBarang = $barangData['barang_name'];
@@ -2301,8 +2307,8 @@ class LaporanWarehouse extends BaseController
 
             $dataAllKartuStock[] = [
                 'no' => $no++,
-                'tipe_barang' => $tipe_barang,
-                'sumber_barang' => $sumberBCName . " / " .  $data['no_aju'],
+                'tipe_barang' => strtoupper(str_replace('_', " ", $data['tipe_barang'])),
+                'sumber_barang' => $sumberBCName . " / " .  $data['no_aju'] . " / " . $data['sumber'],
                 'supplier' => $data['supplier_name'],
                 'warehouse_name' => $data['warehouse_name'],
                 'tanggal_penerimaan' => date('d/m/Y', strtotime($data['stock_date'])),

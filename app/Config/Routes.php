@@ -634,6 +634,7 @@ $routes->get('order-form-lain/get-no', 'PenjualanLain\SalesOrderLain::getSalesOr
 // Production Result
 $routes->get('/production-result', 'Production\ProductionResult::index', ['filter' => 'Auth']);
 $routes->get('/production-result/details/(:segment)', 'Production\ProductionResult::getById/$1', ['filter' => 'Auth']);
+$routes->get('/production-result/print/(:segment)', 'Production\ProductionResult::printProductionResultPDF/$1', ['filter' => 'Auth']);
 $routes->get('/production-result/all', 'Production\ProductionResult::getAll', ['filter' => 'Auth']);
 $routes->get('/production-result/create', 'Production\ProductionResult::createProductionResult', ['filter' => 'Auth']);
 $routes->post('/production-result/create', 'Production\ProductionResult::saveProductionResult', ['filter' => 'Auth']);
@@ -658,6 +659,7 @@ $routes->post('/work-order/delete-detail', 'Production\WorkOrder::deleteWODetail
 // Material Request
 $routes->get('/material-request', 'Production\MaterialRequest::index', ['filter' => 'Auth']);
 $routes->get('/material-request/details/(:segment)', 'Production\MaterialRequest::getById/$1', ['filter' => 'Auth']);
+$routes->get('/material-request/print/(:segment)', 'Production\MaterialRequest::printMaterialRequestPDF/$1', ['filter' => 'Auth']);
 $routes->get('/material-request/create', 'Production\MaterialRequest::createView', ['filter' => 'Auth']);
 $routes->get('/material-request/all', 'Production\MaterialRequest::all', ['filter' => 'Auth']);
 $routes->post('/material-request/delete', 'Production\MaterialRequest::deleteMR', ['filter' => 'Auth']);
@@ -671,6 +673,7 @@ $routes->get('/material-request/list-barang-stock-init', 'Production\MaterialReq
 // Material Request Penolong
 $routes->get('/material-request-penolong', 'Production\MaterialRequestPenolong::index', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/details/(:segment)', 'Production\MaterialRequestPenolong::getById/$1', ['filter' => 'Auth']);
+$routes->get('/material-request-penolong/print/(:segment)', 'Production\MaterialRequestPenolong::printMaterialRequestPenolongPDF/$1', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/create', 'Production\MaterialRequestPenolong::createView', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/all', 'Production\MaterialRequestPenolong::all', ['filter' => 'Auth']);
 $routes->post('/material-request-penolong/delete', 'Production\MaterialRequestPenolong::deleteMR', ['filter' => 'Auth']);
