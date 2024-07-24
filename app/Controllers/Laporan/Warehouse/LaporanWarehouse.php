@@ -2106,8 +2106,11 @@ class LaporanWarehouse extends BaseController
             stock_details.no_dokumen AS no_dokumen_1,
             stock_details.stock_date,
             stock_details.sumber,
-            (SUM(CASE WHEN stock_details.status = "In" THEN stock_details2.qty ELSE 0 END) - SUM(CASE WHEN stock_details.status = "Out" THEN stock_details2.qty ELSE 0 END)) AS stok_total
-        ';
+                (SUM(CASE WHEN stock_details.status = "In" 
+                THEN stock_details2.qty ELSE 0 END) - 
+                SUM(CASE WHEN stock_details.status = "Out" 
+                THEN stock_details2.qty ELSE 0 END)) 
+                AS stok_total';
 
         $dataQry = $this->stockDetail2Model->asArray()
             ->select($selectQry)
@@ -2116,9 +2119,13 @@ class LaporanWarehouse extends BaseController
             ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
             ->join('warehouses', 'warehouses.id = stock.warehouse_id')
             ->join('divisis', 'divisis.id = stock.divisi_id')
+            ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
+            ->join('kemasan', 'kemasan.id = stock.kemasan_id', 'left')
+            ->groupBy('stock_details2.bc_id')
+            ->groupBy('stock_details2.stock_id')
+            ->groupBy('stock_details2.no_aju')
+            ->where('stock.company_id', $this->this_company_id)
             ->having('stok_total >', 0)
-            ->orderBy('stock_details.createdAt', 'ASC')
-            ->groupBy(['stock_details2.stock_dokumen', 'stock_details2.bc_id', 'stock_details2.no_aju'])
             ->findAll();
         $divisiName = [];
         $supplier = [];
