@@ -481,4 +481,19 @@ class BiayaKepiting extends BaseController
             'status' => true
         ]);
     }
+
+    public function autoComplete()
+    {
+        $listBarang = json_decode($_POST['listBarang']);
+        $listPerolehanGaji = json_decode($_POST['listPerolehanGaji']);
+        $listBonus = json_decode($_POST['listBonus']);
+
+        return response()->setJSON([
+            'data' => $listBarang,
+            'dataPerolehanGaji' => $listPerolehanGaji,
+            'dataBonus' => $listBonus,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
 }

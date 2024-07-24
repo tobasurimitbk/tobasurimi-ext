@@ -10,7 +10,7 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data" action="panjar-supplier/save">
-                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id">
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6">
@@ -63,6 +63,7 @@
                 <?php if (can('Pembayaran', 'Panjar Supplier', 'c')) : ?>
                     <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
                 <?php endif; ?>
+                <?php ?>
                 <?php if (can('Pembayaran', 'Panjar Supplier', 'd')) : ?>
                     <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
                 <?php endif; ?>
@@ -481,7 +482,10 @@
         $(".delete-form").css('display', 'none');
         validator.resetForm();
         validator.reset();
-        $(".create-form")[0].reset()
+        $(".create-form")[0].reset();
+        $("#tipe_supplier").val(null).trigger('change');
+        $("#supplier_id").val(null).trigger('change');
+        $("#id").val('');
     })
 
     //delete form by form
@@ -544,8 +548,8 @@
                         $("#id").val(id);
                         $("#no_panjar").val(res.data.no_panjar);
                         $("#payment_date").val(res.data.payment_date);
-                        $("#tipe_supplier").val(res.data.type);
-                        $("#supplier_id").val(res.data.supplier_id);
+                        $("#tipe_supplier").val(res.data.type).change();
+                        $("#supplier_id").val(res.data.supplier_id).change();
                         $("#payment_date").val(res.data.payment_date);
                         $("#total_panjar").val(formatRupiah(res.data.total_panjar));
                         $("#sisa_panjar").val(res.data.fax);
@@ -557,6 +561,8 @@
                             $("#tipe_supplier").prop("disabled", true);
                             $("#supplier_id").prop("disabled", true);
                             $("#total_panjar").prop("disabled", true);
+                            $(".delete-form").css('display', 'none');
+
                         }
 
                         $('.modal').on('hidden.bs.modal', function() {
@@ -569,6 +575,7 @@
                             $("#tipe_supplier").prop("disabled", false);
                             $("#supplier_id").prop("disabled", false);
                             $("#total_panjar").prop("disabled", false);
+                            $(".delete-form").css('display', '')
                         }
 
                     } catch (error) {

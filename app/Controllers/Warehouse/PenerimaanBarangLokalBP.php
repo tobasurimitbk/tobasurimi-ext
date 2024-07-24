@@ -119,6 +119,7 @@ class PenerimaanBarangLokalBP extends BaseController
 
 
         foreach ($penerimaanBarangData['data'] as $data) {
+            $spp = $this->amPurchaseOrderModel->getSPP(json_decode($data->multiple_po_id));
             array_push($dataPenerimaanBarang, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
@@ -129,6 +130,7 @@ class PenerimaanBarangLokalBP extends BaseController
                 "createdAt"             => $data->tanggal ? date("d/m/Y", strtotime($data->tanggal)) : "",
                 "supplier_name"         => $data->supplier_name,
                 "itemCount"             => $data->itemCount,
+                "spp_no"                => count($spp) == 0 ? "-" : $spp[0]['spp_no'],
                 "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
                 "status_post"           => $data->status_post,
             ]);
@@ -420,8 +422,10 @@ class PenerimaanBarangLokalBP extends BaseController
             "dataPenerimaanBarang" => $this->penerimaanBarangModel->where('id', $id)->first(),
             "dataKemasan"   => $dataKemasan,
             "dataDivisi" => $dataDivisi,
-
+            "dataSPP" => []
         ];
+
+        $data['dataSPP'] = $this->amPurchaseOrderModel->getSPP(json_decode($data['dataPenerimaanBarang']['multiple_po_id']));
 
         return view('Warehouse/penerimaanBarangLokal/bahanPenolong/form', $data);
     }

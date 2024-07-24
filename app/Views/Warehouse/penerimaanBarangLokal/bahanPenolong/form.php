@@ -93,8 +93,21 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
+                        <div class="form-floating" style="height: 50px;">
+                            <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select spp_id" id="spp_id" name="spp_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php if (!empty($dataPenerimaanBarang)) : ?>
+                                    <?php foreach ($dataSPP as $d) : ?>
+                                        <option selected value="<?= $d["id"]; ?>"><?= strtoupper($d["spp_no"]); ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                            <label for="floatingInput">No SPP</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> multiple class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
+                            <select disabled <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> multiple class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
                                 <option value=""></option>
                                 <?php if (!empty($dataPenerimaanBarang)) : ?>
                                     <?php foreach (json_decode(($dataPenerimaanBarang['multiple_po_id'])) as $i => $id) : ?>
@@ -446,9 +459,9 @@
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        // GET PO
+        // GET SPP
         $.ajax({
-            url: `<?= base_url('penerimaan-barang-lokal-bp/get-po'); ?>`,
+            url: `<?= base_url('penerimaan-barang-lokal-bp/get-spp'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -462,14 +475,15 @@
             },
             dataType: "json",
             success: function(res) {
-                $(".multiple_po_id").empty()
-                $(".multiple_po_id").append(`<option value=""></option>`)
+                $(".spp_id").empty()
+                $(".spp_id").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
-                    $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
+                    $(".spp_id").append(`<option value="${item.id}">${item.spp_no}</option>`)
                 })
-                $(".multiple_po_id").val([]);
+                $(".spp_id").val();
             }
         });
+
         // GET WAREHOUSES
         $.ajax({
             url: `<?= base_url('penerimaan-barang-lokal-bp/warehouse'); ?>`,
@@ -523,14 +537,46 @@
 
     });
 
-    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id')
+    $(".spp_id").select2({
+        placeholder: "Pilih Nomor SPP",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        // GET PO
+        $.ajax({
+            url: `<?= base_url('penerimaan-barang-lokal-bp/get-po'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                id: $(".supplier_id option:selected").val(),
+                divisi_id: $(".divisi_id option:selected").val(),
+                spp_id: $('#spp_id option:selected').val()
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".multiple_po_id").empty()
+                $(".multiple_po_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".multiple_po_id").append(`<option selected value="${item.id}">${item.po_no}</option>`)
+                })
+                $(".multiple_po_id").change();
+            }
+        });
+    });
+
+    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id, .spp_id')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id')
+    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id, .spp_id')
         .parent('div')
         .children('span')
         .children('span')
@@ -538,12 +584,10 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id')
+    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id, .spp_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');
-
-
 
     // Validator Detail
     var validator_detail = $(".detail-form").validate({

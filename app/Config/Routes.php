@@ -634,6 +634,7 @@ $routes->get('order-form-lain/get-no', 'PenjualanLain\SalesOrderLain::getSalesOr
 // Production Result
 $routes->get('/production-result', 'Production\ProductionResult::index', ['filter' => 'Auth']);
 $routes->get('/production-result/details/(:segment)', 'Production\ProductionResult::getById/$1', ['filter' => 'Auth']);
+$routes->get('/production-result/print/(:segment)', 'Production\ProductionResult::printProductionResultPDF/$1', ['filter' => 'Auth']);
 $routes->get('/production-result/all', 'Production\ProductionResult::getAll', ['filter' => 'Auth']);
 $routes->get('/production-result/create', 'Production\ProductionResult::createProductionResult', ['filter' => 'Auth']);
 $routes->post('/production-result/create', 'Production\ProductionResult::saveProductionResult', ['filter' => 'Auth']);
@@ -658,6 +659,7 @@ $routes->post('/work-order/delete-detail', 'Production\WorkOrder::deleteWODetail
 // Material Request
 $routes->get('/material-request', 'Production\MaterialRequest::index', ['filter' => 'Auth']);
 $routes->get('/material-request/details/(:segment)', 'Production\MaterialRequest::getById/$1', ['filter' => 'Auth']);
+$routes->get('/material-request/print/(:segment)', 'Production\MaterialRequest::printMaterialRequestPDF/$1', ['filter' => 'Auth']);
 $routes->get('/material-request/create', 'Production\MaterialRequest::createView', ['filter' => 'Auth']);
 $routes->get('/material-request/all', 'Production\MaterialRequest::all', ['filter' => 'Auth']);
 $routes->post('/material-request/delete', 'Production\MaterialRequest::deleteMR', ['filter' => 'Auth']);
@@ -671,6 +673,7 @@ $routes->get('/material-request/list-barang-stock-init', 'Production\MaterialReq
 // Material Request Penolong
 $routes->get('/material-request-penolong', 'Production\MaterialRequestPenolong::index', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/details/(:segment)', 'Production\MaterialRequestPenolong::getById/$1', ['filter' => 'Auth']);
+$routes->get('/material-request-penolong/print/(:segment)', 'Production\MaterialRequestPenolong::printMaterialRequestPenolongPDF/$1', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/create', 'Production\MaterialRequestPenolong::createView', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/all', 'Production\MaterialRequestPenolong::all', ['filter' => 'Auth']);
 $routes->post('/material-request-penolong/delete', 'Production\MaterialRequestPenolong::deleteMR', ['filter' => 'Auth']);
@@ -897,6 +900,7 @@ $routes->get('/biaya-udang/all', 'JasaVendor\BiayaUdang::all', ['filter' => 'Aut
 $routes->get('/biaya-udang/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/list-divisi', 'JasaVendor\BiayaUdang::dropdownDivisi', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/list-jasa-vendor-in', 'JasaVendor\BiayaUdang::dropdownJasaVendorIn', ['filter' => 'Auth']);
+$routes->post('/biaya-udang/autocomplete', 'JasaVendor\BiayaUdang::autoComplete', ['filter' => 'Auth']);
 // BIAYA KEPITING
 $routes->get('/biaya-kepiting', 'JasaVendor\BiayaKepiting::index', ['filter' => 'Auth']);
 $routes->get('/biaya-kepiting/create', 'JasaVendor\BiayaKepiting::create', ['filter' => 'Auth']);
@@ -910,6 +914,7 @@ $routes->get('/biaya-kepiting/id/(:segment)',  'JasaVendor\BiayaKepiting::detail
 $routes->get('/biaya-kepiting/print/(:segment)',  'JasaVendor\BiayaKepiting::print/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-kepiting/all', 'JasaVendor\BiayaKepiting::all', ['filter' => 'Auth']);
 $routes->post('/biaya-kepiting/posting', 'JasaVendor\BiayaKepiting::posting', ['filter' => 'Auth']);
+$routes->post('/biaya-kepiting/autocomplete', 'JasaVendor\BiayaKepiting::autoComplete', ['filter' => 'Auth']);
 
 // Stuffing Lokal
 $routes->get('/pengeluaran-lokal',  'Stuffing\Lokal::index', ['filter' => 'Auth']);
@@ -1055,7 +1060,8 @@ $routes->get('/penerimaan-barang-lokal-bp/all', 'Warehouse\PenerimaanBarangLokal
 $routes->get('/penerimaan-barang-lokal-bp/create', 'Warehouse\PenerimaanBarangLokalBP::create', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-lokal-bp/insert', 'Warehouse\PenerimaanBarangLokalBP::createAction', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/generate-po-no', 'Warehouse\PenerimaanBarangLokalBP::generatePONo', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-lokal-bp/get-po', 'Purchase\POLokalBahanPenolong::dropdownPOLokalBahanPenolong', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bp/get-po', 'Purchase\POLokalBahanPenolong::dropdownPOBySpp', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bp/get-spp', 'Purchase\POLokalBahanPenolong::dropdownSPPBahanPenolong', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/list-barang', 'Warehouse\PenerimaanBarangLokalBP::listBarangLPB', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/id/(:segment)', 'Warehouse\PenerimaanBarangLokalBP::update/$1', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-lokal-bp/update', 'Warehouse\PenerimaanBarangLokalBP::updateAction', ['filter' => 'Auth']);

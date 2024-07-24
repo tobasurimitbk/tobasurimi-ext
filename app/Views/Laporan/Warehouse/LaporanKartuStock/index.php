@@ -9,7 +9,7 @@
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-warehouse/stock-kartu/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-warehouse/stock-kartu/print"); ?>')">Excel</button></li>
         </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-warehouse"); ?>">
@@ -25,27 +25,36 @@
                     <div class="form-floating mb-3">
                         <select class="form-select filter_tipe_barang" name="filter_tipe_barang" id="filter_tipe_barang">
                             <option disabled selected value=""></option>
-                            <option value="bahan_penolong">Bahan Penolong</option>
-                            <option value="bahan_baku">Bahan Baku</option>
-                            <option value="kemasan">Kemasan</option>
+                            <?php foreach ($tipe_barang as $td) : ?>
+                                <option value="<?= $td ?>"><?= strtoupper(str_replace('_', " ", $td)) ?></option>
+                            <?php endforeach ?>
                         </select>
                         <label style="z-index: 1;">Filter Tipe Barang</label>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
                         </div>
-
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="input-group input-group-password" style="height: 50px;">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99;margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -74,6 +83,7 @@
                         <label style="z-index: 1;">Warehouse</label>
 
                     </div>
+
                 </div>
                 <div class="col mb-4">
                     <div class="form-floating">
@@ -81,9 +91,7 @@
                         <label style="z-index: 1;">Cari Kode / Nama Barang </label>
                     </div>
                 </div>
-                <!-- <div class="col mb-4">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
-                </div> -->
+
 
             </div>
             <div class="row">
@@ -93,13 +101,13 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSort('tipe_barang')" class="sort">Tipe Barang</th>
-                                <th onclick="changeSort('no aju')" class="sort">Sumber Barang (BC/No Aju)</th>
+                                <th onclick="changeSort('no aju')" class="sort">Sumber Barang (BC/No Aju/Sumber)</th>
                                 <th onclick="changeSort('supplier')" class="sort">Supplier</th>
+                                <th onclick="changeSort('department')" class="sort">Department </th>
                                 <th onclick="changeSort('warehouse')" class="sort">Warehouse</th>
                                 <th onclick="changeSort('tanggal_penerimaan')" class="sort">Tanggal Penerimaan</th>
                                 <th onclick="changeSort('no_dok')" class="sort">Nomor</th>
-                                <th onclick="changeSort('department')" class="sort">Department <!-- department --></th>
-                                <th onclick="changeSort('kode_barang')" class="sort">Kode Barang <!-- tipe-barang --></th>
+                                <th onclick="changeSort('kode_barang')" class="sort">Kode Barang </th>
                                 <th onclick="changeSort('nama_baramg')" class="sort">Nama Barang</th>
                                 <th onclick="changeSort('spesifikasi')" class="sort">Spesifikasi</th>
                                 <th onclick="changeSort('satuan')" class="sort">Satuan</th>
@@ -178,6 +186,10 @@
                 className: "text-center",
             },
             {
+                data: "department",
+                className: "text-center",
+            },
+            {
                 data: "warehouse_name",
                 className: "text-center",
             },
@@ -187,10 +199,6 @@
             },
             {
                 data: "nomor",
-                className: "text-center",
-            },
-            {
-                data: "department",
                 className: "text-center",
             },
             {
