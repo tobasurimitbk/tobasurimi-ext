@@ -2077,7 +2077,7 @@
                     <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${data.reduce((sum, item) => sum + parseFloat(item.qty_isi), 0)}">
                 </td>
                 <td>
-                    <input class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${totalBhnTersedia.toFixed(2)}%">
+                    <input class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${totalBhnTersedia.toFixed(2)}">
                 </td>
                 <td></td>
                 <td>
