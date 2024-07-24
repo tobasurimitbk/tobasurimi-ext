@@ -2229,6 +2229,7 @@ class LaporanWarehouse extends BaseController
             ->groupBy('stock_details2.bc_id')
             ->groupBy('stock_details2.stock_id')
             ->groupBy('stock_details2.no_aju')
+            ->where('stock.company_id', $this->this_company_id)
             ->having('stok_total >', 0)
             ->orderBy($sort, $sortType);
 
