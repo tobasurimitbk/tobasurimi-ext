@@ -23,9 +23,14 @@
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control no_surat_jalan" id="no_surat_retur" name="no_surat_retur" readonly value="<?= !empty($data) ? $data->no_return : $noReturn; ?>" placeholder="Nomor surat Return">
-                            <label for="floatingInput">Nomor Surat Return</label>
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control no_surat_jalan" id="no_surat_retur" name="no_surat_retur" value="<?= !empty($data) ? $data->no_return : $noReturn; ?>" placeholder="Nomor surat Return">
+                                <label for="floatingInput">Nomor Surat Return</label>
+                            </div>
+                            <div style="<?= !empty($data) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -498,6 +503,34 @@
             $(element).removeClass('select-class');
         },
     });
+
+    function changeStatus() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
+        if (value) {
+            $.ajax({
+                url: `<?= base_url("/return-barang-sales/get-nomor-surat-return"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res) {
+                        $("#no_surat_retur").val(res);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        $("#no_surat_retur").attr("readonly", false);
+                        $("#auto_generate").prop("checked", false);
+                        $("#no_surat_retur").val("");
+                    }
+                }
+            })
+        } else {
+            $("#no_surat_retur").attr("readonly", false);
+            $("#no_surat_retur").val("");
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>

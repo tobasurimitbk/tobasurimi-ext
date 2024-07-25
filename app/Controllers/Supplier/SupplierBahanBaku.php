@@ -183,7 +183,7 @@ class SupplierBahanBaku extends BaseController
 
             $supplierCode = $this->request->getPost("kode");
             if ($supplierCode == 'AUTO GENERATE') {
-                $supplierCode = $supplierModel->generateSupplierCode("BB");
+                $supplierCode = $supplierModel->generateSupplierCode("BB", $this->this_company_id);
             }
 
             $insertData = [

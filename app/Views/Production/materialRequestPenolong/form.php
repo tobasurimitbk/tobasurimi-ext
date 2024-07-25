@@ -95,12 +95,12 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input value="<?= !empty($dataMaterialRequests) ? $dataMaterialRequests->req_no : "AUTO GENERATE" ?>" readonly autocomplete="one-time-code" type="text" class="form-control req_no" id="req_no" name="req_no" placeholder="Kode Produksi">
+                                    <input value="<?= !empty($dataMaterialRequests) ? $dataMaterialRequests->req_no : "" ?>" autocomplete="one-time-code" type="text" class="form-control req_no" id="req_no" name="req_no" placeholder="Kode Produksi">
                                     <label for="floatingInput">Kode Request</label>
                                 </div>
-                                <!-- <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
-                                </div> -->
+                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 20px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -818,17 +818,7 @@
         $('.detail-modal').modal('hide');
     });
 
-    // const changeStatus = function() {
-    //     let value = document.getElementById('auto_generate').checked ? true : false;
 
-    //     if (value) {
-    //         $(".req_no").attr("readonly", true);
-    //         $(".req_no").val("AUTO GENERATE");
-    //     } else {
-    //         $(".req_no").attr("readonly", false);
-    //         $(".req_no").val("");
-    //     }
-    // }
 
     const deleteRowDetail = function(id) {
         const indexToRemove = listStockAsal.findIndex(item => item.barang_detail_id === id);
@@ -1437,6 +1427,36 @@
 
     const print = function(url) {
         window.open(url);
+    }
+
+    const changeStatus = function() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
+
+        if (value) {
+            $.ajax({
+                url: `<?= base_url("/material-request-penolong/generate-kode-request"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res) {
+                        $(".req_no").val(res);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        $("#req_no").attr("readonly", false);
+                        $("#auto_generate").prop("checked", false);
+                        $("#req_no").val("");
+                    }
+                }
+            })
+
+        } else {
+            $(".req_no").attr("readonly", false);
+            $(".req_no").val("");
+        }
     }
 </script>
 

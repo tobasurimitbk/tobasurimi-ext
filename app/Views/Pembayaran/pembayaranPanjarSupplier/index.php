@@ -14,9 +14,14 @@
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" readonly value="<?= $noPanjar ?>" class="form-control name" id="no_panjar" name="no_panjar" placeholder="no_panjar">
-                                <label for="floatingInput">No Panjar</label>
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control name" id="no_panjar" name="no_panjar" placeholder="no_panjar">
+                                    <label for="floatingInput">No Panjar</label>
+                                </div>
+                                <div style="" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: -8px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
                             </div>
                         </div>
 
@@ -175,7 +180,7 @@
                         <thead>
                             <tr>
                                 <td style="width: 10px;text-align: center;color:#E7323A;font-weight:bold;">No</td>
-                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Nomor PO</td>
+                                <td style="text-align: center;color:#E7323A;font-weight:bold;" class="nomor">Nomor PO</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;">Total Panjar</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;">Bayar Panjar</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;">Payment Date</td>
@@ -549,20 +554,19 @@
                         $("#no_panjar").val(res.data.no_panjar);
                         $("#payment_date").val(res.data.payment_date);
                         $("#tipe_supplier").val(res.data.type).change();
-                        $("#supplier_id").val(res.data.supplier_id).change();
+                        $("#supplier_id").val(res.data.supplier_id);
                         $("#payment_date").val(res.data.payment_date);
                         $("#total_panjar").val(formatRupiah(res.data.total_panjar));
                         $("#sisa_panjar").val(res.data.fax);
                         $(".add-modal").modal("show");
+                        $('#auto_generate').css('display', 'none');
+                        $("#no_panjar").prop("disabled", true);
                         if (res.data.is_posted === "1") {
-
-                            $("#no_panjar").prop("disabled", true);
                             $("#payment_date").prop("disabled", true);
                             $("#tipe_supplier").prop("disabled", true);
                             $("#supplier_id").prop("disabled", true);
                             $("#total_panjar").prop("disabled", true);
                             $(".delete-form").css('display', 'none');
-
                         }
 
                         $('.modal').on('hidden.bs.modal', function() {
@@ -575,7 +579,8 @@
                             $("#tipe_supplier").prop("disabled", false);
                             $("#supplier_id").prop("disabled", false);
                             $("#total_panjar").prop("disabled", false);
-                            $(".delete-form").css('display', '')
+                            $(".delete-form").css('display', '');
+                            $('#auto_generate').css('display', '');
                         }
 
                     } catch (error) {
@@ -619,12 +624,44 @@
 
     // APPEND DATA SUPPLIER BY TYPE
     function appendDropdownSupplier(data) {
-        $(".supplier_id").empty()
+        // $(".supplier_id").empty()
         $(".supplier_id").append(`<option value=""></option>`)
         data.forEach(function(item) {
             $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`)
         })
     }
+
+    changeStatus();
+
+    function changeStatus() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
+        if (value) {
+            $.ajax({
+                url: `<?= base_url("/panjar-supplier/generate-no-panjar"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res) {
+                        $("#no_panjar").val(res);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        $("#no_panjar").attr("readonly", false);
+                        $("#auto_generate").prop("checked", false);
+                        $("#no_panjar").val("");
+                    }
+                }
+            })
+        } else {
+            $("#no_panjar").attr("readonly", false);
+            $("#no_panjar").val("");
+        }
+
+    }
+
 
 
     $(".btn-submit-parent").click(function() {
@@ -830,6 +867,11 @@
                     var newRow = $('<tr>');
                     newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Pembayaran</td>'));
                     table.find('tbody').append(newRow);
+                }
+                if (response.panjar_detail.type === 'BAHAN PENOLONG') {
+                    $(".nomor").text("Nomor Tanda Terima Faktur");
+                } else {
+                    $(".nomor").text("Nomor PO");
                 }
                 $('#historiModal').modal('show');
 

@@ -15,8 +15,11 @@
                         <div class="col-md-6">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" readonly="true" type="text" class="form-control kode" id="kode" name="kode" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
+                                    <input autocomplete="one-time-code" type="text" class="form-control kode" id="kode" name="kode" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
                                     <label for="floatingInput">Kode Supplier</label>
+                                </div>
+                                <div style="<?= !empty($dataSPP) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input checked autocomplete="one-time-code" style="z-index: 99;  margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -964,8 +967,15 @@
                         $(".email").val(res.data.email);
                         $(".province_parent_id").val(res.data.province_id).change();
                         $(".country_code").val(res.data.country_code).change();
+                        $('#auto_generate').css('display', 'none');
+                        $("#kode").prop("readonly", true);
                         // $(".account_receivable").val(res.data.account_receivable);
                         // $(".account_payable").val(res.data.account_payable);
+                        $('.modal').on('hidden.bs.modal', function() {
+                            $('#auto_generate').css('display', '');
+                            $("#kode").prop("readonly", false);
+                        });
+
 
                         // AJAX GET CITY
                         $.ajax({
@@ -1343,6 +1353,34 @@
             form.target = '_blank';
             form.action = newAction;
             form.submit();
+        }
+    }
+
+    function changeStatus() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
+        if (value) {
+            $.ajax({
+                url: `<?= base_url("/supplier-bahan-baku/generate-kode-supplier-bb"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res) {
+                        $("#kode").val(res);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        $("#kode").attr("readonly", false);
+                        $("#auto_generate").prop("checked", false);
+                        $("#kode").val("");
+                    }
+                }
+            })
+        } else {
+            $("#kode").attr("readonly", false);
+            $("#kode").val("");
         }
     }
 </script>

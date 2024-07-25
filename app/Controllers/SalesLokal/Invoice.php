@@ -1323,4 +1323,10 @@ class Invoice extends BaseController
             'token' => csrf_hash(),
         ]);
     }
+
+    public function getNomorFaktur()
+    {
+        $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur($this->this_company_id);
+        return json_encode($noFaktur);
+    }
 }

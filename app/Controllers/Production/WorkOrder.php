@@ -164,10 +164,9 @@ class WorkOrder extends BaseController
     public function create()
     {
         try {
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-            $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day, $this->this_company_id);
+
             $id = $this->workOrdersModel->insert([
-                "wo_no" => $no,
+                "wo_no" => $this->request->getVar("wo_no"),
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar("department_id"),
                 'warehouse_id' => $this->request->getVar("warehouse_id"),
@@ -316,5 +315,13 @@ class WorkOrder extends BaseController
             'token' => csrf_hash(),
             'status' => true
         ]);
+    }
+
+    public function generateKodeProduksi()
+    {
+        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+        $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day, $this->this_company_id);
+
+        return json_encode($no);
     }
 }

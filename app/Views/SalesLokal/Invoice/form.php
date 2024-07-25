@@ -42,9 +42,14 @@
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" type="text" class="form-control no_faktur" id="no_faktur" name="no_faktur" value="<?= !empty($data) ? $data->no_faktur : $noFaktur; ?>" placeholder="Auto Generate">
-                            <label for="floatingInput">No Faktur</label>
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" type="text" class="form-control no_faktur" id="no_faktur" name="no_faktur" value="<?= !empty($data) ? $data->no_faktur : $noFaktur; ?>" placeholder="Auto Generate">
+                                <label for="floatingInput">No Faktur</label>
+                            </div>
+                            <div style="<?= !empty($data) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 20px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -477,6 +482,8 @@
             placeholder: "",
             theme: "bootstrap-5"
         })
+
+        //nomor faktur
 
 
 
@@ -1166,6 +1173,35 @@
             })
         }
     });
+
+
+    function changeStatus() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
+        if (value) {
+            $.ajax({
+                url: `<?= base_url("/invoice-penjualan-lokal/get-nomor-faktur"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res) {
+                        $("#no_faktur").val(res);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        $("#no_faktur").attr("readonly", false);
+                        $("#auto_generate").prop("checked", false);
+                        $("#no_faktur").val("");
+                    }
+                }
+            })
+        } else {
+            $("#no_faktur").attr("readonly", false);
+            $("#no_faktur").val("");
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>
