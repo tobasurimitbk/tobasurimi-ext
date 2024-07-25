@@ -885,7 +885,6 @@ class RMPurchaseOrderModel extends Model
 
     public function getPOBBCondition($divisi_id, $po_date_awal, $po_date_akhir, $kategori_id)
     {
-
         $selectQry = "
             barang_master.barang_name AS barangName, 
             barang_master_spesifikasi.spesifikasi AS spekName, 
@@ -912,7 +911,7 @@ class RMPurchaseOrderModel extends Model
             ->where('rm_purchase_orders.is_posted', '1')
             ->where('rm_purchase_orders.po_date >=', date('Y-m-d', strtotime($po_date_awal)))
             ->where('rm_purchase_orders.po_date <=', date('Y-m-d', strtotime($po_date_akhir)))
-            ->where('account_barang.kategori_id', $kategori_id)
+            // ->where('account_barang.kategori_id', $kategori_id)
             ->where('account_barang.divisi_id', $divisi_id)
             ->findAll();
 

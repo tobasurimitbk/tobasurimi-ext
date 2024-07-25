@@ -5,6 +5,7 @@ namespace App\Controllers\Accounting\Rasio;
 use App\Controllers\BaseController;
 use App\Controllers\JasaVendor\BiayaKepiting;
 use App\Controllers\JasaVendor\BiayaUdang;
+use App\Controllers\JasaVendor\JasaVendorOut;
 use App\Models\MetadataModel;
 use App\Models\DivisisModel;
 use App\Models\Sub_AkunsModel;
@@ -20,7 +21,10 @@ use App\Models\BiayaKepitingGajiModel;
 use App\Models\BiayaKepitingModel;
 use App\Models\BiayaUdangDetailModel;
 use App\Models\BiayaUdangModel;
+use App\Models\JasaVendorInDetailModel;
 use App\Models\JasaVendorInModel;
+use App\Models\JasaVendorOutDetailModel;
+use App\Models\JasaVendorOutModel;
 use App\Models\JurnalUmumModel;
 use App\Models\KemasanModel;
 use App\Models\KursModel;
@@ -83,6 +87,7 @@ class RasioController extends BaseController
     protected $biayaKepitingDetailModel;
     protected $biayaKepitingGajiModel;
     protected $jasaVendorInModel;
+    protected $jasaVendorInDetailModel;
     protected $stockModel;
     protected $stockDetail2Model;
     protected $barangMasterModel;
@@ -95,6 +100,8 @@ class RasioController extends BaseController
     protected $adjusmentDetailModel;
     protected $mutasiModel;
     protected $mutasiDetailModel;
+    protected $jasaVendorOutModel;
+    protected $jasaVendorOutDetailModel;
 
     public function __construct()
     {
@@ -130,6 +137,9 @@ class RasioController extends BaseController
         $this->biayaKepitingDetailModel = new BiayaKepitingDetailModel();
         $this->biayaKepitingGajiModel = new BiayaKepitingGajiModel();
         $this->jasaVendorInModel = new JasaVendorInModel();
+        $this->jasaVendorInDetailModel = new JasaVendorInDetailModel();
+        $this->jasaVendorOutModel = new JasaVendorOutModel();
+        $this->jasaVendorOutDetailModel = new JasaVendorOutDetailModel();
         $this->stockModel = new StockModel();
         $this->stockDetail2Model = new StockDetail2Model();
         $this->barangMasterModel = new BarangMasterModel();
@@ -727,335 +737,221 @@ class RasioController extends BaseController
                     $value->satuanLPB = $satuanLPB;
                 }
             }
-            // Process the matched record
-            // var_dump($productionResultDataTitle);
-
-            // exit;
 
             foreach ($productionResultDataTitle as &$value) {
-                $stockDokumen = explode(' ', $value['stock_dokumen'])[0]; // Get the first part of the split string
-                $poBBLokal = $this->rmPurchaseOrderModel->where('po_no', $stockDokumen)->first();
-                $poBBImport = $this->rmImportPOModel->where('po_no', $stockDokumen)->first();
-                $poBP = $this->amPurchaseOrderModel->where('po_no', $stockDokumen)->first();
-                $jasaVendorIn = $this->jasaVendorInModel->where('no_penerimaan_surat_jalan', $stockDokumen)->first();
+                $stockDokumen = $value['stock_dokumen'];
 
-                // if ($jasaVendorIn) {
-                //     // Ensure $jasaVendorIn['id'] is wrapped in an array for whereIn
-                //     $biayaVendorUdang = $this->biayaUdangModel
-                //         ->whereIn('biaya_udang.multiple_jasa_vendor_in_id', [$jasaVendorIn['id']])
-                //         ->first();
-                //     $biayaVendorKepiting = $this->biayaKepitingModel
-                //         ->where('biaya_kepiting.jasa_vendor_in_id', $jasaVendorIn['id'])
-                //         ->first();
-
-                //     if ($biayaVendorUdang) {
-                //         var_dump($biayaVendorUdang);
-                //     }
-
-                //     if ($biayaVendorKepiting) {
-                //         $biayaKepitingDetail = $this->biayaKepitingDetailModel
-                //             ->where('barang_master_id', $value['barang1_id'])
-                //             ->where('barang_master_spesifikasi_id', $value['barang2_id'])
-                //             ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //             ->first();
-                //         if ($biayaKepitingDetail['jumbo']) {
-                //             $upahKopekKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('jumbo !=', 0)
-                //                 ->where('jenis', 'Upah Kopek')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $komisiKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('jumbo !=', 0)
-                //                 ->where('jenis', 'Komisi / Kg Daging')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $bonusKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('jumbo !=', 0)
-                //                 ->where('jenis', 'Bonus / Kg Daging')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $tambahanKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('jumbo !=', 0)
-                //                 ->where('jenis', 'Tamb. Upah Kopek Ex. Lump')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $biayaKepitingDetail['upah_kopek'] = $upahKopekKepiting['jumbo'] ?? 0;
-                //             $biayaKepitingDetail['komisi'] = $komisiKepiting['jumbo'] ?? 0;
-                //             $biayaKepitingDetail['bonus'] = $bonusKepiting['jumbo'] ?? 0;
-                //             $biayaKepitingDetail['tambahan'] = $tambahanKepiting['jumbo'] ?? 0;
-                //         } else if ($biayaKepitingDetail['ex_lump']) {
-                //             $upahKopekKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('ex_lump !=', 0)
-                //                 ->where('jenis', 'Upah Kopek')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $komisiKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('ex_lump !=', 0)
-                //                 ->where('jenis', 'Komisi / Kg Daging')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $bonusKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('ex_lump !=', 0)
-                //                 ->where('jenis', 'Bonus / Kg Daging')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $tambahanKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('ex_lump !=', 0)
-                //                 ->where('jenis', 'Tamb. Upah Kopek Ex. Lump')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $biayaKepitingDetail['upah_kopek'] = $upahKopekKepiting['ex_lump'] ?? 0;
-                //             $biayaKepitingDetail['komisi'] = $komisiKepiting['ex_lump'] ?? 0;
-                //             $biayaKepitingDetail['bonus'] = $bonusKepiting['ex_lump'] ?? 0;
-                //             $biayaKepitingDetail['tambahan'] = $tambahanKepiting['ex_lump'] ?? 0;
-                //         } else if ($biayaKepitingDetail['lump']) {
-                //             $upahKopekKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('lump !=', 0)
-                //                 ->where('jenis', 'Upah Kopek')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $komisiKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('lump !=', 0)
-                //                 ->where('jenis', 'Komisi / Kg Daging')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $bonusKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('lump !=', 0)
-                //                 ->where('jenis', 'Bonus / Kg Daging')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $tambahanKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('lump !=', 0)
-                //                 ->where('jenis', 'Tamb. Upah Kopek Ex. Lump')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $biayaKepitingDetail['upah_kopek'] = $upahKopekKepiting['lump'] ?? 0;
-                //             $biayaKepitingDetail['komisi'] = $komisiKepiting['lump'] ?? 0;
-                //             $biayaKepitingDetail['bonus'] = $bonusKepiting['lump'] ?? 0;
-                //             $biayaKepitingDetail['tambahan'] = $tambahanKepiting['lump'] ?? 0;
-                //         } else if ($biayaKepitingDetail['special']) {
-                //             $upahKopekKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('special !=', 0)
-                //                 ->where('jenis', 'Upah Kopek')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $komisiKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('special !=', 0)
-                //                 ->where('jenis', 'Komisi / Kg Daging')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $bonusKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('special !=', 0)
-                //                 ->where('jenis', 'Bonus / Kg Daging')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $tambahanKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('special !=', 0)
-                //                 ->where('jenis', 'Tamb. Upah Kopek Ex. Lump')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $biayaKepitingDetail['upah_kopek'] = $upahKopekKepiting['special'] ?? 0;
-                //             $biayaKepitingDetail['komisi'] = $komisiKepiting['special'] ?? 0;
-                //             $biayaKepitingDetail['bonus'] = $bonusKepiting['special'] ?? 0;
-                //             $biayaKepitingDetail['tambahan'] = $tambahanKepiting['special'] ?? 0;
-                //         } else if ($biayaKepitingDetail['claw']) {
-                //             $upahKopekKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('claw !=', 0)
-                //                 ->where('jenis', 'Upah Kopek')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $komisiKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('claw !=', 0)
-                //                 ->where('jenis', 'Komisi / Kg Daging')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $bonusKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('claw !=', 0)
-                //                 ->where('jenis', 'Bonus / Kg Daging')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $tambahanKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('claw !=', 0)
-                //                 ->where('jenis', 'Tamb. Upah Kopek Ex. Lump')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $biayaKepitingDetail['upah_kopek'] = $upahKopekKepiting['claw'] ?? 0;
-                //             $biayaKepitingDetail['komisi'] = $komisiKepiting['claw'] ?? 0;
-                //             $biayaKepitingDetail['bonus'] = $bonusKepiting['claw'] ?? 0;
-                //             $biayaKepitingDetail['tambahan'] = $tambahanKepiting['claw'] ?? 0;
-                //         } else if ($biayaKepitingDetail['mh']) {
-                //             $upahKopekKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('mh !=', 0)
-                //                 ->where('jenis', 'Upah Kopek')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $komisiKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('mh !=', 0)
-                //                 ->where('jenis', 'Komisi / Kg Daging')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $bonusKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('mh !=', 0)
-                //                 ->where('jenis', 'Bonus / Kg Daging')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $tambahanKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('mh !=', 0)
-                //                 ->where('jenis', 'Tamb. Upah Kopek Ex. Lump')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $biayaKepitingDetail['upah_kopek'] = $upahKopekKepiting['mh'] ?? 0;
-                //             $biayaKepitingDetail['komisi'] = $komisiKepiting['mh'] ?? 0;
-                //             $biayaKepitingDetail['bonus'] = $bonusKepiting['mh'] ?? 0;
-                //             $biayaKepitingDetail['tambahan'] = $tambahanKepiting['mh'] ?? 0;
-                //         } else if ($biayaKepitingDetail['cf']) {
-                //             $upahKopekKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('cf !=', 0)
-                //                 ->where('jenis', 'Upah Kopek')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $komisiKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('cf !=', 0)
-                //                 ->where('jenis', 'Komisi / Kg Daging')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $bonusKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('cf !=', 0)
-                //                 ->where('jenis', 'Bonus / Kg Daging')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $tambahanKepiting = $this->biayaKepitingGajiModel
-                //                 ->where('cf !=', 0)
-                //                 ->where('jenis', 'Tamb. Upah Kopek Ex. Lump')
-                //                 ->where('biaya_kepiting_id', $biayaVendorKepiting['id'])
-                //                 ->first();
-                //             $biayaKepitingDetail['upah_kopek'] = $upahKopekKepiting['cf'] ?? 0;
-                //             $biayaKepitingDetail['komisi'] = $komisiKepiting['cf'] ?? 0;
-                //             $biayaKepitingDetail['bonus'] = $bonusKepiting['cf'] ?? 0;
-                //             $biayaKepitingDetail['tambahan'] = $tambahanKepiting['cf'] ?? 0;
-                //         }
-                //         var_dump($biayaKepitingDetail);
-                //     }
-                //     $value['totalQtyKopek'] = $totalQty;
-                //     $value['totalHargaKopek'] = $totalHarga;
-                //     $value['hargaSatuanKopek'] = $hargaSatuan;
-                //     $value['satuanKopek'] = $satuanPO;
-                // }
-
-                if ($poBBLokal) {
-                    $totalQty = 0;
-                    $totalHarga = 0;
-                    $hargaSatuan = 0;
-                    $satuanPO = "";
-                    $poBBLokalDetail = $this->rmPurchaseOrderDetailModel
-                        ->select('rm_purchase_order_details.*, satuans.kode_satuan')
-                        ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
-                        ->where('rm_purchase_order_id', $poBBLokal['id'])
-                        ->where('barang1_id', $value['barang1_id'])
-                        ->where('barang2_id', $value['barang2_id'])
-                        ->findAll();
-                    foreach ($poBBLokalDetail as $valuePoBBLokal) {
-                        $kursValue = 1;
-                        $hargaSatuan = $valuePoBBLokal['general_price'] + $valuePoBBLokal['daily_price'] + $valuePoBBLokal['monthly_price'];
-                        $totalQty += $valuePoBBLokal['qty'];
-                        $satuanPO = $valuePoBBLokal['kode_satuan'];
-                    }
-                    $totalHarga = $value['qty'] * $hargaSatuan;
-                    $value['totalQtyPO'] = $value['qty'];
-                    $value['totalHargaPO'] = $totalHarga;
-                    $value['hargaSatuanPO'] = $hargaSatuan;
-                    $value['satuanPO'] = $satuanPO;
+                // Cek apakah ada teks dalam kurung
+                if (preg_match('/\((PO\/[^)]+)\)/', $stockDokumen, $matches)) {
+                    // Jika ada teks dalam kurung, gunakan yang di dalam kurung
+                    $poNo = $matches[1];
+                    $jasaVendorNo = trim(explode(' (', $stockDokumen)[0]);
+                } else {
+                    // Jika tidak ada kurung, gunakan nilai langsung
+                    $poNo = $stockDokumen;
+                    $jasaVendorNo = 0;
                 }
 
-                if ($poBBImport) {
-                    $totalQty = 0;
-                    $totalHarga = 0;
-                    $hargaSatuan = 0;
-                    $hargaSatuanDisc = 0;
-                    $satuanPO = "";
-                    $poBBImportDetail = $this->rmImportPODetailModel
-                        ->select('rm_import_po_details.*, satuans.kode_satuan, rm_import_pos.currency, rm_import_pos.po_date')
-                        ->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
-                        ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left')
-                        ->where('rm_import_po_id', $poBBImport['id'])
-                        ->where('barang_id', $value['barang1_id'])
-                        ->where('spesifikasi_id', $value['barang2_id'])
+                $poBBLokal = $this->rmPurchaseOrderModel->where('po_no', $poNo)->first();
+                $poBBImport = $this->rmImportPOModel->where('po_no', $poNo)->first();
+                $poBP = $this->amPurchaseOrderModel->where('po_no', $poNo)->first();
+                $jasaVendorIn = $this->jasaVendorInModel->where('no_penerimaan_surat_jalan', $jasaVendorNo)->first();
+
+                if ($jasaVendorNo != 0) {
+                    $jasaVendorInDetailCheck = $this->jasaVendorInDetailModel
+                        ->join('stock', "stock.id = jasa_vendor_in_detail.stock_in_id")
+                        ->where('jasa_vendor_in_id', $jasaVendorIn['id'])
+                        ->where('stock.barang1_id', $value['barang1_id'])
+                        ->where('stock.barang2_id', $value['barang2_id'])
                         ->findAll();
-                    foreach ($poBBImportDetail as $valuePoBBImport) {
-                        $kurs = $this->kursModel
-                            ->where('metadata_id', $valuePoBBImport['currency'])
-                            ->where('start_date <=', $valuePoBBImport['po_date'])
-                            ->where('end_date >=', $valuePoBBImport['po_date'])
-                            ->first();
-                        $kursValue = $kurs ? $kurs['nilai_kurs'] : 1;
-                        $hargaSatuanDisc = ($valuePoBBImport['price'] * $kursValue) * ($valuePoBBImport['disc'] / 100);
-                        $hargaSatuan = ($valuePoBBImport['price'] * $kursValue) - $hargaSatuanDisc;
-                        $totalQty += $valuePoBBImport['qty'];
-                        $satuanPO = $valuePoBBImport['kode_satuan'];
+                    // var_dump($jasaVendorInDetailCheck);
+                    foreach ($jasaVendorInDetailCheck as $valueJasaVendorIn) {
+                        $jasaVendorOutDetail = $this->jasaVendorOutDetailModel
+                            ->join('stock', "stock.id = jasa_vendor_out_detail.stock_out_id")
+                            ->where('jasa_vendor_out_detail.id', $valueJasaVendorIn['jasa_vendor_out_detail_id'])
+                            ->findAll();
+                        foreach ($jasaVendorOutDetail as $valueJasaVendorOut) {
+                            if ($poBBLokal) {
+                                $totalQty = 0;
+                                $totalHarga = 0;
+                                $hargaSatuan = 0;
+                                $satuanPO = "";
+                                $poBBLokalDetail = $this->rmPurchaseOrderDetailModel
+                                    ->select('rm_purchase_order_details.*, satuans.kode_satuan')
+                                    ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+                                    ->where('rm_purchase_order_id', $poBBLokal['id'])
+                                    ->where('barang1_id', $valueJasaVendorOut['barang1_id'])
+                                    ->where('barang2_id', $valueJasaVendorOut['barang2_id'])
+                                    ->findAll();
+                                foreach ($poBBLokalDetail as $valuePoBBLokal) {
+                                    $kursValue = 1;
+                                    $hargaSatuan = $valuePoBBLokal['general_price'] + $valuePoBBLokal['daily_price'] + $valuePoBBLokal['monthly_price'];
+                                    $totalQty += $valuePoBBLokal['qty'];
+                                    $satuanPO = $valuePoBBLokal['kode_satuan'];
+                                }
+                                $totalHarga = $value['qty'] * $hargaSatuan;
+                                $value['totalQtyPO'] = $value['qty'];
+                                $value['totalHargaPO'] = $totalHarga;
+                                $value['hargaSatuanPO'] = $hargaSatuan;
+                                $value['satuanPO'] = $satuanPO;
+                            }
+
+                            if ($poBBImport) {
+                                $totalQty = 0;
+                                $totalHarga = 0;
+                                $hargaSatuan = 0;
+                                $hargaSatuanDisc = 0;
+                                $satuanPO = "";
+                                $poBBImportDetail = $this->rmImportPODetailModel
+                                    ->select('rm_import_po_details.*, satuans.kode_satuan, rm_import_pos.currency, rm_import_pos.po_date')
+                                    ->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
+                                    ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left')
+                                    ->where('rm_import_po_id', $poBBImport['id'])
+                                    ->where('barang_id', $valueJasaVendorOut['barang1_id'])
+                                    ->where('spesifikasi_id', $valueJasaVendorOut['barang2_id'])
+                                    ->findAll();
+                                foreach ($poBBImportDetail as $valuePoBBImport) {
+                                    $kurs = $this->kursModel
+                                        ->where('metadata_id', $valuePoBBImport['currency'])
+                                        ->where('start_date <=', $valuePoBBImport['po_date'])
+                                        ->where('end_date >=', $valuePoBBImport['po_date'])
+                                        ->first();
+                                    $kursValue = $kurs ? $kurs['nilai_kurs'] : 1;
+                                    $hargaSatuanDisc = ($valuePoBBImport['price'] * $kursValue) * ($valuePoBBImport['disc'] / 100);
+                                    $hargaSatuan = ($valuePoBBImport['price'] * $kursValue) - $hargaSatuanDisc;
+                                    $totalQty += $valuePoBBImport['qty'];
+                                    $satuanPO = $valuePoBBImport['kode_satuan'];
+                                }
+                                $totalHarga = $totalQty * $hargaSatuan;
+                                $value['totalQtyPO'] = $value['qty'];
+                                $value['totalHargaPO'] = $totalHarga;
+                                $value['hargaSatuanPO'] = $hargaSatuan;
+                                $value['satuanPO'] = $satuanPO;
+                            }
+                            if ($poBP) {
+                                $totalQty = 0;
+                                $totalHarga = 0;
+                                $hargaSatuan = 0;
+                                $satuanPO = "";
+                                $poBPDetail = $this->amPurchaseOrderDetailModel
+                                    ->select('am_purchase_order_details.*, satuans.kode_satuan')
+                                    ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+                                    ->where('am_purchase_order_id', $poBP['id'])
+                                    ->where('barang_id', $valueJasaVendorOut['barang1_id'])
+                                    ->where('spesifikasi_id', $valueJasaVendorOut['barang2_id'])
+                                    ->findAll();
+                                foreach ($poBPDetail as $valuePoBPDetail) {
+                                    $kurs = $this->kursModel
+                                        ->where('metadata_id', $valuePoBBImport['currency'])
+                                        ->where('start_date <=', $valuePoBBImport['po_date'])
+                                        ->where('end_date >=', $valuePoBBImport['po_date'])
+                                        ->first();
+                                    $kursValue = $kurs ? $kurs['nilai_kurs'] : 1;
+                                    $disc = $valuePoBPDetail['disc'] / 100;
+                                    $hargaSetelahDisc = $valuePoBPDetail['price'] * $disc;
+                                    $hargaSatuan = $valuePoBPDetail['price'] - $hargaSetelahDisc;
+                                    $totalQty += $valuePoBPDetail['qty'];
+                                    $satuanPO = $valuePoBPDetail['kode_satuan'];
+                                }
+                                $totalHarga = $totalQty * $hargaSatuan;
+                                $value['totalQtyPO'] = $value['qty'];
+                                $value['totalHargaPO'] = $totalHarga;
+                                $value['hargaSatuanPO'] = $hargaSatuan;
+                                $value['satuanPO'] = $satuanPO;
+                            }
+                        }
                     }
-                    $totalHarga = $totalQty * $hargaSatuan;
-                    $value['totalQtyPO'] = $value['qty'];
-                    $value['totalHargaPO'] = $totalHarga;
-                    $value['hargaSatuanPO'] = $hargaSatuan;
-                    $value['satuanPO'] = $satuanPO;
-                }
-                if ($poBP) {
-                    $totalQty = 0;
-                    $totalHarga = 0;
-                    $hargaSatuan = 0;
-                    $satuanPO = "";
-                    $poBPDetail = $this->amPurchaseOrderDetailModel
-                        ->select('am_purchase_order_details.*, satuans.kode_satuan')
-                        ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
-                        ->where('am_purchase_order_id', $poBP['id'])
-                        ->where('barang_id', $value['barang1_id'])
-                        ->where('spesifikasi_id', $value['barang2_id'])
-                        ->findAll();
-                    foreach ($poBPDetail as $valuePoBPDetail) {
-                        $kurs = $this->kursModel
-                            ->where('metadata_id', $valuePoBBImport['currency'])
-                            ->where('start_date <=', $valuePoBBImport['po_date'])
-                            ->where('end_date >=', $valuePoBBImport['po_date'])
-                            ->first();
-                        $kursValue = $kurs ? $kurs['nilai_kurs'] : 1;
-                        $disc = $valuePoBPDetail['disc'] / 100;
-                        $hargaSetelahDisc = $valuePoBPDetail['price'] * $disc;
-                        $hargaSatuan = $valuePoBPDetail['price'] - $hargaSetelahDisc;
-                        $totalQty += $valuePoBPDetail['qty'];
-                        $satuanPO = $valuePoBPDetail['kode_satuan'];
+                } else {
+                    if ($poBBLokal) {
+                        $totalQty = 0;
+                        $totalHarga = 0;
+                        $hargaSatuan = 0;
+                        $satuanPO = "";
+                        $poBBLokalDetail = $this->rmPurchaseOrderDetailModel
+                            ->select('rm_purchase_order_details.*, satuans.kode_satuan')
+                            ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+                            ->where('rm_purchase_order_id', $poBBLokal['id'])
+                            ->where('barang1_id', $value['barang1_id'])
+                            ->where('barang2_id', $value['barang2_id'])
+                            ->findAll();
+                        foreach ($poBBLokalDetail as $valuePoBBLokal) {
+                            $kursValue = 1;
+                            $hargaSatuan = $valuePoBBLokal['general_price'] + $valuePoBBLokal['daily_price'] + $valuePoBBLokal['monthly_price'];
+                            $totalQty += $valuePoBBLokal['qty'];
+                            $satuanPO = $valuePoBBLokal['kode_satuan'];
+                        }
+                        $totalHarga = $value['qty'] * $hargaSatuan;
+                        $value['totalQtyPO'] = $value['qty'];
+                        $value['totalHargaPO'] = $totalHarga;
+                        $value['hargaSatuanPO'] = $hargaSatuan;
+                        $value['satuanPO'] = $satuanPO;
                     }
-                    $totalHarga = $totalQty * $hargaSatuan;
-                    $value['totalQtyPO'] = $value['qty'];
-                    $value['totalHargaPO'] = $totalHarga;
-                    $value['hargaSatuanPO'] = $hargaSatuan;
-                    $value['satuanPO'] = $satuanPO;
+
+                    if ($poBBImport) {
+                        $totalQty = 0;
+                        $totalHarga = 0;
+                        $hargaSatuan = 0;
+                        $hargaSatuanDisc = 0;
+                        $satuanPO = "";
+                        $poBBImportDetail = $this->rmImportPODetailModel
+                            ->select('rm_import_po_details.*, satuans.kode_satuan, rm_import_pos.currency, rm_import_pos.po_date')
+                            ->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
+                            ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left')
+                            ->where('rm_import_po_id', $poBBImport['id'])
+                            ->where('barang_id', $value['barang1_id'])
+                            ->where('spesifikasi_id', $value['barang2_id'])
+                            ->findAll();
+                        foreach ($poBBImportDetail as $valuePoBBImport) {
+                            $kurs = $this->kursModel
+                                ->where('metadata_id', $valuePoBBImport['currency'])
+                                ->where('start_date <=', $valuePoBBImport['po_date'])
+                                ->where('end_date >=', $valuePoBBImport['po_date'])
+                                ->first();
+                            $kursValue = $kurs ? $kurs['nilai_kurs'] : 1;
+                            $hargaSatuanDisc = ($valuePoBBImport['price'] * $kursValue) * ($valuePoBBImport['disc'] / 100);
+                            $hargaSatuan = ($valuePoBBImport['price'] * $kursValue) - $hargaSatuanDisc;
+                            $totalQty += $valuePoBBImport['qty'];
+                            $satuanPO = $valuePoBBImport['kode_satuan'];
+                        }
+                        $totalHarga = $totalQty * $hargaSatuan;
+                        $value['totalQtyPO'] = $value['qty'];
+                        $value['totalHargaPO'] = $totalHarga;
+                        $value['hargaSatuanPO'] = $hargaSatuan;
+                        $value['satuanPO'] = $satuanPO;
+                    }
+                    if ($poBP) {
+                        $totalQty = 0;
+                        $totalHarga = 0;
+                        $hargaSatuan = 0;
+                        $satuanPO = "";
+                        $poBPDetail = $this->amPurchaseOrderDetailModel
+                            ->select('am_purchase_order_details.*, satuans.kode_satuan')
+                            ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+                            ->where('am_purchase_order_id', $poBP['id'])
+                            ->where('barang_id', $value['barang1_id'])
+                            ->where('spesifikasi_id', $value['barang2_id'])
+                            ->findAll();
+                        foreach ($poBPDetail as $valuePoBPDetail) {
+                            $kurs = $this->kursModel
+                                ->where('metadata_id', $valuePoBBImport['currency'])
+                                ->where('start_date <=', $valuePoBBImport['po_date'])
+                                ->where('end_date >=', $valuePoBBImport['po_date'])
+                                ->first();
+                            $kursValue = $kurs ? $kurs['nilai_kurs'] : 1;
+                            $disc = $valuePoBPDetail['disc'] / 100;
+                            $hargaSetelahDisc = $valuePoBPDetail['price'] * $disc;
+                            $hargaSatuan = $valuePoBPDetail['price'] - $hargaSetelahDisc;
+                            $totalQty += $valuePoBPDetail['qty'];
+                            $satuanPO = $valuePoBPDetail['kode_satuan'];
+                        }
+                        $totalHarga = $totalQty * $hargaSatuan;
+                        $value['totalQtyPO'] = $value['qty'];
+                        $value['totalHargaPO'] = $totalHarga;
+                        $value['hargaSatuanPO'] = $hargaSatuan;
+                        $value['satuanPO'] = $satuanPO;
+                    }
                 }
-                // if ($penerimaanBarang) {
-                //     $totalQty = 0;
-                //     $totalHarga = 0;
-                //     $hargaSatuan = 0;
-                //     $satuanLPB = "";
-                //     $penerimaanBarangDetail = $this->penerimaanBarangDetailModel
-                //         ->select('penerimaan_barang_detail.*, satuans.kode_satuan')
-                //         ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
-                //         ->where('penerimaan_barang_id', $penerimaanBarang['id'])
-                //         ->where('barang_id', $value['barang1_id'])
-                //         ->where('spesifikasi_id', $value['barang2_id'])
-                //         ->findAll();
-                //     foreach ($penerimaanBarangDetail as $valuePenerimaanBarangDetail) {
-                //         $hargaSatuan = ($valuePenerimaanBarangDetail['harga'] + $valuePenerimaanBarangDetail['harga_harian'] + $valuePenerimaanBarangDetail['harga_bulanan']) * $kursValue;
-                //         $totalQty += $valuePenerimaanBarangDetail['qty'];
-                //         $satuanLPB = $valuePenerimaanBarangDetail['kode_satuan'];
-                //     }
-                //     $totalHarga = $totalQty * $hargaSatuan;
-                //     $value['totalQtyLPB'] = $totalQty;
-                //     $value['totalHargaLPB'] = $totalHarga;
-                //     $value['hargaSatuanLPB'] = $hargaSatuan;
-                //     $value['satuanLPB'] = $satuanLPB;
-                // }
             }
-
-            // exit;
 
             if ($productionResultDataTitle) {
                 return response()->setJSON([

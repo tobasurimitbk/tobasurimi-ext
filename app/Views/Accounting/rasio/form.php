@@ -372,7 +372,7 @@
         getDataRawMaterialI();
         getDataRawMaterialII();
         getDataCost();
-        getListWarehouseAsal()
+        // getListWarehouseAsal()
     });
 
     $('#warehouse_id').select2({
@@ -418,26 +418,26 @@
         .css('margin-top', '22px').css('margin-left', '-7px');
 
 
-    function getListWarehouseAsal() {
-        setLoading();
-        // GET LIST WAREHOUSE ASAL
-        $.ajax({
-            url: `<?= base_url('mutasi/warehouse'); ?>`,
-            method: "GET",
-            data: {
-                divisi_id: $(".divisi_id option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".warehouse_id").empty()
-                $(".warehouse_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
-                })
-                stopLoading();
-            }
-        });
-    }
+    // function getListWarehouseAsal() {
+    //     setLoading();
+    //     // GET LIST WAREHOUSE ASAL
+    //     $.ajax({
+    //         url: `<?= base_url('mutasi/warehouse'); ?>`,
+    //         method: "GET",
+    //         data: {
+    //             divisi_id: $(".divisi_id option:selected").val(),
+    //         },
+    //         dataType: "json",
+    //         success: function(res) {
+    //             $(".warehouse_id").empty()
+    //             $(".warehouse_id").append(`<option value=""></option>`)
+    //             res.data.forEach(function(item) {
+    //                 $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
+    //             })
+    //             stopLoading();
+    //         }
+    //     });
+    // }
 
     const getDataJurnalSubsidi = function() {
         var department_id = $('#divisi_id').val();

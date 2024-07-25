@@ -303,7 +303,7 @@ class RMImportPOModel extends Model
             ->where('rm_import_pos.is_posted', '1')
             ->where('rm_import_pos.po_date >=', date('Y-m-d', strtotime($po_date_awal)))
             ->where('rm_import_pos.po_date <=', date('Y-m-d', strtotime($po_date_akhir)))
-            ->where('account_barang.kategori_id', $kategori_id)
+            // ->where('account_barang.kategori_id', $kategori_id)
             ->where('account_barang.divisi_id', $divisi_id)
             ->findAll();
 

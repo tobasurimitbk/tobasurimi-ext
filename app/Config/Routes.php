@@ -1153,8 +1153,9 @@ $routes->get('/penerimaan-barang-import/receivedItemsBySupplier/(:num)', 'Wareho
 $routes->get('/penerimaan-barang-import/generate', 'Warehouse\PenerimaanBarangImport::generatePenerimaanBarang', ['filter' => 'Auth']);
 
 // RETURN BARANG
-$routes->get('/return-barang/id/(:segment)', 'Warehouse\ReturnBarangLokalBB::update/$1', ['filter' => 'Auth']);
-$routes->get('/return-barang/generate-po-no', 'Warehouse\ReturnBarangLokalBB::generatePONo', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bb/return-barang/id/(:segment)', 'Warehouse\ReturnBarangPO::update/$1', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bb/return-barang/generate-po-no', 'Warehouse\ReturnBarangPO::generatePONo', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bb/return-barang/list-barang', 'Warehouse\ReturnBarangPO::listBarangLPB', ['filter' => 'Auth']);
 
 // ROUTE BEA CUKAI REVAMP
 // SETTING AKUN BEA CUKAI

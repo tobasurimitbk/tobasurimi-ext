@@ -262,7 +262,7 @@
         $('#dataTable tbody').on('click', '.return-out', function() {
             // Use the closest 'tr' element to get the data
             const data = table.row($(this).closest('tr')).data();
-            location.replace(`<?= base_url("return-barang/id"); ?>/${data.id}`);
+            location.replace(`<?= base_url("penerimaan-barang-lokal-bb/return-barang/id"); ?>/${data.id}`);
         });
     })
 

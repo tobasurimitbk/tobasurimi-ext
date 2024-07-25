@@ -10,6 +10,7 @@ use App\Models\KemasanModel;
 use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
+use App\Models\PengembalianBarangModel;
 use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\SatuansModel;
@@ -25,7 +26,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-class ReturnBarangLokalBB extends BaseController
+class ReturnBarangPO extends BaseController
 {
     protected $this_company_id;
     protected $penerimaanBarangModel;
@@ -46,6 +47,7 @@ class ReturnBarangLokalBB extends BaseController
     protected $stockDetail2Model;
     protected $this_user_id;
     protected $dompdf;
+    protected $pengembalianBarangModel;
 
     public function __construct()
     {
@@ -68,243 +70,9 @@ class ReturnBarangLokalBB extends BaseController
         $this->barangMasterModel = new BarangMasterModel();
         $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->dompdf = new Dompdf();
-    }
 
-    public function index()
-    {
-        return view('Warehouse/penerimaanBarangLokal/bahanBaku/index');
-    }
-
-    public function all()
-    {
-        $payload = [
-            "pageSize"      => $this->request->getVar("length"),
-            "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
-            "search" => $this->request->getVar("search"),
-            "sort" => $this->request->getVar("sort"),
-            "sorttype" => $this->request->getVar("sortType"),
-            "statuspenerimaan" => "LOKAL",
-            "status" => $this->request->getVar("status"),
-            "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
-        ];
-
-        $condition = [
-            "penerimaan_barang.company_id" => $this->this_company_id,
-            "status_penerimaan" => "LOKAL",
-            "penerimaan_barang.deletedAt" => null,
-            "penerimaan_barang_detail.deletedAt" => null,
-            "tipe_bahan" => "BAKU"
-        ];
-
-        $addCondition = [
-            "search"        => $this->request->getVar("search"),
-            "sort"          => $this->request->getVar("sort"),
-            "sortType"      => $this->request->getVar("sortType"),
-            "status" => $this->request->getVar("status"),
-            "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
-        ];
-
-        $limit = $this->request->getVar("length");
-        $offset = $this->request->getVar("start");
-        $penerimaanBarangData = $this->penerimaanBarangModel->getPenerimaanBarangList($condition, $addCondition, $limit, $offset);
-
-        $dataPenerimaanBarang = [];
-
-        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-
-        foreach ($penerimaanBarangData['data'] as $data) {
-            array_push($dataPenerimaanBarang, [
-                "no"                    => $no++,
-                "id"                    => encrypt($data->id),
-                "divisi"                => $data->divisi,
-                "no_penerimaan_barang"  => $data->no_penerimaan_barang,
-                "warehouse_name"        => $data->warehouse_name,
-                "tipe_bahan"            => $data->tipe_bahan,
-                "createdAt"             => $data->createdAt ? date("d/m/Y", strtotime($data->tanggal)) : "",
-                "supplier_name"         => $data->supplier_name,
-                "itemCount"             => $data->itemCount,
-                "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
-                "status_post"           => $data->status_post,
-            ]);
-        }
-
-        $data = [
-            "draw"              => intval($this->request->getVar("draw")),
-            "recordsTotal"      => $penerimaanBarangData['totalData'],
-            "recordsFiltered"   => $penerimaanBarangData['totalFilteredData'],
-            "data"              => $dataPenerimaanBarang,
-            "payload"           => $payload,
-
-        ];
-
-        echo json_encode($data);
-        return;
-    }
-
-    public function printTable()
-    {
-        $filename = "PENERIMAAN BARANG DARI PO LOKAL BAHAN BAKU";
-
-        $condition = [
-            "penerimaan_barang.company_id" => $this->this_company_id,
-            "status_penerimaan" => "LOKAL",
-            "penerimaan_barang.deletedAt" => null,
-            "penerimaan_barang_detail.deletedAt" => null,
-            "tipe_bahan" => "BAKU"
-        ];
-
-        $addCondition = [
-            "search"        => $this->request->getVar("search"),
-            "sort"          => $this->request->getVar("sort"),
-            "sortType"      => $this->request->getVar("sortType"),
-            "status" => $this->request->getVar("status"),
-            "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
-        ];
-
-        $penerimaanBarangData = $this->penerimaanBarangModel->getPenerimaanBarangList($condition, $addCondition, 100000000, 0);
-
-        $dataPenerimaanBarang = [];
-
-        $no = 1;
-
-        foreach ($penerimaanBarangData['data'] as $data) {
-            array_push($dataPenerimaanBarang, [
-                "no"                    => $no++,
-                "id"                    => encrypt($data->id),
-                "divisi"                => $data->divisi,
-                "no_penerimaan_barang"  => $data->no_penerimaan_barang,
-                "warehouse_name"        => $data->warehouse_name,
-                "tipe_bahan"            => $data->tipe_bahan,
-                "createdAt"             => $data->createdAt ? date("d/m/Y", strtotime($data->tanggal)) : "",
-                "supplier_name"         => $data->supplier_name,
-                "itemCount"             => $data->itemCount,
-                "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
-                "status_post"           => $data->status_post,
-            ]);
-        }
-
-        $data = [
-            "data"  => $dataPenerimaanBarang,
-        ];
-        $this->dompdf->loadHtml(view('Warehouse/penerimaanBarangLokal/bahanBaku/print-table', $data));
-        $this->dompdf->setPaper('A4', 'landscape');
-        $this->dompdf->render();
-        $this->dompdf->stream($filename, array("Attachment" => false));
-        exit(0);
-    }
-
-    public function exportExcel()
-    {
-
-        $filename = "EXPORT_LPB_LOKAL_BB";
-
-        $condition = [
-            "penerimaan_barang.company_id" => $this->this_company_id,
-            "status_penerimaan" => "LOKAL",
-            "penerimaan_barang.deletedAt" => null,
-            "penerimaan_barang_detail.deletedAt" => null,
-            "tipe_bahan" => "BAKU"
-        ];
-
-        $addCondition = [
-            "search"        => $this->request->getVar("search"),
-            "sort"          => $this->request->getVar("sort"),
-            "sortType"      => $this->request->getVar("sortType"),
-            "status" => $this->request->getVar("status"),
-            "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
-        ];
-
-        $penerimaanBarangData = $this->penerimaanBarangModel->getPenerimaanBarangList($condition, $addCondition, 100000000, 0);
-
-        $dataPenerimaanBarang = [];
-
-        $no = 1;
-
-        foreach ($penerimaanBarangData['data'] as $data) {
-            array_push($dataPenerimaanBarang, [
-                "NO"                    => $no++,
-                "DEPARTEMEN"            => $data->divisi,
-                "NO PENERIMAAN BARANG"  => $data->no_penerimaan_barang,
-                "NO PO"                 => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
-                "GUDANG"                => $data->warehouse_name,
-                "TANGGAL"               => $data->createdAt ? date("d/m/Y", strtotime($data->tanggal)) : "",
-                "SUPPLIER"              => $data->supplier_name,
-                "JUMLAH ITEM"           => $data->itemCount,
-            ]);
-        }
-
-        $data = [
-            "data"  => $dataPenerimaanBarang,
-        ];
-
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $sheet->getStyle('A1:H1')->applyFromArray([
-            'font' => [
-                'bold' => true,
-            ],
-        ]);
-
-
-        if (empty($dataPenerimaanBarang)) {
-            $sheet->setCellValue('A1', 'Tidak Ada Data Penerimaan Barang');
-        } else {
-            $header = array_keys($dataPenerimaanBarang[0]);
-            $sheet->fromArray($header, null, 'A1');
-            $sheet->getStyle('A1:H1')->applyFromArray([
-                'font' => [
-                    'bold' => true,
-                ],
-            ]);
-
-            $rowData = array_map('array_values', $dataPenerimaanBarang);
-            $sheet->fromArray($rowData, null, 'A2');
-
-            foreach (range('A', $sheet->getHighestDataColumn()) as $col) {
-                $sheet->getColumnDimension($col)->setAutoSize(true);
-            }
-
-            $sheet->getStyle('A1:' . $sheet->getHighestDataColumn() . $sheet->getHighestDataRow())
-                ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        }
-
-        ob_start();
-        $writer = new Xlsx($spreadsheet);
-        $writer->save('php://output');
-        $excelOutput = ob_get_clean();
-
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $filename . '.xlsx"');
-        header('Cache-Control: max-age=0');
-        header('Content-Length: ' . strlen($excelOutput));
-
-        echo $excelOutput;
-        exit();
-    }
-
-    public function create()
-    {
-        $dataAJU = $this->metadataModel->getBCUsed('po_lokal_bb');
-        $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN BAKU');
-        $dataSatuan = $this->satuanModel->asObject()->find();
-        $dataDivisi = $this->divisiModel->getDivisiAccess();
-        $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
-
-        $data = [
-            "dataSatuan" => $dataSatuan,
-            "dataSupplier" => $dataSupplier,
-            "dataAJU" => $dataAJU,
-            "dataDivisi" => $dataDivisi,
-            "dataKemasan" => $dataKemasan
-        ];
-
-        return view('Warehouse/penerimaanBarangLokal/bahanBaku/form', $data);
+        $this->pengembalianBarangModel = new PengembalianBarangModel();
+        // $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
     }
 
     public function createAction()
@@ -407,6 +175,7 @@ class ReturnBarangLokalBB extends BaseController
         }
 
         $dataPenerimaanBarang =  $this->penerimaanBarangModel->where('id', $id)->first();
+        $dataPengembalianBarang =  $this->pengembalianBarangModel->where('penerimaan_barang_id', $id)->first();
         $dataAJU = $this->metadataModel->where('name', 'jenis_dok_aju')->findAll();
         $dataSupplier = $this->supplierModel->where('deletedAt', null)->findAll();
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
@@ -421,6 +190,7 @@ class ReturnBarangLokalBB extends BaseController
             "dataAJU" => $dataAJU,
             "dataDivisi" => $dataDivisi,
             "dataPenerimaanBarang" => $dataPenerimaanBarang,
+            "dataPengembalianBarang" => $dataPengembalianBarang,
             "dataKemasan"   => $dataKemasan
         ];
 
@@ -752,44 +522,16 @@ class ReturnBarangLokalBB extends BaseController
         return response()->setJSON($this->rmPurchaseOrderDetailModel->getListLPBBahanBaku($rmPurchaseOrderID, "LOKAL", "BAKU", $penerimaanBarangID));
     }
 
-    public function dropdownDivisiPOLokalBB()
-    {
-        // Dapatkan divisi yang ada nomor PO nya
-        $supplierID = $this->request->getVar('id');
-        $condition = [
-            'rm_purchase_orders.deletedAt' => null,
-            'rm_purchase_orders.supplier_id' => $supplierID,
-            'rm_purchase_orders.is_posted' => '1',
-            'rm_purchase_orders.status_penerimaan' => '0',
-            'divisis.company_id' => $this->this_company_id,
-            'divisis.deletedAt' => null
-        ];
-
-        $selectQry = "divisis.*";
-        $result = $this->divisiModel->select($selectQry)
-            ->join('rm_purchase_orders', 'rm_purchase_orders.divisi_id = divisis.id', 'left')
-            ->whereIn('divisis.id', session()->get('login')->this_access_divisi_id)
-            ->where($condition)
-            ->groupBy('divisis.id')
-            ->findAll();
-
-        return response()->setJSON([
-            'data' => $result,
-            'status' => true,
-            'token' => csrf_hash()
-        ]);
-    }
-
     public function generatePONo()
     {
         $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
         $warehouseID = $this->request->getVar('warehouseID');
 
         if (empty($warehouseID)) {
-            $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day, "", $warehouseID);
+            $no = $this->pengembalianBarangModel->get_no(date('m'), date('Y'), $last_day, "", $warehouseID);
         } else {
             $warehouse = $this->warehousesModel->where('id', $warehouseID)->first();
-            $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day, $warehouse['code_warehouse'], $warehouseID);
+            $no = $this->pengembalianBarangModel->get_no(date('m'), date('Y'), $last_day, $warehouse['code_warehouse'], $warehouseID);
         }
         return response()->setJSON([
             'status' => true,

@@ -10,7 +10,7 @@
             </a>
             <?php if (!empty($dataPenerimaanBarang)) : ?>
                 <?php if (can('Warehouse', 'P. Barang Lokal BB', 'p')) : ?>
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-lokal-bb/print/"); ?><?= encrypt($dataPenerimaanBarang['id']); ?>')">
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-lokal-bb/return-barang/print/"); ?><?= encrypt($dataPenerimaanBarang['id']); ?>')">
                         Print
                     </button>
                 <?php endif; ?>
@@ -43,7 +43,8 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPenerimaanBarang) ? encrypt($dataPenerimaanBarang['id']) : ""; ?>" />
+                <input autocomplete="one-time-code" type="text" class="penerimaan_barang_id" name="penerimaan_barang_id" id="penerimaan_barang_id" value="<?= !empty($dataPenerimaanBarang) ? encrypt($dataPenerimaanBarang['id']) : ""; ?>" />
+                <input autocomplete="one-time-code" type="text" class="pengembalian_barang_id" name="pengembalian_barang_id" id="pengembalian_barang_id" value="<?= !empty($dataPengembalianBarang) ? encrypt($dataPengembalianBarang['id']) : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row mb-1">
                     <div class="col-md-4">
@@ -55,11 +56,11 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" value="" type="text" class="form-control no_return_barang" id="no_return_barang" name="no_return_barang" placeholder="No. Surat Jalan">
+                                    <input autocomplete="one-time-code" value="" type="text" class="form-control no_return_barang" id="no_return_barang" name="no_return_barang" placeholder="No. Surat Jalan">
                                     <label for="floatingInput">No. Surat Jalan</label>
                                 </div>
                                 <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -215,7 +216,7 @@
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
                     <div class="col-md-12">
-                        <label class="form-label font-weight-bold modal-sub-title">List Barang <?= !empty($dataPenerimaanBarang) ? "(Hanya Menampilkan Barang berdasarkan data yang sudah disimpan sebelumnya)" : "(Hanya Menampilkan Barang yang Belum Diterima Full)" ?></label>
+                        <label class="form-label font-weight-bold modal-sub-title">List Barang <?= !empty($dataPenerimaanBarang) ? "(Hanya Menampilkan Barang berdasarkan data yang sudah diposting pada LPB)" : "" ?></label>
                     </div>
                 </div>
             </div>
@@ -264,117 +265,6 @@
     </div>
 </section>
 
-<div class="modal detail-modal" tabindex="1">
-    <div class="modal-dialog" style="min-width: 900px;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
-            </div>
-            <div class="modal-body">
-                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="one-time-code" type="hidden" class="rm_purchase_order_id" name="rm_purchase_order_id" id="rm_purchase_order_id" />
-                    <input autocomplete="one-time-code" type="hidden" class="rm_purchase_order_details_id" name="rm_purchase_order_details_id" id="rm_purchase_order_details_id" />
-                    <input autocomplete="one-time-code" type="hidden" class="jml_diterima_lpb_last" name="jml_diterima_lpb_last" id="jml_diterima_lpb_last" />
-                    <div class="row">
-                        <div class="col mb-3">
-                            <h5 class="title-tambah-barang">Data Barang</h5>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control po_no" id="po_no" name="po_no" placeholder="Nomor PO">
-                                <label for="floatingInput">Nomor PO</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control kode_barang" id="kode_barang" name="kode_barang" placeholder="Kode Barang">
-                                <label for="floatingInput">Kode Barang</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control nama_barang" id="nama_barang" name="nama_barang" placeholder="Nama Barang">
-                                <label for="floatingInput">Nama Barang</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control satuan_order" id="satuan_order" name="satuan_order" placeholder="Satuan Order">
-                                <label for="floatingInput">Satuan Order</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control jml_order" id="jml_order" name="jml_order" placeholder="Jumlah Order">
-                                <label for="floatingInput">Jumlah Order</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" readonly="true" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan" />
-                                <label for="floatingInput">Keterangan</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control jml_diterima_lpb" id="jml_diterima_lpb" name="jml_diterima_lpb" placeholder="Qty Diterima LPB ini">
-                                <label for="floatingInput">Qty Diterima Saat ini</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" readonly type="text" class="form-control jml_diterima_total" id="jml_diterima_total" name="jml_diterima_total" placeholder="Qty Diterima Total">
-                                <label for="floatingInput">Qty Diterima Total</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" readonly type="text" readonly="true" class="form-control sisa_total" id="sisa_total" name="sisa_total" placeholder="Sisa Total">
-                                <label for="floatingInput">Sisa Total</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col mb-3">
-                            <h5 class="title-tambah-barang">Detail Barang di Dokumen</h5>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input readonly autocomplete="one-time-code" type="text" class="form-control nama_barang_dokumen" id="nama_barang_dokumen" name="nama_barang_dokumen" placeholder="Nama Barang di dokumen">
-                                <label for="floatingInput">Nama Barang di dokumen (Bea Cukai)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input readonly autocomplete="one-time-code" type="text" class="form-control harga" id="harga" name="harga" placeholder="Harga">
-                                <label for="floatingInput">Harga Satuan<label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input readonly disabled autocomplete="one-time-code" type="text" class="form-control sub_total" name="sub_total" id="sub_total" placeholder="Total Harga">
-                                <label for="floatingInput">Total Harga</label>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-hide-detail btn-discard mr-2">Kembali</button>
-                <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     var listData = [];
@@ -395,11 +285,11 @@
     }).change(function() {
         let arr = $('.multiple_po_id').val();
         $.ajax({
-            url: `<?= base_url("penerimaan-barang-lokal-bb/list-barang"); ?>`,
+            url: `<?= base_url("penerimaan-barang-lokal-bb/return-barang/list-barang"); ?>`,
             method: "GET",
             data: {
                 rm_purchase_order_id: JSON.stringify(arr),
-                penerimaan_barang_id: $('.id').val()
+                penerimaan_barang_id: $('.penerimaan_barang_id').val()
             },
             dataType: "json",
             success: function(res) {
@@ -416,109 +306,18 @@
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
         allowClear: true
-    }).change(function() {
-        // GET DIVISI
-        $.ajax({
-            url: `<?= base_url('penerimaan-barang-lokal-bb/get-divisi'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                id: $(".supplier_id option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".divisi_id").empty()
-                $(".divisi_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".divisi_id").append(`<option value="${item.id}">${item.divisi}</option>`)
-                })
-                $(".divisi_id").val();
-            }
-        });
     });
 
     $('.warehouse_id').select2({
         placeholder: "Pilih Warehouse",
         theme: "bootstrap-5",
         allowClear: true
-    }).change(function() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
-        if (value) {
-            $.ajax({
-                url: `<?= base_url("penerimaan-barang-lokal-bb/generate-po-no"); ?>`,
-                method: "GET",
-                data: {
-                    warehouseID: $(this).val()
-                },
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        $(".no_penerimaan_barang").val(res.data);
-                    }
-                }
-            })
-        }
     });
 
     $('.divisi_id').select2({
         placeholder: "Pilih Departemen Purchase Order",
         theme: "bootstrap-5",
         allowClear: true
-    }).change(function() {
-        // GET PO
-        $.ajax({
-            url: `<?= base_url('penerimaan-barang-lokal-bb/get-po'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                id: $(".supplier_id option:selected").val(),
-                divisi_id: $(".divisi_id option:selected").val()
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".multiple_po_id").empty()
-                $(".multiple_po_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
-                })
-                $(".multiple_po_id").val([]);
-            }
-        });
-        // GET WAREHOUSES
-        $.ajax({
-            url: `<?= base_url('penerimaan-barang-lokal-bb/warehouse'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                divisi_id: $(".divisi_id option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".warehouse_id").empty()
-                $(".warehouse_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
-                })
-                $(".warehouse_id").val();
-            }
-        });
-        listData = [];
-        drawTable(listData);
     });
 
     $('.kemasan_id').select2({
@@ -528,16 +327,6 @@
     }).change(function() {
 
     });
-
-    $('.btn-discard').click(function() {
-        $('.detail-modal').modal('hide');
-    })
-
-    // $('.aju_document_type').select2({
-    //     placeholder: "Pilih Dokumen Bea Cukai",
-    //     theme: "bootstrap-5",
-    //     allowClear: true
-    // });
 
     $('.kemasan_id, .divisi_id, .supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id')
         .parent('div')
@@ -722,7 +511,7 @@
                         if (id) {
                             formData.append("id", id);
                             $.ajax({
-                                url: "<?= base_url("penerimaan-barang-lokal-bb/update"); ?>",
+                                url: "<?= base_url("penerimaan-barang-lokal-bb/return-barang/update"); ?>",
                                 data: formData,
                                 method: "POST",
                                 dataType: "json",
@@ -756,7 +545,7 @@
                             });
                         } else {
                             $.ajax({
-                                url: "<?= base_url("penerimaan-barang-lokal-bb/insert"); ?>",
+                                url: "<?= base_url("penerimaan-barang-lokal-bb/return-barang/insert"); ?>",
                                 data: formData,
                                 method: "POST",
                                 dataType: "json",
@@ -808,7 +597,6 @@
                     listData.result[i].sisa_total = Number($('.sisa_total').val());
                     listData.result[i].sub_total = Number(formatCurrency($('.sub_total').val()));
                     drawTable(listData);
-                    $('.detail-modal').modal('hide');
                     break;
                 }
             }
@@ -943,41 +731,12 @@
         }
     }
 
-    function editModal(rm_purchase_order_id, rm_purchase_order_details_id) {
-        $('.detail-modal').modal('show');
-        $('.title-detail-name').text("Update Penerimaan ");
-
-        var item = null;
-        for (var i = 0; i < listData.result.length; i++) {
-            if (Number(listData.result[i].rm_purchase_order_details_id) == Number(rm_purchase_order_details_id) && Number(listData.result[i].rm_purchase_order_id) == Number(rm_purchase_order_id)) {
-                item = listData.result[i];
-                break;
-            }
-        }
-
-        $('.rm_purchase_order_id').val(item.rm_purchase_order_id);
-        $('.rm_purchase_order_details_id').val(item.rm_purchase_order_details_id);
-        $('.po_no').val(item.po_no);
-        $('.kode_barang').val(item.kode_barang);
-        $('.nama_barang').val(item.nama_barang);
-        $('.satuan_order').val(item.satuan);
-        $('.jml_order').val(item.jml_order);
-        $('.keterangan').val(item.keterangan);
-        $('.jml_diterima_lpb').val(item.jml_diterima_lpb);
-        $('.jml_diterima_total').val(item.jml_diterima_total);
-        $('.sisa_total').val(item.sisa_total.toFixed(2));
-        $('.nama_barang_dokumen').val(item.nama_barang_master);
-        $('.harga').val("" + formatRupiah(Number(item.harga_sum).toFixed(2) || 0));
-        $('.sub_total').val("" + formatRupiah(Number(item.sub_total).toFixed(2) || 0));
-        $('.jml_diterima_lpb_last').val(item.jml_diterima_lpb);
-    }
-
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
         if (value) {
             $(".no_return_barang").attr("readonly", true);
             $.ajax({
-                url: `<?= base_url("return-barang/generate-po-no"); ?>`,
+                url: `<?= base_url("penerimaan-barang-lokal-bb/return-barang/generate-po-no"); ?>`,
                 method: "GET",
                 data: {
                     warehouseID: $('#warehouse_id').val()
@@ -1054,7 +813,7 @@
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     $.ajax({
-                        url: "<?= base_url("penerimaan-barang-lokal-bb/posting"); ?>",
+                        url: "<?= base_url("penerimaan-barang-lokal-bb/return-barang/posting"); ?>",
                         data: {
                             id: $('.id').val()
                         },
@@ -1104,7 +863,7 @@
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     $.ajax({
-                        url: "<?= base_url("penerimaan-barang-lokal-bb/delete"); ?>",
+                        url: "<?= base_url("penerimaan-barang-lokal-bb/return-barang/delete"); ?>",
                         data: {
                             id: $('.id').val()
                         },
