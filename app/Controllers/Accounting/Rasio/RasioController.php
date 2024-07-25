@@ -763,12 +763,14 @@ class RasioController extends BaseController
                         ->where('jasa_vendor_in_id', $jasaVendorIn['id'])
                         ->where('stock.barang1_id', $value['barang1_id'])
                         ->where('stock.barang2_id', $value['barang2_id'])
+                        ->where('jasa_vendor_in_detail.no_aju_in', $value['no_aju'])
                         ->findAll();
                     // var_dump($jasaVendorInDetailCheck);
                     foreach ($jasaVendorInDetailCheck as $valueJasaVendorIn) {
                         $jasaVendorOutDetail = $this->jasaVendorOutDetailModel
                             ->join('stock', "stock.id = jasa_vendor_out_detail.stock_out_id")
                             ->where('jasa_vendor_out_detail.id', $valueJasaVendorIn['jasa_vendor_out_detail_id'])
+                            ->where('jasa_vendor_out_detail.no_aju_out', $value['no_aju'])
                             ->findAll();
                         foreach ($jasaVendorOutDetail as $valueJasaVendorOut) {
                             if ($poBBLokal) {
@@ -1489,7 +1491,7 @@ class RasioController extends BaseController
 
         $dataResults = [];
         $dataStockModel = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
-            "bahan_setengah_jadi",
+            "bahan_baku",
             $this->request->getVar('divisi_id')
         );
 
