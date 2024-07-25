@@ -9,6 +9,9 @@
                 Kembali
             </a>
             <?php if (!empty($bc27)) : ?>
+                <a class="btn btn-info btn-print float-right text-white" href="<?= base_url('bea-cukai-bc-27/id/header/' . encrypt($bc27['id'])) ?>">
+                    Form Ceisa
+                </a>
                 <?php if ($bc27['status_posting'] == "0") : ?>
                     <?php if (can('Bea Cukai', 'BC 2.7', 'd')) : ?>
                         <button class="btn btn-hapus delete-parent float-right" onclick="deleteAction()">
