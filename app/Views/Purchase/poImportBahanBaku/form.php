@@ -509,9 +509,29 @@
 
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
+
         if (value) {
-            $(".po_no").attr("readonly", true);
-            $(".po_no").val("AUTO GENERATE");
+            $.ajax({
+                url: `<?= base_url("/po-import-bahan-baku/generate-no-po"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res) {
+                        $(".po_no").val(res);
+                        $(".po_no").attr("readonly", true);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        $(".po_no").attr("readonly", false);
+                        $("#auto_generate").prop("checked", false);
+                        $(".po_no").val("");
+                    }
+                }
+            })
+
         } else {
             $(".po_no").attr("readonly", false);
             $(".po_no").val("");

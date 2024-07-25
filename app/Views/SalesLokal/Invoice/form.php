@@ -44,7 +44,7 @@
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" type="text" class="form-control no_faktur" id="no_faktur" name="no_faktur" value="<?= !empty($data) ? $data->no_faktur : $noFaktur; ?>" placeholder="Auto Generate">
+                                <input readonly autocomplete="one-time-code" type="text" class="form-control no_faktur" id="no_faktur" name="no_faktur" value="<?= !empty($data) ? $data->no_faktur : $noFaktur; ?>" placeholder="Auto Generate">
                                 <label for="floatingInput">No Faktur</label>
                             </div>
                             <div style="<?= !empty($data) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -1185,6 +1185,7 @@
                 success: function(res) {
                     if (res) {
                         $("#no_faktur").val(res);
+                        $("#no_faktur").attr("readonly", true);
                     } else {
                         Swal.fire({
                             icon: 'error',

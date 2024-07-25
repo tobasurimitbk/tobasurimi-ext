@@ -634,4 +634,15 @@ class POImportBahanBaku extends BaseController
             'status' => true
         ]);
     }
+
+    public function generateNoPo()
+    {
+        $noPoNew =  $this->rmImportPOModel->get_new_no_po(
+            date('m'),
+            date('Y'),
+            getLastDay(),
+            $this->this_company_id
+        );
+        return json_encode($noPoNew);
+    }
 }

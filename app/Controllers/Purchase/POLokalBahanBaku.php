@@ -828,4 +828,15 @@ class POLokalBahanBaku extends BaseController
             'data' => $this->SupplierHargaModel->getSupplierHarga($supplier_id, $bahan_baku_id)
         ]);
     }
+
+    public function generateNoPO()
+    {
+        $no = $this->RMPurchaseOrderModel->get_new_no_po(
+            date('m'),
+            date('Y'),
+            getLastDay(),
+            $this->this_company_id
+        );
+        return json_encode($no);
+    }
 }

@@ -15,7 +15,7 @@
                         <div class="col-md-6">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control kode" id="kode" name="kode" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
+                                    <input readonly autocomplete="one-time-code" type="text" class="form-control kode" id="kode" name="kode" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
                                     <label for="floatingInput">Kode Supplier</label>
                                 </div>
                                 <div style="<?= !empty($dataSPP) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -410,7 +410,7 @@
                         $("#kode").prop("readonly", true);
                         $('.modal').on('hidden.bs.modal', function() {
                             $('#auto_generate').css('display', '');
-                            $("#kode").prop("readonly", false);
+
                         });
 
                         // AJAX GET CITY
@@ -620,6 +620,7 @@
                 success: function(res) {
                     if (res) {
                         $("#kode").val(res);
+                        $("#kode").attr("readonly", true);
                     } else {
                         Swal.fire({
                             icon: 'error',
