@@ -11,11 +11,9 @@
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
-        /* @page {
-            size: 8.27in 5.50in landscape;
-            margin: 25px;
-            padding: 25px;
-        } */
+        @page {
+            size: 10.27in 10.50in landscape;
+        }
 
         .body {
             margin-left: 30px;
@@ -154,6 +152,30 @@
                     $upahKopekClaw = 0;
                     $upahKopekMh = 0;
                     $upahKopekCf = 0;
+                    // komisi
+                    $komisiDagingJumbo = 0;
+                    $komisiDagingExLump = 0;
+                    $komisiDagingLump = 0;
+                    $komisiDagingSpecial = 0;
+                    $komisiDagingClaw = 0;
+                    $komisiDagingMh = 0;
+                    $komisiDagingCf = 0;
+                    // bonus
+                    $bonusDagingJumbo = 0;
+                    $bonusDagingExLump = 0;
+                    $bonusDagingLump = 0;
+                    $bonusDagingSpecial = 0;
+                    $bonusDagingClaw = 0;
+                    $bonusDagingMh = 0;
+                    $bonusDagingCf = 0;
+                    // tambahan
+                    $tambahanJumbo = 0;
+                    $tambahanExLump = 0;
+                    $tambahanLump = 0;
+                    $tambahanSpecial = 0;
+                    $tambahanClaw = 0;
+                    $tambahanMh = 0;
+                    $tambahanCf = 0;
                     // Qty Kopek
                     $qtySebelumKopekTotal = 0;
                     ?>
@@ -195,7 +217,7 @@
                             Rata Rata Rasio
                         </td>
                         <td>
-                            <?= number_format(($qtySebelumKopekTotal / count($biayaKepitingDetail)), 2) ?>
+                            <?= number_format($qtySebelumKopekTotal, 2) ?>
                         </td>
                         <td>
                             <?= number_format(($qtyTotalBahanBaku / $qtySebelumKopekTotal) * 100, 2) ?> %
@@ -237,6 +259,37 @@
                             $upahKopekMh += $d['mh'];
                             $upahKopekCf += $d['cf'];
                         }
+
+                        if ($d['description'] == 'Komisi / Kg Daging') {
+                            $komisiDagingJumbo += $d['jumbo'];
+                            $komisiDagingExLump += $d['ex_lump'];
+                            $komisiDagingLump += $d['lump'];
+                            $komisiDagingSpecial += $d['special'];
+                            $komisiDagingClaw += $d['claw'];
+                            $komisiDagingMh += $d['mh'];
+                            $komisiDagingCf += $d['cf'];
+                        }
+
+                        if ($d['description'] == 'Bonus / Kg Daging') {
+                            $bonusDagingJumbo += $d['jumbo'];
+                            $bonusDagingExLump += $d['ex_lump'];
+                            $bonusDagingLump += $d['lump'];
+                            $bonusDagingSpecial += $d['special'];
+                            $bonusDagingClaw += $d['claw'];
+                            $bonusDagingMh += $d['mh'];
+                            $bonusDagingCf += $d['cf'];
+                        }
+
+                        if ($d['value'] == 'tamb_upah_kopek') {
+                            $tambahanJumbo += $d['jumbo'];
+                            $tambahanExLump += $d['ex_lump'];
+                            $tambahanLump += $d['lump'];
+                            $tambahanSpecial += $d['special'];
+                            $tambahanClaw += $d['claw'];
+                            $tambahanMh += $d['mh'];
+                            $tambahanCf += $d['cf'];
+                        }
+
                         ?>
                         <tr>
                             <td colspan="5"><?= $d['description'] ?></td>
@@ -252,34 +305,118 @@
                     <?php endforeach; ?>
                     <?php
                     $totalTotal = ($totalTotal == 0) ? 1 : $totalTotal;
+                    // upah kopek jumbo
+                    $totalUpahKopekJumbo = $jumboTotal * $upahKopekJumbo;
+                    $totalUpahKopekExLump = $exLumpTotal * $upahKopekExLump;
+                    $totalUpahKopekLump = $lumpTotal * $upahKopekLump;
+                    $totalUpahKopekSpecial = $specialTotal * $upahKopekSpecial;
+                    $totalUpahKopekClaw = $clawTotal * $upahKopekClaw;
+                    $totalUpahKopekMh = $mhTotal * $upahKopekMh;
+                    $totalUpahKopekCf = $cfTotal * $upahKopekCf;
+                    $totalUpahKopek = $totalUpahKopekJumbo + $totalUpahKopekExLump + $totalUpahKopekLump + $totalUpahKopekSpecial + $totalUpahKopekClaw + $totalUpahKopekMh + $totalUpahKopekCf;
+                    // komisi
+                    $totalKomisiJumbo = $jumboTotal * $komisiDagingJumbo;
+                    $totalKomisiExLump = $exLumpTotal * $komisiDagingExLump;
+                    $totalKomisiLump = $lumpTotal * $komisiDagingLump;
+                    $totalKomisiSpecial = $specialTotal * $komisiDagingSpecial;
+                    $totalKomisiClaw = $clawTotal * $komisiDagingClaw;
+                    $totalKomisiMh = $mhTotal * $komisiDagingMh;
+                    $totalKomisiCf = $cfTotal * $komisiDagingCf;
+                    $totalKomisi = $totalKomisiJumbo + $totalKomisiExLump + $totalKomisiLump + $totalKomisiSpecial + $totalKomisiClaw + $totalKomisiMh + $totalKomisiCf;
+                    // bonus
+                    $totalBonusJumbo = $jumboTotal * $bonusDagingJumbo;
+                    $totalBonusExLump = $exLumpTotal * $bonusDagingExLump;
+                    $totalBonusLump = $lumpTotal * $bonusDagingLump;
+                    $totalBonusSpecial = $specialTotal * $bonusDagingSpecial;
+                    $totalBonusClaw = $clawTotal * $bonusDagingClaw;
+                    $totalBonusMh = $mhTotal * $bonusDagingMh;
+                    $totalBonusCf = $cfTotal * $bonusDagingCf;
+                    $totalBonus = $totalBonusJumbo + $totalBonusExLump + $totalBonusLump + $totalBonusSpecial + $totalBonusClaw + $totalBonusMh + $totalBonusCf;
+                    // tambahan
+                    $totalTambahanJumbo = $jumboTotal * $tambahanJumbo;
+                    $totalTambahanExLump = $exLumpTotal * $tambahanExLump;
+                    $totalTambahanLump = $lumpTotal * $tambahanLump;
+                    $totalTambahanSpecial = $specialTotal * $tambahanSpecial;
+                    $totalTambahanClaw = $clawTotal * $tambahanClaw;
+                    $totalTambahanMh = $mhTotal * $tambahanMh;
+                    $totalTambahanCf = $cfTotal * $tambahanCf;
+                    $totalTambahan = $totalTambahanJumbo + $totalTambahanExLump + $totalTambahanLump + $totalTambahanSpecial + $totalTambahanClaw + $totalTambahanMh + $totalTambahanCf;
+                    // presentase kopek
+                    $presentaseJumbo = $jumboTotal != 0 ? ($jumboTotal * 100 / $totalTotal) : 0;
+                    $presentaseExLump = $exLumpTotal != 0 ? ($exLumpTotal * 100 / $totalTotal) : 0;
+                    $presentaseLump = $lumpTotal != 0 ? ($lumpTotal * 100 / $totalTotal) : 0;
+                    $presentaseSpecial = $specialTotal != 0 ? ($specialTotal * 100 / $totalTotal) : 0;
+                    $presentaseClaw = $clawTotal != 0 ? ($clawTotal * 100 / $totalTotal) : 0;
+                    $presentaseMh = $mhTotal != 0 ? ($mhTotal * 100 / $totalTotal) : 0;
+                    $presentaseCf = $cfTotal != 0 ? ($cfTotal * 100 / $totalTotal) : 0;
+                    $totalPresentase = $presentaseJumbo + $presentaseExLump + $presentaseLump + $presentaseSpecial + $presentaseClaw + $presentaseMh + $presentaseCf;
+                    // grand total upah kopek
+                    $grandTotalUpahKopek = $totalUpahKopek + $totalKomisi + $totalBonus + $totalTambahan;
+
                     ?>
                     <tr>
+                        <td colspan="13">-------</td>
+                    </tr>
+                    <tr>
                         <td colspan="5">Total Upah Kopek / Kg</td>
-                        <td><?= number_format(($jumboTotal * $upahKopekJumbo), 2) ?></td>
-                        <td><?= number_format(($exLumpTotal * $upahKopekExLump), 2) ?></td>
-                        <td><?= number_format(($lumpTotal * $upahKopekLump), 2) ?></td>
-                        <td><?= number_format(($specialTotal * $upahKopekSpecial), 2) ?></td>
-                        <td><?= number_format(($clawTotal * $upahKopekCf), 2) ?></td>
-                        <td><?= number_format(($mhTotal * $upahKopekMh), 2) ?></td>
-                        <td><?= number_format(($cfTotal * $upahKopekCf), 2) ?></td>
-                        <td></td>
+                        <td><?= number_format($totalUpahKopekJumbo, 2) ?></td>
+                        <td><?= number_format($totalUpahKopekExLump, 2) ?></td>
+                        <td><?= number_format($totalUpahKopekLump, 2) ?></td>
+                        <td><?= number_format($totalUpahKopekSpecial, 2) ?></td>
+                        <td><?= number_format($totalUpahKopekClaw, 2) ?></td>
+                        <td><?= number_format($totalUpahKopekMh, 2) ?></td>
+                        <td><?= number_format($totalUpahKopekCf, 2) ?></td>
+                        <td><?= number_format($totalUpahKopek, 2) ?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">Total Komisi / Kg</td>
+                        <td><?= number_format($totalKomisiJumbo, 2) ?></td>
+                        <td><?= number_format($totalKomisiExLump, 2) ?></td>
+                        <td><?= number_format($totalKomisiLump, 2) ?></td>
+                        <td><?= number_format($totalKomisiSpecial, 2) ?></td>
+                        <td><?= number_format($totalKomisiClaw, 2) ?></td>
+                        <td><?= number_format($totalKomisiMh, 2) ?></td>
+                        <td><?= number_format($totalKomisiCf, 2) ?></td>
+                        <td><?= number_format($totalKomisi, 2) ?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">Total Bonus / Kg</td>
+                        <td><?= number_format($totalBonusJumbo, 2) ?></td>
+                        <td><?= number_format($totalBonusExLump, 2) ?></td>
+                        <td><?= number_format($totalBonusLump, 2) ?></td>
+                        <td><?= number_format($totalBonusSpecial, 2) ?></td>
+                        <td><?= number_format($totalBonusClaw, 2) ?></td>
+                        <td><?= number_format($totalBonusMh, 2) ?></td>
+                        <td><?= number_format($totalBonusCf, 2) ?></td>
+                        <td><?= number_format($totalBonus, 2) ?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">Total Tambahan</td>
+                        <td><?= number_format($totalTambahanJumbo, 2) ?></td>
+                        <td><?= number_format($totalTambahanExLump, 2) ?></td>
+                        <td><?= number_format($totalTambahanLump, 2) ?></td>
+                        <td><?= number_format($totalTambahanSpecial, 2) ?></td>
+                        <td><?= number_format($totalTambahanClaw, 2) ?></td>
+                        <td><?= number_format($totalTambahanMh, 2) ?></td>
+                        <td><?= number_format($totalTambahanCf, 2) ?></td>
+                        <td><?= number_format($totalTambahan, 2) ?></td>
                     </tr>
                     <tr>
                         <td colspan="5">Presentase Kopek</td>
-                        <td><?= number_format(($jumboTotal * 100) / $totalTotal, 2) ?> %</td>
-                        <td><?= number_format(($exLumpTotal * 100) / $totalTotal, 2) ?> %</td>
-                        <td><?= number_format(($lumpTotal * 100) / $totalTotal, 2) ?> %</td>
-                        <td><?= number_format(($specialTotal * 100) / $totalTotal, 2) ?> %</td>
-                        <td><?= number_format(($clawTotal * 100) / $totalTotal, 2) ?> %</td>
-                        <td><?= number_format(($mhTotal * 100) / $totalTotal, 2) ?> %</td>
-                        <td><?= number_format(($cfTotal * 100) / $totalTotal, 2) ?> %</td>
-                        <td>100 %</td>
+                        <td><?= number_format($presentaseJumbo, 2) ?> %</td>
+                        <td><?= number_format($presentaseExLump, 2) ?> %</td>
+                        <td><?= number_format($presentaseLump, 2) ?> %</td>
+                        <td><?= number_format($presentaseSpecial, 2) ?> %</td>
+                        <td><?= number_format($presentaseClaw, 2) ?> %</td>
+                        <td><?= number_format($presentaseMh, 2) ?> %</td>
+                        <td><?= number_format($presentaseCf, 2) ?> %</td>
+                        <td><?= $totalPresentase ?> %</td>
                     </tr>
                     <tr>
                         <td colspan="12">
                             Grand Total Upah Kopek
                         </td>
-                        <td><?= number_format($totalPerolehanGaji, 2) ?></td>
+                        <td><?= number_format($grandTotalUpahKopek, 2) ?></td>
                     </tr>
 
 
@@ -324,7 +461,7 @@
                 <table class="table">
                     <thead class="thead-dark">
                         <tr>
-                            <th style="text-align: center;" colspan="6">Bonus Khusus Untuk Anggota Kupas di KK</th>
+                            <th style="text-align: center;" colspan="6">Bonus Khusus Untuk <?= $vendor == null ? "-" : strtoupper($vendor['name']) ?></th>
                         </tr>
                         <tr>
                             <th style="text-align: center;width:10px">No</th>

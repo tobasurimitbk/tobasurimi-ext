@@ -973,12 +973,12 @@
                 newRow.append($('<td>').text(v.kode_satuan_in));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <input <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control qty_kotor" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-spesifikasi_in_id="${v.spesifikasi_in_id}" class="form-control qty_kotor" type="text" value="${v.qty_kotor.toFixed(2)}">
+                    <input <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control qty_kotor" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-spesifikasi_in_id="${v.spesifikasi_in_id}" class="form-control qty_kotor" type="text" value="${v.qty_kotor.toFixed(3)}">
                 `
                 ));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <input <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control qty_bersih" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-spesifikasi_in_id="${v.spesifikasi_in_id}" class="form-control qty_bersih" type="text" value="${v.qty_bersih.toFixed(2)}">
+                    <input <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control qty_bersih" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-spesifikasi_in_id="${v.spesifikasi_in_id}" class="form-control qty_bersih" type="text" value="${v.qty_bersih.toFixed(3)}">
                 `
                 ));
                 newRow.append($('<td style="text-align: center;">').html(

@@ -215,7 +215,7 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable3" width="100%" border="1" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="text-align: center;" colspan="6">Bonus Khusus Untuk Anggota Kupas di KK</th>
+                                    <th style="text-align: center;" colspan="6" class="thead-bonus"><?= !empty($biayaKepiting) ? "Bonus Khusus Untuk Vendor " . $jasaVendorInDetail['name'] : "Bonus Khusus Untuk Vendor" ?></th>
                                 </tr>
                                 <tr>
                                     <th style="text-align: center;">No</th>
@@ -287,6 +287,8 @@
         var selected = $('.jasa_vendor_in_id option:selected');
         $('.vendor').val(selected.data('vendor'));
         $('.divisi').val(selected.data('divisi'));
+        $('.thead-bonus').text("Bonus Khusus Untuk " + selected.data('vendor'));
+
         listDataBarang();
         changeStatus();
     });
@@ -814,7 +816,7 @@
             // DATATABLE 1
             $.each(listBarang, function(i, v) {
                 var total = parseFloat(v.jumbo) + parseFloat(v.ex_lump) + parseFloat(v.lump) + parseFloat(v.special) + parseFloat(v.claw) + parseFloat(v.mh) + parseFloat(v.cf)
-                var rasio = total == 0.00 ? 0 : ((total / v.qty_kopek) * 10).toFixed(2);
+                var rasio = total == 0.00 ? 0 : ((total / v.qty_kopek) * 100).toFixed(2);
                 var newRow = $('<tr  style="color:whitesmoke;">');
                 newRow.append($('<td style="text-align: center;">').html(
                     `
@@ -873,9 +875,11 @@
                 cfTotal += parseFloat(v.cf);
                 totalTotal += total;
                 qtyKopekTotal += parseFloat(v.qty_kopek);
-                totalRasio += parseFloat(rasio);
+                // totalRasio += parseFloat(rasio);
 
             });
+
+            totalRasio = qtyKopekTotal == 0 ? 0 : ((totalTotal / qtyKopekTotal) * 100);
 
             // GRAND TOTAL 1
             var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
@@ -910,11 +914,35 @@
                 var gajiTotal = 0;
                 var upahKopekJumbo = 0;
                 var upahKopekExLump = 0;
-                var updahKopekLump = 0;
+                var upahKopekLump = 0;
                 var upahKopekSpecial = 0;
-                var updahKopekClaw = 0;
+                var upahKopekClaw = 0;
                 var upahKopekMh = 0;
                 var upahKopekCf = 0;
+
+                var komisiDagingJumbo = 0;
+                var komisiDagingExLump = 0;
+                var komisiDagingLump = 0;
+                var komisiDagingSpecial = 0;
+                var komisiDagingClaw = 0;
+                var komisiDagingMh = 0;
+                var komisiDagingCf = 0;
+
+                var bonusDagingJumbo = 0;
+                var bonusDagingExLump = 0;
+                var bonusDagingLump = 0;
+                var bonusDagingSpecial = 0;
+                var bonusDagingClaw = 0;
+                var bonusDagingMh = 0;
+                var bonusDagingCf = 0;
+
+                var tambahanJumbo = 0;
+                var tambahanExLump = 0;
+                var tambahanLump = 0;
+                var tambahanSpecial = 0;
+                var tambahanClaw = 0;
+                var tambahanMh = 0;
+                var tambahanCf = 0;
 
                 $.each(listPerolehanGaji, function(i, v) {
                     var total = parseFloat(v.jumbo) + parseFloat(v.ex_lump) + parseFloat(v.lump) + parseFloat(v.special) + parseFloat(v.claw) + parseFloat(v.mh) + parseFloat(v.cf);
@@ -923,11 +951,41 @@
                     if (v.description == 'Upah Kopek') {
                         upahKopekJumbo += v.jumbo;
                         upahKopekExLump += v.ex_lump;
-                        updahKopekLump += v.lump;
+                        upahKopekLump += v.lump;
                         upahKopekSpecial += v.special;
-                        updahKopekClaw += v.claw;
+                        upahKopekClaw += v.claw;
                         upahKopekMh += v.mh;
                         upahKopekCf += v.cf;
+                    }
+
+                    if (v.description == 'Komisi / Kg Daging') {
+                        komisiDagingJumbo += v.jumbo;
+                        komisiDagingExLump += v.ex_lump;
+                        komisiDagingLump += v.lump;
+                        komisiDagingSpecial += v.special;
+                        komisiDagingClaw += v.claw;
+                        komisiDagingMh += v.mh;
+                        komisiDagingCf += v.cf;
+                    }
+
+                    if (v.description == 'Bonus / Kg Daging') {
+                        bonusDagingJumbo += v.jumbo;
+                        bonusDagingExLump += v.ex_lump;
+                        bonusDagingLump += v.lump;
+                        bonusDagingSpecial += v.special;
+                        bonusDagingClaw += v.claw;
+                        bonusDagingMh += v.mh;
+                        bonusDagingCf += v.cf;
+                    }
+
+                    if (v.value == 'tamb_upah_kopek') { // ex lump
+                        tambahanJumbo += v.jumbo;
+                        tambahanExLump += v.ex_lump;
+                        tambahanLump += v.lump;
+                        tambahanSpecial += v.special;
+                        tambahanClaw += v.claw;
+                        tambahanMh += v.mh;
+                        tambahanCf += v.cf;
                     }
 
                     var newRow = $('<tr  style="color:whitesmoke;">');
@@ -974,37 +1032,121 @@
 
                 });
 
+                var totalUpahKopekJumbo = jumboTotal * upahKopekJumbo;
+                var totalUpahKopekExLump = exLumpTotal * upahKopekExLump;
+                var totalUpahKopekLump = lumpTotal * upahKopekLump;
+                var totalUpahKopekSpecial = specialTotal * upahKopekSpecial;
+                var totalUpahKopekClaw = clawTotal * upahKopekClaw;
+                var totalUpahKopekMh = mhTotal * upahKopekMh;
+                var totalUpahKopekCf = cfTotal * upahKopekCf;
+                var totalUpahKopek = totalUpahKopekJumbo + totalUpahKopekExLump + totalUpahKopekLump + totalUpahKopekSpecial + totalUpahKopekClaw + totalUpahKopekMh + totalUpahKopekCf;
 
                 var newRow3 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
                 newRow3.append($('<td style="text-align: center;">').html("<b>TOTAL UPAH KOPEK / KG</b>"));
-                newRow3.append($('<td>').text((jumboTotal != 0 ? formatRupiah((jumboTotal * upahKopekJumbo).toFixed(2)) : '0')));
-                newRow3.append($('<td>').text((exLumpTotal != 0 ? formatRupiah((exLumpTotal * upahKopekExLump).toFixed(2)) : '0')));
-                newRow3.append($('<td>').text((lumpTotal != 0 ? formatRupiah((lumpTotal * updahKopekLump).toFixed(2)) : '0')));
-                newRow3.append($('<td>').text((specialTotal != 0 ? formatRupiah((specialTotal * upahKopekSpecial).toFixed(2)) : '0')));
-                newRow3.append($('<td>').text((clawTotal != 0 ? formatRupiah((clawTotal * updahKopekClaw).toFixed(2)) : '0')));
-                newRow3.append($('<td>').text((mhTotal != 0 ? formatRupiah((mhTotal * upahKopekMh).toFixed(2)) : '0')));
-                newRow3.append($('<td>').text((cfTotal != 0 ? formatRupiah((cfTotal * upahKopekCf).toFixed(2)) : '0')));
+                newRow3.append($('<td>').text((totalUpahKopekJumbo != 0 ? formatRupiah((totalUpahKopekJumbo).toFixed(2)) : '0')));
+                newRow3.append($('<td>').text((totalUpahKopekExLump != 0 ? formatRupiah((totalUpahKopekExLump).toFixed(2)) : '0')));
+                newRow3.append($('<td>').text((totalUpahKopekLump != 0 ? formatRupiah((totalUpahKopekLump).toFixed(2)) : '0')));
+                newRow3.append($('<td>').text((totalUpahKopekSpecial != 0 ? formatRupiah((totalUpahKopekSpecial).toFixed(2)) : '0')));
+                newRow3.append($('<td>').text((totalUpahKopekClaw != 0 ? formatRupiah((totalUpahKopekClaw).toFixed(2)) : '0')));
+                newRow3.append($('<td>').text((totalUpahKopekMh != 0 ? formatRupiah((totalUpahKopekMh).toFixed(2)) : '0')));
+                newRow3.append($('<td>').text((totalUpahKopekCf != 0 ? formatRupiah((totalUpahKopekCf).toFixed(2)) : '0')));
 
-                newRow3.append($('<td>').text(''));
+                newRow3.append($('<td>').text(formatRupiah(totalUpahKopek)));
                 table2.find('tbody').append(newRow3);
+
+                var totalKomisiJumbo = jumboTotal * komisiDagingJumbo;
+                var totalKomisiExLump = exLumpTotal * komisiDagingExLump;
+                var totalKomisiLump = lumpTotal * komisiDagingLump;
+                var totalKomisiSpecial = specialTotal * komisiDagingSpecial;
+                var totalKomisiClaw = clawTotal * komisiDagingClaw;
+                var totalKomisiMh = mhTotal * komisiDagingMh;
+                var totalKomisiCf = cfTotal * komisiDagingCf;
+                var totalKomisi = totalKomisiJumbo + totalKomisiExLump + totalKomisiLump + totalKomisiSpecial + totalKomisiClaw + totalKomisiMh + totalKomisiCf;
+
+                var newRow4 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
+                newRow4.append($('<td style="text-align: center;">').html("<b>TOTAL KOMISI / KG</b>"));
+                newRow4.append($('<td>').text((totalKomisiJumbo != 0 ? formatRupiah((totalKomisiJumbo).toFixed(2)) : '0')));
+                newRow4.append($('<td>').text((totalKomisiExLump != 0 ? formatRupiah((totalKomisiExLump).toFixed(2)) : '0')));
+                newRow4.append($('<td>').text((totalKomisiLump != 0 ? formatRupiah((totalKomisiLump).toFixed(2)) : '0')));
+                newRow4.append($('<td>').text((totalKomisiSpecial != 0 ? formatRupiah((totalKomisiSpecial).toFixed(2)) : '0')));
+                newRow4.append($('<td>').text((totalKomisiClaw != 0 ? formatRupiah((totalKomisiClaw).toFixed(2)) : '0')));
+                newRow4.append($('<td>').text((totalKomisiMh != 0 ? formatRupiah((totalKomisiMh).toFixed(2)) : '0')));
+                newRow4.append($('<td>').text((totalKomisiCf != 0 ? formatRupiah((totalKomisiCf).toFixed(2)) : '0')));
+
+                newRow4.append($('<td>').text(formatRupiah(totalKomisi)));
+                table2.find('tbody').append(newRow4);
+
+                var totalBonusJumbo = jumboTotal * bonusDagingJumbo;
+                var totalBonusExLump = exLumpTotal * bonusDagingExLump;
+                var totalBonusLump = lumpTotal * bonusDagingLump;
+                var totalBonusSpecial = specialTotal * bonusDagingSpecial;
+                var totalBonusClaw = clawTotal * bonusDagingClaw;
+                var totalBonusMh = mhTotal * bonusDagingMh;
+                var totalBonusCf = cfTotal * bonusDagingCf;
+                var totalBonus = totalBonusJumbo + totalBonusExLump + totalBonusLump + totalBonusSpecial + totalBonusClaw + totalBonusMh + totalBonusCf;
+
+                var newRow5 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
+                newRow5.append($('<td style="text-align: center;">').html("<b>TOTAL BONUS / KG</b>"));
+                newRow5.append($('<td>').text((totalBonusJumbo != 0 ? formatRupiah((totalBonusJumbo).toFixed(2)) : '0')));
+                newRow5.append($('<td>').text((totalBonusExLump != 0 ? formatRupiah((totalBonusExLump).toFixed(2)) : '0')));
+                newRow5.append($('<td>').text((totalBonusLump != 0 ? formatRupiah((totalBonusLump).toFixed(2)) : '0')));
+                newRow5.append($('<td>').text((totalBonusSpecial != 0 ? formatRupiah((totalBonusSpecial).toFixed(2)) : '0')));
+                newRow5.append($('<td>').text((totalBonusClaw != 0 ? formatRupiah((totalBonusClaw).toFixed(2)) : '0')));
+                newRow5.append($('<td>').text((totalBonusMh != 0 ? formatRupiah((totalBonusMh).toFixed(2)) : '0')));
+                newRow5.append($('<td>').text((totalBonusCf != 0 ? formatRupiah((totalBonusCf).toFixed(2)) : '0')));
+
+                newRow5.append($('<td>').text(formatRupiah(totalBonus)));
+                table2.find('tbody').append(newRow5);
+
+                var totalTambahanJumbo = jumboTotal * tambahanJumbo;
+                var totalTambahanExLump = exLumpTotal * tambahanExLump;
+                var totalTambahanLump = lumpTotal * tambahanLump;
+                var totalTambahanSpecial = specialTotal * tambahanSpecial;
+                var totalTambahanClaw = clawTotal * tambahanClaw;
+                var totalTambahanMh = mhTotal * tambahanMh;
+                var totalTambahanCf = cfTotal * tambahanCf;
+                var totalTambahan = totalTambahanJumbo + totalTambahanExLump + totalTambahanLump + totalTambahanSpecial + totalTambahanClaw + totalTambahanMh + totalTambahanCf;
+
+                var newRow6 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
+                newRow6.append($('<td style="text-align: center;">').html("<b>TOTAL TAMBAHAN</b>"));
+                newRow6.append($('<td>').text((totalTambahanJumbo != 0 ? formatRupiah((totalTambahanJumbo).toFixed(2)) : '0')));
+                newRow6.append($('<td>').text((totalTambahanExLump != 0 ? formatRupiah((totalTambahanExLump).toFixed(2)) : '0')));
+                newRow6.append($('<td>').text((totalTambahanLump != 0 ? formatRupiah((totalTambahanLump).toFixed(2)) : '0')));
+                newRow6.append($('<td>').text((totalTambahanSpecial != 0 ? formatRupiah((totalTambahanSpecial).toFixed(2)) : '0')));
+                newRow6.append($('<td>').text((totalTambahanClaw != 0 ? formatRupiah((totalTambahanClaw).toFixed(2)) : '0')));
+                newRow6.append($('<td>').text((totalTambahanMh != 0 ? formatRupiah((totalTambahanMh).toFixed(2)) : '0')));
+                newRow6.append($('<td>').text((totalTambahanCf != 0 ? formatRupiah((totalTambahanCf).toFixed(2)) : '0')));
+
+                newRow6.append($('<td>').text(formatRupiah(totalTambahan)));
+                table2.find('tbody').append(newRow6);
+
+                var presentaseJumbo = jumboTotal != 0 ? (jumboTotal * 100 / totalTotal) : 0;
+                var presentaseExLump = exLumpTotal != 0 ? (exLumpTotal * 100 / totalTotal) : 0;
+                var presentaseLump = lumpTotal != 0 ? (lumpTotal * 100 / totalTotal) : 0;
+                var presentaseSpecial = specialTotal != 0 ? (specialTotal * 100 / totalTotal) : 0;
+                var presentaseClaw = clawTotal != 0 ? (clawTotal * 100 / totalTotal) : 0;
+                var presentaseMh = mhTotal != 0 ? (mhTotal * 100 / totalTotal) : 0;
+                var presentaseCf = cfTotal != 0 ? (cfTotal * 100 / totalTotal) : 0;
+                var totalPresentase = presentaseJumbo + presentaseExLump + presentaseLump + presentaseSpecial + presentaseClaw + presentaseMh + presentaseCf;
 
                 var newRow2 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
                 newRow2.append($('<td style="text-align: center;">').html("<b>PRESENTASE KOPEK</b>"));
-                newRow2.append($('<td>').text((jumboTotal != 0 ? (jumboTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
-                newRow2.append($('<td>').text((exLumpTotal != 0 ? (exLumpTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
-                newRow2.append($('<td>').text((lumpTotal != 0 ? (lumpTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
-                newRow2.append($('<td>').text((specialTotal != 0 ? (specialTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
-                newRow2.append($('<td>').text((clawTotal != 0 ? (clawTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
-                newRow2.append($('<td>').text((mhTotal != 0 ? (mhTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
-                newRow2.append($('<td>').text((cfTotal != 0 ? (cfTotal * 100 / totalTotal).toFixed(2) : '0') + ' %'));
+                newRow2.append($('<td>').text((presentaseJumbo != 0 ? (presentaseJumbo).toFixed(2) : '0') + ' %'));
+                newRow2.append($('<td>').text((presentaseExLump != 0 ? (presentaseExLump).toFixed(2) : '0') + ' %'));
+                newRow2.append($('<td>').text((presentaseLump != 0 ? (presentaseLump).toFixed(2) : '0') + ' %'));
+                newRow2.append($('<td>').text((presentaseSpecial != 0 ? (presentaseSpecial).toFixed(2) : '0') + ' %'));
+                newRow2.append($('<td>').text((presentaseClaw != 0 ? (presentaseClaw).toFixed(2) : '0') + ' %'));
+                newRow2.append($('<td>').text((presentaseMh != 0 ? (presentaseMh).toFixed(2) : '0') + ' %'));
+                newRow2.append($('<td>').text((presentaseCf != 0 ? (presentaseCf).toFixed(2) : '0') + ' %'));
 
-                newRow2.append($('<td>').text('100%'));
+                newRow2.append($('<td>').text(totalPresentase.toFixed() + ' %'));
                 table2.find('tbody').append(newRow2);
 
                 // GRAND TOTAL 2    
+                var grandTotalUpahKopek = totalUpahKopek + totalKomisi + totalBonus + totalTambahan;
                 var newRow1 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
                 newRow1.append($('<td style="text-align: center;" colspan="8">').html("<b>GRAND TOTAL UPAH KOPEK</b>"));
-                newRow1.append($('<td>').text(formatRupiah(gajiTotal.toFixed(2))));
+                newRow1.append($('<td>').text(formatRupiah(grandTotalUpahKopek.toFixed(2))));
                 table2.find('tbody').append(newRow1);
             }
 
