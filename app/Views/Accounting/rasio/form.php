@@ -118,14 +118,14 @@
                         <li class="nav-item">
                             <a class="nav-link nav-link-raw-material-i" id="rawISaldoJual" href="#saldo_jual">Saldo Jual</a>
                         </li>
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a class="nav-link nav-link-raw-material-i" id="rawISaldoTrimming" href="#saldo_trimming">Saldo Trimming</a>
-                        </li>
+                        </li> -->
                         <li class="nav-item">
                             <a class="nav-link nav-link-raw-material-i" id="rawISaldoKopek" href="#saldo_kopek">Saldo Kopek</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link nav-link-raw-material-i" id="rawIBahanJadi" href="#bahan_jadi">Bahan Jadi</a>
+                            <a class="nav-link nav-link-raw-material-i" id="rawIBahanJadi" href="#bahan_jadi">Hasil Produksi</a>
                         </li>
                     </ul>
 
