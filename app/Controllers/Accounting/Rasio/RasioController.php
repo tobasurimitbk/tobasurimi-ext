@@ -1235,7 +1235,8 @@ class RasioController extends BaseController
         $conditionProduction = [
             'tanggal_awal' => $tanggal_awal,
             'tanggal_akhir' => $tanggal_akhir,
-            'divisi_id' => $this->request->getVar('divisi_id'),
+            'divisi_id' => $this->request->getVar('department'),
+            'kategori_id' => $this->request->getVar('kategori'),
         ];
         $kursValue = 1;
         $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
@@ -1406,8 +1407,8 @@ class RasioController extends BaseController
         $conditionProduction = [
             'tanggal_awal' => $tanggal_awal,
             'tanggal_akhir' => $tanggal_akhir,
-            // 'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
-            'divisi_id' => $this->request->getVar('divisi_id'),
+            'divisi_id' => $this->request->getVar('department'),
+            'kategori_id' => $this->request->getVar('kategori'),
         ];
         $kursValue = 1;
         $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
@@ -1480,7 +1481,8 @@ class RasioController extends BaseController
         $conditionProduction = [
             'tanggal_awal' => $tanggal_awal,
             'tanggal_akhir' => $tanggal_akhir,
-            'divisi_id' => $this->request->getVar('divisi_id'),
+            'divisi_id' => $this->request->getVar('department'),
+            'kategori_id' => $this->request->getVar('kategori'),
         ];
         $kursValue = 1;
         $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
