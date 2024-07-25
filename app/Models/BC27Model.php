@@ -133,4 +133,20 @@ class BC27Model extends Model
             ->first();
         return $result;
     }
+
+    public function isCompleteFormHeader($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($payload->kodeTujuanPengiriman != "") {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
 }
