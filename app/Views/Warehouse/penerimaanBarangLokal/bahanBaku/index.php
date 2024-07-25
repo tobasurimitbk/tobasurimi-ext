@@ -184,12 +184,7 @@
                     } else {
                         return `
                         <div class="mt-0" >
-                            <button data-toggle="tooltip" title="Return Out" class="btn btn-success return-out" onclick="" style="box-shadow: none !important;">
-                                <i class="fa fa-undo fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <button data-toggle="tooltip" title="Return In" class="btn btn-success" onclick="" style="box-shadow: none !important;">
-                                <i class="fa fa-redo fa-sm" aria-hidden="true"></i>
-                            </button>
+                            
                             <?php if (can('Warehouse', 'P. Barang Lokal BB', 'p')) : ?>
                                 <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bb/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
