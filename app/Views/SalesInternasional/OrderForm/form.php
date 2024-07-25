@@ -46,6 +46,9 @@
                                     <input autocomplete="one-time-code" type="text" <?= !empty($dataSalesExport) ? 'readonly' : '' ?> class="form-control no_sales_order" id="no_sales_order" name="no_sales_order" placeholder="No. Sales Order" required <?= !empty($dataSalesExport) ? 'disabled value="' . $dataSalesExport->sales_order_export_no . '"' : '' ?>>
                                     <label for="floatingInput">No. Order</label>
                                 </div>
+                                <div style="<?= !empty($dataSalesExport) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -792,34 +795,34 @@
     }
 
     function changeStatus() {
-        // let value = document.getElementById('auto_generate').checked ? true : false;
+        let value = document.getElementById('auto_generate').checked ? true : false;
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
-        // if (value) {
-        $.ajax({
-            url: "<?= base_url("order-form-internasional/generate-no-order-form"); ?>",
-            method: "POST",
-            dataType: "json",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                csrf.val(response.token);
-                $(".no_sales_order").val(response.data);
-            },
+        if (value) {
+            $.ajax({
+                url: "<?= base_url("order-form-internasional/generate-no-order-form"); ?>",
+                method: "POST",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    $(".no_sales_order").val(response.data);
+                },
 
-        });
-        $(".no_sales_order").attr("readonly", true);
-        // } else {
-        //     $(".no_sales_order").attr("readonly", false);
-        //     $(".no_sales_order").val("");
-        // }
+            });
+            $(".no_sales_order").attr("readonly", true);
+        } else {
+            $(".no_sales_order").attr("readonly", false);
+            $(".no_sales_order").val("");
+        }
     }
 </script>
 <?= $this->endSection(); ?>

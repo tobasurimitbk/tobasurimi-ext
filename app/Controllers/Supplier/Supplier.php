@@ -65,6 +65,14 @@ class Supplier extends BaseController
         return view('Supplier/supplierBahanBaku/index', $data);
     }
 
+    public function generateKodeSupplierBB()
+    {
+        $supplierModel = new SupplierModel();
+        $supplierCode = $supplierModel->generateSupplierCode("BB", $this->this_company_id);
+
+        return json_encode($supplierCode);
+    }
+
     public function getSupplierBahanBakuHarga($id)
     {
         $id = decrypt($id);
@@ -360,6 +368,14 @@ class Supplier extends BaseController
         return view('Supplier/supplierBahanPenolong/index', $data);
     }
 
+
+    public function generateKodeSupplierBP()
+    {
+        $supplierModel = new SupplierModel();
+        $supplierCode = $supplierModel->generateSupplierCode("BP", $this->this_company_id);
+
+        return json_encode($supplierCode);
+    }
     public function allSupplierBahanPenolong()
     {
         $payload = [
@@ -601,6 +617,15 @@ class Supplier extends BaseController
     public function supplierInternasional()
     {
         return view('Supplier/supplierInternasional/index');
+    }
+
+
+    public function generateKodeSupplierInternasional()
+    {
+        $supplierModel = new SupplierModel();
+        $supplierCode = $supplierModel->generateSupplierCode("I", $this->this_company_id);
+
+        return json_encode($supplierCode);
     }
 
     public function allSupplierInternasional()

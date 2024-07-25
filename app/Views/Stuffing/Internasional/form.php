@@ -75,6 +75,9 @@
                                     <input readonly autocomplete="one-time-code" <?= !empty($stuffingInternasional) ? 'disabled=true' : ''; ?> value="<?= !empty($stuffingInternasional) ? $stuffingInternasional['no_stuffing'] : ""; ?>" type="text" class="form-control <?= !empty($stuffingInternasional) ? '' : 'no_stuffing'; ?>" id="no_stuffing" name="no_stuffing" placeholder="No. Stuffing Internasional">
                                     <label for="floatingInput">No. Stuffing Internasional</label>
                                 </div>
+                                <div style="<?= !empty($stuffingInternasional) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1403,25 +1406,32 @@
     }
 
     function changeStatus() {
-        $(".no_stuffing").attr("readonly", true);
-        $.ajax({
-            url: `<?= base_url("pengeluaran-internasional/get-pengeluaran-internasional-no"); ?>`,
-            method: "GET",
-            dataType: "json",
-            success: function(res) {
-                if (res.status) {
-                    $(".no_stuffing").val(res.data);
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: res.message,
-                        confirmButtonColor: '#4e73df',
-                    })
-                    $(".no_stuffing").attr("readonly", false);
-                    $(".no_stuffing").val("");
+        let value = document.getElementById('auto_generate').checked ? true : false;
+        if (value) {
+            $(".no_stuffing").attr("readonly", true);
+            $.ajax({
+                url: `<?= base_url("pengeluaran-internasional/get-pengeluaran-internasional-no"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res.status) {
+                        $(".no_stuffing").val(res.data);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        $(".no_stuffing").attr("readonly", false);
+                        $("#auto_generate").prop("checked", false);
+                        $(".no_stuffing").val("");
+                    }
                 }
-            }
-        })
+            })
+        } else {
+            $(".no_stuffing").attr("readonly", false);
+            $(".no_stuffing").val("");
+        }
     }
 
     const print = function(url) {

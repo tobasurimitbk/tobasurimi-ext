@@ -230,6 +230,7 @@ $routes->post('/supplier/delete', 'Supplier\Supplier::deleteSupplier', ['filter'
 
 // BAHAN BAKU LOKAL
 $routes->get('/supplier-bahan-baku', 'Supplier\Supplier::supplierBahanBaku', ['filter' => 'Auth']);
+$routes->get('/supplier-bahan-baku/generate-kode-supplier-bb', 'Supplier\Supplier::generateKodeSupplierBB', ['filter' => 'Auth']);
 $routes->get('/supplier-bahan-baku/harga/(:segment)', 'Supplier\Supplier::getSupplierBahanBakuHarga/$1', ['filter' => 'Auth']);
 $routes->get('/supplier-bahan-baku/all', 'Supplier\Supplier::allSupplierBahanBaku', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-baku/save', 'Supplier\Supplier::saveSupplierBahanBaku', ['filter' => 'Auth']);
@@ -244,11 +245,13 @@ $routes->post('/supplier-bahan-baku/harga/delete', 'Supplier\SupplierHarga::dele
 
 // BAHAN PENOLONG
 $routes->get('/supplier-bahan-penolong', 'Supplier\Supplier::supplierBahanPenolong', ['filter' => 'Auth']);
+$routes->get('/supplier-bahan-penolong/generate-kode-supplier-bp', 'Supplier\Supplier::generateKodeSupplierBP', ['filter' => 'Auth']);
 $routes->get('/supplier-bahan-penolong/all', 'Supplier\Supplier::allSupplierBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-penolong/save', 'Supplier\Supplier::saveSupplierBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-penolong/update', 'Supplier\Supplier::updateSupplierBahanPenolong', ['filter' => 'Auth']);
 
 $routes->get('/supplier-internasional', 'Supplier\Supplier::supplierInternasional', ['filter' => 'Auth']);
+$routes->get('/supplier-internasional/generate-kode-supplier-internasional', 'Supplier\Supplier::generateKodeSupplierInternasional', ['filter' => 'Auth']);
 $routes->get('/supplier-internasional/all', 'Supplier\Supplier::allSupplierInternasional', ['filter' => 'Auth']);
 $routes->post('/supplier-internasional/save', 'Supplier\Supplier::saveSupplierInternasional', ['filter' => 'Auth']);
 $routes->post('/supplier-internasional/update', 'Supplier\Supplier::updateSupplierInternasional', ['filter' => 'Auth']);
@@ -475,6 +478,7 @@ $routes->post('/panjar-supplier/update', 'Pembayaran\PanjarSupplier::updatePanja
 $routes->post('/panjar-supplier/update-status', 'Pembayaran\PanjarSupplier::updateStatusPanjarSupplier', ['filter' => 'Auth']);
 $routes->post('/panjar-supplier/delete', 'Pembayaran\PanjarSupplier::deletePanjarSupplier', ['filter' => 'Auth']);
 $routes->get('/panjar-supplier/history-pembayaran', 'Pembayaran\PanjarSupplier::dropDownHistoryPembayaranPanjar', ['filter' => 'Auth']);
+$routes->get('/panjar-supplier/generate-no-panjar', 'Pembayaran\PanjarSupplier::generateNoPanjar', ['filter' => 'Auth']);
 
 
 
@@ -515,6 +519,7 @@ $routes->get('/invoice-penjualan-lokal/getDocNumber/(:segment)/(:segment)', 'Sal
 $routes->get('/invoice-penjualan-lokal/getDocumentData/(:alpha)/(:num)', 'SalesLokal\Invoice::getDocData/$1/$2', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/getItemList/(:num)', 'SalesLokal\Invoice::getItemList/$1', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/print/(:segment)', 'SalesLokal\Invoice::printInvoice/$1', ['filter' => 'Auth']);
+$routes->get('/invoice-penjualan-lokal/get-nomor-faktur', 'SalesLokal\Invoice::getNomorFaktur', ['filter' => 'Auth']);
 // $routes->post('/invoice-penjualan-lokal/print',  'SalesLokal\Invoice::printInvoice', ['filter' => 'Auth']);
 
 // Surat Jalan
@@ -540,6 +545,7 @@ $routes->post('/return-barang-sales/save', 'SalesLokal\Retur::save', ['filter' =
 $routes->post('/return-barang-sales/update', 'SalesLokal\Retur::update', ['filter' => 'Auth']);
 $routes->post('/return-barang-sales/delete', 'SalesLokal\Retur::delete', ['filter' => 'Auth']);
 $routes->get('/return-barang-sales/get-detail-invoice/(:segment)', 'SalesLokal\Retur::getInvoiceNumberList/$1', ['filter' => 'Auth']);
+$routes->get('/return-barang-sales/get-nomor-surat-return', 'SalesLokal\Retur::getNomorSuratReturn', ['filter' => 'Auth']);
 
 // Retur Pembelian
 $routes->get('/retur-barang', 'Purchase\ReturPembelian::index', ['filter' => 'Auth']);
@@ -633,6 +639,7 @@ $routes->get('order-form-lain/get-no', 'PenjualanLain\SalesOrderLain::getSalesOr
 // PRODUKSI
 // Production Result
 $routes->get('/production-result', 'Production\ProductionResult::index', ['filter' => 'Auth']);
+$routes->get('/production-result/generate-kode-penerimaan', 'Production\ProductionResult::generateKodePenerimaan', ['filter' => 'Auth']);
 $routes->get('/production-result/details/(:segment)', 'Production\ProductionResult::getById/$1', ['filter' => 'Auth']);
 $routes->get('/production-result/print/(:segment)', 'Production\ProductionResult::printProductionResultPDF/$1', ['filter' => 'Auth']);
 $routes->get('/production-result/all', 'Production\ProductionResult::getAll', ['filter' => 'Auth']);
@@ -648,6 +655,7 @@ $routes->post('/production-result/delete-detail', 'Production\ProductionResult::
 
 // Rencana Produksi
 $routes->get('/work-order', 'Production\WorkOrder::index', ['filter' => 'Auth']);
+$routes->get('/work-order/generate-kode-produksi', 'Production\WorkOrder::generateKodeProduksi', ['filter' => 'Auth']);
 $routes->get('/work-order/details/(:segment)', 'Production\WorkOrder::getById/$1', ['filter' => 'Auth']);
 $routes->get('/work-order/create', 'Production\WorkOrder::createView', ['filter' => 'Auth']);
 $routes->get('/work-order/all', 'Production\WorkOrder::all', ['filter' => 'Auth']);
@@ -672,6 +680,7 @@ $routes->get('/material-request/list-barang-stock-init', 'Production\MaterialReq
 
 // Material Request Penolong
 $routes->get('/material-request-penolong', 'Production\MaterialRequestPenolong::index', ['filter' => 'Auth']);
+$routes->get('/material-request-penolong/generate-kode-request', 'Production\MaterialRequestPenolong::generateKodeRequest', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/details/(:segment)', 'Production\MaterialRequestPenolong::getById/$1', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/print/(:segment)', 'Production\MaterialRequestPenolong::printMaterialRequestPenolongPDF/$1', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/create', 'Production\MaterialRequestPenolong::createView', ['filter' => 'Auth']);
@@ -686,6 +695,7 @@ $routes->get('/material-request-penolong/list-barang-stock-init', 'Production\Ma
 
 // Material Request Kimia
 $routes->get('/material-request-kimia', 'Production\MaterialRequestKimia::index', ['filter' => 'Auth']);
+$routes->get('/material-request-kimia/generate-kode-request', 'Production\MaterialRequestKimia::generateKodeRequest', ['filter' => 'Auth']);
 $routes->get('/material-request-kimia/details/(:segment)', 'Production\MaterialRequestKimia::getById/$1', ['filter' => 'Auth']);
 $routes->get('/material-request-kimia/create', 'Production\MaterialRequestKimia::createView', ['filter' => 'Auth']);
 $routes->get('/material-request-kimia/all', 'Production\MaterialRequestKimia::all', ['filter' => 'Auth']);

@@ -33,7 +33,7 @@ class PanjarSupplier extends BaseController
     {
 
         $data = [
-            'noPanjar' => $this->panjarSupplierModel->getNumber($this->this_company_id)
+            // 'noPanjar' => $this->panjarSupplierModel->getNumber($this->this_company_id)
         ];
 
         return view('Pembayaran/pembayaranPanjarSupplier/index', $data);
@@ -76,6 +76,15 @@ class PanjarSupplier extends BaseController
                 ];
                 echo json_encode($data);
                 return;
+            }
+            //check
+            $check = $this->panjarSupplierModel->where('company_id', $this->this_company_id)->where('no_panjar', $this->request->getPost("no_panjar"))->first();
+            if ($check != null) {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'message' => "No Panjar sudah digunakan",
+                    'status' => false
+                ]);
             }
 
             $insertData = [
@@ -150,6 +159,14 @@ class PanjarSupplier extends BaseController
                 echo json_encode($data);
                 return;
             }
+            $check = $this->panjarSupplierModel->where('company_id', $this->this_company_id)->where('no_panjar', $this->request->getPost("no_panjar"))->first();
+            if ($check != null) {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'message' => "No Panjar sudah digunakan",
+                    'status' => false
+                ]);
+            }
 
             if ($this->validate($rules)) {
                 $id = decrypt($this->request->getPost("id"));
@@ -162,7 +179,6 @@ class PanjarSupplier extends BaseController
                     "total_panjar"  => repairDouble($this->request->getVar("total_panjar")),
                 ];
             }
-
 
             if ($payload) {
                 $this->panjarSupplierModel->update($id, $payload);
@@ -365,5 +381,10 @@ class PanjarSupplier extends BaseController
 
 
         return response()->setJSON($data);
+    }
+    public function generateNoPanjar()
+    {
+        $noPanjar = $this->panjarSupplierModel->getNumber($this->this_company_id);
+        return json_encode($noPanjar);
     }
 }

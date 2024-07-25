@@ -299,8 +299,6 @@ class MaterialRequestKimia extends BaseController
     public function create()
     {
         try {
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-            $no = $this->materialRequestModel->get_no(date('d'), date('m'), date('Y'), $last_day, $this->this_company_id);
 
             $dataMaterial = [
                 // "work_order_id" => $this->request->getPost("kode_produksi"),
@@ -309,7 +307,7 @@ class MaterialRequestKimia extends BaseController
                 'warehouse_id' => $this->request->getVar("warehouse_id"),
                 "production_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
                 "request_date" => $this->request->getVar("date_request") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_request")))) : "",
-                "req_no" => $no,
+                "req_no" =>  $this->request->getVar("req_no"),
                 'is_posted' => 0,
                 'createdBy' =>  session()->get("login")->user_id,
             ];
@@ -773,5 +771,13 @@ class MaterialRequestKimia extends BaseController
         $dompdf->stream("Print Material Request Kimia", array("Attachment" => false));
 
         exit(0);
+    }
+
+    public function generateKodeRequest()
+    {
+        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+        $no = $this->materialRequestModel->get_no(date('d'), date('m'), date('Y'), $last_day, $this->this_company_id);
+
+        return json_encode($no);
     }
 }

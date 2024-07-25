@@ -444,4 +444,10 @@ class Retur extends BaseController
         }
         return json_encode($documentList);
     }
+
+    public function getNomorSuratReturn()
+    {
+        $noReturn = $this->soReturnModel->generateNoReturn();
+        return json_encode($noReturn);
+    }
 }

@@ -24,12 +24,12 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataWorkOrders) ? 'readonly' : '' ?> autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->wo_no : "AUTO GENERATE"; ?>" class="form-control wo_no" id="wo_no" name="wo_no" placeholder="Kode Produksi" readonly>
+                                    <input <?= !empty($dataWorkOrders) ? 'readonly' : '' ?> autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->wo_no : ""; ?>" class="form-control wo_no" id="wo_no" name="wo_no" placeholder="Kode Produksi">
                                     <label for="floatingInput">Kode Produksi</label>
                                 </div>
-                                <!-- <div style="<?= !empty($dataWorkOrders) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
-                                </div> -->
+                                <div style="<?= !empty($dataWorkOrders) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input autocomplete="one-time-code" style="z-index: 99;  margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -691,17 +691,34 @@
         }
     }
 
-    // const changeStatus = function() {
-    //     let value = document.getElementById('auto_generate').checked ? true : false;
+    const changeStatus = function() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
 
-    //     if (value) {
-    //         $(".wo_no").attr("readonly", true);
-    //         $(".wo_no").val("AUTO GENERATE");
-    //     } else {
-    //         $(".wo_no").attr("readonly", false);
-    //         $(".wo_no").val("");
-    //     }
-    // }
+        if (value) {
+            $.ajax({
+                url: `<?= base_url("/work-order/generate-kode-produksi"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res) {
+                        $("#wo_no").val(res);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        $("#wo_no").attr("readonly", false);
+                        $("#auto_generate").prop("checked", false);
+                        $("#wo_no").val("");
+                    }
+                }
+            })
+        } else {
+            $(".wo_no").attr("readonly", false);
+            $(".wo_no").val("");
+        }
+    }
     const getID = function() {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let randomString = '';

@@ -1126,4 +1126,10 @@ class ProductionResult extends BaseController
 
         exit(0);
     }
+
+    public function generateKodePenerimaan()
+    {
+        $no = $this->generatePRNo();
+        return json_encode($no);
+    }
 }

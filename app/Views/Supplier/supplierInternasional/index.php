@@ -18,6 +18,9 @@
                                     <input autocomplete="one-time-code" readonly="true" type="text" class="form-control kode" id="kode" name="kode" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
                                     <label for="floatingInput">Kode Supplier</label>
                                 </div>
+                                <div style="<?= !empty($biayaKepiting) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -280,6 +283,12 @@
                         $(".fax").val(res.data.fax);
                         $(".phone").val(res.data.phone);
                         $(".contact_person").val(res.data.contact_person);
+                        $('#auto_generate').css('display', 'none');
+                        $("#kode").prop("readonly", true);
+                        $('.modal').on('hidden.bs.modal', function() {
+                            $('#auto_generate').css('display', '');
+                            $("#kode").prop("readonly", false);
+                        });
 
                         $(".add-modal").modal("show");
 
@@ -427,6 +436,34 @@
             sort = val;
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
+
+    function changeStatus() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
+        if (value) {
+            $.ajax({
+                url: `<?= base_url("/supplier-internasional/generate-kode-supplier-internasional"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res) {
+                        $("#kode").val(res);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        $("#kode").attr("readonly", false);
+                        $("#auto_generate").prop("checked", false);
+                        $("#kode").val("");
+                    }
+                }
+            })
+        } else {
+            $("#kode").attr("readonly", false);
+            $("#kode").val("");
         }
     }
 </script>

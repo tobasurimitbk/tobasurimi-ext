@@ -66,8 +66,11 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control res_no" id="res_no" name="res_no" placeholder="Kode Penerimaan" value="<?= isset($data) ? $data->pr_no : "AUTO GENERATE"; ?>" <?= isset($data) ? "readonly" : "readonly"; ?>>
+                                    <input autocomplete="one-time-code" type="text" class="form-control res_no" id="res_no" name="res_no" placeholder="Kode Penerimaan" value="<?= isset($data) ? $data->pr_no : ""; ?>" <?= isset($data) ? "readonly" : ""; ?>>
                                     <label for="floatingInput">Kode Penerimaan</label>
+                                </div>
+                                <div style="<?= !empty($data) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 0px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -1538,17 +1541,17 @@
         });
     });
 
-    const changeStatus = function() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
+    // const changeStatus = function() {
+    //     let value = document.getElementById('auto_generate').checked ? true : false;
 
-        if (value) {
-            $(".res_no").attr("readonly", true);
-            $(".res_no").val("AUTO GENERATE");
-        } else {
-            $(".res_no").attr("readonly", false);
-            $(".res_no").val("");
-        }
-    }
+    //     if (value) {
+    //         $(".res_no").attr("readonly", true);
+    //         $(".res_no").val("AUTO GENERATE");
+    //     } else {
+    //         $(".res_no").attr("readonly", false);
+    //         $(".res_no").val("");
+    //     }
+    // }
     const getID = function() {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let randomString = '';
@@ -1947,6 +1950,34 @@
     }
     const print = function(url) {
         window.open(url);
+    }
+
+    function changeStatus() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
+        if (value) {
+            $.ajax({
+                url: `<?= base_url("/production-result/generate-kode-penerimaan"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res) {
+                        $("#res_no").val(res);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        $("#res_no").attr("readonly", false);
+                        $("#auto_generate").prop("checked", false);
+                        $("#res_no").val("");
+                    }
+                }
+            })
+        } else {
+            $("#res_no").attr("readonly", false);
+            $("#res_no").val("");
+        }
     }
 </script>
 

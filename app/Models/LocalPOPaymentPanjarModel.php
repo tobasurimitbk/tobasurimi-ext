@@ -88,24 +88,61 @@ class LocalPOPaymentPanjarModel extends Model
         $condition = [
             'panjar_id' => $id
         ];
+        $panjarType = $this->where('panjar_id', $id)->first();
+        $list = [];
 
-        $selectQry = "no_panjar,total_panjar, bayar_panjar, panjar_supplier.supplier_id, multiple_lpb_no, name, local_po_payments.payment_date";
-        $list = $this->asObject()
-            ->select($selectQry)
-            ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id', 'inner')
-            ->join('suppliers', 'panjar_supplier.supplier_id = suppliers.id', 'inner')
-            ->join('local_po_payments', 'local_po_payment_panjar.local_po_payment_id = local_po_payments.id', 'inner')
-            ->where($condition)
-            ->findAll();
+        if (!empty($panjarType)) {
+            if ($panjarType['type'] == "BB") {
+                $selectQry = "no_panjar,total_panjar, bayar_panjar, panjar_supplier.supplier_id, multiple_lpb_no, name, local_po_payments.payment_date";
+                $list = $this->asObject()
+                    ->select($selectQry)
+                    ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id', 'inner')
+                    ->join('suppliers', 'panjar_supplier.supplier_id = suppliers.id', 'inner')
+                    ->join('local_po_payments', 'local_po_payment_panjar.local_po_payment_id = local_po_payments.id', 'inner')
+                    ->where($condition)
+                    ->findAll();
+                foreach ($list as $l) {
+                    $l->multiple_lpb_no = json_decode($l->multiple_lpb_no);
+                    $l->total_panjar = number_format($l->total_panjar, 2);
+                    $l->bayar_panjar = number_format($l->bayar_panjar, 2);
+                    $l->payment_date = date('d/m/Y', strtotime($l->payment_date));
+                }
+            } elseif ($panjarType['type'] == "BP") {
+                $selectQry = "no_panjar,total_panjar, bayar_panjar, panjar_supplier.supplier_id, faktur_no, name, local_po_payment_bp.payment_date";
+                $list = $this->asObject()
+                    ->select($selectQry)
+                    ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id', 'inner')
+                    ->join('suppliers', 'panjar_supplier.supplier_id = suppliers.id', 'inner')
+                    ->join('local_po_payment_bp', 'local_po_payment_panjar.local_po_payment_id = local_po_payment_bp.id', 'inner')
+                    ->join('tanda_terima_faktur', 'local_po_payment_bp.tanda_terima_faktur_id = tanda_terima_faktur.id')
+                    ->where($condition)
+                    ->findAll();
+                foreach ($list as $l) {
+                    $l->multiple_lpb_no = $l->faktur_no;
+                    $l->total_panjar = number_format($l->total_panjar, 2);
+                    $l->bayar_panjar = number_format($l->bayar_panjar, 2);
+                    $l->payment_date = date('d/m/Y', strtotime($l->payment_date));
+                }
+            } elseif ($panjarType['type'] == "INTERNASIONAL") {
+                $selectQry = "no_panjar,total_panjar, bayar_panjar, panjar_supplier.supplier_id, po_no, name, import_po_payments.payment_date";
+                $list = $this->asObject()
+                    ->select($selectQry)
+                    ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
+                    ->join('suppliers', 'panjar_supplier.supplier_id = suppliers.id')
+                    ->join('import_po_payments', 'local_po_payment_panjar.local_po_payment_id = import_po_payments.id')
+                    ->join('rm_import_pos', 'import_po_payments.po_id = rm_import_pos.id')
+                    ->where($condition)
+                    ->findAll();
 
-
-
-        foreach ($list as $l) {
-            $l->multiple_lpb_no = json_decode($l->multiple_lpb_no);
-            $l->total_panjar = number_format($l->total_panjar, 2);
-            $l->bayar_panjar = number_format($l->bayar_panjar, 2);
-            $l->payment_date = date('d/m/Y', strtotime($l->payment_date));
+                foreach ($list as $l) {
+                    $l->multiple_lpb_no = $l->po_no;
+                    $l->total_panjar = number_format($l->total_panjar, 2);
+                    $l->bayar_panjar = number_format($l->bayar_panjar, 2);
+                    $l->payment_date = date('d/m/Y', strtotime($l->payment_date));
+                }
+            }
         }
+
 
 
         return $list;
