@@ -204,6 +204,7 @@ class ProductionResultModel extends Model
         SUM(production_result_details.qty_isi) AS qty_isi,
         production_result_details.stock_dokumen AS stock_dokumen,
         production_result_details.type,
+        production_result_details.no_aju,
         production_results.id as production_result_id,
         production_result_details.id as production_result_details_id
         ';
