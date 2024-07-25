@@ -3,6 +3,7 @@
 namespace App\Controllers\HR;
 
 use App\Controllers\BaseController;
+use App\Controllers\Master\BigDays;
 use App\Models\AttendancesLogModel;
 use App\Models\AttendancesModel;
 use App\Models\BigDaysModel;
@@ -18,8 +19,12 @@ use CodeIgniter\I18n\Time;
 use DateTime;
 use Dompdf\Dompdf;
 use Locale;
+use PDO;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 
 class Attendance extends BaseController
 {
@@ -175,6 +180,7 @@ class Attendance extends BaseController
             'endMonth' => $resStartEndMonth[1],
             'golongan' => $golonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
         ];
+
 
         $data['pager'] = $pager;
 
@@ -595,6 +601,10 @@ class Attendance extends BaseController
         $FormPerijinanModel = new FormPerijinanModel();
         $divisiModel = new DivisisModel();
         $golonganModel = new GolonganModel();
+        $formPerizinanModel = new FormPerijinanModel();
+        $bigDaysModel = new BigDaysModel();
+
+
 
         if (!empty($divisiID) || !empty($golongan)) {
             $employeeData = $employeesModel->getEmployeesByDivisionID(
@@ -652,9 +662,257 @@ class Attendance extends BaseController
                 ->orderBy('name', "ASC")
                 ->findAll(),
         ];
+        $statusPerizinan = $metaDataModel->where('name', "Status Perizinan")
+            ->whereNotIn('value', ['HADIR_H', 'LIBUR_L', 'ALPHA_A'])
+            ->orderBy('name', "ASC")
+            ->findAll();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $headerStyleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+        $dataStyleArray = [
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'No.')
+            ->setCellValue('B1', 'Karyawan')
+            ->setCellValue('C1', 'Department')
+            ->setCellValue('D1', 'Bagian');
+
+        $month = $splitYearMonth[1];
+        $year = $splitYearMonth[0];
+        $last_date = date("t", strtotime($yearMonth . "-01"));
+        for ($i = 1; $i <= $last_date; $i++) {
+            $temp = mktime(0, 0, 0, $month, $i, $year);
+            $no = (strlen($i) == 1) ? ("0" . $i) : $i;
+            $column = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(4 + $i);
+            $spreadsheet->setActiveSheetIndex(0)->setCellValue($column . '1', $i);
+        }
+
+        $row = 2;
+        $nomor = 1;
+        for ($i = 0; $i < count($dataResult); $i++) {
+            $hadir = 0;
+            $alpha = 0;
+            $libur = 0;
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $row, $nomor++)
+                ->setCellValue('B' . $row, $dataResult[$i]['employeeName'])
+                ->setCellValue('C' . $row, $dataResult[$i]['divisi'])
+                ->setCellValue('D' . $row, $dataResult[$i]['namaBagian']);
+            for ($j = 1; $j <= $last_date; $j++) {
+                $columnBody = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(4 + $j);
+                $no = (strlen($j) == 1) ? ("0" . $j) : $j;
+                $jam_masuk = "";
+                $jam_keluar = "";
+                $check = 0;
+                $dateFormat = ($year . "-" . $month . "-" . $no);
+                $perizinanCheck = $formPerizinanModel
+                    ->where('employee_id', $dataResult[$i]['employeeID'])
+                    ->where('periode', ($year . "-" . $month . "-" . $no))
+                    ->first();
+
+                $hariBesarCheck = $bigDaysModel
+                    ->where('date', $dateFormat)
+                    ->first();
+
+                foreach ($dataResult[$i]["list_attendance"] as $val) {
+
+                    if ($val->periode == ($year . "-" . $month . "-" . $no)) {
+                        $jam_masuk = $val->checkin;
+                        $jam_keluar = $val->checkout;
+                        if ($val->checkin != '')
+                            $check = 1;
+                        break;
+                    }
+                }
+                if ($hariBesarCheck != null) {
+                    $spreadsheet->setActiveSheetIndex(0)
+                        ->setCellValue($columnBody . $row, 'L');
+                    $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
+                        ->getFill()->setFillType(Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB('845EC2');
+                } elseif ($perizinanCheck != null) {
+                    $statusKode = explode("_", $perizinanCheck['status'])[1];
+                    if ($perizinanCheck['status']  == "CUTI TAHUNAN_CT") {
+                        $spreadsheet->setActiveSheetIndex(0)
+                            ->setCellValue($columnBody . $row, $statusKode);
+                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('ffc107');
+                    } elseif ($perizinanCheck['status'] == "CUTI HAID_CHD") {
+                        $spreadsheet->setActiveSheetIndex(0)
+                            ->setCellValue($columnBody . $row, $statusKode);
+                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('242120');
+                    } elseif ($perizinanCheck['status'] == "CUTI HAMIL_CHL") {
+                        $spreadsheet->setActiveSheetIndex(0)
+                            ->setCellValue($columnBody . $row, $statusKode);
+                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('C34A36');
+                    } elseif ($perizinanCheck['status'] == "CUTI MELAHIRKAN_CM") {
+                        $spreadsheet->setActiveSheetIndex(0)
+                            ->setCellValue($columnBody . $row, $statusKode);
+                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('4B4453');
+                    } elseif ($perizinanCheck['status'] == "IJIN_I") {
+                        $spreadsheet->setActiveSheetIndex(0)
+                            ->setCellValue($columnBody . $row, $statusKode);
+                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('17a2b8');
+                    } elseif ($perizinanCheck['status'] == "SAKIT_S") {
+                        $spreadsheet->setActiveSheetIndex(0)
+                            ->setCellValue($columnBody . $row, $statusKode);
+                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('28a745');
+                    } elseif ($perizinanCheck['status'] == "RL_RL") {
+                        $spreadsheet->setActiveSheetIndex(0)
+                            ->setCellValue($columnBody . $row, $statusKode);
+                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('ff7b00');
+                    }
+                } else {
+                    if ($check == 1) {
+                        $hadir++;
+                        $spreadsheet->setActiveSheetIndex(0)
+                            ->setCellValue($columnBody . $row, 'H');
+                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('304de2');
+                    } else {
+                        $temp = mktime(0, 0, 0, $month, $j, $year);
+                        if (date("N", $temp) == 7) {
+                            $libur++;
+                            $spreadsheet->setActiveSheetIndex(0)
+                                ->setCellValue($columnBody . $row, 'L');
+                            $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
+                                ->getFill()->setFillType(Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('845EC2');
+                        } else {
+                            $alpha++;
+                            $spreadsheet->setActiveSheetIndex(0)
+                                ->setCellValue($columnBody . $row, 'A');
+                            $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
+                                ->getFill()->setFillType(Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('e7323a');
+                        }
+                    }
+                }
+            }
+
+            $row++;
+            $kehadiran[] = [
+                'id' => $dataResult[$i]['employeeID'],
+                'hadir' => $hadir,
+                'libur' => $libur,
+                'alpha' => $alpha
+            ];
+        }
 
 
-        return view('hr/attendance/excel-log', $data);
+        foreach (range('A', 'D') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        function getColumnLetters($start, $end)
+        {
+            $letters = [];
+            $start = strtoupper($start);
+            $end = strtoupper($end);
+            $startIndex = Coordinate::columnIndexFromString($start);
+            $endIndex = Coordinate::columnIndexFromString($end);
+
+            for ($i = $startIndex; $i <= $endIndex; $i++) {
+                $letters[] = Coordinate::stringFromColumnIndex($i);
+            }
+
+            return $letters;
+        }
+        $colNumber = getColumnLetters('E', $columnBody);
+
+        foreach ($colNumber as $col) {
+            $sheet->getColumnDimension($col)->setWidth(5);
+        }
+        $spreadsheet->createSheet();
+
+        $sheet2 = $spreadsheet->setActiveSheetIndex(1);
+
+        $sheet2->setCellValue('A1', 'No.')
+            ->setCellValue('B1', 'Karyawan')
+            ->setCellValue('C1', 'Department')
+            ->setCellValue('D1', 'Bagian')
+            ->setCellValue('E1', 'CT')
+            ->setCellValue('F1', 'CHD')
+            ->setCellValue('G1', 'CHL')
+            ->setCellValue('H1', 'CM')
+            ->setCellValue('I1', 'I')
+            ->setCellValue('J1', 'S')
+            ->setCellValue('K1', 'RL')
+            ->setCellValue('L1', 'L')
+            ->setCellValue('M1', 'A')
+            ->setCellValue('N1', 'H');
+        $nomorRekapDataKehadiran = 1;
+        $rowRekapDataKehadiran = 2;
+
+        for ($i = 0; $i < count($dataResult); $i++) {
+            $sheet2
+                ->setCellValue('A' . $rowRekapDataKehadiran, $nomorRekapDataKehadiran++)
+                ->setCellValue('B' . $rowRekapDataKehadiran, $dataResult[$i]['employeeName'])
+                ->setCellValue('C' . $rowRekapDataKehadiran, $dataResult[$i]['divisi'])
+                ->setCellValue('D' . $rowRekapDataKehadiran, $dataResult[$i]['namaBagian']);
+            $columnIndex = 5;
+            foreach ($statusPerizinan as $s) {
+
+                $sheet2->setCellValue(chr($columnIndex + 64) . $rowRekapDataKehadiran, $dataResult[$i]['statusAttendances'][explode("_", $s['value'])[1]]);
+                $columnIndex++;
+            }
+            if ($kehadiran[$i]['id'] == $dataResult[$i]['employeeID']) {
+                $sheet2->setCellValue('L' . $rowRekapDataKehadiran, $kehadiran[$i]['libur'])
+                    ->setCellValue('M' . $rowRekapDataKehadiran, $kehadiran[$i]['alpha'])
+                    ->setCellValue('N' . $rowRekapDataKehadiran, $kehadiran[$i]['hadir']);
+            }
+
+            $rowRekapDataKehadiran++;
+        }
+        foreach (range('B', 'D') as $columnID) {
+            $sheet2->getColumnDimension($columnID)->setAutoSize(true);
+        }
+        foreach (range('E', 'N') as $col) {
+            $sheet2->getColumnDimension($col)->setWidth(5);
+        }
+        $sheet2->setCellValue('A' . $rowRekapDataKehadiran + 1, 'Keterangan: Cuti tahunan (CT), Cuti haid (CHD), Cuti hamil (CHL), Cuti melahirkan (CM), Ijin (I), Sakit (S), Rl (RL), Hadir (H), Alpha (A), Libur (L) ');
+        $sheet2->getColumnDimension('A')->setWidth(4);
+
+        $sheet->setTitle('Absen Log');
+        $sheet2->setTitle('Rekap Absen');
+        $writer = new Xlsx($spreadsheet);
+        $filename = "LogAbsensi_" . $yearMonth;
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
     }
 
     public function exportPDFPresensi($yearMonth)
@@ -739,6 +997,7 @@ class Attendance extends BaseController
         $metaDataModel = new MetadataModel();
         $companyModel = new CompaniesModel();
         $divisiModel = new DivisisModel();
+        $attandanceModel = new AttendancesModel();
 
         if (!empty($divisiID) || !empty($golongan)) {
             $employeeData = $employeesModel->getEmployeesByDivisionID($this->this_company_id, $divisiID, $golongan);
@@ -785,8 +1044,202 @@ class Attendance extends BaseController
                 ->orderBy('name', "ASC")
                 ->findAll(),
         ];
+        $statusPerizinan = $metaDataModel->where('name', "Status Perizinan")
+            ->orderBy('name', "ASC")
+            ->findAll();
+        $startMonth =  $resStartEndMonth[0];
+        $endMonth = $resStartEndMonth[1];
 
-        return \view('hr/attendance/excel-attendance', $data);
+        function num2alpha($n)
+        {
+            for ($r = ""; $n >= 0; $n = intval($n / 26) - 1)
+                $r = chr($n % 26 + 0x41) . $r;
+            return $r;
+        }
+        function getColumnLetters($start, $end)
+        {
+            $letters = [];
+            $start = strtoupper($start);
+            $end = strtoupper($end);
+            $startIndex = Coordinate::columnIndexFromString($start);
+            $endIndex = Coordinate::columnIndexFromString($end);
+
+            for ($i = $startIndex; $i <= $endIndex; $i++) {
+                $letters[] = Coordinate::stringFromColumnIndex($i);
+            }
+
+            return $letters;
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet(0);
+
+        $sheet->setCellValue('A1', 'No')
+            ->setCellValue('B1', 'Karyawan')
+            ->setCellValue('C1', 'Department')
+            ->setCellValue('D1', 'Bagian')
+            ->setCellValue('E1', $startMonth['firstMonthName']);
+
+
+        $startMonthLastColumn = $startMonth['totalDay'] + 3;
+
+        $sheet->mergeCells('E1:' .  num2alpha($startMonthLastColumn) . '1');
+        $sheet->setCellValue(num2alpha($startMonthLastColumn + 1) . '1',  $endMonth['secondMonthName']);
+        foreach (getColumnLetters('E', num2alpha($startMonthLastColumn + $endMonth['totalDay'])) as $col) {
+            $sheet->getColumnDimension($col)->setWidth(5);
+        }
+        $sheet->mergeCells(num2alpha($startMonthLastColumn  + 1) . '1:' . num2alpha($startMonthLastColumn + $endMonth['totalDay']) . '1');
+        $sheet->mergeCells('A1:A2');
+        $sheet->mergeCells('B1:B2');
+        $sheet->mergeCells('C1:C2');
+        $sheet->mergeCells('D1:D2');
+        $column = 4;
+        foreach ($allDates as $a) {
+            if (date("N", strtotime($a)) == 7) {
+                $sheet->setCellValue(num2alpha($column) . "2", date('d', strtotime($a)));
+                $sheet->getStyle(num2alpha($column) . "2")->getFont()->getColor()->setARGB(Color::COLOR_RED);
+            } else {
+                $sheet->setCellValue(num2alpha($column) . "2", date('d', strtotime($a)));
+            }
+            $column++;
+        }
+        $no = 1;
+        $row = 3;
+        $column = 4;
+        foreach ($employeeData as $i => $e) {
+            $sheet->setCellValue('A' . $row, $no++)
+                ->setCellValue('B' . $row, strtoupper($e['name']))
+                ->setCellValue('C' . $row, strtoupper($e["divisi"]))
+                ->setCellValue('D' . $row, strtoupper($e["namaBagian"]));
+
+            $j = 1;
+            foreach ($allDates as $a) {
+
+                $attandance = $attandanceModel->getAttendances($a, $e['id']);
+                if ($attandance == null) {
+                    $sheet->setCellValue(num2alpha($column) . $row, 'A')
+                        ->getStyle(num2alpha($column)  . $row)
+                        ->getFill()->setFillType(Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB('e7323a');
+                } else {
+                    $statusKode = explode("_", $attandance->status)[1];
+                    if ($statusKode == "A") {
+                        $sheet->setCellValue(num2alpha($column) . $row, 'A')
+                            ->getStyle(num2alpha($column)  . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('e7323a');
+                    } elseif ($statusKode == "H") {
+                        $sheet->setCellValue(num2alpha($column) . $row, 'H')
+                            ->getStyle(num2alpha($column)  . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('304de2');
+                    } elseif ($statusKode == "I") {
+                        $sheet->setCellValue(num2alpha($column) . $row, $statusKode)
+                            ->getStyle(num2alpha($column)  . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('17a2b8');
+                    } elseif ($statusKode == "CT") {
+                        $sheet->setCellValue(num2alpha($column) . $row, $statusKode)
+                            ->getStyle(num2alpha($column)  . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('ffc107');
+                    } elseif ($statusKode == "CHD") {
+                        $sheet->setCellValue(num2alpha($column) . $row, $statusKode)
+                            ->getStyle(num2alpha($column)  . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('242120');
+                    } elseif ($statusKode == "CHL") {
+                        $sheet->setCellValue(num2alpha($column) . $row, $statusKode)
+                            ->getStyle(num2alpha($column)  . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('C34A36');
+                    } elseif ($statusKode == "CM") {
+                        $sheet->setCellValue(num2alpha($column) . $row, $statusKode)
+                            ->getStyle(num2alpha($column)  . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('C34A36');
+                    } elseif ($statusKode == "S") {
+                        $sheet->setCellValue(num2alpha($column) . $row, $statusKode)
+                            ->getStyle(num2alpha($column)  . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('28a745');
+                    } elseif ($statusKode == "L") {
+                        $sheet->setCellValue(num2alpha($column) . $row, $statusKode)
+                            ->getStyle(num2alpha($column)  . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('845EC2');
+                    } elseif ($statusKode == "RL") {
+                        $sheet->setCellValue(num2alpha($column) . $row, $statusKode)
+                            ->getStyle(num2alpha($column)  . $row)
+                            ->getFill()->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('ff7b00');
+                    }
+                }
+                $column++;
+            }
+            $column = 4;
+            $row++;
+        }
+
+        foreach (range('A', 'D') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+        $sheet->setTitle('Absensi Final');
+        $spreadsheet->createSheet();
+
+        $sheet2 = $spreadsheet->setActiveSheetIndex(1);
+        $sheet2->setTitle('Rekap Absensi Final');
+        $sheet2->setCellValue('A1', 'No')
+            ->setCellValue('B1', 'Karyawan')
+            ->setCellValue('C1', 'Department')
+            ->setCellValue('D1', 'Bagian');
+        $column = 4;
+        $keteranganStr = "";
+        foreach ($statusPerizinan as $s) {
+            $sheet2->setCellValue(num2alpha($column) . "1", explode("_", $s['value'])[1]);
+            $column++;
+            $keteranganStr .= " " . explode("_", $s['value'])[0] . "(" . explode("_", $s['value'])[1] . ")";
+        }
+        foreach (range('B', 'D') as $columnID) {
+            $sheet2->getColumnDimension($columnID)->setAutoSize(true);
+        }
+        foreach (range('E', num2alpha($column)) as $rekapCol) {
+            $sheet2->getColumnDimension($rekapCol)->setWidth(4);
+        }
+
+        $sheet2->getColumnDimension('A')->setWidth(4);
+        //rekap sheet
+        $row2 = 2;
+        $no2 = 1;
+        foreach ($employeeData as $i => $e) {
+            $status = $attandanceModel->getStatusAttendances($year, $month, $e['id']);
+            $sheet2->setCellValue('A' . $row2,  $no2++)
+                ->setCellValue('B' . $row2,  $e['name'])
+                ->setCellValue('C' . $row2, $e['divisi'])
+                ->setCellValue('D' . $row2,  $e["namaBagian"]);
+            //column for rekap
+            $column2 = 4;
+            foreach ($statusPerizinan as $s) {
+                $sheet2->setCellValue(num2alpha($column2) . $row2,  $status[$s['value']]);
+                $column2++;
+            }
+            $row2++;
+        }
+
+
+        $sheet2->setCellValue('A' . $row2 + 2, 'Keteranagan: ' . $keteranganStr);
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = " AbsensiFinal_" . $yearMonth;
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
+
+        // return \view('hr/attendance/excel-attendance', $data);
     }
 
     public function exportTriwulanAbsensi($startMonth, $endMonth, $divisionID)
