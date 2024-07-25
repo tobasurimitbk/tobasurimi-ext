@@ -239,6 +239,7 @@ class JasaVendorOut extends BaseController
             'divisi_id' => $this->request->getVar('divisi_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
             'no_kontainer' => $this->request->getVar('no_kontainer'),
+            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
             'keterangan' => $this->request->getVar('keterangan')
         ]);
 

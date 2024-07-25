@@ -829,37 +829,37 @@
                 newRow.append($('<td>').text(rasio + ' %'));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control jumbo" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control jumbo" type="text" onkeyup="autoComplete()" value="${v.jumbo}">
+                            <input id="${i+'_1_jumbo'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control jumbo" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control jumbo" type="text" onkeyup="autoComplete()" value="${v.jumbo}">
                         `
                 ));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control ex_lump" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control ex_lump" onkeyup="autoComplete()" type="text" value="${v.ex_lump}">
+                            <input id="${i+'_1_ex_lump'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control ex_lump" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control ex_lump" onkeyup="autoComplete()" type="text" value="${v.ex_lump}">
                         `
                 ));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control lump" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control lump" onkeyup="autoComplete()" type="text" value="${v.lump}">
+                            <input id="${i+'_1_lump'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control lump" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control lump" onkeyup="autoComplete()" type="text" value="${v.lump}">
                         `
                 ));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control special" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control special" onkeyup="autoComplete()" type="text" value="${v.special}">
+                            <input id="${i+'_1_special'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control special" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control special" onkeyup="autoComplete()" type="text" value="${v.special}">
                         `
                 ));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control claw" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control claw" onkeyup="autoComplete()" type="text" value="${v.claw}">
+                            <input id="${i+'_1_claw'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control claw" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control claw" onkeyup="autoComplete()" type="text" value="${v.claw}">
                         `
                 ));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control mh" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control mh" onkeyup="autoComplete()" type="text" value="${v.mh}">
+                            <input id="${i+'_1_mh'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control mh" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control mh" onkeyup="autoComplete()" type="text" value="${v.mh}">
                         `
                 ));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control cf" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control cf" onkeyup="autoComplete()" type="text" value="${v.cf}">
+                            <input id="${i+'_1_cf'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control cf" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control cf" onkeyup="autoComplete()" type="text" value="${v.cf}">
                         `
                 ));
 
@@ -992,37 +992,37 @@
                     newRow.append($('<td>').text(v.description));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_jumbo" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_jumbo" type="text" onkeyup="autoComplete()" value="${v.jumbo}">
+                            <input id="${i+'_2_jumbo'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_jumbo" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_jumbo" type="text" onkeyup="autoComplete()" value="${v.jumbo}">
                         `
                     ));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_ex_lump" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_ex_lump" type="text" onkeyup="autoComplete()" value="${v.ex_lump}">
+                            <input id="${i+'_2_ex_lump'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_ex_lump" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_ex_lump" type="text" onkeyup="autoComplete()" value="${v.ex_lump}">
                         `
                     ));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_lump" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_lump" type="text" onkeyup="autoComplete()" value="${v.lump}">
+                            <input id="${i+'_2_lump'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_lump" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_lump" type="text" onkeyup="autoComplete()" value="${v.lump}">
                         `
                     ));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_special" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_special" type="text" onkeyup="autoComplete()" value="${v.special}">
+                            <input id="${i+'_2_special'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_special" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_special" type="text" onkeyup="autoComplete()" value="${v.special}">
                         `
                     ));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_claw" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_claw" type="text" onkeyup="autoComplete()" value="${v.claw}">
+                            <input id="${i+'_2_claw'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_claw" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_claw" type="text" onkeyup="autoComplete()" value="${v.claw}">
                         `
                     ));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_mh" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_mh" type="text" onkeyup="autoComplete()" value="${v.mh}">
+                            <input id="${i+'_2_mh'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_mh" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_mh" type="text" onkeyup="autoComplete()" value="${v.mh}">
                         `
                     ));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_cf" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_cf" type="text" onkeyup="autoComplete()" value="${v.cf}">
+                            <input id="${i+'_2_cf'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_cf" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_cf" type="text" onkeyup="autoComplete()" value="${v.cf}">
                         `
                     ));
                     newRow.append($('<td>').text(formatRupiah(total.toFixed(2))));
@@ -1051,7 +1051,7 @@
                 newRow3.append($('<td>').text((totalUpahKopekMh != 0 ? formatRupiah((totalUpahKopekMh).toFixed(2)) : '0')));
                 newRow3.append($('<td>').text((totalUpahKopekCf != 0 ? formatRupiah((totalUpahKopekCf).toFixed(2)) : '0')));
 
-                newRow3.append($('<td>').text(formatRupiah(totalUpahKopek)));
+                newRow3.append($('<td>').text(formatRupiah(totalUpahKopek.toFixed(2))));
                 table2.find('tbody').append(newRow3);
 
                 var totalKomisiJumbo = jumboTotal * komisiDagingJumbo;
@@ -1172,12 +1172,12 @@
                 newRow.append($('<td style="text-align: center;">').text(v.nama_barang));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_bonus" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control kg_bonus" onkeyup="autoComplete()" type="text" value="${v.kg_bonus}">
+                            <input id="${i+'_3_kg'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_bonus" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control kg_bonus" onkeyup="autoComplete()" type="text" value="${v.kg_bonus}">
                         `
                 ));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                            <input <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control bonus_nominal" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control bonus_nominal" onkeyup="autoComplete()" type="text" value="${v.bonus_nominal}">
+                            <input id="${i+'_3_bonus'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control bonus_nominal" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control bonus_nominal" onkeyup="autoComplete()" type="text" value="${v.bonus_nominal}">
                         `
                 ));
                 newRow.append($('<td>').text(formatRupiah(totalBonus)));
@@ -1368,7 +1368,7 @@
             request.abort();
         }
 
-        // Lakukan request baru ke server
+        var focusedElementId = document.activeElement.id;
         request = $.ajax({
             url: "<?= base_url('biaya-kepiting/autocomplete'); ?>",
             data: data,
@@ -1385,6 +1385,16 @@
                 listPerolehanGaji = res.dataPerolehanGaji;
                 listBonus = res.dataBonus;
                 drawTable();
+
+                if (focusedElementId) {
+                    var newFocusedElement = document.getElementById(focusedElementId);
+                    if (newFocusedElement) {
+                        newFocusedElement.focus();
+                        var val = newFocusedElement.value;
+                        newFocusedElement.value = '';
+                        newFocusedElement.value = val;
+                    }
+                }
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 if (textStatus !== 'abort') {
