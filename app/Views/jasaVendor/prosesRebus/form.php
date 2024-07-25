@@ -632,7 +632,7 @@
                         if (!isIDSelected && qtyRebusFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
                             var rebusQty = Math.min(qtyRebusFifo, parseFloat(listStockAsal[i].stok_total));
                             listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                            listStockAsal[i].qty = parseFloat(rebusQty.toFixed(2));
+                            listStockAsal[i].qty = parseFloat(rebusQty.toFixed(3));
 
                             listStockSelected.push(listStockAsal[i]);
                             qtyRebusFifo = qtyRebusFifo - rebusQty;
@@ -644,7 +644,7 @@
                 // STOK HASIL REBUS
                 var lengthStockSelected = idStockInserted.length;
                 var qtyHasilBagi = qtyHasilRebusFifo / lengthStockSelected;
-                qtyHasilBagi = qtyHasilBagi.toFixed(2);
+                qtyHasilBagi = qtyHasilBagi.toFixed(3);
 
                 $.each(listStockSelected, function(i, v) {
                     if ($.inArray(v.id, idStockInserted) !== -1) { // Cek apakah elemen ditemukan dalam array

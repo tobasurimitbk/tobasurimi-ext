@@ -823,6 +823,7 @@
                 success: function(res) {
                     if (res) {
                         $(".req_no").val(res);
+                        $("#req_no").attr("readonly", true);
                     } else {
                         Swal.fire({
                             icon: 'error',

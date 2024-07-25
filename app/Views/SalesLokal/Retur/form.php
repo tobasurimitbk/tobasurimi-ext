@@ -25,7 +25,7 @@
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control no_surat_jalan" id="no_surat_retur" name="no_surat_retur" value="<?= !empty($data) ? $data->no_return : $noReturn; ?>" placeholder="Nomor surat Return">
+                                <input readonly autocomplete="one-time-code" type="text" class="form-control no_surat_jalan" id="no_surat_retur" name="no_surat_retur" value="<?= !empty($data) ? $data->no_return : $noReturn; ?>" placeholder="Nomor surat Return">
                                 <label for="floatingInput">Nomor Surat Return</label>
                             </div>
                             <div style="<?= !empty($data) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -514,6 +514,7 @@
                 success: function(res) {
                     if (res) {
                         $("#no_surat_retur").val(res);
+                        $("#no_surat_retur").attr("readonly", true);
                     } else {
                         Swal.fire({
                             icon: 'error',

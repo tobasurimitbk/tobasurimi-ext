@@ -582,8 +582,8 @@
 
                                     qtyKotorRes = z.qty_kotor / totalDetailBarangKeluar;
                                     qtyBersihRes = z.qty_bersih / totalDetailBarangKeluar;
-                                    qtyKotorRes = qtyKotorRes.toFixed(2);
-                                    qtyBersihRes = qtyBersihRes.toFixed(2);
+                                    qtyKotorRes = qtyKotorRes.toFixed(3);
+                                    qtyBersihRes = qtyBersihRes.toFixed(3);
 
                                     listBarang[j].list_barang_masuk = listBarang[j].list_barang_masuk.filter(item => item.spesifikasi_in_id !== z.spesifikasi_in_id);
 
@@ -992,8 +992,8 @@
             });
             var newRow1 = $('<<tr style="color:whitesmoke; background-color:#f2c996;">>');
             newRow1.append($('<td colspan="4" style="text-align:right"><b>GRAND TOTAL</b></td>'));
-            newRow1.append($('<td class="total-qty-kotor">').text(totalQtyKotor.toFixed(2)));
-            newRow1.append($('<td class="total-qty-bersih">').text(totalQtyBersih.toFixed(2)));
+            newRow1.append($('<td class="total-qty-kotor">').text(totalQtyKotor.toFixed(3)));
+            newRow1.append($('<td class="total-qty-bersih">').text(totalQtyBersih.toFixed(3)));
             newRow1.append($('<td>'));
             table.find('tbody').append(newRow1);
 
@@ -1018,7 +1018,7 @@
                 newRow.append($('<td>').text(v.tipe_barang));
                 newRow.append($('<td>').text(v.kode_barang_out));
                 newRow.append($('<td>').text(v.barang_out));
-                newRow.append($('<td>').text(v.qty_out.toFixed(2)));
+                newRow.append($('<td>').text(v.qty_out.toFixed(3)));
                 newRow.append($('<td>').text(v.satuan_out));
                 newRow.append($('<td>').text(v.list_barang_masuk.length + " Barang"));
                 newRow.append($('<td style="text-align: center;">').html(
@@ -1257,14 +1257,14 @@
         $(".qty_kotor").each(function() {
             sum += Number($(this).val());
         });
-        $(".total-qty-kotor").text(sum.toFixed(2));
+        $(".total-qty-kotor").text(sum.toFixed(3));
     });
     $(document).on("input", ".qty_bersih", function() {
         var sum = 0;
         $(".qty_bersih").each(function() {
             sum += Number($(this).val());
         });
-        $(".total-qty-bersih").text(sum.toFixed(2));
+        $(".total-qty-bersih").text(sum.toFixed(3));
     });
 </script>
 

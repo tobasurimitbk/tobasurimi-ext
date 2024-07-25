@@ -126,8 +126,8 @@
                         <tr style="text-align: center; font-weight:bold;">
                             <td><?= strtoupper($j['barang_name']) . "-" . strtoupper($j['spesifikasi']) ?></td>
                             <td><?= $j['kode_satuan'] ?></td>
-                            <td><?= number_format($j['qty_kotor'], 2) ?></td>
-                            <td><?= number_format($j['qty_bersih'], 2) ?></td>
+                            <td><?= number_format($j['qty_kotor'], 3) ?></td>
+                            <td><?= number_format($j['qty_bersih'], 3) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

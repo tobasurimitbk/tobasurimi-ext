@@ -275,6 +275,7 @@ $routes->get('/spp/print/(:segment)', 'Purchase\SPP::print/$1', ['filter' => 'Au
 
 // BAHAN BAKU PO LOKAL
 $routes->get('/po-lokal-bahan-baku', 'Purchase\POLokalBahanBaku::poLokalBahanBaku', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-baku/generate-po-no', 'Purchase\POLokalBahanBaku::generateNoPO', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/all', 'Purchase\POLokalBahanBaku::allPOLokalBahanBaku', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/id/(:segment)', 'Purchase\POLokalBahanBaku::getByIdPOLokalBahanBaku/$1', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/create', 'Purchase\POLokalBahanBaku::createPOLokalBahanBaku', ['filter' => 'Auth']);
@@ -292,6 +293,7 @@ $routes->get('/po-lokal-bahan-baku/get-spesifikasi-barang-supplier', 'Purchase\P
 
 // BAHAN BAKU PO PENOLONG
 $routes->get('/po-lokal-bahan-penolong', 'Purchase\POLokalBahanPenolong::poLokalBahanPenolong', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-penolong/generate-po-no', 'Purchase\POLokalBahanPenolong::generateNoPO', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/all', 'Purchase\POLokalBahanPenolong::allPOLokalBahanPenolong', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/id/(:segment)', 'Purchase\POLokalBahanPenolong::getByIdPOLokalBahanPenolong/$1', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/create', 'Purchase\POLokalBahanPenolong::createPOLokalBahanPenolong', ['filter' => 'Auth']);
@@ -309,6 +311,7 @@ $routes->get('/po-lokal-bahan-penolong/dropdown/get-detail-barang-spp', 'Purchas
 
 // BAHAN BAKU PO IMPORT
 $routes->get('/po-import-bahan-baku', 'Purchase\POImportBahanBaku::poImportBahanBaku', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-baku/generate-no-po', 'Purchase\POImportBahanBaku::generateNoPo', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-baku/all', 'Purchase\POImportBahanBaku::allPOImportBahanBaku', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-baku/id/(:segment)', 'Purchase\POImportBahanBaku::getByIdPOImportBahanBaku/$1', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-baku/print/(:segment)', 'Purchase\POImportBahanBaku::print/$1', ['filter' => 'Auth']);
@@ -325,6 +328,7 @@ $routes->get('/po-import-bahan-baku/dropdown/get-detail-barang-spp', 'Purchase\P
 
 // BAHAN BAKU PO PENOLONG
 $routes->get('/po-import-bahan-penolong', 'Purchase\POImportBahanPenolong::poImportBahanPenolong', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-penolong/generate-no-po', 'Purchase\POImportBahanPenolong::generateNoPo', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-penolong/all', 'Purchase\POImportBahanPenolong::allPOImportBahanPenolong', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-penolong/id/(:segment)', 'Purchase\POImportBahanPenolong::getByIdPOImportBahanPenolong/$1', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-penolong/print/(:segment)', 'Purchase\POImportBahanPenolong::print/$1', ['filter' => 'Auth']);

@@ -633,16 +633,16 @@
                     var newRow = $('<tr  style="color:whitesmoke; background-color:#fadfbe">');
                     newRow.append($('<td style="text-align: center;" colspan="5">').html("<b>SUB TOTAL</b>"));
                     newRow.append($('<td>').text(totalFirst.kg_rebus_total.toFixed(2)));
-                    newRow.append($('<td >').text(totalFirst.kg_fauzy_total.toFixed(2)));
-                    newRow.append($('<td>').text(totalFirst.kg_cn_total.toFixed(2)));
-                    newRow.append($('<td>').text(totalFirst.kg_daging_total.toFixed(2)));
+                    newRow.append($('<td >').text(totalFirst.kg_fauzy_total.toFixed(3)));
+                    newRow.append($('<td>').text(totalFirst.kg_cn_total.toFixed(3)));
+                    newRow.append($('<td>').text(totalFirst.kg_daging_total.toFixed(3)));
                     newRow.append($('<td>').text(totalFirst.ratio.toFixed(2) + ' %'));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
-                            <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" oninput="preventNegativeInput(this)" data-barang_master_id="${barang_master_id_last}" autocomplete="one-time-code" class="form-control kg_rebus" onkeyup="autoComplete()" type="text" value="${tb_harga_last}">
+                            <input id="${i+'_0'}" <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" oninput="preventNegativeInput(this)" data-barang_master_id="${barang_master_id_last}" autocomplete="one-time-code" class="form-control kg_rebus" onkeyup="autoComplete()" type="text" value="${tb_harga_last}">
                         `
                     ));
-                    newRow.append($('<td >').text(formatRupiah(totalFirst.total_harga.toFixed(2))));
+                    newRow.append($('<td >').text(formatRupiah(totalFirst.total_harga)));
                     table.find('tbody').append(newRow);
                 }
 
@@ -656,7 +656,7 @@
                 newRow.append($('<td style="text-align: center;">').text(v.tanggal_keluar));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                        <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tanggal_po" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control tanggal_po" type="date" value="${v.tanggal_po}">
+                        <input id="${i+'_kg_dg_1'}" <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tanggal_po" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control tanggal_po" type="date" value="${v.tanggal_po}">
                     `
                 ));
                 newRow.append($('<td style="text-align: center;">').text(v.barang_name));
@@ -664,17 +664,17 @@
                 newRow.append($('<td>').text(v.qty_rebus));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                            <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_fauzy" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control kg_fauzy" onkeyup="autoComplete()" type="text" value="${v.kg_fauzy}">
+                            <input id="${i+'_kg_dg_2'}" <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_fauzy" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control kg_fauzy" onkeyup="autoComplete()" type="text" value="${v.kg_fauzy}">
                         `
                 ));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                            <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_cn" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control kg_cn" onkeyup="autoComplete()" type="text" value="${v.kg_cn}">
+                            <input id="${i+'_kg_dg_3'}" <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_cn" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control kg_cn" onkeyup="autoComplete()" type="text" value="${v.kg_cn}">
                         `
                 ));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                            <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_daging" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control kg_daging" onkeyup="autoComplete()" type="text" value="${v.kg_daging}">
+                            <input id="${i+'_kg_dg_4'}" <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_daging" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control kg_daging" onkeyup="autoComplete()" type="text" value="${v.kg_daging}">
                         `
                 ));
                 newRow.append($('<td>').text('-'));
@@ -703,16 +703,16 @@
                     var newRow = $('<tr  style="color:whitesmoke; background-color:#fadfbe">');
                     newRow.append($('<td style="text-align: center;" colspan="5">').html("<b>SUB TOTAL</b>"));
                     newRow.append($('<td>').text(totalFirst.kg_rebus_total.toFixed(2)));
-                    newRow.append($('<td >').text(totalFirst.kg_fauzy_total.toFixed(2)));
-                    newRow.append($('<td>').text(totalFirst.kg_cn_total.toFixed(2)));
-                    newRow.append($('<td>').text(totalFirst.kg_daging_total.toFixed(2)));
+                    newRow.append($('<td >').text(totalFirst.kg_fauzy_total.toFixed(3)));
+                    newRow.append($('<td>').text(totalFirst.kg_cn_total.toFixed(3)));
+                    newRow.append($('<td>').text(totalFirst.kg_daging_total.toFixed(3)));
                     newRow.append($('<td>').text(totalFirst.ratio.toFixed(2) + ' %'));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
-                                <input <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" data-barang_master_id="${v.barang_master_id}" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control tb_harga" type="text" onkeyup="autoComplete()" value="${v.tb_harga}">
+                                <input id="${i+'_6'}" <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" data-barang_master_id="${v.barang_master_id}" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control tb_harga" type="text" onkeyup="autoComplete()" value="${v.tb_harga}">
                         `
                     ));
-                    newRow.append($('<td >').text(formatRupiah(totalFirst.total_harga.toFixed(2))));
+                    newRow.append($('<td >').text(formatRupiah(totalFirst.total_harga)));
                     table.find('tbody').append(newRow);
                 }
 
@@ -722,12 +722,12 @@
             var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996">');
             newRow.append($('<td style="text-align: center;" colspan="5">').html("<b>GRAND TOTAL</b>"));
             newRow.append($('<td>').text(kg_rebus_sum.toFixed(2)));
-            newRow.append($('<td >').text(kg_fauzy_sum.toFixed(2)));
-            newRow.append($('<td>').text(kg_cn_sum.toFixed(2)));
-            newRow.append($('<td>').text(kg_daging_sum.toFixed(2)));
+            newRow.append($('<td >').text(kg_fauzy_sum.toFixed(3)));
+            newRow.append($('<td>').text(kg_cn_sum.toFixed(3)));
+            newRow.append($('<td>').text(kg_daging_sum.toFixed(3)));
             newRow.append($('<td>').text("-"));
             newRow.append($('<td >').text('-'));
-            newRow.append($('<td >').text(formatRupiah(total_harga.toFixed(2))));
+            newRow.append($('<td >').text(formatRupiah(total_harga)));
             table.find('tbody').append(newRow);
         }
 
@@ -949,8 +949,7 @@
         if (request) {
             request.abort();
         }
-
-        // Lakukan request baru ke server
+        var focusedElementId = document.activeElement.id;
         request = $.ajax({
             url: "<?= base_url('biaya-udang/autocomplete'); ?>",
             data: data,
@@ -966,10 +965,19 @@
                 listBarang = res.data;
                 listTotal = res.dataTotal;
                 drawTable();
+
+                if (focusedElementId) {
+                    var newFocusedElement = document.getElementById(focusedElementId);
+                    if (newFocusedElement) {
+                        newFocusedElement.focus();
+                        var val = newFocusedElement.value;
+                        newFocusedElement.value = '';
+                        newFocusedElement.value = val;
+                    }
+                }
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 if (textStatus !== 'abort') {
-                    // Handle error selain abort
                     console.error('Error:', textStatus, errorThrown);
                 }
             }

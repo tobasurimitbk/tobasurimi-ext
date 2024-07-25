@@ -624,4 +624,16 @@ class POImportBahanPenolong extends BaseController
             'status' => true
         ]);
     }
+
+    public function generateNoPo()
+    {
+        $noPoNew =  $this->amPurchaseOrderModel->get_new_no_po_import(
+            date('m'),
+            date('y'),
+            getLastDay(),
+            $this->this_company_id
+        );
+
+        return json_encode($noPoNew);
+    }
 }

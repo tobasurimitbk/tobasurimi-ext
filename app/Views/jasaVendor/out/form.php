@@ -631,6 +631,7 @@
                     });
                 }
 
+
                 if (!isValid) {
                     Swal.fire({
                         icon: 'error',
@@ -948,7 +949,7 @@
 
             var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
             newRow.append($('<td style="text-align: right;" colspan="9">').html("<b>GRAND TOTAL</b>"));
-            newRow.append($('<td>').text(totalQtyKeluar.toFixed(2)));
+            newRow.append($('<td>').text(totalQtyKeluar.toFixed(3)));
             newRow.append($('<td>').text(''));
             table.find('tbody').append(newRow);
 

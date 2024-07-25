@@ -643,6 +643,7 @@
                 success: function(res) {
                     if (res) {
                         $("#no_panjar").val(res);
+                        $("#no_panjar").attr("readonly", true);
                     } else {
                         Swal.fire({
                             icon: 'error',
