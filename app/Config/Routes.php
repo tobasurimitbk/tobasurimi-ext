@@ -1356,6 +1356,35 @@ $routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
     $routes->get('list-mutasi-global', 'BeaCukai\BC27::dropdownMutasiGlobal');
     $routes->get('list-barang-mutasi', 'BeaCukai\BC27::getListMutasiDetail');
 
+    //header
+    $routes->get('id/header/(:segment)', 'BeaCukai\BC27::header/$1');
+    $routes->post('id/header', 'BeaCukai\BC27::updateHeader');
+
+    //ENTITAS
+
+    $routes->get('id/entitas/(:segment)', 'BeaCukai\BC27::entitas/$1');
+    $routes->post('id/entitas', 'BeaCukai\BC27::updateEntitas');
+
+    // DOKUMEN
+    $routes->get('id/dokumen/(:segment)', 'BeaCukai\BC27::dokumen/$1');
+    $routes->post('id/dokumen', 'BeaCukai\BC27::updateDokumen');
+    $routes->post('id/dokumen/delete', 'BeaCukai\BC27::deleteDokumen');
+
+    // PENGANGKUT
+    $routes->get('id/pengangkut/(:segment)', 'BeaCukai\BC27::pengangkut/$1');
+    $routes->post('id/pengangkut', 'BeaCukai\BC27::pengangkutUpdate');
+
+    // KEMASAN & PETI KEMASAN
+    $routes->get('id/kemasan-peti-kemas/(:segment)', 'BeaCukai\BC27::kemasanPetiKemas/$1');
+    $routes->post('id/kemasan-peti-kemas/kemasan', 'BeaCukai\BC27::kemasanUpdate');
+    $routes->post('id/kemasan-peti-kemas/kemasan/delete', 'BeaCukai\BC27::deleteKemasan');
+    $routes->post('id/kemasan-peti-kemas/kontainer', 'BeaCukai\BC27::kontainerUpdate');
+    $routes->post('id/kemasan-peti-kemas/kontainer/delete', 'BeaCukai\BC27::deleteKontainer');
+
+    // TRANSAKSI
+    $routes->get('id/transaksi/(:segment)', 'BeaCukai\BC27::transaksi/$1');
+    $routes->post('id/transaksi', 'BeaCukai\BC27::transaksiUpdate');
+
     // OUTSTANDING
     $routes->get('bc-27-outstanding-all', 'BeaCukai\BC27::allOutstanding');
     $routes->get('bc-27-outstanding', 'BeaCukai\BC27::viewOutstanding');
