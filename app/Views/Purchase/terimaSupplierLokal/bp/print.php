@@ -191,34 +191,12 @@
                     <td></td>
                 </tr>
             <?php endforeach; ?>
-            <?php foreach ($taxData as $t) : ?>
-                <tr>
-                    <td></td>
-                    <td><?= $t->tax_type . " - " . $t->tax_inv_no ?></td>
-                    <td class="txt-right"><?= toRupiah($t->tax_amt) ?></td>
-                    <td></td>
-                </tr>
-            <?php endforeach; ?>
             <tr>
                 <td></td>
-                <td>POTONGAN</td>
-                <td class="txt-right"><?= toRupiah($potongan) ?></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>TAMBAHAN</td>
+                <td>TAMBAHAN <?= $data->information != "" ?  ", " . $data->information : "" ?></td>
                 <td class="txt-right"><?= toRupiah($tambahan) ?></td>
                 <td></td>
             </tr>
-            <?php if ($data->information != "") : ?>
-                <tr>
-                    <td></td>
-                    <td><?= $data->information ?></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            <?php endif; ?>
             <tr>
                 <th></th>
                 <th class="txt-right">TOTAL</th>
@@ -344,21 +322,14 @@
                     <td></td>
                 </tr>
             <?php endforeach; ?>
-            <?php foreach ($taxReturnData as $t) : ?>
-                <tr>
-                    <td><?= $t->tax_type . " - " . $t->tax_inv_no ?></td>
-                    <td class="txt-right"><?= str_replace('Rp', '', toRupiah($t->tax_amt)) ?></td>
-                    <td></td>
-                </tr>
-            <?php endforeach; ?>
             <tr>
-                <td>POTONGAN</td>
+                <td>POTONGAN <?= $data->information != "" ?  ", " . $data->information : "" ?></td>
                 <td class="txt-right"><?= toRupiah($potongan) ?></td>
                 <td></td>
             </tr>
             <tr>
                 <th class="txt-right">TOTAL</th>
-                <th class="txt-right"><?= str_replace('Rp', '', toRupiah($taxReturnTotal))  ?></th>
+                <th class="txt-right"><?= str_replace('Rp', '', toRupiah($taxTotal))  ?></th>
                 <th></th>
             </tr>
         </table>

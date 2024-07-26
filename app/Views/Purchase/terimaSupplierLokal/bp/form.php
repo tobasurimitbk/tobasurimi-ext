@@ -284,7 +284,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <textarea style="height: 10px;" autocomplete="one-time-code" class="form-control information text-area-all" id="tax_note" name="tax_note" placeholder="Keterangan"></textarea>
+                                        <textarea style="height: auto;" autocomplete="one-time-code" class="form-control information text-area-all" id="tax_note" name="tax_note" placeholder="Keterangan"></textarea>
                                         <label for="floatingInput">Keterangan (Opsional)</label>
                                     </div>
                                 </div>
