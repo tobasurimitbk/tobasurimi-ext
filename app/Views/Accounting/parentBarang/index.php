@@ -250,11 +250,11 @@
                 className: "text-left",
                 sortable: false,
             }, {
-                data: "ap_id",
+                data: "ap_no",
                 className: "text-center",
                 sortable: false,
             }, {
-                data: "ar_id",
+                data: "ar_no",
                 className: "text-center",
                 sortable: false,
             }, ],
@@ -311,6 +311,7 @@
                 processData: false,
                 contentType: false,
                 success: function(res) {
+                    console.log(res);
                     csrf.val();
                     if (res.status) {
                         if (res.data != null) {

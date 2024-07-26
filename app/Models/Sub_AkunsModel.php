@@ -86,10 +86,17 @@ class Sub_AkunsModel extends Model
     {
 
         if ($company_id != "") {
-            $arrCondition = [
-                'deletedAt' => null,
-                'company_id' => $company_id
-            ];
+            if ($company_id == 1 || $company_id == 2) {
+                $arrCondition = [
+                    'deletedAt' => null,
+                    'company_id' => 1
+                ];
+            } else {
+                $arrCondition = [
+                    'deletedAt' => null,
+                    'company_id' => $company_id
+                ];
+            }
         } else {
             $arrCondition = [
                 'deletedAt' => null
