@@ -348,7 +348,8 @@ class StockDetail2Model extends Model
             THEN stock_details2.qty ELSE 0 END) - 
             SUM(CASE WHEN stock_details.status = "Out" 
             THEN stock_details2.qty ELSE 0 END)) 
-            AS stok_total,        
+            AS stok_total,  
+            GROUP_CONCAT(stock_details2.no_aju) AS group_no_aju,     
         ';
 
         if ($isAdjusment == true) {
