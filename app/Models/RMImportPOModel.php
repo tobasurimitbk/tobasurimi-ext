@@ -276,20 +276,20 @@ class RMImportPOModel extends Model
 
     public function getPOBBCondition($divisi_id, $po_date_awal, $po_date_akhir, $kategori_id)
     {
-
         $selectQry = "
             barang_master.barang_name AS barangName, 
-            barang_master_spesifikasi.spesifikasi AS spekName, 
+            CONCAT(barang_master_spesifikasi.spesifikasi, ' (IMPORT)') AS spekName, 
             rm_import_pos.potongan_harga AS subsidi,
             rm_import_po_details.price AS price1,
             rm_import_po_details.total AS totalPrice,
             rm_import_po_details.disc AS disc,
             rm_import_po_details.additional_cost AS additional_cost,
-            rm_import_po_details.qty AS qtyPO,
+            SUM(rm_import_po_details.qty) AS qtyPO,
             rm_import_po_details.barang_id AS barang1_id,
             rm_import_po_details.spesifikasi_id AS barang2_id,
             satuans.kode_satuan AS satuanName, 
-            rm_import_pos.po_no AS po_no,
+            GROUP_CONCAT(rm_import_pos.po_no) AS po_no,
+            (SUM(rm_import_po_details.price) / SUM(rm_import_po_details.qty)) AS avg_price_per_qty
         ";
 
         $poBBImportData = $this->asObject()
@@ -305,6 +305,7 @@ class RMImportPOModel extends Model
             ->where('rm_import_pos.po_date <=', date('Y-m-d', strtotime($po_date_akhir)))
             // ->where('account_barang.kategori_id', $kategori_id)
             ->where('account_barang.divisi_id', $divisi_id)
+            ->groupBy('rm_import_po_details.barang_id, rm_import_po_details.spesifikasi_id')
             ->findAll();
 
         return $poBBImportData;

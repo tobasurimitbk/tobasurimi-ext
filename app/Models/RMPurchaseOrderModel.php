@@ -886,19 +886,20 @@ class RMPurchaseOrderModel extends Model
     public function getPOBBCondition($divisi_id, $po_date_awal, $po_date_akhir, $kategori_id)
     {
         $selectQry = "
-            barang_master.barang_name AS barangName, 
-            barang_master_spesifikasi.spesifikasi AS spekName, 
-            rm_purchase_orders.subsidi_langsung AS subsidi,
-            rm_purchase_order_details.daily_price AS price1,
-            rm_purchase_order_details.monthly_price AS price2,
-            rm_purchase_order_details.general_price AS price3,
-            rm_purchase_order_details.qty AS qtyPO,
-            rm_purchase_order_details.barang1_id AS barang1_id,
-            rm_purchase_order_details.barang2_id AS barang2_id,
-            rm_purchase_orders.pph AS poPPH,
-            satuans.kode_satuan AS satuanName, 
-            rm_purchase_orders.po_no AS po_no,
-        ";
+        barang_master.barang_name AS barangName, 
+        barang_master_spesifikasi.spesifikasi AS spekName, 
+        rm_purchase_orders.subsidi_langsung AS subsidi,
+        rm_purchase_order_details.daily_price AS price1,
+        rm_purchase_order_details.monthly_price AS price2,
+        rm_purchase_order_details.general_price AS price3,
+        SUM(rm_purchase_order_details.qty) AS qtyPO,
+        rm_purchase_order_details.barang1_id AS barang1_id,
+        rm_purchase_order_details.barang2_id AS barang2_id,
+        rm_purchase_orders.pph AS poPPH,
+        satuans.kode_satuan AS satuanName, 
+        GROUP_CONCAT(rm_purchase_orders.po_no) AS po_no, 
+        (SUM(rm_purchase_order_details.daily_price + rm_purchase_order_details.monthly_price + rm_purchase_order_details.general_price) / SUM(rm_purchase_order_details.qty)) AS avg_price_per_qty
+    ";
 
         $poBBLokalData = $this->asObject()
             ->select($selectQry)
@@ -913,6 +914,7 @@ class RMPurchaseOrderModel extends Model
             ->where('rm_purchase_orders.po_date <=', date('Y-m-d', strtotime($po_date_akhir)))
             // ->where('account_barang.kategori_id', $kategori_id)
             ->where('account_barang.divisi_id', $divisi_id)
+            ->groupBy('rm_purchase_order_details.barang1_id, rm_purchase_order_details.barang2_id')
             ->findAll();
 
         return $poBBLokalData;

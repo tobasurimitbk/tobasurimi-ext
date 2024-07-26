@@ -670,12 +670,6 @@ class RasioController extends BaseController
                 'divisi_id' => $this->request->getVar('department'),
                 'kategori_id' => $this->request->getVar('kategori'),
             ];
-            //     $conditionProduction = [
-            //     'tanggal_jurnal' => date('Y-m', strtotime($convertedDate)),
-            //     'divisi_id' => $this->request->getVar('department'),
-            // ];
-            // var_dump($conditionProduction);
-            // exit;
             $kursValue = 1;
             $poBBLokal = $this->rmPurchaseOrderModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID);
             $poBBImport = $this->rmImportPOModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID);
@@ -684,8 +678,6 @@ class RasioController extends BaseController
             $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
 
             foreach ($dataResultPO as &$value) {
-                // Process the matched record
-                // var_dump($value);
                 // Use object properties instead of array syntax
                 $poNo = $value->po_no;
                 $barang1_id = $value->barang1_id;
@@ -694,12 +686,13 @@ class RasioController extends BaseController
                 $price1 = isset($value->price1) ? floatval($value->price1) : 0;
                 $price2 = isset($value->price2) ? floatval($value->price2) : 0;
                 $price3 = isset($value->price3) ? floatval($value->price3) : 0;
+                $avgprice = isset($value->avg_price_per_qty) ? floatval($value->avg_price_per_qty) : 0;
                 $discount = isset($value->disc) ? floatval($value->disc) : 0;
                 $hargaSatuan = $price1 + $price2 + $price3;
                 $hargaDiscount = $hargaSatuan * ($discount / 100);
                 $additional_cost = isset($value->additional_cost) ? floatval($value->additional_cost) : 0;
-                $hargaSatuanPO = $price1 + $price2 + $price3 + $additional_cost - $hargaDiscount;
-                $totalHargaPO = isset($value->totalPrice) ? floatval($value->totalPrice) : $hargaSatuanPO * $totalQtyPO;
+                $hargaSatuanPO = $avgprice + $additional_cost - $hargaDiscount;
+                $totalHargaPO = $hargaSatuanPO * $totalQtyPO;
 
                 $value->totalQtyPO = $totalQtyPO;
                 $value->totalHargaPO = $totalHargaPO;
@@ -708,34 +701,41 @@ class RasioController extends BaseController
                 $value->barang_name =  $value->barangName;
                 $value->spesifikasi =  $value->spekName;
 
-                // Directly using JSON_CONTAINS in the query
-                $penerimaanBarang = $this->penerimaanBarangModel
-                    ->where("JSON_CONTAINS(multiple_po_no, '\"" . $poNo . "\"')")
-                    ->first();
+                // var_dump(explode(',', $poNo));
 
-                if ($penerimaanBarang) {
-                    $totalQty = 0;
-                    $totalHarga = 0;
-                    $hargaSatuan = 0;
-                    $satuanLPB = "";
-                    $penerimaanBarangDetail = $this->penerimaanBarangDetailModel
-                        ->select('penerimaan_barang_detail.*, satuans.kode_satuan')
-                        ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
-                        ->where('penerimaan_barang_id', $penerimaanBarang['id'])
-                        ->where('barang_id', $barang1_id)
-                        ->where('spesifikasi_id', $barang2_id)
-                        ->findAll();
-                    foreach ($penerimaanBarangDetail as $valuePenerimaanBarangDetail) {
-                        $hargaSatuan = ($valuePenerimaanBarangDetail['harga'] + $valuePenerimaanBarangDetail['harga_harian'] + $valuePenerimaanBarangDetail['harga_bulanan']) * $kursValue;
-                        $totalQty += $valuePenerimaanBarangDetail['qty'];
-                        $satuanLPB = $valuePenerimaanBarangDetail['kode_satuan'];
+                $parsePoNo = explode(',', $poNo);
+
+                $totalQty = 0;
+                $totalHarga = 0;
+                $hargaSatuan = 0;
+                $satuanLPB = "";
+                foreach ($parsePoNo as $key => $valuePoNo) {
+                    $penerimaanBarang = $this->penerimaanBarangModel
+                        ->where("JSON_CONTAINS(multiple_po_no, '\"" . $valuePoNo . "\"')")
+                        ->first();
+
+                    if ($penerimaanBarang) {
+                        $penerimaanBarangDetail = $this->penerimaanBarangDetailModel
+                            ->select('penerimaan_barang_detail.*, SUM(penerimaan_barang_detail.harga) AS harga, SUM(penerimaan_barang_detail.harga_harian) AS harga_harian, SUM(penerimaan_barang_detail.harga_bulanan) AS harga_bulanan, SUM(penerimaan_barang_detail.qty) AS qty, satuans.kode_satuan')
+                            ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
+                            ->where('penerimaan_barang_id', $penerimaanBarang['id'])
+                            ->where('barang_id', $barang1_id)
+                            ->where('spesifikasi_id', $barang2_id)
+                            ->groupBy('barang_id, spesifikasi_id')
+                            ->findAll();
+                        // var_dump($penerimaanBarangDetail);
+                        foreach ($penerimaanBarangDetail as $valuePenerimaanBarangDetail) {
+                            $hargaSatuan += ($valuePenerimaanBarangDetail['harga'] + $valuePenerimaanBarangDetail['harga_harian'] + $valuePenerimaanBarangDetail['harga_bulanan']) * $kursValue;
+                            $totalQty += $valuePenerimaanBarangDetail['qty'];
+                            $satuanLPB = $valuePenerimaanBarangDetail['kode_satuan'];
+                        }
                     }
-                    $totalHarga = $totalQty * $hargaSatuan;
-                    $value->totalQtyLPB = $totalQty;
-                    $value->totalHargaLPB = $totalHarga;
-                    $value->hargaSatuanLPB = $hargaSatuan;
-                    $value->satuanLPB = $satuanLPB;
                 }
+                $totalHarga = $totalQty * $hargaSatuan;
+                $value->totalQtyLPB = $totalQty;
+                $value->totalHargaLPB = $hargaSatuan;
+                $value->hargaSatuanLPB = $hargaSatuan / $totalQty;
+                $value->satuanLPB = $satuanLPB;
             }
 
             foreach ($productionResultDataTitle as &$value) {
