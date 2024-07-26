@@ -218,7 +218,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-floating mb-3">
-                                    <textarea <?= $isUsed ? 'disabled' : '' ?> style="height: 10px;" autocomplete="one-time-code" class="form-control information text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan"><?= $dataTandaTerimaFaktur['information'] ?? ""; ?></textarea>
+                                    <textarea <?= $isUsed ? 'disabled' : '' ?> style="height: auto;" autocomplete="one-time-code" class="form-control information text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan"><?= $dataTandaTerimaFaktur['information'] ?? ""; ?></textarea>
                                     <label for="floatingInput">Keterangan (Opsional)</label>
                                 </div>
                             </div>

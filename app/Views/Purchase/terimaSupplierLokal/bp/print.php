@@ -177,6 +177,28 @@
                 <td class="txt-right"><?= toRupiah($itemTotal) ?></td>
                 <td></td>
             </tr>
+            <!-- <tr>
+                <td></td>
+                <td><?= $taxList ?></td>
+                <td class="txt-right"><?= toRupiah($taxTotal) ?></td>
+                <td></td>
+            </tr> -->
+            <?php foreach ($taxReturnData as $t) : ?>
+                <tr>
+                    <td></td>
+                    <td><?= $t->tax_type . " - " . $t->tax_inv_no ?></td>
+                    <td class="txt-right"><?= str_replace('Rp', '', toRupiah($t->tax_amt)) ?></td>
+                    <td></td>
+                </tr>
+            <?php endforeach; ?>
+            <?php foreach ($taxData as $t) : ?>
+                <tr>
+                    <td></td>
+                    <td><?= $t->tax_type . " - " . $t->tax_inv_no ?></td>
+                    <td class="txt-right"><?= toRupiah($t->tax_amt) ?></td>
+                    <td></td>
+                </tr>
+            <?php endforeach; ?>
             <tr>
                 <td></td>
                 <td>POTONGAN</td>
@@ -189,20 +211,14 @@
                 <td class="txt-right"><?= toRupiah($tambahan) ?></td>
                 <td></td>
             </tr>
-            <!-- <tr>
-                <td></td>
-                <td><?= $taxList ?></td>
-                <td class="txt-right"><?= toRupiah($taxTotal) ?></td>
-                <td></td>
-            </tr> -->
-            <?php foreach ($taxData as $t) : ?>
+            <?php if ($data->information != "") : ?>
                 <tr>
                     <td></td>
-                    <td><?= $t->tax_type ?></td>
-                    <td class="txt-right"><?= toRupiah($t->tax_amt) ?></td>
+                    <td><?= $data->information ?></td>
+                    <td></td>
                     <td></td>
                 </tr>
-            <?php endforeach; ?>
+            <?php endif; ?>
             <tr>
                 <th></th>
                 <th class="txt-right">TOTAL</th>
@@ -321,13 +337,25 @@
                     <td></td>
                 </tr>
             <?php endif; ?> -->
+            <?php foreach ($taxData as $t) : ?>
+                <tr>
+                    <td><?= $t->tax_type . " - " . $t->tax_inv_no ?></td>
+                    <td class="txt-right"><?= toRupiah($t->tax_amt) ?></td>
+                    <td></td>
+                </tr>
+            <?php endforeach; ?>
             <?php foreach ($taxReturnData as $t) : ?>
                 <tr>
-                    <td><?= $t->tax_type ?></td>
+                    <td><?= $t->tax_type . " - " . $t->tax_inv_no ?></td>
                     <td class="txt-right"><?= str_replace('Rp', '', toRupiah($t->tax_amt)) ?></td>
                     <td></td>
                 </tr>
             <?php endforeach; ?>
+            <tr>
+                <td>POTONGAN</td>
+                <td class="txt-right"><?= toRupiah($potongan) ?></td>
+                <td></td>
+            </tr>
             <tr>
                 <th class="txt-right">TOTAL</th>
                 <th class="txt-right"><?= str_replace('Rp', '', toRupiah($taxReturnTotal))  ?></th>

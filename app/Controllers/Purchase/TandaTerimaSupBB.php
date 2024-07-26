@@ -383,6 +383,7 @@ class TandaTerimaSupBB extends BaseController
             } else {
                 $taxTotal += $tax->tax_amt;
             }
+            $taxReturnTotal += $tax->tax_amt;
         }
 
         foreach ($taxReturnData as $tax) {
@@ -390,7 +391,9 @@ class TandaTerimaSupBB extends BaseController
             $taxReturnTotal += $tax->tax_amt;
         }
 
-        $total = ($itemTotal + $dataInv->tambahan + $taxTotal - $dataInv->potongan) - $taxPph23;
+        // $total = ($itemTotal + $dataInv->tambahan + $taxTotal - $dataInv->potongan) - $taxPph23;
+        $total = ($itemTotal + $dataInv->tambahan + $taxTotal + $taxReturnTotal  - $dataInv->potongan) - $taxPph23;
+        $taxReturnTotal += $dataInv->potongan;
 
         $data["data"] = $dataInv;
         $data['invNo'] = $dataInv->faktur_no;

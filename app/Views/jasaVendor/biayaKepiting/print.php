@@ -12,7 +12,7 @@
         }
 
         @page {
-            size: 10.27in 10.50in landscape;
+            size: 11.27in 10.50in landscape;
         }
 
         .body {
