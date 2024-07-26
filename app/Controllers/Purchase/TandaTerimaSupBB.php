@@ -213,7 +213,8 @@ class TandaTerimaSupBB extends BaseController
             'tambahan' => $this->request->getVar('tambahan') ? repairDouble($this->request->getVar('tambahan')) : 0,
             'recipient' => $this->request->getVar('penerima'),
             'faktur_type' => 'LOKAL',
-            'information' => $this->request->getVar('keterangan'),
+            'information_tambahan' => $this->request->getVar('keterangan_tambahan'),
+            'information_potongan' => $this->request->getVar('keterangan_potongan'),
             'tipe_bahan' => 'PENOLONG',
             'user_id' => $this->user_id,
         ]);
@@ -269,7 +270,8 @@ class TandaTerimaSupBB extends BaseController
             'tambahan' => $this->request->getVar('tambahan') ? repairDouble($this->request->getVar('tambahan')) : 0,
             'recipient' => $this->request->getVar('penerima'),
             'faktur_type' => 'LOKAL',
-            'information' => $this->request->getVar('keterangan'),
+            'information_tambahan' => $this->request->getVar('keterangan_tambahan'),
+            'information_potongan' => $this->request->getVar('keterangan_potongan'),
             'tipe_bahan' => 'PENOLONG',
             'user_id' => $this->user_id,
         ]);
