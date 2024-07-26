@@ -28,7 +28,8 @@ class TandaTerimaFakturModel extends Model
         'recipient',
         'tambahan',
         'faktur_type',
-        'information',
+        'information_tambahan',
+        'information_potongan',
         'tipe_bahan',
         'user_id',
         'status_update'

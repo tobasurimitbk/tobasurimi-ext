@@ -218,8 +218,14 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-floating mb-3">
-                                    <textarea <?= $isUsed ? 'disabled' : '' ?> style="height: auto;" autocomplete="one-time-code" class="form-control information text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan"><?= $dataTandaTerimaFaktur['information'] ?? ""; ?></textarea>
-                                    <label for="floatingInput">Keterangan (Opsional)</label>
+                                    <textarea <?= $isUsed ? 'disabled' : '' ?> style="height: auto;" autocomplete="one-time-code" class="form-control information text-area-all" name="keterangan_tambahan" id="keterangan_tambahan" placeholder="Keterangan"><?= $dataTandaTerimaFaktur['information_tambahan'] ?? ""; ?></textarea>
+                                    <label for="floatingInput">Keterangan Tambahan (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    <textarea <?= $isUsed ? 'disabled' : '' ?> style="height: auto;" autocomplete="one-time-code" class="form-control information text-area-all" name="keterangan_potongan" id="keterangan_potongan" placeholder="Keterangan Potongan"><?= $dataTandaTerimaFaktur['information_potongan'] ?? ""; ?></textarea>
+                                    <label for="floatingInput">Keterangan Potongan (Opsional)</label>
                                 </div>
                             </div>
                         </div>
