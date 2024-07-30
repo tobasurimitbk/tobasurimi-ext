@@ -1167,9 +1167,29 @@ $routes->get('/penerimaan-barang-import/receivedItemsBySupplier/(:num)', 'Wareho
 $routes->get('/penerimaan-barang-import/generate', 'Warehouse\PenerimaanBarangImport::generatePenerimaanBarang', ['filter' => 'Auth']);
 
 // RETURN BARANG
-$routes->get('/penerimaan-barang-lokal-bb/return-barang/id/(:segment)', 'Warehouse\ReturnBarangPO::update/$1', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-lokal-bb/return-barang/generate-po-no', 'Warehouse\ReturnBarangPO::generatePONo', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-lokal-bb/return-barang/list-barang', 'Warehouse\ReturnBarangPO::listBarangLPB', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bb/return-barang/id/(:segment)', 'Warehouse\ReturnBarangPOBB::update/$1', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bb/return-barang/generate-po-no', 'Warehouse\ReturnBarangPOBB::generatePONo', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bb/return-barang/list-barang', 'Warehouse\ReturnBarangPOBB::listBarangLPB', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-lokal-bb/return-barang/insert', 'Warehouse\ReturnBarangPOBB::createAction', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-lokal-bb/return-barang/update', 'Warehouse\ReturnBarangPOBB::updateAction', ['filter' => 'Auth']);
+
+$routes->get('/penerimaan-barang-import-bb/return-barang/id/(:segment)', 'Warehouse\ReturnBarangImportPOBB::update/$1', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import-bb/return-barang/generate-po-no', 'Warehouse\ReturnBarangImportPOBB::generatePONo', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import-bb/return-barang/list-barang', 'Warehouse\ReturnBarangImportPOBB::listBarangLPB', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-import-bb/return-barang/insert', 'Warehouse\ReturnBarangImportPOBB::createAction', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-import-bb/return-barang/update', 'Warehouse\ReturnBarangImportPOBB::updateAction', ['filter' => 'Auth']);
+
+$routes->get('/penerimaan-barang-lokal-bp/return-barang/id/(:segment)', 'Warehouse\ReturnBarangPOBP::update/$1', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bp/return-barang/generate-po-no', 'Warehouse\ReturnBarangPOBP::generatePONo', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bp/return-barang/list-barang', 'Warehouse\ReturnBarangPOBP::listBarangLPB', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-lokal-bp/return-barang/insert', 'Warehouse\ReturnBarangPOBP::createAction', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-lokal-bp/return-barang/update', 'Warehouse\ReturnBarangPOBP::updateAction', ['filter' => 'Auth']);
+
+$routes->get('/penerimaan-barang-import-bp/return-barang/id/(:segment)', 'Warehouse\ReturnBarangImportPOBP::update/$1', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import-bp/return-barang/generate-po-no', 'Warehouse\ReturnBarangImportPOBP::generatePONo', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import-bp/return-barang/list-barang', 'Warehouse\ReturnBarangImportPOBP::listBarangLPB', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-import-bp/return-barang/insert', 'Warehouse\ReturnBarangImportPOBP::createAction', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-import-bp/return-barang/update', 'Warehouse\ReturnBarangImportPOBP::updateAction', ['filter' => 'Auth']);
 
 // ROUTE BEA CUKAI REVAMP
 // SETTING AKUN BEA CUKAI

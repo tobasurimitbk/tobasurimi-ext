@@ -190,13 +190,16 @@
                     `
                     } else {
                         return `
-                        <?php if (can('Warehouse', 'P. Barang Lokal BP', 'p')) : ?>
-                            <div class="mt-0" style="text-align:center;">
+                        <div class="mt-0" style="text-align:center;">
+                            <button data-toggle="tooltip" title="Return Out" class="btn btn-success return-out" onclick="" style="box-shadow: none !important;">
+                                <i class="fa fa-undo fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <?php if (can('Warehouse', 'P. Barang Lokal BP', 'p')) : ?>
                                 <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                 </button>
-                            </div>
-                        <?php endif; ?>
+                            <?php endif; ?>
+                        </div>
                     `
                     }
 
@@ -259,6 +262,12 @@
             const data = table.row(this).data();
             location.replace(`<?= base_url("penerimaan-barang-lokal-bp/id"); ?>/${data.id}`);
         })
+
+        $('#dataTable tbody').on('click', '.return-out', function() {
+            // Use the closest 'tr' element to get the data
+            const data = table.row($(this).closest('tr')).data();
+            location.replace(`<?= base_url("penerimaan-barang-lokal-bp/return-barang/id"); ?>/${data.id}`);
+        });
     })
 
     const posting = function(id) {

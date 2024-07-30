@@ -192,7 +192,9 @@ class AMPurchaseOrderDetailModel extends Model
             }
 
             $firstLPB =  $penerimaanBarangModel
+                ->select('penerimaan_barang.*, penerimaan_barang_detail.*, pengembalian_barang_detail.* , penerimaan_barang_detail.id AS penerimaan_barang_detail_id, pengembalian_barang_detail.id AS pengembalian_barang_detail_id')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
+                ->join('pengembalian_barang_detail', 'pengembalian_barang_detail.penerimaan_barang_detail_id = penerimaan_barang_detail.id', 'left')
                 ->where('penerimaan_barang_id', $penerimaanBarangID)
                 ->where('purchase_order_id', $b['am_purchase_order_id'])
                 ->where('tipe_bahan', $tipeBahan)
@@ -213,6 +215,10 @@ class AMPurchaseOrderDetailModel extends Model
                 if ($sisaDiterima != 0) {
                     // TAMPILKAN YANG MASIH ADA SISA AJA
                     $res[] = [
+                        'penerimaan_barang_detail_id' => $firstLPB['penerimaan_barang_detail_id'],
+                        'pengembalian_barang_detail_id' => $firstLPB['pengembalian_barang_detail_id'],
+                        'jumlah_return' => $firstLPB['jumlah_return'],
+                        'keterangan_return' => $firstLPB['keterangan'],
                         'am_purchase_order_details_id' => $b['id'],
                         'am_purchase_order_id' => $b['am_purchase_order_id'],
                         'kode_barang' => $b['kode_barang'],
@@ -242,6 +248,10 @@ class AMPurchaseOrderDetailModel extends Model
                 if ($inLPB != 0) {
                     // TAMPILKAN YANG MASIH ADA SISA SAJA
                     $res[] = [
+                        'penerimaan_barang_detail_id' => $firstLPB['penerimaan_barang_detail_id'],
+                        'pengembalian_barang_detail_id' => $firstLPB['pengembalian_barang_detail_id'],
+                        'jumlah_return' => $firstLPB['jumlah_return'],
+                        'keterangan_return' => $firstLPB['keterangan'],
                         'am_purchase_order_details_id' => $b['id'],
                         'am_purchase_order_id' => $b['am_purchase_order_id'],
                         'kode_barang' => $b['kode_barang'],

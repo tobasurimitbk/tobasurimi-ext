@@ -60,7 +60,7 @@ class PengembalianBarangModel extends Model
 
         if (!empty($query->getResultArray())) {
             foreach ($query->getResultArray() as $string) {
-                $explode = explode('/', $string['pengembalian_barang.no_surat_jalan']);
+                $explode = explode('/', $string['no_surat_jalan']);
                 $number = intval($explode[2]);
 
                 if ($number > $lastPenerimaan) {

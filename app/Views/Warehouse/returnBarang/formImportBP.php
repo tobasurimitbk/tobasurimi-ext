@@ -3,20 +3,20 @@
 
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Return Barang</h1>
+        <h1 class="title-name">Return Barang Bahan Penolong</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-barang-lokal-bb"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-barang-import-bp"); ?>">
                 Kembali
             </a>
             <?php if (!empty($dataPenerimaanBarang)) : ?>
                 <?php if (can('Warehouse', 'P. Barang Lokal BB', 'p')) : ?>
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-lokal-bb/return-barang/print/"); ?><?= encrypt($dataPenerimaanBarang['id']); ?>')">
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-import-bp/return-barang/print/"); ?><?= encrypt($dataPenerimaanBarang['id']); ?>')">
                         Print
                     </button>
                 <?php endif; ?>
             <?php endif; ?>
-            <?php if (!empty($dataPenerimaanBarang)) : ?>
-                <?php if ($dataPenerimaanBarang['status_post'] === "WAITING") : ?>
+            <?php if (!empty($dataPengembalianBarang)) : ?>
+                <?php if ($dataPengembalianBarang['status_post'] === "WAITING") : ?>
                     <?php if (can('Warehouse', 'P. Barang Lokal BB', 'd')) : ?>
                         <button class="btn btn-hapus delete-parent float-right">
                             Hapus
@@ -43,8 +43,8 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="text" class="penerimaan_barang_id" name="penerimaan_barang_id" id="penerimaan_barang_id" value="<?= !empty($dataPenerimaanBarang) ? encrypt($dataPenerimaanBarang['id']) : ""; ?>" />
-                <input autocomplete="one-time-code" type="text" class="pengembalian_barang_id" name="pengembalian_barang_id" id="pengembalian_barang_id" value="<?= !empty($dataPengembalianBarang) ? encrypt($dataPengembalianBarang['id']) : ""; ?>" />
+                <input autocomplete="one-time-code" type="hidden" class="penerimaan_barang_id" name="penerimaan_barang_id" id="penerimaan_barang_id" value="<?= !empty($dataPenerimaanBarang) ? encrypt($dataPenerimaanBarang['id']) : ""; ?>" />
+                <input autocomplete="one-time-code" type="hidden" class="pengembalian_barang_id" name="pengembalian_barang_id" id="pengembalian_barang_id" value="<?= !empty($dataPengembalianBarang) ? encrypt($dataPengembalianBarang['id']) : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row mb-1">
                     <div class="col-md-4">
@@ -56,10 +56,10 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" value="" type="text" class="form-control no_return_barang" id="no_return_barang" name="no_return_barang" placeholder="No. Surat Jalan">
+                                    <input autocomplete="one-time-code" <?= !empty($dataPengembalianBarang) ? "readonly" : ""; ?> value="<?= !empty($dataPengembalianBarang) ? $dataPengembalianBarang['no_surat_jalan'] : ""; ?>" type="text" class="form-control no_return_barang" id="no_return_barang" name="no_return_barang" placeholder="No. Surat Jalan">
                                     <label for="floatingInput">No. Surat Jalan</label>
                                 </div>
-                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div class="input-generate input-group-prepend group-prepend-password align-items-center" style="<?= !empty($dataPengembalianBarang) ?  "display: none" : ""; ?>">
                                     <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
@@ -68,7 +68,7 @@
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" value="" type="text" class="form-control tanggal_return_barang" name="tanggal_return_barang" id="tanggal_return_barang" placeholder="Tanggal Return Barang">
+                                <input autocomplete="one-time-code" <?= !empty($dataPengembalianBarang) ? (($dataPengembalianBarang['status_post'] !== "WAITING") ? "readonly" : "") : ""; ?> value="<?= !empty($dataPengembalianBarang) ? date('d/m/Y', strtotime($dataPengembalianBarang['tanggal_surat_jalan'])) : ""; ?>" type="text" class="form-control tanggal_return_barang" name="tanggal_return_barang" id="tanggal_return_barang" placeholder="Tanggal Return Barang">
                                 <label for="floatingInput">Tanggal Return Barang</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
@@ -238,6 +238,7 @@
                                 <th style="text-align: center;">Sub Total</th>
                                 <th style="text-align: center;">Keterangan</th>
                                 <th style="text-align:center;">Jml. Return</th>
+                                <th style="text-align:center;">Ket. Return</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
@@ -255,6 +256,7 @@
                                 <td style="text-align: center;"><b>0.0</b></td>
                                 <td style="text-align: center;"><b>0.0</b></td>
                                 <td style="text-align: center;"><b></b></td>
+                                <td style="text-align: center;"></td>
                                 <td style="text-align: center;"></td>
                             </tr>
                         </tfoot>
@@ -274,7 +276,8 @@
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
-        autoclose: true
+        autoclose: true,
+        enableOnReadonly: false
     })
 
     // SELECT2
@@ -285,10 +288,10 @@
     }).change(function() {
         let arr = $('.multiple_po_id').val();
         $.ajax({
-            url: `<?= base_url("penerimaan-barang-lokal-bb/return-barang/list-barang"); ?>`,
+            url: `<?= base_url("penerimaan-barang-import-bp/return-barang/list-barang"); ?>`,
             method: "GET",
             data: {
-                rm_purchase_order_id: JSON.stringify(arr),
+                am_purchase_order_id: JSON.stringify(arr),
                 penerimaan_barang_id: $('.penerimaan_barang_id').val()
             },
             dataType: "json",
@@ -297,6 +300,7 @@
                 listFromDatabase = [];
                 listData = res;
                 listFromDatabase = res.result;
+                console.log(listData);
                 drawTable(listData);
             }
         })
@@ -396,61 +400,19 @@
     // Validator Parent
     var validator = $(".create-form").validate({
         rules: {
-            no_penerimaan_barang: {
+            no_return_barang: {
                 required: true,
             },
-            supplier_id: {
+            tanggal_return_barang: {
                 required: true,
-            },
-            warehouse_id: {
-                required: true
-            },
-            kemasan_id: {
-                required: true
-            },
-            jumlah_kemasan: {
-                required: true,
-                number: true,
-                min: 0
-            },
-            ongkos_kirim: {
-                number: true,
-                min: 0
-            },
-            divisi_id: {
-                required: true
-            },
-            tanggal_penerimaan_lpb: {
-                required: true
             }
         },
         messages: {
-            no_penerimaan_barang: {
-                required: "Nomor penerimaan wajib diisi"
+            no_return_barang: {
+                required: "Nomor surat jalan wajib diisi"
             },
-            supplier_id: {
-                required: "Supplier wajib diisi"
-            },
-            warehouse_id: {
-                required: "Warehouse wajib diisi"
-            },
-            kemasan_id: {
-                required: "Jenis kemasan wajib diisi"
-            },
-            jumlah_kemasan: {
-                required: "Jumlah kemasan wajib diisi",
-                number: "Masukkan hanya angka",
-                min: "Tidak boleh minus"
-            },
-            ongkos_kirim: {
-                number: "Masukkan hanya angka",
-                min: "Tidak boleh minus"
-            },
-            divisi_id: {
-                required: "Departemen wajib diisi"
-            },
-            tanggal_penerimaan_lpb: {
-                required: "Tanggal barang diterima wajib diisi"
+            tanggal_return_barang: {
+                required: "Tanggal return wajib diisi"
             }
         },
         errorElement: 'span',
@@ -497,21 +459,20 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
-                        var id = $('#id').val();
+                        var pengembalian_barang_id = $('#pengembalian_barang_id').val();
+                        var penerimaan_barang_id = $('#penerimaan_barang_id').val();
                         var po_no = $('.multiple_po_id').select2('data').map(function(elem) {
                             return elem.text;
                         });
 
                         var formData = new FormData(document.querySelector(".create-form"));
-                        formData.append("acceptance_type", po_no.length > 1 ? "MULTIPLE ORDER" : "SINGLE ORDER");
-                        formData.append("multiple_po_id", JSON.stringify($('.multiple_po_id').val()));
-                        formData.append("multiple_po_no", JSON.stringify(po_no));
                         formData.append("barangs", JSON.stringify(listData.result));
 
-                        if (id) {
-                            formData.append("id", id);
+                        if (pengembalian_barang_id) {
+                            formData.append("pengembalian_barang_id", pengembalian_barang_id);
+                            formData.append("penerimaan_barang_id", penerimaan_barang_id);
                             $.ajax({
-                                url: "<?= base_url("penerimaan-barang-lokal-bb/return-barang/update"); ?>",
+                                url: "<?= base_url("penerimaan-barang-import-bp/return-barang/update"); ?>",
                                 data: formData,
                                 method: "POST",
                                 dataType: "json",
@@ -532,7 +493,7 @@
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         }).then(() => {
-                                            window.location.href = "<?= base_url("penerimaan-barang-lokal-bb") ?>";
+                                            window.location.href = "<?= base_url("penerimaan-barang-import-bp") ?>";
                                         });
                                     } else {
                                         Swal.fire({
@@ -545,7 +506,7 @@
                             });
                         } else {
                             $.ajax({
-                                url: "<?= base_url("penerimaan-barang-lokal-bb/return-barang/insert"); ?>",
+                                url: "<?= base_url("penerimaan-barang-import-bp/return-barang/insert"); ?>",
                                 data: formData,
                                 method: "POST",
                                 dataType: "json",
@@ -566,7 +527,7 @@
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         }).then(() => {
-                                            window.location.href = "<?= base_url("penerimaan-barang-lokal-bb"); ?>";
+                                            window.location.href = "<?= base_url("penerimaan-barang-import-bp"); ?>";
                                         });
                                     } else {
                                         Swal.fire({
@@ -591,7 +552,7 @@
         if ($(".detail-form").valid()) {
             var indexToRemove = -1;
             for (var i = 0; i < listData.result.length; i++) {
-                if (Number(listData.result[i].rm_purchase_order_details_id) == Number($('.rm_purchase_order_details_id').val()) && Number(listData.result[i].rm_purchase_order_id) == Number($('.rm_purchase_order_id').val())) {
+                if (Number(listData.result[i].am_purchase_order_details_id) == Number($('.am_purchase_order_details_id').val()) && Number(listData.result[i].am_purchase_order_id) == Number($('.am_purchase_order_id').val())) {
                     listData.result[i].jml_diterima_lpb = Number($('.jml_diterima_lpb').val());
                     listData.result[i].jml_diterima_total = Number($('.jml_diterima_total').val());
                     listData.result[i].sisa_total = Number($('.sisa_total').val());
@@ -609,7 +570,7 @@
         var jml_diterima_lpb_last = Number($('.jml_diterima_lpb_last').val()) || 0;
         if (jml_diterima_lpb == 0) {
             for (var i = 0; i < listData.result.length; i++) {
-                if (Number(listData.result[i].rm_purchase_order_details_id) == Number($('.rm_purchase_order_details_id').val()) && Number(listData.result[i].rm_purchase_order_id) == Number($('.rm_purchase_order_id').val())) {
+                if (Number(listData.result[i].rm_purchase_order_details_id) == Number($('.rm_purchase_order_details_id').val()) && Number(listData.result[i].am_purchase_order_id) == Number($('.am_purchase_order_id').val())) {
                     item = listData.result[i];
                     var jml_diterima_total_now = Number(item.jml_diterima_total - jml_diterima_lpb_last);
                     var sisa_total_now = Number(item.sisa_total + jml_diterima_lpb_last);
@@ -625,7 +586,7 @@
 
         } else {
             for (var i = 0; i < listData.result.length; i++) {
-                if (Number(listData.result[i].rm_purchase_order_details_id) == Number($('.rm_purchase_order_details_id').val()) && Number(listData.result[i].rm_purchase_order_id) == Number($('.rm_purchase_order_id').val())) {
+                if (Number(listData.result[i].rm_purchase_order_details_id) == Number($('.rm_purchase_order_details_id').val()) && Number(listData.result[i].am_purchase_order_id) == Number($('.am_purchase_order_id').val())) {
                     item = listData.result[i];
                     var jml_diterima_total_now = (Number(item.jml_diterima_total) + Number(jml_diterima_lpb) - jml_diterima_lpb_last);
                     var sisa_total_now = item.jml_order - jml_diterima_total_now;
@@ -670,6 +631,7 @@
             newRow.append($('<td style="text-align:left;"><b>0.0</b></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
+            newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
 
         } else {
@@ -678,8 +640,11 @@
             var jmlDiterimaTotal = 0;
             var sisaTotal = 0;
             var subTotal = 0;
+            var sumTotal = 0;
 
             $.each(listData.result, function(i, v) {
+                var jmlReturn = v.jumlah_return == null ? "" : v.jumlah_return;
+                var ketReturn = v.keterangan_return == null ? "" : v.keterangan_return;
                 var newRow = $('<tr>');
                 newRow.append($('<td>').text(no++));
                 newRow.append($('<td>').text(v.kode_barang));
@@ -690,17 +655,21 @@
                 newRow.append($('<td>').text(v.jml_diterima_lpb));
                 newRow.append($('<td>').text(v.jml_diterima_total));
                 newRow.append($('<td>').text(v.sisa_total.toFixed(2)));
-                newRow.append($('<td>').text(formatRupiah(parseInt(v.harga_sum).toFixed(2) || 0)));
+                newRow.append($('<td>').text(formatRupiah(parseInt(v.harga).toFixed(2) || 0)));
                 newRow.append($('<td>').text(formatRupiah(parseInt(v.sub_total).toFixed(2) || 0)));
                 newRow.append($('<td>').text(v.keterangan));
                 newRow.append($('<td>').html(`
-                    <input style="height:30px;padding: 5px 5px;" class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-stok_total="${v.jml_diterima_total}" data-index="${i}" class="form-control" type="text" value="">
+                    <input style="height:30px;width:100px;padding: 5px 5px;" class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-stok_total="${v.jml_diterima_total}" data-index="${i}" class="form-control" type="text" value="${jmlReturn}">
+                `));
+                newRow.append($('<td>').html(`
+                    <input style="height:30px;width:150px;padding: 5px 5px;" class="form-control ket-bahan-request" autocomplete="one-time-code" data-index="${i}" class="form-control" type="text" value="${ketReturn}">
                 `));
                 table.find('tbody').append(newRow);
                 jmlDiterimaLPBTotal += Number(v.jml_diterima_lpb) || 0;
                 jmlDiterimaTotal += Number(v.jml_diterima_total) || 0;
                 sisaTotal += Number(v.sisa_total) || 0;
                 subTotal += Number(v.sub_total) || 0;
+                sumTotal += Number(v.harga) || 0;
             });
             table.find('tfoot').empty();
             var newRow = $('<tr>');
@@ -711,8 +680,9 @@
             newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaLPBTotal.toFixed(2) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaTotal.toFixed(2) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + sisaTotal.toFixed(2) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(listData.harga_sum_total).toFixed(2) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(sumTotal).toFixed(2) || 0) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(subTotal).toFixed(2) || 0) + '</b></td>'));
+            newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
@@ -728,6 +698,12 @@
                 }
                 listData.result[index].qtyReturn = input_user;
             });
+
+            $('.ket-bahan-request').on('input change', function() {
+                var index = $(this).data('index');
+                var input_user = $(this).val();
+                listData.result[index].ketReturn = input_user;
+            });
         }
     }
 
@@ -736,7 +712,7 @@
         if (value) {
             $(".no_return_barang").attr("readonly", true);
             $.ajax({
-                url: `<?= base_url("penerimaan-barang-lokal-bb/return-barang/generate-po-no"); ?>`,
+                url: `<?= base_url("penerimaan-barang-import-bp/return-barang/generate-po-no"); ?>`,
                 method: "GET",
                 data: {
                     warehouseID: $('#warehouse_id').val()
@@ -813,7 +789,7 @@
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     $.ajax({
-                        url: "<?= base_url("penerimaan-barang-lokal-bb/return-barang/posting"); ?>",
+                        url: "<?= base_url("penerimaan-barang-import-bp/return-barang/posting"); ?>",
                         data: {
                             id: $('.id').val()
                         },
@@ -833,7 +809,7 @@
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 }).then((result) => {
-                                    window.location.href = "<?= base_url("penerimaan-barang-lokal-bb") ?>";
+                                    window.location.href = "<?= base_url("penerimaan-barang-import-bp") ?>";
                                 });
                             } else {
                                 Swal.fire({
@@ -863,7 +839,7 @@
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     $.ajax({
-                        url: "<?= base_url("penerimaan-barang-lokal-bb/return-barang/delete"); ?>",
+                        url: "<?= base_url("penerimaan-barang-import-bp/return-barang/delete"); ?>",
                         data: {
                             id: $('.id').val()
                         },
@@ -883,7 +859,7 @@
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 }).then((result) => {
-                                    window.location.href = "<?= base_url('penerimaan-barang-lokal-bb') ?>"
+                                    window.location.href = "<?= base_url('penerimaan-barang-import-bp') ?>"
                                 });
                             }
                         },
