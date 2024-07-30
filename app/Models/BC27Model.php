@@ -149,4 +149,105 @@ class BC27Model extends Model
         }
         return $isCompleteForm;
     }
+    public function isCompleteFormEntitas($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->entitas) != 0) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormDokumen($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->dokumen) != 0) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormPengangkut($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->pengangkut) != 0) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormPetiKemas($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->kontainer) != 0 && count($payload->kemasan) != 0) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormTransaksi($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($payload->kodeValuta) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+    public function dropdownKemasan($mutasiGlobalId)
+    {
+        $mutasiGlobalDetailModel = new MutasiGlobalDetailModel();
+        $selectQry = "
+            mutasi_global_detail.*, 
+            stock.tipe_barang, 
+            stock.barang2_id,
+            barang_master.kode_barang,
+            CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS barang, 
+        ";
+
+        $dataList = $mutasiGlobalDetailModel
+            ->select($selectQry)
+            ->join('stock', 'stock.id = mutasi_global_detail.stock_id', 'left')
+            ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
+            ->where('mutasi_global_id', $mutasiGlobalId)
+            ->where('stock.tipe_barang', "bahan_penolong") // KEMASAN AMBIL DARI BAHAN PENOLONG 
+            ->findAll();
+
+        return $dataList;
+    }
 }
