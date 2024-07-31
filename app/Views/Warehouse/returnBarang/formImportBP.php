@@ -440,10 +440,22 @@
     $('.btn-submit-parent').click(function(e) {
         e.preventDefault();
         if ($('.create-form').valid()) {
-            if (listData.length === 0) {
+            let sumQtyReturn = 0;
+
+            $.each(listData.result, function(i, v) {
+                if (v.qtyReturn == undefined || v.qtyReturn == 0) {
+                    sumQtyReturn += 0;
+                } else {
+                    sumQtyReturn += v.qtyReturn;
+                }
+            });
+            if (sumQtyReturn == 0) {
+                isValid = false;
+            }
+            if (!isValid) {
                 Swal.fire({
                     icon: 'error',
-                    title: "Pilih nomor PO dahulu",
+                    title: "Jumlah Barang di return harus diisi atau tidak boleh 0",
                     confirmButtonColor: '#4e73df',
                 })
             } else {
@@ -564,42 +576,6 @@
         }
     });
 
-    $('.jml_diterima_lpb').keyup(function() {
-        var item = null;
-        var jml_diterima_lpb = Number($(this).val()) || 0;
-        var jml_diterima_lpb_last = Number($('.jml_diterima_lpb_last').val()) || 0;
-        if (jml_diterima_lpb == 0) {
-            for (var i = 0; i < listData.result.length; i++) {
-                if (Number(listData.result[i].rm_purchase_order_details_id) == Number($('.rm_purchase_order_details_id').val()) && Number(listData.result[i].am_purchase_order_id) == Number($('.am_purchase_order_id').val())) {
-                    item = listData.result[i];
-                    var jml_diterima_total_now = Number(item.jml_diterima_total - jml_diterima_lpb_last);
-                    var sisa_total_now = Number(item.sisa_total + jml_diterima_lpb_last);
-                    $('.sub_total').val('' +
-                        formatRupiah(Number(jml_diterima_lpb) * (Number(item.harga_harian) + Number(item.harga_bulanan) + Number(item.harga_umum))));
-                    $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(2));
-                    $('.sisa_total').val(sisa_total_now.toFixed(2));
-
-                    break;
-                }
-            }
-
-
-        } else {
-            for (var i = 0; i < listData.result.length; i++) {
-                if (Number(listData.result[i].rm_purchase_order_details_id) == Number($('.rm_purchase_order_details_id').val()) && Number(listData.result[i].am_purchase_order_id) == Number($('.am_purchase_order_id').val())) {
-                    item = listData.result[i];
-                    var jml_diterima_total_now = (Number(item.jml_diterima_total) + Number(jml_diterima_lpb) - jml_diterima_lpb_last);
-                    var sisa_total_now = item.jml_order - jml_diterima_total_now;
-                    $('.sub_total').val('' +
-                        formatRupiah(Number(jml_diterima_lpb) * (Number(item.harga_harian) + Number(item.harga_bulanan) + Number(item.harga_umum))));
-                    $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(2));
-                    $('.sisa_total').val(sisa_total_now.toFixed(2));
-                    break;
-                }
-            }
-        }
-    });
-
     function preventNegativeInput(inputElement) {
         var inputValue = inputElement.value;
         var numericValue = inputValue.replace(/[^0-9.]/g, '');
@@ -659,10 +635,10 @@
                 newRow.append($('<td>').text(formatRupiah(parseInt(v.sub_total).toFixed(2) || 0)));
                 newRow.append($('<td>').text(v.keterangan));
                 newRow.append($('<td>').html(`
-                    <input style="height:30px;width:100px;padding: 5px 5px;" class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-stok_total="${v.jml_diterima_total}" data-index="${i}" class="form-control" type="text" value="${jmlReturn}">
+                    <input <?= !empty($dataPengembalianBarang) ? (($dataPengembalianBarang['status_post'] !== "WAITING") ? "readonly" : "") : ""; ?> style="height:30px;width:100px;padding: 5px 5px;" class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-stok_total="${v.jml_diterima_total}" data-index="${i}" class="form-control" type="text" value="${jmlReturn}">
                 `));
                 newRow.append($('<td>').html(`
-                    <input style="height:30px;width:150px;padding: 5px 5px;" class="form-control ket-bahan-request" autocomplete="one-time-code" data-index="${i}" class="form-control" type="text" value="${ketReturn}">
+                    <input <?= !empty($dataPengembalianBarang) ? (($dataPengembalianBarang['status_post'] !== "WAITING") ? "readonly" : "") : ""; ?> style="height:30px;width:150px;padding: 5px 5px;" class="form-control ket-bahan-request" autocomplete="one-time-code" data-index="${i}" class="form-control" type="text" value="${ketReturn}">
                 `));
                 table.find('tbody').append(newRow);
                 jmlDiterimaLPBTotal += Number(v.jml_diterima_lpb) || 0;
@@ -776,9 +752,11 @@
         }
 
         $('.posting-lpb').click(function() {
+            var pengembalian_barang_id = $('#pengembalian_barang_id').val();
+            var penerimaan_barang_id = $('#penerimaan_barang_id').val();
             Swal.fire({
                 icon: 'question',
-                title: 'Posting LPB ini?',
+                title: 'Posting Return Barang ini?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
@@ -791,7 +769,8 @@
                     $.ajax({
                         url: "<?= base_url("penerimaan-barang-import-bp/return-barang/posting"); ?>",
                         data: {
-                            id: $('.id').val()
+                            pengembalian_barang_id: pengembalian_barang_id,
+                            penerimaan_barang_id: penerimaan_barang_id,
                         },
                         beforeSend: function(xhr) {
                             setLoading();
@@ -828,7 +807,7 @@
         $('.delete-parent').click(function() {
             Swal.fire({
                 icon: 'question',
-                title: 'Hapus LPB ini?',
+                title: 'Hapus Return Barang ini?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
@@ -841,7 +820,7 @@
                     $.ajax({
                         url: "<?= base_url("penerimaan-barang-import-bp/return-barang/delete"); ?>",
                         data: {
-                            id: $('.id').val()
+                            pengembalian_barang_id: $('#pengembalian_barang_id').val()
                         },
                         beforeSend: function(xhr) {
                             setLoading();
