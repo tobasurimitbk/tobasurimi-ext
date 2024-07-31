@@ -1256,6 +1256,36 @@
             });
         }
     }
+
+    $(document).keydown(function(e) {
+        if (e.keyCode === 116) {
+            e.preventDefault();
+            $.ajax({
+                url: `<?= base_url("/po-import-bahan-baku/dropdown/get-barang-bahan-baku"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+
+                    $(".barang_id").empty();
+                    $(".barang_id").append(`<option data-barang_id="" data-satuan_id="" data-nama_barang="" data-kode_barang="" data-spesifikasi_id="" value=""></option>`);
+                    res.forEach(function(item) {
+                        $(".barang_id").append(`
+                            <option 
+                                data-barang_id="${item.id}" 
+                                data-satuan_id="${item.satuan_1}" 
+                                data-nama_barang="${item.barang_name_master}" 
+                                data-kode_barang="${item.kode_barang}" 
+                                data-spesifikasi_id="${item.barang_master_spesifikasi_id}" 
+                                value="${item.id}"s>
+                                ${item.kode_barang} ( ${item.barang_name_master} - ${item.spesifikasi} )
+                            </option>`);
+                    });
+                    $(".barang_id").val("").change();
+                }
+            });
+
+        }
+    });
 </script>
 <?php if (!empty($dataPOImport)) : ?>
     <script>

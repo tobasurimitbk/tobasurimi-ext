@@ -1306,6 +1306,55 @@
             $(".po_no").val("");
         }
     }
+    $(document).keydown(function(e) {
+        let id = $(".id").val();
+        if (e.keyCode === 116) {
+            if (!id) {
+                e.preventDefault();
+                $.ajax({
+                    url: `<?= base_url("po-lokal-bahan-baku/get-spesifikasi-barang-supplier"); ?>`,
+                    method: "GET",
+                    beforeSend: function() {
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    data: {
+                        barang_id: $(".barang_id option:selected").val(),
+                        supplier_id: $(".supplier_id option:selected").val()
+                    },
+                    dataType: "json",
+                    success: function(res) {
+                        $(".spesifikasi").empty();
+
+                        $(".spesifikasi").append(`<option data-nama_satuan="" data-kode_satuan="" data-satuan_id="" data-umum="" data-harian="" data-bulanan="" value=""></option>`);
+
+                        res.data.forEach(function(item) {
+                            $(".spesifikasi").append(`<option
+                                data-spesifikasi_id="${item.spesifikasi_id}" 
+                                data-nama_satuan="${item.nama_satuan}" 
+                                data-kode_satuan="${item.kode_satuan}" 
+                                data-satuan_id="${item.satuan_id}" 
+                                data-umum="${Number(item.harga_umum).toLocaleString(undefined, {minimumFractionDigits: 2, maximumSignificantDigits: 2})}" 
+                                data-harian=" ${Number(item.harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
+                                data-bulanan=" ${Number(item.harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
+                                value="${item.id}">
+                                ${item.spesifikasi}
+                                </option>`);
+                        })
+
+                        $(".spesifikasi").val("").change();
+
+                        drawTable();
+                    }
+                })
+            }
+
+
+
+        }
+    });
 
 
     const resetDetailForm = function() {

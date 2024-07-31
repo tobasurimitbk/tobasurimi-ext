@@ -325,6 +325,7 @@ $routes->post('/po-import-bahan-baku/find-divisi', 'Purchase\POLokalBahanPenolon
 $routes->get('/po-import-bahan-baku/histori-lpb', 'Purchase\POImportBahanBaku::dropdownHistoriPenerimaanBarang', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-baku/dropdown/get-spp', 'Purchase\POLokalBahanBaku::dropdownGetSpp', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-baku/dropdown/get-detail-barang-spp', 'Purchase\POImportBahanBaku::dropdownGetSppDetail', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-baku/dropdown/get-barang-bahan-baku', 'Purchase\POImportBahanBaku::dropDownBahanBaku', ['filter' => 'Auth']);
 
 // BAHAN BAKU PO PENOLONG
 $routes->get('/po-import-bahan-penolong', 'Purchase\POImportBahanPenolong::poImportBahanPenolong', ['filter' => 'Auth']);
@@ -342,6 +343,7 @@ $routes->post('/po-import-bahan-penolong/find-divisi', 'Purchase\POLokalBahanPen
 $routes->get('/po-import-bahan-penolong/histori-lpb', 'Purchase\POImportBahanPenolong::dropdownHistoriPenerimaanBarang', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-penolong/dropdown/get-spp', 'Purchase\POLokalBahanBaku::dropdownGetSpp', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-penolong/dropdown/get-detail-barang-spp', 'Purchase\POImportBahanBaku::dropdownGetSppDetail', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-penolong/dropdown/get-barang-bahan-penolong', 'Purchase\POImportBahanPenolong::dropDownBahanPenolong', ['filter' => 'Auth']);
 
 // TANDA TERIMA FAKTUR LOKAL BB
 $routes->get('/tanda-terima-faktur-lokal-bp', 'Purchase\TandaTerimaSupBB::index', ['filter' => 'Auth']);
