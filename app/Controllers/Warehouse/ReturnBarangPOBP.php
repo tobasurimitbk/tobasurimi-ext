@@ -154,8 +154,9 @@ class ReturnBarangPOBP extends BaseController
             return redirect()->to('penerimaan-barang-lokal-bb');
         }
 
-        $dataPenerimaanBarang =  $this->penerimaanBarangModel->where('id', $id)->first();
-        $dataPengembalianBarang =  $this->pengembalianBarangModel->where('penerimaan_barang_id', $id)->first();
+        $dataPenerimaanBarang =  $this->penerimaanBarangModel->where('id', $id)->where('deletedAt', null)->first();
+        $dataPengembalianBarang =  $this->pengembalianBarangModel->where('penerimaan_barang_id', $id)->where('deletedAt', null)->first();
+
         $dataAJU = $this->metadataModel->getBCUsed("po_lokal_bp");
         $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN PENOLONG');
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
