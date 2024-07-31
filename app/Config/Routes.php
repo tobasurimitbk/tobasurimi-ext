@@ -1180,6 +1180,8 @@ $routes->get('/penerimaan-barang-import-bb/return-barang/generate-po-no', 'Wareh
 $routes->get('/penerimaan-barang-import-bb/return-barang/list-barang', 'Warehouse\ReturnBarangImportPOBB::listBarangLPB', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-import-bb/return-barang/insert', 'Warehouse\ReturnBarangImportPOBB::createAction', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-import-bb/return-barang/update', 'Warehouse\ReturnBarangImportPOBB::updateAction', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-import-bb/return-barang/posting', 'Warehouse\ReturnBarangImportPOBB::posting', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-import-bb/return-barang/delete', 'Warehouse\ReturnBarangImportPOBB::delete', ['filter' => 'Auth']);
 
 $routes->get('/penerimaan-barang-lokal-bp/return-barang/id/(:segment)', 'Warehouse\ReturnBarangPOBP::update/$1', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/return-barang/generate-po-no', 'Warehouse\ReturnBarangPOBP::generatePONo', ['filter' => 'Auth']);

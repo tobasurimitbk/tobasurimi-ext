@@ -87,6 +87,15 @@ class ReturnBarangImportPOBB extends BaseController
         $tanggalReturnBarang = $this->request->getVar('tanggal_return_barang');
         $barangs = $this->request->getVar('barangs');
 
+        $first = $this->pengembalianBarangModel->where('company_id', $this->this_company_id)->where('no_surat_jalan', $noReturnBarang)->first();
+        if ($first != null) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "No Surat Jalan Sudah Ada",
+                'status' => false
+            ]);
+        }
+
         // Cek Kekosongan
         $qtyReturn = 0;
         foreach (json_decode($barangs) as $b) {
@@ -101,15 +110,6 @@ class ReturnBarangImportPOBB extends BaseController
             ]);
         }
 
-        $first = $this->pengembalianBarangModel->where('company_id', $this->this_company_id)->where('no_surat_jalan', $noReturnBarang)->first();
-        if ($first != null) {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'message' => "No Surat Jalan Sudah Ada",
-                'status' => false
-            ]);
-        }
-
         $pengembalianBarangID = $this->pengembalianBarangModel->insert([
             'company_id' => $this->this_company_id,
             'penerimaan_barang_id' => $penerimaanBarangID,
@@ -119,13 +119,15 @@ class ReturnBarangImportPOBB extends BaseController
         ]);
 
         foreach (json_decode($barangs) as $b) {
-            if ($b->qtyReturn != 0) {
-                $this->pengembalianBarangDetailModel->insert([
-                    'pengembalian_barang_id' => $pengembalianBarangID,
-                    'penerimaan_barang_detail_id' => $b->penerimaan_barang_detail_id,
-                    'jumlah_return' => $b->qtyReturn,
-                    'keterangan' => isset($b->ketReturn) ? $b->ketReturn : "",
-                ]);
+            if (isset($b->qtyReturn)) {
+                if ($b->qtyReturn != 0 || $b->qtyReturn != "") {
+                    $this->pengembalianBarangDetailModel->insert([
+                        'pengembalian_barang_id' => $pengembalianBarangID,
+                        'penerimaan_barang_detail_id' => $b->penerimaan_barang_detail_id,
+                        'jumlah_return' => $b->qtyReturn,
+                        'keterangan_return' => isset($b->ketReturn) ? $b->ketReturn : "",
+                    ]);
+                }
             }
         }
 
@@ -145,8 +147,8 @@ class ReturnBarangImportPOBB extends BaseController
             return redirect()->to('penerimaan-barang-lokal-bb');
         }
 
-        $dataPenerimaanBarang =  $this->penerimaanBarangModel->where('id', $id)->first();
-        $dataPengembalianBarang =  $this->pengembalianBarangModel->where('penerimaan_barang_id', $id)->first();
+        $dataPenerimaanBarang =  $this->penerimaanBarangModel->where('id', $id)->where('deletedAt', null)->first();
+        $dataPengembalianBarang =  $this->pengembalianBarangModel->where('penerimaan_barang_id', $id)->where('deletedAt', null)->first();
 
         $dataAJU = $this->metadataModel->getBCUsed("po_import_bb");
         $dataSupplier = $this->supplierModel->getSupplierByType('INTERNASIONAL');
@@ -196,7 +198,7 @@ class ReturnBarangImportPOBB extends BaseController
                 $this->pengembalianBarangDetailModel
                     ->update($b->pengembalian_barang_detail_id, [
                         'jumlah_return' => $qtyReturn,
-                        'keterangan' => isset($b->ketReturn) ? $b->ketReturn : $b->keterangan_return,
+                        'keterangan_return' => isset($b->ketReturn) ? $b->ketReturn : $b->keterangan_return,
                     ]);
             }
         }
@@ -228,193 +230,98 @@ class ReturnBarangImportPOBB extends BaseController
 
     public function delete()
     {
-        $id = decrypt($this->request->getVar('id'));
+        $id = decrypt($this->request->getVar('pengembalian_barang_id'));
 
-        $this->penerimaanBarangModel->where('id', $id)->delete();
-        $penerimaanBarangList = $this->penerimaanBarangDetailModel->asObject()->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();
-        foreach ($penerimaanBarangList as $b) {
-            // update remeaning di detail po
-            $last = $this->rmImportPoDetail->where('id', $b->purchase_order_details_id)
-                ->where('rm_purchase_order_id', $b->purchase_order_id)
-                ->first();
-
-            $this->rmImportPoDetail->where('id', $b->purchase_order_details_id)
-                ->where('rm_purchase_order_id', $b->purchase_order_id)
-                ->set('remaining_qty', $last['remaining_qty'] + $b->jml_masuk)
-                ->set('qty_diterima', $last['qty_diterima'] - $b->jml_masuk)
-                ->update();
-        }
-        $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->delete();
+        $this->pengembalianBarangModel->where('id', $id)->delete();
+        $this->pengembalianBarangDetailModel->where('pengembalian_barang_id', $id)->delete();
 
         return response()->setJSON([
             'status' => true,
-            'message' => "LPB berhasil dihapus",
+            'message' => "Return berhasil dihapus",
             'token' => csrf_hash()
         ]);
     }
 
-    // public function posting()
-    // {
-    //     $id = decrypt($this->request->getVar('id'));
+    public function posting()
+    {
+        $pengembalian_barang_id = decrypt($this->request->getVar('pengembalian_barang_id'));
+        $penerimaan_barang_id = decrypt($this->request->getVar('penerimaan_barang_id'));
 
-    //     try {
-    //         $penerimaanBarang = $this->penerimaanBarangModel->where('id', $id)->first();
-    //         $penerimaanBarangList = $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();
+        try {
+            $penerimaanBarang = $this->penerimaanBarangModel
+                ->join('pengembalian_barang', 'pengembalian_barang.penerimaan_barang_id = penerimaan_barang.id')
+                ->where('penerimaan_barang.id', $penerimaan_barang_id)
+                ->where('pengembalian_barang.id', $pengembalian_barang_id)
+                ->first();
+            $penerimaanBarangList = $this->penerimaanBarangDetailModel
+                ->join('pengembalian_barang_detail', 'pengembalian_barang_detail.penerimaan_barang_detail_id = penerimaan_barang_detail.id')
+                ->where('pengembalian_barang_id', $pengembalian_barang_id)
+                ->where('pengembalian_barang_detail.deletedAt', null)
+                ->where('penerimaan_barang_detail.deletedAt', null)
+                ->findAll();
+            // var_dump($penerimaanBarang);
+            // var_dump($penerimaanBarangList);
+            // exit;
 
-    //         // MASUKKAN STOK BARANG DAN KEMASAN JIKA NON PABEAN 
-    //         // (JIKA ADA BC MASUK KE INVENTORI DI MODUL BEA CUKAI)
-    //         if ($penerimaanBarang['bc_type'] == 0) {
-    //             // CHECK STOK APAKAH SUDAH DIINISASI
-    //             foreach ($penerimaanBarangList as $p) {
+            // STOK BARANG DIINPUT
+            foreach ($penerimaanBarangList as $p) {
+                $stok = $this->stockModel->insertStok(
+                    $penerimaanBarang['company_id'],
+                    $penerimaanBarang['warehouse_id'],
+                    $penerimaanBarang['divisi_id'],
+                    $penerimaanBarang['tipe_bahan'] == "BAKU" ? "bahan_baku" : "bahan_penolong",
+                    $p['barang_id'],
+                    $p['spesifikasi_id'],
+                    ($p['jumlah_return'] * -1)
+                );
 
-    //                 // CHECK STOK BARANG HEADER
-    //                 $stok = $this->stockModel->getStokMaster(
-    //                     $this->this_company_id,
-    //                     $penerimaanBarang['warehouse_id'],
-    //                     $penerimaanBarang['divisi_id'],
-    //                     "bahan_baku",
-    //                     $p['barang_id'],
-    //                     $p['spesifikasi_id'],
-    //                 );
+                // DETAIL
+                $stokDetail = $this->stockDetailModel->insertStokDetail(
+                    $stok,
+                    $p['jumlah_return'],
+                    "Out",
+                    date('Y-m-d'),
+                    $this->this_user_id,
+                    "LPB",
+                    $penerimaanBarang['no_surat_jalan'],
+                    $p['keterangan_return'] ? $p['keterangan_return'] : "-"
+                );
 
-    //                 if ($stok == null) {
-    //                     $stok = $this->stockModel->insertStok(
-    //                         $this->this_company_id,
-    //                         $penerimaanBarang['warehouse_id'],
-    //                         $penerimaanBarang['divisi_id'],
-    //                         "bahan_baku",
-    //                         $p['barang_id'],
-    //                         $p['spesifikasi_id'],
-    //                         0
-    //                     );
-    //                 }
-    //             }
+                // SUB DETAIL
+                $this->stockDetail2Model->insertStokDetail2(
+                    $penerimaanBarang['bc_type'],
+                    $stok,
+                    $stokDetail,
+                    $p['jumlah_return'],
+                    "-",
+                    $penerimaanBarang['no_surat_jalan'],
+                    $penerimaanBarang['no_penerimaan_barang'],
+                    $penerimaanBarang['supplier_id'],
+                    $p['harga'],
+                    $p['harga_harian'],
+                    $p['harga_bulanan'],
+                );
+            }
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Gagal Posting : Terjadi kesalahan saat mengeluarkan stok",
+                'error' => $e->getTrace(),
+                'token' => csrf_hash()
+            ]);
+        }
 
-    //             // CHECK STOK KEMASAN HEADER
-    //             $stok = $this->stockModel->getStokMaster(
-    //                 $this->this_company_id,
-    //                 $penerimaanBarang['warehouse_id'],
-    //                 $penerimaanBarang['divisi_id'],
-    //                 "kemasan",
-    //                 0,
-    //                 $penerimaanBarang['kemasan_id'],
-    //             );
+        $this->pengembalianBarangModel
+            ->where(['id' => $pengembalian_barang_id])
+            ->set(['status_post' => 'FINISH'])
+            ->update();
 
-    //             if ($stok == null) {
-    //                 $stok = $this->stockModel->insertStok(
-    //                     $this->this_company_id,
-    //                     $penerimaanBarang['warehouse_id'],
-    //                     $penerimaanBarang['divisi_id'],
-    //                     "kemasan",
-    //                     0,
-    //                     $penerimaanBarang['kemasan_id'],
-    //                     0
-    //                 );
-    //             }
-
-    //             // STOK BARANG DIINPUT
-    //             foreach ($penerimaanBarangList as $p) {
-    //                 // HEADER
-    //                 $stok = $this->stockModel->insertStok(
-    //                     $this->this_company_id,
-    //                     $penerimaanBarang['warehouse_id'],
-    //                     $penerimaanBarang['divisi_id'],
-    //                     "bahan_baku",
-    //                     $p['barang_id'],
-    //                     $p['spesifikasi_id'],
-    //                     $p['jml_masuk']
-    //                 );
-
-    //                 // DETAIL
-    //                 $stokDetail = $this->stockDetailModel->insertStokDetail(
-    //                     $stok,
-    //                     $p['jml_masuk'],
-    //                     'In',
-    //                     date('Y-m-d'),
-    //                     $this->this_user_id,
-    //                     "LPB",
-    //                     $penerimaanBarang['no_penerimaan_barang'],
-    //                     "-",
-    //                 );
-
-    //                 // GET PURCHASE ORDER
-    //                 $po = $this->rmPurchaseOrderModel->find($p['purchase_order_id']);
-    //                 // SUB DETAIL
-    //                 $this->stockDetail2Model->insertStokDetail2(
-    //                     $penerimaanBarang['bc_type'],
-    //                     $stok,
-    //                     $stokDetail,
-    //                     $p['jml_masuk'],
-    //                     "-",
-    //                     $po['po_no'],
-    //                     $po['po_no'],
-    //                     $penerimaanBarang['supplier_id'],
-    //                     $p['harga'],
-    //                     $p['harga_harian'],
-    //                     $p['harga_bulanan'],
-    //                     $po['po_no']
-    //                 );
-    //             }
-
-    //             // KEMASAN
-    //             // HEADER
-    //             $stok = $this->stockModel->insertStok(
-    //                 $this->this_company_id,
-    //                 $penerimaanBarang['warehouse_id'],
-    //                 $penerimaanBarang['divisi_id'],
-    //                 "kemasan",
-    //                 0,
-    //                 $penerimaanBarang['kemasan_id'],
-    //                 $penerimaanBarang['jumlah_kemasan']
-    //             );
-
-
-    //             // DETAIL
-    //             $stokDetail = $this->stockDetailModel->insertStokDetail(
-    //                 $stok,
-    //                 $penerimaanBarang['jumlah_kemasan'],
-    //                 "In",
-    //                 date('Y-m-d'),
-    //                 $this->this_user_id,
-    //                 "LPB",
-    //                 $penerimaanBarang['no_penerimaan_barang'],
-    //                 "-",
-    //             );
-
-    //             // SUB DETAIL
-    //             $this->stockDetail2Model->insertStokDetail2(
-    //                 $penerimaanBarang['bc_type'],
-    //                 $stok,
-    //                 $stokDetail,
-    //                 $penerimaanBarang['jumlah_kemasan'],
-    //                 "-",
-    //                 $penerimaanBarang['no_penerimaan_barang'],
-    //                 $penerimaanBarang['no_penerimaan_barang'],
-    //                 $penerimaanBarang['supplier_id'],
-    //             );
-    //         }
-    //     } catch (Exception $e) {
-    //         return response()->setJSON([
-    //             'status' => false,
-    //             'message' => "Gagal Posting : Terjadi kesalahan saat menambah stok",
-    //             'error' => $e->getTrace(),
-    //             'token' => csrf_hash()
-    //         ]);
-    //     }
-
-    //     $this->penerimaanBarangModel
-    //         ->where(['id' => $id])
-    //         ->set(['status_post' => 'FINISH'])
-    //         ->update();
-
-    //     $this->penerimaanBarangModel->autoClosePO($id);
-
-    //     return response()->setJSON([
-    //         'status' => true,
-    //         'message' => "Return barang berhasil diposting",
-    //         'token' => csrf_hash()
-    //     ]);
-    // }
+        return response()->setJSON([
+            'status' => true,
+            'message' => "Return barang berhasil diposting",
+            'token' => csrf_hash()
+        ]);
+    }
 
     public function listBarangLPB()
     {
