@@ -37,6 +37,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Dompdf\Dompdf;
 use Exception;
 
+
 // META DATA -> jenis_dok_aju
 // BC 2.3 -> 48
 // BC 2.5 -> 49
@@ -1830,6 +1831,19 @@ class BC23 extends BaseController
         $beacukaiApi = new BeaCukaiApi($this->akunCeisa['username'], $this->akunCeisa['password']);
         $kodeKantorBongkar = decrypt($this->request->getVar('header_kantor_pabean_bongkar'));
         $res = $beacukaiApi->getListKodePelabuhan($kodeKantorBongkar);
+
+        return response()->setJSON([
+            'data' => $res,
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
+    }
+
+    public function getPelabuhanByKata()
+    {
+        $beacukaiApi = new BeaCukaiApi($this->akunCeisa['username'], $this->akunCeisa['password']);
+        $kataPelabuhan = $this->request->getVar('kata_pelabuhan');
+        $res = $beacukaiApi->getListPelabuhanByKata($kataPelabuhan);
 
         return response()->setJSON([
             'data' => $res,
