@@ -186,7 +186,7 @@ class RMPurchaseOrderDetailModel extends Model
                 $firstLPB =  $penerimaanBarangModel
                     ->select('penerimaan_barang.*, penerimaan_barang_detail.*, pengembalian_barang_detail.* , penerimaan_barang_detail.id AS penerimaan_barang_detail_id, pengembalian_barang_detail.id AS pengembalian_barang_detail_id')
                     ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
-                    ->join('pengembalian_barang_detail', 'pengembalian_barang_detail.penerimaan_barang_detail_id = penerimaan_barang_detail.id', 'left')
+                    ->join('pengembalian_barang_detail', 'pengembalian_barang_detail.penerimaan_barang_detail_id = penerimaan_barang_detail.id AND pengembalian_barang_detail.deletedAt IS NULL', 'left')
                     ->where('penerimaan_barang_id', $penerimaanBarangID)
                     ->where('purchase_order_id', $b['rm_purchase_order_id'])
                     ->where('purchase_order_details_id', $b['id'])
@@ -203,8 +203,8 @@ class RMPurchaseOrderDetailModel extends Model
                     $res[] = [
                         'penerimaan_barang_detail_id' => $firstLPB['penerimaan_barang_detail_id'],
                         'pengembalian_barang_detail_id' => $firstLPB['pengembalian_barang_detail_id'],
-                        'jumlah_return' => $firstLPB['jumlah_return'],
-                        'keterangan_return' => $firstLPB['keterangan'],
+                        'jumlah_return' => isset($firstLPB['jumlah_return']) ? $firstLPB['jumlah_return'] : "",
+                        'keterangan_return' => isset($firstLPB['keterangan_return']) ? $firstLPB['keterangan_return'] : "",
                         'rm_purchase_order_details_id' => $b['id'],
                         'rm_purchase_order_id' => $b['rm_purchase_order_id'],
                         'kode_barang' => $b['kode_barang'],
@@ -257,7 +257,7 @@ class RMPurchaseOrderDetailModel extends Model
                 $firstLPB =  $penerimaanBarangModel
                     ->select('penerimaan_barang.*, penerimaan_barang_detail.*, pengembalian_barang_detail.* , penerimaan_barang_detail.id AS penerimaan_barang_detail_id, pengembalian_barang_detail.id AS pengembalian_barang_detail_id')
                     ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
-                    ->join('pengembalian_barang_detail', 'pengembalian_barang_detail.penerimaan_barang_detail_id = penerimaan_barang_detail.id', 'left')
+                    ->join('pengembalian_barang_detail', 'pengembalian_barang_detail.penerimaan_barang_detail_id = penerimaan_barang_detail.id AND pengembalian_barang_detail.deletedAt IS NULL', 'left')
                     ->where('penerimaan_barang_id', $penerimaanBarangID)
                     ->where('purchase_order_id', $b['rm_purchase_order_id'])
                     ->where('purchase_order_details_id', $b['id'])
@@ -265,6 +265,7 @@ class RMPurchaseOrderDetailModel extends Model
                     ->where('status_penerimaan', $statusPenerimaan)
                     ->where('penerimaan_barang.deletedAt', null)
                     ->where('penerimaan_barang_detail.deletedAt', null)
+                    ->where('pengembalian_barang_detail.deletedAt', null)
                     ->first();
                 // var_dump($firstLPB);
 
@@ -275,8 +276,8 @@ class RMPurchaseOrderDetailModel extends Model
                     $res[] = [
                         'penerimaan_barang_detail_id' => $firstLPB['penerimaan_barang_detail_id'],
                         'pengembalian_barang_detail_id' => $firstLPB['pengembalian_barang_detail_id'],
-                        'jumlah_return' => $firstLPB['jumlah_return'],
-                        'keterangan_return' => $firstLPB['keterangan'],
+                        'jumlah_return' => isset($firstLPB['jumlah_return']) ? $firstLPB['jumlah_return'] : "",
+                        'keterangan_return' => isset($firstLPB['keterangan_return']) ? $firstLPB['keterangan_return'] : "",
                         'rm_purchase_order_details_id' => $b['id'],
                         'rm_purchase_order_id' => $b['rm_purchase_order_id'],
                         'kode_barang' => $b['kode_barang'],
