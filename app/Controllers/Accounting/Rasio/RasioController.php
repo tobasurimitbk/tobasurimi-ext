@@ -1590,7 +1590,9 @@ class RasioController extends BaseController
             'saldo_jual',
             'saldo_trimming',
             'saldo_kopek',
-            'bahan_jadi'
+            'hasil_trimming',
+            'hasil_kaleng',
+            'hasil_frozen',
         ];
 
         if (in_array($page, $validPages)) {

@@ -125,7 +125,13 @@
                             <a class="nav-link nav-link-raw-material-i" id="rawISaldoKopek" href="#saldo_kopek">Saldo Kopek</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link nav-link-raw-material-i" id="rawIBahanJadi" href="#bahan_jadi">Hasil Produksi</a>
+                            <a class="nav-link nav-link-raw-material-i" id="rawIHasilTrimming" href="#hasil_trimming">Hasil Trimming</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-raw-material-i" id="rawIHasilKaleng" href="#hasil_kaleng">Hasil Kaleng</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-raw-material-i" id="rawIHasilFrozen" href="#hasil_frozen">Hasil Frozen</a>
                         </li>
                     </ul>
 
