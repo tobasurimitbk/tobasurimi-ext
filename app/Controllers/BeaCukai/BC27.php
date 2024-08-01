@@ -700,8 +700,7 @@ class BC27 extends BaseController
             'pengusahaTPB' => $pengusahaTPB,
             'payload' => json_decode($this->bc27Model->find($id)['payload'])
         ];
-        // var_dump($data['payload']->entitas);
-        // die;
+
         return view('BeaCukai/bc-27/form-entitas', $data);
     }
 
@@ -1058,17 +1057,22 @@ class BC27 extends BaseController
     public function transaksiUpdate()
     {
         $id = decrypt($this->request->getVar('id'));
+
+        if ($this->request->getVar('berat_bruto') < $this->request->getVar('berat_netto')) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Berat Bruto harus lebih besar daripada Berat Netto"
+            ]);
+        }
         $payload = json_decode($this->bc27Model->find($id)['payload']);
 
         $payload->kodeValuta = $this->request->getVar('harga_kode_valuta');
         $payload->ndpbm = (float)convertRupiahToNumber($this->request->getVar('harga_ndpbm'));
         $payload->cif = (float)convertRupiahToNumber($this->request->getVar('harga_cif'));
         $payload->hargaPenyerahan = (float)convertRupiahToNumber($this->request->getVar('harga_nilai_penyerahan'));
-        $payload->dasarPengenaanPajak = (float)convertRupiahToNumber($this->request->getVar('pajak_dasar_pengenaan_pajak'));
-        $payload->ppnPajak = (float)($this->request->getVar('pajak_ppn_pajak'));
-        $payload->tarifPpnPajak = (float)convertRupiahToNumber($this->request->getVar('pajak_tarif_ppn_pajak'));
-        $payload->ppnbmPajak = (float)($this->request->getVar('pajak_ppnbm_pajak'));
-        $payload->tarifPpnbmPajak = (float)convertRupiahToNumber($this->request->getVar('pajak_tarif_ppnbm_pajak'));
+        $payload->nilaiJasa = (float)convertRupiahToNumber($this->request->getVar('nilai_jasa'));
+        $payload->uangMuka = (float)convertRupiahToNumber($this->request->getVar('nilai_muka'));
+
         $payload->bruto = (float)convertRupiahToNumber($this->request->getVar('berat_bruto'));
         $payload->netto = (float)convertRupiahToNumber($this->request->getVar('berat_netto'));
 

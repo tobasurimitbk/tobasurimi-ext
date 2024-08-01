@@ -2225,6 +2225,47 @@
         <?php endforeach; ?>
         drawTableDetail();
     <?php endif; ?>
+
+    $(document).keydown(function(e) {
+        if (e.keyCode === 116) {
+            e.preventDefault();
+            var spp_type = $('.spp_type').val().trim();
+            var type = "";
+
+            if (spp_type === "Import BB" || spp_type === "Lokal BB") {
+                type = "bahan_baku";
+            } else {
+                type = "bahan_penolong";
+            }
+            $(".spp_type_bypass").val(type)
+            if (spp_type) {
+                $.ajax({
+                    url: `<?= base_url("barang/dropdown/type"); ?>`,
+                    method: "GET",
+                    dataType: "json",
+                    data: {
+                        type: type
+                    },
+                    success: function(res) {
+                        $(".kode_barang").empty();
+                        $(".kode_barang").append(`<option data-barang_name_master="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
+                        res.data.forEach(function(item) {
+                            $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                        })
+                        $(".kode_barang").val("").change();
+                        $(".detail-modal").modal("show");
+                    }
+                })
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Pilih Tipe SPP Dahulu",
+                    confirmButtonColor: '#4e73df',
+                })
+            }
+            console.log('u just pressed f5');
+        }
+    });
 </script>
 <script>
     $("select[name='parent_type_id']")

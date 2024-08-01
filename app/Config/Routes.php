@@ -325,6 +325,7 @@ $routes->post('/po-import-bahan-baku/find-divisi', 'Purchase\POLokalBahanPenolon
 $routes->get('/po-import-bahan-baku/histori-lpb', 'Purchase\POImportBahanBaku::dropdownHistoriPenerimaanBarang', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-baku/dropdown/get-spp', 'Purchase\POLokalBahanBaku::dropdownGetSpp', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-baku/dropdown/get-detail-barang-spp', 'Purchase\POImportBahanBaku::dropdownGetSppDetail', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-baku/dropdown/get-barang-bahan-baku', 'Purchase\POImportBahanBaku::dropDownBahanBaku', ['filter' => 'Auth']);
 
 // BAHAN BAKU PO PENOLONG
 $routes->get('/po-import-bahan-penolong', 'Purchase\POImportBahanPenolong::poImportBahanPenolong', ['filter' => 'Auth']);
@@ -342,6 +343,7 @@ $routes->post('/po-import-bahan-penolong/find-divisi', 'Purchase\POLokalBahanPen
 $routes->get('/po-import-bahan-penolong/histori-lpb', 'Purchase\POImportBahanPenolong::dropdownHistoriPenerimaanBarang', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-penolong/dropdown/get-spp', 'Purchase\POLokalBahanBaku::dropdownGetSpp', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-penolong/dropdown/get-detail-barang-spp', 'Purchase\POImportBahanBaku::dropdownGetSppDetail', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-penolong/dropdown/get-barang-bahan-penolong', 'Purchase\POImportBahanPenolong::dropDownBahanPenolong', ['filter' => 'Auth']);
 
 // TANDA TERIMA FAKTUR LOKAL BB
 $routes->get('/tanda-terima-faktur-lokal-bp', 'Purchase\TandaTerimaSupBB::index', ['filter' => 'Auth']);
@@ -1286,6 +1288,7 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     // API
     $routes->get('api/valuta', 'BeaCukai\BC23::getValuta');
     $routes->get('api/get-pelabuhan', 'BeaCukai\BC23::getPelabuhan');
+    $routes->get('api/get-pelabuhan-by-kata', 'BeaCukai\BC23::getPelabuhanByKata');
     $routes->get('api/get-manifest', 'BeaCukai\BC23::getManifest');
     $routes->get('api/get-kontainer-peti-kemas', 'BeaCukai\BC23::getBLKontainerPetiKemas');
     $routes->get('api/kirim-dokumen/(:segment)', 'BeaCukai\BC23::kirimCeisa/$1');
@@ -1436,6 +1439,41 @@ $routes->group('bea-cukai-bc-30', ['filter' => 'Auth'], function ($routes) {
 
     $routes->get('list-barang', 'BeaCukai\BC30::getListBarang');
     $routes->get('list-sales-order', 'BeaCukai\BC30::dropdownSalesOrder');
+
+    //HEADER
+    $routes->get('id/header/(:segment)', 'BeaCukai\BC30::header/$1');
+    $routes->post('id/header', 'BeaCukai\BC30::updateHeader');
+
+    //ENTITAS   
+    $routes->get('id/entitas/(:segment)', 'BeaCukai\BC30::entitas/$1');
+    $routes->post('id/entitas', 'BeaCukai\BC30::updateEntitas');
+    $routes->post('id/entitas/pemilik', 'BeaCukai\BC30::updateEntitasPemilik');
+    $routes->post('id/entitas/pemilik-delete', 'BeaCukai\BC30::deleteEntitasPemilik');
+
+    // DOKUMEN
+    $routes->get('id/dokumen/(:segment)', 'BeaCukai\BC30::dokumen/$1');
+    $routes->post('id/dokumen', 'BeaCukai\BC30::updateDokumen');
+    $routes->post('id/dokumen/delete', 'BeaCukai\BC30::deleteDokumen');
+
+    // PENGANGKUT
+    $routes->get('id/pengangkut/(:segment)', 'BeaCukai\BC30::pengangkut/$1');
+    $routes->post('id/pengangkut', 'BeaCukai\BC30::pengangkutUpdate');
+    $routes->post('id/pengangkut-insert-table', 'BeaCukai\BC30::createPengangkutanAction');
+    $routes->post('id/pengangkut-delete-table', 'BeaCukai\BC30::deletePengangkutAction');
+
+    // KEMASAN & PETI KEMASAN
+    $routes->get('id/kemasan-peti-kemas/(:segment)', 'BeaCukai\BC30::kemasanPetiKemas/$1');
+    $routes->post('id/kemasan-peti-kemas/kemasan', 'BeaCukai\BC30::kemasanUpdate');
+    $routes->post('id/kemasan-peti-kemas/kemasan/delete', 'BeaCukai\BC30::deleteKemasan');
+    $routes->post('id/kemasan-peti-kemas/kontainer', 'BeaCukai\BC30::kontainerUpdate');
+    $routes->post('id/kemasan-peti-kemas/kontainer/delete', 'BeaCukai\BC30::deleteKontainer');
+
+    // TRANSAKSI
+    $routes->get('id/transaksi/(:segment)', 'BeaCukai\BC30::transaksi/$1');
+    $routes->post('id/transaksi', 'BeaCukai\BC30::transaksiUpdate');
+    $routes->post('id/transaksi/bankDevisa', 'BeaCukai\BC30::saveBankDevisa');
+    $routes->post('id/transaksi/bank-devisa-delete', 'BeaCukai\BC30::deleteBankDevisa');
+
 
     // OUTSTANDING
     $routes->get('bc-30-outstanding-all', 'BeaCukai\BC30::allOutstanding');

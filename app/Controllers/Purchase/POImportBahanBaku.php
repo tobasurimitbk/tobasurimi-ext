@@ -83,6 +83,17 @@ class POImportBahanBaku extends BaseController
 
         return view('Purchase/poImportBahanBaku/form', $data);
     }
+    public function dropDownBahanBaku()
+    {
+        $barangBaku =  $this->barangMasterModel->getBarangByTypeWithSpec([
+            'barang_master.type_barang'  => 'bahan_baku',
+            'barang_master.company_id' => $this->this_company_id,
+            'barang_master.deletedAt' => null,
+            'barang_master_spesifikasi.deletedAt' => null
+        ]);
+
+        return json_encode($barangBaku);
+    }
 
     public function getByIdPOImportBahanBaku($id = null)
     {

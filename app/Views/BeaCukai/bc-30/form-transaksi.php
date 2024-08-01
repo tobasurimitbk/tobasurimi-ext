@@ -7,11 +7,37 @@
     }
 </style>
 
+<!-- modal tambah bank devisa -->
+<div class="modal add-modal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><label class="title-name"></label> Tambah Bank Devisa</h5>
+            </div>
+            <div class="modal-body">
+                <form id="form-bank-devisa" class="form-bank-devisa">
+
+                    <div class="mt-1">
+                        <div class="form-floating mb-3">
+                            <input id="tambah-kode-bank-devisa" value="" name="tambah-kode-bank-devisa" type="text" class="form-control tambah-kode-bank-devisa" placeholder="">
+                            <label>Kode Bank</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-tambah-bank-devisa" class="btn btn-submit-form btn-submit-parent">Tambah</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <section class="section section-form">
     <?php include('header.php') ?>
     <div class="card">
         <div class="card-header" style="font-weight: bold; color:black;">
-            BC 2.7 - PEMBERITAHUAN PENGELUARAN UNTUK DIANGKUT DARI TEMPAT PENIMBUNAN BERIKAT KE TEMPAT PENIMBUNAN BERIKAT LAINNYA
+            BC 3.0 - PEMBERITAHUAN IMPOR BARANG DARI TEMPAT PENIMBUNAN BERIKAT
         </div>
         <div class="card-body">
             <?php include_once('nav.php') ?>
@@ -55,51 +81,95 @@
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select transaksi_kode_incoterm" id="transaksi_kode_incoterm" name="transaksi_kode_incoterm" aria-label="Floating label select example">
+                                    <option selected value=""></option>
+                                    <?php foreach ($kodeIncoterm as $i) : ?>
+                                        <option <?= $payload->kodeIncoterm == $i['value'] ? 'selected' : '' ?> data-id_encrypt="<?= encrypt($i['value']) ?>" value="<?= $i['value'] ?>">
+                                            <?= strtoupper($i['value']) . " - " . strtoupper($i['description']) . "" ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="z-index: 1;">Cara Penyerahan</label>
+                            </div>
+                        </div>
+
+                        <div class="mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input id="harga_cif" name="harga_cif" value="<?= $payload->cif  == "" ? "0" : formatRupiah($payload->cif)  ?>" type="text" class="harga_cif form-control" onchange="this.value = formatRupiah(this.value)">
                                 <label>Nilai Cif</label>
                             </div>
                         </div>
+
                         <div class="mt-1">
-                            <div class="form-floating mb-3">
-                                <input id="harga_nilai_pabean" readonly value="<?= $payload->hargaPenyerahan  == "" ? "0" : number_format($payload->hargaPenyerahan * $payload->ndpbm, 2)  ?>" name="harga_nilai_pabean" type="text" class="form-control harga_nilai_pabean">
-                                <label>Nilai Pabean</label>
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input id="freight" name="freight" value="<?= $payload->cif  == "" ? "0" : formatRupiah($payload->cif)  ?>" type="text" class="freight form-control" onchange="this.value = formatRupiah(this.value)">
+                                <label>Frieght</label>
                             </div>
                         </div>
                         <div class="mt-1">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input readonly id="harga_nilai_penyerahan" value="<?= $payload->hargaPenyerahan == "" ? "0" : formatRupiah($payload->hargaPenyerahan) ?>" name="harga_nilai_penyerahan" type="text" class="harga_nilai_penyerahan form-control" onchange="this.value = formatRupiah(this.value)">
-                                <label>Harga Penyerahan/Harga Jual/Harga Barang</label>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select  " id="transaksi_kode_asuransi" name="transaksi_kode_asuransi" aria-label="Floating label select example">
+                                            <option selected value=""></option>
+                                            <?php foreach ($kodeAsuransi as $a) : ?>
+                                                <option <?= $payload->kodeAsuransi == $a['value'] ? 'selected' : '' ?> data-id_encrypt="<?= encrypt($a['value']) ?>" value="<?= $a['value'] ?>">
+                                                    <?= strtoupper($a['value']) . " - " . strtoupper($a['description']) . "" ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <label style="z-index: 1;">Asuransi </label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-floating mb-3">
+                                        <input id="tambah_nomor_pemilik_barang" value="" name="tambah_nomor_pemilik_barang" type="number" class="tambah_nomor_pemilik_barang form-control" placeholder="">
+                                        <label>Asuransi</label>
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <label class="form-label font-weight-bold lable-title mt-4 mb-2">
-                            Harga Lainnya
+                            <span style="color: white;">hidden</span>
                         </label>
+
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="nilai_jasa" value=" <?= $payload->nilaiJasa  == "" ? "0" : formatRupiah($payload->nilaiJasa)  ?>" name="nilai_jasa" type="text" class="form-control nilai_jasa" onchange="this.value = formatRupiah(this.value)">
-                                <label>Nilai Jasa</label>
+                                <input id="nilai_maklon" value="0" name="nilai_maklon" type="text" class="form-control nilai_maklon" onchange="this.value = formatRupiah(this.value)">
+                                <label>Nilai Maklon</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="nilai_muka" value=" <?= $payload->uangMuka  == "" ? "0" : formatRupiah($payload->uangMuka)  ?>" name="nilai_muka" type="text" class="form-control nilai_muka" onchange="this.value = formatRupiah(this.value)">
-                                <label>Nilai Muka</label>
+                                <input readonly id="pajak_dikson" value="0" name="pajak_dikson" type="text" class="form-control pajak_dikson" onchange="this.value = formatRupiah(this.value)">
+                                <label>Nilai Bea Keluar</label>
                             </div>
                         </div>
+                        <div class="mt-1">
+                            <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                <select class="form-select status_pph" name="status_pph" id="status_pph">
+                                    <option value="1">PPH 2.5 %</option>
+                                    <option value="0">TIDAK ADA</option>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Status PPH</label>
+                            </div>
+                        </div>
+                        <div class="mt-1">
+                            <div class="form-floating mb-3">
+                                <input readonly id="nilai_pungutan_sawit" value="0" name="nilai_pungutan_sawit" type="text" class="form-control nilai_pungutan_sawit" onchange="this.value = formatRupiah(this.value)">
+                                <label>Nilai Pungutan Sawit</label>
+                            </div>
+                        </div>
+
 
                     </div>
                     <div class="col-sm-4 mt-1">
                         <label class="form-label font-weight-bold lable-title mt-4 mb-2">
                             Berat
                         </label>
-                        <div class="mt-1">
-                            <div class="form-floating mb-3">
-                                <input readonly id="volume" value="<?= $payload->netto == "" ? "0" : formatRupiah($payload->netto) ?>" name="volume" type="text" class="form-control volume" onchange="this.value = formatRupiah(this.value)">
-                                <label>Volume(M3)</label>
-                            </div>
-                        </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
                                 <input readonly id="berat_netto" value="<?= $payload->netto == "" ? "0" : formatRupiah($payload->netto) ?>" name="berat_netto" type="text" class="form-control berat_netto" onchange="this.value = formatRupiah(this.value)">
@@ -117,6 +187,52 @@
                     </div>
                 </div>
             </form>
+            <div class="row">
+                <div class="section-header">
+                    <label class="form-label font-weight-bold lable-title mt-4 mb-2">
+                        Bank Devisa
+                    </label>
+                    <button class="btn btn-show-form btn-add float-right" id="btn-display-modal">
+                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                    </button>
+                </div>
+
+                <div class="table-responsive  mt-3">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-bank-devisa" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="text-align: center;">Seri</th>
+                                <th style="text-align: center;">Kode Bank</th>
+                                <th style="text-align: center;">Nama Bank</th>
+                                <th style="text-align: center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (count($payload->bankDevisa) == 0) : ?>
+                                <tr style="color: white; text-align:center;">
+                                    <td colspan="4">Tidak ada Bank Devisa</td>
+                                </tr>
+                            <?php else : ?>
+                                <?php $length = count($payload->bankDevisa); ?>
+                                <?php foreach ($payload->bankDevisa as $i => $p) : ?>
+                                    <tr style="color: white; text-align:center;">
+                                        <td><?= $p->seriBank ?></td>
+                                        <td><?= $p->kodeBank ?></td>
+                                        <td><?= $p->namaBank ?></td>
+                                        <td>
+                                            <?php if ($i == $length - 1) : ?>
+                                                <button type="button" class="btn btn-danger" onclick="removeData(<?= $i ?>)"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                                            <?php else : ?>
+
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
             <a href="#" class="btn btn-primary mt-4" id="btn-simpan-perubahan" style="float: right;">
                 Simpan Perubahan
@@ -126,6 +242,7 @@
                 Loading
             </button>
         </div>
+
     </div>
 
 </section>
@@ -138,6 +255,20 @@
         placeholder: "Pilih Valuta",
         theme: "bootstrap-5",
     });
+    $('#transaksi_kode_asuransi').select2({
+        placeholder: "Pilih Kode Asuransi",
+        theme: "bootstrap-5",
+    });
+    $('#transaksi_kode_incoterm').select2({
+        placeholder: "Pilih Kode Incoterm",
+        theme: "bootstrap-5",
+    });
+
+    // DISPLAY MODAL
+    $('#btn-display-modal').click(function(event) {
+        event.preventDefault();
+        $('.add-modal').modal('show');
+    })
 
     $('#btn-sesuai-valuta-terbaru-loading').hide();
 
@@ -231,10 +362,10 @@
             harga_nilai_penyerahan: {
                 required: true
             },
-            nilai_jasa: {
+            pajak_uang_muka: {
                 required: true
             },
-            nilai_muka: {
+            pajak_dikson: {
                 required: true
             },
             pajak_ppn_pajak: {
@@ -255,9 +386,6 @@
             berat_netto: {
                 required: true
             },
-            volume: {
-                required: true
-            }
         },
         messages: {
             harga_kode_valuta: {
@@ -275,10 +403,10 @@
             harga_nilai_penyerahan: {
                 required: true
             },
-            nilai_jasa: {
+            pajak_uang_muka: {
                 required: true
             },
-            nilai_muka: {
+            pajak_dikson: {
                 required: true
             },
             pajak_ppn_pajak: {
@@ -299,9 +427,6 @@
             berat_netto: {
                 required: true
             },
-            volume: {
-                required: true
-            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -342,9 +467,9 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-transaksi"));
-                    formData.append("id", "<?= encrypt($bc27['id']) ?>");
+                    formData.append("id", "<?= encrypt($bc30['id']) ?>");
                     $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-27/id/transaksi"); ?>",
+                        url: "<?= base_url("bea-cukai-bc-30/id/transaksi"); ?>",
                         data: formData,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -379,6 +504,109 @@
             })
         }
     });
+    $('#btn-tambah-bank-devisa').click(function() {
+        if ($('#form-bank-devisa').valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Simpan Bank Devisa ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Ya',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var formData = new FormData(document.querySelector("#form-bank-devisa"));
+                    formData.append("id", "<?= encrypt($bc30['id']) ?>");
+                    $.ajax({
+                        url: "<?= base_url("bea-cukai-bc-30/id/transaksi/bankDevisa"); ?>",
+                        data: formData,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            $('#btn-loading').show();
+                            $('#btn-simpan-perubahan').hide();
+                        },
+                        complete: function() {
+                            $('#btn-loading').hide();
+                            $('#btn-simpan-perubahan').show();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    confirmButtonText: 'Ok'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        location.reload();
+                                    }
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            }
+                        },
+                    });
+                }
+            })
+
+        }
+    });
+
+    function removeData(index_delete) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Bank Devisa ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("bea-cukai-bc-30/id/transaksi/bank-devisa-delete"); ?>",
+                    data: {
+                        id: "<?= encrypt($bc30['id']) ?>",
+                        index_delete: index_delete
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    },
+                });
+            }
+        })
+
+    }
 
     function formatRupiah(angka) {
         var formatter = new Intl.NumberFormat('id-ID', {
