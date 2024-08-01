@@ -105,6 +105,7 @@ class AMPurchaseOrderModel extends Model
             ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
             ->join('companies', 'companies.id = am_purchase_orders.company_id', 'left')
             ->join('am_purchase_order_details', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
+            ->join('purchase_requests', 'purchase_requests.id = am_purchase_order_id.purchase_request_id')
             ->groupBy(('am_purchase_orders.id'))
             ->orderBy($sort, $sortType);
 

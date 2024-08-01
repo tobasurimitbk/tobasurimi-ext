@@ -128,6 +128,7 @@ class RMPurchaseOrderModel extends Model
             ->join('companies', 'rm_purchase_orders.company_id = companies.id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
             ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
+            ->join('purchase_requests', 'purchase_requests.id = rm_purchase_orders.purchase_request_id')
             ->groupBy(('rm_purchase_orders.id'))
             ->orderBy($sort, $sortType);
 

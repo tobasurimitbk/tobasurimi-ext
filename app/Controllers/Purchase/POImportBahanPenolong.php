@@ -145,6 +145,7 @@ class POImportBahanPenolong extends BaseController
             "am_purchase_orders.po_type"        => "Import",
             "am_purchase_order_details.deletedAt" => null,
             "am_purchase_orders.company_id" => $this->this_company_id,
+            "purchase_requests.user_id" => $this->user_id
         ];
 
         $addCondition = [

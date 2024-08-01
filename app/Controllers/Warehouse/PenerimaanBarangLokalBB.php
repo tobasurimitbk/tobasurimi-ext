@@ -2,6 +2,7 @@
 
 namespace App\Controllers\Warehouse;
 
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Controllers\BaseController;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
@@ -48,6 +49,7 @@ class PenerimaanBarangLokalBB extends BaseController
     protected $stockDetail2Model;
     protected $returnAmPoDetailModel;
     protected $bcPurchaseOrder;
+    protected $jurnalUmumController;
     protected $this_user_id;
     protected $dompdf;
 
@@ -73,6 +75,7 @@ class PenerimaanBarangLokalBB extends BaseController
         $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->returnAmPoDetailModel = new ReturAmPoDetailModel();
         $this->bcPurchaseOrder = new BCPurchaseOrderModel();
+        $this->jurnalUmumController = new JurnalUmum();
         $this->dompdf = new Dompdf();
     }
 
@@ -749,7 +752,14 @@ class PenerimaanBarangLokalBB extends BaseController
         $id = decrypt($this->request->getVar('id'));
 
         $penerimaanBarang = $this->penerimaanBarangModel->where('id', $id)->first();
-        $penerimaanBarangList = $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();
+        $penerimaanBarangList = $this->penerimaanBarangDetailModel
+            ->select('penerimaan_barang_detail.*,barang_master.id as barang1_id, barang_master_spesifikasi.id as barang2_id, barang_master.type_barang')
+            ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = barang_master.id')
+            ->where('penerimaan_barang_id', $id)
+            ->where('penerimaan_barang_detail.deletedAt', null)
+            ->findAll();
+
         $retur_am_po_detail_list = $this->returnAmPoDetailModel->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();
         $bc_purchase_order_detail_list = $this->bcPurchaseOrder->like('multiple_lpb_id', $id)->where('deletedAt', null)->findAll();
 
@@ -777,6 +787,22 @@ class PenerimaanBarangLokalBB extends BaseController
             ]);
         }
 
+        foreach ($penerimaanBarangList as $p) {
+
+            $statusOUT = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $penerimaanBarang['divisi_id'], $p['barang1_id'], $p['barang2_id'], $p['type_barang'], $penerimaanBarang['no_penerimaan_barang'], 'OUT');
+
+            if ($statusOUT) {
+                $responseBody = json_decode($statusOUT->getBody(), true);
+                $data = [
+                    "status"    => false,
+                    "id"    => $this->request->getVar('id'),
+                    "message"   => $responseBody['message'],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+        }
 
         $this->penerimaanBarangModel
             ->where(['id' => $id])

@@ -735,6 +735,73 @@ class PenerimaanBarangLokalBP extends BaseController
         ]);
     }
 
+    public function unposting()
+    {
+        $id = decrypt($this->request->getVar('id'));
+
+        $penerimaanBarang = $this->penerimaanBarangModel->where('id', $id)->first();
+        $penerimaanBarangList = $this->penerimaanBarangDetailModel
+            ->select('penerimaan_barang_detail.*,barang_master.id as barang1_id, barang_master_spesifikasi.id as barang2_id, barang_master.type_barang')
+            ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = barang_master.id')
+            ->where('penerimaan_barang_id', $id)
+            ->where('penerimaan_barang_detail.deletedAt', null)
+            ->findAll();
+
+        $retur_am_po_detail_list = $this->returnAmPoDetailModel->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();
+        $bc_purchase_order_detail_list = $this->bcPurchaseOrder->like('multiple_lpb_id', $id)->where('deletedAt', null)->findAll();
+
+        if ($penerimaanBarang['bc_type'] == 0) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Gagal UnPosting : Terdapat barang adalah non pabean",
+                'token' => csrf_hash()
+            ]);
+        }
+
+        if (!empty($retur_am_po_detail_list)) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Gagal UnPosting : Terdapat barang dalam return",
+                'token' => csrf_hash()
+            ]);
+        }
+
+        if (!empty($bc_purchase_order_detail_list)) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Gagal UnPosting : Terdapat barang dalam BC",
+                'token' => csrf_hash()
+            ]);
+        }
+
+        // foreach ($penerimaanBarangList as $p) {
+
+        //     $statusOUT = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $penerimaanBarang['divisi_id'], $p['barang1_id'], $p['barang2_id'], $p['type_barang'], $penerimaanBarang['no_penerimaan_barang'], 'OUT');
+
+        //     if ($statusOUT) {
+        //         $responseBody = json_decode($statusOUT->getBody(), true);
+        //         $data = [
+        //             "status"    => false,
+        //             "id"    => $this->request->getVar('id'),
+        //             "message"   => $responseBody['message'],
+        //             'token'     => csrf_hash()
+        //         ];
+        //         echo json_encode($data);
+        //         return;
+        //     }
+        // }
+
+        $this->penerimaanBarangModel
+            ->where(['id' => $id])
+            ->set(['status_post' => 'WAITING'])
+            ->update();
+        return response()->setJSON([
+            'status' => true,
+            'message' => "LPB berhasil diunpost ",
+            'token' => csrf_hash()
+        ]);
+    }
     public function listBarangLPB()
     {
         $penerimaanBarangID = empty($this->request->getVar('penerimaan_barang_id')) ? null : decrypt($this->request->getVar('penerimaan_barang_id'));

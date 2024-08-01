@@ -18,6 +18,7 @@ class SppModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'company_id',
+        'user_id',
         'request_date',
         'spp_no',
         'spp_type',

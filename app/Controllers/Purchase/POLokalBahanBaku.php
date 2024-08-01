@@ -50,10 +50,13 @@ class POLokalBahanBaku extends BaseController
     protected $divisiModel;
     protected $kemasanModel;
 
+    protected $this_user_id;
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_user_id = session()->get("login")->user_id;
         $this->RMPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $this->SupplierModel = new SupplierModel();
@@ -166,7 +169,8 @@ class POLokalBahanBaku extends BaseController
         $condition = [
             'rm_purchase_orders.deletedAt' => null,
             'rm_purchase_orders.company_id' => $this->this_company_id,
-            'rm_purchase_order_details.deletedAt' => null
+            'rm_purchase_order_details.deletedAt' => null,
+            'purchase_requests.user_id' => $this->this_user_id
         ];
 
         $addCondition = [
@@ -716,6 +720,7 @@ class POLokalBahanBaku extends BaseController
             'purchase_requests.divisi_id' => $id,
             'purchase_requests.is_posted' => '1',
             'purchase_requests.request_status' => 'waiting',
+            'purchase_requests.user_id' => $this->this_user_id,
             // 'purchase_requests.spp_type' => $spp_type
         ];
         $data = $this->sppModel->where($condition)->like('purchase_requests.spp_type', $spp_type)->findAll();

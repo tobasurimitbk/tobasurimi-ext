@@ -23,6 +23,7 @@ class POLokalBahanPenolong extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $this_user_id;
     protected $aMPurchaseOrderModel;
     protected $aMPurchaseOrderDetailModel;
     protected $MetadataModel;
@@ -44,6 +45,7 @@ class POLokalBahanPenolong extends BaseController
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_user_id = session()->get("login")->user_id;
         $this->aMPurchaseOrderModel = new AMPurchaseOrderModel();
         $this->aMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->MetadataModel = new MetadataModel();
@@ -193,7 +195,8 @@ class POLokalBahanPenolong extends BaseController
             'po_type' => "Lokal",
             'am_purchase_orders.deletedAt' => null,
             'am_purchase_orders.company_id' => $this->this_company_id,
-            'am_purchase_order_details.deletedAt' => null
+            'am_purchase_order_details.deletedAt' => null,
+            'purchase_requests.user_id' => $this->this_user_id
         ];
 
         $addCondition = [

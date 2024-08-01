@@ -141,7 +141,8 @@ class POImportBahanBaku extends BaseController
 
         $condition = [
             "rm_import_pos.company_id" => $this->this_company_id,
-            "rm_import_po_details.deletedAt" => null
+            "rm_import_po_details.deletedAt" => null,
+            'purchase_requests.user_id' => $this->user_id,
         ];
 
         $addCondition = [
