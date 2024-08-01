@@ -1102,6 +1102,7 @@ $routes->post('/penerimaan-barang-lokal-bb/update', 'Warehouse\PenerimaanBarangL
 $routes->get('/penerimaan-barang-lokal-bb/print/(:segment)', 'Warehouse\PenerimaanBarangLokalBB::print/$1', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-lokal-bb/delete', 'Warehouse\PenerimaanBarangLokalBB::delete', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-lokal-bb/posting', 'Warehouse\PenerimaanBarangLokalBB::posting', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-lokal-bb/unposting', 'Warehouse\PenerimaanBarangLokalBB::unposting', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bb/get-divisi', 'Warehouse\PenerimaanBarangLokalBB::dropdownDivisiPOLokalBB', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bb/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bb/print-table', 'Warehouse\PenerimaanBarangLokalBB::printTable', ['filter' => 'Auth']);

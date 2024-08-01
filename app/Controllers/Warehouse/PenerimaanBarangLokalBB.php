@@ -19,6 +19,8 @@ use App\Models\StockModel;
 use App\Models\SupplierHargaModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
+use App\Models\ReturAmPoDetailModel;
+use App\Models\BCPurchaseOrderModel;
 use Dompdf\Dompdf;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -44,6 +46,8 @@ class PenerimaanBarangLokalBB extends BaseController
     protected $kemasanModel;
     protected $stockModel;
     protected $stockDetail2Model;
+    protected $returnAmPoDetailModel;
+    protected $bcPurchaseOrder;
     protected $this_user_id;
     protected $dompdf;
 
@@ -67,6 +71,8 @@ class PenerimaanBarangLokalBB extends BaseController
         $this->kemasanModel = new KemasanModel();
         $this->barangMasterModel = new BarangMasterModel();
         $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $this->returnAmPoDetailModel = new ReturAmPoDetailModel();
+        $this->bcPurchaseOrder = new BCPurchaseOrderModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -128,6 +134,7 @@ class PenerimaanBarangLokalBB extends BaseController
                 "itemCount"             => $data->itemCount,
                 "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
                 "status_post"           => $data->status_post,
+                "bc_type"               => $data->bc_type
             ]);
         }
 
@@ -733,6 +740,51 @@ class PenerimaanBarangLokalBB extends BaseController
         return response()->setJSON([
             'status' => true,
             'message' => "LPB berhasil diposting",
+            'token' => csrf_hash()
+        ]);
+    }
+
+    public function unposting()
+    {
+        $id = decrypt($this->request->getVar('id'));
+
+        $penerimaanBarang = $this->penerimaanBarangModel->where('id', $id)->first();
+        $penerimaanBarangList = $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();
+        $retur_am_po_detail_list = $this->returnAmPoDetailModel->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();
+        $bc_purchase_order_detail_list = $this->bcPurchaseOrder->like('multiple_lpb_id', $id)->where('deletedAt', null)->findAll();
+
+        if ($penerimaanBarang['bc_type'] == 0) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Gagal UnPosting : Terdapat barang adalah non pabean",
+                'token' => csrf_hash()
+            ]);
+        }
+
+        if (!empty($retur_am_po_detail_list)) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Gagal UnPosting : Terdapat barang dalam return",
+                'token' => csrf_hash()
+            ]);
+        }
+
+        if (!empty($bc_purchase_order_detail_list)) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Gagal UnPosting : Terdapat barang dalam BC",
+                'token' => csrf_hash()
+            ]);
+        }
+
+
+        $this->penerimaanBarangModel
+            ->where(['id' => $id])
+            ->set(['status_post' => 'WAITING'])
+            ->update();
+        return response()->setJSON([
+            'status' => true,
+            'message' => "LPB berhasil diunpost ",
             'token' => csrf_hash()
         ]);
     }
