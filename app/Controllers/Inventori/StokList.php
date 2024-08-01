@@ -749,6 +749,7 @@ class StokList extends BaseController
             'jenisDokAju' => $this->metaDataModel->getByName("jenis_dok_aju"),
             'tipeAdjusment' => $this->metaDataModel->where('deletedAt', null)->where('name', "Tipe Adjusment")->findAll(),
             'stok' => $stok,
+            'supplierName' => $this->supplierModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll(),
             'detail' => $this->stockModel->detailStock($id),
             'total' => [
                 'totalPerDokumen' => $totalStokPerDokumen,
@@ -840,6 +841,111 @@ class StokList extends BaseController
                     "no" => $no++,
                     "bc_type" => $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'],
                     "no_aju" => $data->no_aju,
+                    "stok_1" => $data->stok_total . " " . $satuan_1['kode_satuan'],
+                    "stok_2" => '-',
+                    "stok_3" => '-',
+                ]);
+            }
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getVar("draw")),
+            "recordsTotal"      => $dataQry['totalData'],
+            "recordsFiltered"   => $dataQry['totalFilteredData'],
+            "data"              => $dataResult,
+            "payload"           => $payload,
+        ];
+
+        return response()->setJSON($data);
+    }
+
+    public function allStokPerSupplier()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getVar("length"),
+            "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
+            "sort" => $this->request->getVar("sort"),
+            "sorttype" => $this->request->getVar("sortType"),
+        ];
+
+        $addCondition = [
+            "sort"   => $this->request->getVar("sort"),
+            "sortType"  => $this->request->getVar("sortType"),
+            "supplier_id" => $this->request->getVar("supplier_id"),
+            "no_aju" => $this->request->getVar("no_aju"),
+            "divisi_id" => $this->request->getVar("divisi_id"),
+            "warehouse_id" => $this->request->getVar('warehouse_id'),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+        ];
+
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
+
+        $stok_id = decrypt($this->request->getVar('stok_id'));
+        $stok = $this->stockModel->find($stok_id);
+
+        $condition = [
+            "stock_details2.stock_id" => $stok_id,
+            "stock_details2.deletedAt" => null,
+            "stock_details.deletedAt" => null,
+        ];
+
+        $dataQry = $this->stockDetail2Model->getListStokPerSupplier($condition, $addCondition, $limit, $offset);
+        $dataResult = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        if ($stok['kemasan_id'] == 0) {
+            // BARANG
+            $barang = $this->barangMasterSpesifikasiModel->find($stok['barang2_id']);
+        } else {
+            // KEMASAN
+            $barang = $this->kemasanModel->find($stok['kemasan_id']);
+        }
+
+        foreach ($dataQry['data'] as $data) {
+            $dokumenBC = $this->metaDataModel->find($data->bc_id);
+            $bcType = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+
+            if ($stok['kemasan_id'] == 0) {
+                // BARANG
+                $satuan_1 = $this->satuanModel->find($barang['satuan_1']);
+                $satuan_2 = $this->satuanModel->find($barang['satuan_2']);
+                $satuan_3 = $this->satuanModel->find($barang['satuan_3']);
+                $barangMaster = $this->barangMasterModel->find($stok['barang1_id']);
+                $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stok['barang2_id']);
+
+                array_push($dataResult, [
+                    "no" => $no++,
+                    "supplier_name" => $data->supplier_name,
+                    "sumber" => $bcType . " / " . $data->no_aju . " / " . $data->sumber,
+                    "divisi" => $data->divisi,
+                    "warehouse" => $data->warehouse_name,
+                    "tanggal_penerimaan" => date('d/m/Y', strtotime($data->stock_date)),
+                    "nomor" => $data->stock_dokumen,
+                    "kode_barang" => $barangMaster['kode_barang'],
+                    "barang" => strtoupper($barangMaster['barang_name'] . " - " . $barangMasterSpesifikasi['spesifikasi']),
+                    "no_aju" => $data->no_aju,
+                    "stok_1" => $data->stok_total . " " . $satuan_1['kode_satuan'],
+                    "stok_2" => $satuan_2 == null ? "-" : (sprintf("%.2f", $data->stok_total / $barang['konversi_satuan_2'])) . " " . $satuan_2['kode_satuan'],
+                    "stok_3" => $satuan_3 == null ? "-" : (sprintf("%.2f", $data->stok_total / $barang['konversi_satuan_3'])) . " " . $satuan_3['kode_satuan'],
+                ]);
+            } else {
+                // KEMASAN
+                $satuan_1 = $this->satuanModel->find($barang['satuan_id']);
+                $kemasan = $this->kemasanModel->find($data->kemasan_id);
+
+                array_push($dataResult, [
+                    "no" => $no++,
+                    "supplier_name" => $data->supplier_name,
+                    "sumber" => $bcType . " / " . $data->noAju . " / " . $data->sumber,
+                    "divisi" => $data->divisi,
+                    "warehouse" => $data->warehouse_name,
+                    "tanggal_penerimaan" => date('d/m/Y', strtotime($data->stock_date)),
+                    "nomor" => $data->stock_dokumen,
+                    "no_aju" => $data->no_aju,
+                    "kode_barang" => $kemasan['kode'],
                     "stok_1" => $data->stok_total . " " . $satuan_1['kode_satuan'],
                     "stok_2" => '-',
                     "stok_3" => '-',

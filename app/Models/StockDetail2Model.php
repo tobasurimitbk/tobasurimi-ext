@@ -106,6 +106,82 @@ class StockDetail2Model extends Model
         ];
     }
 
+    public function getListStokPerSupplier($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'supplier_id' => 'stock_details2.supplier_id',
+            'no_aju' => 'stock_details2.no_aju',
+            'stok_total' => 'stok_total'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'stock_details.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = '
+        suppliers.name AS supplier_name,
+        warehouses.warehouse_name,
+        divisis.divisi,
+        stock.kemasan_id,
+        stock_details2.bc_id,
+        stock_details2.supplier_id,
+        stock_details2.stock_detail_id,
+        stock_details2.no_aju,
+        stock_details2.stock_dokumen,
+        stock_details.stock_date,
+        stock_details.sumber,
+        (SUM(CASE WHEN stock_details.status = "In" 
+        THEN stock_details2.qty ELSE 0 END) - 
+        SUM(CASE WHEN stock_details.status = "Out" 
+        THEN stock_details2.qty ELSE 0 END)) 
+        AS stok_total,        
+    ';
+
+        $dataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
+            ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+            ->join('warehouses', 'warehouses.id = stock.warehouse_id')
+            ->join('divisis', 'divisis.id = stock.divisi_id')
+            ->where($condition)
+            ->groupBy('stock_details2.supplier_id')
+            ->groupBy('stock_details2.stock_id')
+            ->groupBy('stock_details2.no_aju')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $dataQry->countAllResults(false);
+
+        if ($addCondition['supplier_id'] != "" || $addCondition['no_aju'] != "" || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $dataQry->groupStart();
+            if ($addCondition['supplier_id'] || $addCondition['supplier_id'] == 0 && $addCondition['supplier_id'] != "") {
+                $dataQry->where('stock_details2.supplier_id', $addCondition['supplier_id']);
+            }
+
+            if ($addCondition['no_aju']) {
+                $dataQry->where('stock_details2.no_aju', $addCondition['no_aju']);
+            }
+
+            if ($addCondition['dateStart']) {
+                $dataQry->where('stock_details.stock_date >=',  $addCondition['dateStart']);
+            }
+            if ($addCondition['dateEnd']) {
+                $dataQry->where('stock_details.stock_date <=', $addCondition['dateEnd']);
+            }
+
+            $dataQry->groupEnd();
+        }
+
+        $totalFilteredData = $dataQry->countAllResults(false);
+        $data = $dataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
+
     public function insertStokDetail2(
         $bc_id,
         $stok_id,
