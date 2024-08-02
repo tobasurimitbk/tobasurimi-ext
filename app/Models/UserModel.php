@@ -22,6 +22,7 @@ class UserModel extends Model
         'current_company_id',
         'employee_id',
         'status',
+        'is_admin',
         'createdAt',
         'updatedAt',
         'deletedAt'
