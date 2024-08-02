@@ -88,7 +88,8 @@ class SuratJalan extends BaseController
 
         $condition = [
             "surat_jalan_so.deletedAt" => null,
-            "surat_jalan_so.id_company" => $this->this_company_id
+            "surat_jalan_so.id_company" => $this->this_company_id,
+            'surat_jalan_so.id_user' => $this->userId
         ];
 
         $addCondition = [

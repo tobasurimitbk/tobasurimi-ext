@@ -100,7 +100,8 @@ class SalesOrderLain extends BaseController
 
         $condition = [
             'sales_order_lain.company_id' => $this->this_company_id,
-            'sales_order_lain.deletedAt' => null
+            'sales_order_lain.deletedAt' => null,
+            'sales_order_lain.user_id' => $this->this_user_id
         ];
 
         foreach ($this->divisiModel->getDivisiAccess() as $d) {
@@ -229,7 +230,8 @@ class SalesOrderLain extends BaseController
             'no_sales_order' => $this->request->getVar('no_sales_order'),
             'tanggal' =>  $this->request->getPost("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
             'status_posting' => '0',
-            'keterangan' => strtoupper($this->request->getVar('keterangan'))
+            'keterangan' => strtoupper($this->request->getVar('keterangan')),
+            'user_id' => $this->this_user_id
         ]);
 
         foreach (json_decode($_POST['listBarang']) as $l) {

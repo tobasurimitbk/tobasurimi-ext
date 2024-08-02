@@ -144,6 +144,7 @@ class OrderForm extends BaseController
         $condition = [
             "sales_order.id_company" => $this->this_company_id,
             "sales_order.deletedAt" => null,
+            'sales_order.id_user' => $this->userId
         ];
 
         $addCondition = [

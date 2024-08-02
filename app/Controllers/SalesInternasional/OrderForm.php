@@ -71,7 +71,8 @@ class OrderForm extends BaseController
         $condition = [
             "sales_order_export.company_id"    => $this->this_company_id,
             "status"      => $this->request->getGet("status"),
-            "sales_order_export.deletedAt" => null
+            "sales_order_export.deletedAt" => null,
+            'sales_order_export.user_id' => $this->this_user_id
         ];
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -184,6 +185,7 @@ class OrderForm extends BaseController
                 "company_id"                  => $this->this_company_id,
                 "status"                      => "NEW",
                 "used"                        => "NOT USED",
+                'user_id'                     => $this->this_user_id
             ];
 
             // Create a new validation instance

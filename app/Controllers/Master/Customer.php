@@ -18,6 +18,7 @@ class Customer extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $this_user_id;
     protected $ProvincesModel;
     protected $CustomerModel;
     protected $BanksModel;
@@ -32,6 +33,7 @@ class Customer extends BaseController
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_user_id = session()->get("login")->user_id;
         $this->ProvincesModel = new ProvincesModel();
         $this->CustomerModel = new CustomerModel();
         $this->BanksModel = new BanksModel();
