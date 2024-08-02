@@ -194,7 +194,6 @@ class SPP extends BaseController
             'spp_type' => trim($this->request->getVar('spp_type')),
             'divisi_id' => $this->request->getVar('divisi_id'),
             'note' => $this->request->getVar('note'),
-            'createdBy' =>  session()->get("login")->user_id,
         ]);
 
         $spp_detail = json_decode($this->request->getVar("items"));

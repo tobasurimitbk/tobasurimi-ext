@@ -724,6 +724,7 @@ class POLokalBahanBaku extends BaseController
             // 'purchase_requests.spp_type' => $spp_type
         ];
         $data = $this->sppModel->where($condition)->like('purchase_requests.spp_type', $spp_type)->findAll();
+
         return response()->setJSON([
             'token' => csrf_hash(),
             'data' => $data,
