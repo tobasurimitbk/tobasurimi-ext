@@ -162,6 +162,7 @@
                     let tipe_bahan = row.tipe_bahan;
                     let status_post = row.status_post;
                     let bc_type = row.bc_type;
+                    let in_bc = row.in_bc;
 
 
                     if (status == "WAITING") {
@@ -200,10 +201,9 @@
                                 </button>
                             <?php endif; ?>
                            `;
-                        if (bc_type != '0') {
-                            string += buttonUnpost
-                        } +
-                        string
+                        if (bc_type !== '0' && in_bc === 'out') {
+                            string += buttonUnpost;
+                        }
                         return string + `</div>`;
                     }
 

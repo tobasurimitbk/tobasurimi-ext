@@ -135,6 +135,7 @@ class PenerimaanBarangImportBP extends BaseController
 
 
         foreach ($penerimaanBarangData['data'] as $data) {
+            $bc_purchase_order_detail_list = $this->bcPurchaseOrder->like('multiple_lpb_id', $data->id)->where('deletedAt', null)->findAll();
             array_push($dataPenerimaanBarang, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
@@ -147,6 +148,9 @@ class PenerimaanBarangImportBP extends BaseController
                 "itemCount"             => $data->itemCount,
                 "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
                 "status_post"           => $data->status_post,
+                "bc_type"               => $data->bc_type,
+                "in_bc"                 => $bc_purchase_order_detail_list != null ? 'in' : 'out',
+
             ]);
         }
 

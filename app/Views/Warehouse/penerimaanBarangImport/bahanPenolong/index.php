@@ -159,8 +159,10 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row.id;
-                    let status = row.status_post
-                    let tipe_bahan = row.tipe_bahan
+                    let status = row.status_post;
+                    let tipe_bahan = row.tipe_bahan;
+                    let type_bc = row.bc_type;
+                    let in_bc = row.in_bc;
 
 
                     if (status == "WAITING") {
@@ -184,7 +186,12 @@
                         </div>
                     `
                     } else {
-                        return `
+                        buttonUnpost = `<button data-toggle="tooltip" title="Unpost" class="btn btn-danger btn-print" onclick="unposting('${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-ban fa-sm" aria-hidden="true"></i>
+                                </button>
+                        `;
+                        string =
+                            `
                         <div class="mt-0" style="text-align:center;">
                             <button data-toggle="tooltip" title="Return Out" class="btn btn-success return-out" onclick="" style="box-shadow: none !important;">
                                 <i class="fa fa-undo fa-sm" aria-hidden="true"></i>
@@ -194,11 +201,12 @@
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
-                            <button data-toggle="tooltip" title="Unpost" class="btn btn-danger btn-print" onclick="unposting('${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-ban fa-sm" aria-hidden="true"></i>
-                            </button>
-                        </div>
                     `
+                        if (type_bc !== '0' && in_bc == 'out') {
+                            string += buttonUnpost
+                        }
+                        return string + ` </div>`;
+
                     }
 
                 }
