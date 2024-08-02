@@ -192,6 +192,9 @@
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
+                            <button data-toggle="tooltip" title="Unpost" class="btn btn-danger btn-print" onclick="unposting('${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-ban fa-sm" aria-hidden="true"></i>
+                            </button>
                         </div>
                     `
                     }
@@ -313,6 +316,59 @@
                 });
             }
         })
+    }
+    const unposting = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan di unposting?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("/penerimaan-barang-import-bp/unposting"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+
+                        }
+                    },
+
+                });
+            }
+        })
+
     }
 
     const remove = function(id) {

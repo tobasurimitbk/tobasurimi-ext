@@ -2,6 +2,7 @@
 
 namespace App\Controllers\Warehouse;
 
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Controllers\BaseController;
 use App\Models\PenerimaanBarangModel;
 use App\Models\AMPurchaseOrderModel;
@@ -19,6 +20,9 @@ use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
 use App\Models\SupplierHargaModel;
+use App\Models\ReturAmPoDetailModel;
+use App\Models\BCPurchaseOrderModel;
+
 use Dompdf\Dompdf;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -45,8 +49,11 @@ class PenerimaanBarangLokalBP extends BaseController
     protected $kemasanModel;
     protected $stockModel;
     protected $stockDetail2Model;
+    protected $returnAmPoDetailModel;
+    protected $bcPurchaseOrder;
     protected $this_user_id;
     protected $dompdf;
+    protected $jurnalUmumController;
 
     public function __construct()
     {
@@ -70,6 +77,9 @@ class PenerimaanBarangLokalBP extends BaseController
         $this->kemasanModel = new KemasanModel();
         $this->stockModel = new StockModel();
         $this->stockDetail2Model = new StockDetail2Model();
+        $this->returnAmPoDetailModel = new ReturAmPoDetailModel();
+        $this->bcPurchaseOrder = new BCPurchaseOrderModel();
+        $this->jurnalUmumController = new JurnalUmum();
         $this->dompdf = new Dompdf();
     }
 
@@ -775,22 +785,22 @@ class PenerimaanBarangLokalBP extends BaseController
             ]);
         }
 
-        // foreach ($penerimaanBarangList as $p) {
+        foreach ($penerimaanBarangList as $p) {
 
-        //     $statusOUT = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $penerimaanBarang['divisi_id'], $p['barang1_id'], $p['barang2_id'], $p['type_barang'], $penerimaanBarang['no_penerimaan_barang'], 'OUT');
+            $statusOUT = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $penerimaanBarang['divisi_id'], $p['barang1_id'], $p['barang2_id'], $p['type_barang'], $penerimaanBarang['no_penerimaan_barang'], 'OUT');
 
-        //     if ($statusOUT) {
-        //         $responseBody = json_decode($statusOUT->getBody(), true);
-        //         $data = [
-        //             "status"    => false,
-        //             "id"    => $this->request->getVar('id'),
-        //             "message"   => $responseBody['message'],
-        //             'token'     => csrf_hash()
-        //         ];
-        //         echo json_encode($data);
-        //         return;
-        //     }
-        // }
+            if ($statusOUT) {
+                $responseBody = json_decode($statusOUT->getBody(), true);
+                $data = [
+                    "status"    => false,
+                    "id"    => $this->request->getVar('id'),
+                    "message"   => $responseBody['message'],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+        }
 
         $this->penerimaanBarangModel
             ->where(['id' => $id])
