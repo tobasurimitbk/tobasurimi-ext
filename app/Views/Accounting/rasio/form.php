@@ -322,6 +322,7 @@
     let list_items_barang_jadi_trimming = [];
     let list_items_barang_jadi_kaleng = [];
     let list_items_barang_jadi_frozen = [];
+    let list_items_barang_filling = [];
     let list_items_barang_digunakan = [];
     let list_items_barang_pembelian = [];
     let list_items_barang_digunakan_ulang = [];
@@ -350,6 +351,7 @@
         list_items_barang_jadi_trimming = [];
         list_items_barang_jadi_kaleng = [];
         list_items_barang_jadi_frozen = [];
+        list_items_barang_filling = [];
         list_items_barang_jadi_material_2 = [];
         list_items_barang_digunakan = [];
         list_items_barang_pembelian = [];
@@ -372,6 +374,7 @@
         list_items_barang_jadi_trimming = [];
         list_items_barang_jadi_kaleng = [];
         list_items_barang_jadi_frozen = [];
+        list_items_barang_filling = [];
         list_items_barang_jadi_material_2 = [];
         list_items_barang_digunakan = [];
         list_items_barang_pembelian = [];
@@ -409,6 +412,7 @@
         list_items_barang_jadi_trimming = [];
         list_items_barang_jadi_kaleng = [];
         list_items_barang_jadi_frozen = [];
+        list_items_barang_filling = [];
         list_items_barang_jadi_material_2 = [];
         list_items_barang_digunakan = [];
         list_items_barang_pembelian = [];
@@ -587,6 +591,7 @@
                         list_items_barang_digunakan = [];
                         list_items_barang_pembelian = [];
                         list_items_barang_digunakan_ulang = [];
+                        list_items_barang_filling = [];
                         list_items_barang_jadi_trimming = [];
                         list_items_barang_jadi_kaleng = [];
                         list_items_barang_jadi_frozen = [];
@@ -641,18 +646,52 @@
                         drawTableSaldoAdjusmentLainnya();
                         drawTableSaldoJual();
 
-                        if (list_items_barang_jadi_trimming.length != 0) {
-                            drawTableRasioTrimming();
-                            $("#rawIHasilKaleng").hide();
-                            $("#rawIHasilFrozen").hide();
-                        } else if (list_items_barang_jadi_kaleng.length != 0) {
-                            drawTableRasioKaleng();
+                        if (list_items_barang_digunakan.length == 0) {
+                            $("#rawIBahanDigunakan").hide();
+                        }
+
+                        if (list_items_barang_digunakan_ulang.length == 0) {
+                            $("#rawIBahanProsesUlang").hide();
+                        }
+
+                        if (list_items_barang_filling.length == 0) {
+                            $("#rawIBahanFilling").hide();
+                        }
+
+                        if (list_items_barang_jadi_trimming.length == 0) {
                             $("#rawIHasilTrimming").hide();
-                            $("#rawIHasilFrozen").hide();
-                        } else if (list_items_barang_jadi_frozen.length != 0) {
-                            drawTableRasioFrozen();
-                            $("#rawIHasilTrimming").hide();
+                        }
+
+                        if (list_items_barang_jadi_kaleng.length == 0) {
                             $("#rawIHasilKaleng").hide();
+                        }
+
+                        if (list_items_barang_jadi_frozen.length == 0) {
+                            $("#rawIHasilFrozen").hide();
+                        }
+
+                        if (list_items_saldo_awal.length == 0) {
+                            $("#rawISaldoAwal").hide();
+                        }
+
+                        if (list_items_saldo_akhir.length == 0) {
+                            $("#rawISaldoAkhir").hide();
+                        }
+
+                        if (list_items_saldo_adjusment.length == 0) {
+                            $("#rawISaldoAdjustment").hide();
+                        }
+
+                        if (list_items_saldo_jual.length == 0) {
+                            $("#rawISaldoJual").hide();
+                        }
+
+                        if (list_items_saldo_kopek.length == 0) {
+                            $("#rawISaldoKopek").hide();
+                        }
+
+                        if (list_items_saldo_trimming.length == 0) {
+                            $("#rawISaldoTrimming").hide();
                         }
 
                     } else {
