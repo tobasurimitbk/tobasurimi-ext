@@ -586,7 +586,6 @@
                 },
                 dataType: "json",
                 success: function(res) {
-                    stopLoading()
                     if (res.status) {
                         list_items_barang_digunakan = [];
                         list_items_barang_pembelian = [];
@@ -693,6 +692,7 @@
                         if (list_items_saldo_trimming.length == 0) {
                             $("#rawISaldoTrimming").hide();
                         }
+                        stopLoading()
 
                     } else {
                         stopLoading()
