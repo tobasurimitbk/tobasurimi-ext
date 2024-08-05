@@ -319,7 +319,9 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
 
-    let list_items_barang_jadi = [];
+    let list_items_barang_jadi_trimming = [];
+    let list_items_barang_jadi_kaleng = [];
+    let list_items_barang_jadi_frozen = [];
     let list_items_barang_digunakan = [];
     let list_items_barang_pembelian = [];
     let list_items_barang_digunakan_ulang = [];
@@ -345,7 +347,9 @@
         orientation: "bottom auto",
         autoclose: true
     }).change(function() {
-        list_items_barang_jadi = [];
+        list_items_barang_jadi_trimming = [];
+        list_items_barang_jadi_kaleng = [];
+        list_items_barang_jadi_frozen = [];
         list_items_barang_jadi_material_2 = [];
         list_items_barang_digunakan = [];
         list_items_barang_pembelian = [];
@@ -365,7 +369,9 @@
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        list_items_barang_jadi = [];
+        list_items_barang_jadi_trimming = [];
+        list_items_barang_jadi_kaleng = [];
+        list_items_barang_jadi_frozen = [];
         list_items_barang_jadi_material_2 = [];
         list_items_barang_digunakan = [];
         list_items_barang_pembelian = [];
@@ -400,7 +406,9 @@
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        list_items_barang_jadi = [];
+        list_items_barang_jadi_trimming = [];
+        list_items_barang_jadi_kaleng = [];
+        list_items_barang_jadi_frozen = [];
         list_items_barang_jadi_material_2 = [];
         list_items_barang_digunakan = [];
         list_items_barang_pembelian = [];
@@ -564,7 +572,7 @@
         if (department_id && tanggal_awal && tanggal_akhir && kategori) {
             setLoading();
             $.ajax({
-                url: `<?= base_url('rasio/get-barang-digunakan'); ?>`,
+                url: `<?= base_url('rasio/get-material-i'); ?>`,
                 method: "GET",
                 data: {
                     department: department_id,
@@ -578,200 +586,313 @@
                     if (res.status) {
                         list_items_barang_digunakan = [];
                         list_items_barang_pembelian = [];
+                        list_items_barang_digunakan_ulang = [];
+                        list_items_barang_jadi_trimming = [];
+                        list_items_barang_jadi_kaleng = [];
+                        list_items_barang_jadi_frozen = [];
+                        list_items_saldo_awal = [];
+                        list_items_saldo_akhir = [];
+                        list_items_saldo_adjusment = [];
+                        list_items_saldo_jual = [];
                         let no = 0;
                         // Iterate over each item in the response data
-                        res.dataResultPO.forEach(function(item) {
+                        // bahan digunakan pembelian
+                        res.dataBahanDigunakanPO.forEach(function(item) {
                             list_items_barang_pembelian.push(item);
                         });
-                        res.data.forEach(function(item) {
-                            list_items_barang_digunakan.push(item);
+                        // bahan digunakan produksi
+                        res.dataProduksiBahanDigunakan.forEach(function(item) {
+                            if (item.barang_name != undefined) {
+                                list_items_barang_digunakan.push(item);
+                            }
                         });
+                        // bahan digunakan proses ulang
+                        res.dataProduksiBahanDigunakanProsesUlang.forEach(function(item) {
+                            list_items_barang_digunakan_ulang.push(item);
+                        });
+                        // saldo awal
+                        list_items_saldo_awal = res.dataSaldoAwal;
+                        // saldo akhir
+                        list_items_saldo_akhir = res.dataSaldoAkhir;
+                        // saldo adjustment
+                        list_items_saldo_adjusment = res.dataSaldoAdjusment;
+                        // saldo jual
+                        list_items_saldo_jual = res.dataSaldoMutasi;
+                        // bahan jadi produksi
+                        res.dataBarangJadi.forEach(function(item) {
+                            if (item.barang_type == "bahan_setengah_jadi") {
+                                list_items_barang_jadi_trimming.push(item);
+                            } else if (item.barang_type == "bahan_jadi" && item.kode_satuan == "CAN") {
+                                list_items_barang_jadi_kaleng.push(item);
+                            } else {
+                                list_items_barang_jadi_frozen.push(item);
+                            }
+                        });
+                        console.log(list_items_barang_digunakan);
+
                         drawTablePembelian();
                         drawTableDigunakan();
+                        drawTableDigunakanJadi();
+                        drawTableSaldoAwal();
+                        drawTableSaldoAkhir();
+                        drawTableSaldoAdjusmentAnalisa();
+                        drawTableSaldoAdjusmentSample();
+                        drawTableSaldoAdjusmentBonus();
+                        drawTableSaldoAdjusmentLainnya();
+                        drawTableSaldoJual();
+
+                        if (list_items_barang_jadi_trimming.length != 0) {
+                            drawTableRasioTrimming();
+                            $("#rawIHasilKaleng").hide();
+                            $("#rawIHasilFrozen").hide();
+                        } else if (list_items_barang_jadi_kaleng.length != 0) {
+                            drawTableRasioKaleng();
+                            $("#rawIHasilTrimming").hide();
+                            $("#rawIHasilFrozen").hide();
+                        } else if (list_items_barang_jadi_frozen.length != 0) {
+                            drawTableRasioFrozen();
+                            $("#rawIHasilTrimming").hide();
+                            $("#rawIHasilKaleng").hide();
+                        }
+
                     } else {
                         stopLoading()
                         list_items_barang_digunakan = [];
                         list_items_barang_pembelian = [];
+                        list_items_barang_digunakan_ulang = [];
+                        list_items_barang_jadi_trimming = [];
+                        list_items_barang_jadi_kaleng = [];
+                        list_items_barang_jadi_frozen = [];
+                        list_items_saldo_awal = [];
+                        list_items_saldo_akhir = [];
+                        list_items_saldo_adjusment = [];
+                        list_items_saldo_jual = [];
+
                         drawTablePembelian();
                         drawTableDigunakan();
+                        drawTableDigunakanJadi();
+                        drawTableSaldoAwal();
+                        drawTableSaldoAkhir();
+                        drawTableSaldoAdjusmentAnalisa();
+                        drawTableSaldoAdjusmentSample();
+                        drawTableSaldoAdjusmentBonus();
+                        drawTableSaldoAdjusmentLainnya();
+                        drawTableSaldoJual();
+                        drawTableRasioTrimming();
+                        drawTableRasioKaleng();
+                        drawTableRasioFrozen();
                     }
                 },
             });
-            $.ajax({
-                url: `<?= base_url('rasio/get-barang-digunakan-jadi'); ?>`,
-                method: "GET",
-                data: {
-                    department: department_id,
-                    tanggal_awal: tanggal_awal,
-                    tanggal_akhir: tanggal_akhir,
-                    kategori: kategori,
-                },
-                dataType: "json",
-                success: function(res) {
-                    stopLoading()
-                    if (res.status) {
-                        list_items_barang_digunakan_ulang = [];
-                        let no = 0;
-                        // Iterate over each item in the response data
-                        res.data.forEach(function(item) {
-                            list_items_barang_digunakan_ulang.push(item);
-                        });
-                        drawTableDigunakanJadi();
-                    } else {
-                        stopLoading()
-                        list_items_barang_digunakan_ulang = [];
-                        drawTableDigunakanJadi();
-                    }
-                },
-            });
-            $.ajax({
-                url: `<?= base_url('rasio/get-barang-jadi'); ?>`,
-                method: "GET",
-                data: {
-                    department: department_id,
-                    tanggal_awal: tanggal_awal,
-                    tanggal_akhir: tanggal_akhir,
-                    kategori: kategori,
-                },
-                dataType: "json",
-                success: function(res) {
-                    stopLoading()
-                    if (res.status) {
-                        list_items_barang_jadi = [];
-                        let no = 0;
-                        // Iterate over each item in the response data
-                        res.data.forEach(function(item) {
-                            list_items_barang_jadi.push(item);
-                        });
-                        drawTableRasio();
-                    } else {
-                        stopLoading()
-                        list_items_barang_jadi = [];
-                        list_items_barang_digunakan = [];
+            // $.ajax({
+            //     url: `<?= base_url('rasio/get-barang-digunakan'); ?>`,
+            //     method: "GET",
+            //     data: {
+            //         department: department_id,
+            //         tanggal_awal: tanggal_awal,
+            //         tanggal_akhir: tanggal_akhir,
+            //         kategori: kategori,
+            //     },
+            //     dataType: "json",
+            //     success: function(res) {
+            //         stopLoading()
+            //         if (res.status) {
+            //             list_items_barang_digunakan = [];
+            //             list_items_barang_pembelian = [];
+            //             let no = 0;
+            //             // Iterate over each item in the response data
+            //             res.dataResultPO.forEach(function(item) {
+            //                 list_items_barang_pembelian.push(item);
+            //             });
+            //             res.data.forEach(function(item) {
+            //                 list_items_barang_digunakan.push(item);
+            //             });
+            //             drawTablePembelian();
+            //             drawTableDigunakan();
+            //         } else {
+            //             stopLoading()
+            //             list_items_barang_digunakan = [];
+            //             list_items_barang_pembelian = [];
+            //             drawTablePembelian();
+            //             drawTableDigunakan();
+            //         }
+            //     },
+            // });
+            // $.ajax({
+            //     url: `<?= base_url('rasio/get-barang-digunakan-jadi'); ?>`,
+            //     method: "GET",
+            //     data: {
+            //         department: department_id,
+            //         tanggal_awal: tanggal_awal,
+            //         tanggal_akhir: tanggal_akhir,
+            //         kategori: kategori,
+            //     },
+            //     dataType: "json",
+            //     success: function(res) {
+            //         stopLoading()
+            //         if (res.status) {
+            //             list_items_barang_digunakan_ulang = [];
+            //             let no = 0;
+            //             // Iterate over each item in the response data
+            //             res.data.forEach(function(item) {
+            //                 list_items_barang_digunakan_ulang.push(item);
+            //             });
+            //             drawTableDigunakanJadi();
+            //         } else {
+            //             stopLoading()
+            //             list_items_barang_digunakan_ulang = [];
+            //             drawTableDigunakanJadi();
+            //         }
+            //     },
+            // });
+            // $.ajax({
+            //     url: `<?= base_url('rasio/get-barang-jadi'); ?>`,
+            //     method: "GET",
+            //     data: {
+            //         department: department_id,
+            //         tanggal_awal: tanggal_awal,
+            //         tanggal_akhir: tanggal_akhir,
+            //         kategori: kategori,
+            //     },
+            //     dataType: "json",
+            //     success: function(res) {
+            //         stopLoading()
+            //         if (res.status) {
+            //             list_items_barang_jadi = [];
+            //             let no = 0;
+            //             // Iterate over each item in the response data
+            //             res.data.forEach(function(item) {
+            //                 list_items_barang_jadi.push(item);
+            //             });
+            //             drawTableRasio();
+            //         } else {
+            //             stopLoading()
+            //             list_items_barang_jadi = [];
+            //             list_items_barang_digunakan = [];
 
-                        drawTableRasio();
-                        drawTableDigunakan();
-                    }
-                },
-            });
-            $.ajax({
-                url: `<?= base_url('rasio/get-saldo-akhir'); ?>`,
-                method: "GET",
-                data: {
-                    divisi_id: department_id,
-                },
-                dataType: "json",
-                success: function(res) {
-                    stopLoading()
-                    if (res.status) {
-                        list_items_saldo_akhir = [];
-                        list_items_saldo_akhir = res.data;
-                        drawTableSaldoAkhir();
-                    } else {
-                        stopLoading()
-                        list_items_saldo_akhir = [];
-                        drawTableSaldoAkhir();
-                    }
-                },
-            });
-            $.ajax({
-                url: `<?= base_url('rasio/get-saldo-awal'); ?>`,
-                method: "GET",
-                data: {
-                    divisi_id: department_id,
-                    tanggal_awal: tanggal_awal,
-                    tanggal_akhir: tanggal_akhir,
-                    kategori: kategori,
-                },
-                dataType: "json",
-                success: function(res) {
-                    stopLoading()
-                    if (res.status) {
-                        list_items_saldo_awal = [];
-                        list_items_saldo_awal = res.data;
-                        drawTableSaldoAwal();
-                    } else {
-                        stopLoading()
-                        list_items_saldo_awal = [];
-                        drawTableSaldoAwal();
-                    }
-                },
-            });
-            $.ajax({
-                url: `<?= base_url('rasio/get-saldo-adjusment'); ?>`,
-                method: "GET",
-                data: {
-                    divisi_id: department_id,
-                    tanggal_awal: tanggal_awal,
-                    tanggal_akhir: tanggal_akhir,
-                    kategori: kategori,
-                },
-                dataType: "json",
-                success: function(res) {
-                    stopLoading()
-                    if (res.status) {
-                        list_items_saldo_adjusment = [];
-                        list_items_saldo_adjusment = res.data;
-                        drawTableSaldoAdjusmentAnalisa();
-                        drawTableSaldoAdjusmentSample();
-                        drawTableSaldoAdjusmentBonus();
-                        drawTableSaldoAdjusmentLainnya();
-                    } else {
-                        stopLoading()
-                        list_items_saldo_adjusment = [];
-                        drawTableSaldoAdjusmentAnalisa();
-                        drawTableSaldoAdjusmentSample();
-                        drawTableSaldoAdjusmentBonus();
-                        drawTableSaldoAdjusmentLainnya();
-                    }
-                },
-            });
-            $.ajax({
-                url: `<?= base_url('rasio/get-saldo-jual'); ?>`,
-                method: "GET",
-                data: {
-                    divisi_id: department_id,
-                    tanggal_awal: tanggal_awal,
-                    tanggal_akhir: tanggal_akhir,
-                    kategori: kategori,
-                },
-                dataType: "json",
-                success: function(res) {
-                    stopLoading()
-                    if (res.status) {
-                        list_items_saldo_jual = [];
-                        list_items_saldo_jual = res.data;
-                        drawTableSaldoJual();
-                    } else {
-                        stopLoading()
-                        list_items_saldo_jual = [];
-                        drawTableSaldoJual();
-                    }
-                },
-            });
-            $.ajax({
-                url: `<?= base_url('rasio/get-saldo-trimming'); ?>`,
-                method: "GET",
-                data: {
-                    divisi_id: department_id,
-                    tanggal_awal: tanggal_awal,
-                    tanggal_akhir: tanggal_akhir,
-                    kategori: kategori,
-                },
-                dataType: "json",
-                success: function(res) {
-                    stopLoading()
-                    if (res.status) {
-                        list_items_saldo_trimming = [];
-                        list_items_saldo_trimming = res.data;
-                        drawTableSaldoTrimming();
-                    } else {
-                        stopLoading()
-                        list_items_saldo_trimming = [];
-                        drawTableSaldoTrimming();
-                    }
-                },
-            });
+            //             drawTableRasio();
+            //             drawTableDigunakan();
+            //         }
+            //     },
+            // });
+            // $.ajax({
+            //     url: `<?= base_url('rasio/get-saldo-akhir'); ?>`,
+            //     method: "GET",
+            //     data: {
+            //         divisi_id: department_id,
+            //     },
+            //     dataType: "json",
+            //     success: function(res) {
+            //         stopLoading()
+            //         if (res.status) {
+            //             list_items_saldo_akhir = [];
+            //             list_items_saldo_akhir = res.data;
+            //             drawTableSaldoAkhir();
+            //         } else {
+            //             stopLoading()
+            //             list_items_saldo_akhir = [];
+            //             drawTableSaldoAkhir();
+            //         }
+            //     },
+            // });
+            // $.ajax({
+            //     url: `<?= base_url('rasio/get-saldo-awal'); ?>`,
+            //     method: "GET",
+            //     data: {
+            //         divisi_id: department_id,
+            //         tanggal_awal: tanggal_awal,
+            //         tanggal_akhir: tanggal_akhir,
+            //         kategori: kategori,
+            //     },
+            //     dataType: "json",
+            //     success: function(res) {
+            //         stopLoading()
+            //         if (res.status) {
+            //             list_items_saldo_awal = [];
+            //             list_items_saldo_awal = res.data;
+            //             drawTableSaldoAwal();
+            //         } else {
+            //             stopLoading()
+            //             list_items_saldo_awal = [];
+            //             drawTableSaldoAwal();
+            //         }
+            //     },
+            // });
+            // $.ajax({
+            //     url: `<?= base_url('rasio/get-saldo-adjusment'); ?>`,
+            //     method: "GET",
+            //     data: {
+            //         divisi_id: department_id,
+            //         tanggal_awal: tanggal_awal,
+            //         tanggal_akhir: tanggal_akhir,
+            //         kategori: kategori,
+            //     },
+            //     dataType: "json",
+            //     success: function(res) {
+            //         stopLoading()
+            //         if (res.status) {
+            //             list_items_saldo_adjusment = [];
+            //             list_items_saldo_adjusment = res.data;
+            //             drawTableSaldoAdjusmentAnalisa();
+            //             drawTableSaldoAdjusmentSample();
+            //             drawTableSaldoAdjusmentBonus();
+            //             drawTableSaldoAdjusmentLainnya();
+            //         } else {
+            //             stopLoading()
+            //             list_items_saldo_adjusment = [];
+            //             drawTableSaldoAdjusmentAnalisa();
+            //             drawTableSaldoAdjusmentSample();
+            //             drawTableSaldoAdjusmentBonus();
+            //             drawTableSaldoAdjusmentLainnya();
+            //         }
+            //     },
+            // });
+            // $.ajax({
+            //     url: `<?= base_url('rasio/get-saldo-jual'); ?>`,
+            //     method: "GET",
+            //     data: {
+            //         divisi_id: department_id,
+            //         tanggal_awal: tanggal_awal,
+            //         tanggal_akhir: tanggal_akhir,
+            //         kategori: kategori,
+            //     },
+            //     dataType: "json",
+            //     success: function(res) {
+            //         stopLoading()
+            //         if (res.status) {
+            //             list_items_saldo_jual = [];
+            //             list_items_saldo_jual = res.data;
+            //             drawTableSaldoJual();
+            //         } else {
+            //             stopLoading()
+            //             list_items_saldo_jual = [];
+            //             drawTableSaldoJual();
+            //         }
+            //     },
+            // });
+            // $.ajax({
+            //     url: `<?= base_url('rasio/get-saldo-trimming'); ?>`,
+            //     method: "GET",
+            //     data: {
+            //         divisi_id: department_id,
+            //         tanggal_awal: tanggal_awal,
+            //         tanggal_akhir: tanggal_akhir,
+            //         kategori: kategori,
+            //     },
+            //     dataType: "json",
+            //     success: function(res) {
+            //         stopLoading()
+            //         if (res.status) {
+            //             list_items_saldo_trimming = [];
+            //             list_items_saldo_trimming = res.data;
+            //             drawTableSaldoTrimming();
+            //         } else {
+            //             stopLoading()
+            //             list_items_saldo_trimming = [];
+            //             drawTableSaldoTrimming();
+            //         }
+            //     },
+            // });
         }
     }
 
@@ -1870,21 +1991,21 @@
         }
     }
 
-    const drawTableRasio = function() {
-        $('.body-table-rasio').empty();
-        $('.tfoot-rasio').empty();
+    const drawTableRasioTrimming = function() {
+        $('.body-table-rasio-trimming').empty();
+        $('.tfoot-rasio-trimming').empty();
         var row = '';
         var rowFooter = '';
         var no = 1;
 
-        if (list_items_barang_jadi.length === 0) {
+        if (list_items_barang_jadi_trimming.length === 0) {
             row += '<tr><td colspan="7" class="text-center">Data Barang Tidak Ada</td></tr>';
-            $('.tfoot-rasio').append(row);
+            $('.tfoot-rasio-trimming').append(row);
         } else {
             var total_qty = 0;
             var total_harga_satuan = 0;
             var total_harga_total = 0;
-            list_items_barang_jadi.map((item, index) => {
+            list_items_barang_jadi_trimming.map((item, index) => {
                 var qty = parseFloat(item.qtyTotal);
                 var harga_satuan = 0;
                 var harga_total = 0;
@@ -1922,8 +2043,8 @@
                 '<input class="form-control harga-total-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" value="' + formatRupiah(total_harga_total) + '">' +
                 '</td>';
             rowFooter += '</tr>';
-            $('.tfoot-rasio').append(rowFooter);
-            $('.body-table-rasio').append(row);
+            $('.tfoot-rasio-trimming').append(rowFooter);
+            $('.body-table-rasio-trimming').append(row);
 
             // Update total harga jika ada perubahan pada input dengan kelas harga
             $('.harga-satuan').on('input', function() {
@@ -1941,8 +2062,178 @@
 
                     // Update the array with the new harga_satuan value
                     if (!isNaN(harga)) {
-                        list_items_barang_jadi[index].harga_satuan = harga;
-                        list_items_barang_jadi[index].harga_total = totalHargaQty;
+                        list_items_barang_jadi_trimming[index].harga_satuan = harga;
+                        list_items_barang_jadi_trimming[index].harga_total = totalHargaQty;
+                    }
+
+                    $('.harga-total-awal[data-index="' + index + '"]').val(formatRupiah(parseFloat(totalHargaQty)));
+                    $(this).val(harga);
+                });
+
+                $('.harga-satuan-total').val(formatRupiah(parseFloat(totalHarga)));
+                $('.harga-total-total').val(formatRupiah(parseFloat(totalTotalHargaQty)));
+            });
+        }
+    }
+
+    const drawTableRasioKaleng = function() {
+        $('.body-table-rasio-kaleng').empty();
+        $('.tfoot-rasio-kaleng').empty();
+        var row = '';
+        var rowFooter = '';
+        var no = 1;
+
+        if (list_items_barang_jadi_kaleng.length === 0) {
+            row += '<tr><td colspan="7" class="text-center">Data Barang Tidak Ada</td></tr>';
+            $('.tfoot-rasio-kaleng').append(row);
+        } else {
+            var total_qty = 0;
+            var total_harga_satuan = 0;
+            var total_harga_total = 0;
+            list_items_barang_jadi_kaleng.map((item, index) => {
+                var qty = parseFloat(item.qtyTotal);
+                var harga_satuan = 0;
+                var harga_total = 0;
+
+                total_qty += qty;
+                total_harga_satuan += harga_satuan;
+                total_harga_total += harga_total;
+
+                row += '<tr style="color:whitesmoke;text-align: center;">';
+                row += '<td>' + no + '</td>';
+                row += '<td>' + item.kode_barang + '</td>';
+                row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
+                row += '<td>' + item.kode_satuan + '</td>';
+                row += '<td>' +
+                    '<input class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
+                    '</td>';
+                row += '<td>' +
+                    '<input class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
+                    '</td>';
+                row += '<td>' +
+                    '<input class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
+                    '</td>';
+                row += '</tr>';
+                no++;
+            });
+            rowFooter += '<tr>';
+            rowFooter += '<td colspan="4"></td>';
+            rowFooter += '<td>' +
+                '<input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" value="' + total_qty + '">' +
+                '</td>';
+            rowFooter += '<td>' +
+                '<input class="form-control harga-satuan-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" value="' + formatRupiah(total_harga_satuan) + '">' +
+                '</td>';
+            rowFooter += '<td>' +
+                '<input class="form-control harga-total-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" value="' + formatRupiah(total_harga_total) + '">' +
+                '</td>';
+            rowFooter += '</tr>';
+            $('.tfoot-rasio-kaleng').append(rowFooter);
+            $('.body-table-rasio-kaleng').append(row);
+
+            // Update total harga jika ada perubahan pada input dengan kelas harga
+            $('.harga-satuan').on('input', function() {
+                var totalHarga = 0;
+                var totalHargaQty = 0;
+                var totalTotalHargaQty = 0;
+                $('.harga-satuan').each(function() {
+                    var harga = parseFloat($(this).val().replace(/Rp|\./g, ""));
+                    var index = $(this).data('index');
+                    var qty = ($('.jumlah-barang[data-index="' + index + '"]').val());
+
+                    totalHarga += isNaN(harga) ? 0 : harga;
+                    totalHargaQty = harga * (isNaN(qty) ? 0 : qty);
+                    totalTotalHargaQty += totalHargaQty;
+
+                    // Update the array with the new harga_satuan value
+                    if (!isNaN(harga)) {
+                        list_items_barang_jadi_kaleng[index].harga_satuan = harga;
+                        list_items_barang_jadi_kaleng[index].harga_total = totalHargaQty;
+                    }
+
+                    $('.harga-total-awal[data-index="' + index + '"]').val(formatRupiah(parseFloat(totalHargaQty)));
+                    $(this).val(harga);
+                });
+
+                $('.harga-satuan-total').val(formatRupiah(parseFloat(totalHarga)));
+                $('.harga-total-total').val(formatRupiah(parseFloat(totalTotalHargaQty)));
+            });
+        }
+    }
+
+    const drawTableRasioFrozen = function() {
+        $('.body-table-rasio-frozen').empty();
+        $('.tfoot-rasio-frozen').empty();
+        var row = '';
+        var rowFooter = '';
+        var no = 1;
+
+        if (list_items_barang_jadi_frozen.length === 0) {
+            row += '<tr><td colspan="7" class="text-center">Data Barang Tidak Ada</td></tr>';
+            $('.tfoot-rasio-frozen').append(row);
+        } else {
+            var total_qty = 0;
+            var total_harga_satuan = 0;
+            var total_harga_total = 0;
+            list_items_barang_jadi_frozen.map((item, index) => {
+                var qty = parseFloat(item.qtyTotal);
+                var harga_satuan = 0;
+                var harga_total = 0;
+
+                total_qty += qty;
+                total_harga_satuan += harga_satuan;
+                total_harga_total += harga_total;
+
+                row += '<tr style="color:whitesmoke;text-align: center;">';
+                row += '<td>' + no + '</td>';
+                row += '<td>' + item.kode_barang + '</td>';
+                row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
+                row += '<td>' + item.kode_satuan + '</td>';
+                row += '<td>' +
+                    '<input class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
+                    '</td>';
+                row += '<td>' +
+                    '<input class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
+                    '</td>';
+                row += '<td>' +
+                    '<input class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
+                    '</td>';
+                row += '</tr>';
+                no++;
+            });
+            rowFooter += '<tr>';
+            rowFooter += '<td colspan="4"></td>';
+            rowFooter += '<td>' +
+                '<input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" value="' + total_qty + '">' +
+                '</td>';
+            rowFooter += '<td>' +
+                '<input class="form-control harga-satuan-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" value="' + formatRupiah(total_harga_satuan) + '">' +
+                '</td>';
+            rowFooter += '<td>' +
+                '<input class="form-control harga-total-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" value="' + formatRupiah(total_harga_total) + '">' +
+                '</td>';
+            rowFooter += '</tr>';
+            $('.tfoot-rasio-frozen').append(rowFooter);
+            $('.body-table-rasio-frozen').append(row);
+
+            // Update total harga jika ada perubahan pada input dengan kelas harga
+            $('.harga-satuan').on('input', function() {
+                var totalHarga = 0;
+                var totalHargaQty = 0;
+                var totalTotalHargaQty = 0;
+                $('.harga-satuan').each(function() {
+                    var harga = parseFloat($(this).val().replace(/Rp|\./g, ""));
+                    var index = $(this).data('index');
+                    var qty = ($('.jumlah-barang[data-index="' + index + '"]').val());
+
+                    totalHarga += isNaN(harga) ? 0 : harga;
+                    totalHargaQty = harga * (isNaN(qty) ? 0 : qty);
+                    totalTotalHargaQty += totalHargaQty;
+
+                    // Update the array with the new harga_satuan value
+                    if (!isNaN(harga)) {
+                        list_items_barang_jadi_frozen[index].harga_satuan = harga;
+                        list_items_barang_jadi_frozen[index].harga_total = totalHargaQty;
                     }
 
                     $('.harga-total-awal[data-index="' + index + '"]').val(formatRupiah(parseFloat(totalHargaQty)));
@@ -1962,15 +2253,6 @@
         let row = '';
         let rowFooter = '';
         let no = 1;
-
-        // Retrieve and parse input values
-        // const amount = $('#hargaTotalPenerimaan').val() ? parseFloat($('#hargaTotalPenerimaan').val().replace(/Rp|\./g, "")) : 0;
-        // const qtyTotalPenerimaan = $('#qtyTotalPenerimaan').val() ? parseFloat($('#qtyTotalPenerimaan').val().replace(/Rp|\./g, "")) : 0;
-        // const biayaSubsidi = $('#biayaSubsidi').val() ? parseFloat($('#biayaSubsidi').val().replace(/Rp|\./g, "")) : 0;
-        // const biayaLain = $('#biayaLain').val() ? parseFloat($('#biayaLain').val().replace(/Rp|\./g, "")) : 0;
-        // const biayaKopek = $('#biayaKopek').val() ? parseFloat($('#biayaKopek').val().replace(/Rp|\./g, "")) : 0;
-
-
 
         var amount = 0;
         var qtyTotalPenerimaan = 0;
@@ -2371,8 +2653,18 @@
                     if (list_items_barang_digunakan_alokasi.length != 0) {
                         drawTableDigunakanAlokasi(list_items_barang_digunakan_alokasi);
                     }
-                    if (list_items_barang_jadi.length != 0) {
-                        drawTableRasio();
+                    if (list_items_barang_jadi_trimming.length != 0) {
+                        drawTableRasioTrimming();
+                        $("#rawIHasilKaleng").hide();
+                        $("#rawIHasilFrozen").hide();
+                    } else if (list_items_barang_jadi_kaleng.length != 0) {
+                        drawTableRasioKaleng();
+                        $("#rawIHasilTrimming").hide();
+                        $("#rawIHasilFrozen").hide();
+                    } else if (list_items_barang_jadi_frozen.length != 0) {
+                        drawTableRasioFrozen();
+                        $("#rawIHasilTrimming").hide();
+                        $("#rawIHasilKaleng").hide();
                     }
                     if (list_items_saldo_akhir.length != 0) {
                         drawTableSaldoAkhir();

@@ -20,9 +20,9 @@
                         <th style="text-align: center;">Total</th>
                     </tr>
                 </thead>
-                <tbody class="body-table-rasio">
+                <tbody class="body-table-rasio-frozen">
                 </tbody>
-                <tfoot style="background: #ffffff !important;" class="tfoot-rasio" id="tfoot-rasio">
+                <tfoot style="background: #ffffff !important;" class="tfoot-rasio-frozen" id="tfoot-rasio-frozen">
                     <tr>
                         <td colspan="7" style="text-align: center;">
                             Tidak Ada Barang
@@ -90,7 +90,7 @@
                 confirmButtonText: 'Ok'
             });
         } else {
-            drawTableRasioAkhir(list_items_barang_jadi);
+            drawTableRasioAkhir(list_items_barang_jadi_frozen);
         }
     });
 </script>

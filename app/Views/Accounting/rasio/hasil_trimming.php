@@ -20,9 +20,9 @@
                         <th style="text-align: center;">Total</th>
                     </tr>
                 </thead>
-                <tbody class="body-table-rasio">
+                <tbody class="body-table-rasio-trimming">
                 </tbody>
-                <tfoot style="background: #ffffff !important;" class="tfoot-rasio" id="tfoot-rasio">
+                <tfoot style="background: #ffffff !important;" class="tfoot-rasio-trimming" id="tfoot-rasio-trimming">
                     <tr>
                         <td colspan="7" style="text-align: center;">
                             Tidak Ada Barang
@@ -125,8 +125,8 @@
                 confirmButtonText: 'Ok'
             });
         } else {
-            drawTableRasioAkhir(list_items_barang_jadi);
-            drawTableRasioTerhadapBahanBaku(list_items_barang_jadi);
+            drawTableRasioAkhir(list_items_barang_jadi_trimming);
+            drawTableRasioTerhadapBahanBaku(list_items_barang_jadi_trimming);
         }
     });
 </script>

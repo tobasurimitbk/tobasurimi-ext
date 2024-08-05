@@ -1858,15 +1858,18 @@ $routes->post('/setting-akun-costing/save', 'Accounting\SettingAkunCosting\Setti
 //Rasio
 $routes->get('/rasio', 'Accounting\Rasio\RasioController::index', ['filter' => 'Auth']);
 $routes->get('/rasio/create', 'Accounting\Rasio\RasioController::createRasio', ['filter' => 'Auth']);
-$routes->get('/rasio/get-barang-jadi', 'Accounting\Rasio\RasioController::getRasioBarangJadi', ['filter' => 'Auth']);
 $routes->get('/rasio/get-barang-digunakan', 'Accounting\Rasio\RasioController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/rasio/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
 $routes->get('/rasio/get-saldo-akhir', 'Accounting\Rasio\RasioController::getSaldoAkhir', ['filter' => 'Auth']);
 $routes->get('/rasio/get-saldo-awal', 'Accounting\Rasio\RasioController::getSaldoAwal', ['filter' => 'Auth']);
 $routes->get('/rasio/get-saldo-adjusment', 'Accounting\Rasio\RasioController::getSaldoAdjusment', ['filter' => 'Auth']);
 $routes->get('/rasio/get-saldo-jual', 'Accounting\Rasio\RasioController::getSaldoJual', ['filter' => 'Auth']);
 $routes->get('/rasio/get-saldo-trimming', 'Accounting\Rasio\RasioController::getSaldoTrimming', ['filter' => 'Auth']);
+$routes->get('/rasio/get-barang-jadi', 'Accounting\Rasio\RasioController::getRasioBarangJadi', ['filter' => 'Auth']);
+
+$routes->get('/rasio/get-material-i', 'Accounting\Rasio\RasioController::getRawMaterialI', ['filter' => 'Auth']);
+
 $routes->get('/rasio/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
-$routes->get('/rasio/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
 $routes->get('/rasio/get-jurnal', 'Accounting\Rasio\RasioController::getDataJurnal', ['filter' => 'Auth']);
 $routes->get('/rasio/get-cost', 'Accounting\Rasio\RasioController::getCost', ['filter' => 'Auth']);
 $routes->get('/rasio/all', 'Accounting\Rasio\RasioController::allRasio', ['filter' => 'Auth']);

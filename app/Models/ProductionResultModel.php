@@ -120,6 +120,7 @@ class ProductionResultModel extends Model
         production_result_details.no_aju as no_aju,
         production_result_details.stock_dokumen as stock_dokumen,
         production_result_details.qty as qty,
+        production_result_details.barang_type as barang_type,
         production_result_details.qty2 as qty2,
         production_result_details.qty_isi as qty_isi,
         GROUP_CONCAT(production_result_details.qty) as qtyProduksi,
@@ -202,7 +203,7 @@ class ProductionResultModel extends Model
         SUM(production_result_details.qty) AS qty,
         SUM(production_result_details.qty2) AS qty2,
         SUM(production_result_details.qty_isi) AS qty_isi,
-        production_result_details.stock_dokumen AS stock_dokumen,
+        GROUP_CONCAT(production_result_details.stock_dokumen) AS stock_dokumen,
         production_result_details.type,
         production_result_details.no_aju,
         production_results.id as production_result_id,
@@ -216,7 +217,7 @@ class ProductionResultModel extends Model
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->join('work_orders', 'work_orders.id = production_results.work_order_id', 'left')
-            ->join('account_barang', 'account_barang.barang_master_id = production_result_details.barang1_id', 'left')
+            ->join('account_barang', 'account_barang.barang_master_id = production_result_details.barang1_id')
             // ->like('production_results.receive_date', $where['tanggal_jurnal'])
             ->where('production_results.receive_date >=', $where['tanggal_awal'])
             ->where('production_results.receive_date <=', $where['tanggal_akhir'])
@@ -228,7 +229,7 @@ class ProductionResultModel extends Model
             ->where('production_result_details.type', 'DIGUNAKAN')
             ->where('production_result_details.deletedAt', $where['deletedAt'])
             ->where('production_results.deletedAt', $where['deletedAt'])
-            ->groupBy('production_result_details.stock_dokumen, production_result_details.stock_id')
+            ->groupBy('production_result_details.barang1_id, production_result_details.barang2_id')
             ->findAll();
 
         // var_dump($dataQry);
