@@ -25,6 +25,7 @@ class SalesOrderLain extends BaseController
 {
     protected $this_company_id;
     protected $this_user_id;
+    protected $is_admin;
     protected $salesOrderLainModel;
     protected $salesOrderLainDetailModel;
     protected $metaDataModel;
@@ -48,6 +49,7 @@ class SalesOrderLain extends BaseController
     {
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->is_admin = session()->get("login")->is_admin;
         $this->salesOrderLainModel = new SalesOrderLainModel();
         $this->salesOrderLainDetailModel = new SalesOrderLainDetailModel();
         $this->metaDataModel = new MetadataModel();
@@ -98,11 +100,19 @@ class SalesOrderLain extends BaseController
         $divisiArr = array();
         $dataResult = array();
 
-        $condition = [
-            'sales_order_lain.company_id' => $this->this_company_id,
-            'sales_order_lain.deletedAt' => null,
-            'sales_order_lain.user_id' => $this->this_user_id
-        ];
+
+        if ($this->is_admin == '1') {
+            $condition = [
+                'sales_order_lain.company_id' => $this->this_company_id,
+                'sales_order_lain.deletedAt' => null,
+            ];
+        } else {
+            $condition = [
+                'sales_order_lain.company_id' => $this->this_company_id,
+                'sales_order_lain.deletedAt' => null,
+                'sales_order_lain.user_id' => $this->this_user_id
+            ];
+        }
 
         foreach ($this->divisiModel->getDivisiAccess() as $d) {
             array_push($divisiArr, $d['id']);

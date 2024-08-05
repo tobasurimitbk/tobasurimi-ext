@@ -11,11 +11,13 @@ class SupplierBahanBaku extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $this_user_id;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_user_id = session()->get("login")->user_id;
     }
 
     public function supplierBahanBaku()
@@ -51,11 +53,6 @@ class SupplierBahanBaku extends BaseController
         ];
 
         $supplierModel = new SupplierModel();
-        $condition = [
-            "suppliers.company_id"  => $this->this_company_id,
-            "kategori"              => "LOKAL",
-            "suppliers.type"        => "BAHAN BAKU"
-        ];
         $addCondition = [
             "search"    => $this->request->getGet("search"),
             "sort"      => $this->request->getGet("sort"),

@@ -18,6 +18,7 @@ use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\PenerimaanBarangDetailModel;
 
+
 class Supplier extends BaseController
 {
     protected $this_company_id, $provinceModel, $countryModel, $supplierModel, $supplierHargaModel, $barangMasterModel, $bagianModel;
@@ -27,10 +28,13 @@ class Supplier extends BaseController
     protected $penerimaanBarangDetailModel;
     protected $warehousesModel;
     protected $divisiModel;
-
+    protected $is_admin;
+    protected $this_user_id;
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->is_admin = session()->get("login")->is_admin;
+        $this->this_user_id = session()->get("login")->user_id;
         $this->provinceModel = new ProvinceModel();
         $this->countryModel = new CountryModel();
         $this->supplierModel = new SupplierModel();
@@ -113,10 +117,21 @@ class Supplier extends BaseController
             "type"          => "BAHAN BAKU"
         ];
 
-        $condition = [
-            "suppliers.type"        => "BAHAN BAKU",
-            "company_id" => $this->this_company_id
-        ];
+
+        if ($this->is_admin == '1') {
+
+            $condition = [
+                "suppliers.type"        => "BAHAN BAKU",
+                "company_id" => $this->this_company_id
+            ];
+        } elseif ($this->is_admin == '0') {
+            $condition = [
+                "suppliers.type"        => "BAHAN BAKU",
+                "company_id" => $this->this_company_id,
+                'suppliers.user_id' => $this->this_user_id
+            ];
+        }
+
         $addCondition = [
             "search"    => $this->request->getGet("search"),
             "sort"      => $this->request->getGet("sort"),
@@ -387,10 +402,22 @@ class Supplier extends BaseController
             "type"          => "BAHAN PENOLONG"
         ];
 
-        $condition = [
-            "suppliers.company_id" => $this->this_company_id,
-            "suppliers.type"        => "BAHAN PENOLONG"
-        ];
+
+        if ($this->is_admin == '1') {
+
+            $condition = [
+                "suppliers.company_id" => $this->this_company_id,
+                "suppliers.type"        => "BAHAN PENOLONG"
+            ];
+        } elseif ($this->is_admin == '0') {
+            $condition = [
+                "suppliers.company_id" => $this->this_company_id,
+                "suppliers.type"        => "BAHAN PENOLONG",
+                'suppliers.user_id' => $this->this_user_id
+            ];
+        }
+
+
         $addCondition = [
             "search"    => $this->request->getGet("search"),
             "sort"      => $this->request->getGet("sort"),
@@ -639,10 +666,19 @@ class Supplier extends BaseController
             "type"          => "INTERNASIONAL"
         ];
 
-        $condition = [
-            "suppliers.company_id" => $this->this_company_id,
-            "suppliers.type"        => "INTERNASIONAL"
-        ];
+        if ($this->is_admin == '1') {
+            $condition = [
+                "suppliers.company_id" => $this->this_company_id,
+                "suppliers.type"        => "INTERNASIONAL"
+            ];
+        } elseif ($this->is_admin == '0') {
+            $condition = [
+                "suppliers.company_id" => $this->this_company_id,
+                "suppliers.type"        => "INTERNASIONAL",
+                'suppliers.user_id' => $this->this_user_id
+            ];
+        }
+
         $addCondition = [
             "search"    => $this->request->getGet("search"),
             "sort"      => $this->request->getGet("sort"),

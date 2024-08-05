@@ -20,6 +20,7 @@ class OrderForm extends BaseController
     protected $token;
     protected $this_company_id;
     protected $this_user_id;
+    protected $is_admin;
     protected $customerModel;
     protected $salesKontrakModel;
     protected $salesKontrakDetailModel;
@@ -38,6 +39,7 @@ class OrderForm extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->this_user_id = session()->get("login")->user_id;
+        $this->is_admin = session()->get("login")->is_admin;
         $this->customerModel = new CustomerModel();
         $this->salesKontrakModel = new SalesKontrakModel();
         $this->salesKontrakDetailModel = new SalesKontrakDetailModel();
@@ -67,13 +69,24 @@ class OrderForm extends BaseController
             "idCompany"     => $this->this_company_id,
             "status"      => $this->request->getGet("status")
         ];
+        if ($this->is_admin == '1') {
 
-        $condition = [
-            "sales_order_export.company_id"    => $this->this_company_id,
-            "status"      => $this->request->getGet("status"),
-            "sales_order_export.deletedAt" => null,
-            'sales_order_export.user_id' => $this->this_user_id
-        ];
+            $condition = [
+                "sales_order_export.company_id"    => $this->this_company_id,
+                "status"      => $this->request->getGet("status"),
+                "sales_order_export.deletedAt" => null,
+            ];
+        } else {
+            $condition = [
+                "sales_order_export.company_id"    => $this->this_company_id,
+                "status"      => $this->request->getGet("status"),
+                "sales_order_export.deletedAt" => null,
+                'sales_order_export.user_id' => $this->this_user_id
+            ];
+        }
+
+
+
         $addCondition = [
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),

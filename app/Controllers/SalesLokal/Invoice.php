@@ -23,6 +23,7 @@ class Invoice extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $is_admin;
     private $companyModel;
     protected $CustomerModel;
     private $userId;
@@ -41,6 +42,7 @@ class Invoice extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->userId = session()->get("login")->user_id;
+        $this->is_admin = session()->get("login")->is_admin;
 
         $this->encrypter = Services::encrypter();
 
@@ -97,12 +99,20 @@ class Invoice extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
         ];
 
-        $condition = [
-            "sales_order_invoice.id_company"    => $this->this_company_id,
-            "sales_order_invoice.deletedAt" => null,
-            "sales_order_invoice.tipe_invoice" => 'LOKAL',
-            "sales_order_invoice.id_user" => $this->userId
-        ];
+        if ($this->is_admin == '1') {
+            $condition = [
+                "sales_order_invoice.id_company"    => $this->this_company_id,
+                "sales_order_invoice.deletedAt" => null,
+                "sales_order_invoice.tipe_invoice" => 'LOKAL',
+            ];
+        } else {
+            $condition = [
+                "sales_order_invoice.id_company"    => $this->this_company_id,
+                "sales_order_invoice.deletedAt" => null,
+                "sales_order_invoice.tipe_invoice" => 'LOKAL',
+                "sales_order_invoice.id_user" => $this->userId
+            ];
+        }
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),

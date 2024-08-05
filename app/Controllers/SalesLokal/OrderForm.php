@@ -30,6 +30,7 @@ class OrderForm extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $is_admin;
     protected $encrypter;
 
     private $companyModel;
@@ -75,6 +76,7 @@ class OrderForm extends BaseController
         $this->salesOrderInvoiceModel = new SalesOrderInvoiceModel();
 
         $this->userId = session()->get("login")->user_id;
+        $this->is_admin = session()->get("login")->is_admin;
     }
 
     public function index()
@@ -140,12 +142,18 @@ class OrderForm extends BaseController
             "sortType" => $this->request->getGet("sortType"),
         ];
 
-
-        $condition = [
-            "sales_order.id_company" => $this->this_company_id,
-            "sales_order.deletedAt" => null,
-            'sales_order.id_user' => $this->userId
-        ];
+        if ($this->is_admin == '1') {
+            $condition = [
+                "sales_order.id_company" => $this->this_company_id,
+                "sales_order.deletedAt" => null,
+            ];
+        } elseif ($this->is_admin == '0') {
+            $condition = [
+                "sales_order.id_company" => $this->this_company_id,
+                "sales_order.deletedAt" => null,
+                'sales_order.id_user' => $this->userId
+            ];
+        }
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),

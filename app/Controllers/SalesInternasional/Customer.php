@@ -11,6 +11,7 @@ class Customer extends BaseController
     protected $token;
     protected $this_company_id;
     protected $this_user_id;
+    protected $is_admin;
     protected $ProvincesModel;
     protected $countryModel;
     protected $CustomerModel;
@@ -20,6 +21,7 @@ class Customer extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->this_user_id = session()->get("login")->user_id;
+        $this->is_admin = session()->get("login")->is_admin;
         $this->countryModel = new CountryModel();
         $this->CustomerModel = new CustomerModel();
     }
@@ -44,13 +46,20 @@ class Customer extends BaseController
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType")
         ];
-
-        $condition = [
-            'tipe_customer' => $this->request->getGet('customerType'),
-            'customers.company_id' => $this->this_company_id,
-            'customers.deletedAt' => null,
-            'customers.sales_id' => session()->get('login')->user_id
-        ];
+        if ($this->is_admin == '1') {
+            $condition = [
+                'tipe_customer' => $this->request->getGet('customerType'),
+                'customers.company_id' => $this->this_company_id,
+                'customers.deletedAt' => null,
+            ];
+        } else {
+            $condition = [
+                'tipe_customer' => $this->request->getGet('customerType'),
+                'customers.company_id' => $this->this_company_id,
+                'customers.deletedAt' => null,
+                'customers.sales_id' => session()->get('login')->user_id
+            ];
+        }
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
