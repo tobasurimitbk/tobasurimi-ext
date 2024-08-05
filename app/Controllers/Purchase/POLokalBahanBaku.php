@@ -180,7 +180,7 @@ class POLokalBahanBaku extends BaseController
                 'rm_purchase_orders.deletedAt' => null,
                 'rm_purchase_orders.company_id' => $this->this_company_id,
                 'rm_purchase_order_details.deletedAt' => null,
-                'purchase_requests.user_id' => $this->this_user_id
+                'rm_purchase_orders.createdBy' => $this->this_user_id
             ];
         }
 

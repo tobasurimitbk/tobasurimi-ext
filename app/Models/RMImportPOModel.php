@@ -78,7 +78,6 @@ class RMImportPOModel extends Model
             ->join('metadata', 'metadata.id = rm_import_pos.currency', 'left')
             ->join('companies', 'companies.id = rm_import_pos.company_id', 'left')
             ->join('rm_import_po_details', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
-            ->join('purchase_requests', 'purchase_requests.id = rm_import_pos.purchase_request_id')
             ->groupBy(('rm_import_pos.id'))
             ->orderBy($sort, $sortType);
 
