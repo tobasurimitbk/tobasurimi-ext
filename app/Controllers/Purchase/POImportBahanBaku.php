@@ -23,6 +23,7 @@ class POImportBahanBaku extends BaseController
     protected $token;
     protected $this_company_id;
     protected $user_id;
+    protected $is_admin;
     protected $companyModel;
     protected $metadataModel;
     protected $rmImportPOModel;
@@ -43,6 +44,7 @@ class POImportBahanBaku extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->user_id = session()->get("login")->user_id;
+        $this->is_admin = session()->get("login")->is_admin;
         $this->companyModel = new CompaniesModel();
         $this->metadataModel = new MetadataModel();
         $this->rmImportPOModel = new RMImportPOModel();
@@ -139,10 +141,20 @@ class POImportBahanBaku extends BaseController
             "dateEnd" => $this->request->getVar("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
-        $condition = [
-            "rm_import_pos.company_id" => $this->this_company_id,
-            "rm_import_po_details.deletedAt" => null
-        ];
+        if ($this->is_admin == '1') {
+            $condition = [
+                "rm_import_pos.company_id" => $this->this_company_id,
+                "rm_import_po_details.deletedAt" => null,
+            ];
+        } elseif ($this->is_admin == '0') {
+            $condition = [
+                "rm_import_pos.company_id" => $this->this_company_id,
+                "rm_import_po_details.deletedAt" => null,
+                'rm_import_pos.createdBy' => $this->user_id,
+            ];
+        }
+
+
 
         $addCondition = [
             "search"        => $this->request->getVar("search"),

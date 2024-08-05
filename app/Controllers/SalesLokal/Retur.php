@@ -18,6 +18,7 @@ class Retur extends BaseController
     protected $token;
     protected $this_company_id;
     protected $encrypter;
+    protected $is_admin;
 
     private $customerModel;
     private $soModel;
@@ -33,7 +34,7 @@ class Retur extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->encrypter = Services::encrypter();
         $this->userId = session()->get("login")->user_id;
-
+        $this->is_admin = session()->get("login")->is_admin;
         $this->customerModel = new CustomerModel();
         $this->soModel = new SalesOrderModel();
         $this->soReturnModel = new SalesOrderReturnModel();
@@ -85,10 +86,20 @@ class Retur extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
         ];
 
-        $condition = [
-            "sales_order_return.deletedAt" => null,
-            "sales_order_return.id_company" => $this->this_company_id
-        ];
+        if ($this->is_admin == '1') {
+            $condition = [
+                "sales_order_return.deletedAt" => null,
+                "sales_order_return.id_company" => $this->this_company_id,
+
+            ];
+        } else {
+            $condition = [
+                "sales_order_return.deletedAt" => null,
+                "sales_order_return.id_company" => $this->this_company_id,
+                'sales_order_return.id_user' => $this->userId
+            ];
+        }
+
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),

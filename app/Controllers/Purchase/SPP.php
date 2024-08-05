@@ -29,6 +29,8 @@ class SPP extends BaseController
     protected $RmImportPoModel;
 
     protected $this_company_id;
+    protected $this_user_id;
+    protected $is_admin;
     protected $dompdf;
 
     public function __construct()
@@ -46,6 +48,8 @@ class SPP extends BaseController
         $this->RmImportPoModel = new RMImportPOModel();
 
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_user_id = session()->get("login")->user_id;
+        $this->is_admin = session()->get("login")->is_admin;
 
         $this->dompdf = new Dompdf();
     }
@@ -120,11 +124,21 @@ class SPP extends BaseController
             "dateEnd"          => $this->request->getVar("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
-        $condition = [
-            "purchase_request_details.deletedAt" => null,
-            "purchase_requests.deletedAt" => null,
-            "purchase_requests.company_id" => $this->this_company_id
-        ];
+        if ($this->is_admin == '1') {
+            $condition = [
+                "purchase_request_details.deletedAt" => null,
+                "purchase_requests.deletedAt" => null,
+                "purchase_requests.company_id" => $this->this_company_id,
+            ];
+        } elseif ($this->is_admin == '0') {
+            $condition = [
+                "purchase_request_details.deletedAt" => null,
+                "purchase_requests.deletedAt" => null,
+                "purchase_requests.company_id" => $this->this_company_id,
+                "purchase_requests.user_id" => $this->this_user_id
+            ];
+        }
+
 
         $addCondition = [
             "search"        => $this->request->getVar("search"),
@@ -182,14 +196,15 @@ class SPP extends BaseController
 
     public function saveSPP()
     {
+
         $id = $this->SppModel->insert([
             'company_id' => $this->this_company_id,
+            'user_id' => $this->this_user_id,
             "request_date" => $this->request->getVar("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("request_date")))) : "",
             'spp_no' => $this->request->getVar('spp_no'),
             'spp_type' => trim($this->request->getVar('spp_type')),
             'divisi_id' => $this->request->getVar('divisi_id'),
             'note' => $this->request->getVar('note'),
-            'createdBy' =>  session()->get("login")->user_id,
         ]);
 
         $spp_detail = json_decode($this->request->getVar("items"));

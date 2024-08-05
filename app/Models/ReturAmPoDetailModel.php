@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 class ReturAmPoDetailModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'returampodetails';
+    protected $table            = 'retur_am_po_detail';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -28,9 +28,9 @@ class ReturAmPoDetailModel extends Model
     // Dates
     protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at';
+    protected $createdField  = 'createdAt';
+    protected $updatedField  = 'updatedAt';
+    protected $deletedField  = 'deletedAt';
 
     // Validation
     protected $validationRules      = [];

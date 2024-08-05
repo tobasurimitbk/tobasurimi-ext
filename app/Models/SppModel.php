@@ -18,6 +18,7 @@ class SppModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'company_id',
+        'user_id',
         'request_date',
         'spp_no',
         'spp_type',
@@ -25,7 +26,6 @@ class SppModel extends Model
         'note',
         'is_posted',
         'request_status',
-        'createdBy'
     ];
 
     // Dates
@@ -121,14 +121,14 @@ class SppModel extends Model
         $selectQry = "purchase_requests.*,
         divisis.divisi AS divisiName,
         companies.company AS companyName,
-        createdBy.name AS createdByName
+        users.name AS createdByName
         ";
 
         $sppData = $this->asObject()
             ->select($selectQry)
             ->join('divisis', 'purchase_requests.divisi_id = divisis.id', 'left')
             ->join('companies', 'purchase_requests.company_id = companies.id', 'left')
-            ->join('users AS createdBy', 'purchase_requests.createdBy = createdBy.id', 'left')
+            ->join('users', 'purchase_requests.user_id = users.id', 'left')
             ->find($id);
 
         return $sppData;

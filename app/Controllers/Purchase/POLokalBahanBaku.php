@@ -50,10 +50,15 @@ class POLokalBahanBaku extends BaseController
     protected $divisiModel;
     protected $kemasanModel;
 
+    protected $this_user_id;
+    protected $is_admin;
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_user_id = session()->get("login")->user_id;
+        $this->is_admin = session()->get("login")->is_admin;
         $this->RMPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $this->SupplierModel = new SupplierModel();
@@ -163,11 +168,21 @@ class POLokalBahanBaku extends BaseController
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
-        $condition = [
-            'rm_purchase_orders.deletedAt' => null,
-            'rm_purchase_orders.company_id' => $this->this_company_id,
-            'rm_purchase_order_details.deletedAt' => null
-        ];
+
+        if ($this->is_admin == '1') {
+            $condition = [
+                'rm_purchase_orders.deletedAt' => null,
+                'rm_purchase_orders.company_id' => $this->this_company_id,
+                'rm_purchase_order_details.deletedAt' => null,
+            ];
+        } elseif ($this->is_admin == '0') {
+            $condition = [
+                'rm_purchase_orders.deletedAt' => null,
+                'rm_purchase_orders.company_id' => $this->this_company_id,
+                'rm_purchase_order_details.deletedAt' => null,
+                'rm_purchase_orders.createdBy' => $this->this_user_id
+            ];
+        }
 
         $addCondition = [
             "search"        => $this->request->getVar("search"),
@@ -716,9 +731,11 @@ class POLokalBahanBaku extends BaseController
             'purchase_requests.divisi_id' => $id,
             'purchase_requests.is_posted' => '1',
             'purchase_requests.request_status' => 'waiting',
+            'purchase_requests.user_id' => $this->this_user_id,
             // 'purchase_requests.spp_type' => $spp_type
         ];
         $data = $this->sppModel->where($condition)->like('purchase_requests.spp_type', $spp_type)->findAll();
+
         return response()->setJSON([
             'token' => csrf_hash(),
             'data' => $data,

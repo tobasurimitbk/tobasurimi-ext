@@ -22,6 +22,7 @@ class UserModel extends Model
         'current_company_id',
         'employee_id',
         'status',
+        'is_admin',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -56,10 +57,12 @@ class UserModel extends Model
         $availableSort = [
             'username'          => 'users.username',
             'name'              => 'users.name',
+            'is_admin'          => 'users.is_admin',
             'employeeName'      => 'employees.name',
             'status'            => 'users.status',
             'createdAt'         => 'users.createdAt',
             'updatedAt'         => 'users.updatedAt',
+
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 

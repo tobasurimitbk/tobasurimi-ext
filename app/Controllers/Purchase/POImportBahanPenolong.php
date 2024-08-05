@@ -24,6 +24,7 @@ class POImportBahanPenolong extends BaseController
     protected $token;
     protected $this_company_id;
     protected $user_id;
+    protected $is_admin;
     protected $barangModel;
     protected $metadataModel;
     protected $amPurchaseOrderModel;
@@ -44,6 +45,7 @@ class POImportBahanPenolong extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->user_id = session()->get("login")->user_id;
+        $this->is_admin = session()->get("login")->is_admin;
         $this->barangModel = new BarangModel();
         $this->metadataModel = new MetadataModel();
         $this->amPurchaseOrderModel = new AMPurchaseOrderModel();
@@ -141,11 +143,20 @@ class POImportBahanPenolong extends BaseController
             "dateEnd" => $this->request->getVar("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
-        $condition = [
-            "am_purchase_orders.po_type"        => "Import",
-            "am_purchase_order_details.deletedAt" => null,
-            "am_purchase_orders.company_id" => $this->this_company_id,
-        ];
+        if ($this->is_admin == '1') {
+            $condition = [
+                "am_purchase_orders.po_type"        => "Import",
+                "am_purchase_order_details.deletedAt" => null,
+                "am_purchase_orders.company_id" => $this->this_company_id,
+            ];
+        } elseif ($this->is_admin == '0') {
+            $condition = [
+                "am_purchase_orders.po_type"        => "Import",
+                "am_purchase_order_details.deletedAt" => null,
+                "am_purchase_orders.company_id" => $this->this_company_id,
+                "purchase_requests.user_id" => $this->user_id
+            ];
+        }
 
         $addCondition = [
             "search"        => $this->request->getVar("search"),

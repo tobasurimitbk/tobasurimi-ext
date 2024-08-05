@@ -19,6 +19,7 @@ class SuratJalan extends BaseController
 {
     private $token;
     private $this_company_id;
+    protected $is_admin;
     private $userId;
 
     private $companyModel;
@@ -35,6 +36,7 @@ class SuratJalan extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->userId = session()->get("login")->user_id;
+        $this->is_admin = session()->get("login")->is_admin;
 
         $this->encrypter = Services::encrypter();
         $this->companyModel = new CompaniesModel();
@@ -86,10 +88,19 @@ class SuratJalan extends BaseController
             "sortType" => $this->request->getGet("sortType"),
         ];
 
-        $condition = [
-            "surat_jalan_so.deletedAt" => null,
-            "surat_jalan_so.id_company" => $this->this_company_id
-        ];
+        if ($this->is_admin == '1') {
+            $condition = [
+                "surat_jalan_so.deletedAt" => null,
+                "surat_jalan_so.id_company" => $this->this_company_id,
+            ];
+        } else {
+            $condition = [
+                "surat_jalan_so.deletedAt" => null,
+                "surat_jalan_so.id_company" => $this->this_company_id,
+                'surat_jalan_so.id_user' => $this->userId
+            ];
+        }
+
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),

@@ -25,6 +25,7 @@ class SalesOrderLain extends BaseController
 {
     protected $this_company_id;
     protected $this_user_id;
+    protected $is_admin;
     protected $salesOrderLainModel;
     protected $salesOrderLainDetailModel;
     protected $metaDataModel;
@@ -48,6 +49,7 @@ class SalesOrderLain extends BaseController
     {
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->is_admin = session()->get("login")->is_admin;
         $this->salesOrderLainModel = new SalesOrderLainModel();
         $this->salesOrderLainDetailModel = new SalesOrderLainDetailModel();
         $this->metaDataModel = new MetadataModel();
@@ -98,10 +100,19 @@ class SalesOrderLain extends BaseController
         $divisiArr = array();
         $dataResult = array();
 
-        $condition = [
-            'sales_order_lain.company_id' => $this->this_company_id,
-            'sales_order_lain.deletedAt' => null
-        ];
+
+        if ($this->is_admin == '1') {
+            $condition = [
+                'sales_order_lain.company_id' => $this->this_company_id,
+                'sales_order_lain.deletedAt' => null,
+            ];
+        } else {
+            $condition = [
+                'sales_order_lain.company_id' => $this->this_company_id,
+                'sales_order_lain.deletedAt' => null,
+                'sales_order_lain.user_id' => $this->this_user_id
+            ];
+        }
 
         foreach ($this->divisiModel->getDivisiAccess() as $d) {
             array_push($divisiArr, $d['id']);
@@ -229,7 +240,8 @@ class SalesOrderLain extends BaseController
             'no_sales_order' => $this->request->getVar('no_sales_order'),
             'tanggal' =>  $this->request->getPost("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
             'status_posting' => '0',
-            'keterangan' => strtoupper($this->request->getVar('keterangan'))
+            'keterangan' => strtoupper($this->request->getVar('keterangan')),
+            'user_id' => $this->this_user_id
         ]);
 
         foreach (json_decode($_POST['listBarang']) as $l) {

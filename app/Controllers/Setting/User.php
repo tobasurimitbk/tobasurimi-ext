@@ -160,6 +160,7 @@ class User extends BaseController
                 "username" => $data->username,
                 "employeeName" => $data->employeeName,
                 "status" => $data->status,
+                "admin" => $data->is_admin == 1 ? "Admin" : "Non Admin"
             ]);
         }
 
@@ -225,7 +226,8 @@ class User extends BaseController
                     "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
                     "company_role" => $this->request->getPost("company_role"),
                     "status" => $this->request->getPost("status"),
-                    "current_company_id" => $this->request->getPost("current_company_id")
+                    "current_company_id" => $this->request->getPost("current_company_id"),
+                    "is_admin" => $this->request->getvar('is_admin')
                 ];
 
                 // $data = [
@@ -316,7 +318,8 @@ class User extends BaseController
                             "user_pass" => password_hash($this->request->getVar("password"), PASSWORD_BCRYPT),
                             "company_role" => $this->request->getPost("company_role"),
                             "status" => $this->request->getPost("status"),
-                            "current_company_id" => $this->request->getPost("current_company_id")
+                            "current_company_id" => $this->request->getPost("current_company_id"),
+                            "is_admin" => $this->request->getPost('is_admin')
                         ];
                     } else {
                         $payload = [
@@ -324,7 +327,8 @@ class User extends BaseController
                             "username" => $this->request->getPost("username"),
                             "company_role" => $this->request->getPost("company_role"),
                             "status" => $this->request->getPost("status"),
-                            "current_company_id" => $this->request->getPost("current_company_id")
+                            "current_company_id" => $this->request->getPost("current_company_id"),
+                            "is_admin" => $this->request->getPost('is_admin')
                         ];
                     }
 
@@ -375,6 +379,7 @@ class User extends BaseController
 
     public function getByIdUser($id = null)
     {
+
         if (!empty($id)) {
             $response =  $this->UserModel->getUser($id);
 
@@ -393,7 +398,7 @@ class User extends BaseController
                         "company_name" => $company_name ? $company_name["company"] : "",
                         "role_name" => $role_name ? $role_name["name"] : "",
                         "divisi_access_id" => $item->divisi_access_id,
-                        "divisi_access_name" => $item->divisi_access_name
+                        "divisi_access_name" => $item->divisi_access_name,
                     ]);
                 }
                 $data = [

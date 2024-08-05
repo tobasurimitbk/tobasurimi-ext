@@ -23,6 +23,8 @@ class POLokalBahanPenolong extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $this_user_id;
+    protected $is_admin;
     protected $aMPurchaseOrderModel;
     protected $aMPurchaseOrderDetailModel;
     protected $MetadataModel;
@@ -44,6 +46,8 @@ class POLokalBahanPenolong extends BaseController
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_user_id = session()->get("login")->user_id;
+        $this->is_admin = session()->get("login")->is_admin;
         $this->aMPurchaseOrderModel = new AMPurchaseOrderModel();
         $this->aMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->MetadataModel = new MetadataModel();
@@ -188,13 +192,23 @@ class POLokalBahanPenolong extends BaseController
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
+        if ($this->is_admin == '1') {
+            $condition = [
+                'po_type' => "Lokal",
+                'am_purchase_orders.deletedAt' => null,
+                'am_purchase_orders.company_id' => $this->this_company_id,
+                'am_purchase_order_details.deletedAt' => null,
+            ];
+        } elseif ($this->is_admin == '0') {
+            $condition = [
+                'po_type' => "Lokal",
+                'am_purchase_orders.deletedAt' => null,
+                'am_purchase_orders.company_id' => $this->this_company_id,
+                'am_purchase_order_details.deletedAt' => null,
+                'purchase_requests.user_id' => $this->this_user_id
+            ];
+        }
 
-        $condition = [
-            'po_type' => "Lokal",
-            'am_purchase_orders.deletedAt' => null,
-            'am_purchase_orders.company_id' => $this->this_company_id,
-            'am_purchase_order_details.deletedAt' => null
-        ];
 
         $addCondition = [
             "search"        => $this->request->getVar("search"),

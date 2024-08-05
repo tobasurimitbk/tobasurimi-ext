@@ -158,8 +158,12 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row.id;
-                    let status = row.status_post
-                    let tipe_bahan = row.tipe_bahan
+                    let status = row.status_post;
+                    let tipe_bahan = row.tipe_bahan;
+                    let status_post = row.status_post;
+                    let bc_type = row.bc_type;
+                    let in_bc = row.in_bc;
+
 
                     if (status == "WAITING") {
                         return `
@@ -182,7 +186,11 @@
                         </div>
                     `
                     } else {
-                        return `
+                        buttonUnpost = `<button data-toggle="tooltip" title="Unpost" class="btn btn-danger btn-print" onclick="unposting('${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-ban fa-sm" aria-hidden="true"></i>
+                                </button>`;
+
+                        string = `
                         <div class="mt-0" >
                             <button data-toggle="tooltip" title="Return Out" class="btn btn-success return-out" onclick="" style="box-shadow: none !important;">
                                 <i class="fa fa-undo fa-sm" aria-hidden="true"></i>
@@ -192,8 +200,11 @@
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
-                        </div>
-                    `
+                           `;
+                        if (bc_type !== '0' && in_bc === 'out') {
+                            string += buttonUnpost;
+                        }
+                        return string + `</div>`;
                     }
 
                 }
@@ -314,6 +325,60 @@
                 });
             }
         })
+    }
+
+    const unposting = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan di unposting?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("penerimaan-barang-lokal-bb/unposting"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+
+                        }
+                    },
+
+                });
+            }
+        })
+
     }
 
     const remove = function(id) {

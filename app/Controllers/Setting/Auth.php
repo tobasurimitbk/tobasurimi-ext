@@ -145,6 +145,7 @@ class Auth extends BaseController
                             "this_role_id" => $this_role_id,
                             "this_role_name" => $this_role_name,
                             "this_access_divisi_id" => $this_access_divisi_id,
+                            "is_admin" => $res_user[0]['is_admin'],
                             //"company_role" => $data->company_role,
                             //"company_role" => $data->company_role,
                             "arr_company"   => $res_company,
