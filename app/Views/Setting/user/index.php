@@ -64,6 +64,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+
+                        <div class="col">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select is_admin" name="is_admin" id="is_admin" aria-label="Floating label select example">
+                                    <option value="1">Admin</option>
+                                    <option value="0">Non Admin</option>
+                                </select>
+                                <label for="floatingInput">Admin</label>
+                            </div>
+                            <small>Jika Admin maka User dapat melihat semua data purchasing dan di semua sales</small>
+                        </div>
+
+                    </div>
                 </form>
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
@@ -167,6 +181,7 @@
                                 <th onclick="changeSort('username')" class="sort">Username</th>
                                 <th onclick="changeSort('employeeName')" class="sort">Employee</th>
                                 <th onclick="changeSort('status')" class="sort">Status</th>
+                                <th onclick="changeSort('is_admin')" class="sort">Admin</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -235,6 +250,10 @@
             },
             {
                 data: "status",
+                className: "text-center"
+            },
+            {
+                data: "admin",
                 className: "text-center"
             }
         ],
@@ -329,6 +348,7 @@
             theme: "bootstrap-5",
             dropdownParent: $(".detail-modal .modal-content")
         })
+
 
         $('.role_id').select2({
             placeholder: "",
@@ -957,6 +977,7 @@
                         $(".name").val(res.data.nip + " - " + res.data.name);
                         $(".username").val(res.data.username);
                         $(".status").val(res.data.status);
+                        $(".is_admin").val(res.data.is_admin);
 
                         $(".body-detail-table").empty()
                         row = 0;
