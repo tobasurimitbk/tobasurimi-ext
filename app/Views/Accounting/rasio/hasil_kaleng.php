@@ -48,38 +48,39 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-12">
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover-tobasurimi dataTable" id="selectedItemTableRasioAkhir" width="100%" border="1" cellspacing="0">
-                <thead class="thead-dark">
-                    <tr>
-                        <th style="text-align: center;">No</th>
-                        <th style="text-align: center;">Kode Barang</th>
-                        <th style="text-align: center;">Nama Barang</th>
-                        <th style="text-align: center;">Satuan</th>
-                        <th style="text-align: center;">Jumlah Barang </th>
-                        <th style="text-align: center;">Jumlah Barang (KG)</th>
-                        <th style="text-align: center;">Bhn Tersedia</th>
-                        <th style="text-align: center;">Filling Weight</th>
-                        <th style="text-align: center;">Rasio</th>
-                        <th style="text-align: center;">Harga Satuan</th>
-                        <th style="text-align: center;">Total</th>
-                        <th style="text-align: center;">Harga BB</th>
-                    </tr>
-                </thead>
-                <tbody class="body-table-rasio-akhir">
-                </tbody>
-                <tfoot style="background: #ffffff !important;" class="tfoot-rasio-akhir" id="tfoot-rasio-akhir">
-                    <tr>
-                        <td colspan="12" style="text-align: center;">
-                            Tidak Ada Barang
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
+    <!-- <div class="col-md-12"> -->
+    <div class="table-responsive">
+        <table class="table nowrap table-bordered table-hover dataTable" id="selectedItemTableRasioAkhir" width="100%" cellspacing="0">
+            <thead class="thead-dark">
+                <tr>
+                    <th style="text-align: center;">No</th>
+                    <th style="text-align: center;">Kode Barang</th>
+                    <th style="text-align: center;">Nama Barang</th>
+                    <th style="text-align: center;">Satuan</th>
+                    <th style="text-align: center;">Jumlah Barang</th>
+                    <th style="text-align: center;">Jumlah Barang (KG)</th>
+                    <th style="text-align: center;">Bhn Tersedia</th>
+                    <th style="text-align: center;">Filling Weight</th>
+                    <th style="text-align: center;">Rasio</th>
+                    <th style="text-align: center;">Harga Satuan</th>
+                    <th style="text-align: center;">Total</th>
+                    <th style="text-align: center;">Harga BB</th>
+                </tr>
+            </thead>
+            <tbody class="body-table-rasio-akhir">
+            </tbody>
+            <tfoot style="background: #ffffff !important;" class="tfoot-rasio-akhir" id="tfoot-rasio-akhir">
+                <tr>
+                    <td colspan="12" style="text-align: center;">
+                        Tidak Ada Barang
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+        <!-- </div> -->
     </div>
 </div>
+
 <script>
     $('#select-item-btn').click(function() {
         if (list_items_barang_digunakan_alokasi.length == 0) {

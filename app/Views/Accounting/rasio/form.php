@@ -2059,13 +2059,13 @@
                 row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
                 row += '<td>' + item.kode_satuan + '</td>';
                 row += '<td>' +
-                    '<input class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
+                    '<input style="width: 250px;" class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
                     '</td>';
                 row += '<td>' +
-                    '<input class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
+                    '<input style="width: 250px;" class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
                     '</td>';
                 row += '<td>' +
-                    '<input class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
+                    '<input style="width: 250px;" class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
                     '</td>';
                 row += '</tr>';
                 no++;
@@ -2144,13 +2144,13 @@
                 row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
                 row += '<td>' + item.kode_satuan + '</td>';
                 row += '<td>' +
-                    '<input class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
+                    '<input style="width: 250px;" class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
                     '</td>';
                 row += '<td>' +
-                    '<input class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
+                    '<input style="width: 250px;" class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
                     '</td>';
                 row += '<td>' +
-                    '<input class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
+                    '<input style="width: 250px;" class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
                     '</td>';
                 row += '</tr>';
                 no++;
@@ -2229,13 +2229,13 @@
                 row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
                 row += '<td>' + item.kode_satuan + '</td>';
                 row += '<td>' +
-                    '<input class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
+                    '<input style="width: 250px;" class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
                     '</td>';
                 row += '<td>' +
-                    '<input class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
+                    '<input style="width: 250px;" class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
                     '</td>';
                 row += '<td>' +
-                    '<input class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
+                    '<input style="width: 250px;" class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
                     '</td>';
                 row += '</tr>';
                 no++;
@@ -2286,6 +2286,8 @@
     }
 
     const drawTableRasioAkhir = function(data) {
+        console.log(data);
+
         $('.body-table-rasio-akhir').empty();
         $('.tfoot-rasio-akhir').empty();
 
@@ -2328,13 +2330,29 @@
             });
 
             data.forEach((item, index) => {
+
                 let calculatedHargaTotal = 0;
                 let itemHargaTotal = 0;
                 let hargaSatuan = 0;
-                const totalQtyAll = parseFloat(item.totalQtyAll);
-                const rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyAll) * 100;
-                const rasioTanpaManual = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyTanpaManual) * 100;
+                let totalQtyAll = 0;
+                let rasio = 0;
+                let rasioTanpaManual = 0;
 
+                if (item.barang_type == "bahan_setengah_jadi") {
+                    calculatedHargaTotal = 0;
+                    itemHargaTotal = 0;
+                    hargaSatuan = 0;
+                    totalQtyAll = parseFloat(item.totalQtyAll);
+                    rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyAll) * 100;
+                    rasioTanpaManual = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyTanpaManual) * 100;
+                } else {
+                    calculatedHargaTotal = 0;
+                    itemHargaTotal = 0;
+                    hargaSatuan = 0;
+                    totalQtyAll = parseFloat(item.totalQtyAll);
+                    rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / parseFloat(item.hasilWithPersentase));
+                    rasioTanpaManual = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / parseFloat(item.hasilWithPersentase));
+                }
 
                 if (isNaN(totalHargaTotalManual)) {
                     calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan)) * (rasio / 100);
@@ -2367,28 +2385,28 @@
                     <td>${item.barang_name} - ${item.spesifikasi}</td>
                     <td>${item.kode_satuan}</td>
                     <td>
-                        <input class="form-control jumlah-barang text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qtyTotal}">
+                        <input style="width: 150px;" class="form-control jumlah-barang text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qtyTotal}">
                     </td>
                     <td>
-                        <input class="form-control jumlah-barang-berat text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty_isi}">
+                        <input style="width: 150px;" class="form-control jumlah-barang-berat text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty_isi}">
                     </td>
                     <td>
-                        <input class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.hasilWithPersentase}">
+                        <input style="width: 150px;" class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.hasilWithPersentase}">
                     </td>
                     <td>
-                        <input class="form-control filling-weight-barang text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty2}">
+                        <input style="width: 150px;" class="form-control filling-weight-barang text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty2}">
                     </td>
                     <td>
-                        <input class="form-control rasio text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${rasio.toFixed(2)}%">
+                        <input style="width: 150px;" class="form-control rasio text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${rasio.toFixed(2)}%">
                     </td>
                     <td>
-                        <input class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${formatRupiah(hargaSatuan)}">
+                        <input style="width: 200px;" class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${formatRupiah(hargaSatuan)}">
                     </td>
                     <td>
-                        <input class="form-control harga text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 || item.harga_total == undefined ? formatRupiah(calculatedHargaTotal) : formatRupiah(item.harga_total)}">
+                        <input style="width: 200px;" class="form-control harga text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 || item.harga_total == undefined ? formatRupiah(calculatedHargaTotal) : formatRupiah(item.harga_total)}">
                     </td>
                     <td>
-                        <input class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 || item.harga_total == undefined ? formatRupiah(calculatedHargaTotal / item.hasilWithPersentase) : formatRupiah(item.harga_total / item.hasilWithPersentase)}">
+                        <input style="width: 200px;" class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 || item.harga_total == undefined ? formatRupiah(calculatedHargaTotal / item.hasilWithPersentase) : formatRupiah(item.harga_total / item.hasilWithPersentase)}">
                     </td>
                 </tr>`;
                 no++;
@@ -2519,13 +2537,13 @@
                     <td>${item.barang_name} - ${item.spesifikasi}</td>
                     <td>${item.kode_satuan}</td>
                     <td>
-                        <input class="form-control jumlah-barang text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qtyTotal}">
+                        <input style="width: 150px;" class="form-control jumlah-barang text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qtyTotal}">
                     </td>
                     <td>
-                        <input class="form-control rasio text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${rasio.toFixed(2)}%">
+                        <input style="width: 150px;" class="form-control rasio text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${rasio.toFixed(2)}%">
                     </td>
                     <td>
-                        <input class="form-control harga text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 || item.harga_total == undefined ? formatRupiah(calculatedHargaTotal) : formatRupiah(item.harga_total)}">
+                        <input style="width: 150px;" class="form-control harga text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 || item.harga_total == undefined ? formatRupiah(calculatedHargaTotal) : formatRupiah(item.harga_total)}">
                     </td>
                 </tr>`;
                 no++;
