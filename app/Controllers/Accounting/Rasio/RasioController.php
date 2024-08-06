@@ -653,16 +653,20 @@ class RasioController extends BaseController
                             ->findAll();
                         // var_dump($penerimaanBarangDetail);
                         foreach ($penerimaanBarangDetail as $valuePenerimaanBarangDetail) {
-                            $hargaSatuan += ($valuePenerimaanBarangDetail['harga'] + $valuePenerimaanBarangDetail['harga_harian'] + $valuePenerimaanBarangDetail['harga_bulanan']) * $kursValue;
-                            $totalQty += $valuePenerimaanBarangDetail['qty'];
+                            $hargaSatuan += (floatval($valuePenerimaanBarangDetail['harga']) + floatval($valuePenerimaanBarangDetail['harga_harian']) + floatval($valuePenerimaanBarangDetail['harga_bulanan'])) * $kursValue;
+                            $totalQty += floatval($valuePenerimaanBarangDetail['qty']);
                             $satuanLPB = $valuePenerimaanBarangDetail['kode_satuan'];
                         }
+                    } else {
+                        $hargaSatuan += floatval(0);
+                        $totalQty += floatval(0);
+                        $satuanLPB = $value->satuanPO;
                     }
                 }
                 $totalHarga = $totalQty * $hargaSatuan;
                 $value->totalQtyLPB = $totalQty;
                 $value->totalHargaLPB = $hargaSatuan;
-                $value->hargaSatuanLPB = $hargaSatuan / $totalQty;
+                $value->hargaSatuanLPB = $hargaSatuan != 0 && $totalQty != 0 ? $hargaSatuan / $totalQty : 0;
                 $value->satuanLPB = $satuanLPB;
             }
 

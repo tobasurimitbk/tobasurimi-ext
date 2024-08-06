@@ -632,7 +632,6 @@
                                 list_items_barang_jadi_frozen.push(item);
                             }
                         });
-                        console.log(list_items_barang_digunakan);
 
                         drawTablePembelian();
                         drawTableDigunakan();
@@ -2059,13 +2058,13 @@
                 row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
                 row += '<td>' + item.kode_satuan + '</td>';
                 row += '<td>' +
-                    '<input style="width: 250px;" class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
+                    '<input style="width: 350px;" class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
                     '</td>';
                 row += '<td>' +
-                    '<input style="width: 250px;" class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
+                    '<input style="width: 350px;" class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
                     '</td>';
                 row += '<td>' +
-                    '<input style="width: 250px;" class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
+                    '<input style="width: 350px;" class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
                     '</td>';
                 row += '</tr>';
                 no++;
@@ -2144,13 +2143,13 @@
                 row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
                 row += '<td>' + item.kode_satuan + '</td>';
                 row += '<td>' +
-                    '<input style="width: 250px;" class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
+                    '<input style="width: 350px;" class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
                     '</td>';
                 row += '<td>' +
-                    '<input style="width: 250px;" class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
+                    '<input style="width: 350px;" class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
                     '</td>';
                 row += '<td>' +
-                    '<input style="width: 250px;" class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
+                    '<input style="width: 350px;" class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
                     '</td>';
                 row += '</tr>';
                 no++;
@@ -2229,13 +2228,13 @@
                 row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
                 row += '<td>' + item.kode_satuan + '</td>';
                 row += '<td>' +
-                    '<input style="width: 250px;" class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
+                    '<input style="width: 350px;" class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
                     '</td>';
                 row += '<td>' +
-                    '<input style="width: 250px;" class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
+                    '<input style="width: 350px;" class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
                     '</td>';
                 row += '<td>' +
-                    '<input style="width: 250px;" class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
+                    '<input style="width: 350px;" class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
                     '</td>';
                 row += '</tr>';
                 no++;
@@ -2286,7 +2285,6 @@
     }
 
     const drawTableRasioAkhir = function(data) {
-        console.log(data);
 
         $('.body-table-rasio-akhir').empty();
         $('.tfoot-rasio-akhir').empty();
@@ -2307,7 +2305,6 @@
         });
 
         const hargaTotalPenerimaan = amount + biayaSubsidi + biayaLain + biayaKopek;
-
 
         if (data.length === 0) {
             row += '<tr><td colspan="12" class="text-center">Data Barang Tidak Ada</td></tr>';
@@ -2330,7 +2327,6 @@
             });
 
             data.forEach((item, index) => {
-
                 let calculatedHargaTotal = 0;
                 let itemHargaTotal = 0;
                 let hargaSatuan = 0;
@@ -2366,7 +2362,6 @@
                         itemHargaTotal = item.harga_total == 0 ? parseFloat(calculatedHargaTotal) : parseFloat(item.harga_total);
                     }
                 }
-
 
                 if (item.harga_satuan == 0 || item.harga_satuan == undefined) {
                     hargaSatuan = (parseFloat(calculatedHargaTotal) / parseFloat(item.qtyTotal));
