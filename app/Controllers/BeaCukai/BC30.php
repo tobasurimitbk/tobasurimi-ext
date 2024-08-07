@@ -1232,8 +1232,6 @@ class BC30 extends BaseController
         $payload = json_decode($this->bc30Model->find($id)['payload']);
         $detailBarang = $this->bc30Model->detailBarang($bc30['id'], $kodeBarang, $bc30['sales_order_id']);
         $totalBarang = count($this->bc30Model->barang($bc30['sales_order_id'], $bc30['tipe_sales_order']));
-        var_dump($payload->barang);
-        die;
         // $this->setFlashDataNavigatorSession($id);
 
         if ($detailBarang['bcDetail'] == null) {
