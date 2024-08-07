@@ -68,10 +68,12 @@ class MutasiGlobalDetailModel extends Model
                 $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stock['barang2_id']);
                 $satuan = $satuanModel->find($barangMasterSpesifikasi['satuan_1']);
                 $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
+                $kodeBarang = $barangMaster['kode_barang'];
             } else {
                 $kemasan = $kemasanModel->find($stock['kemasan_id']);
                 $satuan = $satuanModel->find($kemasan['satuan_id']);
                 $barangName = $kemasan['name'];
+                $kodeBarang = $kemasan['kode'];
             }
 
             $supplier = $supplierModel->select('suppliers.*')
@@ -91,9 +93,14 @@ class MutasiGlobalDetailModel extends Model
             $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
             $stockList['supplier_name'] = $supplier != null ? strtoupper($supplier['name']) : "-";
             $stockList['stok_total'] = $stockList['stok_total'];
+            $stockList['kode_barang'] = $kodeBarang;
+            $stockList['satuan_id'] = $satuan['id'];
+            $stockList['satuan'] = $satuan['kode_satuan'];
+            $stockList['total_harga'] = $stockList['harga_umum'] + $stockList['harga_harian'] + $stockList['harga_bulanan'];
 
             array_push($result, $stockList);
         }
+
 
         return $result;
     }

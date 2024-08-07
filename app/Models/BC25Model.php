@@ -252,7 +252,7 @@ class BC25Model extends Model
                 $result[$key]['total_harga'] = (int)$item['total_harga'];
                 $result[$key]['qty_konversi'] = (int)$item['qty_konversi'];
             } else {
-                $result[$key]['total_harga'] = (int)$item['total_harga'];
+                $result[$key]['total_harga'] += (int)$item['total_harga'];
                 $result[$key]['qty_konversi'] += (int)$item['qty_konversi'];
             }
         }

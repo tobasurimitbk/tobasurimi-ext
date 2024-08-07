@@ -138,6 +138,8 @@ class BC30Model extends Model
                 barang_master_sales.barang_name AS nama_barang_sales,
                 barang_master.kode_barang AS kode_barang_internal,
                 barang_master_spesifikasi.satuan_1 AS satuan_internal_id,
+                barang_master.id as barang_master_id,
+                 barang_master.barang_name as nama_barang,
                 CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) as nama_barang_internal,
                 stuffing_lokal_detail.stock_id_warehouse,
                 stuffing_lokal_detail.bc_id_warehouse,
@@ -180,6 +182,7 @@ class BC30Model extends Model
                 $dataResult[$i]['tipe_barang'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
                 $dataResult[$i]['dokumen_asal'] = ($bcTypeText != "NON PABEAN") ? $bcTypeText . " / " . $stockList['no_aju'] : "NON PABEAN";
                 $dataResult[$i]['harga'] =  number_format(($dataResult[$i]['qty_keluar'] * $salesOrderDetail['harga_barang']), 2);
+                $dataResult[$i]['harga_number'] = ($dataResult[$i]['qty_keluar'] * $salesOrderDetail['harga_barang']);
                 $dataResult[$i]['mata_uang'] = "IDR";
                 $dataResult[$i]['kode_satuan_sales'] = $satuanSales == null ? "-" : $satuanSales['kode_satuan'];
                 $dataResult[$i]['kode_satuan_internal'] = $satuanInternal == null ? "-" : $satuanInternal['kode_satuan'];
@@ -190,6 +193,8 @@ class BC30Model extends Model
                 barang_master_sales.kode_barang AS kode_barang_sales,
                 barang_master_sales.barang_name AS nama_barang_sales,
                 barang_master.kode_barang AS kode_barang_internal,
+                barang_master.id as barang_master_id,
+                barang_master.barang_name as nama_barang,
                 barang_master_spesifikasi.satuan_1 AS satuan_internal_id,
                 CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) as nama_barang_internal,
                 stuffing_internasional_detail.stock_id_warehouse,
@@ -240,6 +245,7 @@ class BC30Model extends Model
                 $dataResult[$i]['tipe_barang'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
                 $dataResult[$i]['dokumen_asal'] = ($bcTypeText != "NON PABEAN") ? $bcTypeText . " / " . $stockList['no_aju'] : "NON PABEAN";
                 $dataResult[$i]['harga'] = number_format(($dataResult[$i]['qty_keluar'] * $salesOrderDetail['harga_barang']), 2);
+                $dataResult[$i]['harga_number'] = ($dataResult[$i]['qty_keluar'] * $salesOrderDetail['harga_barang']);
                 $dataResult[$i]['mata_uang'] = $salesOrderDetail['value'];
                 $dataResult[$i]['kode_satuan_sales'] = $satuanSales == null ? "-" : $satuanSales['kode_satuan'];
                 $dataResult[$i]['kode_satuan_internal'] = $satuanInternal == null ? "-" : $satuanInternal['kode_satuan'];
@@ -359,5 +365,63 @@ class BC30Model extends Model
 
         $result['country_name'] = $result['country_name'] == null ? "-" : $result['country_name'];
         return $result;
+    }
+
+    public function detailBarang($bcId, $kodeBarang)
+    {
+
+        $bc30 = $this->find($bcId);
+        $listBarang = $this->barang($bc30['sales_order_id'], $bc30['tipe_sales_order']);
+        $result = [];
+        $payload = json_decode($this->find($bcId)['payload']);
+
+
+        foreach ($listBarang as $l) {
+            if ($kodeBarang == $l['kode_barang_internal']) {
+                $result = [
+                    'barangDetail' => $l,
+                    'bcDetail' => null
+                ];
+            }
+        }
+
+        foreach ($payload->barang as $b) {
+            if ($b->kodeBarang == $result['barangDetail']['kode_barang_internal']) {
+                $result['bcDetail'] = $b;
+            }
+        }
+
+
+        return $result;
+    }
+
+    public function barang($salesOrderId, $tipeSalesOrder)
+    {
+
+        $detailBarang =  $this->getListBarang(
+            $salesOrderId,
+            $tipeSalesOrder
+        );
+        $result = [];
+
+
+
+        foreach ($detailBarang as $item) {
+            $key = $item['barang_master_id'];
+
+            if (!isset($result[$key])) {
+                $result[$key] = $item;
+                $result[$key]['harga_number'] = $item['harga_number'];
+                $result[$key]['qty_keluar'] = (int)$item['qty_keluar'];
+            } else {
+                $result[$key]['harga_number'] += $item['harga_number'];
+
+                $result[$key]['qty_keluar'] += (int)$item['qty_keluar'];
+            }
+        }
+
+
+
+        return array_values($result);
     }
 }

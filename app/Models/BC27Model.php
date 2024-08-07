@@ -250,4 +250,47 @@ class BC27Model extends Model
 
         return $dataList;
     }
+
+    public function barang($mutasiGlobalId)
+    {
+        $mutasiGlobalDetailModel = new MutasiGlobalDetailModel();
+        $detailBarang = $mutasiGlobalDetailModel->getMutasiDetail($mutasiGlobalId);
+        $result = [];
+        foreach ($detailBarang as $item) {
+            $key = $item['barang1_id'] . '-' . $item['kemasan_id'];
+            if (!isset($result[$key])) {
+                $result[$key] = $item;
+                $result[$key]['total_harga'] = (int)$item['total_harga'];
+                $result[$key]['qty'] = (int)$item['qty'];
+            } else {
+                $result[$key]['total_harga'] += (int)$item['total_harga'];
+                $result[$key]['qty'] += (int)$item['qty'];
+            }
+        }
+
+        return array_values($result);
+    }
+    public function detailBarang($bcId, $kodeBarang, $mutasiGlobalId)
+    {
+        $listBarang = $this->barang($mutasiGlobalId);
+        $payload = json_decode($this->find($bcId)['payload']);
+        $result = null;
+
+        foreach ($listBarang as $l) {
+            if ($kodeBarang == $l['kode_barang']) {
+                $result = [
+                    'barangDetail' => $l,
+                    'bcDetail' => null
+                ];
+            }
+        }
+
+        foreach ($payload->barang as $b) {
+            if ($b->kodeBarang == $result['barangDetail']['kode_barang']) {
+                $result['bcDetail'] = $b;
+            }
+        }
+
+        return $result;
+    }
 }
