@@ -599,6 +599,7 @@
                         list_items_saldo_adjusment = [];
                         list_items_saldo_jual = [];
                         let no = 0;
+                        let barang1IdQtyMap = {};
                         // Iterate over each item in the response data
                         // bahan digunakan pembelian
                         res.dataBahanDigunakanPO.forEach(function(item) {
@@ -629,9 +630,53 @@
                             } else if (item.barang_type == "bahan_jadi" && item.kode_satuan == "CAN") {
                                 list_items_barang_jadi_kaleng.push(item);
                             } else {
-                                list_items_barang_jadi_frozen.push(item);
+                                let barang1Id = item.barang1_id;
+                                let barang_name = item.barang_name;
+                                let kode_barang = item.kode_barang;
+                                let kode_satuan = item.kode_satuan;
+
+                                if (barang1IdQtyMap[barang1Id]) {
+                                    barang1IdQtyMap[barang1Id].qty += parseFloat(item.qty);
+                                    barang1IdQtyMap[barang1Id].qty2 += parseFloat(item.qty2);
+                                    barang1IdQtyMap[barang1Id].qty_isi += parseFloat(item.qty_isi);
+                                    barang1IdQtyMap[barang1Id].banyakData += parseFloat(1);
+                                    barang1IdQtyMap[barang1Id].hasilWithPersentase += parseFloat(item.hasilWithPersentase);
+                                } else {
+                                    // Initialize a new entry for this barang1_id
+                                    barang1IdQtyMap[barang1Id] = {
+                                        barang1_id: barang1Id,
+                                        barang_name: barang_name,
+                                        kode_barang: kode_barang,
+                                        kode_satuan: kode_satuan,
+                                        qty: parseFloat(item.qty),
+                                        qty2: parseFloat(item.qty2),
+                                        qty_isi: parseFloat(item.qty_isi),
+                                        banyakData: parseFloat(1),
+                                        hasilWithPersentase: parseFloat(item.hasilWithPersentase),
+                                    };
+                                }
                             }
                         });
+
+                        // Step 2: Convert the map to a list
+                        for (let key in barang1IdQtyMap) {
+                            if (barang1IdQtyMap.hasOwnProperty(key)) {
+                                let group = barang1IdQtyMap[key];
+                                // Create a new item with the aggregated qty
+                                let newItem = {
+                                    barang1_id: group.barang1_id,
+                                    qtyTotal: group.qty,
+                                    qty2: (group.qty2 / group.banyakData),
+                                    qty_isi: (group.qty_isi / group.banyakData),
+                                    barang_name: group.barang_name,
+                                    kode_barang: group.kode_barang,
+                                    kode_satuan: group.kode_satuan,
+                                    hasilWithPersentase: group.hasilWithPersentase,
+                                };
+                                // list_items_barang_jadi_kaleng.push(newItem);
+                                list_items_barang_jadi_frozen.push(newItem);
+                            }
+                        }
 
                         drawTablePembelian();
                         drawTableDigunakan();
@@ -643,6 +688,9 @@
                         drawTableSaldoAdjusmentBonus();
                         drawTableSaldoAdjusmentLainnya();
                         drawTableSaldoJual();
+                        drawTableRasioTrimming();
+                        drawTableRasioKaleng();
+                        drawTableRasioFrozen();
 
                         if (list_items_barang_digunakan.length == 0) {
                             $("#rawIBahanDigunakan").hide();
@@ -2225,7 +2273,7 @@
                 row += '<tr style="color:whitesmoke;text-align: center;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.kode_barang + '</td>';
-                row += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
+                row += '<td>' + item.barang_name + '</td>';
                 row += '<td>' + item.kode_satuan + '</td>';
                 row += '<td>' +
                     '<input style="width: 350px;" class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
