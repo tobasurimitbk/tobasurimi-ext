@@ -1884,6 +1884,9 @@ $routes->post('/rasio/delete', 'Accounting\Rasio\RasioController::deleteRasio', 
 $routes->post('/rasio/get', 'Accounting\Rasio\RasioController::get', ['filter' => 'Auth']);
 $routes->get('/rasio/load_content', 'Accounting\Rasio\RasioController::load_content', ['filter' => 'Auth']);
 
+// Tutup Buku
+$routes->get('/tutup-buku', 'Accounting\TutupBuku\TutupBukuController::index', ['filter' => 'Auth']);
+$routes->get('/tutup-buku/all', 'Accounting\TutupBuku\TutupBukuController::all', ['filter' => 'Auth']);
 //Laporan
 //Accounting
 $routes->get('/laporan-accounting', 'Laporan\Accounting\Accounting::index', ['filter' => 'Auth']);
