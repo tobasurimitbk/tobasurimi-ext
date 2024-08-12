@@ -10,17 +10,13 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end mt-3">
-                <div class="col-md-4">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Supplier" value="" />
-                </div>
-            </div>
             <div class="row mt-3">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
+                                <th>Department</th>
                                 <th>Bulan</th>
                                 <th>Stock</th>
                                 <th>Saldo</th>
@@ -108,7 +104,6 @@
                 url: "<?= base_url("tutup-buku/all"); ?>",
                 dataSrc: "data",
                 data: function(data) {
-                    data.search = $(".search").val();
                     data.sort = sort;
                     data.sortType = sortType;
                 }
@@ -126,6 +121,9 @@
                 sortable: false,
                 width: "5%"
             }, {
+                data: "divisi",
+                className: "text-center",
+            }, {
                 data: "bulan",
                 className: "text-center",
             }, {
@@ -135,7 +133,7 @@
                     console.log(data);
 
                     // If "akun_coa" exists and is not empty, display a checkbox
-                    if (data && data !== "") {
+                    if (data == 1) {
                         return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
                     } else { // Otherwise, display a dash "-"
                         return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
@@ -146,7 +144,7 @@
                 className: "text-center",
                 render: function(data, type, row) {
                     // If "akun_coa" exists and is not empty, display a checkbox
-                    if (data && data !== "") {
+                    if (data == 1) {
                         return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
                     } else { // Otherwise, display a dash "-"
                         return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
@@ -166,14 +164,10 @@
                 }
             }
         });
-
-        $(".search").keyup(function() {
-            table.ajax.reload();
-        });
         // create modal show
         $('.btn-show-form').click(function() {
             resetVal();
-            $('.title-name').text("Tambah Account Supplier");
+            $('.title-name').text("Tambah Tutup Buku");
             $('.delete-btn').hide();
             $('.add-modal').modal('show');
         });
@@ -189,10 +183,10 @@
             let formData = new FormData();
             formData.append("id", id);
             $('.delete-btn').show();
-            $('.title-name').text("Update Account Supplier");
+            $('.title-name').text("Update Tutup Buku");
 
             $.ajax({
-                url: "<?= base_url("akun-supplier/get"); ?>",
+                url: "<?= base_url("tutup-buku/get"); ?>",
                 data: formData,
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -205,18 +199,8 @@
                     csrf.val();
                     if (res.status) {
                         $("#id").val(id).change();
-                        if (res.data.supplier_id != 0) {
-                            $('.delete-btn').show();
-                            $("#supplier_id").prop("disabled", false);
-
-                            $("#supplier_id").val(res.data.supplier_id).change();
-                        } else {
-                            $('.delete-btn').hide();
-                            $("#supplier_id").prop("disabled", true);
-                            $("#supplier_id").val("").change()
-                        }
-                        $("#akun_ap_id").val(res.data.ap_id).change();
-                        $("#akun_ar_id").val(res.data.ar_id).change();
+                        $("#divisi_id").val(res.data.divisi_id).change();
+                        $("#bulan_closing").val(res.data.bulan).change();
                         $('.add-modal').modal('show');
                     } else {
                         Swal.fire({
@@ -234,7 +218,7 @@
             var parentName = $('#parentName').val();
             Swal.fire({
                 icon: 'question',
-                title: 'Hapus Account Supplier ?',
+                title: 'Hapus Tutup Buku ?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
@@ -249,7 +233,7 @@
                     // console.log(id);
 
                     $.ajax({
-                        url: "<?= base_url("akun-supplier/delete"); ?>",
+                        url: "<?= base_url("tutup-buku/delete"); ?>",
                         data: {
                             id: id
                         },
@@ -283,13 +267,19 @@
         // init validation
         var validator = $(".create-form").validate({
             rules: {
-                parentName: {
+                divisi_id: {
+                    required: true
+                },
+                bulan_closing: {
                     required: true
                 },
             },
             messages: {
-                parentName: {
-                    required: "Kelompok Barang Wajib Diisi"
+                divisi_id: {
+                    required: "Department Wajib Diisi"
+                },
+                bulan_closing: {
+                    required: "Bulan Closing Wajib Diisi"
                 },
             },
             errorElement: 'span',
@@ -334,7 +324,7 @@
 
                         if (id) {
                             $.ajax({
-                                url: "<?= base_url("akun-supplier/update"); ?>",
+                                url: "<?= base_url("tutup-buku/update"); ?>",
                                 data: data,
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -380,7 +370,7 @@
                             });
                         } else {
                             $.ajax({
-                                url: "<?= base_url("akun-supplier/save"); ?>",
+                                url: "<?= base_url("tutup-buku/save"); ?>",
                                 data: data,
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());

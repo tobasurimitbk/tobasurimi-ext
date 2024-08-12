@@ -63,10 +63,12 @@ class StockModel extends Model
             stock.qty,
             parent_barang.parent_type,
             parent_barang.parent_name,
+            barang_master.id as barang1_id,
             barang_master.kode_barang,
             barang_master.barang_name,
             divisis.divisi,
             warehouses.warehouse_name AS warehouse,
+            barang_master_spesifikasi.id as barang2_id,
             barang_master_spesifikasi.spesifikasi,
             barang_master_spesifikasi.satuan_1,
             barang_master_spesifikasi.satuan_2,
@@ -810,6 +812,62 @@ class StockModel extends Model
         return $dataResult;
     }
 
+    public function getBarangAndStockConditionWithoutWarehouseAndType($divisi_id, $addCondition = null)
+    {
+        // if ($type_barang == "kemasan") {
+        //     // LIST KEMASAN
+        //     $selectQry = "
+        //         stock.id AS stock_id,
+        //         kemasan.id AS barang_id,
+        //         kemasan.id AS spesifikasi_id,
+        //         UPPER(kemasan.name) AS barang,
+        //         kemasan.kode AS kode_barang,
+        //         satuans.kode_satuan
+        //     ";
+
+        //     $dataResult = $this->asArray()->select($selectQry)
+        //         ->join('kemasan', 'kemasan.id = stock.kemasan_id')
+        //         ->join('satuans', 'satuans.id = kemasan.satuan_id', 'left')
+        //         ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+        //         // ->where('stock.tipe_barang', $type_barang)
+        //         ->where('stock.divisi_id', $divisi_id)
+        //         // ->where('stock.warehouse_id', $warehouse_id)
+        //         ->where('stock.deletedAt', null)
+        //         ->where('kemasan.deletedAt', null)
+        //         // ->where($addCondition)
+        //         ->orderBy('kemasan.kode', "ASC")
+        //         ->findAll();
+        // } else {
+        // LIST BARANG
+        $selectQry = "
+                stock.id AS stock_id,
+                stock.barang1_id AS barang_id,
+                stock.barang2_id AS spesifikasi_id,
+                CONCAT(UPPER(barang_master.barang_name), '-', UPPER(barang_master_spesifikasi.spesifikasi)) AS barang,
+                barang_master.kode_barang,
+                satuans.kode_satuan,
+                parent_barang.parent_name
+            ";
+
+        $dataResult = $this->asArray()->select($selectQry)
+            ->join('barang_master', 'barang_master.id = stock.barang1_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
+            // ->where('stock.tipe_barang', $type_barang)
+            ->where('stock.divisi_id', $divisi_id)
+            // ->where('stock.warehouse_id', $warehouse_id)
+            ->where('stock.deletedAt', null)
+            ->where('barang_master_spesifikasi.deletedAt', null)
+            ->where('barang_master.deletedAt', null)
+            // ->where($addCondition)
+            ->orderBy('barang_master.kode_barang', "ASC")
+            ->findAll();
+        // }
+
+        return $dataResult;
+    }
+
     public function initStockBarang($companyId, $divisiId, $warehouseId, $tipeBarang, $barang2Id)
     {
         $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
@@ -839,5 +897,37 @@ class StockModel extends Model
         } else {
             return $stok['id'];
         }
+    }
+
+    public function getStockForTutupBuku($condition)
+    {
+        $selectQry = '
+            stock.id,
+            stock.qty,
+            parent_barang.parent_type,
+            parent_barang.parent_name,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            divisis.divisi,
+            warehouses.warehouse_name AS warehouse,
+            barang_master_spesifikasi.spesifikasi,
+            barang_master_spesifikasi.satuan_1,
+            barang_master_spesifikasi.satuan_2,
+            barang_master_spesifikasi.satuan_3,
+            barang_master_spesifikasi.konversi_satuan_2,
+            barang_master_spesifikasi.konversi_satuan_3
+        ';
+
+        $dataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('barang_master', 'barang_master.id = stock.barang1_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
+            ->join('warehouses', 'warehouses.id = stock.warehouse_id')
+            ->join('divisis', 'divisis.id = stock.divisi_id')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
+            ->where($condition)
+            ->findAll();
+
+        return $data;
     }
 }

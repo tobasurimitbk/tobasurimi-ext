@@ -5,6 +5,8 @@ namespace App\Controllers\Accounting\TutupBuku;
 use App\Controllers\BaseController;
 use App\Models\DivisisModel;
 use App\Models\SaldoTutupBukuModel;
+use App\Models\SatuansModel;
+use App\Models\StockModel;
 use App\Models\StockTutupBukuModel;
 use App\Models\TutupBukuModel;
 
@@ -16,6 +18,8 @@ class TutupBukuController extends BaseController
     protected $tutupBukuModel;
     protected $stockTutupBukuModel;
     protected $saldoTutupBukuModel;
+    protected $stockModel;
+    protected $satuanModel;
     protected $encrypter;
 
     public function __construct()
@@ -27,6 +31,8 @@ class TutupBukuController extends BaseController
         $this->tutupBukuModel = new TutupBukuModel();
         $this->stockTutupBukuModel = new StockTutupBukuModel();
         $this->saldoTutupBukuModel = new SaldoTutupBukuModel();
+        $this->stockModel = new StockModel();
+        $this->satuanModel = new SatuansModel();
     }
     public function index()
     {
@@ -84,6 +90,7 @@ class TutupBukuController extends BaseController
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
+                "divisi"                 => $data->divisi,
                 "bulan"                 => $data->bulan,
                 "stock"                 => $stockTutupBukuVar,
                 "saldo"                 => $saldoTutupBukuVar,
@@ -114,19 +121,54 @@ class TutupBukuController extends BaseController
         ]);
     }
 
-    public function saveAccountSupplier()
+    public function save()
     {
+        $addCondition = [
+            "sort"   => $this->request->getVar("sort"),
+            "sortType"  => $this->request->getVar("sortType"),
+            "search" => $this->request->getVar("search"),
+            "parent_type" => $this->request->getVar("parent_type"),
+            "parent_name" => $this->request->getVar("parent_name"),
+            "divisi_id" => $this->request->getVar("divisi_id"),
+            "warehouse_id" => $this->request->getVar("warehouse_id"),
+            "kode" =>  $this->request->getVar("search"),
+            "kode_barang" =>  $this->request->getVar("search"),
+        ];
+        $condition = [
+            "barang_master.company_id" => $this->this_company_id,
+            "barang_master.deletedAt" => null,
+            "barang_master_spesifikasi.deletedAt" => null,
+            "stock.company_id" => $this->this_company_id,
+            "stock.deletedAt" => null,
+        ];
 
-        $this->AccountSupplierModel->insert([
-            'supplier_id' => $this->request->getVar('supplier_id'),
-            'ap_id' => $this->request->getVar('akun_ap_id'),
-            'ar_id' => $this->request->getVar('akun_ar_id')
+        $dataQry = $this->stockModel->getStockListBarang($condition, $addCondition);
+
+        $idTutupBuku = $this->tutupBukuModel->insert([
+            'company_id' => $this->this_company_id,
+            'divisi_id' => $this->request->getVar('divisi_id'),
+            'bulan' => $this->request->getVar('bulan_closing')
         ]);
+
+        foreach ($dataQry['data'] as &$data) {
+            $satuan1 = $this->satuanModel->find($data->satuan_1);
+            $satuan2 = $this->satuanModel->find($data->satuan_2);
+            $satuan3 = $this->satuanModel->find($data->satuan_3);
+            $data->qty = $this->stockModel->detailStock($data->id)['stok']['stokSekarang'];
+            $this->stockTutupBukuModel->insert([
+                'tutup_buku_id' => $idTutupBuku,
+                'divisi_id' => $this->request->getVar('divisi_id'),
+                'stock_id' => $data->id,
+                'barang1_id' => $data->barang1_id,
+                'barang2_id' => $data->barang2_id,
+                'qty' => $data->qty
+            ]);
+        }
 
         return response()->setJSON([
             'token' => csrf_hash(),
             'status' => true,
-            'message' => "Account Supplier Berhasil Ditambahkan"
+            'message' => "Tutup Buku Berhasil Ditambahkan"
         ]);
     }
 

@@ -50,10 +50,12 @@ class TutupBukuModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'id'] ?? 'bulan';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "tutup_buku.*";
+        $selectQry = "tutup_buku.*, divisis.divisi";
         $tutupBukuDataQry = $this->asObject()
             ->select($selectQry)
-            ->where("deletedAt", NULL)
+            ->join("divisis", "divisis.id = tutup_buku.divisi_id")
+            ->where("tutup_buku.deletedAt", NULL)
+            ->where("divisis.deletedAt", NULL)
             ->orderBy($sort, $sortType);
 
         $totalData = $tutupBukuDataQry->countAllResults(false);

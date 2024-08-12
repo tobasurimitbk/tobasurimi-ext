@@ -1916,6 +1916,7 @@ $routes->get('/rasio/load_content', 'Accounting\Rasio\RasioController::load_cont
 // Tutup Buku
 $routes->get('/tutup-buku', 'Accounting\TutupBuku\TutupBukuController::index', ['filter' => 'Auth']);
 $routes->get('/tutup-buku/all', 'Accounting\TutupBuku\TutupBukuController::all', ['filter' => 'Auth']);
+$routes->post('/tutup-buku/save', 'Accounting\TutupBuku\TutupBukuController::save', ['filter' => 'Auth']);
 //Laporan
 //Accounting
 $routes->get('/laporan-accounting', 'Laporan\Accounting\Accounting::index', ['filter' => 'Auth']);
