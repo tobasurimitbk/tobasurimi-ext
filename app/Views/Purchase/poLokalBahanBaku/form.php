@@ -1225,54 +1225,54 @@
                     }
                 });
 
-                // if (validate_same) {
-                //     Swal.fire({
-                //         icon: 'error',
-                //         title: "Spesifikasi Sudah Ada",
-                //         confirmButtonColor: '#4e73df',
-                //     })
-                // } else {
-                if (id_detail) {
-                    list_items.map((item, index) => {
-                        //UPDATE
-                        if (item.id_detail === id_detail) {
-                            list_items[index].supplier_harga_id = supplier_harga_id;
-                            list_items[index].spesifikasi_id = spesifikasi_id;
-                            list_items[index].nama_spesifikasi = spesifikasi_name;
-                            list_items[index].satuan_id = satuan_id;
-                            list_items[index].kode_satuan = kode_satuan;
-                            list_items[index].peti = peti;
-                            list_items[index].quality = quality;
-                            list_items[index].harga = harga;
-                            list_items[index].daily_price = daily_price;
-                            list_items[index].qty = qty;
-                            list_items[index].total = total;
-                            list_items[index].monthly_price = monthly_price;
-                            list_items[index].keterangan = keterangan;
-                        }
-                    });
-
+                if (validate_same) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Spesifikasi Sudah Ada",
+                        confirmButtonColor: '#4e73df',
+                    })
                 } else {
-                    //CREATE
-                    list_items.push({
-                        id_detail: getID(),
-                        supplier_harga_id: supplier_harga_id,
-                        spesifikasi_id: spesifikasi_id,
-                        nama_spesifikasi: spesifikasi_name,
-                        satuan_id: satuan_id,
-                        kode_satuan: kode_satuan,
-                        peti: peti,
-                        quality: quality,
-                        harga: harga,
-                        daily_price: daily_price,
-                        qty: qty,
-                        total: total,
-                        monthly_price: monthly_price,
-                        keterangan: keterangan
-                    });
-                }
+                    if (id_detail) {
+                        list_items.map((item, index) => {
+                            //UPDATE
+                            if (item.id_detail === id_detail) {
+                                list_items[index].supplier_harga_id = supplier_harga_id;
+                                list_items[index].spesifikasi_id = spesifikasi_id;
+                                list_items[index].nama_spesifikasi = spesifikasi_name;
+                                list_items[index].satuan_id = satuan_id;
+                                list_items[index].kode_satuan = kode_satuan;
+                                list_items[index].peti = peti;
+                                list_items[index].quality = quality;
+                                list_items[index].harga = harga;
+                                list_items[index].daily_price = daily_price;
+                                list_items[index].qty = qty;
+                                list_items[index].total = total;
+                                list_items[index].monthly_price = monthly_price;
+                                list_items[index].keterangan = keterangan;
+                            }
+                        });
 
-                // }
+                    } else {
+                        //CREATE
+                        list_items.push({
+                            id_detail: getID(),
+                            supplier_harga_id: supplier_harga_id,
+                            spesifikasi_id: spesifikasi_id,
+                            nama_spesifikasi: spesifikasi_name,
+                            satuan_id: satuan_id,
+                            kode_satuan: kode_satuan,
+                            peti: peti,
+                            quality: quality,
+                            harga: harga,
+                            daily_price: daily_price,
+                            qty: qty,
+                            total: total,
+                            monthly_price: monthly_price,
+                            keterangan: keterangan
+                        });
+                    }
+
+                }
 
                 drawTable();
                 resetDetailForm();
