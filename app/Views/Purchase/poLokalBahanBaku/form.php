@@ -309,13 +309,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="number" class="form-control harga" name="harga" id="harga" placeholder="Harga Umum">
+                            <input autocomplete="one-time-code" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Umum" onchange="this.value = formatRupiah(this.value)">
                             <label for="floatingInput">Harga Umum</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="number" class="form-control daily_price" name="daily_price" id="daily_price" placeholder="Harga Harian">
+                            <input autocomplete="one-time-code" type="text" class="form-control daily_price" name="daily_price" id="daily_price" placeholder="Harga Harian" onchange="this.value = formatRupiah(this.value)">
                             <label for="floatingInput">Harga Harian</label>
                         </div>
                     </div>
@@ -323,7 +323,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="number" class="form-control monthly_price" name="monthly_price" id="monthly_price" placeholder="Harga Bulanan">
+                            <input autocomplete="one-time-code" type="text" class="form-control monthly_price" name="monthly_price" id="monthly_price" placeholder="Harga Bulanan" onchange="this.value = formatRupiah(this.value)">
                             <label for="floatingInput">Harga Bulanan</label>
                         </div>
                     </div>
@@ -338,7 +338,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
+                            <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onchange="this.value = formatRupiah(this.value)">
                             <label for="floatingInput">Total Harga</label>
                         </div>
                     </div>
@@ -821,10 +821,24 @@
 
         $(".qty, .harga, .daily_price, .monthly_price").keyup(function() {
             var qty = $(".qty").val() ? Number($(".qty").val()) : 0;
-            var gabungan_harga = Number($(".harga").val()) + Number($(".daily_price").val()) + Number($(".monthly_price").val());
+            var harga = convertRupiahToNumber($('.harga').val() || 0);
+            var daily_price = convertRupiahToNumber($('.daily_price').val() || 0);
+            var monthly_price = convertRupiahToNumber($('.monthly_price').val() || 0);
+
+            var gabungan_harga = harga + daily_price + monthly_price;
             let total = (gabungan_harga * qty);
             $(".total").val(formatRupiah(total));
-        })
+        });
+
+        $(".total").keyup(function() {
+            var total = convertRupiahToNumber($('.total').val() || 0);
+            var qty = $(".qty").val() ? Number($(".qty").val()) : 1;
+
+            var harga = total / qty;
+            $(".daily_price").val(formatRupiah('0'));
+            $(".monthly_price").val(formatRupiah('0'));
+            $(".harga").val(formatRupiah(harga));
+        });
 
         $(document).on('click', '.edit-table-detail', function(evt) {
             var id_detail = $(this).data("id");
@@ -1196,11 +1210,11 @@
             let kode_satuan = $(".spesifikasi option:selected").data("kode_satuan");
             let peti = $(".peti").val()
             let quality = $(".quality").val()
-            let harga = $(".harga").val()
-            let daily_price = $(".daily_price").val()
+            let harga = convertRupiahToNumber($(".harga").val() || 0)
+            let daily_price = convertRupiahToNumber($(".daily_price").val() || 0)
             let qty = $(".qty").val()
-            let total = $(".total").val()
-            let monthly_price = $(".monthly_price").val()
+            let total = convertRupiahToNumber($(".total").val())
+            let monthly_price = convertRupiahToNumber($(".monthly_price").val() || 0)
             let keterangan = $(".keterangan").val()
             let validate_same = false;
 
@@ -1211,54 +1225,54 @@
                     }
                 });
 
-                if (validate_same) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: "Spesifikasi Sudah Ada",
-                        confirmButtonColor: '#4e73df',
-                    })
+                // if (validate_same) {
+                //     Swal.fire({
+                //         icon: 'error',
+                //         title: "Spesifikasi Sudah Ada",
+                //         confirmButtonColor: '#4e73df',
+                //     })
+                // } else {
+                if (id_detail) {
+                    list_items.map((item, index) => {
+                        //UPDATE
+                        if (item.id_detail === id_detail) {
+                            list_items[index].supplier_harga_id = supplier_harga_id;
+                            list_items[index].spesifikasi_id = spesifikasi_id;
+                            list_items[index].nama_spesifikasi = spesifikasi_name;
+                            list_items[index].satuan_id = satuan_id;
+                            list_items[index].kode_satuan = kode_satuan;
+                            list_items[index].peti = peti;
+                            list_items[index].quality = quality;
+                            list_items[index].harga = harga;
+                            list_items[index].daily_price = daily_price;
+                            list_items[index].qty = qty;
+                            list_items[index].total = total;
+                            list_items[index].monthly_price = monthly_price;
+                            list_items[index].keterangan = keterangan;
+                        }
+                    });
+
                 } else {
-                    if (id_detail) {
-                        list_items.map((item, index) => {
-                            //UPDATE
-                            if (item.id_detail === id_detail) {
-                                list_items[index].supplier_harga_id = supplier_harga_id;
-                                list_items[index].spesifikasi_id = spesifikasi_id;
-                                list_items[index].nama_spesifikasi = spesifikasi_name;
-                                list_items[index].satuan_id = satuan_id;
-                                list_items[index].kode_satuan = kode_satuan;
-                                list_items[index].peti = peti;
-                                list_items[index].quality = quality;
-                                list_items[index].harga = harga;
-                                list_items[index].daily_price = daily_price;
-                                list_items[index].qty = qty;
-                                list_items[index].total = total;
-                                list_items[index].monthly_price = monthly_price;
-                                list_items[index].keterangan = keterangan;
-                            }
-                        });
-
-                    } else {
-                        //CREATE
-                        list_items.push({
-                            id_detail: getID(),
-                            supplier_harga_id: supplier_harga_id,
-                            spesifikasi_id: spesifikasi_id,
-                            nama_spesifikasi: spesifikasi_name,
-                            satuan_id: satuan_id,
-                            kode_satuan: kode_satuan,
-                            peti: peti,
-                            quality: quality,
-                            harga: harga,
-                            daily_price: daily_price,
-                            qty: qty,
-                            total: total,
-                            monthly_price: monthly_price,
-                            keterangan: keterangan
-                        });
-                    }
-
+                    //CREATE
+                    list_items.push({
+                        id_detail: getID(),
+                        supplier_harga_id: supplier_harga_id,
+                        spesifikasi_id: spesifikasi_id,
+                        nama_spesifikasi: spesifikasi_name,
+                        satuan_id: satuan_id,
+                        kode_satuan: kode_satuan,
+                        peti: peti,
+                        quality: quality,
+                        harga: harga,
+                        daily_price: daily_price,
+                        qty: qty,
+                        total: total,
+                        monthly_price: monthly_price,
+                        keterangan: keterangan
+                    });
                 }
+
+                // }
 
                 drawTable();
                 resetDetailForm();
@@ -1542,7 +1556,6 @@
         var harianTotal = 0;
         var bulananTotal = 0;
         var qtyTotal = 0;
-
         // LIST
         list_items.map(item => {
             row += '<tr style="color:whitesmoke;">';
@@ -1575,10 +1588,10 @@
                     '</td>';
             <?php endif; ?>
 
-            umumTotal += Number(item.harga.replace(",", ""));
-            harianTotal += Number(item.daily_price.replace(",", ""));
-            bulananTotal += Number(item.monthly_price.replace(",", ""));
-            qtyTotal += Number(item.qty);
+            umumTotal += parseFloat(item.harga);
+            harianTotal += parseFloat(item.daily_price);
+            bulananTotal += parseFloat(item.monthly_price);
+            qtyTotal += parseFloat(item.qty);
             no++;
         });
 
@@ -1618,16 +1631,24 @@
         window.open(url, "_blank");
     }
 
-    const formatRupiah = function(number) {
-        return number ? Number(number).toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }) : "0.00";
+    function formatRupiah(angka) {
+        var formatter = new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR'
+        });
+        var parsedNumber = parseFloat(angka);
+        if (isNaN(parsedNumber)) {
+            return "0,00";
+        }
+        return formatter.format(parsedNumber).replace('Rp', '').trim();
     }
 
-    const reformatRupiah = function(number) {
-        return number ? Number(number.replaceAll(",", "")) : 0;
+    function convertRupiahToNumber(rupiah) {
+        var withoutDot = rupiah.replace(/\./g, '');
+        var numberWithDot = withoutDot.replace(',', '.');
+        return parseFloat(numberWithDot);
     }
+
 
     <?php if (!empty($dataPOLokal)) : ?>
         <?php foreach ($dataPOLokal->rm_purchase_order_details as $detail) : ?>
