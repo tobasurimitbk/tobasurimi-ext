@@ -177,18 +177,31 @@ class CustomerModel extends Model
         return ($result[0]["total"]) ? $result[0]["total"] : 0;
     }
 
-    public function getCustomer($company_id)
+    public function getCustomer($company_id, $is_admin, $user_id)
     {
-
-        if ($company_id != "") {
-            $arrCondition = [
-                'deletedAt' => null,
-                'company_id' => $company_id
-            ];
+        if ($is_admin == 1) {
+            if ($company_id != "") {
+                $arrCondition = [
+                    'deletedAt' => null,
+                    'company_id' => $company_id
+                ];
+            } else {
+                $arrCondition = [
+                    'deletedAt' => null
+                ];
+            }
         } else {
-            $arrCondition = [
-                'deletedAt' => null
-            ];
+            if ($company_id != "") {
+                $arrCondition = [
+                    'deletedAt' => null,
+                    'company_id' => $company_id,
+                    'user_id' => $user_id
+                ];
+            } else {
+                $arrCondition = [
+                    'deletedAt' => null
+                ];
+            }
         }
 
         $builder = $this->db->table('customers');
