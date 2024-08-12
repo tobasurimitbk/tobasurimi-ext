@@ -11,6 +11,8 @@ class AccountSupplierController extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $is_admin;
+    protected $this_user_id;
     protected $AccountSupplierModel;
     protected $SupplierModel;
     protected $Sub_AkunsModel;
@@ -20,6 +22,8 @@ class AccountSupplierController extends BaseController
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_user_id = session()->get("login")->user_id;
+        $this->is_admin = session()->get("login")->is_admin;
         $this->AccountSupplierModel = new AccountSupplierModel();
         $this->SupplierModel = new SupplierModel();
         $this->Sub_AkunsModel = new Sub_AkunsModel();
@@ -27,7 +31,11 @@ class AccountSupplierController extends BaseController
     }
     public function index()
     {
-        $supplierModel = $this->SupplierModel->where('deletedAt', NULL)->findAll();
+        if ($this->is_admin == 1) {
+            $supplierModel = $this->SupplierModel->where('deletedAt', NULL)->findAll();
+        } else {
+            $supplierModel = $this->SupplierModel->where('deletedAt', NULL)->where('user_id', $this->this_user_id)->findAll();
+        }
         $subAkunsModel = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
         foreach ($subAkunsModel as $val) {
             $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
