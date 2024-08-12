@@ -62,10 +62,19 @@ class AccountSupplierController extends BaseController
             "sortType" => $this->request->getGet("sortType"),
         ];
 
-        $condition = [
-            "suppliers.company_id"  => $this->this_company_id,
-            "suppliers.deletedAt" => NULL
-        ];
+
+        if ($this->is_admin == 1) {
+            $condition = [
+                "suppliers.company_id"  => $this->this_company_id,
+                "suppliers.deletedAt" => NULL
+            ];
+        } else {
+            $condition = [
+                "suppliers.company_id"  => $this->this_company_id,
+                "suppliers.deletedAt" => NULL,
+                "suppliers.user_id" => $this->this_user_id
+            ];
+        }
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
