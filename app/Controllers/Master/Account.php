@@ -1331,12 +1331,10 @@ class Account extends BaseController
                     ->where('company_id', $this->this_company_id)
                     ->where('deletedAt', null)
                     ->first();
-                $coa = $this->metaDataModel
-                    ->where('value', $data[$i][3])
-                    ->first();
+
                 $res_header = $this->HeaderAkunsModel->get_by_id($headerAkun['id']);
                 if ($data[$i][1] != null) {
-                    if ($noSub == null && $headerAkun != null &&  $coa != null) {
+                    if ($noSub == null && $headerAkun != null) {
                         // sub Akun INSERTED
                         $this->Sub_AkunsModel->insert([
                             "company_id"    => $this->this_company_id,
