@@ -477,7 +477,7 @@ class Account extends BaseController
                 $kelompok = $this->metaDataModel->where('value', $data[$i][0])
                     ->where('deletedAt', null)
                     ->first();
-                $noKategori = $this->KategoriAkunsModel->where('no_kategori', $data[$i][1])->first();
+                $noKategori = $this->KategoriAkunsModel->where('no_kategori', $data[$i][1])->where('company_id', $this->this_company_id)->first();
                 if ($data[$i][1] != null) {
                     if ($noKategori == null) {
                         // Kategori Akun INSERTED
