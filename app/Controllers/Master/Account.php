@@ -1340,7 +1340,7 @@ class Account extends BaseController
                             "company_id"    => $this->this_company_id,
                             "header_id" => $headerAkun['id'],
                             "kategori_id" => $res_header[0]["kategori_id"],
-                            "coa_id" => $coa['id'],
+                            // "coa_id" => $coa['id'],
                             "no_sub" => $data[$i][1],
                             "nama_sub" => $data[$i][2],
                             "status" => $data[$i][4] == 'Aktif' ? "Aktif" : "Void"
