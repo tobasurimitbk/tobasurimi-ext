@@ -1803,12 +1803,14 @@
         $('#file').val(null);
         $('#import_excel_modal').modal('show');
         $(".akun-type").text('Header');
+        $('.btn-submit-excel').attr('onclick', "importSheet('header')");
 
     });
     $('.btn-upload-excel-sub').click(function() {
         $('#file').val(null);
         $('#import_excel_modal').modal('show');
         $(".akun-type").text('Sub');
+        $('.btn-submit-excel').attr('onclick', "importSheet('sub')");
     });
 
     $('.btn-discard-import-excel').click(function() {
