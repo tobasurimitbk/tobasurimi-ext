@@ -215,8 +215,8 @@ class AMPurchaseOrderDetailModel extends Model
                 if ($sisaDiterima != 0) {
                     // TAMPILKAN YANG MASIH ADA SISA AJA
                     $res[] = [
-                        'penerimaan_barang_detail_id' => $firstLPB['penerimaan_barang_detail_id'],
-                        'pengembalian_barang_detail_id' => $firstLPB['pengembalian_barang_detail_id'],
+                        'penerimaan_barang_detail_id' => isset($firstLPB['penerimaan_barang_detail_id']) ? $firstLPB['penerimaan_barang_detail_id'] : "",
+                        'pengembalian_barang_detail_id' => isset($firstLPB['pengembalian_barang_detail_id']) ? $firstLPB['pengembalian_barang_detail_id'] : "",
                         'jumlah_return' => isset($firstLPB['jumlah_return']) ? $firstLPB['jumlah_return'] : "",
                         'keterangan_return' => isset($firstLPB['keterangan_return']) ? $firstLPB['keterangan_return'] : "",
                         'am_purchase_order_details_id' => $b['id'],

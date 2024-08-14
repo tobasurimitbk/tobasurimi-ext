@@ -378,13 +378,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="number" class="form-control harga_satuan" name="harga_satuan" id="harga_satuan" placeholder="Harga Satuan">
+                                <input autocomplete="one-time-code" type="text" class="form-control harga_satuan" name="harga_satuan" id="harga_satuan" placeholder="Harga Satuan" onchange="this.value = formatRupiah(this.value)">
                                 <label for="floatingInput">Harga Satuan</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="number" class="form-control biaya_tambahan" name="biaya_tambahan" id="biaya_tambahan" placeholder="Biaya Tambahan (Opsional)">
+                                <input autocomplete="one-time-code" type="text" class="form-control biaya_tambahan" name="biaya_tambahan" id="biaya_tambahan" placeholder="Biaya Tambahan (Opsional)" onchange="this.value = formatRupiah(this.value)">
                                 <label for="floatingInput">Biaya Tambahan (Opsional)</label>
                             </div>
                         </div>
@@ -392,7 +392,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
+                                <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onchange="this.value = formatRupiah(this.value)">
                                 <label for="floatingInput">Total</label>
                             </div>
                         </div>
@@ -550,14 +550,27 @@
     });
     // HARGA SATUAN DAN QTY CHANE
     $('#harga_satuan,#qty,#biaya_tambahan,#diskon').keyup(function() {
-        var hargaSatuan = parseFloat($('#harga_satuan').val()) || 0;
+        var hargaSatuan = convertRupiahToNumber($('#harga_satuan').val()) || 0;
         var qty = parseFloat($('#qty').val()) || 1;
-        var biayaTambahan = parseFloat($('#biaya_tambahan').val()) || 0;
+        var biayaTambahan = convertRupiahToNumber($('#biaya_tambahan').val()) || 0;
         var diskon = parseFloat($('#diskon').val()) || 0;
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
         $('#total').val(formatRupiah(total.toFixed(2)));
+    });
+
+    $('#total').keyup(function() {
+        var qty = $('#qty').val();
+        console.log(qty);
+        if (qty === "" || qty === 0) {
+            qty = 1;
+            $('#qty').val(qty);
+        }
+        var harga_satuan;
+        var total = $('#total').val()
+        harga_satuan = convertRupiahToNumber(total) / Number(qty);
+        $('#harga_satuan').val(formatRupiah(harga_satuan));
     });
 
     // VALIDATOR DETAIL
@@ -1025,8 +1038,8 @@
             nama_satuan: $('#satuan_id').find("option:selected").data("nama_satuan"),
             qty: $('#qty').val(),
             diskon: $('#diskon').val() || 0,
-            harga_satuan: $('#harga_satuan').val() || 0,
-            biaya_tambahan: $('#biaya_tambahan').val() || 0,
+            harga_satuan: convertRupiahToNumber($('#harga_satuan').val()) || 0,
+            biaya_tambahan: convertRupiahToNumber($('#biaya_tambahan').val()) || 0,
             total: $('#total').val(),
             keterangan: $('#keterangan').val()
         });
@@ -1163,19 +1176,21 @@
     }
 
     function formatRupiah(angka) {
-        if (angka == null) {
-            angka = 0;
+        var formatter = new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR'
+        });
+        var parsedNumber = parseFloat(angka);
+        if (isNaN(parsedNumber)) {
+            return "0,00";
         }
+        return formatter.format(parsedNumber).replace('Rp', '').trim();
+    }
 
-        angka = angka.toString();
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return ribuanFormatted + ',' + desimal;
+    function convertRupiahToNumber(rupiah) {
+        var withoutDot = rupiah.replace(/\./g, '');
+        var numberWithDot = withoutDot.replace(',', '.');
+        return parseFloat(numberWithDot);
     }
 
     function getListSPP() {

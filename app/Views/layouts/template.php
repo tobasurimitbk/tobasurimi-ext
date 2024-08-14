@@ -68,7 +68,7 @@
     <script src="<?= base_url() ?>assets/_vendor/popper/popper.min.js?v=<?= time(); ?>"></script>
     <script src="<?= base_url() ?>assets/_vendor/bootstrap/js/bootstrap.min.js?v=<?= time(); ?>"></script>
     <script src="<?= base_url() ?>assets/js/pdfobject.min.js?v=<?= time(); ?>"></script>
-    <script src="https://kit.fontawesome.com/6297a3e18a.js" crossorigin="anonymous"></script>
+    <!-- <script src="https://kit.fontawesome.com/6297a3e18a.js" crossorigin="anonymous"></script> -->
 
     <div id="app">
         <!-- {% block content_2 %}{% endblock %} -->

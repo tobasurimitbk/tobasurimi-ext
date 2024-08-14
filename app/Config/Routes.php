@@ -1430,11 +1430,14 @@ $routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
     $routes->post('id/barang/bahan-baku-delete', 'BeaCukai\BC27::bahanBakuDelete');
     //PUNGUTAN
     $routes->get('id/pungutan/(:segment)', 'BeaCukai\BC27::pungutan/$1');
+    $routes->post('id/pungutan/generate', 'BeaCukai\BC27::generatePungutan');
+
     // PERYATAAN
     $routes->get('id/pernyataan/(:segment)', 'BeaCukai\BC27::pernyataan/$1');
     $routes->post('id/pernyataan', 'BeaCukai\BC27::pernyataanUpdate');
 
-
+    //kirim ceisa
+    $routes->get('api/kirim-dokumen/(:segment)', 'BeaCukai\BC27::kirimCeisa/$1');
     // OUTSTANDING
     $routes->get('bc-27-outstanding-all', 'BeaCukai\BC27::allOutstanding');
     $routes->get('bc-27-outstanding', 'BeaCukai\BC27::viewOutstanding');
@@ -1503,8 +1506,17 @@ $routes->group('bea-cukai-bc-30', ['filter' => 'Auth'], function ($routes) {
     // BARANG ENTITAS
     $routes->post('id/barang/entitas-create', 'BeaCukai\BC30::createEntitasBarangDetail');
     $routes->post('id/barang/entitas-delete', 'BeaCukai\BC30::deleteEntitasBarangDetail');
+    //KESIAPAN BARNAG
+    $routes->get('id/kesiapan-barang/(:segment)', 'BeaCukai\BC30::kesiapanBarang/$1');
+    $routes->post('id/kesiapan-barang', 'BeaCukai\BC30::kesiapanBarangUpdate');
     // PUNGUTAN
     $routes->get('id/pungutan/(:segment)', 'BeaCukai\BC30::pungutan/$1');
+    // PERYATAAN
+    $routes->get('id/pernyataan/(:segment)', 'BeaCukai\BC30::pernyataan/$1');
+    $routes->post('id/pernyataan', 'BeaCukai\BC30::pernyataanUpdate');
+
+    //KIRIM CEISA
+    $routes->get('api/kirim-dokumen/(:segment)', 'BeaCukai\BC30::kirimCeisa/$1');
     // PERYATAAN
     $routes->get('id/pernyataan/(:segment)', 'BeaCukai\BC30::pernyataan/$1');
     $routes->post('id/pernyataan', 'BeaCukai\BC30::pernyataanUpdate');

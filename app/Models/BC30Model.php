@@ -397,7 +397,6 @@ class BC30Model extends Model
 
     public function barang($salesOrderId, $tipeSalesOrder)
     {
-
         $detailBarang =  $this->getListBarang(
             $salesOrderId,
             $tipeSalesOrder
@@ -419,9 +418,138 @@ class BC30Model extends Model
                 $result[$key]['qty_keluar'] += (int)$item['qty_keluar'];
             }
         }
-
-
-
         return array_values($result);
+    }
+
+    public function isCompleteFormHeader($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($payload->kodeKantor != "") {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+    public function isCompleteFormEntitas($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->entitas) != 0) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormDokumen($id)
+    {
+
+        //hjarus ad packing list
+
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->dokumen) != 0) {
+                foreach ($payload->dokumen as $d) {
+                }
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormPengangkut($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->pengangkut) != 0) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormPetiKemas($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->kontainer) != 0 && count($payload->kemasan) != 0) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormTransaksi($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($payload->kodeValuta) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormBarang($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->barang) != 0) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormPernyataan($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($payload->kotaTtd != "") {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
     }
 }

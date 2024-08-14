@@ -88,6 +88,12 @@
                                     <label>Nama</label>
                                 </div>
                             </div>
+                            <!-- <div class="mt-1">
+                                <div class="form-floating mb-3">
+                                    <input id="entitas_niper_penerima_barang" value="" name="entitas_niper_penerima_barang" type="text" class="form-control entitas_niper_penerima_barang" placeholder="">
+                                    <label>Niper</label>
+                                </div>
+                            </div> -->
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
                                     <textarea name="entitas_alamat_penerima_barang" id="entitas_alamat_penerima_barang" class="form-control entitas_alamat_penerima_barang" style="height: 100px;"><?= count($payload->entitas) == 0 ? "" : $payload->entitas[2]->alamatEntitas ?></textarea>

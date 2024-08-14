@@ -193,7 +193,7 @@
             <?php endforeach; ?>
             <tr>
                 <td></td>
-                <td>TAMBAHAN <?= $data->information != "" ?  ", " . $data->information : "" ?></td>
+                <td>TAMBAHAN <?= $data->information_tambahan != "" ?  ", " . $data->information_tambahan : "" ?></td>
                 <td class="txt-right"><?= toRupiah($tambahan) ?></td>
                 <td></td>
             </tr>
@@ -323,7 +323,7 @@
                 </tr>
             <?php endforeach; ?>
             <tr>
-                <td>POTONGAN <?= $data->information != "" ?  ", " . $data->information : "" ?></td>
+                <td>POTONGAN <?= $data->information_potongan != "" ?  ", " . $data->information_potongan : "" ?></td>
                 <td class="txt-right"><?= toRupiah($potongan) ?></td>
                 <td></td>
             </tr>

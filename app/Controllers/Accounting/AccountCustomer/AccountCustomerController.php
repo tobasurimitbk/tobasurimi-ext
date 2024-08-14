@@ -11,6 +11,8 @@ class AccountCustomerController extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $this_user_id;
+    protected $is_admin;
     protected $AccountCustomerModel;
     protected $CustomerModel;
     protected $Sub_AkunsModel;
@@ -21,6 +23,8 @@ class AccountCustomerController extends BaseController
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_user_id = session()->get("login")->user_id;
+        $this->is_admin = session()->get("login")->is_admin;
         $this->AccountCustomerModel = new AccountCustomerModel();
         $this->CustomerModel = new CustomerModel();
         $this->Sub_AkunsModel = new Sub_AkunsModel();
@@ -28,7 +32,7 @@ class AccountCustomerController extends BaseController
     }
     public function index()
     {
-        $customerModel = $this->CustomerModel->getCustomer($this->this_company_id);
+        $customerModel = $this->CustomerModel->getCustomer($this->this_company_id, $this->is_admin, $this->this_user_id);
         $subAkunsModel = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
         foreach ($subAkunsModel as $val) {
             $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
@@ -55,10 +59,18 @@ class AccountCustomerController extends BaseController
             "sortType" => $this->request->getGet("sortType"),
         ];
 
-        $condition = [
-            "customers.company_id"  => $this->this_company_id,
-            "customers.deletedAt" => NULL
-        ];
+        if ($this->is_admin == 1) {
+            $condition = [
+                "customers.company_id"  => $this->this_company_id,
+                "customers.deletedAt" => NULL
+            ];
+        } else {
+            $condition = [
+                "customers.company_id"  => $this->this_company_id,
+                "customers.deletedAt" => NULL,
+                "customers.user_id" => $this->this_user_id
+            ];
+        }
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),

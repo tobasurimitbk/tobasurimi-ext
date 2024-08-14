@@ -22,11 +22,11 @@
                         Data Pungutan
                     </label>
                 </div>
-                <!-- <div class="col-sm">
-                    <a href="#" type="button" class="btn btn-primary mt-4 mb-2" style="float: right;">
+                <div class="col-sm">
+                    <a href="#" type="button" class="btn btn-primary mt-4 mb-2" id="generate-pungutan" style="float: right;">
                         Generate Pungutan
                     </a>
-                </div> -->
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-pungutan" width="100%" cellspacing="0">
@@ -37,11 +37,14 @@
                             <th style="text-align: center;">Dibayar</th>
                             <th style="text-align: center;">Dibebaskan</th>
                             <th style="text-align: center;">Ditanggung Pemerintah</th>
+                            <th style="text-align: center;">Ditunda</th>
+                            <th style="text-align: center;">Tidak Dipungut</th>
+                            <th style="text-align: center;">Dibebaskan</th>
                             <th style="text-align: center;">Sudah Dilunasi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (count($payload->barang) != 0) : ?>
+                        <?php if (count($payload->pungutan) != 0) : ?>
                             <?php $no = 1; ?>
                             <?php foreach ($pungutanList as $p) : ?>
                                 <tr>
@@ -69,30 +72,75 @@
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
 
-    var tableListInformasiPungutan = $('.table-list-pungutan').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        lengthChange: true,
-        info: false,
-        paging: false,
-        searching: false,
-        ordering: false,
-        order: [],
-        fixedHeader: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        display: "stripe",
-        searching: false,
-        language: {
-            emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
-            }
-        }
+    // var tableListInformasiPungutan = $('.table-list-pungutan').DataTable({
+    //     dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+    //     lengthChange: true,
+    //     info: false,
+    //     paging: false,
+    //     searching: false,
+    //     ordering: false,
+    //     order: [],
+    //     fixedHeader: true,
+    //     "initComplete": function(settings, json) {
+    //         $('.dataTables_length').empty();
+    //         $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+    //         $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+    //     },
+    //     display: "stripe",
+    //     searching: false,
+    //     language: {
+    //         emptyTable: "Tidak Ada Data",
+    //         lengthMenu: "Show _MENU_ entries",
+    //         paginate: {
+    //             previous: '<i class="fa fa-angle-left"></i>',
+    //             next: '<i class="fa fa-angle-right"></i>'
+    //         }
+    //     }
+    // });
+
+
+    $("#generate-pungutan").click(function(e) {
+
+        e.preventDefault();
+        var idBC = "<?= encrypt($bc27['id']) ?>";
+        var formData = new FormData();
+        formData.append("id", idBC);
+        $.ajax({
+            url: "<?= base_url("bea-cukai-bc-27/id/pungutan/generate"); ?>",
+            method: "POST",
+            data: formData,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    }).then((result) => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            },
+
+        });
     });
 </script>
 

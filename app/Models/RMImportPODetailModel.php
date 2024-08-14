@@ -15,8 +15,19 @@ class RMImportPODetailModel extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'id', 'rm_import_po_id', 'barang_id', 'note', 'unit', 'qty', 'price',
-        'disc', 'additional_cost', 'remaining_qty', 'qty_diterima', 'total', 'spesifikasi_id'
+        'id',
+        'rm_import_po_id',
+        'barang_id',
+        'note',
+        'unit',
+        'qty',
+        'price',
+        'disc',
+        'additional_cost',
+        'remaining_qty',
+        'qty_diterima',
+        'total',
+        'spesifikasi_id'
     ];
 
     // Dates
@@ -165,8 +176,8 @@ class RMImportPODetailModel extends Model
                     $harga = ($b['price'] - $diskonHarga) + $b['additional_cost'];
 
                     $res[] = [
-                        'penerimaan_barang_detail_id' => $firstLPB['penerimaan_barang_detail_id'],
-                        'pengembalian_barang_detail_id' => $firstLPB['pengembalian_barang_detail_id'],
+                        'penerimaan_barang_detail_id' => isset($firstLPB['penerimaan_barang_detail_id']) ? $firstLPB['penerimaan_barang_detail_id'] : "",
+                        'pengembalian_barang_detail_id' => isset($firstLPB['pengembalian_barang_detail_id']) ? $firstLPB['pengembalian_barang_detail_id'] : "",
                         'jumlah_return' => isset($firstLPB['jumlah_return']) ? $firstLPB['jumlah_return'] : "",
                         'keterangan_return' => isset($firstLPB['keterangan_return']) ? $firstLPB['keterangan_return'] : "",
                         'rm_import_po_details_id' => $b['id'],
