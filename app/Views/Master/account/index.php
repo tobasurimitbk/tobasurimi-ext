@@ -163,7 +163,7 @@
                                 <select class="form-select coa_id_sub" name="coa_id_sub" id="coa_id_sub">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">COA (optional)</label>
+                                <label for="floatingInput">COA (opsional)</label>
                             </div>
                         </div>
                     </div>

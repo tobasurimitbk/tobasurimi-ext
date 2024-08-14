@@ -152,7 +152,7 @@
                                     <select class="form-select entitas_kode_negara_penerima" id="entitas_kode_negara_penerima" name="entitas_kode_negara_penerima" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($kodeNegaraAsal as $k) : ?>
-                                            <option <?= !empty($payload->entitas[1])  ? ($payload->entitas[1]->kodeNegara == $k['code'] ? 'selected' : '') : '' ?> value="<?= encrypt($k['code']) ?>">
+                                            <option <?= !empty($payload->entitas[$indexEntitas - 1])  ? ($payload->entitas[$indexEntitas - 1]->kodeNegara == $k['code'] ? 'selected' : '') : '' ?> value="<?= encrypt($k['code']) ?>">
                                                 <?= $k['code'] . " - " . strtoupper($k['country_name']) . "" ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -184,7 +184,7 @@
                                     <select class="form-select entitas_kode_negara_pembeli" id="entitas_kode_negara_pembeli" name="entitas_kode_negara_pembeli" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($kodeNegaraAsal as $k) : ?>
-                                            <option <?= !empty($payload->entitas[2])  ? ($payload->entitas[2]->kodeNegara == $k['code'] ? 'selected' : '') : '' ?> value="<?= encrypt($k['code']) ?>">
+                                            <option <?= !empty($payload->entitas[$indexEntitas])  ? ($payload->entitas[$indexEntitas]->kodeNegara == $k['code'] ? 'selected' : '') : '' ?> value="<?= encrypt($k['code']) ?>">
                                                 <?= $k['code'] . " - " . strtoupper($k['country_name']) . "" ?>
                                             </option>
                                         <?php endforeach; ?>

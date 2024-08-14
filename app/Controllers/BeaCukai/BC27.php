@@ -561,6 +561,36 @@ class BC27 extends BaseController
         $writer->save('php://output');
         die;
     }
+
+    public function kirimCeisa($id)
+    {
+        $id = decrypt($id);
+        $payload = json_decode($this->bc27Model->find($id)['payload']);
+        $beacukaiApi = new BeaCukaiApi($this->akunCeisa['username'], $this->akunCeisa['password']);
+
+        // return response()->setJSON([
+        //     'payload' => $payload
+        // ]);
+        // die;
+        $res = $beacukaiApi->kirimDokumenBC($payload, false);
+        if ($res['status'] == false) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => "Gagal Kirim Ceisa Karena : " . $res['message'],
+            ]);
+        }
+        // // UPDATE STATUS
+        $this->bc27Model->set('status_dokumen', "Sudah Kirim")->where('id', $id)->update();
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'message' => "Dokumen BC 2.7 Berhasil Diposting",
+            'res' => $res
+        ]);
+    }
+
     private function setFlashDataNavigatorSession($id)
     {
         $isCompleteFormHeader = $this->bc27Model->isCompleteFormHeader($id);
@@ -569,6 +599,8 @@ class BC27 extends BaseController
         $isCompleteFormPengangkut = $this->bc27Model->isCompleteFormPengangkut($id);
         $isCompleteFormPetiKemas = $this->bc27Model->isCompleteFormPetiKemas($id);
         $isCompleteFormTransaksi = $this->bc27Model->isCompleteFormTransaksi($id);
+        $isCompleteFormBarang = $this->bc27Model->isCompleteFormBarang($id);
+        $isCompleteFormPernyataan = $this->bc27Model->isCompleteFormPernyataan($id);
 
 
         session()->setFlashdata('isCompleteFormHeader', $isCompleteFormHeader);
@@ -577,6 +609,9 @@ class BC27 extends BaseController
         session()->setFlashdata('isCompleteFormPengangkut', $isCompleteFormPengangkut);
         session()->setFlashdata('isCompleteFormPetiKemas', $isCompleteFormPetiKemas);
         session()->setFlashdata('isCompleteFormTransaksi', $isCompleteFormTransaksi);
+        session()->setFlashdata('isCompleteFormBarang', $isCompleteFormBarang);
+        session()->setFlashdata('isCompleteFormPungutan', $isCompleteFormBarang);
+        session()->setFlashdata('isCompleteFormPernyataan', $isCompleteFormPernyataan);
 
         if (
             $isCompleteFormHeader && $isCompleteFormEntitas &&
@@ -614,6 +649,7 @@ class BC27 extends BaseController
             'selectedKantor' => $ceisaSetting['kode_kantor_pabean'],
             'payload' => json_decode($bc27['payload'])
         ];
+
         return view('BeaCukai/bc-27/form-header', $data);
     }
     public function updateHeader()
@@ -624,17 +660,15 @@ class BC27 extends BaseController
 
         $payload->asalData = "S";
         $payload->nomorAju =  str_replace('-', '', $this->request->getVar('nomorAju'));
-        $payload->tanggalAju = getDateFromNomorAju($this->request->getVar('header_no_pengajuan'));
+        $payload->tanggalAju = getDateFromNomorAju($this->request->getVar('nomorAju'));
         $payload->kodeKantor = $this->request->getVar('kodeKantor');
         $payload->kodeKantorTujuan = $this->request->getVar('kodeKantorTujuan');
         $payload->kodeJenisTpb = $this->request->getVar('kodeJenisTpb');
         $payload->kodeTujuanTpb = $this->request->getVar('kodeTujuanTpb');
         $payload->kodeTujuanPengiriman = $this->request->getVar('kodeTujuanPengiriman');
-        $payload->idPengguna = "NPWP";
         $payload->seri = 1;
         $payload->disclaimer = "1";
-        $payload->kodeDokumen = "25";
-        $payload->volume = 0;
+        $payload->kodeDokumen = "27";
 
         $this->bc27Model->update($id, ['payload' => json_encode($payload)]);
 
@@ -738,6 +772,7 @@ class BC27 extends BaseController
             'kodeStatus' => '3',
             'namaEntitas' => $this->request->getVar('entitas_nama_pemilik_barang'),
             'nomorIdentitas' => $this->request->getVar('entitas_npwp_pemilik_barang'),
+            'kodeJenisApi' => "2",
             'seriEntitas' => 2,
         ];
 
@@ -748,7 +783,6 @@ class BC27 extends BaseController
             'kodeJenisIdentitas' => "5",
             'kodeStatus' => '3',
             'namaEntitas' => $this->request->getVar('entitas_nama_penerima_barang'),
-            'niperEntitas' => $this->request->getVar('entitas_niper_penerima_barang'),
             'nomorIdentitas' => $this->request->getVar('entitas_npwp_penerima_barang'),
             'seriEntitas' => 3,
             'nomorIjinEntitas' => $this->request->getVar('entitas_nomor_ijin_tpb_penerima_barang'),
@@ -881,7 +915,7 @@ class BC27 extends BaseController
             'namaPengangkut' => $this->request->getVar('pengangkut_nama_pengangkut'),
             'nomorPengangkut' => $this->request->getVar('pengangkut_nomor_pengangkut'),
             'kodeCaraAngkut' => $this->request->getVar('pengangkut_kode_cara_angkut'),
-            'seriPengangkut' => 1
+            'seriPengangkut' => '1'
         ];
 
         $this->bc27Model->update($id, ['payload' => json_encode($payload)]);
@@ -1051,8 +1085,12 @@ class BC27 extends BaseController
         $this->setFlashDataNavigatorSession($id);
         $payload = json_decode($bc27['payload']);
 
+        $totalHargaBarang = 0;
+
         $data = [
             'kodeValuta' => $this->metaDataModel->where('name', "Valuta")->findAll(),
+            'kodeCaraBayar' => $this->metaDataModel->where('name', "CARA BAYAR")->findAll(),
+            'kodeLokasiBayar' => $this->metaDataModel->where('name', "Lokasi Bayar")->findAll(),
             'bc27' => $bc27,
             'payload' => $payload,
         ];
@@ -1078,9 +1116,11 @@ class BC27 extends BaseController
         $payload->hargaPenyerahan = (float)convertRupiahToNumber($this->request->getVar('harga_nilai_penyerahan'));
         $payload->nilaiJasa = (float)convertRupiahToNumber($this->request->getVar('nilai_jasa'));
         $payload->uangMuka = (float)convertRupiahToNumber($this->request->getVar('nilai_muka'));
+        // $payload->kodeCaraBayar = $this->request->getVar('cara_bayar');
+        // $payload->kodeLokasiBayar = $this->request->getVar('lokasi_bayar');
 
-        $payload->bruto = (float)convertRupiahToNumber($this->request->getVar('berat_bruto'));
-        $payload->netto = (float)convertRupiahToNumber($this->request->getVar('berat_netto'));
+        $payload->bruto = intval($this->request->getVar('berat_bruto'));
+        $payload->netto = intval($this->request->getVar('berat_netto'));
 
         $this->bc27Model->update($id, ['payload' => json_encode($payload)]);
 
@@ -1099,7 +1139,7 @@ class BC27 extends BaseController
             return redirect()->to('bea-cukai-bc-27');
         }
 
-        // $this->setFlashDataNavigatorSession($id);
+        $this->setFlashDataNavigatorSession($id);
         $payload = json_decode($bc27['payload']);
 
 
@@ -1130,8 +1170,8 @@ class BC27 extends BaseController
 
 
             array_push($payload->barang, [
-                'cif' => $cif,
-                'cifRupiah' => $cif,
+                'cif' => intval($cif),
+                'cifRupiah' => intval($cif),
                 'hargaEkspor' => 0,
                 'hargaPenyerahan' => 0,
                 'isiPerKemasan' => 0,
@@ -1152,6 +1192,19 @@ class BC27 extends BaseController
                 'ndpbm' => $ndpbm,
                 'uangMuka' => 0,
                 'nilaiJasa' => 0,
+                // 'barangDokumen' => "",
+                // 'barangTarif' => "",
+                // 'diskon' =>  " ",
+                // 'fob' => '',
+                // 'freight' => 0,
+                // 'jumlahKemasan' => "",
+                // 'kodeDokAsal' => '',
+                // 'kodeGunaBarang' => "",
+                // 'kodeJenisKemasan' => "",
+                // 'kodeKategoriBarang' => "",
+                // 'kodeKondisiBarang' => "",
+                // 'kodePerhitungan' => "",
+
                 'bahanBaku' => [],
             ]);
         }
@@ -1217,36 +1270,40 @@ class BC27 extends BaseController
 
         $nettoTotal = 0;
         $hargaPenyerahanTotal = 0;
+        // $volumeTotal = 0;
         for ($i = 0; $i < count($payload->barang); $i++) {
             if ($payload->barang[$i]->seriBarang == $seriBarang) {
-                $payload->barang[$i]->cif = $this->request->getVar('cif');
-                $payload->barang[$i]->cifRupiah = '';
-                $payload->barang[$i]->hargaEkspor =  ($this->request->getVar('hargaEkspor'));
+                $payload->barang[$i]->cif = (float) $this->request->getVar('cif');
+                $payload->barang[$i]->cifRupiah = (float) $this->request->getVar('cif');
+                $payload->barang[$i]->hargaEkspor =  (float)convertRupiahToNumber($this->request->getVar('hargaEkspor'));
                 $payload->barang[$i]->hargaPenyerahan = (float)convertRupiahToNumber($this->request->getVar('hargaPenyerahan'));
-                $payload->barang[$i]->isiPerKemasan = '';
-                $payload->barang[$i]->jumlahSatuan = $this->request->getVar('jumlahSatuan');
+                $payload->barang[$i]->isiPerKemasan = 1; //idk man
+                $payload->barang[$i]->jumlahSatuan = (float)$this->request->getVar('jumlahSatuan');
                 $payload->barang[$i]->kodeBarang = $this->request->getVar('kodeBarang');
                 $payload->barang[$i]->kodeDokumen = "";
-                $payload->barang[$i]->kodeSatuanBarang = decrypt($this->request->getVar('kodeSatuanBarang'));
+                $payload->barang[$i]->kodeSatuanBarang = "" . decrypt($this->request->getVar('kodeSatuanBarang'));
                 $payload->barang[$i]->merk = $this->request->getVar('merk');
                 $payload->barang[$i]->netto = $this->request->getVar('netto');
-                $payload->barang[$i]->nilaiBarang = "";
-                $payload->barang[$i]->posTarif = (float)$this->request->getVar('posTarif');
+                $payload->barang[$i]->nilaiBarang = 0; //idk
+                $payload->barang[$i]->posTarif = $this->request->getVar('posTarif');
                 $payload->barang[$i]->seriBarang = $this->request->getVar('seriBarang');
                 $payload->barang[$i]->spesifikasiLain = $this->request->getVar('spesifikasiLain');
                 $payload->barang[$i]->tipe = $this->request->getVar('tipe');
-                $payload->barang[$i]->ukuran = (float)$this->request->getVar('netto');
+                $payload->barang[$i]->netto = (float)$this->request->getVar('netto');
                 $payload->barang[$i]->uraian = $this->request->getVar('uraian');
                 $payload->barang[$i]->hargaPerolehan = (float)convertRupiahToNumber($this->request->getVar('hargaPerolehan'));
-                $payload->barang[$i]->ndpbm = "";
+                $payload->barang[$i]->ndpbm = 0; //idk
                 $payload->barang[$i]->nilaiJasa = (float)convertRupiahToNumber($this->request->getVar('nilaiJasa'));
+                // $payload->barang[$i]->volume = $this->request->getVar('volume');
             }
             $nettoTotal += $payload->barang[$i]->netto;
             $hargaPenyerahanTotal += $payload->barang[$i]->hargaPenyerahan;
+            // $volumeTotal += $payload->barang[$i]->volume;
         }
 
         $payload->netto = $nettoTotal;
         $payload->hargaPenyerahan = $hargaPenyerahanTotal;
+        // $payload->volume = $volumeTotal;
 
         $this->bc27Model->update($id, ['payload' => json_encode($payload)]);
 
@@ -1280,10 +1337,11 @@ class BC27 extends BaseController
 
         $bcPurchaseOrder = $this->bcPurchaseOrderModel->find($bcPurchaseOrderId);
 
+
         foreach ($bahanBakuBCList->barang as $b) {
             array_push($payload->barang[$indexBarang]->bahanBaku, [
-                'cif' => $b->cif,
-                'cifRupiah' => $b->cifRupiah,
+                'cif' => (float) $b->cif,
+                'cifRupiah' => (float) $b->cifRupiah,
                 'hargaPenyerahan' => $b->hargaPenyerahan,
                 'hargaPerolehan' => 0,
                 'jumlahSatuan' => $b->jumlahSatuan,
@@ -1307,8 +1365,18 @@ class BC27 extends BaseController
                 'tipeBarang' => $b->tipe,
                 'ukuranBarang' => $b->ukuran,
                 'uraianBarang' => $b->uraian,
-                'bahanBakuTarif' => $b->barangTarif
+                'nilaiJasa' => $payload->barang[$indexBarang]->nilaiJasa,
+                'bahanBakuTarif' => $b->barangTarif,
+
             ]);
+            foreach ($payload->barang[$indexBarang]->bahanBaku as $bb) {
+                foreach ($bb['bahanBakuTarif'] as $i  => $t) {
+                    $t->seriBahanBaku = $seriBahanBakuLast;
+                    $t->kodeAsalBahanBaku = $b->kodeAsalBahanBaku;
+                    // $bb[$i]['seriBahanBaku'] = $seriBahanBakuLast;
+                    // $bb[$i]['kodeAsalBahanBaku'] = $b->kodeAsalBahanBaku;
+                }
+            }
 
             $seriBahanBakuLast++;
         }
@@ -1317,6 +1385,30 @@ class BC27 extends BaseController
 
         return response()->setJSON([
             'message' => "Bahan baku berhasil disimpan",
+            'status' => true,
+        ]);
+    }
+
+    public function bahanBakuDelete()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $seriBarang = $this->request->getVar('seriBarang');
+        $indexDelete = $this->request->getVar('indexDelete');
+        $payload = json_decode($this->bc27Model->find($id)['payload']);
+
+        $indexBarang = 0;
+
+        foreach ($payload->barang as $i => $b) {
+            if ($b->seriBarang == $seriBarang) {
+                $indexBarang = $i;
+            }
+        }
+
+        unset($payload->barang[$indexBarang]->bahanBaku[$indexDelete]);
+        $this->bc27Model->update($id, ['payload' => json_encode($payload)]);
+
+        return response()->setJSON([
+            'message' => "Bahan baku berhasil dihapus",
             'status' => true,
         ]);
     }
@@ -1354,37 +1446,35 @@ class BC27 extends BaseController
         $ppnDibebaskan = 0;
         $ppnSudahDilunasi = 0;
 
-        foreach ($payload->barang as $b) {
-            foreach ($b->bahanBaku as $c) {
-                foreach ($c->bahanBakuTarif as $p) {
-                    if ($p->kodeJenisPungutan == "BM" && $p->kodeFasilitasTarif == 1) {
-                        $bmDibayar += $p->nilaiBayar;
-                    } elseif ($p->kodeJenisPungutan == "BM" && $p->kodeFasilitasTarif == 2) {
-                        $bmDitanggung += $p->nilaiBayar;
-                    } elseif ($p->kodeJenisPungutan == "BM" && $p->kodeFasilitasTarif == 5) {
-                        $bmDibebaskan += $p->nilaiBayar;
-                    } elseif ($p->kodeJenisPungutan == "BM" && $p->kodeFasilitasTarif == 7) {
-                        $bmSudahDilunasi += $p->nilaiBayar;
-                    } elseif ($p->kodeJenisPungutan == "PPN" && $p->kodeFasilitasTarif == 1) {
-                        $ppnDibayar += $p->nilaiBayar;
-                    } elseif ($p->kodeJenisPungutan == "PPN" && $p->kodeFasilitasTarif == 2) {
-                        $ppnDitanggung  += $p->nilaiBayar;
-                    } elseif ($p->kodeJenisPungutan == "PPN" && $p->kodeFasilitasTarif == 5) {
-                        $ppnDibebaskan  += $p->nilaiBayar;
-                    } elseif ($p->kodeJenisPungutan == "PPN" && $p->kodeFasilitasTarif == 7) {
-                        $ppnSudahDilunasi  += $p->nilaiBayar;
-                    } elseif ($p->kodeJenisPungutan == "PPH" && $p->kodeFasilitasTarif == 1) {
-                        $pphDibayar  += $p->nilaiBayar;
-                    } elseif ($p->kodeJenisPungutan == "PPH" && $p->kodeFasilitasTarif == 2) {
-                        $pphDitanggung  += $p->nilaiBayar;
-                    } elseif ($p->kodeJenisPungutan == "PPH" && $p->kodeFasilitasTarif == 5) {
-                        $pphDibebaskan  += $p->nilaiBayar;
-                    } elseif ($p->kodeJenisPungutan == "PPH" && $p->kodeFasilitasTarif == 7) {
-                        $pphSudahDilunasi  += $p->nilaiBayar;
-                    }
-                }
+
+        foreach ($payload->pungutan as $p) {
+            if ($p->kodeJenisPungutan == "BM" && $p->kodeFasilitasTarif == 1) {
+                $bmDibayar += $p->nilaiPungutan;
+            } elseif ($p->kodeJenisPungutan == "BM" && $p->kodeFasilitasTarif == 2) {
+                $bmDitanggung += $p->nilaiPungutan;
+            } elseif ($p->kodeJenisPungutan == "BM" && $p->kodeFasilitasTarif == 5) {
+                $bmDibebaskan += $p->nilaiPungutan;
+            } elseif ($p->kodeJenisPungutan == "BM" && $p->kodeFasilitasTarif == 7) {
+                $bmSudahDilunasi += $p->nilaiPungutan;
+            } elseif ($p->kodeJenisPungutan == "PPN" && $p->kodeFasilitasTarif == 1) {
+                $ppnDibayar += $p->nilaiPungutan;
+            } elseif ($p->kodeJenisPungutan == "PPN" && $p->kodeFasilitasTarif == 2) {
+                $ppnDitanggung  += $p->nilaiPungutan;
+            } elseif ($p->kodeJenisPungutan == "PPN" && $p->kodeFasilitasTarif == 5) {
+                $ppnDibebaskan  += $p->nilaiPungutan;
+            } elseif ($p->kodeJenisPungutan == "PPN" && $p->kodeFasilitasTarif == 7) {
+                $ppnSudahDilunasi  += $p->nilaiPungutan;
+            } elseif ($p->kodeJenisPungutan == "PPH" && $p->kodeFasilitasTarif == 1) {
+                $pphDibayar  += $p->nilaiPungutan;
+            } elseif ($p->kodeJenisPungutan == "PPH" && $p->kodeFasilitasTarif == 2) {
+                $pphDitanggung  += $p->nilaiPungutan;
+            } elseif ($p->kodeJenisPungutan == "PPH" && $p->kodeFasilitasTarif == 5) {
+                $pphDibebaskan  += $p->nilaiPungutan;
+            } elseif ($p->kodeJenisPungutan == "PPH" && $p->kodeFasilitasTarif == 7) {
+                $pphSudahDilunasi  += $p->nilaiPungutan;
             }
         }
+
         foreach ($kodeJenisPungutan as $k) {
             if ($k['value'] == "BM") {
                 $pungutanList[] = [
@@ -1415,14 +1505,44 @@ class BC27 extends BaseController
             }
         }
 
-
         $data = [
             'bc27' => $bc27,
             'payload' => $payload,
             'pungutanList' => $pungutanList,
         ];
 
+
         return view('BeaCukai/bc-27/form-pungutan', $data);
+    }
+
+    public function generatePungutan()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $bc27 = $this->bc27Model->find($id);
+        $payload = json_decode($bc27['payload']);
+        $idPungutan = 1;
+
+        $payload->pungutan = [];
+
+        foreach ($payload->barang as $b) {
+            foreach ($b->bahanBaku as $bb) {
+                foreach ($bb->bahanBakuTarif as $t) {
+                    array_push($payload->pungutan, [
+                        "idPungutan" => "$idPungutan",
+                        "kodeFasilitasTarif" => $t->kodeFasilitasTarif,
+                        "kodeJenisPungutan" => $t->kodeJenisPungutan,
+                        "nilaiPungutan" => $t->nilaiBayar
+                    ]);
+                    $idPungutan++;
+                }
+            }
+        }
+        $this->bc27Model->update($id, ['payload' => json_encode($payload)]);
+
+        return response()->setJSON([
+            'message' => "Generating Pungutan",
+            'status' => true,
+        ]);
     }
 
     public function pernyataan($id)
@@ -1444,6 +1564,7 @@ class BC27 extends BaseController
             'payload' => $payload,
             'ceisaSetting' => $ceisaSetting
         ];
+
 
         return view('BeaCukai/bc-27/form-penyataan', $data);
     }

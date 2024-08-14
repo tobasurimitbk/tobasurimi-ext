@@ -228,6 +228,40 @@ class BC27Model extends Model
         }
         return $isCompleteForm;
     }
+
+    public function isCompleteFormBarang($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->barang) != 0) {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+    public function isCompleteFormPernyataan($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if ($payload->kotaTtd != "") {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+
+
     public function dropdownKemasan($mutasiGlobalId)
     {
         $mutasiGlobalDetailModel = new MutasiGlobalDetailModel();

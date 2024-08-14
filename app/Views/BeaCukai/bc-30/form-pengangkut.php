@@ -145,6 +145,19 @@
                                     <label style="z-index: 1;">Pelabuhan tujuan </label>
                                 </div>
                             </div>
+                            <div class="mt-1">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select negara_tujuan_ekspor" id="negara_tujuan_ekspor" name="negara_tujuan_ekspor" aria-label="Floating label select example">
+                                        <option value=""></option>
+                                        <?php foreach ($kodeNegaraAsal as $k) : ?>
+                                            <option value="<?= encrypt($k['code']) ?>" <?= $payload->kodeNegaraTujuan == $k['code'] ? 'selected' : '' ?>>
+                                                <?= $k['code'] . " - " . strtoupper($k['country_name']) . "" ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label style="z-index: 1;">Negara Tujuan Ekspor</label>
+                                </div>
+                            </div>
 
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -619,6 +632,7 @@
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-pengangkut"));
                     formData.append("id", "<?= encrypt($bc30['id']) ?>");
+                    formData.append("pengangkut_muat_ekspor", $("#pengangkut_muat_ekspor").val());
                     $.ajax({
                         url: "<?= base_url("bea-cukai-bc-30/id/pengangkut"); ?>",
                         data: formData,

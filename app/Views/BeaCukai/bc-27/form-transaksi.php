@@ -61,7 +61,7 @@
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="harga_nilai_pabean" readonly value="<?= $payload->hargaPenyerahan  == "" ? "0" : number_format($payload->hargaPenyerahan * $payload->ndpbm, 2)  ?>" name="harga_nilai_pabean" type="text" class="form-control harga_nilai_pabean">
+                                <input id="harga_nilai_pabean" readonly value="<?= $payload->hargaPenyerahan  == "" ? "0" : formatRupiah($payload->hargaPenyerahan * $payload->ndpbm)  ?>" name="harga_nilai_pabean" type="text" class="form-control harga_nilai_pabean">
                                 <label>Nilai Pabean</label>
                             </div>
                         </div>
@@ -96,19 +96,19 @@
                         </label>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input readonly id="volume" value="<?= $payload->netto == "" ? "0" : formatRupiah($payload->netto) ?>" name="volume" type="text" class="form-control volume" onchange="this.value = formatRupiah(this.value)">
+                                <input readonly id="volume" value="" name="volume" type="text" class="form-control volume" onchange="this.value = formatRupiah(this.value)">
                                 <label>Volume(M3)</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input readonly id="berat_netto" value="<?= $payload->netto == "" ? "0" : formatRupiah($payload->netto) ?>" name="berat_netto" type="text" class="form-control berat_netto" onchange="this.value = formatRupiah(this.value)">
+                                <input readonly id="berat_netto" value="<?= $payload->netto == 0 ? "0" : $payload->netto ?>" name="berat_netto" type="text" class="form-control berat_netto">
                                 <label>Berat Bersih/Netto (KGM)</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="berat_bruto" name="berat_bruto" value="<?= $payload->bruto == "" ? "0" : formatRupiah($payload->bruto) ?>" type="text" class="form-control berat_bruto" onchange="this.value = formatRupiah(this.value)">
+                                <input id="berat_bruto" name="berat_bruto" value="<?= $payload->bruto == "" ? "0" : $payload->bruto ?>" type="text" class="form-control berat_bruto">
                                 <label>Berat Kotor/Bruto (KGM)</label>
                             </div>
                         </div>
@@ -191,11 +191,12 @@
     $('#harga_ndpbm').keyup(function() {
         var ndpbm = convertRupiahToNumber($(this).val()) || 0;
         var hargaBarang = convertRupiahToNumber($("#harga_nilai_penyerahan").val()) || 0;
-        var hargaPabean = (Number(ndpbm) * Number(hargaBarang));
-
+        var cif = convertRupiahToNumber($("#harga_cif").val()) || 0;
+        var hargaPabean = (Number(ndpbm) * Number(cif));
         $('#harga_cif').val(formatRupiah(ndpbm));
-        $('#harga_nilai_pabean').val(formatRupiah(hargaPabean))
+        $('#harga_nilai_pabean').val(formatRupiah(hargaPabean));
     });
+
 
     $('#harga_nilai_penyerahan').keyup(function() {
         var ndpbm = convertRupiahToNumber($("#harga_ndpbm").val()) || 0;
@@ -255,9 +256,6 @@
             berat_netto: {
                 required: true
             },
-            volume: {
-                required: true
-            }
         },
         messages: {
             harga_kode_valuta: {
