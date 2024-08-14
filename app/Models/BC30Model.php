@@ -463,9 +463,20 @@ class BC30Model extends Model
             $isCompleteForm = false;
         } else {
             if (count($payload->dokumen) != 0) {
+                $isCompleteForm = false;
+                $foundInvoice = false;
+                $foundPackingList = false;
                 foreach ($payload->dokumen as $d) {
+                    if ($d->kodeDokumen == '380') {
+                        $foundInvoice = true;
+                    }
+                    if ($d->kodeDokumen == '217') {
+                        $foundPackingList = true;
+                    }
+                    if ($foundInvoice && $foundPackingList) {
+                        $isCompleteForm = true;
+                    }
                 }
-                $isCompleteForm = true;
             } else {
                 $isCompleteForm = false;
             }
@@ -545,6 +556,21 @@ class BC30Model extends Model
             $isCompleteForm = false;
         } else {
             if ($payload->kotaTtd != "") {
+                $isCompleteForm = true;
+            } else {
+                $isCompleteForm = false;
+            }
+        }
+        return $isCompleteForm;
+    }
+    public function iscompleteFormKesiapanBarang($id)
+    {
+        $isCompleteForm = false;
+        $payload = json_decode($this->find($id)['payload']);
+        if ($payload == null) {
+            $isCompleteForm = false;
+        } else {
+            if (count($payload->kesiapanBarang) != 0) {
                 $isCompleteForm = true;
             } else {
                 $isCompleteForm = false;

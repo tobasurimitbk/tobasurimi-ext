@@ -33,7 +33,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-floating mb-3">
-                                    <input id="tambah_nomor_pemilik_barang" value="   " name="tambah_nomor_pemilik_barang" type="text" class="tambah_nomor_pemilik_barang form-control" placeholder="">
+                                    <input id="tambah_nomor_pemilik_barang" value="" name="tambah_nomor_pemilik_barang" type="text" class="tambah_nomor_pemilik_barang form-control" placeholder="">
                                     <!-- <label>Nomor Pengajuan</label> -->
                                 </div>
                             </div>
@@ -68,8 +68,7 @@
     <div class="root-form-view">
         <div class="card">
             <div class="card-header" style="font-weight: bold; color:black;">
-                BC 3.0 - PEMBERITAHUAN PENGELUARAN UNTUK DIANGKUT DARI TEMPAT PENIMBUNAN BERIKAT KE TEMPAT PENIMBUNAN BERIKAT LAINNYA
-            </div>
+                BC 3.0 - PEMBERITAHUAN EKSPOR BARANG </div>
             <div class="card-body">
                 <?php include_once('nav.php') ?>
                 <?= csrf_field() ?>
@@ -184,7 +183,7 @@
                                     <select class="form-select entitas_kode_negara_pembeli" id="entitas_kode_negara_pembeli" name="entitas_kode_negara_pembeli" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($kodeNegaraAsal as $k) : ?>
-                                            <option <?= !empty($payload->entitas[$indexEntitas])  ? ($payload->entitas[$indexEntitas]->kodeNegara == $k['code'] ? 'selected' : '') : '' ?> value="<?= encrypt($k['code']) ?>">
+                                            <option <?= !empty($payload->entitas[$indexEntitas - 1])  ? ($payload->entitas[$indexEntitas - 1]->kodeNegara == $k['code'] ? 'selected' : '') : '' ?> value="<?= encrypt($k['code']) ?>">
                                                 <?= $k['code'] . " - " . strtoupper($k['country_name']) . "" ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -281,6 +280,51 @@
         .children('span')
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('#entitas-pemilik-form')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    var validatorEntitasPemilik = $('#entitas-pemilik-form').validate({
+        rules: {
+            tambah_pemilik_kode_jenis_entitas: {
+                required: true
+            },
+            tambah_nomor_pemilik_barang: {
+                required: true
+            },
+            tambah_nama_pemilik_barang: {
+                required: true
+            },
+            tambah_alamat_pemilik_barang: {
+                required: true
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    })
 
     var validatorEntitas = $("#form-entitas").validate({
         rules: {

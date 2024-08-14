@@ -37,7 +37,7 @@
     <?php include('header.php') ?>
     <div class="card">
         <div class="card-header" style="font-weight: bold; color:black;">
-            BC 3.0 - PEMBERITAHUAN IMPOR BARANG DARI TEMPAT PENIMBUNAN BERIKAT
+            BC 3.0 - PEMBERITAHUAN EKSPOR BARANG
         </div>
         <div class="card-body">
             <?php include_once('nav.php') ?>

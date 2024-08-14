@@ -68,7 +68,7 @@
     <div class="root-form-view">
         <div class="card">
             <div class="card-header" style="font-weight: bold; color:black;">
-                BC 3.0
+                BC 3.0 - PEMBERITAHUAN EKSPOR BARANG
             </div>
             <div class="card-body">
                 <?php include_once('nav.php') ?>
@@ -83,13 +83,11 @@
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select pengangkut_tempat_penimbuhan" id="pengangkut_tempat_penimbuhan" name="pengangkut_tempat_penimbuhan" aria-label="Floating label select example">
-                                        <option value=""></option>
-                                        <?php foreach ($kodeKantor as $k) : ?>
-                                            <option <?= !empty($payload->kodeTps) ? (encrypt($payload->kodeTps) == encrypt($k['kode']) ? 'selected' : '') : '' ?> value="<?= encrypt($k['kode']) ?>">
-                                                <?= strtoupper($k['kode']) . " - " . strtoupper($k['kantor_name']) . " " ?>
-                                            </option>
-                                        <?php endforeach; ?>
-
+                                        <?php if (!empty($payload)) : ?>
+                                            <option value="<?= $payload->kodeTps ?>"><?= $payload->kodeTps ?></option>
+                                        <?php else : ?>
+                                            <option value=""></option>
+                                        <?php endif; ?>
                                     </select>
                                     <label style="z-index: 1;">Tempat Penimbuhan</label>
                                 </div>
@@ -102,20 +100,21 @@
                                         <?php else : ?>
                                             <option value=""></option>
                                         <?php endif; ?>
-
                                     </select>
                                     <label style="z-index: 1;">Pelabuhan Muat Asal </label>
                                 </div>
+                                <input id="kodeKantorMuat" class="kodeKantorMuat" type="hidden" value="<?= $payload->kodeKantorMuat != "" ? $payload->kodeKantorMuat : "" ?>">
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select disabled class="form-select pengangkut_muat_ekspor" id="pengangkut_muat_ekspor" name="pengangkut_muat_ekspor" aria-label="Floating label select example">
-                                        <option value=""></option>
-                                        <?php foreach ($kodeKantor as $k) : ?>
-                                            <option <?= !empty($selectedKantor) ? (encrypt($selectedKantor['value']) == encrypt($k['kode']) ? 'selected' : '') : '' ?> value="<?= encrypt($k['kode']) ?>">
-                                                <?= strtoupper($k['kode']) . " - " . strtoupper($k['kantor_name']) . " " ?>
-                                            </option>
-                                        <?php endforeach; ?>
+                                        <?php if ($payload->kodePelEkspor != ""):  ?>
+                                            <option value="<?= $payload->kodePelEkspor ?>"><?= $payload->kodePelEkspor ?></option>
+                                        <?php else: ?>
+                                            <option value=""></option>
+                                        <?php endif; ?>
+
+
                                     </select>
                                     <label style="z-index: 1;">Pelabuhan Muat Ekspor </label>
                                 </div>
@@ -213,17 +212,20 @@
                                         </div>
                                     </div>
                                 </div>
-
-
                             </div>
-                            <!-- <div class="mt-4">
+                            <div class="mt-4">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select pengangkutan_kantor_pemeriksa" id="pengangkutan_kantor_pemeriksa" name="pengangkutan_kantor_pemeriksa" aria-label="Floating label select example">
                                         <option value=""></option>
+                                        <?php foreach ($kodeKantor as $k) : ?>
+                                            <option value="<?= $k['kode'] ?>" <?= $payload->kodeKantorPeriksa == $k['kode'] ? 'selected' : '' ?>>
+                                                <?= strtoupper($k['kode']) . " - " . strtoupper($k['kantor_name']) . " " ?>
+                                            </option>
+                                        <?php endforeach; ?>
                                     </select>
                                     <label style="z-index: 1;">Kantor Pemeriksa</label>
                                 </div>
-                            </div> -->
+                            </div>
                         </div>
                     </div>
                     <div class="row">
@@ -304,22 +306,45 @@
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
 
-    $('#pengangkut_tempat_penimbuhan').select2({
-        placeholder: "Pilih Tempat Penimbuhan",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
+    <?php if ($payload->kodeKantor != "") : ?>
+        $.ajax({
+            url: `<?= base_url("bea-cukai-bc-23/api/get-tps-by-kode-kantor"); ?>`,
+            method: "GET",
+            data: {
+                kodeKantor: <?= $payload->kodeKantor; ?>
+            },
+            beforeSend: function() {
+
+            },
+            complete: function() {
+
+            },
+            dataType: "json",
+            success: function(res) {
+                if (res.data.status === false) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.data.message,
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    });
+                } else {
+                    $('#pengangkut_tempat_penimbuhan').empty();
+                    $.each(res.data.data, function(i, v) {
+                        var option = $('<option>').val(v.kodeGudang).text(v.kodeGudang + " - " + v.namaGudang);
+                        $('#pengangkut_tempat_penimbuhan').append(option);
+                    });
+                }
+            }
+        });
+    <?php endif; ?>
+    <?php if ($payload->kodeKantorMuat != "") :  ?>
+        var kodeKantorMuat = $("#kodeKantorMuat").val();
         $.ajax({
             url: `<?= base_url("bea-cukai-bc-23/api/get-pelabuhan"); ?>`,
             method: "GET",
             data: {
-                header_kantor_pabean_bongkar: $('#pengangkut_tempat_penimbuhan').val()
-            },
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
+                header_kantor_pabean_bongkar: kodeKantorMuat
             },
             dataType: "json",
             success: function(res) {
@@ -339,8 +364,13 @@
                 }
             }
         });
-    })
+    <?php endif; ?>
 
+    $('#pengangkut_tempat_penimbuhan').select2({
+        placeholder: "Pilih Tempat Penimbuhan",
+        theme: "bootstrap-5",
+        allowClear: true
+    });
     $('#pengangkut_muat_asal').select2({
         placeholder: "Pilih Pelabuhan Muat Asal",
         theme: "bootstrap-5",
@@ -351,15 +381,29 @@
         placeholder: "Pilih Pelabuhan Muat Asal",
         theme: "bootstrap-5",
         allowClear: true
-    }).change(function() {
-        $.ajax({
-            url: `<?= base_url("bea-cukai-bc-23/api/get-pelabuhan"); ?>`,
-            method: "GET",
-            data: {
-                header_kantor_pabean_bongkar: $('#pengangkut_muat_ekspor').val()
-            },
+    });
 
-            dataType: "json",
+
+
+    $('#pengangkut_bongkar').select2({
+        placeholder: "Pilih Pelabuhan Bongkar",
+        theme: "bootstrap-5",
+        allowClear: true,
+        ajax: {
+            url: '<?= base_url('bea-cukai-bc-23/api/get-pelabuhan-by-kata') ?>',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    search: params.term,
+                };
+            },
+            processResults: function(data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: data.results,
+                };
+            },
             success: function(res) {
                 if (res.data.status === false) {
                     Swal.fire({
@@ -371,66 +415,56 @@
                 } else {
                     $('#pengangkut_bongkar').empty();
                     $.each(res.data.data, function(i, v) {
-                        var option = $('<option>').val(v.kodePelabuhan).text(v.kodePelabuhan);
+                        var option = $('<option>').val(v.kodePelabuhan).text(v.kodePelabuhan + " - " + v.namaPelabuhan);
                         $('#pengangkut_bongkar').append(option);
                     });
                 }
-            }
-        });
+            },
+            cache: true
+        },
+        minimumInputLength: 1,
 
-    });
-
-    $('#pengangkut_muat_ekspor').trigger('change');
-
-    $('#pengangkut_bongkar').select2({
-        placeholder: "Pilih Pelabuhan Bongkar",
-        theme: "bootstrap-5",
-        allowClear: true
     });
     $('#pengangkut_tujuan').select2({
         placeholder: "Pilih Pelabuhan Tujuan",
         theme: "bootstrap-5",
-        allowClear: true
-    }).on('select2:open', function() {
-        let select2SearchField = $('.select2-container--open .select2-search__field');
-        select2SearchField.on('keydown', function(event) {
-            if (event.key === "Enter" || event.keyCode === 13) {
-                var searchTerm = $(this).val();
-                $.ajax({
-                    url: `<?= base_url("bea-cukai-bc-23/api/get-pelabuhan-by-kata"); ?>`,
-                    method: "GET",
-                    data: {
-                        kata_pelabuhan: searchTerm
-                    },
-                    dataType: "json",
-                    beforeSend: function() {
-                        setLoading();
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    success: function(res) {
-                        if (res.data.status === false) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: res.data.message,
-                                confirmButtonColor: '#4e73df',
-                                confirmButtonText: 'Ok'
-                            });
-                        } else {
-                            $('#pengangkut_tujuan').empty();
-                            $.each(res.data.data, function(i, v) {
-                                var option = $('<option>').val(v.kodePelabuhan).text(v.kodePelabuhan + " - " + v.namaPelabuhan);
-                                $('#pengangkut_tujuan').append(option);
-                            });
-                        }
-                    }
-                });
-            }
+        allowClear: true,
+        ajax: {
+            url: '<?= base_url('bea-cukai-bc-23/api/get-pelabuhan-by-kata') ?>',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    search: params.term,
+                };
+            },
+            processResults: function(data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: data.results,
+                };
+            },
+            success: function(res) {
+                if (res.data.status === false) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.data.message,
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    });
+                } else {
+                    $('#pengangkut_tujuan').empty();
+                    $.each(res.data.data, function(i, v) {
+                        var option = $('<option>').val(v.kodePelabuhan).text(v.kodePelabuhan + " - " + v.namaPelabuhan);
+                        $('#pengangkut_tujuan').append(option);
+                    });
+                }
+            },
+            cache: true
+        },
+        minimumInputLength: 1,
+    });
 
-        });
-
-    })
 
 
     $('#pengangkutan_lokasi_pemeriksaan').select2({
@@ -476,6 +510,44 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
+    var validatorSaranaPengangkut = $("#pengangkut-form-table").validate({
+        rules: {
+            nama_sarana_angkut: {
+                required: true,
+            },
+            cara_pengangkutan: {
+                required: true,
+
+            },
+            nomor_pengangkutan: {
+                required: true,
+            },
+            pengangkutan_negara: {
+                required: true,
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    })
+
     var validatorPengangkut = $("#form-pengangkut").validate({
         rules: {
             pengangkut_tempat_penimbuhan: {
@@ -505,6 +577,7 @@
             pengangkutan_kantor_pemeriksa: {
                 required: true
             },
+
         },
         messages: {
             pengangkut_tempat_penimbuhan: {

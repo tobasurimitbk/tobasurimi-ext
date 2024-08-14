@@ -1296,6 +1296,7 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('api/get-pelabuhan-by-kata', 'BeaCukai\BC23::getPelabuhanByKata');
     $routes->get('api/get-manifest', 'BeaCukai\BC23::getManifest');
     $routes->get('api/get-kontainer-peti-kemas', 'BeaCukai\BC23::getBLKontainerPetiKemas');
+    $routes->get('api/get-tps-by-kode-kantor', 'BeaCukai\BC23::getTpsByKodeKantor');
     $routes->get('api/kirim-dokumen/(:segment)', 'BeaCukai\BC23::kirimCeisa/$1');
     $routes->get('satuan-barang', 'BeaCukai\BC23::getKodeSatuanBarang');
     // DELETE & UPDATE NO AJU

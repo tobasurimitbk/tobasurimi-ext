@@ -12,7 +12,7 @@
     <div class="root-form-view">
         <div class="card">
             <div class="card-header" style="font-weight: bold; color:black;">
-                BC 3.0
+                BC 3.0 - PEMBERITAHUAN EKSPOR BARANG
             </div>
             <div class="card-body">
                 <?php include_once('nav.php') ?>
@@ -29,10 +29,10 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select kodeKantor" id="kodeKantor" name="kodeKantor" aria-label="Floating label select example">
+                                    <select class="form-select kodeKantorMuat" id="kodeKantorMuat" name="kodeKantorMuat" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($kodeKantor as $k) : ?>
-                                            <option <?= $payload->kodeKantor == "" ? (encrypt($selectedKantor) == encrypt($k['kode']) ? 'selected' : '') : '' ?> <?= $payload->kodeKantor != "" ? ($payload->kodeKantor == $k['kode'] ? 'selected' : '') : "" ?> value="<?= encrypt($k['kode']) ?>">
+                                            <option <?= $payload->kodeKantorMuat == "" ? (encrypt($selectedKantor) == encrypt($k['kode']) ? 'selected' : '') : '' ?> <?= $payload->kodeKantorMuat != "" ? ($payload->kodeKantorMuat == $k['kode'] ? 'selected' : '') : "" ?> value="<?= $k['kode'] ?>">
                                                 <?= strtoupper($k['kode']) . " - " . strtoupper($k['kantor_name']) . " " ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -43,15 +43,22 @@
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select kodePelabuhan" id="kodePelabuhan" name="kodePelabuhan" aria-label="Floating label select example">
-                                        <option value=""></option>
+                                        <option value="<?= $payload->kodePelEkspor ?>"><?= $payload->kodePelEkspor ?></option>
                                     </select>
                                     <label style="z-index: 1;">Pelabuhan Muat Ekspor</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input id="kodeKantorEkspor" value="kodeKantorEkspor" name="kodeKantorEkspor" type="text" readonly class=" form-control" placeholder="">
-                                    <label>Kantor Pabean Muatan Ekspor</label>
+                                    <select disabled class="form-select kodeKantorEkspor" id="kodeKantorEkspor" name="kodeKantorEkspor" aria-label="Floating label select example">
+                                        <option value=""></option>
+                                        <?php foreach ($kodeKantor as $k) : ?>
+                                            <option <?= $payload->kodeKantorEkspor == "" ? (encrypt($selectedKantor) == encrypt($k['kode']) ? 'selected' : '') : '' ?> <?= $payload->kodeKantorEkspor != "" ? ($payload->kodeKantorEkspor == $k['kode'] ? 'selected' : '') : "" ?> value="<?= $k['kode'] ?>">
+                                                <?= strtoupper($k['kode']) . " - " . strtoupper($k['kantor_name']) . " " ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label style="z-index: 1;">Kantor Pabean Muatan Ekspor Asal</label>
                                 </div>
                             </div>
                             <div class="mt-1">
@@ -152,7 +159,7 @@
     // init loading
     $('#btn-loading').hide();
 
-    $('#kodeKantor').select2({
+    $('#kodeKantorMuat').select2({
         placeholder: "Pilih Kode Kantor Asal",
         theme: "bootstrap-5",
         allowClear: true
@@ -161,7 +168,7 @@
             url: `<?= base_url("bea-cukai-bc-23/api/get-pelabuhan"); ?>`,
             method: "GET",
             data: {
-                header_kantor_pabean_bongkar: $('#kodeKantor').val()
+                header_kantor_pabean_bongkar: $('#kodeKantorMuat').val()
             },
             beforeSend: function() {
                 setLoading();
@@ -187,6 +194,9 @@
                 }
             }
         });
+        var kodeKantorMuat = $('#kodeKantorMuat').val()
+        console.log(kodeKantorMuat);
+        $('#kodeKantorEkspor').val(kodeKantorMuat);
     });
 
     $('#jenisEkspor').select2({
@@ -284,7 +294,7 @@
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-header"));
                     formData.append("nomorAju", $('#nomorAju').val());
-
+                    formData.append("kodeKantorEkspor", $('#kodeKantorEkspor').val());
                     $.ajax({
                         url: "<?= base_url("bea-cukai-bc-30/id/header"); ?>",
                         data: formData,
