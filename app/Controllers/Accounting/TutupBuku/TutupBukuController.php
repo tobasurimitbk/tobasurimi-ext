@@ -8,6 +8,7 @@ use App\Models\SaldoTutupBukuModel;
 use App\Models\SatuansModel;
 use App\Models\StockModel;
 use App\Models\StockTutupBukuModel;
+use App\Models\Sub_AkunsModel;
 use App\Models\TutupBukuModel;
 
 class TutupBukuController extends BaseController
@@ -20,6 +21,7 @@ class TutupBukuController extends BaseController
     protected $saldoTutupBukuModel;
     protected $stockModel;
     protected $satuanModel;
+    protected $subAkunModel;
     protected $encrypter;
 
     public function __construct()
@@ -33,6 +35,7 @@ class TutupBukuController extends BaseController
         $this->saldoTutupBukuModel = new SaldoTutupBukuModel();
         $this->stockModel = new StockModel();
         $this->satuanModel = new SatuansModel();
+        $this->subAkunModel = new Sub_AkunsModel();
     }
     public function index()
     {
@@ -81,10 +84,14 @@ class TutupBukuController extends BaseController
 
             if ($stockTutupBuku) {
                 $stockTutupBukuVar = 1;
+            } else {
+                $stockTutupBukuVar = 0;
             }
 
             if ($saldoTutupBuku) {
                 $saldoTutupBukuVar = 1;
+            } else {
+                $saldoTutupBukuVar = 0;
             }
 
             array_push($rdata, [
@@ -134,15 +141,32 @@ class TutupBukuController extends BaseController
             "kode" =>  $this->request->getVar("search"),
             "kode_barang" =>  $this->request->getVar("search"),
         ];
-        $condition = [
+        $conditionStock = [
             "barang_master.company_id" => $this->this_company_id,
             "barang_master.deletedAt" => null,
             "barang_master_spesifikasi.deletedAt" => null,
             "stock.company_id" => $this->this_company_id,
             "stock.deletedAt" => null,
         ];
+        $bulan_closing_input = $this->request->getVar("bulan_closing");
 
-        $dataQry = $this->stockModel->getStockListBarang($condition, $addCondition);
+        // Konversi format MM/YYYY ke format YYYY-MM
+        list($month, $year) = explode('/', $bulan_closing_input);
+        $bulan_closing = "$year-$month";
+
+        $conditionSaldo = [
+            "sub_akuns.company_id" => $this->this_company_id,
+            "sub_akuns.deletedAt" => null,
+            "jurnal_umum.company_id" => $this->this_company_id,
+            "jurnal_umum.deletedAt" => null,
+            "DATE_FORMAT(jurnal_umum.tanggal_jurnal, '%Y-%m') =" => $bulan_closing, // Filter tanggal dalam array kondisi
+        ];
+
+        $dataQrySaldo = $this->subAkunModel->getSubsAkunWithDataJurnal($conditionSaldo);
+        // var_dump($bulan_closing);
+        // var_dump($dataQrySaldo);
+        // exit;
+        $dataQry = $this->stockModel->getStockListBarang($conditionStock, $addCondition);
 
         $idTutupBuku = $this->tutupBukuModel->insert([
             'company_id' => $this->this_company_id,
@@ -162,6 +186,15 @@ class TutupBukuController extends BaseController
                 'barang1_id' => $data->barang1_id,
                 'barang2_id' => $data->barang2_id,
                 'qty' => $data->qty
+            ]);
+        }
+
+        foreach ($dataQrySaldo as &$data) {
+            $this->saldoTutupBukuModel->insert([
+                'tutup_buku_id' => $idTutupBuku,
+                'divisi_id' => $this->request->getVar('divisi_id'),
+                'coa_id' => $data->id_coa,
+                'saldo' => $data->saldo_akhir,
             ]);
         }
 
