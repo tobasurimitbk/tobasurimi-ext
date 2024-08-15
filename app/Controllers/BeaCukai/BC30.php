@@ -687,16 +687,7 @@ class BC30 extends BaseController
                     "nomorIdentitas" => "",
                     "seriEntitas" => "1",
                 ],
-                [
-                    //pemilik
-                    "alamatEntitas" => "",
-                    "kodeEntitas" => "7",
-                    "kodeJenisIdentitas" => "",
-                    "nibEntitas" => "",
-                    "namaEntitas" => "",
-                    "nomorIdentitas" => "",
-                    "seriEntitas" => "4",
-                ],
+
                 [
                     //penerima
 
@@ -722,15 +713,24 @@ class BC30 extends BaseController
         $payload = json_decode($this->bc30Model->find($id)['payload']);
         $pemilikBarang = [];
         $nomor = 1;
+        $indexPembeli = 0;
+        $indexPenerima = 0;
+
         $indexEntitas = count($payload->entitas);
         foreach ($payload->entitas as $i => $e) {
-            if ($i > 0 && $i < $indexEntitas - 2) {
-                $e->nomor = $nomor++;
+            if ($payload->entitas[$i]->kodeEntitas == 6) {
+                $indexPembeli = $i;
+            }
+            if ($payload->entitas[$i]->kodeEntitas == 8) {
+                $indexPenerima = $i;
+            }
+            if ($payload->entitas[$i]->kodeEntitas == 7) {
                 array_push($pemilikBarang, $e);
+                $e->$nomor++;
             }
         }
 
-        // var_dump($payload->entitas);
+        // var_dump($indexPembeli);
         // die;
         $data = [
             'bc30' => $bc30,
@@ -738,6 +738,8 @@ class BC30 extends BaseController
             'payload' => $payload,
             'kodeNegaraAsal' => $this->countryModel->findAll(),
             'pemilik' => $pemilikBarang,
+            'indexPembeli' => $indexPembeli,
+            'indexPenerima' => $indexPenerima,
             'indexEntitas' => $indexEntitas
         ];
 

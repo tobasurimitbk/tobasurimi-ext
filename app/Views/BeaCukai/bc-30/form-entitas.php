@@ -15,8 +15,9 @@
             </div>
             <div class="modal-body">
                 <form id="entitas-pemilik-form" class="entitas-pemilik-form">
-
                     <div class="mt-1">
+
+
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -102,9 +103,17 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
-                                        <div class="form-floating mb-3">
-                                            <input id="entitas_nomor_eksportir" value="<?= !empty($payload->entitas[0]) ? $payload->entitas[0]->nomorIdentitas : "" ?>" name="entitas_nomor_eksportir" type="text" class="entitas_nomor_eksportir form-control" placeholder="">
-                                            <label>Nomor Indentitas</label>
+
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <select class="form-select entitas_nomor_eksportir" id="entitas_nomor_eksportir" name="entitas_nomor_eksportir" aria-label="Floating label select example">
+                                                <option value=""></option>
+                                                <?php foreach ($pengusahaTPB as $p) : ?>
+                                                    <option <?= $payload->entitas[0]->nomorIdentitas != null ? ($payload->entitas[0]->nomorIdentitas ? 'selected' : '')  : '' ?> value="<?= $p['npwp'] ?>" data-nama_pengusaha="<?= $p['nama_pengusaha'] ?>" data-alamat="<?= $p['alamat'] ?>" data-nib="<?= $p['nib'] ?>" data-id="<?= $p['id'] ?>">
+                                                        <?= $p['npwp'] ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                            <label style="z-index: 1;">Nomor Identitas</label>
                                         </div>
                                     </div>
                                 </div>
@@ -132,13 +141,13 @@
 
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="entitas_nama_penerima" value="<?= count($payload->entitas) == 0 ? "" : $payload->entitas[1]->namaEntitas ?>" name="entitas_nama_penerima" type="text" class="form-control entitas_nama_penerima" placeholder="">
+                                    <input id="entitas_nama_penerima" value="<?= count($payload->entitas) == 0 ? "" : $payload->entitas[$indexPenerima]->namaEntitas ?>" name="entitas_nama_penerima" type="text" class="form-control entitas_nama_penerima" placeholder="">
                                     <label>Nama</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <textarea name="entitas_alamat_penerima" id="entitas_alamat_penerima" class="form-control entitas_alamat_penerima" style="height: 100px;"><?= count($payload->entitas) == 0 ? "" : $payload->entitas[1]->alamatEntitas ?></textarea>
+                                    <textarea name="entitas_alamat_penerima" id="entitas_alamat_penerima" class="form-control entitas_alamat_penerima" style="height: 100px;"><?= count($payload->entitas) == 0 ? "" : $payload->entitas[$indexPenerima]->alamatEntitas ?></textarea>
                                     <label>Alamat</label>
                                 </div>
                             </div>
@@ -147,7 +156,7 @@
                                     <select class="form-select entitas_kode_negara_penerima" id="entitas_kode_negara_penerima" name="entitas_kode_negara_penerima" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($kodeNegaraAsal as $k) : ?>
-                                            <option <?= !empty($payload->entitas[$indexEntitas - 1])  ? ($payload->entitas[$indexEntitas - 1]->kodeNegara == $k['code'] ? 'selected' : '') : '' ?> value="<?= encrypt($k['code']) ?>">
+                                            <option <?= !empty($payload->entitas[$indexPenerima])  ? ($payload->entitas[$indexPenerima]->kodeNegara == $k['code'] ? 'selected' : '') : '' ?> value="<?= encrypt($k['code']) ?>">
                                                 <?= $k['code'] . " - " . strtoupper($k['country_name']) . "" ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -164,13 +173,13 @@
 
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="entitas_nama_pembeli" value="<?= count($payload->entitas) == 0 ? "" : $payload->entitas[2]->namaEntitas ?>" name="entitas_nama_pembeli" type="text" class="form-control entitas_nama_pembeli" placeholder="">
+                                    <input id="entitas_nama_pembeli" value="<?= count($payload->entitas) == 0 ? "" : $payload->entitas[$indexPembeli]->namaEntitas ?>" name="entitas_nama_pembeli" type="text" class="form-control entitas_nama_pembeli" placeholder="">
                                     <label>Nama</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <textarea name="entitas_alamat_pembeli" id="entitas_alamat_pembeli" class="form-control entitas_alamat_pembeli" style="height: 100px;"><?= count($payload->entitas) == 0 ? "" : $payload->entitas[2]->alamatEntitas ?></textarea>
+                                    <textarea name="entitas_alamat_pembeli" id="entitas_alamat_pembeli" class="form-control entitas_alamat_pembeli" style="height: 100px;"><?= count($payload->entitas) == 0 ? "" : $payload->entitas[$indexPembeli]->alamatEntitas ?></textarea>
                                     <label>Alamat</label>
                                 </div>
                             </div>
@@ -179,7 +188,7 @@
                                     <select class="form-select entitas_kode_negara_pembeli" id="entitas_kode_negara_pembeli" name="entitas_kode_negara_pembeli" aria-label="Floating label select example">
                                         <option value=""></option>
                                         <?php foreach ($kodeNegaraAsal as $k) : ?>
-                                            <option <?= !empty($payload->entitas[$indexEntitas - 1])  ? ($payload->entitas[$indexEntitas - 1]->kodeNegara == $k['code'] ? 'selected' : '') : '' ?> value="<?= encrypt($k['code']) ?>">
+                                            <option <?= !empty($payload->entitas[$indexPembeli])  ? ($payload->entitas[$indexPembeli]->kodeNegara == $k['code'] ? 'selected' : '') : '' ?> value="<?= encrypt($k['code']) ?>">
                                                 <?= $k['code'] . " - " . strtoupper($k['country_name']) . "" ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -267,21 +276,7 @@
     var no = 1;
 
 
-    $('.form-select')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('#entitas-pemilik-form')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
 
     var validatorEntitasPemilik = $('#entitas-pemilik-form').validate({
         rules: {
@@ -516,36 +511,6 @@
         }
     });
 
-    function getListNoIjinTPB() {
-        $.ajax({
-            url: `<?= base_url('bea-cukai-bc-23/list-no-ijin-tpb'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                pengusaha_tpb_id: $(".entitas_npwp_pengusaha option:selected").data('id'),
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".entitas_nomor_ijin_tpb").empty();
-                $(".entitas_nomor_ijin_tpb").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".entitas_nomor_ijin_tpb").append(`<option data-alamat_pemilik_barang="${item.alamat_pemilik_barang}" data-tanggal_skep_tpb="${item.tanggal_skep_tpb}"  value="${item.no_ijin_tpb}">${item.no_ijin_tpb}</option>`)
-                })
-                $(".entitas_nomor_ijin_tpb").val();
-                $(".entitas_nomor_ijin_tpb_penerima_barang").empty();
-                $(".entitas_nomor_ijin_tpb_penerima_barang").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".entitas_nomor_ijin_tpb_penerima_barang").append(`<option data-alamat_pemilik_barang="${item.alamat_pemilik_barang}" data-tanggal_skep_tpb="${item.tanggal_skep_tpb}"  value="${item.no_ijin_tpb}">${item.no_ijin_tpb}</option>`)
-                })
-                $(".entitas_nomor_ijin_tpb_penerima_barang").val();
-            }
-        });
-    }
 
     function removeData(index_delete) {
         Swal.fire({
@@ -614,6 +579,50 @@
         theme: "bootstrap-5",
         allowClear: true
     });
+    $('#entitas_nomor_eksportir').select2({
+        placeholder: "Pilih No NPWP",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        var selected = $(this).find('option:selected');
+        var npwpPengusaha = $(this).val();
+        var namaPengusaha = selected.data('nama_pengusaha');
+        var alamatPengusaha = selected.data('alamat');
+        var nibDefault = selected.data('nib');
+        $('#entitas_nama_eksportir').val(namaPengusaha);
+        $('#entitas_alamat_eksportir').val(alamatPengusaha);
+
+        // DROPDOPWN NOMOR IZIN TPB
+        getListNoIjinTPB();
+    });
+
+    function getListNoIjinTPB() {
+        $.ajax({
+            url: `<?= base_url('bea-cukai-bc-23/list-no-ijin-tpb'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                pengusaha_tpb_id: $("#entitas_nomor_eksportir option:selected").data('id'),
+            },
+            dataType: "json",
+            success: function(res) {
+
+            }
+        });
+    }
+
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 </script>
 
 

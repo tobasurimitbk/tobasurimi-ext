@@ -19,7 +19,7 @@
                 <?= csrf_field() ?>
                 <form id="form-kesiapan-barang">
                     <input type="hidden" name="id" id="id" class="id" value="<?= encrypt($bc30['id']) ?>">
-                    <div class="row">
+                    <div class="row mt-3">
                         <div class="col-sm-4 mt-1">
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
