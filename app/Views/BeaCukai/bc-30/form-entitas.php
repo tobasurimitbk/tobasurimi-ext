@@ -232,7 +232,7 @@
                                         <?php $length = count($pemilik); ?>
                                         <?php foreach ($pemilik as $i => $p) : ?>
                                             <tr style="color: white; text-align:center;">
-                                                <td><?= $p->nomor ?></td>
+                                                <td><?= $i + 1 ?></td>
                                                 <td><?= $p->nomorIdentitas ?></td>
                                                 <td><?= $p->alamatEntitas ?></td>
                                                 <td><?= $p->namaEntitas ?></td>

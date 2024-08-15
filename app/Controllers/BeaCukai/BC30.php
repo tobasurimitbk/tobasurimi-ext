@@ -726,7 +726,6 @@ class BC30 extends BaseController
             }
             if ($payload->entitas[$i]->kodeEntitas == 7) {
                 array_push($pemilikBarang, $e);
-                $e->$nomor++;
             }
         }
 
