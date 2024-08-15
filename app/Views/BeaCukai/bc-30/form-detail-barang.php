@@ -229,116 +229,14 @@
                         </div>
 
                     </div>
-                    <!-- <div class="row">
-                        <div class="col-sm-6 mt-1">
-                            <label class="form-label font-weight-bold lable-title mb-3">
-                                Pungutan
-                            </label>
-                            <form id="form-pungutan">
-                                <div class="mt-1">
-                                    <div class="form-floating mb-3">
-                                        <select class="form-select barang_detail_kode_jenis_pungutan" id="barang_detail_kode_jenis_pungutan" name="barang_detail_kode_jenis_pungutan" aria-label="Floating label select example">
-                                            <option value=""></option>
-                                            <?php foreach ($kodeJenisPungutan as $k) : ?>
-                                                <option value="<?= encrypt($k['value']) ?>">
-                                                    <?= $k['value'] . " - " . strtoupper($k['description']) . " " ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <label style="z-index: 1;">Pilih Pungutan</label>
-                                    </div>
-                                </div>
-                                <div class="mt-1">
-                                    <div class="form-floating mb-3">
-                                        <select class="form-select barang_detail_kode_jenis_tarif" id="barang_detail_kode_jenis_tarif" name="barang_detail_kode_jenis_tarif" aria-label="Floating label select example">
-                                            <option value=""></option>
-                                            <?php foreach ($kodeJenisTarif as $k) : ?>
-                                                <option value="<?= encrypt($k['value']) ?>">
-                                                    <?= $k['value'] . " - " . strtoupper($k['description']) . " " ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <label style="z-index: 1;">Jenis Tarif</label>
-                                    </div>
-                                </div>
-                                <div class="mt-1">
-                                    <div class="form-floating mb-3">
-                                        <input id="barang_detail_nilai_tarif" name="barang_detail_nilai_tarif" type="number" min="0" max="100" class="form-control barang_detail_nilai_tarif" placeholder="" oninput="$(this).val(Math.max(0, Math.min(100, $(this).val())))">
-                                        <label>Nilai Tarif (%)</label>
-                                    </div>
-                                </div>
-                                <div class="mt-1">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select barang_detail_kode_fasilitas_tarif" id="barang_detail_kode_fasilitas_tarif" name="barang_detail_kode_fasilitas_tarif" aria-label="Floating label select example">
-                                            <option value=""></option>
-                                            <?php foreach ($kodeFasilitasTarif as $k) : ?>
-                                                <option value="<?= encrypt($k['value']) ?>">
-                                                    (<?= $k['value'] ?>) <?= $k['description'] ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <label style="z-index: 1;">Fasilitas Tarif</label>
-                                    </div>
-                                </div>
-                                <div class="mt-1">
-                                    <div class="form-floating mb-3">
-                                        <input id="barang_detail_tarif_fasilitas" max="100" value="100" name="barang_detail_tarif_fasilitas" type="number" class="form-control barang_detail_tarif_fasilitas" placeholder="" minlength="1" maxlength="100" oninput="$(this).val(Math.max(0, Math.min(100, $(this).val())))">
-                                        <label>Tarif Fasilitas (%)</label>
-                                    </div>
-                                </div>
 
-                            </form>
-                            <div class="row">
-                                <div class="col-md-6"></div>
-                                <div class="col-md-6">
-                                    <div class="row" style="float: right; margin-bottom:5px;">
-                                        <div class="col-sm" style="margin-right: -20px;">
-                                            <button type="button" class="btn btn-add btn-block float-right btn-submit-pungutan" style="float: right;">
-                                                <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="table-responsive">
-                                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-informasi-pungutan" width="100%" cellspacing="0">
-                                    <thead class="thead-dark">
-                                        <tr>
-                                            <th style="text-align: center; width:10px;">No</th>
-                                            <th style="text-align: center;">Jenis Pungutan</th>
-                                            <th style="text-align: center;">Jenis Tarif</th>
-                                            <th style="text-align: center;">Nilai Tarif (%)</th>
-                                            <th style="text-align: center;">Fasilitas Tarif</th>
-                                            <th style="text-align: center;">Tarif Fasilitas (%)</th>
-                                            <th style="text-align: center;">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div> -->
                 </form>
                 <div class="row">
-                    <div class="col-sm mt-1">
+                    <div class="col-sm-6 mt-1">
                         <label class="form-label font-weight-bold lable-title mb-3 mt-3">
                             Dokumen Fasilitas / Lartas
                         </label>
 
-                        <div class="row">
-                            <div class="col-md-6"></div>
-                            <div class="col-md-6">
-                                <div class="row" style="float: right; margin-bottom:5px;">
-                                    <div class="col-sm" style="margin-right: -20px;">
-                                        <button type="button" class="btn btn-add btn-block float-right btn-open-modal" style="float: right;">
-                                            <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-informasi-lartas" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
@@ -371,26 +269,12 @@
                             </tbody>
                         </table>
                     </div>
-
-                </div>
-                <div class="row">
-                    <div class="col-sm mt-1">
+                    <div class="col-sm-6 mt-1">
                         <label class="form-label font-weight-bold lable-title mb-3 mt-3">
                             Entitas Barang
                         </label>
 
-                        <div class="row">
-                            <div class="col-md-6"></div>
-                            <div class="col-md-6">
-                                <div class="row" style="float: right; margin-bottom:5px;">
-                                    <div class="col-sm" style="margin-right: -20px;">
-                                        <button type="button" class="btn btn-add btn-block float-right btn-open-modal" style="float: right;">
-                                            <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-informasi-entitas-barang" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
@@ -405,7 +289,7 @@
                                 <?php $no = 1; ?>
                                 <?php if (count($entitas) == 0) :  ?>
                                     <tr style="color:white; text-align: center;">
-                                        <td colspan="4">Tidak ada Entitas</td>
+                                        <td colspan="5">Tidak ada Entitas</td>
 
                                     </tr>
                                 <?php else : ?>
@@ -427,6 +311,7 @@
                     </div>
 
                 </div>
+
             </div>
 
 
@@ -451,6 +336,18 @@
 
     $('#kodeJenisKemasan').select2({
         placeholder: "Pilih Kode Jenis Kemasan",
+        theme: "bootstrap-5",
+    });
+    $('#negaraAsalBarang').select2({
+        placeholder: "Pilih Kode Negara Asal Barang",
+        theme: "bootstrap-5",
+    });
+    $('#daerahAsalBarang').select2({
+        placeholder: "Pilih Kode Daerah Asal Barang",
+        theme: "bootstrap-5",
+    });
+    $('#barang_detail_kode_asal_bahan_baku').select2({
+        placeholder: "Pilih Kode Referensi Asal Barang",
         theme: "bootstrap-5",
     });
 

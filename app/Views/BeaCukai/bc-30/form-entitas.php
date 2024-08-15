@@ -28,13 +28,13 @@
                                         <option value="4">4 - LAINNYA</option>
                                         <option value="5">5 - NPWP 15 DIGIT</option>
                                     </select>
-                                    <label style="z-index: 1;">Nama Identitas </label>
+                                    <label style="z-index: 1;">Kode Identitas </label>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-floating mb-3">
                                     <input id="tambah_nomor_pemilik_barang" value="" name="tambah_nomor_pemilik_barang" type="text" class="tambah_nomor_pemilik_barang form-control" placeholder="">
-                                    <!-- <label>Nomor Pengajuan</label> -->
+                                    <label>Nomor Identitas</label>
                                 </div>
                             </div>
                         </div>
@@ -84,31 +84,21 @@
                                     <div class="col-sm-6">
                                         <div class="form-floating mb-3" style="height: 50px;">
                                             <select class="form-select entitas_kode_jenis_identitas_eksportir" id="entitas_kode_jenis_identitas_eksportir" name="entitas_kode_jenis_identitas_eksportir" aria-label="Floating label select example">
-                                                <?php if (!empty($payload->entitas[0]) != 0) :  ?>
-                                                    <option value=""></option>
-                                                    <option value="0" <?= $payload->entitas[0]->kodeJenisIdentitas == 0 ? 'selected' : '' ?>>0 - NPWP 12 DIGIT</option>
-                                                    <option value="1" <?= $payload->entitas[0]->kodeJenisIdentitas == 1 ? 'selected' : '' ?>>1 - NPWP 10 digit</option>
-                                                    <option value="2" <?= $payload->entitas[0]->kodeJenisIdentitas == 2 ? 'selected' : '' ?>>2 - PASSPOR</option>
-                                                    <option value="3" <?= $payload->entitas[0]->kodeJenisIdentitas == 3 ? 'selected' : '' ?>>3 - KTP</option>
-                                                    <option value="4" <?= $payload->entitas[0]->kodeJenisIdentitas == 4 ? 'selected' : '' ?>>4 - LAINNYA</option>
-                                                    <option value="5" <?= $payload->entitas[0]->kodeJenisIdentitas == 5 ? 'selected' : '' ?>>5 - NPWP 15 DIGIT</option>
-                                                <?php else : ?>
-                                                    <option value=""></option>
-                                                    <option value="0">0 - NPWP 12 DIGIT</option>
-                                                    <option value="1">1 - NPWP 10 digit</option>
-                                                    <option value="2">2 - PASSPOR</option>
-                                                    <option value="3">3 - KTP</option>
-                                                    <option value="4">4 - LAINNYA</option>
-                                                    <option value="5">5 - NPWP 15 DIGIT</option>
-                                                <?php endif; ?>
+                                                <option value=""></option>
+                                                <option value="0" <?= $payload->entitas[0]->kodeJenisIdentitas == 0 ? 'selected' : '' ?>>0 - NPWP 12 DIGIT</option>
+                                                <option value="1" <?= $payload->entitas[0]->kodeJenisIdentitas == 1 ? 'selected' : '' ?>>1 - NPWP 10 digit</option>
+                                                <option value="2" <?= $payload->entitas[0]->kodeJenisIdentitas == 2 ? 'selected' : '' ?>>2 - PASSPOR</option>
+                                                <option value="3" <?= $payload->entitas[0]->kodeJenisIdentitas == 3 ? 'selected' : '' ?>>3 - KTP</option>
+                                                <option value="4" <?= $payload->entitas[0]->kodeJenisIdentitas == 4 ? 'selected' : '' ?>>4 - LAINNYA</option>
+                                                <option value="5" <?= $payload->entitas[0]->kodeJenisIdentitas == 5 ? 'selected' : '' ?>>5 - NPWP 15 DIGIT</option>
                                             </select>
-                                            <label style="z-index: 1;">Nama Identitas </label>
+                                            <label style="z-index: 1;">Kode Identitas </label>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-floating mb-3">
                                             <input id="entitas_nomor_eksportir" value="<?= !empty($payload->entitas[0]) ? $payload->entitas[0]->nomorIdentitas : "" ?>" name="entitas_nomor_eksportir" type="text" class="entitas_nomor_eksportir form-control" placeholder="">
-                                            <!-- <label>Nomor Pengajuan</label> -->
+                                            <label>Nomor Indentitas</label>
                                         </div>
                                     </div>
                                 </div>
@@ -221,7 +211,7 @@
                                 <tbody>
                                     <?php if (count($pemilik) == 0) : ?>
                                         <tr style="color: white; text-align:center;">
-                                            <!-- <td colspan="5">Tidak ada dokumen</td> -->
+                                            <td colspan="5">Tidak ada Entitas Pemilik</td>
                                         </tr>
                                     <?php else : ?>
                                         <?php $length = count($pemilik); ?>
@@ -328,86 +318,68 @@
 
     var validatorEntitas = $("#form-entitas").validate({
         rules: {
-            entitas_npwp_pengusaha: {
+            entitas_kode_jenis_identitas_eksportir: {
                 required: true
             },
-            entitas_nama_pengusaha: {
+            entitas_nomor_eksportir: {
                 required: true
             },
-            entitas_alamat_pengusaha: {
+            entitas_nama_eksportir: {
                 required: true
             },
-            entitas_nomor_ijin_tpb: {
+            entitas_alamat_eksportir: {
                 required: true
             },
-            entitas_tanggal_skep_tpb: {
+            entitas_nama_penerima: {
                 required: true
             },
-            entitas_nib: {
+            entitas_alamat_penerima: {
                 required: true
             },
-            entitas_npwp_pemilik_barang: {
+            entitas_kode_negara_penerima: {
                 required: true
             },
-            entitas_nama_pemilik_barang: {
+            entitas_nama_pembeli: {
                 required: true
             },
-            entitas_alamat_pemilik_barang: {
+            entitas_alamat_pembeli: {
                 required: true
             },
-            entitas_npwp_penerima_barang: {
+            entitas_kode_negara_pembeli: {
                 required: true
             },
-            entitas_nama_penerima_barang: {
-                required: true
-            },
-            entitas_niper_penerima_barang: {
-                required: true
-            },
-            entitas_alamat_penerima_barang: {
-                required: true
-            }
         },
         messages: {
-            entitas_npwp_pengusaha: {
-                required: "Npwp pengusaha wajib diisi"
+            entitas_kode_jenis_identitas_eksportir: {
+                required: "Kode Jenis Identitas Eksportir Wajib diisi"
             },
-            entitas_nama_pengusaha: {
-                required: "Nama pengusaha wajib diisi"
+            entitas_nomor_eksportir: {
+                required: "Nomor Eksportir wajib diisi"
             },
-            entitas_alamat_pengusaha: {
-                required: "Alamat wajib diisi"
+            entitas_nama_eksportir: {
+                required: "Nama Eksportir wajib diisi"
             },
-            entitas_nomor_ijin_tpb: {
-                required: "Nomor ijin TPB wajib diisi"
+            entitas_alamat_eksportir: {
+                required: "Alamat Eksportir wajib diisi"
             },
-            entitas_tanggal_skep_tpb: {
-                required: "Tanggal skep TPB wajib diisi"
+            entitas_nama_penerima: {
+                required: "Nama Penerima wajib diisi"
             },
-            entitas_nib: {
-                required: "NIB wajib diisi"
+            entitas_alamat_penerima: {
+                required: "Alamat Penerima wajib diisi"
             },
-            entitas_npwp_pemilik_barang: {
-                required: "NPWP pemilik Wajib diisi"
+            entitas_kode_negara_penerima: {
+                required: "Kode Negara Penerima wajib diisi"
             },
-            entitas_nama_pemilik_barang: {
-                required: "Nama pemilik barang wajib diisi"
+            entitas_nama_pembeli: {
+                required: "Nama Pembeli wajib diisi"
             },
-            entitas_alamat_pemilik_barang: {
-                required: "Alamat pemilik barang wajib diisi"
+            entitas_alamat_pembeli: {
+                required: "Alamat pembeli wajib diisi"
             },
-            entitas_npwp_penerima_barang: {
-                required: "NPWP penerima barang wajib diisi"
+            entitas_kode_negara_pembeli: {
+                required: "Kode Negara pembeli wajib diisi"
             },
-            entitas_nama_penerima_barang: {
-                required: "Nama penerima barang wajib diisi"
-            },
-            entitas_niper_penerima_barang: {
-                required: "Niper penerima barang wajib diisi"
-            },
-            entitas_alamat_penerima_barang: {
-                required: "Alamat penerima barang wajib diisi"
-            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',

@@ -371,6 +371,11 @@
         theme: "bootstrap-5",
         allowClear: true
     });
+    $('#negara_tujuan_ekspor').select2({
+        placeholder: "Pilih Kode Negara Tujuan",
+        theme: "bootstrap-5",
+        allowClear: true
+    });
     $('#pengangkut_muat_asal').select2({
         placeholder: "Pilih Pelabuhan Muat Asal",
         theme: "bootstrap-5",
