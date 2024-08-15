@@ -73,6 +73,11 @@
             <div class="card-body">
                 <?php include_once('nav.php') ?>
                 <?= csrf_field() ?>
+                <div class="mt-3">
+                    <a href="#" class="btn btn-primary" id="btn-simpan-perubahan" style="float: right;">
+                        Simpan Perubahan
+                    </a>
+                </div>
                 <form id="form-pengangkut">
                     <input type="hidden" name="id" value="<?= encrypt($bc30['id']) ?>" class="id" id="id">
                     <label class="form-label font-weight-bold lable-title mt-4 mb-2">
@@ -287,9 +292,7 @@
                             </table>
                         </div>
                     </div>
-                    <a href="#" class="btn btn-primary" id="btn-simpan-perubahan" style="float: right;">
-                        Simpan Perubahan
-                    </a>
+
                     <button class="btn btn-primary" type="button" disabled id="btn-loading" style="float: right;">
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                         Loading

@@ -232,12 +232,12 @@
 
                 </form>
                 <div class="row">
-                    <div class="col-sm-6 mt-1">
+                    <div class="col-sm-6 mt-1 table-responsive">
                         <label class="form-label font-weight-bold lable-title mb-3 mt-3">
                             Dokumen Fasilitas / Lartas
                         </label>
 
-                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-informasi-lartas" width="100%" cellspacing="0">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-informasi-lartas table-responsive" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="text-align: center; width:10px;">#</th>
@@ -269,12 +269,10 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="col-sm-6 mt-1">
+                    <div class="col-sm-6 mt-1 table-responsive">
                         <label class="form-label font-weight-bold lable-title mb-3 mt-3">
                             Entitas Barang
                         </label>
-
-
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-informasi-entitas-barang" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>

@@ -15,6 +15,7 @@
             </div>
             <div class="modal-body">
                 <form id="entitas-pemilik-form" class="entitas-pemilik-form">
+
                     <div class="mt-1">
                         <div class="row">
                             <div class="col-sm-6">
@@ -72,6 +73,11 @@
             <div class="card-body">
                 <?php include_once('nav.php') ?>
                 <?= csrf_field() ?>
+                <div class="mt-3">
+                    <a href="#" class="btn btn-primary" id="btn-simpan-perubahan" style="float: right;">
+                        Simpan Perubahan
+                    </a>
+                </div>
                 <form id="form-entitas">
                     <input type="hidden" name="id" value="<?= encrypt($bc30['id']) ?>">
                     <div class="row">
@@ -236,9 +242,7 @@
                         </div>
                     </div>
 
-                    <a href="#" class="btn btn-primary" id="btn-simpan-perubahan" style="float: right;">
-                        Simpan Perubahan
-                    </a>
+
                     <button class="btn btn-primary" type="button" disabled id="btn-loading" style="float: right;">
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                         Loading
