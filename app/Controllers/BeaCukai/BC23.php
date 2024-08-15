@@ -1829,7 +1829,7 @@ class BC23 extends BaseController
     public function getPelabuhan()
     {
         $beacukaiApi = new BeaCukaiApi($this->akunCeisa['username'], $this->akunCeisa['password']);
-        $kodeKantorBongkar = decrypt($this->request->getVar('header_kantor_pabean_bongkar'));
+        $kodeKantorBongkar = $this->request->getVar('header_kantor_pabean_bongkar');
         $res = $beacukaiApi->getListKodePelabuhan($kodeKantorBongkar);
 
         return response()->setJSON([
@@ -1842,8 +1842,21 @@ class BC23 extends BaseController
     public function getPelabuhanByKata()
     {
         $beacukaiApi = new BeaCukaiApi($this->akunCeisa['username'], $this->akunCeisa['password']);
-        $kataPelabuhan = $this->request->getVar('kata_pelabuhan');
+        $kataPelabuhan = $this->request->getVar('search');
         $res = $beacukaiApi->getListPelabuhanByKata($kataPelabuhan);
+
+        return response()->setJSON([
+            'data' => $res,
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
+    }
+
+    public function getTpsByKodeKantor()
+    {
+        $beacukaiApi = new BeaCukaiApi($this->akunCeisa['username'], $this->akunCeisa['password']);
+        $kodeKantor = decrypt($this->request->getVar('kodeKantor'));
+        $res = $beacukaiApi->getKodeTpsByKodeKantor($kodeKantor);
 
         return response()->setJSON([
             'data' => $res,

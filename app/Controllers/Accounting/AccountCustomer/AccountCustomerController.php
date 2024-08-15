@@ -59,10 +59,18 @@ class AccountCustomerController extends BaseController
             "sortType" => $this->request->getGet("sortType"),
         ];
 
-        $condition = [
-            "customers.company_id"  => $this->this_company_id,
-            "customers.deletedAt" => NULL
-        ];
+        if ($this->is_admin == 1) {
+            $condition = [
+                "customers.company_id"  => $this->this_company_id,
+                "customers.deletedAt" => NULL
+            ];
+        } else {
+            $condition = [
+                "customers.company_id"  => $this->this_company_id,
+                "customers.deletedAt" => NULL,
+                "customers.user_id" => $this->this_user_id
+            ];
+        }
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),

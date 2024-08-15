@@ -163,7 +163,7 @@
                                 <select class="form-select coa_id_sub" name="coa_id_sub" id="coa_id_sub">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">COA</label>
+                                <label for="floatingInput">COA (opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -817,9 +817,9 @@
                 header_id_sub: {
                     required: true
                 },
-                coa_id_sub: {
-                    required: true
-                },
+                // coa_id_sub: {
+                //     required: true
+                // },
                 kode_akun_sub: {
                     required: true
                 },
@@ -831,9 +831,9 @@
                 header_id_sub: {
                     required: "Header Akun wajib diisi"
                 },
-                coa_id_sub: {
-                    required: "COA wajib diisi"
-                },
+                // coa_id_sub: {
+                //     required: "COA wajib diisi"
+                // },
                 kode_akun_sub: {
                     required: "Kode Sub Akun wajib diisi"
                 },
@@ -1803,12 +1803,14 @@
         $('#file').val(null);
         $('#import_excel_modal').modal('show');
         $(".akun-type").text('Header');
+        $('.btn-submit-excel').attr('onclick', "importSheet('header')");
 
     });
     $('.btn-upload-excel-sub').click(function() {
         $('#file').val(null);
         $('#import_excel_modal').modal('show');
         $(".akun-type").text('Sub');
+        $('.btn-submit-excel').attr('onclick', "importSheet('sub')");
     });
 
     $('.btn-discard-import-excel').click(function() {

@@ -120,4 +120,24 @@ class Sub_AkunsModel extends Model
     {
         return $this->where('LOWER(REPLACE(no_sub, " ", ""))', $query)->orWhere('LOWER(REPLACE(CONCAT(no_sub, nama_sub), " ", ""))', $query)->where('deletedAt', null)->findAll();
     }
+
+    public function getSubsAkunWithDataJurnal($condition)
+    {
+        $selectQry = '
+            sub_akuns.*,
+            jurnal_umum.*,
+            SUM(jurnal_umum.debit) AS saldo_debit,
+            SUM(jurnal_umum.kredit) AS saldo_kredit,
+            SUM(jurnal_umum.debit) - SUM(jurnal_umum.kredit) AS saldo_akhir,
+        ';
+
+        $dataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('jurnal_umum', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
+            ->where($condition)
+            ->groupBy('jurnal_umum.id_coa')
+            ->findAll();
+
+        return $dataQry;
+    }
 }

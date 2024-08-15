@@ -477,7 +477,7 @@ class Account extends BaseController
                 $kelompok = $this->metaDataModel->where('value', $data[$i][0])
                     ->where('deletedAt', null)
                     ->first();
-                $noKategori = $this->KategoriAkunsModel->where('no_kategori', $data[$i][1])->first();
+                $noKategori = $this->KategoriAkunsModel->where('no_kategori', $data[$i][1])->where('company_id', $this->this_company_id)->first();
                 if ($data[$i][1] != null) {
                     if ($noKategori == null) {
                         // Kategori Akun INSERTED
@@ -1331,18 +1331,16 @@ class Account extends BaseController
                     ->where('company_id', $this->this_company_id)
                     ->where('deletedAt', null)
                     ->first();
-                $coa = $this->metaDataModel
-                    ->where('value', $data[$i][3])
-                    ->first();
+
                 $res_header = $this->HeaderAkunsModel->get_by_id($headerAkun['id']);
                 if ($data[$i][1] != null) {
-                    if ($noSub == null && $headerAkun != null &&  $coa != null) {
+                    if ($noSub == null && $headerAkun != null) {
                         // sub Akun INSERTED
                         $this->Sub_AkunsModel->insert([
                             "company_id"    => $this->this_company_id,
                             "header_id" => $headerAkun['id'],
                             "kategori_id" => $res_header[0]["kategori_id"],
-                            "coa_id" => $coa['id'],
+                            // "coa_id" => $coa['id'],
                             "no_sub" => $data[$i][1],
                             "nama_sub" => $data[$i][2],
                             "status" => $data[$i][4] == 'Aktif' ? "Aktif" : "Void"

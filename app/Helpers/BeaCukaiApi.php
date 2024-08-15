@@ -81,7 +81,6 @@ class BeaCukaiApi
     public function getListPelabuhanByKata($kata)
     {
         $token = $this->getTokenApi();
-
         if ($token['status'] === false) {
             return [
                 'status' => false,
@@ -135,6 +134,51 @@ class BeaCukaiApi
         }
 
         $endPoint = $this->baseUrl . "/openapi/pelabuhan/kodeKantor/" . $kodeKantor;
+        $headers = array(
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token['token'],
+        );
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $endPoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $response = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            return [
+                'message' => curl_error($ch),
+                'status' => false
+            ];
+        } else {
+            $responseData = json_decode($response);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+            if ($httpCode == 200) {
+                return [
+                    'data' => $responseData->data,
+                    'status' => true
+                ];
+            } else {
+                return [
+                    'message' => "Server Ceisa Error : " . $httpCode,
+                    'status' => false
+                ];
+            }
+        }
+    }
+
+    public function getKodeTpsByKodeKantor($kodeKantor)
+    {
+        $token = $this->getTokenApi();
+
+        if ($token['status'] === false) {
+            return [
+                'status' => false,
+                'message' => $token['message']
+            ];
+        }
+
+        $endPoint = $this->baseUrl . "/openapi/gudangTPS/kodeKantor/" . $kodeKantor;
         $headers = array(
             'Content-Type: application/json',
             'Authorization: Bearer ' . $token['token'],

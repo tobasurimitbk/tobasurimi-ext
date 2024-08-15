@@ -37,7 +37,7 @@
     <?php include('header.php') ?>
     <div class="card">
         <div class="card-header" style="font-weight: bold; color:black;">
-            BC 3.0 - PEMBERITAHUAN IMPOR BARANG DARI TEMPAT PENIMBUNAN BERIKAT
+            BC 3.0 - PEMBERITAHUAN EKSPOR BARANG
         </div>
         <div class="card-body">
             <?php include_once('nav.php') ?>
@@ -159,7 +159,7 @@
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input readonly id="nilai_pungutan_sawit" value="0" name="nilai_pungutan_sawit" type="text" class="form-control nilai_pungutan_sawit" onchange="this.value = formatRupiah(this.value)">
+                                <input id="nilai_pungutan_sawit" value="0" name="nilai_pungutan_sawit" type="text" class="form-control nilai_pungutan_sawit" onchange="this.value = formatRupiah(this.value)">
                                 <label>Nilai Pungutan Sawit</label>
                             </div>
                         </div>

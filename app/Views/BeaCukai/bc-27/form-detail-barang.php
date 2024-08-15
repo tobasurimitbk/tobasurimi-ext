@@ -168,15 +168,15 @@
                                     <label>Nilai Pabean</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input id="hargaPenyerahan" name="hargaPenyerahan" onchange="this.value = formatRupiah(this.value)" type="text" class="form-control hargaPenyerahan" value="<?= $barang['bcDetail']->hargaPenyerahan == 0  ? 0 : $barang['bcDetail']->hargaPenyerahan ?>" placeholder="">
+                                    <input id="hargaPenyerahan" name="hargaPenyerahan" onchange="this.value = formatRupiah(this.value)" type="text" class="form-control hargaPenyerahan" value="<?= $barang['bcDetail']->hargaPenyerahan == 0  ? 0 :  formatRupiah($barang['bcDetail']->hargaPenyerahan) ?>" placeholder="">
                                     <label>Harga Penyerahan / Harga Jual</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input id="hargaPerolehan" name="hargaPerolehan" onchange="this.value = formatRupiah(this.value)" type="text" class="form-control hargaPerolehan" value="<?= $barang['bcDetail']->hargaPerolehan == 0  ? 0 : $barang['bcDetail']->hargaPerolehan ?>" placeholder="">
+                                    <input id="hargaPerolehan" name="hargaPerolehan" onchange="this.value = formatRupiah(this.value)" type="text" class="form-control hargaPerolehan" value="<?= $barang['bcDetail']->hargaPerolehan == 0  ? 0 : formatRupiah($barang['bcDetail']->hargaPerolehan)  ?>" placeholder="">
                                     <label>Harga Perolehan</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input id="nilaiJasa" name="nilaiJasa" onchange="this.value = formatRupiah(this.value)" type="text" class="form-control nilaiJasa" value="<?= $barang['bcDetail']->nilaiJasa == 0  ? 0 : $barang['bcDetail']->nilaiJasa ?>" placeholder="">
+                                    <input id="nilaiJasa" name="nilaiJasa" onchange="this.value = formatRupiah(this.value)" type="text" class="form-control nilaiJasa" value="<?= $barang['bcDetail']->nilaiJasa == 0  ? 0 : formatRupiah($barang['bcDetail']->nilaiJasa) ?>" placeholder="">
                                     <label>Nilai Penggantian / Nilai Jasa</label>
                                 </div>
                             </div>
@@ -271,6 +271,31 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <?php if (count($bahanBakuLokal) == 0) : ?>
+                                    <tr style="color: white; text-align:center;">
+                                        <td colspan="5">Tidak ada bahan baku lokal</td>
+                                    </tr>
+                                <?php else : ?>
+                                    <?php $no = 1;
+                                    $i = 0; ?>
+                                    <?php foreach ($bahanBakuLokal as $b) : ?>
+                                        <tr style="color: white; text-align:center;">
+                                            <td><?= $no++; ?></td>
+                                            <td><?= $b['posTarif']; ?></td>
+                                            <td><?= $b['uraianBarang']; ?></td>
+                                            <td><?= number_format($b['hargaPenyerahan'], 2); ?></td>
+                                            <td><?= $b['kodeSatuanBarang']; ?></td>
+                                            <td>
+                                                <?php if (count($bahanBakuImpor) - 1 == $i) : ?>
+
+                                                    <button type="button" class="btn btn-danger" onclick="removeBahanBaku('<?= $b['indexDelete'] ?>')"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php $i++;
+                                    endforeach; ?>
+                                <?php endif; ?>
+
 
                             </tbody>
                         </table>
