@@ -159,13 +159,10 @@ class TutupBukuController extends BaseController
             "sub_akuns.deletedAt" => null,
             "jurnal_umum.company_id" => $this->this_company_id,
             "jurnal_umum.deletedAt" => null,
-            "DATE_FORMAT(jurnal_umum.tanggal_jurnal, '%Y-%m') =" => $bulan_closing, // Filter tanggal dalam array kondisi
+            "DATE_FORMAT(jurnal_umum.tanggal_jurnal, '%Y-%m') =" => $bulan_closing,
         ];
 
         $dataQrySaldo = $this->subAkunModel->getSubsAkunWithDataJurnal($conditionSaldo);
-        // var_dump($bulan_closing);
-        // var_dump($dataQrySaldo);
-        // exit;
         $dataQry = $this->stockModel->getStockListBarang($conditionStock, $addCondition);
 
         $idTutupBuku = $this->tutupBukuModel->insert([
