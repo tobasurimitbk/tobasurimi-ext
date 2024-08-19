@@ -12,46 +12,46 @@
     <div class="root-form-view">
         <div class="card">
             <div class="card-header" style="font-weight: bold; color:black;">
-                BC 3.0
+                BC 3.0 - PEMBERITAHUAN EKSPOR BARANG
             </div>
             <div class="card-body">
                 <?php include_once('nav.php') ?>
                 <?= csrf_field() ?>
                 <form id="form-kesiapan-barang">
                     <input type="hidden" name="id" id="id" class="id" value="<?= encrypt($bc30['id']) ?>">
-                    <div class="row">
+                    <div class="row mt-3">
                         <div class="col-sm-4 mt-1">
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select jenisBarang" id="jenisBarang" name="jenisBarang" aria-label="Floating label select example">
                                         <option value=""></option>
-                                        <option value="1" <?= empty($payload->kesiapanBarang[0]) ? " " : ($payload->kesiapanBarang[0]->kodeJenisBarang == 1 ? "selected" : "")  ?>>1 - BARANG ESKPOR GABUNGAN</option>
-                                        <option value="2" <?= empty($payload->kesiapanBarang[0]) ? " " : ($payload->kesiapanBarang[0]->kodeJenisBarang == 2 ? "selected" : "")  ?>>2 - BAHAN/BARANG ASAL IMPOR FASILITAS</option>
+                                        <option value="1" <?= empty($payload->kesiapanBarang[0]->kodeJenisBarang) ? " " : ($payload->kesiapanBarang[0]->kodeJenisBarang == 1 ? "selected" : "")  ?>>1 - BARANG ESKPOR GABUNGAN</option>
+                                        <option value="2" <?= empty($payload->kesiapanBarang[0]->kodeJenisBarang) ? " " : ($payload->kesiapanBarang[0]->kodeJenisBarang == 2 ? "selected" : "")  ?>>2 - BAHAN/BARANG ASAL IMPOR FASILITAS</option>
                                     </select>
-                                    <label style="z-index: 1;">Jenis Ekspor</label>
+                                    <label style="z-index: 1;">Jenis Barang</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select jenisGudang" id="jenisGudang" name="jenisGudang" aria-label="Floating label select example">
                                         <option value=""></option>
-                                        <option value="1" <?= empty($payload->kesiapanBarang[0]) ? " " : ($payload->kesiapanBarang[0]->kodeJenisGudang == 1 ? "selected" : "")  ?>>1 - GUDANG VEEM</option>
-                                        <option value="2" <?= empty($payload->kesiapanBarang[0]) ? " " : ($payload->kesiapanBarang[0]->kodeJenisGudang == 2 ? "selected" : "")  ?>>2 - GUDANG PABRIK</option>
-                                        <option value="3" <?= empty($payload->kesiapanBarang[0]) ? " " : ($payload->kesiapanBarang[0]->kodeJenisGudang == 3 ? "selected" : "")  ?>>3 - GUDANG KONSOLIDASI</option>
-                                        <option value="4" <?= empty($payload->kesiapanBarang[0]) ? " " : ($payload->kesiapanBarang[0]->kodeJenisGudang == 4 ? "selected" : "")  ?>>4 - LAINNYA</option>
+                                        <option value="1" <?= empty($payload->kesiapanBarang[0]->kodeJenisGudang) ? " " : ($payload->kesiapanBarang[0]->kodeJenisGudang == 1 ? "selected" : "")  ?>>1 - GUDANG VEEM</option>
+                                        <option value="2" <?= empty($payload->kesiapanBarang[0]->kodeJenisGudang) ? " " : ($payload->kesiapanBarang[0]->kodeJenisGudang == 2 ? "selected" : "")  ?>>2 - GUDANG PABRIK</option>
+                                        <option value="3" <?= empty($payload->kesiapanBarang[0]->kodeJenisGudang) ? " " : ($payload->kesiapanBarang[0]->kodeJenisGudang == 3 ? "selected" : "")  ?>>3 - GUDANG KONSOLIDASI</option>
+                                        <option value="4" <?= empty($payload->kesiapanBarang[0]->kodeJenisGudang) ? " " : ($payload->kesiapanBarang[0]->kodeJenisGudang == 4 ? "selected" : "")  ?>>4 - LAINNYA</option>
                                     </select>
                                     <label style="z-index: 1;">Jenis Gudang </label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input id="namaPic" value="<?= $payload->kesiapanBarang[0]->namaPic != "" ? $payload->kesiapanBarang[0]->namaPic : ""  ?>" name="namaPic" type="text" class=" form-control" placeholder="">
+                                    <input id="namaPic" value="<?= !empty($payload->kesiapanBarang[0]->namaPic)  ? $payload->kesiapanBarang[0]->namaPic : ""  ?>" name="namaPic" type="text" class=" form-control" placeholder="">
                                     <label>Nama PIC</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input id="alamat" value="<?= $payload->kesiapanBarang[0]->alamat != "" ? $payload->kesiapanBarang[0]->alamat : ""  ?>" name="alamat" type="text" class=" form-control" placeholder="">
+                                    <input id="alamat" value="<?= !empty($payload->kesiapanBarang[0]->alamat) ? $payload->kesiapanBarang[0]->alamat : ""  ?>" name="alamat" type="text" class=" form-control" placeholder="">
                                     <label>Alamat</label>
                                 </div>
                             </div>
@@ -59,26 +59,26 @@
                         <div class="col-sm-4 mt-1">
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input id="nomorTelponPic" value="<?= $payload->kesiapanBarang[0]->nomorTelpPic != "" ? $payload->kesiapanBarang[0]->nomorTelpPic : "" ?>" name="nomorTelponPic" type="text" class=" form-control" placeholder="">
+                                    <input id="nomorTelponPic" value="<?= !empty($payload->kesiapanBarang[0]->nomorTelpPic) ? $payload->kesiapanBarang[0]->nomorTelpPic : "" ?>" name="nomorTelponPic" type="text" class=" form-control" placeholder="">
                                     <label>Nomor Telpon Pic</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input id="jumlahContainer20" value="<?= $payload->kesiapanBarang[0]->jumlahContainer20 != "" ? $payload->kesiapanBarang[0]->jumlahContainer20 : ""  ?>" name="jumlahContainer20" type="text" class=" form-control" placeholder="">
+                                    <input id="jumlahContainer20" value="<?= !empty($payload->kesiapanBarang[0]->jumlahContainer20) != "" ? $payload->kesiapanBarang[0]->jumlahContainer20 : ""  ?>" name="jumlahContainer20" type="text" class=" form-control" placeholder="">
                                     <label>Jumlah Container 20</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input id="jumlahContainer40" value="<?= $payload->kesiapanBarang[0]->jumlahContainer40 != "" ? $payload->kesiapanBarang[0]->jumlahContainer40 : ""  ?>" name="jumlahContainer40" type="text" class=" form-control" placeholder="">
+                                    <input id="jumlahContainer40" value="<?= !empty($payload->kesiapanBarang[0]->jumlahContainer40) != "" ? $payload->kesiapanBarang[0]->jumlahContainer40 : ""  ?>" name="jumlahContainer40" type="text" class=" form-control" placeholder="">
                                     <label>Jumlah Container 40</label>
                                 </div>
                             </div>
 
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input id="lokasiSiapPeriksa" value="<?= $payload->kesiapanBarang[0]->lokasiSiapPeriksa != "" ? $payload->kesiapanBarang[0]->lokasiSiapPeriksa : ""  ?>" name="lokasiSiapPeriksa" type="text" class=" form-control" placeholder="">
+                                    <input id="lokasiSiapPeriksa" value="<?= !empty($payload->kesiapanBarang[0]->lokasiSiapPeriksa) != "" ? $payload->kesiapanBarang[0]->lokasiSiapPeriksa : ""  ?>" name="lokasiSiapPeriksa" type="text" class=" form-control" placeholder="">
                                     <label>Lokasi Siap Periksa</label>
                                 </div>
                             </div>
@@ -88,9 +88,9 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select caraStuffing" id="caraStuffing" name="caraStuffing" aria-label="Floating label select example">
                                         <option value=""></option>
-                                        <option value="4" <?= empty($payload->kesiapanBarang[0]) ? " " : ($payload->kesiapanBarang[0]->kodeCaraStuffing == 4 ? "selected" : "")  ?>>4 - EMPTY</option>
-                                        <option value="7" <?= empty($payload->kesiapanBarang[0]) ? " " : ($payload->kesiapanBarang[0]->kodeCaraStuffing == 7 ? "selected" : "")  ?>>7 - LCL</option>
-                                        <option value="8" <?= empty($payload->kesiapanBarang[0]) ? " " : ($payload->kesiapanBarang[0]->kodeCaraStuffing == 8 ? "selected" : "")  ?>>8 - FCL</option>
+                                        <option value="4" <?= empty($payload->kesiapanBarang[0]->kodeCaraStuffing) ? " " : ($payload->kesiapanBarang[0]->kodeCaraStuffing == 4 ? "selected" : "")  ?>>4 - EMPTY</option>
+                                        <option value="7" <?= empty($payload->kesiapanBarang[0]->kodeCaraStuffing) ? " " : ($payload->kesiapanBarang[0]->kodeCaraStuffing == 7 ? "selected" : "")  ?>>7 - LCL</option>
+                                        <option value="8" <?= empty($payload->kesiapanBarang[0]->kodeCaraStuffing) ? " " : ($payload->kesiapanBarang[0]->kodeCaraStuffing == 8 ? "selected" : "")  ?>>8 - FCL</option>
 
                                     </select>
                                     <label style="z-index: 1;">Cara Stuffing</label>
@@ -100,9 +100,9 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select jenisPartOf" id="jenisPartOf" name="jenisPartOf" aria-label="Floating label select example">
                                         <option value=""></option>
-                                        <option value="1" <?= empty($payload->kesiapanBarang[0]) ? " " : ($payload->kesiapanBarang[0]->kodeJenisPartOf == 1 ? "selected" : "")  ?>>1 - GABUNGAN KEMUDAHAN EKSPOR</option>
-                                        <option value="2" <?= empty($payload->kesiapanBarang[0]) ? " " : ($payload->kesiapanBarang[0]->kodeJenisPartOf == 2 ? "selected" : "")  ?>>2 - GABUNGAN KE/NON KE</option>
-                                        <option value="NULL" <?= empty($payload->kesiapanBarang[0]) ? " " : ($payload->kesiapanBarang[0]->kodeJenisPartOf == "NULL" ? "selected" : "")  ?>>TIDAK ADA</option>
+                                        <option value="1" <?= empty($payload->kesiapanBarang[0]->kodeJenisPartOf) ? " " : ($payload->kesiapanBarang[0]->kodeJenisPartOf == 1 ? "selected" : "")  ?>>1 - GABUNGAN KEMUDAHAN EKSPOR</option>
+                                        <option value="2" <?= empty($payload->kesiapanBarang[0]->kodeJenisPartOf) ? " " : ($payload->kesiapanBarang[0]->kodeJenisPartOf == 2 ? "selected" : "")  ?>>2 - GABUNGAN KE/NON KE</option>
+                                        <option value="NULL" <?= empty($payload->kesiapanBarang[0]->kodeJenisPartOf) ? " " : ($payload->kesiapanBarang[0]->kodeJenisPartOf == "NULL" ? "selected" : "")  ?>>TIDAK ADA</option>
 
                                     </select>
                                     <label style="z-index: 1;">Jenis Part Of</label>
@@ -112,7 +112,7 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <div class="input-group input-group-password">
                                         <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" class="form-control input-picker tanggalPkb" id="tanggalPkb" name="tanggalPkb" placeholder="Tanggal Dibuat" value="<?= $payload->kesiapanBarang[0]->tanggalPkb != "" ? date('d/m/Y', strtotime($payload->kesiapanBarang[0]->tanggalPkb)) : ""   ?>">
+                                            <input autocomplete="one-time-code" class="form-control input-picker tanggalPkb" id="tanggalPkb" name="tanggalPkb" placeholder="Tanggal Dibuat" value="<?= !empty($payload->kesiapanBarang[0]->tanggalPkb) ? date('d/m/Y', strtotime($payload->kesiapanBarang[0]->tanggalPkb)) : ""   ?>">
                                             <label for="floatingInput">Tanggal PKB</label>
                                         </div>
                                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -127,7 +127,7 @@
                                         <div class="form-floating mb-3" style="height: 50px;">
                                             <div class="input-group input-group-password">
                                                 <div class="form-floating mb-3" style="height: 50px;">
-                                                    <input autocomplete="one-time-code" class="form-control input-picker tanggalSiapPeriksa" id="tanggalSiapPeriksa" name="tanggalSiapPeriksa" placeholder="Tanggal Dibuat" value="">
+                                                    <input autocomplete="one-time-code" class="form-control input-picker tanggalSiapPeriksa" id="tanggalSiapPeriksa" name="tanggalSiapPeriksa" placeholder="Tanggal Dibuat" value="<?= $tanggalSiapPeriksa != ""  ? $tanggalSiapPeriksa : ""; ?>">
                                                     <label for="floatingInput">Tanggal Siap Periksa</label>
                                                 </div>
                                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -138,7 +138,7 @@
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-floating mb-3" style="height: 50px;">
-                                            <input id="waktuSiapPeriksa" value="" name="waktuSiapPeriksa" type="time" class=" form-control" placeholder="">
+                                            <input id="waktuSiapPeriksa" value="<?= $waktuPeriksa != ""  ? $waktuPeriksa : ""; ?>" name="waktuSiapPeriksa" type="time" class=" form-control" placeholder="">
                                             <input type="hidden" id="timezoneOffset" name="timezoneOffset">
                                             <label>Waktu Siap Periksa</label>
                                         </div>
@@ -171,7 +171,11 @@
 
     // init loading
     $('#btn-loading').hide();
-
+    $('#jenisBarang').select2({
+        placeholder: "Pilih Jenis Barang",
+        theme: "bootstrap-5",
+        allowClear: true
+    })
     $('#kodeKantor').select2({
         placeholder: "Pilih Kode Kantor Asal",
         theme: "bootstrap-5",

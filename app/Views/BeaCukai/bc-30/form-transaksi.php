@@ -37,11 +37,16 @@
     <?php include('header.php') ?>
     <div class="card">
         <div class="card-header" style="font-weight: bold; color:black;">
-            BC 3.0 - PEMBERITAHUAN IMPOR BARANG DARI TEMPAT PENIMBUNAN BERIKAT
+            BC 3.0 - PEMBERITAHUAN EKSPOR BARANG
         </div>
         <div class="card-body">
             <?php include_once('nav.php') ?>
             <?= csrf_field() ?>
+            <div class="mt-3">
+                <a href="#" class="btn btn-primary mt-4" id="btn-simpan-perubahan" style="float: right;">
+                    Simpan Perubahan
+                </a>
+            </div>
             <form id="form-transaksi">
                 <div class="row mt-1">
                     <div class="col-sm-4 mt-1">
@@ -234,9 +239,7 @@
                 </div>
             </div>
 
-            <a href="#" class="btn btn-primary mt-4" id="btn-simpan-perubahan" style="float: right;">
-                Simpan Perubahan
-            </a>
+
             <button class="btn btn-primary" type="button" disabled id="btn-loading" style="float: right;">
                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                 Loading
@@ -497,6 +500,13 @@
                                         location.reload();
                                     }
                                 });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    confirmButtonText: 'Ok'
+                                })
                             }
                         },
                     });
