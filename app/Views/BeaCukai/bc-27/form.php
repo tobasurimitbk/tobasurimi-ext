@@ -186,6 +186,14 @@
                         </div>
                     </div>
                     <div class="row">
+                        <div class="col-sm-6 mt-1">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input id="kode_kantor" name="kode_kantor" type="number" class="kode_kantor form-control" placeholder="" oninput="event.target.value = /^\d{0,6}$/.test(event.target.value) ? event.target.value : ''">
+                                <label>Kode Kantor</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-sm-12 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input id="no_pengajuan" value="<?= !empty($bc27) ? $bc27['no_aju'] : $noAju ?>" name="no_pengajuan" type="text" readonly class="no_pengajuan form-control" placeholder="">
@@ -267,6 +275,12 @@
         var noAju = $('#no_pengajuan').val();
         var splitValues = noAju.split("-");
         splitValues[3] = $(this).val();
+        $('#no_pengajuan').val(splitValues[0] + '-' + splitValues[1] + '-' + splitValues[2] + '-' + splitValues[3]);
+    });
+    $('#kode_kantor').keyup(function() {
+        var noAju = $('#no_pengajuan').val();
+        var splitValues = noAju.split("-");
+        splitValues[1] = $(this).val();
         $('#no_pengajuan').val(splitValues[0] + '-' + splitValues[1] + '-' + splitValues[2] + '-' + splitValues[3]);
     });
 
@@ -440,6 +454,7 @@
         $('#tanggal_pengajuan').val(formattedDate);
         $('#no_pengajuan').val(noAju);
         $('#no_urut_dokumen').val(splitValues[3]);
+        $('#kode_kantor').val(splitValues[1]);
         $('#modalUpdateNoAju').modal('show');
     }
 

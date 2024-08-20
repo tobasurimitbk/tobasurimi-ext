@@ -675,7 +675,7 @@ class BC30 extends BaseController
 
         $payload = json_decode($bc30['payload']);
         // JIKA MASIH KOSONG SET DULU BOSQ
-        if (!is_array($payload->entitas)) {
+        if (count($payload->entitas) == 0) {
             $payload->entitas = [
                 [
                     //eksportir
@@ -687,16 +687,7 @@ class BC30 extends BaseController
                     "nomorIdentitas" => "",
                     "seriEntitas" => "1",
                 ],
-                [
-                    //pemilik
-                    "alamatEntitas" => "",
-                    "kodeEntitas" => "7",
-                    "kodeJenisIdentitas" => "",
-                    "nibEntitas" => "",
-                    "namaEntitas" => "",
-                    "nomorIdentitas" => "",
-                    "seriEntitas" => "4",
-                ],
+
                 [
                     //penerima
 
@@ -722,15 +713,23 @@ class BC30 extends BaseController
         $payload = json_decode($this->bc30Model->find($id)['payload']);
         $pemilikBarang = [];
         $nomor = 1;
+        $indexPembeli = 0;
+        $indexPenerima = 0;
+
         $indexEntitas = count($payload->entitas);
         foreach ($payload->entitas as $i => $e) {
-            if ($i > 0 && $i < $indexEntitas - 2) {
-                $e->nomor = $nomor++;
+            if ($payload->entitas[$i]->kodeEntitas == 6) {
+                $indexPembeli = $i;
+            }
+            if ($payload->entitas[$i]->kodeEntitas == 8) {
+                $indexPenerima = $i;
+            }
+            if ($payload->entitas[$i]->kodeEntitas == 7) {
                 array_push($pemilikBarang, $e);
             }
         }
 
-        // var_dump($payload->entitas);
+        // var_dump($indexPembeli);
         // die;
         $data = [
             'bc30' => $bc30,
@@ -738,6 +737,8 @@ class BC30 extends BaseController
             'payload' => $payload,
             'kodeNegaraAsal' => $this->countryModel->findAll(),
             'pemilik' => $pemilikBarang,
+            'indexPembeli' => $indexPembeli,
+            'indexPenerima' => $indexPenerima,
             'indexEntitas' => $indexEntitas
         ];
 
@@ -900,6 +901,16 @@ class BC30 extends BaseController
                     'status' => false,
                     'token' => csrf_hash(),
                     'message' => "Dokumen seri pertama wajib invoice ",
+                ]);
+            }
+        }
+        if ($seriDokumen == 2) {
+            // HARUS PACKIGN LIST
+            if ($kodeDokumen != 217) {
+                return response()->setJSON([
+                    'status' => false,
+                    'token' => csrf_hash(),
+                    'message' => "Dokumen seri kedua wajib packing list ",
                 ]);
             }
         }
@@ -1212,6 +1223,12 @@ class BC30 extends BaseController
         $bc30 = $this->bc30Model->find($id);
         $payload = json_decode($bc30['payload']);
 
+        if ((float)$this->request->getVar('berat_bruto') < (float) $this->request->getVar('berat_netto')) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "berat bruto Harus Lebih besar daripada berat netto"
+            ]);
+        }
         $payload->kodeValuta = $this->request->getVar('harga_kode_valuta');
         $payload->ndpbm = (float)($this->request->getVar('harga_ndpbm'));
         $payload->kodeIncoterm = $this->request->getVar('transaksi_kode_incoterm');
@@ -1226,9 +1243,10 @@ class BC30 extends BaseController
 
         $this->bc30Model->update($id, ['payload' => json_encode($payload)]);
 
+
         return response()->setJSON([
             'status' => true,
-            'message' => "Bank Devisa berhasil ditambah"
+            'message' => "Transaksi berhasil ditambah"
         ]);
     }
 
@@ -1744,6 +1762,9 @@ class BC30 extends BaseController
         // $this->setFlashDataNavigatorSession($id);
         $payload = json_decode($bc30['payload']);
 
+        $tanggalSiapPeriksa = "";
+        $waktuPeriksa = "";
+
 
         if (count($payload->kesiapanBarang) == 0) {
             $payload->kesiapanBarang[0] = [
@@ -1765,9 +1786,6 @@ class BC30 extends BaseController
             if ($waktuSiapPeriksa) {
                 $tanggalSiapPeriksa = date('d/m/Y', strtotime(substr($waktuSiapPeriksa, 0, 10)));
                 $waktuPeriksa = date("h:i A", strtotime(substr($waktuSiapPeriksa, 11, 5)));
-            } else {
-                $tanggalSiapPeriksa = "";
-                $waktuPeriksa = "";
             }
         }
         $data = [

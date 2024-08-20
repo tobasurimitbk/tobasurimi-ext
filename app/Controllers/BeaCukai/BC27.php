@@ -431,7 +431,7 @@ class BC27 extends BaseController
     }
     public function viewOutstanding()
     {
-        return view('BeaCukai/BC-27/bc27outstanding');
+        return view('BeaCukai/bc-27/bc27outstanding');
     }
 
     public function allOutstanding()

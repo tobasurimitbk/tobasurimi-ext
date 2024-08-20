@@ -887,25 +887,14 @@
 
                     $.each(listStockSelectedBahanBaku, function(i, v) {
                         // if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0 || input_user_sortir > stok_max || isNaN(input_user_sortir) || input_user_sortir == undefined || input_user_sortir == 0 || input_user_sortir > input_user) {
-                        if (listStockSelectedBahanBaku[i].qty2 > listStockSelectedBahanBaku[i].stok_total || isNaN(listStockSelectedBahanBaku[i].qty2) || listStockSelectedBahanBaku[i].qty2 == undefined || listStockSelectedBahanBaku[i].qty2 == 0) {
+                        if (parseFloat(listStockSelectedBahanBaku[i].qty2) > parseFloat(listStockSelectedBahanBaku[i].stok_total) || isNaN(listStockSelectedBahanBaku[i].qty2) || listStockSelectedBahanBaku[i].qty2 == undefined || parseFloat(listStockSelectedBahanBaku[i].qty2) == 0) {
                             dataError = listStockSelectedBahanBaku[i];
                             isValid = false;
                         }
                     });
 
                     $.each(listStockSelectedBahan, function(i, v) {
-                        // var element = $('input[data-id="' + v.id + '"].qty-bahan-request');
-                        // var input_user = parseFloat(element.val());
-                        // var stok_max = parseFloat(element.data('stok_total'));
-
-                        // if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
-                        //     dataError = listStockSelectedBahan[i];
-                        //     isValid = false;
-                        // } else {
-                        //     listStockSelectedBahan[i].qty = stok_max;
-                        //     listStockSelectedBahan[i].qty2 = input_user;
-                        // }
-                        if (listStockSelectedBahan[i].qty2 > listStockSelectedBahan[i].stok_total || isNaN(listStockSelectedBahan[i].qty2) || listStockSelectedBahan[i].qty2 == undefined || listStockSelectedBahan[i].qty2 == 0) {
+                        if (parseFloat(listStockSelectedBahan[i].qty2) > parseFloat(listStockSelectedBahan[i].stok_total) || isNaN(listStockSelectedBahan[i].qty2) || listStockSelectedBahan[i].qty2 == undefined || parseFloat(listStockSelectedBahan[i].qty2) == 0) {
                             dataError = listStockSelectedBahan[i];
                             isValid = false;
                         }
@@ -924,7 +913,7 @@
                         //     listStockSelectedBahanSetengahJadi[i].qty2 = input_user;
                         // }
                         // if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0 || input_user_sortir > stok_max || isNaN(input_user_sortir) || input_user_sortir == undefined || input_user_sortir == 0 || input_user_sortir > input_user) {
-                        if (listStockSelectedBahanSetengahJadi[i].qty2 > listStockSelectedBahanSetengahJadi[i].stok_total || isNaN(listStockSelectedBahanSetengahJadi[i].qty2) || listStockSelectedBahanSetengahJadi[i].qty2 == undefined || listStockSelectedBahanSetengahJadi[i].qty2 == 0) {
+                        if (parseFloat(listStockSelectedBahanSetengahJadi[i].qty2) > parseFloat(listStockSelectedBahanSetengahJadi[i].stok_total) || isNaN(listStockSelectedBahanSetengahJadi[i].qty2) || listStockSelectedBahanSetengahJadi[i].qty2 == undefined || parseFloat(listStockSelectedBahanSetengahJadi[i].qty2) == 0) {
                             dataError = listStockSelectedBahanSetengahJadi[i];
                             isValid = false;
                         }
@@ -937,7 +926,7 @@
                         // var input_user_request = parseFloat(elementRequest.val());
                         // var stok_max = parseFloat(element.data('stok_total'));
 
-                        if (listStockSelectedBahanJadi[i].qty2 > listStockSelectedBahanJadi[i].qty || isNaN(listStockSelectedBahanJadi[i].qty2) || listStockSelectedBahanJadi[i].qty2 == undefined || listStockSelectedBahanJadi[i].qty2 == 0 || isNaN(listStockSelectedBahanJadi[i].qty_isi) || listStockSelectedBahanJadi[i].qty_isi == undefined || listStockSelectedBahanJadi[i].qty_isi == 0) {
+                        if (parseFloat(listStockSelectedBahanJadi[i].qty2) > parseFloat(listStockSelectedBahanJadi[i].qty) || isNaN(listStockSelectedBahanJadi[i].qty2) || listStockSelectedBahanJadi[i].qty2 == undefined || parseFloat(listStockSelectedBahanJadi[i].qty2) == 0 || isNaN(listStockSelectedBahanJadi[i].qty_isi) || listStockSelectedBahanJadi[i].qty_isi == undefined || parseFloat(listStockSelectedBahanJadi[i].qty_isi) == 0) {
                             dataError = listStockSelectedBahanJadi[i];
                             isValid = false;
                         }

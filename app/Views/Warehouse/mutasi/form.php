@@ -97,6 +97,20 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_tujuan_id" id="divisi_tujuan_id" name="divisi_tujuan_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($divisi as $d) : ?>
+                                    <option <?= !empty($mutasi) ? ($mutasi['divisi_asal_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                        <?= $d['divisi']; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_asal_id" id="warehouse_asal_id" name="warehouse_asal_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php if (!empty($warehouseAsal)) : ?>
@@ -111,21 +125,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_tujuan_id" id="divisi_tujuan_id" name="divisi_tujuan_id" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php if (!empty($divisiTujuan)) : ?>
-                                    <?php foreach ($divisiTujuan as $d) : ?>
-                                        <option <?= !empty($mutasi) ? ($mutasi['divisi_tujuan_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
-                                            <?= $d['divisi']; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
-                        </div>
-                    </div>
+
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -423,6 +423,7 @@
         listStockSelected = [];
         drawTableAsalBarang(listStockAsal);
         drawTableSelectedItem(listStockSelected);
+        getListWarehouseTujuan();
     });
 
     $('#divisi_asal_id').select2({
@@ -431,7 +432,7 @@
         allowClear: true
     }).change(function() {
         // CARI DIVISI TUJUAN
-        getListDivisiTujuan();
+        // getListDivisiTujuan();
         // CARI WAREHOUSE ASAL
         getListWarehouseAsal()
         // RESET TYPE BARANG
@@ -785,30 +786,30 @@
         }
     }
 
-    function getListDivisiTujuan() {
-        // GET LIST DIVISI TUJUAN
-        $.ajax({
-            url: `<?= base_url('mutasi/list-divisi-except'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                divisi_id: $(".divisi_asal_id option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".divisi_tujuan_id").empty()
-                $(".divisi_tujuan_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".divisi_tujuan_id").append(`<option value="${item.id}">${item.divisi}</option>`)
-                })
-            }
-        });
-    }
+    // function getListDivisiTujuan() {
+    //     // GET LIST DIVISI TUJUAN
+    //     $.ajax({
+    //         url: `<?= base_url('mutasi/list-divisi-except'); ?>`,
+    //         method: "GET",
+    //         beforeSend: function() {
+    //             setLoading();
+    //         },
+    //         complete: function() {
+    //             stopLoading();
+    //         },
+    //         data: {
+    //             divisi_id: $(".divisi_asal_id option:selected").val(),
+    //         },
+    //         dataType: "json",
+    //         success: function(res) {
+    //             $(".divisi_tujuan_id").empty()
+    //             $(".divisi_tujuan_id").append(`<option value=""></option>`)
+    //             res.data.forEach(function(item) {
+    //                 $(".divisi_tujuan_id").append(`<option value="${item.id}">${item.divisi}</option>`)
+    //             })
+    //         }
+    //     });
+    // }
 
     function getListWarehouseAsal() {
         // GET LIST WAREHOUSE ASAL
@@ -848,6 +849,7 @@
             },
             data: {
                 divisi_id: $(".divisi_tujuan_id option:selected").val(),
+                warehouse_asal_id: $(".warehouse_asal_id option:selected").val(),
             },
             dataType: "json",
             success: function(res) {
