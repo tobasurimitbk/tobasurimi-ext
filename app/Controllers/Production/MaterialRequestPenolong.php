@@ -340,7 +340,7 @@ class MaterialRequestPenolong extends BaseController
                         'stock_date' => $stockDetailBarang->stock_date,
                         'stock_dokumen' => $s->stock_dokumen,
                         'barang_type' => $s->type_barang,
-                        'qty' => $s->qty,
+                        'qty' => $s->qty == 0 ? $s->stok_total : $s->qty,
                         'qty2' => $s->qty2,
                         'qty_isi' => $s->qty_isi,
                     ];
@@ -362,7 +362,7 @@ class MaterialRequestPenolong extends BaseController
                         'stock_date' => $stockDetailBarang->stock_date,
                         'stock_dokumen' => $s->stock_dokumen,
                         'barang_type' => $s->type_barang,
-                        'qty' => $s->qty,
+                        'qty' => $s->qty == 0 ? $s->stok_total : $s->qty,
                         'qty2' => $s->qty2,
                         'qty_isi' => $s->qty_isi,
                     ];
@@ -432,7 +432,7 @@ class MaterialRequestPenolong extends BaseController
                             'stock_date' => $stockDetailBarang->stock_date,
                             'stock_dokumen' => $s->stock_dokumen,
                             'barang_type' => $s->type_barang,
-                            'qty' => $s->qty,
+                            'qty' => $s->qty == 0 ? $s->stok_total : $s->qty,
                             'qty2' => $s->qty2,
                             'qty_isi' => $s->qty_isi,
                         ];
@@ -454,7 +454,7 @@ class MaterialRequestPenolong extends BaseController
                             'stock_date' => $stockDetailBarang->stock_date,
                             'stock_dokumen' => $s->stock_dokumen,
                             'barang_type' => $s->type_barang,
-                            'qty' => $s->qty,
+                            'qty' => $s->qty == 0 ? $s->stok_total : $s->qty,
                             'qty2' => $s->qty2,
                             'qty_isi' => $s->qty_isi,
                         ];
