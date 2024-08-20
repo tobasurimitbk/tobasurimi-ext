@@ -3,21 +3,25 @@
 <section class="section">
     <div class="section-header">
         <h1>Tambah Dokumen BC 4.0</h1>
-        <?php if (can('Bea Cukai', 'BC 4.0', 'c')) : ?>
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                Simpan
-            </button>
-        <?php endif; ?>
-        <?php if (can('Bea Cukai', 'BC 4.0', 'p')) : ?>
-            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 5px;">
-                Export
-            </button>
-            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <li><button onclick="printPdf()" class="dropdown-item print-pdf">PDF</button></li>
-                <li><button onclick="printExcel()" class="dropdown-item print-pdf">EXCEL</button></li>
-            </ul>
-        <?php endif ?>
-
+        <div class="col-button-tambah-spp">
+            <a class="btn btn-hide-form btn-discard float-right root-form-view" href="<?= base_url("bea-cukai-bc-40"); ?>">
+                Kembali
+            </a>
+            <?php if (can('Bea Cukai', 'BC 4.0', 'p')) : ?>
+                <button class="btn btn-warning ml-4 btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 5px;">
+                    Export
+                </button>
+                <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                    <li><button onclick="printPdf()" class="dropdown-item print-pdf">PDF</button></li>
+                    <li><button onclick="printExcel()" class="dropdown-item print-pdf">EXCEL</button></li>
+                </ul>
+            <?php endif ?>
+            <?php if (can('Bea Cukai', 'BC 4.0', 'c')) : ?>
+                <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                    Simpan
+                </button>
+            <?php endif; ?>
+        </div>
     </div>
     <div class="card">
         <div class="card-header" style="font-weight: bold; color:black;">
