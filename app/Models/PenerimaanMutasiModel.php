@@ -157,6 +157,8 @@ class PenerimaanMutasiModel extends Model
     {
         $mutasiModel = new MutasiModel();
         $penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
+        $ppbkbModel = new PPBKBModel();
+
 
         $listMutasi = $mutasiModel
             ->select('mutasi.id, mutasi.no_mutasi, SUM(qty) AS qty_mutasi')
@@ -171,6 +173,7 @@ class PenerimaanMutasiModel extends Model
         $mutasiResult = [];
 
         foreach ($listMutasi as $mutasi) {
+            $checkPPBKB = $ppbkbModel->where('mutasi_id', $mutasi['id'])->first();
             $penerimaanTotal = $penerimaanMutasiDetailModel
                 ->select('SUM(qty) AS qty_diterima')
                 ->where('mutasi_id', $mutasi['id'])
@@ -178,8 +181,10 @@ class PenerimaanMutasiModel extends Model
                 ->groupBy('mutasi_id')
                 ->findAll();
 
-            if (empty($penerimaanTotal) || $penerimaanTotal[0]['qty_diterima'] < $mutasi['qty_mutasi']) {
-                array_push($mutasiResult, $mutasi);
+            if ($checkPPBKB) {
+                if (empty($penerimaanTotal) || $penerimaanTotal[0]['qty_diterima'] < $mutasi['qty_mutasi']) {
+                    array_push($mutasiResult, $mutasi);
+                }
             }
         }
 
