@@ -117,16 +117,18 @@ class SuratJalan extends BaseController
             ->getAllSuratJalan($condition, $addCondition, $pageSize, $offset);
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-        //dd($dataSuratJalan);
+        $customerSales = "-";
+        // var_dump($dataSuratJalan['data']);
+        // exit;
         $dataAllSuratJalan = [];
         foreach ($dataSuratJalan['data'] as $data) {
             $dataNo = json_decode($data->multiple_no_so, true);
 
-            if ($data->sales_id != NULL || $data->sales_id != "0") {
+            if ($data->sales_id == NULL || $data->sales_id == "0") {
+                $customerSales = "-";
+            } else {
                 $getEmployee = $this->EmployeesModel->select("CONCAT(employees.nip, ' - ', employees.name) AS customerSales")->where('employees.id', $data->sales_id)->first();
                 $customerSales = $getEmployee['customerSales'];
-            } else {
-                $customerSales = "-";
             }
             array_push($dataAllSuratJalan, [
                 "no"            => $no++,
