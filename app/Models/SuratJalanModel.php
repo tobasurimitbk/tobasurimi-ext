@@ -69,8 +69,15 @@ class SuratJalanModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'surat_jalan_so.updatedAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "surat_jalan_so.*,  sales_order.jenis_penjualan, sales_order.nama_ecommerce, sales_order.sales_id,
-        customers.name as nama_pelanggan,customers.kode as kode_pelanggan, SUM(sales_order.total_harga) as total_harga, SUM(sales_order.estimated_freight) as estimated_freight, sales_order.tipe_sales_order,
+        $selectQry = "surat_jalan_so.*,  
+        sales_order.jenis_penjualan, 
+        sales_order.nama_ecommerce, 
+        sales_order.sales_id,
+        customers.name as nama_pelanggan,
+        customers.kode as kode_pelanggan, 
+        SUM(sales_order.total_harga) as total_harga, 
+        SUM(sales_order.estimated_freight) as estimated_freight, 
+        sales_order.tipe_sales_order,
         ";
 
         $SuratJalan = $this->asObject()

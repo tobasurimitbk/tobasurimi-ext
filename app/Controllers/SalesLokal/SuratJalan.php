@@ -122,8 +122,7 @@ class SuratJalan extends BaseController
         foreach ($dataSuratJalan['data'] as $data) {
             $dataNo = json_decode($data->multiple_no_so, true);
 
-            if ($data->sales_id != NULL) {
-
+            if ($data->sales_id != NULL || $data->sales_id != "0") {
                 $getEmployee = $this->EmployeesModel->select("CONCAT(employees.nip, ' - ', employees.name) AS customerSales")->where('employees.id', $data->sales_id)->first();
                 $customerSales = $getEmployee['customerSales'];
             } else {
