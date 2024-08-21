@@ -714,7 +714,13 @@ class POLokalBahanBaku extends BaseController
     public function dropdownWarehouse()
     {
         $id = $this->request->getVar('divisi_id');
-        $res = $this->warehousesModel->where('deletedAt', null)->where('divisi_id', $id)->findAll();
+        $warehouse_asal_id = $this->request->getVar('warehouse_asal_id');
+        if ($warehouse_asal_id == null) {
+            $res = $this->warehousesModel->where('deletedAt', null)->where('divisi_id', $id)->findAll();
+        } else {
+            $res = $this->warehousesModel->where('deletedAt', null)->where('divisi_id', $id)->whereNotIn('id', [$warehouse_asal_id])->findAll();
+        }
+
         return response()->setJSON([
             'data' => $res,
             'token' => csrf_hash(),
