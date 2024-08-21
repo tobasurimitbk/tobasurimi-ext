@@ -256,6 +256,18 @@
             font-size: 25px;
             text-decoration: underline;
         }
+
+        .box {
+            display: flex;
+            justify-content: flex-end;
+            background-color: blue;
+        }
+
+        .inner-box {
+            display: flex;
+            justify-content: center;
+            background-color: red;
+        }
     </style>
 </head>
 
@@ -390,10 +402,11 @@
                     <?= strtoupper($dataPO->holding_company) ?><br>
                     <?= $dataPO->companyAddress ?>
                 </div>
-                <div style="padding: 0.5rem">
-                    Kwitansi<br>
+                <div style="padding: 0.5rem; text-align: center;">
+                    <div style="text-decoration: underline; font-size: 1.2em;">
+                        KWITANSI<br>
+                    </div>
                     No. PO : <?= $dataPO->po_no ?><br>
-
                 </div>
             </div>
             <table class="w-100 mt-05">
@@ -445,13 +458,22 @@
                 </tr>
             </table>
 
-            <div class="w-100">
-                <div class="txt-right">
-                    <div>Medan, <?= $dataPO->po_date ? date("d-m-Y", strtotime($dataPO->po_date)) : ""; ?></div>
-                    <div>Yang Menerima</div>
-                    <div class="mt-2">(<?= $dataPO->supplierName ?>)</div>
-                </div>
-            </div>
+
+            <table class="w-100">
+                <tr>
+                    <td style="width: 70%;">
+
+                    </td>
+                    <td style="width: 30%;">
+                        <div class="txt-center">
+                            <div>Medan, <?= $dataPO->po_date ? date("d-m-Y", strtotime($dataPO->po_date)) : ""; ?></div>
+                            <div>Yang Menerima</div>
+                            <div class="mt-2">(<?= $dataPO->supplierName ?>)</div>
+                        </div>
+
+                    </td>
+                </tr>
+            </table>
         </div>
 
         <div class="pagebreak" style="padding-top: 10px;">
@@ -516,20 +538,28 @@
                 </tr>
             </table>
 
-            <div class="w-100">
-                <div class="txt-right">
-                    <div> Medan, <?= $dataPO->po_date ? date("d-m-Y", strtotime($dataPO->po_date)) : ""; ?></div>
-                    <div>Yang Menerima</div>
-                    <div class="mt-2">(<?= $dataPO->supplierName ?>)</div>
-                </div>
-            </div>
+
+            <table class="w-100">
+                <td></td>
+                <td style="width: 30%;">
+                    <div class="txt-center">
+                        <div> Medan, <?= $dataPO->po_date ? date("d-m-Y", strtotime($dataPO->po_date)) : ""; ?></div>
+                        <div>Yang Menerima</div>
+                        <div class="mt-2">(<?= $dataPO->supplierName ?>)</div>
+                    </div>
+                </td>
+            </table>
+
         </div>
 
         <div class=" <?= $dataPO->lpb == null ? '' : 'pagebreak' ?>">
+            <div style="padding: 0.5rem; text-align: center;">
+                <div style="text-decoration: underline; font-size: 1.2em;">KWITANSI TAMBAHAN</div>
+                <div>NO. NOTA : <?= $dataPO->po_no ?></div>
+            </div>
             <table class="w-100">
                 <tr>
-                    <td class="txt-underline txt-bold">KWITANSI TAMBAHAN</td>
-                    <td>NO. NOTA : <?= $dataPO->po_no ?></td>
+
                     <td class="txt-bold txt-right txt-underline">Tanggal: <?= date('d/m/Y', strtotime($dataPO->po_date))  ?></td>
                 </tr>
             </table>
