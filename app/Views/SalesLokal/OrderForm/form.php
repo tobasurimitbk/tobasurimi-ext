@@ -2269,7 +2269,7 @@
             $(".no_sales_order").attr("readonly", true);
         } else {
             $(".no_sales_order").attr("readonly", false);
-            $(".no_sales_order").val("");
+            // $(".no_sales_order").val("");
         }
     }
 

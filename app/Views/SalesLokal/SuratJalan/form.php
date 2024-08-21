@@ -604,7 +604,7 @@
             $(".no_surat_jalan").attr("readonly", true);
         } else {
             $(".no_surat_jalan").attr("readonly", false);
-            $(".no_surat_jalan").val("");
+            // $(".no_surat_jalan").val("");
         }
     }
 </script>

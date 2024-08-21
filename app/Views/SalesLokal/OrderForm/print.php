@@ -30,7 +30,7 @@
         .description-container {
             border: 1px solid;
             border-radius: 7px;
-            height: 65px;
+            height: 50px;
 
             width: 60%;
             position: relative;
