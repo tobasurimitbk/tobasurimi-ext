@@ -92,11 +92,17 @@ class TipeBarang extends BaseController
         $id = $this->request->getVar('id');
         $divisiId = $this->request->getVar('divisi_id');
         $subAkunsModel = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
-        $dataAccountBarang = $this->barangMasterModel
+        // $dataAccountBarang = $this->barangMasterModel
+        //     ->select('barang_master.*,account_barang.divisi_id,account_barang.ar_id,account_barang.ap_id,account_barang.kategori_id,account_barang.pemakaian_id')
+        //     ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
+        //     ->where('barang_master.id', $id)
+        //     ->where('divisi_id', $divisiId)
+        //     ->first();
+        $dataAccountBarang = $this->accountBarangModel
             ->select('barang_master.*,account_barang.divisi_id,account_barang.ar_id,account_barang.ap_id,account_barang.kategori_id,account_barang.pemakaian_id')
-            ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
-            ->where('barang_master.id', $id)
-            ->where('divisi_id', $divisiId)
+            ->join('barang_master', 'barang_master.id = account_barang.barang_master_id', 'left')
+            ->where('account_barang.id', $id)
+            ->where('account_barang.divisi_id', $divisiId)
             ->first();
 
         // $data = [
@@ -151,54 +157,36 @@ class TipeBarang extends BaseController
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $res = $this->barangMasterModel->getListForAccount($condition, $divisiAccessArr, $addCondition, $limit, $offset);
+        $res = $this->accountBarangModel->getListForAccount($condition, $addCondition, $limit, $offset);
 
         $rdata = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($res['data'] as $data) {
-            // var_dump($res);
-            // exit;
             $dataNamaAP = "-";
             $dataNamaAR = "-";
             $dataNamaPemakaian = "-";
 
-            $dataAccountBarang = $this->barangMasterModel
-                ->select('barang_master.*,account_barang.divisi_id,account_barang.ar_id,account_barang.ap_id,account_barang.pemakaian_id')
-                ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
-                ->where('barang_master.id', $data['id'])
-                ->where('divisi_id', $data['divisi_id'])
-                ->where('barang_master.company_id', $this->this_company_id)
-                ->where('account_barang.deleted_at', null)
-                ->where('barang_master.deletedAt', null)
-                ->first();
+            if ($data['ar_id'] != null) {
+                $dataAR = $this->Sub_AkunsModel->where('id', $data['ar_id'])->first();
+                $dataNamaAR = $dataAR['no_sub'];
+            } else {
+                $dataNamaAR = "-";
+            }
 
-            // var_dump($dataAccountBarang);
-            // exit;
+            if ($data['ap_id'] != null) {
+                $dataAP = $this->Sub_AkunsModel->where('id', $data['ap_id'])->first();
+                $dataNamaAP = $dataAP['no_sub'];
+            } else {
+                $dataNamaAP = "-";
+            }
 
-            if ($dataAccountBarang != null) {
-                $dataAR = $this->Sub_AkunsModel->where('id', $dataAccountBarang['ar_id'])->first();
-                $dataAP = $this->Sub_AkunsModel->where('id', $dataAccountBarang['ap_id'])->first();
-                $dataPemakaian = $this->Sub_AkunsModel->where('id', $dataAccountBarang['pemakaian_id'])->first();
-
-                if ($dataAR != null) {
-                    $dataNamaAR = $dataAR['no_sub'];
-                } else {
-                    $dataNamaAR = "-";
-                }
-
-                if ($dataAP != null) {
-                    $dataNamaAP = $dataAP['no_sub'];
-                } else {
-                    $dataNamaAP = "-";
-                }
-
-                if ($dataPemakaian != null) {
-                    $dataNamaPemakaian = $dataPemakaian['no_sub'];
-                } else {
-                    $dataNamaPemakaian = "-";
-                }
+            if ($data['pemakaian_id'] != null) {
+                $dataPemakaian = $this->Sub_AkunsModel->where('id', $data['pemakaian_id'])->first();
+                $dataNamaPemakaian = $dataPemakaian['no_sub'];
+            } else {
+                $dataNamaPemakaian = "-";
             }
 
             if ($addCondition['filter_coa'] == "belum") {
@@ -209,9 +197,9 @@ class TipeBarang extends BaseController
                         "divisi_id"             => $data['divisi_id'],
                         "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
                         "divisi"                => strtoupper($data['divisi']),
-                        "ap_id"                 => $dataAccountBarang['ap_id'],
-                        "ar_id"                 => $dataAccountBarang['ar_id'],
-                        "pemakaian_id"          => $dataAccountBarang['pemakaian_id'],
+                        "ap_id"                 => $data['ap_id'],
+                        "ar_id"                 => $data['ar_id'],
+                        "pemakaian_id"          => $data['pemakaian_id'],
                         "ap_no"                 => $dataNamaAP,
                         "ar_no"                 => $dataNamaAR,
                         "pemakaian_no"          => $dataNamaPemakaian,
@@ -225,9 +213,9 @@ class TipeBarang extends BaseController
                         "divisi_id"             => $data['divisi_id'],
                         "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
                         "divisi"                => strtoupper($data['divisi']),
-                        "ap_id"                 => $dataAccountBarang['ap_id'],
-                        "ar_id"                 => $dataAccountBarang['ar_id'],
-                        "pemakaian_id"          => $dataAccountBarang['pemakaian_id'],
+                        "ap_id"                 => $data['ap_id'],
+                        "ar_id"                 => $data['ar_id'],
+                        "pemakaian_id"          => $data['pemakaian_id'],
                         "ap_no"                 => $dataNamaAP,
                         "ar_no"                 => $dataNamaAR,
                         "pemakaian_no"          => $dataNamaPemakaian,
@@ -240,18 +228,14 @@ class TipeBarang extends BaseController
                     "divisi_id"             => $data['divisi_id'],
                     "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
                     "divisi"                => strtoupper($data['divisi']),
-                    "ap_id"                 => isset($dataAccountBarang['ap_id']) ? $dataAccountBarang['ap_id'] : "-",
-                    "ar_id"                 => isset($dataAccountBarang['ar_id']) ? $dataAccountBarang['ar_id'] : "-",
-                    "pemakaian_id"          => isset($dataAccountBarang['pemakaian_id']) ? $dataAccountBarang['pemakaian_id'] : "-",
+                    "ap_id"                 => isset($data['ap_id']) ? $data['ap_id'] : "-",
+                    "ar_id"                 => isset($data['ar_id']) ? $data['ar_id'] : "-",
+                    "pemakaian_id"          => isset($data['pemakaian_id']) ? $data['pemakaian_id'] : "-",
                     "ap_no"                 => $dataNamaAP,
                     "ar_no"                 => $dataNamaAR,
                     "pemakaian_no"          => $dataNamaPemakaian,
                 ]);
             }
-
-            // if ($searchBarangId == false && $searchDivisiId !== true) {
-
-            // }
         }
 
         $data = [
@@ -265,4 +249,159 @@ class TipeBarang extends BaseController
 
         return response()->setJSON($data);
     }
+
+    // public function allTipeBarang()
+    // {
+    //     $payload = [
+    //         "pageSize" => $this->request->getGet("length"),
+    //         "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+    //         "search" => $this->request->getGet("search"),
+    //         "sort" => $this->request->getGet("sort"),
+    //         "sortType" => $this->request->getGet("sortType"),
+    //     ];
+
+    //     $condition = [
+    //         "type_barang" => $this->request->getGet('parent_type'),
+    //         'barang_master.company_id' => $this->this_company_id,
+    //         'divisis.company_id' => $this->this_company_id,
+    //         "barang_master.deletedAt" => NULL,
+    //         'divisis.deletedAt' => null
+    //     ];
+
+    //     $addCondition = [
+    //         "search"        => $this->request->getGet("search"),
+    //         "filter_coa"        => $this->request->getGet("filter_coa"),
+    //         'filter_divisi' => $this->request->getGet('filter_divisi'),
+    //         "sort"          => $this->request->getGet("sort"),
+    //         "sortType"      => $this->request->getGet("sortType")
+    //     ];
+
+    //     $divisiAccess = $this->divisiModel->getDivisiAccess();
+    //     $divisiAccessArr = [];
+
+    //     foreach ($divisiAccess as $d) {
+    //         array_push($divisiAccessArr, $d['id']);
+    //     }
+
+    //     $dataNamaAP = "";
+    //     $dataNamaAR = "";
+    //     $dataNamaPemakaian = "";
+
+    //     $limit = $this->request->getGet("length");
+    //     $offset = $this->request->getGet("start");
+
+    //     $res = $this->barangMasterModel->getListForAccount($condition, $divisiAccessArr, $addCondition, $limit, $offset);
+
+    //     $rdata = [];
+
+    //     $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+    //     foreach ($res['data'] as $data) {
+    //         // var_dump($res);
+    //         // exit;
+    //         $dataNamaAP = "-";
+    //         $dataNamaAR = "-";
+    //         $dataNamaPemakaian = "-";
+
+    //         $dataAccountBarang = $this->barangMasterModel
+    //             ->select('barang_master.*,account_barang.divisi_id,account_barang.ar_id,account_barang.ap_id,account_barang.pemakaian_id')
+    //             ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
+    //             ->where('barang_master.id', $data['id'])
+    //             ->where('divisi_id', $data['divisi_id'])
+    //             ->where('barang_master.company_id', $this->this_company_id)
+    //             ->where('account_barang.deleted_at', null)
+    //             ->where('barang_master.deletedAt', null)
+    //             ->first();
+
+    //         // var_dump($dataAccountBarang);
+    //         // exit;
+
+    //         if ($dataAccountBarang != null) {
+    //             $dataAR = $this->Sub_AkunsModel->where('id', $dataAccountBarang['ar_id'])->first();
+    //             $dataAP = $this->Sub_AkunsModel->where('id', $dataAccountBarang['ap_id'])->first();
+    //             $dataPemakaian = $this->Sub_AkunsModel->where('id', $dataAccountBarang['pemakaian_id'])->first();
+
+    //             if ($dataAR != null) {
+    //                 $dataNamaAR = $dataAR['no_sub'];
+    //             } else {
+    //                 $dataNamaAR = "-";
+    //             }
+
+    //             if ($dataAP != null) {
+    //                 $dataNamaAP = $dataAP['no_sub'];
+    //             } else {
+    //                 $dataNamaAP = "-";
+    //             }
+
+    //             if ($dataPemakaian != null) {
+    //                 $dataNamaPemakaian = $dataPemakaian['no_sub'];
+    //             } else {
+    //                 $dataNamaPemakaian = "-";
+    //             }
+    //         }
+
+    //         if ($addCondition['filter_coa'] == "belum") {
+    //             if ($dataNamaAP == "-" || $dataAP == "-") {
+    //                 array_push($rdata, [
+    //                     "no"                    => $no++,
+    //                     "id"                    => $data['id'],
+    //                     "divisi_id"             => $data['divisi_id'],
+    //                     "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
+    //                     "divisi"                => strtoupper($data['divisi']),
+    //                     "ap_id"                 => $dataAccountBarang['ap_id'],
+    //                     "ar_id"                 => $dataAccountBarang['ar_id'],
+    //                     "pemakaian_id"          => $dataAccountBarang['pemakaian_id'],
+    //                     "ap_no"                 => $dataNamaAP,
+    //                     "ar_no"                 => $dataNamaAR,
+    //                     "pemakaian_no"          => $dataNamaPemakaian,
+    //                 ]);
+    //             }
+    //         } elseif ($addCondition['filter_coa'] == "sudah") {
+    //             if ($dataNamaAP != "-" && $dataAP != "-") {
+    //                 array_push($rdata, [
+    //                     "no"                    => $no++,
+    //                     "id"                    => $data['id'],
+    //                     "divisi_id"             => $data['divisi_id'],
+    //                     "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
+    //                     "divisi"                => strtoupper($data['divisi']),
+    //                     "ap_id"                 => $dataAccountBarang['ap_id'],
+    //                     "ar_id"                 => $dataAccountBarang['ar_id'],
+    //                     "pemakaian_id"          => $dataAccountBarang['pemakaian_id'],
+    //                     "ap_no"                 => $dataNamaAP,
+    //                     "ar_no"                 => $dataNamaAR,
+    //                     "pemakaian_no"          => $dataNamaPemakaian,
+    //                 ]);
+    //             }
+    //         } else {
+    //             array_push($rdata, [
+    //                 "no"                    => $no++,
+    //                 "id"                    => $data['id'],
+    //                 "divisi_id"             => $data['divisi_id'],
+    //                 "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
+    //                 "divisi"                => strtoupper($data['divisi']),
+    //                 "ap_id"                 => isset($dataAccountBarang['ap_id']) ? $dataAccountBarang['ap_id'] : "-",
+    //                 "ar_id"                 => isset($dataAccountBarang['ar_id']) ? $dataAccountBarang['ar_id'] : "-",
+    //                 "pemakaian_id"          => isset($dataAccountBarang['pemakaian_id']) ? $dataAccountBarang['pemakaian_id'] : "-",
+    //                 "ap_no"                 => $dataNamaAP,
+    //                 "ar_no"                 => $dataNamaAR,
+    //                 "pemakaian_no"          => $dataNamaPemakaian,
+    //             ]);
+    //         }
+
+    //         // if ($searchBarangId == false && $searchDivisiId !== true) {
+
+    //         // }
+    //     }
+
+    //     $data = [
+    //         "draw"              => intval($this->request->getGet("draw")),
+    //         "recordsTotal"      => $res['totalData'],
+    //         "recordsFiltered"   => $res['totalFilteredData'],
+    //         "data"              => $rdata,
+    //         "payload"           => $payload,
+    //         "test" => $_GET
+    //     ];
+
+    //     return response()->setJSON($data);
+    // }
 }

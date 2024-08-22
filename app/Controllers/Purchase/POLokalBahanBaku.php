@@ -4,7 +4,7 @@ namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
 use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
-
+use App\Models\AccountBarangModel;
 use App\Models\CompaniesModel;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\RMPurchaseOrderDetailModel;
@@ -49,6 +49,7 @@ class POLokalBahanBaku extends BaseController
     protected $sppDetailModel;
     protected $divisiModel;
     protected $kemasanModel;
+    protected $accountBarangModel;
 
     protected $this_user_id;
     protected $is_admin;
@@ -79,6 +80,7 @@ class POLokalBahanBaku extends BaseController
         $this->divisiModel = new DivisisModel();
         $this->sppModel = new SppModel();
         $this->kemasanModel = new KemasanModel();
+        $this->accountBarangModel = new AccountBarangModel();
     }
 
     public function poLokalBahanBaku()
@@ -298,6 +300,8 @@ class POLokalBahanBaku extends BaseController
             ]);
         }
 
+        $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"));
+
         return response()->setJSON([
             'message' => "PO Lokal Bahan Baku Berhasil Disimpan",
             'token' => csrf_hash(),
@@ -412,6 +416,8 @@ class POLokalBahanBaku extends BaseController
             ->where('rm_purchase_order_id', $id)
             ->whereNotIn('id', $id_detail_all)
             ->delete();
+
+        $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"));
 
         return response()->setJSON([
             'message' => "PO Lokal Bahan Baku Berhasil Diupdate",
