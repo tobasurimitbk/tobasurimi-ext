@@ -282,9 +282,8 @@
                         </table>
                     </div>
                 </div>
-
+            </form>
         </div>
-        </form>
 
     </div>
     </div>
@@ -1200,7 +1199,7 @@
             })
         } else {
             $("#no_faktur").attr("readonly", false);
-            $("#no_faktur").val("");
+            // $("#no_faktur").val("");
         }
     }
 </script>

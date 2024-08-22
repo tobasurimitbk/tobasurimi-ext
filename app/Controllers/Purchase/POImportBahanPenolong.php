@@ -4,7 +4,7 @@ namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
 use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
-
+use App\Models\AccountBarangModel;
 use App\Models\BarangModel;
 use App\Models\MetadataModel;
 use App\Models\AMPurchaseOrderModel;
@@ -39,6 +39,7 @@ class POImportBahanPenolong extends BaseController
     protected $sppModel;
     protected $sppDetailModel;
     protected $jurnalController;
+    protected $accountBarangModel;
 
     public function __construct()
     {
@@ -61,6 +62,7 @@ class POImportBahanPenolong extends BaseController
         $this->jurnalController = new JurnalUmum();
         $this->sppModel = new SppModel();
         $this->sppDetailModel = new SppDetailModel();
+        $this->accountBarangModel = new AccountBarangModel();
     }
 
     public function poImportBahanPenolong()
@@ -274,6 +276,7 @@ class POImportBahanPenolong extends BaseController
                 'remaining_qty' => $b->qty,
                 'total' => repairDouble($b->total),
             ]);
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);
         }
 
         $this->sppModel->update($this->request->getVar('spp_id'), [
@@ -382,6 +385,7 @@ class POImportBahanPenolong extends BaseController
                     'total' => repairDouble($b->total),
                 ]);
                 array_push($id_detail_all, $check['id']);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);
             } else {
                 // NEW BARANG
                 // DELETE
@@ -405,6 +409,7 @@ class POImportBahanPenolong extends BaseController
                     'total' => repairDouble($b->total),
                 ]);
                 array_push($id_detail_all, $id_detail_new);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);
             }
         }
 

@@ -4,7 +4,7 @@ namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
 use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
-
+use App\Models\AccountBarangModel;
 use App\Models\BarangMasterModel;
 use App\Models\CompaniesModel;
 use App\Models\MetadataModel;
@@ -38,6 +38,7 @@ class POImportBahanBaku extends BaseController
     protected $jurnalController;
     protected $sppModel;
     protected $sppDetailModel;
+    protected $accountBarangModel;
 
     public function __construct()
     {
@@ -58,6 +59,7 @@ class POImportBahanBaku extends BaseController
         $this->jurnalController = new JurnalUmum();
         $this->sppModel = new SppModel();
         $this->sppDetailModel = new SppDetailModel();
+        $this->accountBarangModel = new AccountBarangModel();
     }
 
     public function poImportBahanBaku()
@@ -273,6 +275,7 @@ class POImportBahanBaku extends BaseController
                 'note' => $b->keterangan,
                 'total' => repairDouble($b->total),
             ]);
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);
         }
 
         $this->sppModel->update($this->request->getVar('spp_id'), [
@@ -379,6 +382,7 @@ class POImportBahanBaku extends BaseController
                     'total' => repairDouble($b->total),
                 ]);
                 array_push($id_detail_all, $check['id']);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);
             } else {
                 // NEW BARANG
                 // DELETE
@@ -403,6 +407,7 @@ class POImportBahanBaku extends BaseController
                     'total' => repairDouble($b->total),
                 ]);
                 array_push($id_detail_all, $id_detail_new);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);
             }
         }
 

@@ -46,7 +46,7 @@
                     <div class="form-floating mb-3">
                         <select class="form-select filter_coa" name="filter_coa" id="filter_coa">
                             <option value="" data-code=""></option>
-                            <option value="belum" data-code="">BELUM PUNYA COA</option>
+                            <option value="belum" data-code="" selected>BELUM PUNYA COA</option>
                             <option value="sudah" data-code="">SUDAH PUNYA COA</option>
                         </select>
                         <label for="floatingInput">Filter Akun</label>

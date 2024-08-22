@@ -58,4 +58,94 @@ class AccountBarangModel extends Model
             ->where('account_barang.deleted_at', null)
             ->findAll();
     }
+
+    public function getListForAccount($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode_barang'       => 'barang_master.kode_barang',
+            'barang_name'       => 'barang_master.barang_name'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'account_barang.id, divisis.divisi';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "barang_master.kode_barang,
+                    barang_master.barang_name,
+                    account_barang.*,
+                    divisis.id AS divisi_id,
+                    divisis.divisi";
+
+        $barangDataQry = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('barang_master', 'barang_master.id = account_barang.barang_master_id', 'left')
+            ->join('divisis', 'divisis.id = account_barang.divisi_id', 'left')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $barangDataQry->countAllResults(false);
+
+        if ($addCondition['search'] || $addCondition['filter_divisi']) {
+            $barangDataQry->groupStart();
+        }
+
+        if ($addCondition['filter_divisi']) {
+            $barangDataQry->where('divisis.id', $addCondition['filter_divisi']);
+        }
+
+        if ($addCondition['search']) {
+            $barangDataQry->like('barang_master.barang_name', $addCondition['search']);
+        }
+
+        if ($addCondition['search']) {
+            $barangDataQry->orLike('barang_master.kode_barang', $addCondition['search']);
+        }
+
+        if ($addCondition['search'] || $addCondition['filter_divisi']) {
+            $barangDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $barangDataQry->countAllResults(false);
+        $data = $barangDataQry->findAll($limit, $offset);
+
+        // var_dump($data);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
+
+    public function checkAccountBarang($company_id, $divisi_id, $barang_id)
+    {
+        $accountBarang = $this->asArray()
+            ->where('company_id', $company_id)
+            ->where('divisi_id', $divisi_id)
+            ->where('barang_master_id', $barang_id)
+            ->where('deleted_at', null)
+            ->first();
+
+        if ($accountBarang == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public function insertAccountBarang($company_id, $divisi_id, $barang_id)
+    {
+        if ($this->checkAccountBarang($company_id, $divisi_id, $barang_id)) {
+        } else {
+            // BELUM ADA
+            $accountBarang = $this->insert([
+                'company_id' => $company_id,
+                'divisi_id' => $divisi_id,
+                'barang_master_id' => $barang_id,
+            ]);
+            return $accountBarang;
+        }
+    }
 }

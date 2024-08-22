@@ -529,7 +529,7 @@
             })
         } else {
             $("#no_surat_retur").attr("readonly", false);
-            $("#no_surat_retur").val("");
+            // $("#no_surat_retur").val("");
         }
     }
 </script>

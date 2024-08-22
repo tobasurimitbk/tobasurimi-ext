@@ -201,7 +201,7 @@
             $rowNumber++;
         endforeach;
         ?>
-        <?php for ($i = 0; $i < (9 - count($soData)); $i++) : ?>
+        <?php for ($i = 0; $i < (8 - count($soData)); $i++) : ?>
             <tr>
                 <td>&nbsp;</td>
                 <td>&nbsp;</td>
