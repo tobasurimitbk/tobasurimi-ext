@@ -17,6 +17,10 @@ use App\Models\RMPurchaseOrderModel;
 use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\PenerimaanBarangDetailModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class LaporanSupplierLokalBB extends BaseController
 {
@@ -557,7 +561,6 @@ class LaporanSupplierLokalBB extends BaseController
             'getBarang' => $this->barangMasterModel->getBarangByType("bahan_baku"),
         ];
 
-
         return view('Laporan/SupplierLokalBB/RekapAllSupplier/index', $data);
     }
 
@@ -790,6 +793,177 @@ class LaporanSupplierLokalBB extends BaseController
 
         exit();
         // return view('Supplier/supplierBahanBaku/print');
+    }
+
+    public function exportExcelLaporanRekapAllSupplier()
+    {
+        $totalDppUmum = 0;
+        $totalPphUmum = 0;
+        $totalTotalUmum = 0;
+        $totalDppHarian = 0;
+        $totalPphHarian = 0;
+        $totalTotalHarian = 0;
+        $totalDppBulanan = 0;
+        $totalPphBulanan = 0;
+        $totalTotalBulanan = 0;
+        $totalDppSubsidi = 0;
+        $totalPphSubsidi = 0;
+        $totalTotalSubsidi = 0;
+        $totalTotalRow = 0;
+
+        $dateStart = $this->request->getVar('dateStart');
+        $newDateStart = $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "";
+        $dateEnd = $this->request->getVar('dateEnd');
+        $newDateEnd = $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "";
+        $supplierId = $this->request->getVar('filter_supplier');
+        $barangId = $this->request->getVar('filter_barang');
+
+        $companyId  = $this->this_company_id;
+
+        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForAllSupplierReportPdf($newDateStart, $newDateEnd, $supplierId, $barangId, $companyId);
+        $dataBahanBaku = $this->barangMasterModel->asObject()->where('id', $barangId)->where('type_barang', 'bahan_baku')->first();
+
+        $dataTotalBBLokal = [];
+        if (!empty($dataBBLokal)) {
+            foreach ($dataBBLokal as $row) {
+                $row->pphUmum       = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
+                $row->totalUmum     = $row->dppUmum - $row->pphUmum;
+                $row->pphHarian     = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppHarian * 0.0025) : ($row->dppHarian * 0.005)) : 0;
+                $row->totalHarian   = $row->dppHarian - $row->pphHarian;
+                $row->pphBulanan    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppBulanan * 0.0025) : ($row->dppBulanan * 0.005)) : 0;
+                $row->totalBulanan  = $row->dppBulanan - $row->pphBulanan;
+                $row->pphSubsidi    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
+                $row->totalSubsidi  = $row->subsidi - $row->pphSubsidi;
+                $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
+                $totalDppUmum += $row->dppUmum;
+                $totalPphUmum += $row->pphUmum;
+                $totalTotalUmum += $row->totalUmum;
+                $totalDppHarian += $row->dppHarian;
+                $totalPphHarian += $row->pphHarian;
+                $totalTotalHarian += $row->totalHarian;
+                $totalDppBulanan += $row->dppBulanan;
+                $totalPphBulanan += $row->pphBulanan;
+                $totalTotalBulanan += $row->totalBulanan;
+                $totalDppSubsidi += $row->subsidi;
+                $totalPphSubsidi += $row->pphSubsidi;
+                $totalTotalSubsidi += $row->totalSubsidi;
+            }
+            $totalTotalRow = $totalTotalUmum + $totalTotalHarian + $totalTotalBulanan + $totalTotalSubsidi;
+        }
+        $no = 1;
+
+        $data = [
+            'no' => $no,
+            'header' => "Laporan Rekap All Supplier",
+            'tanggalAwal' => $dateStart,
+            'tanggalAkhir' => $dateEnd,
+            'bahanBaku' => !empty($dataBahanBaku) ? $dataBahanBaku->barang_name : "All",
+            'dataOrder' => $dataBBLokal,
+            'totalDppUmum' => $totalDppUmum,
+            'totalPphUmum' => $totalPphUmum,
+            'totalTotalUmum' => $totalTotalUmum,
+            'totalDppHarian' => $totalDppHarian,
+            'totalPphHarian' => $totalPphHarian,
+            'totalTotalHarian' => $totalTotalHarian,
+            'totalDppBulanan' => $totalDppBulanan,
+            'totalPphBulanan' => $totalPphBulanan,
+            'totalTotalBulanan' => $totalTotalBulanan,
+            'totalDppSubsidi' => $totalDppSubsidi,
+            'totalPphSubsidi' => $totalPphSubsidi,
+            'totalTotalSubsidi' => $totalTotalSubsidi,
+            'totalTotalRow' => $totalTotalRow
+        ];
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $headerStyleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+        $dataStyleArray = [
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+        $sheet
+            ->setCellValue('A2', 'Tanggal')
+            ->setCellValue('B2', !empty($dateStart || $dateEnd) ? $dateStart . " SD " . $dateEnd : "ALL")
+            ->setCellValue('A3', 'No')
+            ->setCellValue('B3', 'Supplier')
+            ->setCellValue('C3', 'Bahan Baku')
+
+            ->setCellValue('D3', 'Harian')
+            ->setCellValue('D4', 'DDP')
+            ->setCellValue('E4', 'PPh')
+            ->setCellValue('F4', 'Dibayarkan')
+
+            ->setCellValue('G3', 'Tambahan Harian')
+            ->setCellValue('G4', 'DDP')
+            ->setCellValue('H4', 'PPh')
+            ->setCellValue('I4', 'Dibayarkan')
+
+            ->setCellValue('J3', 'Tambahan Bulanan')
+            ->setCellValue('J4', 'DDP')
+            ->setCellValue('K4', 'PPh')
+            ->setCellValue('L4', 'Dibayarkan')
+
+            ->setCellValue('M3', 'Subsidi')
+            ->setCellValue('M4', 'DDP')
+            ->setCellValue('N4', 'PPh')
+            ->setCellValue('O4', 'Dibayarkan')
+
+            ->setCellValue('P3', 'Total');
+        $sheet->mergeCells('A3:A4');
+        $sheet->mergeCells('B3:B4');
+        $sheet->mergeCells('C3:C4');
+        $sheet->mergeCells('P3:P4');
+        $sheet->mergeCells('D3:F3');
+        $sheet->mergeCells('G3:I3');
+        $sheet->mergeCells('J3:L3');
+        $sheet->mergeCells('M3:O3');
+
+        $row = 5;
+        foreach ($dataBBLokal as $d) {
+            $sheet->setCellValue('A' . $row, $no++)
+                ->setCellValue('B' . $row, $d->supplierName)
+                ->setCellValue('C' . $row, $d->barangName)
+                ->setCellValue('D' . $row, number_format($d->dppUmum))
+                ->setCellValue('E' . $row, number_format($d->pphUmum))
+                ->setCellValue('F' . $row, number_format($d->totalUmum))
+                ->setCellValue('G' . $row, number_format($d->dppHarian))
+                ->setCellValue('H' . $row, number_format($d->pphHarian))
+                ->setCellValue('I' . $row, number_format($d->totalHarian))
+                ->setCellValue('J' . $row, number_format($d->dppBulanan))
+                ->setCellValue('K' . $row, number_format($d->pphBulanan))
+                ->setCellValue('L' . $row, number_format($d->totalBulanan))
+                ->setCellValue('M' . $row, number_format($d->subsidi))
+                ->setCellValue('N' . $row, number_format($d->pphSubsidi))
+                ->setCellValue('O' . $row, number_format($d->totalSubsidi))
+                ->setCellValue('P' . $row, number_format($d->totalRow));
+            $row++;
+        }
+        foreach (range('A', 'Q') as $column) {
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = "Laporan Rekap All Supplier ";
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
     }
 
     public function laporanRekapPerSupplier()

@@ -177,8 +177,9 @@ class RasioController extends BaseController
 
     public function saveRasio()
     {
+
         try {
-            $tanggal_input = $this->request->getVar("tanggal") ? $this->request->getVar("tanggal") : "";
+            $tanggal_input = $this->request->getVar("tanggal_akhir") ? $this->request->getVar("tanggal_akhir") : "";
             $tanggal_parts = explode("/", $tanggal_input); // Memisahkan bulan dan tahun
             $tanggal_mysql = $tanggal_parts[1] . "-" . str_pad($tanggal_parts[0], 2, "0", STR_PAD_LEFT);
 
@@ -217,6 +218,7 @@ class RasioController extends BaseController
                 'total_qty_po_bp' => $this->request->getVar("qtyTotalPembelian_material_2") ? number_format((float) str_replace(",", "", $this->request->getVar("qtyTotalPembelian_material_2")), 2, '.', '') : 0,
                 'harga_total_po_bp' => $this->request->getVar("hargaTotalPembelian_material_2") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("hargaTotalPembelian_material_2")), 2, '.', '') : 0,
                 "harga_average_po_bp" => $this->request->getVar("hargaSatuanPembelian_material_2") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("hargaSatuanPembelian_material_2")), 2, '.', '') : 0,
+                "tipe_bahan" => $this->request->getVar('tipe_bahan'),
             ];
 
 
@@ -233,8 +235,10 @@ class RasioController extends BaseController
             $labor_cost = json_decode($this->request->getVar("labor_cost"));
             $overhead_cost = json_decode($this->request->getVar("overhead_cost"));
             $fixed_cost = json_decode($this->request->getVar("fixed_cost"));
+            $barang_frozen_jadi = json_decode(($this->request->getVar("item_jadi_frozen")));
 
             // var_dump($barang_digunakan);
+            // die;
             // var_dump($barang_digunakan_alokasi);
             // var_dump($barang_jadi);
             // exit;
@@ -255,7 +259,7 @@ class RasioController extends BaseController
                     'harga_lpb_total' => $s->totalHargaLPB ?? 0,
                     'harga_lpb_satuan' => $s->hargaSatuanLPB ?? 0,
                     'satuan_lpb' => $s->satuanLPB ?? "-",
-                    'no_dokumen' => $s->no_dokumen,
+                    //'no_dokumen' => $s->no_dokumen,
                     'stock_dokumen' => $s->stock_dokumen,
                     'type' => "digunakan",
                 ]);
@@ -276,8 +280,8 @@ class RasioController extends BaseController
                     'harga_lpb_total' => $s->totalHargaLPB ?? 0,
                     'harga_lpb_satuan' => $s->hargaSatuanLPB ?? 0,
                     'satuan_lpb' => $s->satuanLPB ?? "-",
-                    'no_dokumen' => $s->no_dokumen,
-                    'stock_dokumen' => $s->stock_dokumen,
+                    // 'no_dokumen' => $s->no_dokumen,
+                    // 'stock_dokumen' => $s->stock_dokumen,
                     'type' => "pembelian",
                 ]);
             }
@@ -297,31 +301,57 @@ class RasioController extends BaseController
                     'harga_lpb_total' => $s->totalHargaLPB ?? 0,
                     'harga_lpb_satuan' => $s->hargaSatuanLPB ?? 0,
                     'satuan_lpb' => $s->satuanLPB ?? "-",
-                    'no_dokumen' => $s->no_dokumen,
+                    // 'no_dokumen' => $s->no_dokumen,
                     'stock_dokumen' => $s->stock_dokumen,
                 ]);
+            }
+            if (!empty($barang_jadi)) {
+                foreach ($barang_jadi as $s) {
+                    $this->rasioBarangJadiModel->insert([
+                        'rasio_id' => $id,
+                        'barang_name' => $s->barang_name,
+                        'kode_barang' => $s->kode_barang,
+                        'spesifikasi' => $s->spesifikasi,
+                        'production_result_detail_id' => $s->production_result_detail_id,
+                        'production_result_id' => $s->production_result_id,
+                        'barang1_id' => $s->barang1_id,
+                        'barang2_id' => $s->barang2_id,
+                        'bc_id' => $s->bc_id,
+                        'stock_id' => $s->stock_id,
+                        'no_aju' => $s->no_aju,
+                        'stock_dokumen' => $s->stock_dokumen,
+                        'qty_barang' => $s->qty,
+                        'rasio_barang' => $s->rasio,
+                        'harga_barang' => $s->harga,
+                        'kode_satuan' => $s->kode_satuan,
+                    ]);
+                }
+            } else {
+                foreach ($barang_frozen_jadi as $f) {
+                    foreach ($f as $i) {
+                        $this->rasioBarangJadiModel->insert([
+                            'rasio_id' => $id,
+                            'barang_name' => $i->barang_name,
+                            'kode_barang' => $i->kode_barang,
+                            'spesifikasi' => $i->spesifikasi,
+                            'production_result_detail_id' => $i->production_result_detail_id,
+                            'production_result_id' => $i->production_result_id,
+                            'barang1_id' => $i->barang1_id,
+                            'barang2_id' => $i->barang2_id,
+                            'bc_id' => $i->bc_id,
+                            'stock_id' => $i->stock_id,
+                            'no_aju' => $i->no_aju,
+                            'stock_dokumen' => $i->stock_dokumen,
+                            'qty_barang' => $i->qty,
+                            'rasio_barang' => $i->rasio,
+                            'harga_barang' => $i->harga_satuan,
+                            'kode_satuan' => $i->kode_satuan,
+                            'satuan_id' => $i->satuan_id
+                        ]);
+                    }
+                }
             }
 
-            foreach ($barang_jadi as $s) {
-                $this->rasioBarangJadiModel->insert([
-                    'rasio_id' => $id,
-                    'barang_name' => $s->barang_name,
-                    'kode_barang' => $s->kode_barang,
-                    'spesifikasi' => $s->spesifikasi,
-                    'production_result_detail_id' => $s->production_result_detail_id,
-                    'production_result_id' => $s->production_result_id,
-                    'barang1_id' => $s->barang1_id,
-                    'barang2_id' => $s->barang2_id,
-                    'bc_id' => $s->bc_id,
-                    'stock_id' => $s->stock_id,
-                    'no_aju' => $s->no_aju,
-                    'stock_dokumen' => $s->stock_dokumen,
-                    'qty_barang' => $s->qty,
-                    'rasio_barang' => $s->rasio,
-                    'harga_barang' => $s->harga,
-                    'kode_satuan' => $s->kode_satuan,
-                ]);
-            }
 
             foreach ($barang_digunakan_material_2 as $bd) {
                 foreach ($bd->inputData as $bdm) {
@@ -510,14 +540,13 @@ class RasioController extends BaseController
             "subAkuns" => $subAkunsModel,
             'kategoriBarangAkun' => $this->metadataModel->asObject()->where('name', 'kategori_barang_akun')->findAll(),
             "rasio" => $rasioModel,
-            // "rasioBarangDigunakanAlokasi" => $rasioBarangDigunakanAlokasiModel,
+            "rasioBarangDigunakanAlokasi" => $rasioBarangDigunakanAlokasiModel,
             "rasioBarangDigunakan" => $rasioBarangDigunakanModel,
             "rasioBarangJadi" => $rasioBarangJadiModel,
             "rasioBarangPenolong" => $rasioBarangPenolongModel,
             "rasioCost" => $rasioCostModel,
         ];
-        // var_dump($rasioModel);
-        // exit;
+
         return view('Accounting/rasio/form', $data);
     }
 
@@ -1173,7 +1202,7 @@ class RasioController extends BaseController
             // akhir fungsi untuk bahan jadi
 
             // var_dump($dataProduksiBahanDigunakanKopek);
-            // exit;
+
 
             if ($dataProduksiBahanDigunakan) {
                 return response()->setJSON([

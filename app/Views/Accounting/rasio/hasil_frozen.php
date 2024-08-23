@@ -90,7 +90,7 @@
                 confirmButtonText: 'Ok'
             });
         } else {
-            drawTableRasioAkhir(list_items_barang_jadi_frozen);
+            drawTableRasioAkhirFrozen(list_items_barang_jadi_frozen);
         }
     });
 </script>

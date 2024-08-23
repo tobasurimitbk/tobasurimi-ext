@@ -333,6 +333,8 @@
     let list_items_saldo_jual = [];
     let list_items_saldo_trimming = [];
     let list_items_saldo_kopek = [];
+    let list_items_barang_jadi = [];
+    let tipe_bahan = "";
 
     let list_items_barang_jadi_material_2 = [];
     let list_items_barang_digunakan_material_2 = [];
@@ -627,27 +629,61 @@
                         res.dataBarangJadi.forEach(function(item) {
                             if (item.barang_type == "bahan_setengah_jadi") {
                                 list_items_barang_jadi_trimming.push(item);
+                                tipe_bahan = "trimming";
                             } else if (item.barang_type == "bahan_jadi" && item.kode_satuan == "CAN") {
                                 list_items_barang_jadi_kaleng.push(item);
+                                tipe_bahan = "kaleng";
                             } else {
+                                tipe_bahan = "frozen;"
                                 let barang1Id = item.barang1_id;
+                                let barang2Id = item.barang2_id;
                                 let barang_name = item.barang_name;
                                 let kode_barang = item.kode_barang;
                                 let kode_satuan = item.kode_satuan;
+                                let spesifikasi = item.spesifikasi;
+                                let production_result_detail_id = item.production_result_detail_id;
+                                let production_result_id = item.production_result_id;
+                                let satuan_id = item.satuan_id;
+                                let bc_id = item.bc_id;
+                                let stock_id = item.stock_id;
+                                let no_aju = item.no_aju;
+                                let stock_dokumen = item.stock_dokumen;
 
-                                if (barang1IdQtyMap[barang1Id]) {
-                                    barang1IdQtyMap[barang1Id].qty += parseFloat(item.qty);
-                                    barang1IdQtyMap[barang1Id].qty2 += parseFloat(item.qty2);
-                                    barang1IdQtyMap[barang1Id].qty_isi += parseFloat(item.qty_isi);
-                                    barang1IdQtyMap[barang1Id].banyakData += parseFloat(1);
-                                    barang1IdQtyMap[barang1Id].hasilWithPersentase += parseFloat(item.hasilWithPersentase);
+                                if (!barang1IdQtyMap[barang1Id]) {
+                                    barang1IdQtyMap[barang1Id] = {};
+                                }
+                                if (barang1IdQtyMap[barang1Id][barang2Id]) {
+
+                                    barang1IdQtyMap[barang1Id][barang2Id].qty = parseFloat(item.qty);
+                                    barang1IdQtyMap[barang1Id][barang2Id].qty2 = parseFloat(item.qty2);
+                                    barang1IdQtyMap[barang1Id][barang2Id].qty_isi = parseFloat(item.qty_isi);
+                                    barang1IdQtyMap[barang1Id][barang2Id].banyakData = parseFloat(res.dataBarangJadi.length);
+                                    barang1IdQtyMap[barang1Id][barang2Id].hasilWithPersentase = parseFloat(item.hasilWithPersentase);
+                                    barang1IdQtyMap[barang1Id][barang2Id].hasilWithPersentase = parseFloat(item.hasilWithPersentase);
+
+
+
+                                    // barang1IdQtyMap[barang1Id].qty += parseFloat(item.qty);
+                                    // barang1IdQtyMap[barang1Id].qty2 += parseFloat(item.qty2);
+                                    // barang1IdQtyMap[barang1Id].qty_isi += parseFloat(item.qty_isi);
+                                    // barang1IdQtyMap[barang1Id].banyakData += parseFloat(1);
+                                    // barang1IdQtyMap[barang1Id].hasilWithPersentase += parseFloat(item.hasilWithPersentase);
                                 } else {
                                     // Initialize a new entry for this barang1_id
-                                    barang1IdQtyMap[barang1Id] = {
+                                    barang1IdQtyMap[barang1Id][barang2Id] = {
                                         barang1_id: barang1Id,
+                                        barang2_id: barang2Id,
                                         barang_name: barang_name,
                                         kode_barang: kode_barang,
                                         kode_satuan: kode_satuan,
+                                        spesifikasi: spesifikasi,
+                                        production_result_detail_id: production_result_detail_id,
+                                        production_result_id: production_result_id,
+                                        satuan_id: satuan_id,
+                                        bc_id: bc_id,
+                                        stock_id: stock_id,
+                                        no_aju: no_aju,
+                                        stock_dokumen: stock_dokumen,
                                         qty: parseFloat(item.qty),
                                         qty2: parseFloat(item.qty2),
                                         qty_isi: parseFloat(item.qty_isi),
@@ -662,21 +698,24 @@
                         for (let key in barang1IdQtyMap) {
                             if (barang1IdQtyMap.hasOwnProperty(key)) {
                                 let group = barang1IdQtyMap[key];
-                                // Create a new item with the aggregated qty
-                                let newItem = {
-                                    barang1_id: group.barang1_id,
-                                    qtyTotal: group.qty,
-                                    qty2: (group.qty2 / group.banyakData),
-                                    qty_isi: (group.qty_isi / group.banyakData),
-                                    barang_name: group.barang_name,
-                                    kode_barang: group.kode_barang,
-                                    kode_satuan: group.kode_satuan,
-                                    hasilWithPersentase: group.hasilWithPersentase,
-                                };
+                                let barang1IdArr = Object.values(barang1IdQtyMap[key]);
+
+                                // let newItem = {
+                                //     barang1_id: group.barang1_id,
+                                //     qtyTotal: group.qty,
+                                //     qty2: (group.qty2 / group.banyakData),
+                                //     qty_isi: (group.qty_isi / group.banyakData),
+                                //     barang_name: group.barang_name,
+                                //     kode_barang: group.kode_barang,
+                                //     kode_satuan: group.kode_satuan,
+                                //     hasilWithPersentase: group.hasilWithPersentase,
+                                // };
                                 // list_items_barang_jadi_kaleng.push(newItem);
-                                list_items_barang_jadi_frozen.push(newItem);
+                                list_items_barang_jadi_frozen.push(barang1IdArr);
+
                             }
                         }
+
 
                         drawTablePembelian();
                         drawTableDigunakan();
@@ -2257,36 +2296,65 @@
         if (list_items_barang_jadi_frozen.length === 0) {
             row += '<tr><td colspan="7" class="text-center">Data Barang Tidak Ada</td></tr>';
             $('.tfoot-rasio-frozen').append(row);
+
         } else {
+
             var total_qty = 0;
             var total_harga_satuan = 0;
             var total_harga_total = 0;
-            list_items_barang_jadi_frozen.map((item, index) => {
-                var qty = parseFloat(item.qtyTotal);
-                var harga_satuan = 0;
-                var harga_total = 0;
 
-                total_qty += qty;
-                total_harga_satuan += harga_satuan;
-                total_harga_total += harga_total;
-
-                row += '<tr style="color:whitesmoke;text-align: center;">';
-                row += '<td>' + no + '</td>';
-                row += '<td>' + item.kode_barang + '</td>';
-                row += '<td>' + item.barang_name + '</td>';
-                row += '<td>' + item.kode_satuan + '</td>';
-                row += '<td>' +
-                    '<input style="width: 350px;" class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
-                    '</td>';
-                row += '<td>' +
-                    '<input style="width: 350px;" class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
-                    '</td>';
-                row += '<td>' +
-                    '<input style="width: 350px;" class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
-                    '</td>';
-                row += '</tr>';
-                no++;
+            list_items_barang_jadi_frozen.forEach(function(item, outerIndex) {
+                item.forEach(function(items, innerIndex) {
+                    var harga_satuan = 0;
+                    var harga_total = 0;
+                    row += '<tr style="color:whitesmoke;text-align: center;">';
+                    row += '<td>' + no + '</td>';
+                    row += '<td>' + items.kode_barang + '</td>';
+                    row += '<td>' + items.barang_name + " - " + items.spesifikasi + '</td>';
+                    row += '<td>' + items.kode_satuan + '</td>';
+                    row += '<td>' +
+                        '<input readonly class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-outerIndex = "' + outerIndex + '" data-innerIndex="' + innerIndex + '" value="' + items.qty + '">' +
+                        '</td>';
+                    row += '<td>' +
+                        '<input  class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-outerIndex = "' + outerIndex + '" data-innerIndex="' + innerIndex + '" value="' + (harga_satuan) + '">' +
+                        '</td>';
+                    row += '<td>' +
+                        '<input  class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-outerIndex = "' + outerIndex + '" data-innerIndex="' + innerIndex + '" value="' + formatRupiah(harga_total) + '">' +
+                        '</td>';
+                    row += '</tr>';
+                    no++;
+                    total_qty += items.qty;
+                    total_harga_satuan += harga_satuan;
+                    total_harga_total += harga_total;
+                });
             });
+
+            // list_items_barang_jadi_frozen.map((item, index) => {
+            //     var qty = parseFloat(item.qtyTotal);
+            //     var harga_satuan = 0;
+            //     var harga_total = 0;
+
+            //     total_qty += qty;
+            //     total_harga_satuan += harga_satuan;
+            //     total_harga_total += harga_total;
+
+            //     row += '<tr style="color:whitesmoke;text-align: center;">';
+            //     row += '<td>' + no + '</td>';
+            //     row += '<td>' + item.kode_barang + '</td>';
+            //     row += '<td>' + item.barang_name + '</td>';
+            //     row += '<td>' + item.kode_satuan + '</td>';
+            //     row += '<td>' +
+            //         '<input style="width: 350px;" class="form-control jumlah-barang text-center readonly" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + qty + '">' +
+            //         '</td>';
+            //     row += '<td>' +
+            //         '<input style="width: 350px;" class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + (harga_satuan) + '">' +
+            //         '</td>';
+            //     row += '<td>' +
+            //         '<input style="width: 350px;" class="form-control harga-total-awal text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="' + index + '" value="' + formatRupiah(harga_total) + '">' +
+            //         '</td>';
+            //     row += '</tr>';
+            //     no++;
+            // });
             rowFooter += '<tr>';
             rowFooter += '<td colspan="4"></td>';
             rowFooter += '<td>' +
@@ -2309,20 +2377,20 @@
                 var totalTotalHargaQty = 0;
                 $('.harga-satuan').each(function() {
                     var harga = parseFloat($(this).val().replace(/Rp|\./g, ""));
-                    var index = $(this).data('index');
-                    var qty = ($('.jumlah-barang[data-index="' + index + '"]').val());
-
+                    var outerIndex = $(this).data('outerindex');
+                    var innerIndex = $(this).data('innerindex');
+                    var qty = ($('.jumlah-barang[data-outerindex="' + outerIndex + '"][data-innerindex="' + innerIndex + '"]').val());
                     totalHarga += isNaN(harga) ? 0 : harga;
                     totalHargaQty = harga * (isNaN(qty) ? 0 : qty);
                     totalTotalHargaQty += totalHargaQty;
 
                     // Update the array with the new harga_satuan value
                     if (!isNaN(harga)) {
-                        list_items_barang_jadi_frozen[index].harga_satuan = harga;
-                        list_items_barang_jadi_frozen[index].harga_total = totalHargaQty;
+                        list_items_barang_jadi_frozen[outerIndex][innerIndex].harga_satuan = harga;
+                        list_items_barang_jadi_frozen[outerIndex][innerIndex].harga_total = totalHargaQty;
                     }
 
-                    $('.harga-total-awal[data-index="' + index + '"]').val(formatRupiah(parseFloat(totalHargaQty)));
+                    $('.harga-total-awal[data-outerindex="' + outerIndex + '"][data-innerindex="' + innerIndex + '"]').val(formatRupiah(parseFloat(totalHargaQty)));
                     $(this).val(harga);
                 });
 
@@ -2457,7 +2525,7 @@
 
             rowFooter += `
             <tr>
-                <td colspan="4"></td>
+                <td colspan="4">GrandTotal</td>
                 <td>
                     <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${data.reduce((sum, item) => sum + parseFloat(item.qtyTotal), 0)}">
                 </td>
@@ -2477,9 +2545,9 @@
                 </td>
                 <td></td>
             </tr>`;
-
             $('.tfoot-rasio-akhir').append(rowFooter);
             $('.body-table-rasio-akhir').append(row);
+            $('.body-table-rasio-akhir').append(rowSubTotal);
 
             // Update total harga if any input with class 'harga' changes
             $('.harga').on('change', function() {
@@ -2494,7 +2562,260 @@
             });
         }
     };
+    const drawTableRasioAkhirFrozen = function(data) {
+        console.log(data);
+        $('.body-table-rasio-akhir').empty();
+        $('.tfoot-rasio-akhir').empty();
 
+        let row = '';
+        let rowSubTotal = ``;
+
+        let rowFooter = ``;
+
+        let no = 1;
+
+        var amount = 0;
+        var qtyTotalPenerimaan = 0;
+        var biayaSubsidi = 0;
+        var biayaLain = 0;
+        var biayaKopek = 0;
+
+        list_items_barang_digunakan_alokasi.map((item, index) => {
+            qtyTotalPenerimaan += item.totalQty !== undefined ? item.totalQty : 0;
+            amount += item.totalHarga !== undefined ? item.totalHarga : 0;
+        });
+
+        const hargaTotalPenerimaan = amount + biayaSubsidi + biayaLain + biayaKopek;
+
+        if (data.length === 0) {
+            row += '<tr><td colspan="12" class="text-center">Data Barang Tidak Ada</td></tr>';
+            $('.tfoot-rasio-akhir').append(row);
+        } else {
+            let rasioTotal = 0;
+            let totalHargaRasio = 0;
+            let totalTotalHargaRasio = 0;
+            let totalTotalHargaSatuan = 0;
+
+            let totalHargaTotalManual = 0;
+            let totalQtyTanpaManual = 0;
+
+
+            data.forEach(item => {
+                item.forEach(items => {
+                    totalHargaTotalManual += parseFloat(items.harga_total);
+                    if (items.harga_satuan == 0) {
+                        totalQtyTanpaManual += parseFloat(items.qtyTotal);
+                    }
+                })
+            });
+
+            let grandTotalQty = 0;
+            let grandTotalQtyIsi = 0;
+            let grandTotalHasil = 0;;
+            let grandTotalHargaSatuan = 0;
+            let grandTotalHarga = 0;
+
+
+            data.forEach((item, outerIndex) => {
+                let calculatedHargaTotal = 0;
+                let itemHargaTotal = 0;
+                let hargaSatuan = 0;
+                let totalQtyAll = 0;
+                let rasioTanpaManual = 0;
+                let totalQtyPerBarangMaster = 0;
+                let totalQtyIsiPerBarangMaster = 0;
+                let totalHasilPerBarangMaster = 0;
+                let totalHargaSatuanPerBarangMaster = 0;
+                let totalHargaPerBarangMaster = 0;
+
+
+                item.forEach((items, innerIndex) => {
+                    totalQtyPerBarangMaster += parseFloat(items.qty);
+                    grandTotalQty += parseFloat(items.qty);
+                    totalQtyIsiPerBarangMaster += parseFloat(items.qty_isi);
+                    grandTotalQtyIsi += parseFloat(items.qty_isi);
+                    totalHasilPerBarangMaster += parseFloat(items.hasilWithPersentase);
+                    grandTotalHasil += parseFloat(items.hasilWithPersentase);
+                    let rasioPerBarangMaster = parseFloat(items.qty) / items.hasilWithPersentase;
+                    //update rasio barang to the array
+                    list_items_barang_jadi_frozen[outerIndex][innerIndex].rasio = rasioPerBarangMaster.toFixed(2);
+                    let calculatedHargaTotal = 0;
+                    if (isNaN(totalHargaTotalManual)) {
+                        calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan)) * (rasioPerBarangMaster / 100);
+                        // itemHargaTotal = item.hargaTotal ? parseFloat(item.hargaTotal) : parseFloat(calculatedHargaTotal);
+                    } else {
+                        if (item.harga_total == 0) {
+                            calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasioPerBarangMaster / 100);
+                            // itemHargaTotal = item.harga_total == 0 ? parseFloat(calculatedHargaTotal) : parseFloat(item.harga_total);
+                        } else {
+                            calculatedHargaTotal = (parseFloat(hargaTotalPenerimaan) - parseFloat(totalHargaTotalManual)) * (rasioPerBarangMaster / 100);
+                            // itemHargaTotal = item.harga_total == 0 ? parseFloat(calculatedHargaTotal) : parseFloat(item.harga_total);
+                        }
+                    }
+
+                    if (items.harga_satuan == 0 || items.harga_satuan == undefined) {
+                        hargaSatuan = (parseFloat(calculatedHargaTotal) / parseFloat(items.qty));
+                        list_items_barang_jadi_frozen[outerIndex][innerIndex].harga_satuan = hargaSatuan;
+                    } else {
+                        hargaSatuan = (parseFloat(items.harga_satuan));
+                    }
+                    totalHargaSatuanPerBarangMaster += hargaSatuan;
+                    totalHargaPerBarangMaster += calculatedHargaTotal;
+                    grandTotalHargaSatuan += hargaSatuan;
+                    grandTotalHarga += calculatedHargaTotal;
+
+                    row = `
+                    <tr style="color:whitesmoke;text-align: center;">
+                            <td>${no}</td>
+                            <td>${items.kode_barang}</td>
+                            <td>${items.barang_name} - ${items.spesifikasi}</td>
+                            <td>${items.kode_satuan}</td>
+                                        <td>
+                                            <input readonly style="width: 150px;" class="form-control jumlah-barang text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-outerindex="${outerIndex}"  data-innerindex="${innerIndex}" value="${items.qty}">
+                                        </td>
+                                        <td>
+                                            <input readonly style="width: 150px;" class="form-control jumlah-barang-berat text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-outerindex="${outerIndex}"  data-innerindex="${innerIndex}" value="${items.qty_isi}">
+                                        </td>
+                                        <td>
+                                            <input style="width: 150px;" class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-outerindex="${outerIndex}"  data-innerindex="${innerIndex}" value="${items.hasilWithPersentase}">
+                                        </td>
+                                        <td>
+                                            <input style="width: 150px;" class="form-control filling-weight-barang text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-outerindex="${outerIndex}"  data-innerindex="${innerIndex}" value="${items.qty2}">
+                                        </td>
+                                        <td>
+                                            <input style="width: 150px;" class="form-control rasio text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-outerindex="${outerIndex}"  data-innerindex="${innerIndex}" value="-">
+                                        </td>
+                                        <td>
+                                            <input style="width: 200px;" class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text"  data-outerindex="${outerIndex}"  data-innerindex="${innerIndex}" value="${formatRupiah(hargaSatuan)}"  >
+                                        </td>
+                                        <td>
+                                            <input style="width: 200px;" class="form-control harga text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text"   data-outerindex="${outerIndex}"  data-innerindex="${innerIndex}" value="${items.harga_total == 0 || items.harga_total == undefined ? formatRupiah(calculatedHargaTotal) : formatRupiah(items.harga_total)}"  >
+                                        </td>
+                                        <td>
+                                            <input style="width: 200px;" class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text"   data-outerindex="${outerIndex}"  data-innerindex="${innerIndex}" value="${items.harga_total == 0 || items.harga_total == undefined ? formatRupiah(calculatedHargaTotal / items.hasilWithPersentase) : formatRupiah(items.harga_total / items.hasilWithPersentase)}">
+                                        </td>
+                                    </tr>
+                                     
+                    `;
+                    $('.body-table-rasio-akhir').append(row);
+
+                    no++;
+                });
+
+                rowSubTotal = `
+                   <tr style="color:whitesmoke;text-align: center;">
+                        <td colspan="4"> Sub Total </td>
+                        <td>
+                            <input class="form-control sub-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${totalQtyPerBarangMaster}">
+                        </td>
+                        <td>
+                            <input class="form-control sub-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${totalQtyIsiPerBarangMaster}">
+                        </td>
+                        <td>
+                            <input class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${totalHasilPerBarangMaster}">
+                        </td>
+                
+                        <td></td>
+                        <td>
+                            <input class="form-control rasio-sub-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${(parseFloat(totalQtyPerBarangMaster)/totalHasilPerBarangMaster).toFixed(2)}%">
+                        </td>
+                           <td>
+                            <input class="form-control harga-satuan-sub-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-index="${outerIndex}"  type="text" value="${formatRupiah(totalHargaSatuanPerBarangMaster) }">
+                        </td>
+                    
+                        <td>
+                            <input class="form-control harga-sub-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-index="${outerIndex}" type="text" value="${formatRupiah(totalHargaPerBarangMaster)}">
+                        </td>
+                        <td></td>
+                     </tr>
+                `;
+                $('.body-table-rasio-akhir').append(rowSubTotal);
+                totalQtyPerBarangMaster = 0;
+                totalQtyIsiPerBarangMaster = 0;
+                totalHasilPerBarangMaster = 0;
+                totalHargaPerBarangMaster = 0;
+            });
+
+
+
+            rowFooter += `
+            <tr>
+                <td colspan="4">GrandTotal</td>
+                <td>
+                    <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${grandTotalQty}">
+                </td>
+                <td>
+                    <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${grandTotalQtyIsi}">
+                </td>
+                <td>
+                    <input class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${ grandTotalHasil}">
+                </td>
+                <td></td>
+                <td>
+                    <input class="form-control rasio-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${(parseFloat(grandTotalQty)/grandTotalHasil).toFixed(2) }%">
+                </td>
+                <td></td>
+                <td>
+                    <input class="form-control harga-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${formatRupiah(grandTotalHarga)}">
+                </td>
+                <td></td>
+            </tr>`;
+
+            $('.tfoot-rasio-akhir').append(rowFooter);
+
+
+
+            $('.harga-satuan').on('change', function() {
+                var sum = 0;
+                var innerindex = $(this).data('innerindex');
+                var outerindex = $(this).data('outerindex');
+                var harga_satuan = parseFloat($(this).val().replace(/Rp|\./g, ""));
+                // Update the array with the new harga_satuan value
+                if (!isNaN(harga_satuan)) {
+                    list_items_barang_jadi_frozen[outerindex][innerindex].harga_satuan = harga_satuan;
+                }
+                // var index = $(this).data('index');
+                // var hargaSatuanDiGanti = $(`.harga-satuan[data-id="${id}"][data-index="${index}"]`).val();
+                // var jumlahBarang = $(`.jumlah-barang[data-id="${id}"][data-index="${index}"]`).val()
+                // $(`.harga[data-index="${index}"]`).val(parseFloat(hargaSatuanDiGanti) * jumlahBarang);
+                $(`.harga-satuan[data-outerindex="${outerindex}"]`).each(function() {
+                    const harga = parseFloat($(this).val().replace(/Rp|\./g, ""));
+                    $(this).val(formatRupiah(harga));
+                    sum += harga;
+                });
+                $(`.harga-satuan-sub-total[data-index="${outerindex}"]`).val(formatRupiah(sum));
+
+            });
+
+            // Update total harga if any input with class 'harga' changes
+            $('.harga').on('change', function() {
+                var innerindex = $(this).data('innerindex');
+                var outerindex = $(this).data('outerindex');
+                let subTotalHarga = 0;
+                let hargaTotal = 0;
+                $(`.harga[data-outerindex="${outerindex}"]`).each(function() {
+                    const harga = parseFloat($(this).val().replace(/Rp|\./g, ""));
+                    $(this).val(formatRupiah(harga));
+                    subTotalHarga += isNaN(harga) ? 0 : harga;
+                });
+                $(`.harga-sub-total[data-index="${outerindex}"]`).val(formatRupiah(subTotalHarga));
+                recalculateTotalHarga();
+            });
+
+            function recalculateTotalHarga() {
+                let totalHarga = 0;
+                // Sum all sub-totals
+                $('.harga-sub-total').each(function() {
+                    const harga = parseFloat($(this).val().replace(/Rp|\./g, ""));
+                    totalHarga += isNaN(harga) ? 0 : harga;
+                });
+
+                // Update the total harga
+                $('.harga-total').val(formatRupiah(totalHarga));
+            }
+        }
+
+    };
     const drawTableRasioTerhadapBahanBaku = function(data) {
         $('.body-table-rasio-terhadap-bahan-baku').empty();
         $('.tfoot-rasio-terhadap-bahan-baku').empty();
@@ -2654,20 +2975,8 @@
         <?php endforeach; ?>
         drawTableDigunakan();
 
-        <?php foreach ($rasioBarangJadi as $value) : ?>
-            list_items_barang_jadi.push({
-                'rasio_barang_jadi_id': <?= json_encode($value->id) ?>,
-                'barang_name': <?= json_encode($value->barang_name) ?>,
-                'spesifikasi': <?= json_encode($value->spesifikasi) ?>,
-                'kode_barang': <?= json_encode($value->kode_barang) ?>,
-                'kode_satuan': <?= json_encode($value->kode_satuan) ?>,
-                'qtyTotal': parseFloat(<?= json_encode($value->qty_barang) ?>),
-                'rasio': parseFloat(<?= json_encode($value->rasio_barang) ?>),
-                'hargaTotal': parseFloat(<?= json_encode($value->harga_barang) ?>),
-                'totalQtyAll': parseFloat(<?= json_encode($value->totalQtyAll) ?>),
-            });
-        <?php endforeach; ?>
-        drawTableRasio();
+
+
 
     <?php endif; ?>
 
@@ -3019,7 +3328,6 @@
                             let data = new FormData(document.querySelector(".create-form"));
                             data.append("items_digunakan", JSON.stringify(list_items_barang_digunakan));
                             data.append("items_digunakan_pembelian", JSON.stringify(list_items_barang_pembelian));
-                            data.append("items_jadi", JSON.stringify(list_items_barang_jadi));
                             data.append("items_digunakan_alokasi", JSON.stringify(list_items_barang_digunakan_alokasi));
                             data.append("items_digunakan_material_2", JSON.stringify(list_items_barang_digunakan_material_2));
                             data.append("saldo_awal", JSON.stringify(list_items_saldo_awal));
@@ -3030,6 +3338,9 @@
                             data.append("labor_cost", JSON.stringify(list_items_labor_cost));
                             data.append("overhead_cost", JSON.stringify(list_items_overhead_cost));
                             data.append("fixed_cost", JSON.stringify(list_items_fixed_cost));
+                            data.append("items_jadi", JSON.stringify(list_items_barang_jadi));
+                            data.append("item_jadi_frozen", JSON.stringify(list_items_barang_jadi_frozen));
+                            data.append("tipe_bahan", tipe_bahan);
 
                             let id = $(".id").val();
                             // UPDATE
