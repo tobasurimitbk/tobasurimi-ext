@@ -863,7 +863,7 @@
                         `
                 ));
 
-                newRow.append($('<td>').text(total.toFixed(2)));
+                newRow.append($('<td>').text(total.toFixed(3)));
                 table.find('tbody').append(newRow);
 
                 jumboTotal += parseFloat(v.jumbo);
@@ -893,7 +893,7 @@
             newRow.append($('<td>').text(clawTotal.toFixed(2)));
             newRow.append($('<td>').text(mhTotal.toFixed(2)));
             newRow.append($('<td>').text(cfTotal.toFixed(2)));
-            newRow.append($('<td>').text(totalTotal.toFixed(2)));
+            newRow.append($('<td>').text(totalTotal.toFixed(3)));
             table.find('tbody').append(newRow);
 
             // DATATABLE 2
@@ -1127,6 +1127,14 @@
                 var presentaseClaw = clawTotal != 0 ? (clawTotal * 100 / totalTotal) : 0;
                 var presentaseMh = mhTotal != 0 ? (mhTotal * 100 / totalTotal) : 0;
                 var presentaseCf = cfTotal != 0 ? (cfTotal * 100 / totalTotal) : 0;
+                presentaseJumbo = Math.round(presentaseJumbo);
+                presentaseExLump = Math.round(presentaseExLump);
+                presentaseLump = Math.round(presentaseLump);
+                presentaseSpecial = Math.round(presentaseSpecial);
+                presentaseClaw = Math.round(presentaseClaw);
+                presentaseMh = Math.round(presentaseMh);
+                presentaseCf = Math.round(presentaseCf);
+
                 var totalPresentase = presentaseJumbo + presentaseExLump + presentaseLump + presentaseSpecial + presentaseClaw + presentaseMh + presentaseCf;
 
                 var newRow2 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');

@@ -213,6 +213,122 @@ class BiayaKepitingModel extends Model
         return $jasaVendorOutDetail;
     }
 
+    public function dropdownBarangPrint($jasaVendorInID, $id = null)
+    {
+        $jasaVendorInModel = new JasaVendorInModel();
+        $jasaVendorOutModel = new JasaVendorOutModel();
+        $biayaKepitingDetailModel = new BiayaKepitingDetailModel();
+        $stockDetail2Model = new StockDetail2Model();
+
+        // CARI JASA VENDOR OUT ID
+        $jasaVendorIn = $jasaVendorInModel->find($jasaVendorInID);
+
+        $jasaVendorOutIdArr = json_decode($jasaVendorIn['multiple_jasa_vendor_out_id']);
+
+        // CREATE
+        $selectQryJasaVendorOut = "
+            barang_master.id AS barang_master_id,
+            barang_master_spesifikasi.id AS barang_master_spesifikasi_id,
+            jasa_vendor_out.tanggal AS tanggal_keluar,
+            SUM(jasa_vendor_out_detail.qty) as qty_kopek,
+            jasa_vendor_out_detail.jasa_vendor_out_id,
+            jasa_vendor_out_detail.stock_out_id,
+            jasa_vendor_out_detail.bc_out_id,
+            jasa_vendor_out_detail.no_aju_out,
+            jasa_vendor_out_detail.stock_dokumen,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS nama_barang
+        ";
+
+        $jasaVendorOutDetail = $jasaVendorOutModel
+            ->select($selectQryJasaVendorOut)
+            ->join('jasa_vendor_out_detail', 'jasa_vendor_out_detail.jasa_vendor_out_id = jasa_vendor_out.id')
+            ->join('stock', 'stock.id = jasa_vendor_out_detail.stock_out_id')
+            ->join('barang_master', 'barang_master.id = stock.barang1_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
+            ->whereIn('jasa_vendor_out.id', $jasaVendorOutIdArr)
+            ->where('jasa_vendor_out_detail.deletedAt', null)
+            ->groupBy('jasa_vendor_out_detail.stock_out_id')
+            ->findAll();
+
+        for ($i = 0; $i < count($jasaVendorOutDetail); $i++) {
+            $jasaVendorOutDetail[$i]['tanggal_masuk'] = date('d/m/Y', strtotime($jasaVendorIn['tanggal']));
+            $jasaVendorOutDetail[$i]['tanggal_keluar'] = date('d/m/Y', strtotime($jasaVendorOutDetail[$i]['tanggal_keluar']));
+            $jasaVendorOutDetail[$i]['supplier_name'] = "";
+
+            $stockDetailList = $stockDetail2Model->getStockListDetail(
+                $jasaVendorOutDetail[$i]['stock_out_id'],
+                $jasaVendorOutDetail[$i]['bc_out_id'],
+                $jasaVendorOutDetail[$i]['no_aju_out'],
+                $jasaVendorOutDetail[$i]['stock_dokumen'],
+            );
+
+            $jasaVendorOutDetail[$i]['supplier_name'] = $stockDetailList == null ? "-" : $stockDetailList['supplier_name'];
+
+            if ($id != null) {
+                $biayaKepitingDetail = $biayaKepitingDetailModel
+                    ->where('biaya_kepiting_id', $id)
+                    ->where('jasa_vendor_in_id', $jasaVendorInID)
+                    ->where('barang_master_id', $jasaVendorOutDetail[$i]['barang_master_id'])
+                    ->where('barang_master_spesifikasi_id', $jasaVendorOutDetail[$i]['barang_master_spesifikasi_id'])
+                    ->first();
+
+                $jasaVendorOutDetail[$i]['jumbo'] = $biayaKepitingDetail['jumbo'];
+                $jasaVendorOutDetail[$i]['ex_lump'] = $biayaKepitingDetail['ex_lump'];
+                $jasaVendorOutDetail[$i]['lump'] = $biayaKepitingDetail['lump'];
+                $jasaVendorOutDetail[$i]['special'] = $biayaKepitingDetail['special'];
+                $jasaVendorOutDetail[$i]['claw'] = $biayaKepitingDetail['claw'];
+                $jasaVendorOutDetail[$i]['mh'] = $biayaKepitingDetail['mh'];
+                $jasaVendorOutDetail[$i]['cf'] = $biayaKepitingDetail['cf'];
+            } else {
+
+                $jasaVendorOutDetail[$i]['jumbo'] = 0;
+                $jasaVendorOutDetail[$i]['ex_lump'] = 0;
+                $jasaVendorOutDetail[$i]['lump'] = 0;
+                $jasaVendorOutDetail[$i]['special'] = 0;
+                $jasaVendorOutDetail[$i]['claw'] = 0;
+                $jasaVendorOutDetail[$i]['mh'] = 0;
+                $jasaVendorOutDetail[$i]['cf'] = 0;
+            }
+        }
+
+        $result = [];
+
+        foreach ($jasaVendorOutDetail as $item) {
+            $key = $item['tanggal_masuk'] . '|' . $item['supplier_name'];
+
+            if (!isset($result[$key])) {
+                $result[$key] = [
+                    'tanggal_masuk' => $item['tanggal_masuk'],
+                    'supplier_name' => $item['supplier_name'],
+                    'jumbo' => 0,
+                    'ex_lump' => 0,
+                    'lump' => 0,
+                    'special' => 0,
+                    'claw' => 0,
+                    'mh' => 0,
+                    'cf' => 0,
+                    'qty_kopek' => 0
+                ];
+            }
+
+            $result[$key]['jumbo'] += (float)$item['jumbo'];
+            $result[$key]['ex_lump'] += (float)$item['ex_lump'];
+            $result[$key]['lump'] += (float)$item['lump'];
+            $result[$key]['special'] += (float)$item['special'];
+            $result[$key]['claw'] += (float)$item['claw'];
+            $result[$key]['mh'] += (float)$item['mh'];
+            $result[$key]['cf'] += (float)$item['cf'];
+            $result[$key]['qty_kopek'] += (float)$item['qty_kopek'];
+        }
+
+        $result = array_values($result);
+
+
+        return $result;
+    }
+
     public function dropdownPerolehanGaji($id = null)
     {
         $metaDataModel = new MetadataModel();

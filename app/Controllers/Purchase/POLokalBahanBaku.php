@@ -589,6 +589,8 @@ class POLokalBahanBaku extends BaseController
             if ($dataPO) {
                 $dataPODetail = $this->RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
 
+                // dd($dataPODetail);
+
                 $totalPrice = 0;
                 $totalDailyPrice = 0;
                 $totalQty = 0;

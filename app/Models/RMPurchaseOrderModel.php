@@ -528,6 +528,7 @@ class RMPurchaseOrderModel extends Model
         SUM(rm_purchase_order_details.daily_price) AS dppHarian,
         SUM(rm_purchase_order_details.monthly_price) AS dppBulanan,
         SUM(rm_purchase_order_details.general_price) AS dppUmum,
+        SUM(rm_purchase_order_details.qty) AS totalQty,
         rm_purchase_orders.pph AS poPPH
         ";
         $condition = [
@@ -583,6 +584,7 @@ class RMPurchaseOrderModel extends Model
         suppliers.no_npwp AS supplierNpwp,
         suppliers.name AS supplierName, 
         barang_master.barang_name AS barangName, 
+        SUM(rm_purchase_order_details.qty) AS totalQty,
         SUM(rm_purchase_orders.subsidi_langsung) AS subsidi,
         SUM(rm_purchase_order_details.daily_price) AS dppHarian,
         SUM(rm_purchase_order_details.monthly_price) AS dppBulanan,

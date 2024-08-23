@@ -116,7 +116,7 @@
                     <tr>
                         <th style="text-align: center;">No</th>
                         <th style="text-align: center;">Tanggal Masuk</th>
-                        <th style="text-align: center;">Barang</th>
+                        <th style="text-align: center;">Supplier</th>
 
 
                         <th style="text-align: center;">Qty Sebelum Kopek</th>
@@ -196,17 +196,17 @@
                         <tr>
                             <td><?= $no++ ?></td>
                             <td><?= $b['tanggal_masuk'] ?></td>
-                            <td><?= $b['nama_barang'] ?></td>
+                            <td><?= $b['supplier_name'] ?></td>
                             <td><?= number_format($b['qty_kopek'], 2) ?></td>
                             <td><?= number_format($rasio, 2) . " %" ?></td>
-                            <td><?= $b['jumbo'] ?></td>
-                            <td><?= $b['ex_lump'] ?></td>
-                            <td><?= $b['lump'] ?></td>
-                            <td><?= $b['special'] ?></td>
-                            <td><?= $b['claw'] ?></td>
-                            <td><?= $b['mh'] ?></td>
-                            <td><?= $b['cf'] ?></td>
-                            <td><?= $total ?></td>
+                            <td><?= number_format($b['jumbo'], 3) ?></td>
+                            <td><?= number_format($b['ex_lump'], 3) ?></td>
+                            <td><?= number_format($b['lump'], 3) ?></td>
+                            <td><?= number_format($b['special'], 3) ?></td>
+                            <td><?= number_format($b['claw'], 3) ?></td>
+                            <td><?= number_format($b['mh'], 3) ?></td>
+                            <td><?= number_format($b['cf'], 3) ?></td>
+                            <td><?= number_format($total, 3) ?></td>
                         </tr>
 
                     <?php endforeach; ?>
@@ -440,6 +440,7 @@
             </table>
         </div>
         <div class="pagebreak">
+            <br><br><br><br><br><br><br><br>
             <br><br><br><br><br><br><br><br>
             <table style="width: 100%;">
                 <tr>

@@ -271,11 +271,18 @@
         table.ajax.reload();
     });
 
-    $('.filter_supplier, .filter_barang').select2({
-        placeholder: "",
+    $('.filter_supplier').select2({
+        placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
         allowClear: true,
     })
+
+    $('.filter_barang').select2({
+        placeholder: "Pilih Supplier",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+
 
     $('.filter_supplier, .filter_barang')
         .parent('div')
