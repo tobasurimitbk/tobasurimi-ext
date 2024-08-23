@@ -698,7 +698,10 @@ class MaterialRequestKimia extends BaseController
 
     public function getListBarangIsInit()
     {
-        $addCondition = [];
+        $addCondition = [
+            "stock.company_id" => $this->this_company_id,
+            "barang_master.company_id" => $this->this_company_id
+        ];
         if ($this->request->getVar('type_barang') == "bahan_penolong" && $this->request->getVar('kondisi') == "nonkimia") {
             $addCondition = [
                 "parent_name !=" => "KIMIA"
