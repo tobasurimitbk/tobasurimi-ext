@@ -5,7 +5,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Pembayaran Invoice</h1>
-        <?php if (can('Pembayaran', 'Internasional', 'c')) : ?>
+        <?php if (can('Pembayaran', 'Pembayaran Invoice', 'c')) : ?>
             <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-invoice/create"); ?>">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
@@ -147,6 +147,57 @@
                 data: "amount",
                 className: "text-center"
             },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+                    let form = '';
+                    let status_posting = row.status_posting;
+
+
+                    form += ` <div class="mt-0">`;
+                    if (status_posting == '0') {
+                        form += `
+                            <?php if (can('Pembayaran', 'Pembayaran Invoice', 'd')) : ?>
+                                <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                        `;
+
+                        form += `
+                            <?php if (can('Pembayaran', 'Pembayaran Invoice', 'p')) : ?>
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-import/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                        `;
+
+                        form += `
+                            <?php if (can('Pembayaran', 'Pembayaran Invoice', 'a')) : ?>
+                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}', 1)" class="btn btn-success posting-spp">
+                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                        `;
+                    } else {
+                        form += `
+                            <?php if (can('Pembayaran', 'Pembayaran Invoice', 'p')) : ?>
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-import/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                        `;
+                    }
+
+                    form += ` </div>`;
+
+                    return form;
+                }
+            }
 
 
         ],

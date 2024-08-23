@@ -95,7 +95,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select no_dokumen" name="no_dokumen" id="no_dokumen">
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select no_dokumen" name="no_dokumen" id="no_dokumen">
                                 <option value=""></option>
                                 <?php if (!empty($dokumenList)): ?>
                                     <?php foreach ($dokumenList as $l): ?>
@@ -111,22 +111,15 @@
                 <div class="row">
 
                     <div class="col-md-4">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select customer" name="customer" id="customer">
-                                <option value=""></option>
-                                <?php if (!empty($customers)):   ?>
-                                    <?php foreach ($customers as $c):  ?>
-                                        <option <?= (!empty($detail)) ?  (($detail['customer_id']) == $c['id'] ? "selected" : "") : '' ?> value="<?= encrypt($c['id']); ?>"><?= $c['name']; ?></option>
-                                    <?php endforeach;  ?>
-                                <?php endif; ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Customer</label>
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input readonly name="customer" id="customer" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['customer_name'] : "" ?>" type="text" class="form-control customer" placeholder="Customer">
+                            <label for="floatingInput">Customer</label>
                         </div>
                     </div>
 
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select payment_methods " name="payment_methods" id="payment_methods">
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select payment_methods " name="payment_methods" id="payment_methods">
                                 <option value=""></option>
                                 <option value="BANK">BANK</option>
                                 <option value="CASH">CASH</option>
@@ -137,7 +130,7 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="<?= session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
+                            <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="<?= session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
@@ -147,7 +140,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" name="akun_kas" id="akun_kas">
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?>class="form-select" name="akun_kas" id="akun_kas">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($subsAkuns as $subs) : ?>
                                     <option <?= (!empty($detail)) ?  (($detail['akun_kas']) == $subs->id ? "selected" : "") : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
@@ -158,7 +151,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" name="akun_selisih" id="akun_selisih">
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select" name="akun_selisih" id="akun_selisih">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($subsAkuns as $subs) : ?>
                                     <option <?= (!empty($detail)) ?  (($detail['akun_selisih']) == $subs->id ? "selected" : "") : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
@@ -169,7 +162,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <textarea autocomplete="one-time-code" class="form-control keterangan" id="keterangan" name="keterangan"><?= !empty($detail) ? $detail['keterangan'] : "" ?> </textarea>
+                            <textarea <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> autocomplete="one-time-code" class="form-control keterangan" id="keterangan" name="keterangan"><?= !empty($detail) ? $detail['keterangan'] : "" ?> </textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
@@ -346,12 +339,8 @@
             allowClear: true
         }).change(function() {
             drawTable();
+            getCustomer();
         })
-        $('#customer').select2({
-            placeholder: "Pilih Customer",
-            theme: "bootstrap-5",
-            allowClear: true
-        });
 
 
         $('#payment_methods').select2({
@@ -517,7 +506,7 @@
                 var formData = new FormData();
                 formData.append('id', id);
                 $.ajax({
-                    url: "<?= base_url("pembayaran-po-lokal-bp/delete"); ?>",
+                    url: "<?= base_url("pembayaran-invoice/delete"); ?>",
                     data: formData,
                     method: "POST",
                     dataType: "json",
@@ -536,7 +525,7 @@
                             title: response.message,
                             confirmButtonColor: '#4e73df',
                         }).then((result) => {
-                            location.reload();
+                            window.location.href = "<?= base_url('pembayaran-invoice') ?>"
                         });
 
                     },
@@ -559,7 +548,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("pembayaran-po-lokal-bp/posting"); ?>",
+                    url: "<?= base_url("pembayaran-invoice/posting"); ?>",
                     data: {
                         id: id,
                     },
@@ -767,6 +756,26 @@
             }
         })
     }
+
+    function getCustomer() {
+        let invoice_id = $("#no_dokumen").val();
+        let type_invoice = $("#tipe_invoice").val();
+
+        $.ajax({
+            url: '<?= base_url('pembayaran-invoice/get-customer') ?>',
+            method: "GET",
+            data: {
+                invoice_id: invoice_id,
+                type_invoice: type_invoice
+            },
+            dataType: "json",
+            success: function(res) {
+                $('#customer').val(res);
+            }
+        })
+    }
+
+
     <?php if (!empty($detail)) : ?>
         drawTable();
 

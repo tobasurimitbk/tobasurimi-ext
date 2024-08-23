@@ -54,7 +54,19 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control name" id="total_panjar" name="total_panjar" placeholder="Nama" oninput="preventNegativeInput(this)" onchange="this.value = formatRupiah(this.value)">
+                                <select class="form-select tipe_panjar" name="tipe_panjar" id="tipe_panjar">
+                                    <option value="" selected></option>
+                                    <option value="MERAH">Merah</option>
+                                    <option value="PUTIH">Putih</option>
+
+                                </select>
+                                <label for="floatingInput">Tipe Panjar</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="total_panjar" name="total_panjar" placeholder="Nama" oninput="preventNegativeInput(this)" onkeyup="this.value = formatRupiah(this.value)">
                                 <label for="floatingInput">Total Panjar</label>
                             </div>
                         </div>
