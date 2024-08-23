@@ -316,24 +316,23 @@ class Invoice extends BaseController
             $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->insert($values);
 
             foreach ($postItemsData as $value) {
-                $valuesDetail = [
-                    "id_sales_order_invoice"        => $dataSalesOrderInvoice,
-                    "id_sales_order"                => $value['id_sales_order'],
-                    "id_barang_invoice"             => $value['id_barang'],
-                    "qty_invoice"                   => $value['qty_input'],
-                    "keterangan_invoice"            => "-",
-                    "discount_percentage_invoice"   => $value['disc'],
-                    "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
-                    "tax_invoice"                   => str_replace(',', '', $value['tax']),
-                    "amount_invoice"                => str_replace(',', '', $value['amount']),
-                ];
-                $this->SalesOrderInvoiceDetailModel->insert($valuesDetail);
+                if ($value['qty_input'] != 0) {
+                    $valuesDetail = [
+                        "id_sales_order_invoice"        => $dataSalesOrderInvoice,
+                        "id_sales_order"                => $value['id_sales_order'],
+                        "id_barang_invoice"             => $value['id_barang'],
+                        "qty_invoice"                   => $value['qty_input'],
+                        "keterangan_invoice"            => "-",
+                        "discount_percentage_invoice"   => $value['disc'],
+                        "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
+                        "tax_invoice"                   => str_replace(',', '', $value['tax']),
+                        "amount_invoice"                => str_replace(',', '', $value['amount']),
+                    ];
+                    $this->SalesOrderInvoiceDetailModel->insert($valuesDetail);
+                }
             }
 
             $this->SalesOrderInvoiceModel->db->transComplete();
-
-
-
 
             foreach ($postData['doc_id'] as $id) {
 
@@ -429,15 +428,13 @@ class Invoice extends BaseController
         $id = decrypt($id);
         //Get data sales order
         $dataSalesInvoiceOrder = $this->SalesOrderInvoiceModel->getSalesOrderInvoiceLokalById(($id));
-        $dataSalesInvoiceOrderDetail = $this->SalesOrderInvoiceDetailModel->where('id_sales_order_invoice', $id)->findAll();
+        $dataSalesInvoiceOrderDetail = $this->SalesOrderInvoiceDetailModel->withDeleted()->where('id_sales_order_invoice', $id)->findAll();
 
         if (empty($dataSalesInvoiceOrder)) {
             return view('errors/html/error_404', ['message' => 'Not Found']);
         }
 
         $documentList = $this->getDocNumberList($dataSalesInvoiceOrder->document_type, $dataSalesInvoiceOrder->id_customer);
-
-
 
         $tipeShipping = $this->MetadataModel->asObject()
             ->select(['id', 'value'])
@@ -447,17 +444,26 @@ class Invoice extends BaseController
         $documentData = $this->getDocDataaaa($dataSalesInvoiceOrder->document_type, json_decode($dataSalesInvoiceOrder->document_id));
 
 
-        foreach ($documentData->itemList as &$value) {
-            // var_dump($value);
+        foreach ($documentData->itemList as $key => &$value) {
             foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
+                // var_dump($value);
                 // var_dump($valueDetail);
 
                 if ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) {
+
+                    // Check if deletedAt is not empty
+                    if (!empty($valueDetail['deletedAt'])) {
+                        unset($documentData->itemList[$key]);
+                        break; // Break out of the inner loop since the item has been removed
+                    }
 
                     $value->id_detail_invoice = $valueDetail['id'];
                     $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 2);
                     $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
                     $value->amount = number_format(floatval($valueDetail['amount_invoice']), 0);
+                } else {
+                    unset($documentData->itemList[$key]);
+                    break; // Break out of the inner loop since the item has been removed
                 }
             }
         }
@@ -465,15 +471,25 @@ class Invoice extends BaseController
         // exit();
         //untuk yang sudah di posting
 
-        foreach ($documentData->itemListPosting as &$value) {
+        foreach ($documentData->itemListPosting as $key => &$value) {
             // var_dump($value);
             foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
 
                 if ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) {
+
+                    // Check if deletedAt is not empty
+                    if (!empty($valueDetail['deletedAt'])) {
+                        unset($documentData->itemListPosting[$key]);
+                        break; // Break out of the inner loop since the item has been removed
+                    }
+
                     $value->id_detail_invoice = $valueDetail['id'];
                     $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 2);
                     $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
                     $value->amount = number_format(floatval($valueDetail['amount_invoice']), 0);
+                } else {
+                    unset($documentData->itemList[$key]);
+                    break; // Break out of the inner loop since the item has been removed
                 }
             }
         }
@@ -608,17 +624,21 @@ class Invoice extends BaseController
                 // Periksa apakah $postItemsData tidak kosong sebelum melakukan iterasi
                 foreach ($postItemsData as $value) {
                     if (isset($value['id_detail_invoice'])) {
-                        $valuesDetail = [
-                            "id_barang_invoice"             => $value['id_barang'],
-                            "qty_invoice"                   => $value['qty_input'],
-                            "id_sales_order"                => $value['id_sales_order'],
-                            "keterangan_invoice"            => "-",
-                            "discount_percentage_invoice"   => $value['disc'],
-                            "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
-                            "tax_invoice"                   => str_replace(',', '', $value['tax']),
-                            "amount_invoice"                => str_replace(',', '', $value['amount']),
-                        ];
-                        $this->SalesOrderInvoiceDetailModel->update($value['id_detail_invoice'], $valuesDetail);
+                        if ($value['qty_input'] != 0) {
+                            $valuesDetail = [
+                                "id_barang_invoice"             => $value['id_barang'],
+                                "qty_invoice"                   => $value['qty_input'],
+                                "id_sales_order"                => $value['id_sales_order'],
+                                "keterangan_invoice"            => "-",
+                                "discount_percentage_invoice"   => $value['disc'],
+                                "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
+                                "tax_invoice"                   => str_replace(',', '', $value['tax']),
+                                "amount_invoice"                => str_replace(',', '', $value['amount']),
+                            ];
+                            $this->SalesOrderInvoiceDetailModel->update($value['id_detail_invoice'], $valuesDetail);
+                        } else {
+                            $this->SalesOrderInvoiceDetailModel->where('id', $value['id_detail_invoice'])->delete();
+                        }
                     }
                 }
             } else {
@@ -638,18 +658,20 @@ class Invoice extends BaseController
                     }
                 }
                 foreach ($postItemsData as $value) {
-                    $valuesDetail = [
-                        "id_sales_order_invoice"        => $payload['id'],
-                        "id_barang_invoice"             => $value['id_barang'],
-                        "qty_invoice"                   => $value['qty_input'],
-                        "id_sales_order"                => $value['id_sales_order'],
-                        "keterangan_invoice"            => "-",
-                        "discount_percentage_invoice"   => $value['disc'],
-                        "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
-                        "tax_invoice"                   => str_replace(',', '', $value['tax']),
-                        "amount_invoice"                => str_replace(',', '', $value['amount']),
-                    ];
-                    $this->SalesOrderInvoiceDetailModel->insert($valuesDetail);
+                    if ($value['qty_input'] != 0) {
+                        $valuesDetail = [
+                            "id_sales_order_invoice"        => $payload['id'],
+                            "id_barang_invoice"             => $value['id_barang'],
+                            "qty_invoice"                   => $value['qty_input'],
+                            "id_sales_order"                => $value['id_sales_order'],
+                            "keterangan_invoice"            => "-",
+                            "discount_percentage_invoice"   => $value['disc'],
+                            "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
+                            "tax_invoice"                   => str_replace(',', '', $value['tax']),
+                            "amount_invoice"                => str_replace(',', '', $value['amount']),
+                        ];
+                        $this->SalesOrderInvoiceDetailModel->insert($valuesDetail);
+                    }
                 }
 
                 //input baru

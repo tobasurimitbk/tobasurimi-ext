@@ -383,13 +383,7 @@
     });
     // Display the date on the webpage
     $(document).ready(function() {
-
-        // let customerId = $('.id_customer option:selected').val();
-        // let docType = $('#doc_type option:selected').val();
-
-
         <?php if ($termin == "") : ?>
-
             getTerminList(this.value);
         <?php endif; ?>
 
@@ -437,8 +431,6 @@
             getDocumentList(docType, customerId);
         });
 
-
-
         $("#tanggal_faktur").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
@@ -471,11 +463,6 @@
             placeholder: "",
             theme: "bootstrap-5"
         })
-
-
-        //CSS SELECT2 FLOATING LABEL
-
-
         // Surat jalan
         $('.id_surat_jalan').select2({
             placeholder: "",
@@ -483,10 +470,6 @@
         })
 
         //nomor faktur
-
-
-
-
         function getDocumentList(docType, idCustomer) {
 
             $.ajax({
@@ -503,11 +486,7 @@
             });
         }
 
-
-
         function getTerminList() {
-
-
             $.ajax({
                 url: `<?= base_url("metadata/dropdown"); ?>`,
                 method: "GET",
@@ -584,7 +563,7 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-                    console.log(res);
+                    // console.log(res);
                     // Populate the form fields with document data
                     $('#salesName').val(res.salesName);
                     $('#customerName').val(res.customerName);
@@ -619,7 +598,8 @@
             });
         }
 
-        <?php if (!empty($documentData)) : ?> <?php if ($data->status_posting == "0") : ?>
+        <?php if (!empty($documentData)) : ?>
+            <?php if ($data->status_posting == "0") : ?>
                 const itemList = <?= json_encode($documentData->itemList) ?>;
             <?php else : ?>
                 const itemList = <?= json_encode($documentData->itemListPosting) ?>;
@@ -632,11 +612,6 @@
             // drawTableItem(itemList);
 
         <?php endif; ?>
-
-
-
-
-
         $('#tax_status').on('input change paste', function() {
             if (!this.checked) {
                 $('#include_tax').prop('checked', false);
@@ -713,148 +688,164 @@
     $(".btn-submit").click(function() {
         // console.log(list_items);
         var noDocument = $('#doc_id option:selected').text()
+        isValid = true;
 
-        if ($(".create-form").valid()) {
-            $.each(list_items, function(i, v) {
-                var element = $('input[data-id="' + v.id + '"].input-qty');
-                var input_user = parseFloat(element.val());
-                var stok_max = parseFloat(v.qty_sekarang);
+        $.each(list_items, function(i, v) {
+            var element = $('input[data-id="' + v.id + '"].input-qty');
+            var input_user = parseFloat(element.val());
+            var stok_max = parseFloat(v.qty_sekarang);
 
-                if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
-                    dataError = list_items[i];
-                    isValid = false;
-                } else {
-                    list_items[i].qty_sekarang = stok_max;
-                    list_items[i].qty_input = input_user;
-                }
-            });
+            if (input_user > stok_max || isNaN(input_user) || input_user == undefined) {
+                dataError = list_items[i];
+                isValid = false;
+            } else {
+                list_items[i].qty_sekarang = stok_max;
+                list_items[i].qty_input = input_user;
+            }
+        });
+
+        // Check if list_items is empty after the loop
+        if (list_items.length === 0) {
+            isValid = false;
+        }
+
+        if (!isValid) {
             Swal.fire({
-                icon: 'question',
-                title: 'Simpan Data?',
+                icon: 'error',
+                title: 'Stok barang tidak valid!, Silahkan cek kembali',
                 confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    setLoading()
-                    var noDocument = $('#doc_id').select2('data').map(function(elem) {
-                        return elem.text;
-                    });
-                    let data = new FormData(document.querySelector(".create-form"));
-                    data.append("noDocument", JSON.stringify(noDocument))
-                    data.append("items", JSON.stringify(list_items));
+                confirmButtonText: 'Ok'
+            });
+        } else {
+            if ($(".create-form").valid()) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Kembali',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const csrf = $(`[name="${csrfToken}"]`);
+                        setLoading()
+                        var noDocument = $('#doc_id').select2('data').map(function(elem) {
+                            return elem.text;
+                        });
+                        let data = new FormData(document.querySelector(".create-form"));
+                        data.append("noDocument", JSON.stringify(noDocument))
+                        data.append("items", JSON.stringify(list_items));
 
-                    const ppn = $('#taxTotal').html();
-                    const dpp = $('#itemSubTotal').html()
-                    const totalInvoice = $('#grandTotal').html();
-                    const noSuratJalan = $('.id_surat_jalan').find(":selected").text()
-                    const idCustomer = $('.id_customer').find(":selected").val()
-                    let id = $(".id").val();
+                        const ppn = $('#taxTotal').html();
+                        const dpp = $('#itemSubTotal').html()
+                        const totalInvoice = $('#grandTotal').html();
+                        const noSuratJalan = $('.id_surat_jalan').find(":selected").text()
+                        const idCustomer = $('.id_customer').find(":selected").val()
+                        let id = $(".id").val();
 
 
-                    data.append("total_invoice", totalInvoice)
-                    data.append("ppn", ppn)
-                    data.append("dpp", dpp)
-                    data.append("no_surat_jalan", noSuratJalan)
-                    data.append("id_customer", idCustomer)
-                    if (!id) {
-                        // data.append("tanggal_faktur", tanggalFaktur)
-                    }
+                        data.append("total_invoice", totalInvoice)
+                        data.append("ppn", ppn)
+                        data.append("dpp", dpp)
+                        data.append("no_surat_jalan", noSuratJalan)
+                        data.append("id_customer", idCustomer)
+                        if (!id) {
+                            // data.append("tanggal_faktur", tanggalFaktur)
+                        }
 
-                    // UPDATE
-                    if (id) {
-                        $.ajax({
-                            url: "<?= base_url("invoice-penjualan-lokal/update"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
+                        // UPDATE
+                        if (id) {
+                            $.ajax({
+                                url: "<?= base_url("invoice-penjualan-lokal/update"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        stopLoading()
+                                        Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                window.location.href = "<?= base_url("invoice-penjualan-lokal"); ?>";
+                                            })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         })
-                                        .then(() => {
-                                            window.location.href = "<?= base_url("invoice-penjualan-lokal"); ?>";
-                                        })
-                                } else {
+                                        stopLoading()
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
                                     Swal.fire({
                                         icon: 'error',
-                                        title: response.message,
+                                        title: 'Data Gagal Disimpan, coba Lagi',
                                         confirmButtonColor: '#4e73df',
                                     })
                                     stopLoading()
                                 }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        });
-                    }
-                    // CREATE
-                    else {
-                        $.ajax({
-                            url: "<?= base_url("invoice-penjualan-lokal/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
+                            });
+                        }
+                        // CREATE
+                        else {
+                            $.ajax({
+                                url: "<?= base_url("invoice-penjualan-lokal/save"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        stopLoading()
+                                        Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                window.location.href = `<?= base_url("invoice-penjualan-lokal"); ?>`;
+                                            })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         })
-                                        .then(() => {
-                                            window.location.href = `<?= base_url("invoice-penjualan-lokal"); ?>`;
-                                        })
-                                } else {
+                                        stopLoading()
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
                                     Swal.fire({
                                         icon: 'error',
-                                        title: response.message,
+                                        title: 'Data Gagal Disimpan, coba Lagi',
                                         confirmButtonColor: '#4e73df',
                                     })
                                     stopLoading()
                                 }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        });
+                            });
+                        }
                     }
-                }
-            })
+                })
+            }
         }
     });
 
@@ -942,7 +933,7 @@
             var stok_max = parseFloat(v.qty_sekarang);
 
 
-            if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
+            if (input_user > stok_max || isNaN(input_user) || input_user == undefined) {
                 dataError = list_items[i];
                 isValid = false;
             } else {
@@ -966,21 +957,24 @@
     const posting = function(id) {
         // console.log(list_items);
         var noDocument = $('#doc_id option:selected').text()
+        $.each(list_items, function(i, v) {
+            var element = $('input[data-id="' + v.id + '"].input-qty');
+            var input_user = parseFloat(element.val());
+            var stok_max = parseFloat(v.qty_sekarang);
+
+            if (input_user > stok_max || isNaN(input_user) || input_user == undefined) {
+                dataError = list_items[i];
+                isValid = false;
+            } else if (input_user === 0) {
+                list_items.splice(i, 1); // Remove the item from list_items if input_user is 0
+            } else {
+                list_items[i].qty_sekarang = stok_max;
+                list_items[i].qty_input = input_user;
+            }
+        });
+        // console.log(list_items);
 
         if ($(".create-form").valid()) {
-            $.each(list_items, function(i, v) {
-                var element = $('input[data-id="' + v.id + '"].input-qty');
-                var input_user = parseFloat(element.val());
-                var stok_max = parseFloat(v.qty_sekarang);
-
-                if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
-                    dataError = list_items[i];
-                    isValid = false;
-                } else {
-                    list_items[i].qty_sekarang = stok_max;
-                    list_items[i].qty_input = input_user;
-                }
-            });
             Swal.fire({
                 icon: 'question',
                 title: 'Simpan Data?',
