@@ -126,6 +126,7 @@ class ProductionResultModel extends Model
         GROUP_CONCAT(production_result_details.qty) as qtyProduksi,
         SUM(production_result_details.qty) as qtyTotal,
         satuans.kode_satuan,
+        satuans.id as satuan_id;
         ';
 
         $dataQry = $this->asArray()
