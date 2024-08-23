@@ -88,12 +88,10 @@
                                     <option value="">Pilih Tipe Barang</option>
                                     <option value="bahan_jadi">Bahan Jadi</option>
                                     <option value="kemasan">Kemasan</option>
-
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
                             </div>
                         </div>
-
                     </div>
                     <div class="row">
                         <div class="col-md-6">
@@ -102,7 +100,6 @@
                                 <label for="floatingInput">Nama Barang</label>
                             </div>
                         </div>
-
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
@@ -114,8 +111,6 @@
                                 <label for="floatingInput" style="z-index: 1;">Satuan</label>
                             </div>
                         </div>
-
-
                     </div>
                     <div class="row">
                         <div class="col-md-6">
@@ -130,12 +125,9 @@
                                 <label for="floatingInput">Harga Pokok</label>
                             </div>
                         </div>
-
                     </div>
-
                     <div class="row">
                         <div class="col-md-6">
-
                             <label class="mt-2">
                                 PPN
                             </label>
@@ -145,12 +137,8 @@
                                     <label class="form-check-label" for="status_ppn"></label>
                                 </div>
                             </div>
-
-
-
                         </div>
                     </div>
-
                 </form>
             </div>
             <div class="modal-footer">
