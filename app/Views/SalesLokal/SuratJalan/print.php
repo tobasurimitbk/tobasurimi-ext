@@ -98,7 +98,7 @@
                         <tr>
                             <td style="width: 1px;vertical-align: top">Customer: </td>
                             <td style="border: 1px solid;border-radius: 7px;padding: 5px">
-                                <div><?= $soData[0]->customerName ?></div>
+                                <div><?= $soData[0]->customerCode ?> - <?= $soData[0]->customerName ?></div>
                                 <div><?= $soData[0]->customerAddress ?></div>
                             </td>
                         </tr>
@@ -106,7 +106,7 @@
                 </div>
             </td>
             <td align="right" style="text-align: right;">
-                <div class="txt-bold txt-center">SURAT JALAN</div>
+                <div class="txt-bold txt-center" style="font-size: 17px;">SURAT JALAN</div>
                 <table class="w-100" style="border: 1px solid;border-radius: 7px;margin-left: auto;margin-right: 0">
                     <tr>
                         <td style="border-right: 1px solid;border-right-style: dashed;width: 50%;">
@@ -119,7 +119,23 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="border: 1px solid;border-style: dashed dashed hidden hidden"></td>
+                        <td style="border: 1px solid;border-style: dashed dashed hidden hidden">
+                            <div>No. Order</div>
+                            <div class="txt-center">
+                                <?php
+                                // Check if there are multiple sales orders
+                                if (count($soData) > 1) {
+                                    // Use array_map to extract no_sales_order and join them with a comma
+                                    echo implode(', ', array_map(function ($so) {
+                                        return $so->no_sales_order;
+                                    }, $soData));
+                                } else {
+                                    // If only one sales order, just display it
+                                    echo $soData[0]->no_sales_order;
+                                }
+                                ?>
+                            </div>
+                        </td>
                         <td style="border-top: 1px solid;border-top-style: dashed">
                             <div>PO. No.</div>
                             <div class="txt-center"><?= $sjData->no_po ?>&nbsp;</div>
@@ -162,7 +178,7 @@
             $rowNumber++;
         endforeach;
         ?>
-        <?php for ($i = 0; $i < (9 - count($soData)); $i++) : ?>
+        <?php for ($i = 0; $i < (8 - count($soData)); $i++) : ?>
             <tr>
                 <td>&nbsp;</td>
                 <td>&nbsp;</td>
@@ -221,7 +237,7 @@
         <tr style="vertical-align: top;">
             <td style="height: 65px;border-bottom: 1px solid;width: 90px">Disiapkan</td>
             <td style="height: 65px;border-bottom: 1px solid;width: 90px">Disetujui Oleh</td>
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px">diantar Oleh</td>
+            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Diantar Oleh</td>
             <td style="height: 65px;border-bottom: 1px solid;width: 90px">Diterima Oleh</td>
         </tr>
         <tr>

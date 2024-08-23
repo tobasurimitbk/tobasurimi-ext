@@ -485,7 +485,7 @@
 
                 $('.input-generate').hide();
                 $('.kode_barang').attr('readonly', true);
-                $('.type_barang').attr('disabled', true);
+                // $('.type_barang').attr('disabled', true);
                 $('#add_modal').modal('show');
                 $('.delete-btn').show();
                 $('.title-name').text('Update Barang')
