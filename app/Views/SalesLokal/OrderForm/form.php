@@ -1,5 +1,11 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
+<style>
+    .form-switch-lg .form-check-input {
+        width: 4rem;
+        height: 1.5rem;
+    }
+</style>
 
 
 <!-- Begin Page Content -->
@@ -308,13 +314,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9.]/g, '');" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
+                                <input autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, '');" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
                                 <label for="floatingInput">Harga Barang</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9.]/g,'');" class="form-control qty" name="qty" id="qty" placeholder="Qty">
+                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/\.(?=.*\.)/g, '');" class="form-control qty" name="qty" id="qty" placeholder="Qty">
                                 <label for="floatingInput">Qty</label>
                             </div>
                         </div>
@@ -322,7 +328,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control amount" name="amount" id="amount" placeholder="Total Harga" oninput="this.value=this.value.replace(/[^0-9.]/g,'');">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control amount" name="amount" id="amount" placeholder="Total Harga" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/\.(?=.*\.)/g, '');">
                                 <label for="floatingInput">Total Harga</label>
                             </div>
                         </div>
@@ -344,14 +350,9 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" readonly="true" class="form-control keteranganppn" name="keteranganppn" id="keteranganppn" placeholder="keteranganppn">
                                 <label for="floatingInput">Status PPN</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="hidden" readonly="true" class="form-control statusppn" name="statusppn" id="statusppn" placeholder="statusppn">
                             </div>
                         </div>
-
                     </div>
                 </form>
             </div>
@@ -532,6 +533,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <input autocomplete="one-time-code" type="hidden" class="form-control type_barang" name="type_barang" id="type_barang" value="bahan_jadi">
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -568,8 +570,18 @@
                                 <label for="floatingInput">Harga Jual</label>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <label>
+                                PPN
+                            </label>
+                            <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
+                                <div class="form-check form-switch form-switch-lg">
+                                    <input class="form-check-input" type="checkbox" value="1" name="status_ppn" id="status_ppn">
+                                    <label class="form-check-label" for="status_ppn"></label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
                 </form>
             </div>
             <div class="modal-footer">

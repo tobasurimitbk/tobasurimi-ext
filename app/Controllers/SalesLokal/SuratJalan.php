@@ -573,6 +573,7 @@ class SuratJalan extends BaseController
         $soSelectQry = "sales_order.*,
                         DATE_FORMAT(sales_order.order_date, '%d %b %Y') AS order_date, 
                         DATE_FORMAT(sales_order.shipping_date, '%d %b %Y') AS shipping_date, 
+                        customers.kode AS customerCode, 
                         customers.name AS customerName, 
                         customers.address AS customerAddress,
                         metadata.value AS termin,

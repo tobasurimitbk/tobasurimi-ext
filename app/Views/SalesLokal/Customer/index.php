@@ -143,7 +143,19 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales">
+                                <!-- <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales"> -->
+                                <select class="form-select sales_id" name="sales_id" id="sales_id" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataSales)) {
+                                        foreach ($dataSales as $sales) {
+                                    ?>
+                                            <option value="<?= $sales["id"]; ?>"><?= strtoupper($sales["name"]); ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
                                 <label for="floatingInput">Nama Sales</label>
                             </div>
                         </div>
@@ -294,20 +306,26 @@
 
         // TERMIN
         //CSS SELECT2 FLOATING LABEL
+        $('.sales_id').select2({
+            placeholder: "Pilih Sales",
+            theme: "bootstrap-5",
+            allowClear: true,
+            dropdownParent: $(".add-modal .modal-content")
+        });
         $('.termin').select2({
             placeholder: "",
             theme: "bootstrap-5",
             allowClear: true,
             dropdownParent: $(".add-modal .modal-content")
         });
-        $(".termin")
+        $(".termin, .sales_id")
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $(".termin")
+        $(".termin, .sales_id")
             .parent('div')
             .children('span')
             .children('span')
@@ -315,7 +333,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $(".termin")
+        $(".termin, .sales_id")
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -489,6 +507,9 @@
                 },
                 jenis_penjualan: {
                     required: true
+                },
+                sales_id: {
+                    required: true
                 }
             },
             messages: {
@@ -514,6 +535,9 @@
                 },
                 jenis_penjualan: {
                     required: "Jenis Penjualan wajib diisi"
+                },
+                sales_id: {
+                    required: "Sales wajib diisi"
                 }
             },
             errorElement: 'span',

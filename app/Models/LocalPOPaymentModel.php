@@ -356,20 +356,6 @@ class LocalPOPaymentModel extends Model
             true
         );
 
-
-        // foreach ($result['pembayaranDetail']['multiple_lpb_no'] as $index => $value) {
-        //     // Assuming you want to set 'lpb_no' as a nested key with index as value
-        //     $result['pembayaranDetail']['multiple_lpb_no']['lpb_no'][$index] = $value;
-        // }
-
-        // $result['pembayaranDetail']['multiple_lpb_no']['id'] = [];
-
-        // for ($i = 0; $i < count($result['pembayaranDetail']['multiple_lpb_id']); $i++) {
-        //     $result['pembayaranDetail']['multiple_lpb_no']['id'][$i] =  $result['pembayaranDetail']['multiple_lpb_id'][$i];
-        // }
-        // var_dump($result['pembayaranDetail']['multiple_lpb_no']);
-        // die;
-
         $total_order = 0;
         $total_diterima = 0;
         $total_tagihan = 0;
@@ -949,7 +935,5 @@ class LocalPOPaymentModel extends Model
         return $paymentList;
     }
 
-    public function getlistLPBmonth()
-    {
-    }
+    public function getlistLPBmonth() {}
 }

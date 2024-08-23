@@ -5,6 +5,7 @@ namespace App\Controllers\SalesLokal;
 use App\Controllers\BaseController;
 use App\Models\BanksModel;
 use App\Models\CustomerModel;
+use App\Models\EmployeesModel;
 use App\Models\ProvincesModel;
 
 class Customer extends BaseController
@@ -18,6 +19,7 @@ class Customer extends BaseController
     protected $soInvModel;
     protected $countryModel;
     protected $CustomerModel;
+    protected $employeeModel;
 
     public function __construct()
     {
@@ -28,6 +30,7 @@ class Customer extends BaseController
         $this->ProvincesModel = new ProvincesModel();
         $this->BanksModel = new BanksModel();
         $this->CustomerModel = new CustomerModel();
+        $this->employeeModel = new EmployeesModel();
     }
 
     public function index()
@@ -36,9 +39,16 @@ class Customer extends BaseController
         $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
         $dataBanks = $this->BanksModel->search_list(array(), 'name');
 
+        $condition = [
+            'jabatan_name' => "SALES"
+        ];
+
+        $sales = $this->employeeModel->getEmployeesComplete($this->this_company_id, $condition);
+
         $data = [
             "dataProvinces" => $dataProvinces,
             "dataBanks" => $dataBanks,
+            "dataSales" => $sales,
         ];
 
         return view('SalesLokal/Customer/index', $data);

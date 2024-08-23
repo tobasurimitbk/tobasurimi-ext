@@ -928,6 +928,6 @@ class StockModel extends Model
             ->where($condition)
             ->findAll();
 
-        return $data;
+        return $dataQry;
     }
 }

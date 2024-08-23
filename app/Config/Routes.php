@@ -485,6 +485,21 @@ $routes->post('/panjar-supplier/update-status', 'Pembayaran\PanjarSupplier::upda
 $routes->post('/panjar-supplier/delete', 'Pembayaran\PanjarSupplier::deletePanjarSupplier', ['filter' => 'Auth']);
 $routes->get('/panjar-supplier/history-pembayaran', 'Pembayaran\PanjarSupplier::dropDownHistoryPembayaranPanjar', ['filter' => 'Auth']);
 $routes->get('/panjar-supplier/generate-no-panjar', 'Pembayaran\PanjarSupplier::generateNoPanjar', ['filter' => 'Auth']);
+// PEMBAYARAN INVOICE
+$routes->get('/pembayaran-invoice', 'Pembayaran\PembayaranInvoice::index', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/id/(:segment)', 'Pembayaran\PembayaranInvoice::getById/$1', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/all', 'Pembayaran\PembayaranInvoice::getAllPembayaranInvoice', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/create', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceLokal', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/create-ekspor', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceEkspor', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/create-lain', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceLain', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/get-dokumen-list', 'Pembayaran\PembayaranInvoice::getDokumenList', ['filter' => 'Auth']);
+$routes->get('pembayaran-invoice/get-valas-sales-ekspor', 'Pembayaran\PembayaranInvoice::getValas', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/get-barang-sales-lokal', 'Pembayaran\PembayaranInvoice::getBarangSalesLokal', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/get-barang-sales-ekspor', 'Pembayaran\PembayaranInvoice::getBarangSalesEkspor', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/get-barang-sales-lain', 'Pembayaran\PembayaranInvoice::getBarangSalesLain', ['filter' => 'Auth']);
+$routes->post('/pembayaran-invoice/generate-no-pembayaran', 'Pembayaran\PembayaranInvoice::generateNoPembayaranInvoice', ['filter' => 'Auth']);
+$routes->post('/pembayaran-invoice/save', 'Pembayaran\PembayaranInvoice::saveLokalInvoice', ['filter' => 'Auth']);
+$routes->post('/pembayaran-invoice/update', 'Pembayaran\PembayaranInvoice::updateInvoice', ['filter' => 'Auth']);
 
 
 
@@ -2002,6 +2017,7 @@ $routes->get('/laporan-supplier-lokal-bb/rincian-perbarang/print', 'Laporan\Supp
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRekapAllSupplier', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier/all-rekap-all-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRekapAllSupplier', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRekapAllSupplier', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier/print-excel', 'Laporan\Supplier\LaporanSupplierLokalBB::exportExcelLaporanRekapAllSupplier', ['filter' => 'Auth']);
 
 $routes->get('/laporan-supplier-lokal-bb/rekap-persupplier', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRekapPerSupplier', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-persupplier/all-rekap-persupplier', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRekapPersupplier', ['filter' => 'Auth']);
