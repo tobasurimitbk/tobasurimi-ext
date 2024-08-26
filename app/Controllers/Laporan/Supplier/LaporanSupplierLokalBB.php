@@ -630,20 +630,45 @@ class LaporanSupplierLokalBB extends BaseController
 
         foreach ($dataBBLokal['data'] as $row) {
             $row->no = $no++;  // Add the 'No' field
-            $nilaipph =  ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? (1.00 - 0.0025) : (1.00 - 0.005)) : 1;
-            $nilaiTotalUmum = (($row->dppUmum / $nilaipph) * $row->totalQty);
-            $nilaiTotalHarian = (($row->dppHarian / $nilaipph) * $row->totalQty);
-            $nilaiTotalBulanan = (($row->dppBulanan / $nilaipph) * $row->totalQty);
 
-            $row->pphUmum       = ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? ($nilaiTotalUmum * 0.0025) : ($nilaiTotalUmum * 0.005)) : 0;
-            $row->totalUmum     = $row->dppUmum - $row->pphUmum;
-            $row->pphHarian     = ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? ($nilaiTotalHarian * 0.0025) : ($row->dppHarian * 0.005)) : 0;
-            $row->totalHarian   = $row->dppHarian - $row->pphHarian;
-            $row->pphBulanan    = ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? ($nilaiTotalBulanan * 0.0025) : ($row->dppBulanan * 0.005)) : 0;
-            $row->totalBulanan  = $row->dppBulanan - $row->pphBulanan;
+            $pphDetailGeneralPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                $this->this_company_id,
+                $row->supplier_id,
+                $row->barang_id,
+                $addCondition['dateStart'],
+                $addCondition['dateEnd'],
+                'general_price'
+            );
+
+            $pphDetailDailyPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                $this->this_company_id,
+                $row->supplier_id,
+                $row->barang_id,
+                $addCondition['dateStart'],
+                $addCondition['dateEnd'],
+                'daily_price'
+            );
+
+            $pphDetailMonthlyPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                $this->this_company_id,
+                $row->supplier_id,
+                $row->barang_id,
+                $addCondition['dateStart'],
+                $addCondition['dateEnd'],
+                'monthly_price'
+            );
+
+            $row->pphUmum = $pphDetailGeneralPrice['pphTotal'];
+            $row->totalUmum = $pphDetailGeneralPrice['dibayarkan'];
+            $row->pphHarian = $pphDetailDailyPrice['pphTotal'];
+            $row->totalHarian = $pphDetailDailyPrice['dibayarkan'];
+            $row->pphBulanan = $pphDetailMonthlyPrice['pphTotal'];
+            $row->totalBulanan = $pphDetailMonthlyPrice['dibayarkan'];
+
             $row->pphSubsidi    = ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
             $row->totalSubsidi  = $row->subsidi - $row->pphSubsidi;
             $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
+
             $totalDppUmum += $row->dppUmum;
             $totalPphUmum += $row->pphUmum;
             $totalTotalUmum += $row->totalUmum;
@@ -731,20 +756,44 @@ class LaporanSupplierLokalBB extends BaseController
         $dataTotalBBLokal = [];
         if (!empty($dataBBLokal)) {
             foreach ($dataBBLokal as $row) {
-                $nilaipph =  ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? (1.00 - 0.0025) : (1.00 - 0.005)) : 1;
-                $nilaiTotalUmum = (($row->dppUmum / $nilaipph) * $row->totalQty);
-                $nilaiTotalHarian = (($row->dppHarian / $nilaipph) * $row->totalQty);
-                $nilaiTotalBulanan = (($row->dppBulanan / $nilaipph) * $row->totalQty);
+                $pphDetailGeneralPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                    $this->this_company_id,
+                    $row->supplier_id,
+                    $row->barang_id,
+                    $newDateStart,
+                    $newDateEnd,
+                    'general_price'
+                );
 
-                $row->pphUmum       = ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? ($nilaiTotalUmum * 0.0025) : ($nilaiTotalUmum * 0.005)) : 0;
-                $row->totalUmum     = $row->dppUmum - $row->pphUmum;
-                $row->pphHarian     = ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? ($nilaiTotalHarian * 0.0025) : ($row->dppHarian * 0.005)) : 0;
-                $row->totalHarian   = $row->dppHarian - $row->pphHarian;
-                $row->pphBulanan    = ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? ($nilaiTotalBulanan * 0.0025) : ($row->dppBulanan * 0.005)) : 0;
-                $row->totalBulanan  = $row->dppBulanan - $row->pphBulanan;
+                $pphDetailDailyPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                    $this->this_company_id,
+                    $row->supplier_id,
+                    $row->barang_id,
+                    $newDateStart,
+                    $newDateEnd,
+                    'daily_price'
+                );
+
+                $pphDetailMonthlyPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                    $this->this_company_id,
+                    $row->supplier_id,
+                    $row->barang_id,
+                    $newDateStart,
+                    $newDateEnd,
+                    'monthly_price'
+                );
+
+                $row->pphUmum = $pphDetailGeneralPrice['pphTotal'];
+                $row->totalUmum = $pphDetailGeneralPrice['dibayarkan'];
+                $row->pphHarian = $pphDetailDailyPrice['pphTotal'];
+                $row->totalHarian = $pphDetailDailyPrice['dibayarkan'];
+                $row->pphBulanan = $pphDetailMonthlyPrice['pphTotal'];
+                $row->totalBulanan = $pphDetailMonthlyPrice['dibayarkan'];
+
                 $row->pphSubsidi    = ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
                 $row->totalSubsidi  = $row->subsidi - $row->pphSubsidi;
                 $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
+
                 $totalDppUmum += $row->dppUmum;
                 $totalPphUmum += $row->pphUmum;
                 $totalTotalUmum += $row->totalUmum;
@@ -835,20 +884,44 @@ class LaporanSupplierLokalBB extends BaseController
         $dataTotalBBLokal = [];
         if (!empty($dataBBLokal)) {
             foreach ($dataBBLokal as $row) {
-                $nilaipph =  ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? (1.00 - 0.0025) : (1.00 - 0.005)) : 1;
-                $nilaiTotalUmum = (($row->dppUmum / $nilaipph) * $row->totalQty);
-                $nilaiTotalHarian = (($row->dppHarian / $nilaipph) * $row->totalQty);
-                $nilaiTotalBulanan = (($row->dppBulanan / $nilaipph) * $row->totalQty);
+                $pphDetailGeneralPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                    $this->this_company_id,
+                    $row->supplier_id,
+                    $row->barang_id,
+                    $newDateStart,
+                    $newDateEnd,
+                    'general_price'
+                );
 
-                $row->pphUmum       = ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? ($nilaiTotalUmum * 0.0025) : ($nilaiTotalUmum * 0.005)) : 0;
-                $row->totalUmum     = $row->dppUmum - $row->pphUmum;
-                $row->pphHarian     = ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? ($nilaiTotalHarian * 0.0025) : ($row->dppHarian * 0.005)) : 0;
-                $row->totalHarian   = $row->dppHarian - $row->pphHarian;
-                $row->pphBulanan    = ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? ($nilaiTotalBulanan * 0.0025) : ($row->dppBulanan * 0.005)) : 0;
-                $row->totalBulanan  = $row->dppBulanan - $row->pphBulanan;
+                $pphDetailDailyPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                    $this->this_company_id,
+                    $row->supplier_id,
+                    $row->barang_id,
+                    $newDateStart,
+                    $newDateEnd,
+                    'daily_price'
+                );
+
+                $pphDetailMonthlyPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                    $this->this_company_id,
+                    $row->supplier_id,
+                    $row->barang_id,
+                    $newDateStart,
+                    $newDateEnd,
+                    'monthly_price'
+                );
+
+                $row->pphUmum = $pphDetailGeneralPrice['pphTotal'];
+                $row->totalUmum = $pphDetailGeneralPrice['dibayarkan'];
+                $row->pphHarian = $pphDetailDailyPrice['pphTotal'];
+                $row->totalHarian = $pphDetailDailyPrice['dibayarkan'];
+                $row->pphBulanan = $pphDetailMonthlyPrice['pphTotal'];
+                $row->totalBulanan = $pphDetailMonthlyPrice['dibayarkan'];
+
                 $row->pphSubsidi    = ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
                 $row->totalSubsidi  = $row->subsidi - $row->pphSubsidi;
                 $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
+
                 $totalDppUmum += $row->dppUmum;
                 $totalPphUmum += $row->pphUmum;
                 $totalTotalUmum += $row->totalUmum;

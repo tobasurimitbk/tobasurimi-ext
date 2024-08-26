@@ -524,6 +524,8 @@ class RMPurchaseOrderModel extends Model
         suppliers.no_npwp AS supplierNpwp,
         suppliers.name AS supplierName, 
         barang_master.barang_name AS barangName, 
+        rm_purchase_orders.supplier_id,
+        rm_purchase_orders.barang_id,
         SUM(rm_purchase_orders.subsidi_langsung) AS subsidi,
         SUM(rm_purchase_order_details.daily_price) AS dppHarian,
         SUM(rm_purchase_order_details.monthly_price) AS dppBulanan,
@@ -583,6 +585,8 @@ class RMPurchaseOrderModel extends Model
         $selectQry = "
         suppliers.no_npwp AS supplierNpwp,
         suppliers.name AS supplierName, 
+        rm_purchase_orders.barang_id,
+        rm_purchase_orders.supplier_id,
         barang_master.barang_name AS barangName, 
         SUM(rm_purchase_order_details.qty) AS totalQty,
         SUM(rm_purchase_orders.subsidi_langsung) AS subsidi,
@@ -920,5 +924,77 @@ class RMPurchaseOrderModel extends Model
             ->findAll();
 
         return $poBBLokalData;
+    }
+
+    public function pphPendapatanSupplier($company_id, $supplier_id, $barang1_id, $start_date, $end_date, $type_harga)
+    {
+        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+        $selectQry = "rm_purchase_orders.*,suppliers.no_npwp";
+        $rmPurchaseOrder = $this->asObject()
+            ->select($selectQry)
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->where('rm_purchase_orders.company_id', $company_id)
+            ->where('supplier_id', $supplier_id)
+            ->where('barang_id', $barang1_id)
+            ->where('rm_purchase_orders.deletedAt', null);
+        if ($start_date != '') {
+            $rmPurchaseOrder->where('rm_purchase_orders.po_date >=',  $start_date);
+        }
+        if ($end_date != '') {
+            $rmPurchaseOrder->where('rm_purchase_orders.po_date <=', $end_date);
+        }
+
+        $resultRmPurchaseOrder = $rmPurchaseOrder->findAll();
+        $pphTotal = 0;
+        $dibayarkan = 0;
+
+        foreach ($resultRmPurchaseOrder as $r) {
+            $dataPODetail = $rmPurchaseOrderDetailModel->getPoBBLokalDetailById($r->id);
+            $nilai_pph = !empty($r->no_npwp) ? (1.00 - 0.0025) : (1.00 - 0.005);
+            $nilai_pph2 = !empty($r->no_npwp) ? 0.0025 : 0.005;
+            $nilai_total = 0;
+            // detail 
+            foreach ($dataPODetail as $d) {
+                if ($type_harga == 'general_price') {
+                    if ($r->pph == 'None') {
+                        $nilai_total = $nilai_total + (($d->general_price) * formatter($d->qty, "STR_TO_FLOAT"));
+                    }
+                    if ($r->pph == 'Supplier') {
+                        $nilai_total = $nilai_total + (($d->general_price) * formatter($d->qty, "STR_TO_FLOAT"));
+                    }
+                    if ($r->pph == 'Company') {
+                        $nilai_total = $nilai_total + (($d->general_price / ($nilai_pph)) * formatter($d->qty, "STR_TO_FLOAT"));
+                    }
+                } elseif ($type_harga == 'daily_price') {
+                    if ($r->pph == 'None') {
+                        $nilai_total = $nilai_total + (($d->daily_price) * formatter($d->qty, "STR_TO_FLOAT"));
+                    }
+                    if ($r->pph == 'Supplier') {
+                        $nilai_total = $nilai_total + (($d->daily_price) * formatter($d->qty, "STR_TO_FLOAT"));
+                    }
+                    if ($r->pph == 'Company') {
+                        $nilai_total = $nilai_total + (($d->daily_price / ($nilai_pph)) * formatter($d->qty, "STR_TO_FLOAT"));
+                    }
+                } else {
+                    if ($r->pph == 'None') {
+                        $nilai_total = $nilai_total + (($d->monthly_price) * formatter($d->qty, "STR_TO_FLOAT"));
+                    }
+                    if ($r->pph == 'Supplier') {
+                        $nilai_total = $nilai_total + (($d->monthly_price) * formatter($d->qty, "STR_TO_FLOAT"));
+                    }
+                    if ($r->pph == 'Company') {
+                        $nilai_total = $nilai_total + (($d->monthly_price / ($nilai_pph)) * formatter($d->qty, "STR_TO_FLOAT"));
+                    }
+                }
+            }
+
+            $pphTotal =  $pphTotal + ($nilai_total * $nilai_pph2);
+            $dibayarkan = $dibayarkan + ($nilai_total - $pphTotal);
+        }
+
+        return [
+            'pphTotal' => $pphTotal,
+            'dibayarkan' => $dibayarkan
+        ];
     }
 }
