@@ -331,11 +331,30 @@
         table.ajax.reload();
     });
 
-    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no').select2({
-        placeholder: "",
+    $('.filter_supplier').select2({
+        placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
         allowClear: true,
     })
+
+    $('.filter_warehouse').select2({
+        placeholder: "Pilih Warehouse",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+
+    $('.filter_barang').select2({
+        placeholder: "Pilih Barang",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+
+    $('.filter_po_no').select2({
+        placeholder: "Pilih Nomor PO",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+
 
     $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no')
         .parent('div')

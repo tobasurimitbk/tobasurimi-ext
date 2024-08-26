@@ -278,7 +278,7 @@
     })
 
     $('.filter_barang').select2({
-        placeholder: "Pilih Supplier",
+        placeholder: "Pilih Barang",
         theme: "bootstrap-5",
         allowClear: true,
     })

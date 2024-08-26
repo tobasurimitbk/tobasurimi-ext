@@ -805,7 +805,7 @@ class RMPurchaseOrderModel extends Model
             // ->join('bagian', 'bagian.division_id = divisis.id', 'left')
             // ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
             ->where($condition)
-            ->groupBy(['divisis.divisi', 'barang_master.barang_name', 'suppliers.name'])
+            ->groupBy(['divisis.divisi', 'barang_master_spesifikasi.spesifikasi'])
             ->orderBy($sort, $sortType);
 
         $totalData = $poBBLokalData->countAllResults(false);
