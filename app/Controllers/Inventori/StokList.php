@@ -136,6 +136,10 @@ class StokList extends BaseController
             $dataQry = $this->stockModel->getStockListBarang($condition, $addCondition, $limit, $offset);
             $dataResult = [];
             $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+            // var_dump($condition);
+            // var_dump($addCondition);
+            // var_dump($dataQry['data']);
+            // exit;
 
             foreach ($dataQry['data'] as $data) {
                 $satuan1 = $this->satuanModel->find($data->satuan_1);

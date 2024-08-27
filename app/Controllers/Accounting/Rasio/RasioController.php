@@ -52,6 +52,8 @@ use App\Models\SatuansModel;
 use App\Models\SettingCostingModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockModel;
+use App\Models\StockTutupBukuModel;
+use App\Models\TutupBukuModel;
 
 class RasioController extends BaseController
 {
@@ -102,6 +104,8 @@ class RasioController extends BaseController
     protected $mutasiDetailModel;
     protected $jasaVendorOutModel;
     protected $jasaVendorOutDetailModel;
+    protected $tutupBukuModel;
+    protected $stockTutupBukuModel;
 
     public function __construct()
     {
@@ -152,6 +156,8 @@ class RasioController extends BaseController
         $this->adjusmentDetailModel = new AdjusmentDetailModel();
         $this->mutasiModel = new MutasiModel();
         $this->mutasiDetailModel = new MutasiDetailModel();
+        $this->tutupBukuModel = new TutupBukuModel();
+        $this->stockTutupBukuModel = new StockTutupBukuModel();
     }
 
     public function index()
@@ -179,13 +185,17 @@ class RasioController extends BaseController
     {
 
         try {
-            $tanggal_input = $this->request->getVar("tanggal_akhir") ? $this->request->getVar("tanggal_akhir") : "";
-            $tanggal_parts = explode("/", $tanggal_input); // Memisahkan bulan dan tahun
-            $tanggal_mysql = $tanggal_parts[1] . "-" . str_pad($tanggal_parts[0], 2, "0", STR_PAD_LEFT);
+            $tanggal_awal_input = $this->request->getVar("tanggal_awal") ? $this->request->getVar("tanggal_awal") : "";
+            $tanggal_awal_parts = explode("/", $tanggal_awal_input); // Memisahkan bulan dan tahun
+            $tanggal_awal = $tanggal_awal_parts[2] . "-" . $tanggal_awal_parts[1] . "-" . str_pad($tanggal_awal_parts[0], 2, "0", STR_PAD_LEFT);
+            $tanggal_akhir_input = $this->request->getVar("tanggal_akhir") ? $this->request->getVar("tanggal_akhir") : "";
+            $tanggal_akhir_parts = explode("/", $tanggal_akhir_input); // Memisahkan bulan dan tahun
+            $tanggal_akhir = $tanggal_akhir_parts[2] . "-" . $tanggal_akhir_parts[1] . "-" . str_pad($tanggal_akhir_parts[0], 2, "0", STR_PAD_LEFT);
 
             $cekRasio = $this->rasioModel
                 ->where("divisi_id", $this->request->getVar("divisi_id"))
-                ->where("bulan", $tanggal_mysql)
+                ->where("tanggal_awal >=", $tanggal_awal)
+                ->where("tanggal_akhir <=", $tanggal_akhir)
                 ->findAll();
 
             if ($cekRasio) {
@@ -201,7 +211,8 @@ class RasioController extends BaseController
             $data = [
                 "company_id" => $this->this_company_id,
                 "divisi_id" => $this->request->getVar("divisi_id"),
-                'bulan' => $tanggal_mysql,
+                'tanggal_awal' => $tanggal_awal,
+                'tanggal_akhir' => $tanggal_akhir,
                 'kategori_barang_id' => $this->request->getVar("kategori"),
                 'subsidi_coa_id' => $this->request->getVar("akun_coa_subsidi") ?? null,
                 'biaya_coa_id' => $this->request->getVar("akun_coa_biaya") ?? null,
@@ -240,6 +251,7 @@ class RasioController extends BaseController
             // var_dump($barang_digunakan);
             // die;
             // var_dump($barang_digunakan_alokasi);
+            // var_dump($barang_frozen_jadi);
             // var_dump($barang_jadi);
             // exit;
             $id = $this->rasioModel->insert($data);
@@ -293,14 +305,10 @@ class RasioController extends BaseController
                     'barang2_id' => $s->barang2_id,
                     'barang_name' => $s->barang_name,
                     'spesifikasi' => $s->spesifikasi,
-                    'qty_po' => $s->totalQtyPO ?? 0,
-                    'harga_po_total' => $s->totalHargaPO ?? 0,
-                    'harga_po_satuan' => $s->hargaSatuanPO ?? 0,
-                    'satuan_po' => $s->satuanPO  ?? "-",
-                    'qty_lpb' => $s->totalQtyLPB ?? 0,
-                    'harga_lpb_total' => $s->totalHargaLPB ?? 0,
-                    'harga_lpb_satuan' => $s->hargaSatuanLPB ?? 0,
-                    'satuan_lpb' => $s->satuanLPB ?? "-",
+                    'qty' => $s->totalQty ?? 0,
+                    'harga_total' => $s->totalHarga ?? 0,
+                    'harga_satuan' => $s->hargaSatuan ?? 0,
+                    'satuan' => $s->satuanPO  ?? "-",
                     // 'no_dokumen' => $s->no_dokumen,
                     'stock_dokumen' => $s->stock_dokumen,
                 ]);
@@ -324,6 +332,7 @@ class RasioController extends BaseController
                         'rasio_barang' => $s->rasio,
                         'harga_barang' => $s->harga,
                         'kode_satuan' => $s->kode_satuan,
+                        'tipe_bahan' => $s->tipe_bahan,
                     ]);
                 }
             } else {
@@ -346,6 +355,7 @@ class RasioController extends BaseController
                             'rasio_barang' => $i->rasio,
                             'harga_barang' => $i->harga_satuan,
                             'kode_satuan' => $i->kode_satuan,
+                            'tipe_bahan' => $i->tipe_bahan,
                             'satuan_id' => $i->satuan_id
                         ]);
                     }
@@ -447,28 +457,13 @@ class RasioController extends BaseController
                     'rasio_id' => $id,
                     'barang1_id' => $s->barang1_id,
                     'barang2_id' => $s->barang2_id,
-                    'supplier_name' => $s->supplier_name,
-                    'bc_id' => $s->bc_id,
-                    'stock_detail_id' => $s->stock_detail_id,
-                    'no_aju' => $s->no_aju,
                     'stock_id' => $s->stock_id,
-                    'stock_dokumen' => $s->stock_dokumen,
-                    'no_dokumen_2' => $s->no_dokumen_2,
-                    'supplier_id' => $s->supplier_id,
                     'harga_umum' => $s->harga_umum ?? 0,
                     'harga_harian' => $s->harga_harian ?? 0,
                     'harga_bulanan' => $s->harga_bulanan ?? 0,
-                    'no_po' => $s->no_po,
-                    'no_dokumen_1' => $s->no_dokumen_1,
-                    'stock_date' => $s->stock_date,
-                    'sumber' => $s->sumber,
                     'stok_total' => $s->stok_total,
-                    'bc_type' => $s->bc_type,
                     'satuan' => $s->satuan,
                     'barang' => $s->barang,
-                    'type_barang' => $s->type_barang,
-                    'type_barang_text' => $s->type_barang_text,
-                    'stok_produksi' => $s->stok_produksi ?? 0,
                 ]);
             }
 
@@ -542,20 +537,26 @@ class RasioController extends BaseController
             "rasio" => $rasioModel,
             "rasioBarangDigunakanAlokasi" => $rasioBarangDigunakanAlokasiModel,
             "rasioBarangDigunakan" => $rasioBarangDigunakanModel,
-            "rasioBarangJadi" => $rasioBarangJadiModel,
-            "rasioBarangPenolong" => $rasioBarangPenolongModel,
-            "rasioCost" => $rasioCostModel,
+            // "rasioBarangJadi" => $rasioBarangJadiModel,
+            // "rasioBarangPenolong" => $rasioBarangPenolongModel,
+            // "rasioCost" => $rasioCostModel,
         ];
-
         return view('Accounting/rasio/form', $data);
     }
 
     public function allRasio()
     {
-        $tanggal_input = $this->request->getGet("dateStart") ? $this->request->getGet("dateStart") : "";
-        if ($tanggal_input != "") {
-            $tanggal_parts = explode("/", $tanggal_input); // Memisahkan bulan dan tahun
-            $tanggal_mysql = $tanggal_parts[1] . "-" . str_pad($tanggal_parts[0], 2, "0", STR_PAD_LEFT);
+        $tanggal_awal_input = $this->request->getVar("tanggal_awal") ? $this->request->getVar("tanggal_awal") : "";
+        $tanggal_akhir_input = $this->request->getVar("tanggal_akhir") ? $this->request->getVar("tanggal_akhir") : "";
+
+        if ($tanggal_awal_input != "") {
+            $tanggal_awal_parts = explode("/", $tanggal_awal_input); // Memisahkan bulan dan tahun
+            $tanggal_awal = $tanggal_awal_parts[2] . "-" . $tanggal_awal_parts[1] . "-" . str_pad($tanggal_awal_parts[0], 2, "0", STR_PAD_LEFT);
+        }
+
+        if ($tanggal_akhir_input != "") {
+            $tanggal_akhir_parts = explode("/", $tanggal_akhir_input); // Memisahkan bulan dan tahun
+            $tanggal_akhir = $tanggal_akhir_parts[2] . "-" . $tanggal_akhir_parts[1] . "-" . str_pad($tanggal_akhir_parts[0], 2, "0", STR_PAD_LEFT);
         }
 
         $payload = [
@@ -573,7 +574,8 @@ class RasioController extends BaseController
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
-            "month"         => $tanggal_input != "" ? $tanggal_mysql : "",
+            "tanggal_awal"  => $tanggal_awal_input != "" ? $tanggal_awal : "",
+            "tanggal_akhir" => $tanggal_akhir_input != "" ? $tanggal_akhir : "",
             "department"    => $this->request->getGet("divisi_id"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType")
@@ -594,7 +596,8 @@ class RasioController extends BaseController
                 "no"                    => $no++,
                 "id"                    => encrypt($data['id']),
                 "divisi"                => $data['divisi'],
-                "month"                 => $data['bulan'],
+                "tanggal_awal"          => date('d/m/Y', strtotime($data['tanggal_awal'])),
+                "tanggal_akhir"         => date('d/m/Y', strtotime($data['tanggal_akhir'])),
                 "harga"                 => "" . number_format(formatter($data['harga_total_lpb'], "STR_TO_FLOAT"), 2, '.', ','),
             ]);
         }
@@ -896,54 +899,56 @@ class RasioController extends BaseController
 
             // definisi Saldo Awal
             // awal fungsi untuk saldo Awal
-            $dataBahanBakuDigunakanSaldoAwal = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
-            $dataSaldoAwal = [];
-            $dataStockAwalModel = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
-                "bahan_baku",
-                $divisiID
-            );
+            $dataBahanBakuDigunakanSaldoAwal = $this->stockTutupBukuModel->getStockTutupBukuWithAddCondition($conditionProduction);
+            // var_dump($dataBahanBakuDigunakanSaldoAwal);
+            // exit;
+            // $dataSaldoAwal = [];
+            // $dataStockAwalModel = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
+            //     "bahan_baku",
+            //     $divisiID
+            // );
 
-            foreach ($dataStockAwalModel as $value) {
-                $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
-                    $value['stock_id']
-                );
-                // var_dump($value);
-                $stock = $this->stockModel->find($value['stock_id']);
-                if ($stock['kemasan_id'] == 0) {
-                    $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
-                    $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
-                    $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
-                    $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
-                } else {
-                    $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
-                    $satuan = $this->satuanModel->find($kemasan['satuan_id']);
-                    $barangName = $kemasan['name'];
-                }
-                for ($i = 0; $i < count($dataResult); $i++) {
-                    $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
+            // foreach ($dataStockAwalModel as $value) {
+            //     $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
+            //         $value['stock_id']
+            //     );
+            //     // var_dump($value);
+            //     $stock = $this->stockModel->find($value['stock_id']);
+            //     if ($stock['kemasan_id'] == 0) {
+            //         $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
+            //         $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
+            //         $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+            //         $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
+            //     } else {
+            //         $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
+            //         $satuan = $this->satuanModel->find($kemasan['satuan_id']);
+            //         $barangName = $kemasan['name'];
+            //     }
+            //     for ($i = 0; $i < count($dataResult); $i++) {
+            //         $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
 
-                    $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
-                    $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
-                    $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
-                    $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
-                    $dataResult[$i]['barang'] = strtoupper($barangName);
-                    $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
-                    $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-                    $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
-                    $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-                    $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
+            //         $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
+            //         $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
+            //         $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+            //         $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
+            //         $dataResult[$i]['barang'] = strtoupper($barangName);
+            //         $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+            //         $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+            //         $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
+            //         $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
+            //         $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
 
-                    $dataResult[$i]['stok_produksi'] = 0;
+            //         $dataResult[$i]['stok_produksi'] = 0;
 
-                    foreach ($dataBahanBakuDigunakanSaldoAwal as $valueProductionResultData) {
-                        if ($valueProductionResultData['stock_id'] == $dataResult[$i]['stock_id']) {
-                            $dataResult[$i]['stok_produksi'] = $valueProductionResultData['qty'];
-                            break;
-                        }
-                    }
-                }
-                $dataSaldoAwal = array_merge($dataSaldoAwal, $dataResult);
-            }
+            //         foreach ($dataBahanBakuDigunakanSaldoAwal as $valueProductionResultData) {
+            //             if ($valueProductionResultData['stock_id'] == $dataResult[$i]['stock_id']) {
+            //                 $dataResult[$i]['stok_produksi'] = $valueProductionResultData['qty'];
+            //                 break;
+            //             }
+            //         }
+            //     }
+            //     $dataSaldoAwal = array_merge($dataSaldoAwal, $dataResult);
+            // }
             // exit;
             // akhir fungsi untuk saldo Awal
 
@@ -1209,7 +1214,7 @@ class RasioController extends BaseController
                     'dataProduksiBahanDigunakan'            => $dataProduksiBahanDigunakan,
                     'dataBahanDigunakanPO'                  => $dataBahanDigunakanPO,
                     'dataProduksiBahanDigunakanProsesUlang' => $dataProduksiBahanDigunakanProsesUlang,
-                    'dataSaldoAwal'                         => $dataSaldoAwal,
+                    'dataSaldoAwal'                         => $dataBahanBakuDigunakanSaldoAwal,
                     'dataSaldoAkhir'                        => $dataSaldoAkhir,
                     'dataSaldoAdjusment'                    => $dataSaldoAdjusment,
                     'dataSaldoMutasi'                       => $dataSaldoMutasi,

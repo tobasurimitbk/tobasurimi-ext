@@ -108,6 +108,7 @@ $routes->post('/vendor/save', 'Master\Vendor::saveVendor', ['filter' => 'Auth'])
 $routes->post('/vendor/update', 'Master\Vendor::updateVendor', ['filter' => 'Auth']);
 $routes->post('/vendor/delete', 'Master\Vendor::deleteVendor', ['filter' => 'Auth']);
 
+
 // DIVISI
 $routes->get('/divisi', 'Master\Divisi::divisi', ['filter' => 'Auth']);
 $routes->get('/divisi/all', 'Master\Divisi::allDivisi', ['filter' => 'Auth']);
@@ -804,6 +805,12 @@ $routes->get('/divisi/dropdown', 'Master\Divisi::dropdownDivisi', ['filter' => '
 
 // TAX
 $routes->get('/tax/dropdown', 'Master\Tax::dropdownTax', ['filter' => 'Auth']);
+$routes->get('/tax', 'Master\Tax::index', ['filter' => 'Auth']);
+$routes->get('/tax/all', 'Master\Tax::all', ['filter' => 'Auth']);
+$routes->get('/tax/id/(:segment)', 'Master\Tax::getById/$1', ['filter' => 'Auth']);
+$routes->post('/tax/save', 'Master\Tax::save', ['filter' => 'Auth']);
+$routes->post('/tax/update', 'Master\Tax::update', ['filter' => 'Auth']);
+$routes->post('/tax/delete', 'Master\Tax::delete', ['filter' => 'Auth']);
 
 // BANK
 $routes->get('/bank', 'Master\Bank::index', ['filter' => 'Auth']);

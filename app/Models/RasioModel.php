@@ -60,7 +60,7 @@ class RasioModel extends Model
 
         $totalData = $divisisDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['month'] || $addCondition['department']) {
+        if ($addCondition['search'] || $addCondition['tanggal_awal'] || $addCondition['tanggal_akhir'] || $addCondition['department']) {
             $divisisDataQry->groupStart();
         }
 
@@ -68,15 +68,19 @@ class RasioModel extends Model
             $divisisDataQry->like('divisis.divisi', $addCondition['search']);
         }
 
-        if ($addCondition['month']) {
-            $divisisDataQry->like('rasio.bulan', $addCondition['month']);
+        if ($addCondition['tanggal_awal']) {
+            $divisisDataQry->where('rasio.tanggal_awal >=', $addCondition['tanggal_awal']);
+        }
+
+        if ($addCondition['tanggal_akhir']) {
+            $divisisDataQry->where('rasio.tanggal_akhir <=', $addCondition['tanggal_akhir']);
         }
 
         if ($addCondition['department']) {
             $divisisDataQry->where('rasio.divisi_id', $addCondition['department']);
         }
 
-        if ($addCondition['search'] || $addCondition['month'] || $addCondition['department']) {
+        if ($addCondition['search'] || $addCondition['tanggal_awal'] || $addCondition['tanggal_akhir'] || $addCondition['department']) {
             $divisisDataQry->groupEnd();
         }
 

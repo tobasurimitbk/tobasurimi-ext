@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\DivisisModel;
 use App\Models\SaldoTutupBukuModel;
 use App\Models\SatuansModel;
+use App\Models\StockDetail2Model;
 use App\Models\StockModel;
 use App\Models\StockTutupBukuModel;
 use App\Models\Sub_AkunsModel;
@@ -23,6 +24,7 @@ class TutupBukuController extends BaseController
     protected $satuanModel;
     protected $subAkunModel;
     protected $encrypter;
+    protected $stockDetail2Model;
 
     public function __construct()
     {
@@ -34,6 +36,7 @@ class TutupBukuController extends BaseController
         $this->stockTutupBukuModel = new StockTutupBukuModel();
         $this->saldoTutupBukuModel = new SaldoTutupBukuModel();
         $this->stockModel = new StockModel();
+        $this->stockDetail2Model = new StockDetail2Model();
         $this->satuanModel = new SatuansModel();
         $this->subAkunModel = new Sub_AkunsModel();
     }
@@ -131,15 +134,16 @@ class TutupBukuController extends BaseController
     public function save()
     {
         $addCondition = [
-            "sort"   => $this->request->getVar("sort"),
-            "sortType"  => $this->request->getVar("sortType"),
-            "search" => $this->request->getVar("search"),
-            "parent_type" => $this->request->getVar("parent_type"),
-            "parent_name" => $this->request->getVar("parent_name"),
+            "sort"   => $this->request->getVar("sort") ?? "createdAt",
+            "sortType"  => $this->request->getVar("sortType") ?? "desc",
+            "search" => $this->request->getVar("search") ?? "",
+            "parent_type" => $this->request->getVar("parent_type") ?? "",
+            "parent_name" => $this->request->getVar("parent_name") ?? "",
             "divisi_id" => $this->request->getVar("divisi_id"),
-            "warehouse_id" => $this->request->getVar("warehouse_id"),
-            "kode" =>  $this->request->getVar("search"),
-            "kode_barang" =>  $this->request->getVar("search"),
+            "warehouse_id" => $this->request->getVar("warehouse_id") ?? "",
+            "status_stok" => $this->request->getVar("status_stok") ?? "ALL",
+            "kode" =>  $this->request->getVar("search") ?? "",
+            "kode_barang" =>  $this->request->getVar("search") ?? "",
         ];
         $conditionStock = [
             "barang_master.company_id" => $this->this_company_id,
@@ -163,8 +167,11 @@ class TutupBukuController extends BaseController
         ];
 
         $dataQrySaldo = $this->subAkunModel->getSubsAkunWithDataJurnal($conditionSaldo);
-        $dataQry = $this->stockModel->getStockListBarang($conditionStock, $addCondition);
-
+        $dataQry = $this->stockModel->getStockListBarang($conditionStock, $addCondition, 0, 0);
+        // var_dump($conditionStock);
+        // var_dump($addCondition);
+        // var_dump($dataQry['data']);
+        // exit;
         $idTutupBuku = $this->tutupBukuModel->insert([
             'company_id' => $this->this_company_id,
             'divisi_id' => $this->request->getVar('divisi_id'),
@@ -176,15 +183,21 @@ class TutupBukuController extends BaseController
             $satuan2 = $this->satuanModel->find($data->satuan_2);
             $satuan3 = $this->satuanModel->find($data->satuan_3);
             $data->qty = $this->stockModel->detailStock($data->id)['stok']['stokSekarang'];
+            $avgHarga = $this->stockDetail2Model->getAverageHargaStockList($data->id);
+            // var_dump($avgHarga);
             $this->stockTutupBukuModel->insert([
                 'tutup_buku_id' => $idTutupBuku,
                 'divisi_id' => $this->request->getVar('divisi_id'),
                 'stock_id' => $data->id,
                 'barang1_id' => $data->barang1_id,
                 'barang2_id' => $data->barang2_id,
+                'avg_harga_umum' => $avgHarga['avg_harga_umum'] ?? 0,
+                'avg_harga_harian' => $avgHarga['avg_harga_harian'] ?? 0,
+                'avg_harga_bulanan' => $avgHarga['avg_harga_bulanan'] ?? 0,
                 'qty' => $data->qty
             ]);
         }
+        // exit;
 
         foreach ($dataQrySaldo as &$data) {
             $this->saldoTutupBukuModel->insert([

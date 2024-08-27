@@ -13,20 +13,33 @@
     <div class="card">
         <div class="card-body">
             <div class="row">
-                <div class="col-sm-4 ">
-                    <div class="form-floating " style="height: 50px;">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Dibuat" />
-                                <label for="floatingInput">Pilih Bulan</label>
+                                <input autocomplete="one-time-code" class="form-control input-picker tanggal_awal" id="tanggal_awal" name="tanggal_awal" placeholder="Tanggal Awal Dibuat" value="<?= !empty($rasio) ? date('m/Y', strtotime($rasio->bulan)) : "" ?>">
+                                <label for="floatingInput">Tanggal Dibuat</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 25px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-4 ">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" class="form-control input-picker tanggal_akhir" id="tanggal_akhir" name="tanggal_akhir" placeholder="Tanggal Akhir Dibuat" value="<?= !empty($rasio) ? date('m/Y', strtotime($rasio->bulan)) : "" ?>">
+                                <label for="floatingInput">Tanggal Dibuat</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 ">
                     <div class="form-floating">
                         <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                             <option value=""></option>
@@ -37,7 +50,7 @@
                         <label style="z-index: 1;">Department</label>
                     </div>
                 </div>
-                <div class="col-sm-4 ">
+                <div class="col-sm-3">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari</label>
@@ -51,7 +64,8 @@
                             <tr>
                                 <th>No.</th>
                                 <th>Department</th>
-                                <th>Bulan</th>
+                                <th>Tanggal Awal</th>
+                                <th>Tanggal Akhir</th>
                                 <th>Total Harga</th>
                             </tr>
                         </thead>
@@ -157,7 +171,8 @@
                 dataSrc: "data",
                 data: function(data) {
                     data.search = $(".search").val();
-                    data.dateStart = $(".dateStart").val();
+                    data.tanggal_awal = $(".tanggal_awal").val();
+                    data.tanggal_akhir = $(".tanggal_akhir").val();
                     data.divisi_id = $(".divisi_id").val();
                     data.sort = sort;
                     data.sortType = sortType;
@@ -179,7 +194,10 @@
                 data: "divisi",
                 className: "text-center",
             }, {
-                data: "month",
+                data: "tanggal_awal",
+                className: "text-center",
+            }, {
+                data: "tanggal_akhir",
                 className: "text-center",
             }, {
                 data: "harga",
@@ -203,8 +221,12 @@
             table.ajax.reload();
         });
 
-        $(".dateStart").change(function() {
-            table.ajax.reload();
+        $("#tanggal_awal, #tanggal_akhir").change(function() {
+            var tanggal_awal = $("#tanggal_awal").val();
+            var tanggal_akhir = $("#tanggal_akhir").val();
+            if (tanggal_awal != "" && tanggal_akhir != "") {
+                table.ajax.reload();
+            }
         });
 
         $(".divisi_id").change(function() {
@@ -230,13 +252,11 @@
         }
     }
 
-    $(".dateStart").datepicker({
+    $("#tanggal_awal, #tanggal_akhir").datepicker({
         todayHighlight: true,
-        format: "mm/yyyy",
+        format: "dd/mm/yyyy",
         orientation: "bottom auto",
-        autoclose: true,
-        startView: "months",
-        minViewMode: 1
+        autoclose: true
     });
 
     $('#divisi_id').select2({

@@ -52,7 +52,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal_awal" id="tanggal_awal" name="tanggal_awal" placeholder="Tanggal Awal Dibuat" value="<?= !empty($rasio) ? date('m/Y', strtotime($rasio->bulan)) : "" ?>">
+                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal_awal" id="tanggal_awal" name="tanggal_awal" placeholder="Tanggal Awal Dibuat" value="<?= !empty($rasio) ? date('d/m/Y', strtotime($rasio->tanggal_awal)) : "" ?>">
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -65,7 +65,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal_akhir" id="tanggal_akhir" name="tanggal_akhir" placeholder="Tanggal Akhir Dibuat" value="<?= !empty($rasio) ? date('m/Y', strtotime($rasio->bulan)) : "" ?>">
+                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal_akhir" id="tanggal_akhir" name="tanggal_akhir" placeholder="Tanggal Akhir Dibuat" value="<?= !empty($rasio) ? date('d/m/Y', strtotime($rasio->tanggal_akhir)) : "" ?>">
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -627,63 +627,52 @@
                         list_items_saldo_jual = res.dataSaldoMutasi;
                         // bahan jadi produksi
                         res.dataBarangJadi.forEach(function(item) {
+                            let tipe_bahan;
+
                             if (item.barang_type == "bahan_setengah_jadi") {
-                                list_items_barang_jadi_trimming.push(item);
                                 tipe_bahan = "trimming";
+                                list_items_barang_jadi_trimming.push({
+                                    ...item,
+                                    tipe_bahan: tipe_bahan
+                                });
                             } else if (item.barang_type == "bahan_jadi" && item.kode_satuan == "CAN") {
-                                list_items_barang_jadi_kaleng.push(item);
                                 tipe_bahan = "kaleng";
+                                list_items_barang_jadi_kaleng.push({
+                                    ...item,
+                                    tipe_bahan: tipe_bahan
+                                });
                             } else {
-                                tipe_bahan = "frozen;"
+                                tipe_bahan = "frozen";
                                 let barang1Id = item.barang1_id;
                                 let barang2Id = item.barang2_id;
-                                let barang_name = item.barang_name;
-                                let kode_barang = item.kode_barang;
-                                let kode_satuan = item.kode_satuan;
-                                let spesifikasi = item.spesifikasi;
-                                let production_result_detail_id = item.production_result_detail_id;
-                                let production_result_id = item.production_result_id;
-                                let satuan_id = item.satuan_id;
-                                let bc_id = item.bc_id;
-                                let stock_id = item.stock_id;
-                                let no_aju = item.no_aju;
-                                let stock_dokumen = item.stock_dokumen;
 
                                 if (!barang1IdQtyMap[barang1Id]) {
                                     barang1IdQtyMap[barang1Id] = {};
                                 }
-                                if (barang1IdQtyMap[barang1Id][barang2Id]) {
 
+                                if (barang1IdQtyMap[barang1Id][barang2Id]) {
                                     barang1IdQtyMap[barang1Id][barang2Id].qty = parseFloat(item.qty);
                                     barang1IdQtyMap[barang1Id][barang2Id].qty2 = parseFloat(item.qty2);
                                     barang1IdQtyMap[barang1Id][barang2Id].qty_isi = parseFloat(item.qty_isi);
                                     barang1IdQtyMap[barang1Id][barang2Id].banyakData = parseFloat(res.dataBarangJadi.length);
                                     barang1IdQtyMap[barang1Id][barang2Id].hasilWithPersentase = parseFloat(item.hasilWithPersentase);
-                                    barang1IdQtyMap[barang1Id][barang2Id].hasilWithPersentase = parseFloat(item.hasilWithPersentase);
-
-
-
-                                    // barang1IdQtyMap[barang1Id].qty += parseFloat(item.qty);
-                                    // barang1IdQtyMap[barang1Id].qty2 += parseFloat(item.qty2);
-                                    // barang1IdQtyMap[barang1Id].qty_isi += parseFloat(item.qty_isi);
-                                    // barang1IdQtyMap[barang1Id].banyakData += parseFloat(1);
-                                    // barang1IdQtyMap[barang1Id].hasilWithPersentase += parseFloat(item.hasilWithPersentase);
                                 } else {
                                     // Initialize a new entry for this barang1_id
                                     barang1IdQtyMap[barang1Id][barang2Id] = {
                                         barang1_id: barang1Id,
+                                        tipe_bahan: tipe_bahan,
                                         barang2_id: barang2Id,
-                                        barang_name: barang_name,
-                                        kode_barang: kode_barang,
-                                        kode_satuan: kode_satuan,
-                                        spesifikasi: spesifikasi,
-                                        production_result_detail_id: production_result_detail_id,
-                                        production_result_id: production_result_id,
-                                        satuan_id: satuan_id,
-                                        bc_id: bc_id,
-                                        stock_id: stock_id,
-                                        no_aju: no_aju,
-                                        stock_dokumen: stock_dokumen,
+                                        barang_name: item.barang_name,
+                                        kode_barang: item.kode_barang,
+                                        kode_satuan: item.kode_satuan,
+                                        spesifikasi: item.spesifikasi,
+                                        production_result_detail_id: item.production_result_detail_id,
+                                        production_result_id: item.production_result_id,
+                                        satuan_id: item.satuan_id,
+                                        bc_id: item.bc_id,
+                                        stock_id: item.stock_id,
+                                        no_aju: item.no_aju,
+                                        stock_dokumen: item.stock_dokumen,
                                         qty: parseFloat(item.qty),
                                         qty2: parseFloat(item.qty2),
                                         qty_isi: parseFloat(item.qty_isi),
@@ -715,6 +704,8 @@
 
                             }
                         }
+                        console.log(list_items_barang_jadi_frozen);
+
 
 
                         drawTablePembelian();
@@ -1346,7 +1337,6 @@
                 row += '</tr>';
                 no++;
             });
-
             $('.body-detail-table-alokasi').append(row);
         }
     }
@@ -1459,19 +1449,19 @@
             var stokProduksi = 0;
             var totalHarga = 0;
             list_items_saldo_awal.map((item, index) => {
+                // console.log(item);
+
                 // counting total
                 hargaUmum += item.harga_umum !== null ? parseFloat(item.harga_umum) : 0;
                 hargaHarian += item.harga_harian !== null ? parseFloat(item.harga_harian) : 0;
                 hargaBulanan += item.harga_bulanan !== null ? parseFloat(item.harga_bulanan) : 0;
                 stok = item.stok_total !== null ? parseFloat(item.stok_total) : 0;
-                stokProduksi = item.stok_produksi !== null ? parseFloat(item.stok_produksi) : 0;
-                totalStok = stok + stokProduksi;
-                totalHarga = (hargaUmum + hargaHarian + hargaBulanan) * totalStok;
+                totalHarga = (hargaUmum + hargaHarian + hargaBulanan) * stok;
                 // end counting
                 row += '<tr style="color:whitesmoke;text-align: center;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.barang + '</td>';
-                row += '<td>' + (totalStok !== 0 ? parseFloat(totalStok).toLocaleString() : formatRupiah(0)) + '</td>';
+                row += '<td>' + (stok !== 0 ? parseFloat(stok).toLocaleString() : 0) + '</td>';
                 row += '<td>' + (item.satuan !== undefined ? item.satuan : strip) + '</td>';
                 row += '<td>' + (totalHarga !== 0 ? formatRupiah(parseFloat(totalHarga)) : formatRupiah(0)) + '</td>';
                 row += '</tr>';
@@ -2563,7 +2553,7 @@
         }
     };
     const drawTableRasioAkhirFrozen = function(data) {
-        console.log(data);
+        // console.log(data);
         $('.body-table-rasio-akhir').empty();
         $('.tfoot-rasio-akhir').empty();
 
@@ -2943,42 +2933,6 @@
             });
         }
     };
-
-
-    <?php if (!empty($rasio)) : ?>
-        $("#qtyTotalPembelian").val(<?= !empty($rasio) ? $rasio->total_qty_po : "" ?>.toLocaleString());
-        $("#hargaTotalPembelian").val(formatRupiah(<?= !empty($rasio) ? $rasio->harga_total_po : "" ?>));
-        $("#hargaSatuanPembelian").val(formatRupiah(<?= !empty($rasio) ? $rasio->harga_average_po : "" ?>));
-
-        $("#qtyTotalPenerimaan").val(<?= !empty($rasio) ? $rasio->total_qty_lpb : "" ?>.toLocaleString());
-        $("#hargaTotalPenerimaan").val(formatRupiah(<?= !empty($rasio) ? $rasio->harga_total_lpb : "" ?>));
-        $("#hargaSatuanPenerimaan").val(formatRupiah(<?= !empty($rasio) ? $rasio->harga_average_lpb : "" ?>));
-
-        $("#biayaSubsidi").val(formatRupiah(<?= !empty($rasio) ? $rasio->total_subsidi : "" ?>));
-        $("#biayaLain").val(formatRupiah(<?= !empty($rasio) ? $rasio->total_biaya : "" ?>));
-        $("#biayaKopek").val(formatRupiah(<?= !empty($rasio) ? $rasio->total_kopek : "" ?>));
-
-        <?php foreach ($rasioBarangDigunakan as $value) : ?>
-            list_items_barang_digunakan.push({
-                'rasio_barang_digunakan_id': <?= json_encode($value->id) ?>,
-                'barang_name': <?= json_encode($value->barang_name) ?>,
-                'spesifikasi': <?= json_encode($value->spesifikasi) ?>,
-                'totalQtyPO': parseFloat(<?= json_encode($value->qty_po) ?>),
-                'totalHargaPO': parseFloat(<?= json_encode($value->harga_po_total) ?>),
-                'hargaSatuanPO': parseFloat(<?= json_encode($value->harga_po_satuan) ?>),
-                'satuanPO': <?= json_encode($value->satuan_po) ?>,
-                'totalQtyLPB': parseFloat(<?= json_encode($value->qty_lpb) ?>),
-                'totalHargaLPB': parseFloat(<?= json_encode($value->harga_lpb_total) ?>),
-                'hargaSatuanLPB': parseFloat(<?= json_encode($value->harga_lpb_satuan) ?>),
-                'satuanLPB': <?= json_encode($value->satuan_lpb) ?>,
-            });
-        <?php endforeach; ?>
-        drawTableDigunakan();
-
-
-
-
-    <?php endif; ?>
 
     function preventNegativeInput(inputElement) {
         var inputValue = inputElement.value;
@@ -3443,6 +3397,51 @@
             }
         })
     });
+
+    <?php if (!empty($rasio)) : ?>
+        $("#qtyTotalPembelian").val(<?= !empty($rasio) ? $rasio->total_qty_po : "" ?>.toLocaleString());
+        $("#hargaTotalPembelian").val(formatRupiah(<?= !empty($rasio) ? $rasio->harga_total_po : "" ?>));
+        $("#hargaSatuanPembelian").val(formatRupiah(<?= !empty($rasio) ? $rasio->harga_average_po : "" ?>));
+
+        $("#qtyTotalPenerimaan").val(<?= !empty($rasio) ? $rasio->total_qty_lpb : "" ?>.toLocaleString());
+        $("#hargaTotalPenerimaan").val(formatRupiah(<?= !empty($rasio) ? $rasio->harga_total_lpb : "" ?>));
+        $("#hargaSatuanPenerimaan").val(formatRupiah(<?= !empty($rasio) ? $rasio->harga_average_lpb : "" ?>));
+
+        $("#biayaSubsidi").val(formatRupiah(<?= !empty($rasio) ? $rasio->total_subsidi : "" ?>));
+        $("#biayaLain").val(formatRupiah(<?= !empty($rasio) ? $rasio->total_biaya : "" ?>));
+        $("#biayaKopek").val(formatRupiah(<?= !empty($rasio) ? $rasio->total_kopek : "" ?>));
+
+        <?php foreach ($rasioBarangDigunakan as $value) : ?>
+            list_items_barang_digunakan.push({
+                'rasio_barang_digunakan_id': <?= json_encode($value->id) ?>,
+                'barang_name': <?= json_encode($value->barang_name) ?>,
+                'spesifikasi': <?= json_encode($value->spesifikasi) ?>,
+                'totalQtyPO': parseFloat(<?= json_encode($value->qty_po) ?>),
+                'totalHargaPO': parseFloat(<?= json_encode($value->harga_po_total) ?>),
+                'hargaSatuanPO': parseFloat(<?= json_encode($value->harga_po_satuan) ?>),
+                'satuanPO': <?= json_encode($value->satuan_po) ?>,
+                'totalQtyLPB': parseFloat(<?= json_encode($value->qty_lpb) ?>),
+                'totalHargaLPB': parseFloat(<?= json_encode($value->harga_lpb_total) ?>),
+                'hargaSatuanLPB': parseFloat(<?= json_encode($value->harga_lpb_satuan) ?>),
+                'satuanLPB': <?= json_encode($value->satuan_lpb) ?>,
+            });
+        <?php endforeach; ?>
+        drawTableDigunakan();
+
+        <?php foreach ($rasioBarangDigunakanAlokasi as $value) : ?>
+            list_items_barang_digunakan_alokasi.push({
+                'barang1_id': <?= json_encode($value->barang1_id) ?>,
+                'barang2_id': <?= json_encode($value->barang2_id) ?>,
+                'barang_name': <?= json_encode($value->barang_name) ?>,
+                'hargaSatuan': <?= json_encode($value->harga_satuan) ?>,
+                'satuanPO': <?= json_encode($value->satuan) ?>,
+                'spesifikasi': <?= json_encode($value->spesifikasi) ?>,
+                'totalHarga': parseFloat(<?= json_encode($value->harga_total) ?>),
+                'totalQty': parseFloat(<?= json_encode($value->qty) ?>),
+            });
+        <?php endforeach; ?>
+        console.log(list_items_barang_digunakan_alokasi);
+    <?php endif; ?>
 </script>
 
 <?= $this->endSection(); ?>

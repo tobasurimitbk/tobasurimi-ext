@@ -542,4 +542,24 @@ class StockDetail2Model extends Model
 
         return $dataQry;
     }
+
+    public function getAverageHargaStockList($stockID)
+    {
+        // JIKA $isAdjusment = true MAKA STOK < 0 MUNCUL
+        // JIKA $isAdjusment = false MAKA STOK > 0 YANG MUNCUL
+        $selectQry = '
+        stock_details2.stock_id,
+        AVG(stock_details2.harga_umum) AS avg_harga_umum,
+        AVG(stock_details2.harga_harian) AS avg_harga_harian,
+        AVG(stock_details2.harga_bulanan) AS avg_harga_bulanan
+    ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQry)
+            ->where('stock_details2.stock_id', $stockID)
+            ->groupBy('stock_details2.stock_id')
+            ->first();
+
+        return $dataQry;
+    }
 }
