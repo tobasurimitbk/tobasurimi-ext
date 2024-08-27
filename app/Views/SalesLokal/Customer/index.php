@@ -507,9 +507,6 @@
                 },
                 jenis_penjualan: {
                     required: true
-                },
-                sales_id: {
-                    required: true
                 }
             },
             messages: {
@@ -535,9 +532,6 @@
                 },
                 jenis_penjualan: {
                     required: "Jenis Penjualan wajib diisi"
-                },
-                sales_id: {
-                    required: "Sales wajib diisi"
                 }
             },
             errorElement: 'span',
