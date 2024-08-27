@@ -231,6 +231,10 @@
                 className: "text-center"
             },
             {
+                data: "status",
+                className: "text-center"
+            },
+            {
                 data: "counter_print",
                 className: "text-center",
                 render: function(data, type, row) {
@@ -240,10 +244,6 @@
                         return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
                     }
                 }
-            },
-            {
-                data: "status",
-                className: "text-center"
             },
             {
                 data: "id",
@@ -257,8 +257,8 @@
                         return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
 
                     <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-penjualan-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
-                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                </button>
+                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                    </button>
                     `
                     } else {
                         return `
