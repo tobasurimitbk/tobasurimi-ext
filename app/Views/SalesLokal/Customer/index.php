@@ -697,6 +697,7 @@
                         $(".jenis_penjualan").val(res.data.jenis_penjualan).change();
 
                         $(".nik").val(res.data.nik);
+                        $(".sales_id").val(res.data.sales_id).change();
 
 
                         validator.resetForm();

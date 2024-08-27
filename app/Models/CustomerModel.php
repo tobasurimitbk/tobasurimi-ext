@@ -95,7 +95,7 @@ class CustomerModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "customers.*, 
-                    users.name as namaSales,
+                    employees.name as namaSales,
                     companies.company as companyName,
                       metadata.value AS currencyName,
                       country.country_name AS countryName";
@@ -106,7 +106,7 @@ class CustomerModel extends Model
             ->where($condition)
             ->join('metadata', 'customers.currency = metadata.id', 'left')
             ->join('country', 'country.id = customers.country_id', 'left')
-            ->join('users', 'users.id = customers.sales_id', 'LEFT')
+            ->join('employees', 'employees.id = customers.sales_id', 'LEFT')
             ->join('companies', 'companies.id = customers.company_id', 'LEFT')
             // ->groupBy(('customers.id'))
             ->orderBy($sort, $sortType);
