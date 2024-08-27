@@ -1875,7 +1875,7 @@
                         const includeTaxStatus = $('#include_tax').is(':checked');
                         tableData.map(obj => {
                             // total = total + (obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0) * (obj.qty ? Number(obj.qty) : 0);
-                            total += Number(obj.amount.replaceAll(",", "")) || 0;
+                            total += Number(obj.amount) || 0;
 
                             if (taxStatus && !includeTaxStatus) {
                                 taxAmt += obj.taxAmt ?? 0;

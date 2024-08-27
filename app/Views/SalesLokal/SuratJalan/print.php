@@ -123,15 +123,22 @@
                             <div>No. Order</div>
                             <div class="txt-center">
                                 <?php
-                                // Check if there are multiple sales orders
-                                if (count($soData) > 1) {
-                                    // Use array_map to extract no_sales_order and join them with a comma
-                                    echo implode(', ', array_map(function ($so) {
-                                        return $so->no_sales_order;
-                                    }, $soData));
+                                // Array untuk menyimpan no_sales_order yang unik
+                                $uniqueSalesOrders = [];
+
+                                // Iterasi data sales order
+                                foreach ($soData as $so) {
+                                    // Jika no_sales_order belum ada dalam array, tambahkan
+                                    if (!in_array($so->no_sales_order, $uniqueSalesOrders)) {
+                                        $uniqueSalesOrders[] = $so->no_sales_order;
+                                    }
+                                }
+
+                                // Tampilkan no_sales_order yang berbeda
+                                if (count($uniqueSalesOrders) > 1) {
+                                    echo implode(', ', $uniqueSalesOrders);
                                 } else {
-                                    // If only one sales order, just display it
-                                    echo $soData[0]->no_sales_order;
+                                    echo $uniqueSalesOrders[0];
                                 }
                                 ?>
                             </div>
