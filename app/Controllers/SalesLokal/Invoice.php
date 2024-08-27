@@ -35,7 +35,7 @@ class Invoice extends BaseController
     protected $SalesOrderDetailModel;
     protected $SuratJalanModel;
     protected $SalesOrderInvoiceDetailModel;
-    protected $TaxModel;
+    protected $taxModel;
 
     public function __construct()
     {
@@ -55,7 +55,7 @@ class Invoice extends BaseController
         $this->SalesOrderDetailModel = new SalesOrderDetailModel();
         $this->SuratJalanModel = new SuratJalanModel();
         $this->SalesOrderInvoiceDetailModel = new SalesOrderInvoiceDetailModel();
-        $this->TaxModel = new TaxModel();
+        $this->taxModel = new TaxModel();
     }
 
     public function index()
@@ -73,6 +73,7 @@ class Invoice extends BaseController
         $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
         $tipeShipping = $this->MetadataModel->asObject()->select(['id', 'value'])->where('name', 'tipe_shipping_via')->findAll();
         $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur($this->this_company_id);
+        $taxData = $this->taxModel->getTaxByType('ppn');
         $data = [
             "noFaktur" => $noFaktur,
             "dataCustomers" => $customers,
@@ -80,6 +81,7 @@ class Invoice extends BaseController
             "seller_name" => session()->get('login')->name,
             "via" => $tipeShipping,
             "termin"        => "",
+            "taxData"       => $taxData
         ];
         //echo json_encode($data);
         return view('SalesLokal/Invoice/form', $data);
@@ -311,6 +313,8 @@ class Invoice extends BaseController
                 "tipe_invoice"      => 'LOKAL',
                 "status_pelunasan"  => 'UNPAID',
                 "id_company"        => $this->this_company_id,
+                "tax_id"            => $this->request->getPost('taxes'),
+                "tax_value"         => $this->taxModel->find($this->request->getPost('taxes'))['tax_value'],
             ];
 
             $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->insert($values);
@@ -430,6 +434,7 @@ class Invoice extends BaseController
         $dataSalesInvoiceOrder = $this->SalesOrderInvoiceModel->getSalesOrderInvoiceLokalById(($id));
         $dataSalesInvoiceOrderDetail = $this->SalesOrderInvoiceDetailModel->withDeleted()->where('id_sales_order_invoice', $id)->findAll();
 
+        $taxData = $this->taxModel->getTaxByType('ppn');
         if (empty($dataSalesInvoiceOrder)) {
             return view('errors/html/error_404', ['message' => 'Not Found']);
         }
@@ -461,9 +466,9 @@ class Invoice extends BaseController
                     $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 2);
                     $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
                     $value->amount = number_format(floatval($valueDetail['amount_invoice']), 0);
-                } else {
-                    unset($documentData->itemList[$key]);
-                    break; // Break out of the inner loop since the item has been removed
+                    // } else {
+                    //     unset($documentData->itemList[$key]);
+                    //     break; // Break out of the inner loop since the item has been removed
                 }
             }
         }
@@ -487,9 +492,9 @@ class Invoice extends BaseController
                     $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 2);
                     $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
                     $value->amount = number_format(floatval($valueDetail['amount_invoice']), 0);
-                } else {
-                    unset($documentData->itemList[$key]);
-                    break; // Break out of the inner loop since the item has been removed
+                    // } else {
+                    //     unset($documentData->itemListPosting[$key]);
+                    //     break; // Break out of the inner loop since the item has been removed
                 }
             }
         }
@@ -502,7 +507,8 @@ class Invoice extends BaseController
         $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
 
 
-        // dd($documentList);
+        // var_dump($documentData);
+        // exit;
 
 
         $data = [
@@ -516,6 +522,7 @@ class Invoice extends BaseController
             "seller_name"   => $dataSalesInvoiceOrder->seller_name,
             "via"           => $tipeShipping,
             'invoice_id' => $invoice_id,
+            "taxData"       => $taxData
             // 'dataSo'        => $dataSo
 
         ]; //dd($data);
@@ -1116,7 +1123,7 @@ class Invoice extends BaseController
         $itemList = $this->SalesOrderDetailModel->getItemListByIds($soId);
         //untuk list yang sudah diposting
         $itemListPosting = $this->SalesOrderDetailModel->getItemListPostingByIds($soId);
-        $itemTax = $this->TaxModel->where('id', '4')->asObject()->findAll();
+        $itemTax = $this->taxModel->where('id', '4')->asObject()->findAll();
 
         $dpp = 0;
         $taxAmt = 0;
@@ -1136,8 +1143,6 @@ class Invoice extends BaseController
             } else {
                 $itemTotal = ($hargaBarang - ($hargaBarang * $discount)) * $qty;
             }
-
-
 
             $dpp += $itemTotal;
             $taxAmt += $itemTotal * ($item->tax / 100);

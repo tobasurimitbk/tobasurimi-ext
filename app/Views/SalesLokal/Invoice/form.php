@@ -204,9 +204,9 @@
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-8">
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="mb-3" style="height: 50px;">
                                     <label for="floatingInput">Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
@@ -217,7 +217,18 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-9">
+                            <div class="col-md-4 col-taxes" style="display: none;">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select taxes" name="taxes" id="taxes" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                        <option value=""></option>
+                                        <?php foreach ($taxData as $value) : ?>
+                                            <option value="<?= $value['id']; ?>" data-tax_value="<?= $value['tax_value']; ?>" <?= !empty($data->tax_id) ? ($value['id'] === $data->tax_id ? "selected" : "") : ($value['tax_value'] == 11 ? "selected" : ""); ?>><?= $value['name']; ?>(<?= $value['tax_value']; ?>)</option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput">Pajak</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
                                 <div class="mb-3" style="height: 50px;">
                                     <label for="floatingInput">Include Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
@@ -272,7 +283,7 @@
                                 <td class="font-weight-bold text-right" style="height: 40px;">Rp. <span id="itemSubTotal">0</span></td>
                             </tr>
                             <tr>
-                                <td style="height: 40px;">PPn (11%)</td>
+                                <td style="height: 40px;">PPn (<span id="taxValue"></span>%)</td>
                                 <td class="text-right" style="height: 40px;">Rp. <span id="taxTotal">0</span></td>
                             </tr>
                             <tr>
@@ -548,14 +559,10 @@
 
 
         function getDocumentData(docId) {
-
             <?php if (empty($data)) : ?>
-
                 table.clear();
                 list_items = [];
-
             <?php endif; ?>
-
 
             const docType = $('#doc_type').val();
             $.ajax({
@@ -563,7 +570,6 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-                    // console.log(res);
                     // Populate the form fields with document data
                     $('#salesName').val(res.salesName);
                     $('#customerName').val(res.customerName);
@@ -572,22 +578,13 @@
                     $('#no_po').val(res.no_po);
                     $('#termin').val(res.termin).change();
                     $('#jenis_penjualan').val(res.jenis_penjualan).change();
-
-                    // console.log('sebelum foreach', list_items);
                     // Add items to list_items array
                     res.itemList.forEach(function(item) {
-
                         list_items.push(item);
-
-
                     });
-
 
                     // Update DataTable
                     table.rows.add(res.itemList).draw(false);
-                    // drawTableItem(list_items);
-
-
                     // Update totals
                     // Recount totals
                     reCountTotal();
@@ -599,12 +596,13 @@
         }
 
         <?php if (!empty($documentData)) : ?>
+            var itemList = [];
             <?php if ($data->status_posting == "0") : ?>
-                const itemList = <?= json_encode($documentData->itemList) ?>;
+                itemList = <?= json_encode($documentData->itemList) ?>;
             <?php else : ?>
-                const itemList = <?= json_encode($documentData->itemListPosting) ?>;
+                itemList = <?= json_encode($documentData->itemListPosting) ?>;
             <?php endif; ?>
-            console.log(itemList);
+            console.log(<?= json_encode($documentData) ?>);
             table.rows.add(itemList).draw(false);
             itemList.forEach(function(item) {
                 list_items.push(item);
@@ -615,6 +613,9 @@
         $('#tax_status').on('input change paste', function() {
             if (!this.checked) {
                 $('#include_tax').prop('checked', false);
+                $('.col-taxes').css('display', 'none');
+            } else {
+                $('.col-taxes').css('display', '');
             }
             reCountTotal();
         });
@@ -624,6 +625,10 @@
             if (this.checked && !taxStatus) {
                 $(this).prop('checked', false);
             }
+            reCountTotal();
+        });
+
+        $('#taxes').on('change', function() {
             reCountTotal();
         });
     })
@@ -865,6 +870,10 @@
     const reCountTotal = () => {
         const taxStatus = $('#tax_status').is(':checked');
         const includeTax = $('#include_tax').is(':checked');
+        let taxes = parseFloat($('#taxes option:selected').data('tax_value'));
+
+        console.log(taxes);
+
         const itemList = table.rows().data();
 
         let itemSubTotal = 0;
@@ -874,18 +883,14 @@
         let taxTotalHtml = 0;
         let dummyTax = 0;
 
-
-
         list_items.map((obj) => {
             const itemAmt = parseFloat(obj.amount.replaceAll(',', ''));
             let taxAmt = 0;
 
             discTotal += ((+obj.disc) / 100) * itemAmt;
             if (taxStatus) {
-                dummyTax = (+obj.taxChecked);
-                taxAmt = itemAmt * ((+obj.taxChecked) / 100);
+                taxAmt = itemAmt * (taxes / 100);
             } else {
-                dummyTax = (+obj.tax);
                 taxAmt = itemAmt * ((+obj.tax) / 100);
             }
 
@@ -909,6 +914,7 @@
 
         $('#itemSubTotal').html(itemSubTotal.toLocaleString());
         $('#taxTotal').html(taxTotalHtml.toLocaleString());
+        $('#taxValue').html(taxes);
 
 
         if (taxStatus && includeTax) {

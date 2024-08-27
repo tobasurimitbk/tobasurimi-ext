@@ -137,7 +137,7 @@
                 </div>
             </td>
             <td align="right" style="text-align: right;">
-                <div class="txt-bold txt-center">Sales Invoice</div>
+                <div class="txt-bold txt-center" style="font-size: 17px;">Sales Invoice</div>
                 <table class="w-100 rounded-border" style="margin-left: auto;margin-right: 0">
                     <tr>
                         <td style="border-right: 1px solid;border-right-style: dashed;width: 50%;">

@@ -44,6 +44,8 @@ class SalesOrderInvoiceModel extends Model
         'id_company',
         'document_no',
         'status_posting',
+        'tax_id',
+        'tax_value',
     ];
 
     // Dates

@@ -9,11 +9,13 @@ use App\Models\TaxModel;
 class Tax extends BaseController
 {
     protected $token;
+    protected $this_company_id;
     protected $taxModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
+        $this->this_company_id = session()->get("login")->this_company_id;
         $this->taxModel = new TaxModel();
     }
 
@@ -100,6 +102,7 @@ class Tax extends BaseController
                 $tax_value =  $this->request->getPost("tax_value");
 
                 $values = [
+                    "company_id" => $this->this_company_id,
                     "name" => $tax_name,
                     "type" => $tax_type,
                     "tax_value" => $tax_value,
@@ -165,6 +168,7 @@ class Tax extends BaseController
                 $tax_value =  $this->request->getPost("tax_value");
 
                 $values = [
+                    "company_id" => $this->this_company_id,
                     "name" => $tax_name,
                     "type" => $tax_type,
                     "tax_value" => $tax_value,
