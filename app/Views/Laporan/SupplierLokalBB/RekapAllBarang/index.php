@@ -49,7 +49,7 @@
 
 
                         </select>
-                        <label for="floatingInput">Filter Divisi</label>
+                        <label for="floatingInput">Filter Departemen</label>
                     </div>
                 </div>
 
@@ -75,10 +75,9 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th rowspan="2">No</th>
-                                <th onclick="changeSort('barangName')" class="sort" rowspan="2">Jenis</th>
-
-                                <!-- <th onclick="changeSort('spekName')" class="sort" rowspan="2">Spesifikasi</th> -->
-                                <th onclick="changeSort('bagianName')" class="sort" rowspan="2">Divisi</th>
+                                <th onclick="changeSort('barangName')" class="sort" rowspan="2">Barang</th>
+                                <th onclick="changeSort('spekName')" class="sort" rowspan="2">Spesifikasi</th>
+                                <th onclick="changeSort('bagianName')" class="sort" rowspan="2">Departemen</th>
                                 <th rowspan="2">Qty</th>
                                 <th rowspan="2">Satuan</th>
                                 <th colspan="3">Harian</th>
@@ -160,10 +159,10 @@
 
             },
 
-            // {
-            //     data: "spekName",
-            //     className: "text-center",
-            // },
+            {
+                data: "spekName",
+                className: "text-center",
+            },
 
             {
                 data: "bagianName",
@@ -272,11 +271,18 @@
         table.ajax.reload();
     });
 
-    $(' .filter_divisi , .filter_barang').select2({
-        placeholder: "",
+    $('.filter_divisi').select2({
+        placeholder: "Pilih Departemen",
         theme: "bootstrap-5",
         allowClear: true,
     })
+
+    $('.filter_barang').select2({
+        placeholder: "Pilih Barang",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+
 
     $(' .filter_divisi , .filter_barang')
         .parent('div')

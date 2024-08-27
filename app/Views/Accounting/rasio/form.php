@@ -2693,7 +2693,7 @@
                 });
 
                 rowSubTotal = `
-                   <tr style="color:whitesmoke;text-align: center;">
+                   <tr style="color:whitesmoke;text-align: center; background-color:#fadfbe"">
                         <td colspan="4"> Sub Total </td>
                         <td>
                             <input class="form-control sub-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${totalQtyPerBarangMaster}">
@@ -2729,7 +2729,7 @@
 
 
             rowFooter += `
-            <tr>
+            <tr style="background-color:#f2c996;">
                 <td colspan="4">GrandTotal</td>
                 <td>
                     <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${grandTotalQty}">

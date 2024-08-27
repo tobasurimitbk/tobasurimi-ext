@@ -486,6 +486,7 @@ $routes->post('/panjar-supplier/update-status', 'Pembayaran\PanjarSupplier::upda
 $routes->post('/panjar-supplier/delete', 'Pembayaran\PanjarSupplier::deletePanjarSupplier', ['filter' => 'Auth']);
 $routes->get('/panjar-supplier/history-pembayaran', 'Pembayaran\PanjarSupplier::dropDownHistoryPembayaranPanjar', ['filter' => 'Auth']);
 $routes->get('/panjar-supplier/generate-no-panjar', 'Pembayaran\PanjarSupplier::generateNoPanjar', ['filter' => 'Auth']);
+
 // PEMBAYARAN INVOICE
 $routes->get('/pembayaran-invoice', 'Pembayaran\PembayaranInvoice::index', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/id/(:segment)', 'Pembayaran\PembayaranInvoice::getById/$1', ['filter' => 'Auth']);
@@ -501,6 +502,9 @@ $routes->get('/pembayaran-invoice/get-barang-sales-lain', 'Pembayaran\Pembayaran
 $routes->post('/pembayaran-invoice/generate-no-pembayaran', 'Pembayaran\PembayaranInvoice::generateNoPembayaranInvoice', ['filter' => 'Auth']);
 $routes->post('/pembayaran-invoice/save', 'Pembayaran\PembayaranInvoice::saveLokalInvoice', ['filter' => 'Auth']);
 $routes->post('/pembayaran-invoice/update', 'Pembayaran\PembayaranInvoice::updateInvoice', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/get-customer', 'Pembayaran\PembayaranInvoice::getCustomer', ['filter' => 'Auth']);
+$routes->post('/pembayaran-invoice/delete', 'Pembayaran\PembayaranInvoice::deletePembayaranInvoice', ['filter' => 'Auth']);
+$routes->post('/pembayaran-invoice/posting', 'Pembayaran\PembayaranInvoice::posting', ['filter' => 'Auth']);
 
 
 

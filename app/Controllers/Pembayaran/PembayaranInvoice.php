@@ -69,6 +69,7 @@ class PembayaranInvoice extends BaseController
     public function createPembayaranInvoiceEkspor()
     {
         $subAkunsModel = $this->Sub_AkunsModel->asObject()
+            ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
             ->findAll();
         $dokumenList = [];
@@ -94,6 +95,7 @@ class PembayaranInvoice extends BaseController
     public function createPembayaranInvoiceLain()
     {
         $subAkunsModel = $this->Sub_AkunsModel->asObject()
+            ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
             ->findAll();
         $dokumenList = [];
@@ -117,6 +119,7 @@ class PembayaranInvoice extends BaseController
     public function createPembayaranInvoiceLokal()
     {
         $subAkunsModel = $this->Sub_AkunsModel->asObject()
+            ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
             ->findAll();
         $dokumenList = [];
@@ -223,28 +226,43 @@ class PembayaranInvoice extends BaseController
 
         foreach ($pembayaranInvoiceData['data'] as $p) {
             $nomor_invoice = "";
+            $customer_name = "";
             if ($p['type_invoice'] == "LOKAL") {
-                $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel->where('id', $p['invoice_id'])->first();
+                $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel
+                    ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+                    ->where('sales_order_invoice.id', $p['invoice_id'])
+                    ->first();
                 $nomor_invoice = $salesOrderLokalInvoiceData['document_no'];
                 $nomor_invoice = str_replace(['[', ']', '"'], "", $nomor_invoice);
+                $customer_name = $salesOrderLokalInvoiceData['name'];
             } elseif ($p['type_invoice'] == "EKSPOR") {
-                $salesOrderExportData = $this->salesOrderExportModel->where('sales_order_export_id', $p['invoice_id'])->first();
+                $salesOrderExportData = $this->salesOrderExportModel
+                    ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                    ->join('customers', 'customers.id = sales_contract.customer_id')
+                    ->where('sales_order_export_id', $p['invoice_id'])
+                    ->first();
                 $nomor_invoice = $salesOrderExportData['sales_order_export_no'];
+                $customer_name = $salesOrderExportData['name'];
             } elseif ($p['type_invoice'] == "LAIN-LAIN") {
-                $salesOrderLainData = $this->salesOrderLainModel->where('id', $p['invoice_id'])->first();
+                $salesOrderLainData = $this->salesOrderLainModel
+                    ->join('customers', 'customers.id = sales_order_lain.customer_id')
+                    ->where('sales_order_lain.id', $p['invoice_id'])
+                    ->first();
                 $nomor_invoice = $salesOrderLainData['no_sales_order'];
+                $customer_name = $salesOrderLainData['name'];
             }
 
             array_push($dataPembayaran, [
                 "no" => $no++,
                 "id" => encrypt($p['id']),
                 "no_pembayaran" => $p['no_pembayaran'],
-                "customer_name" => $p['name'],
+                "customer_name" => $customer_name,
                 "payment_date" => date("d/m/Y", strtotime($p['tanggal'])),
                 "tipe_invoice" => $p['type_invoice'],
                 "amount" => number_format($p['total_bayar'], 2),
                 "currency" =>  $p['valas_id'],
-                "nomor_invoice" => $nomor_invoice
+                "nomor_invoice" => $nomor_invoice,
+                "status_posting" => $p['status_posting']
             ]);
         }
 
@@ -377,7 +395,7 @@ class PembayaranInvoice extends BaseController
                 $id = $this->pembayaranInvoiceModel->insert([
                     'company_id' => $this->this_company_id,
                     'user_id' => $this->user_id,
-                    'customer_id' => decrypt($this->request->getVar('customer')),
+                    'payment_method' => $this->request->getVar('payment_methods'),
                     'invoice_id' => decrypt($this->request->getVar('no_dokumen')),
                     'valas_id' => "-",
                     'no_pembayaran' => $this->request->getVar('no_bukti_pembayaran'),
@@ -402,7 +420,7 @@ class PembayaranInvoice extends BaseController
                 $id = $this->pembayaranInvoiceModel->insert([
                     'company_id' => $this->this_company_id,
                     'user_id' => $this->user_id,
-                    'customer_id' => decrypt($this->request->getVar('customer')),
+                    'payment_method' => $this->request->getVar('payment_methods'),
                     'invoice_id' => decrypt($this->request->getVar('no_dokumen')),
                     'valas_id' => "-",
                     'no_pembayaran' => $this->request->getVar('no_bukti_pembayaran'),
@@ -427,7 +445,7 @@ class PembayaranInvoice extends BaseController
                 $id = $this->pembayaranInvoiceModel->insert([
                     'company_id' => $this->this_company_id,
                     'user_id' => $this->user_id,
-                    'customer_id' => decrypt($this->request->getVar('customer')),
+                    'payment_method' => $this->request->getVar('payment_methods'),
                     'invoice_id' => decrypt($this->request->getVar('no_dokumen')),
                     'valas_id' => $this->request->getVar('valas'),
                     'no_pembayaran' => $this->request->getVar('no_bukti_pembayaran'),
@@ -472,7 +490,7 @@ class PembayaranInvoice extends BaseController
             $this->pembayaranInvoiceModel->update($id, [
                 'company_id' => $this->this_company_id,
                 'user_id' => $this->user_id,
-                'customer_id' => decrypt($this->request->getVar('customer')),
+
                 'invoice_id' => decrypt($this->request->getVar('no_dokumen')),
                 'valas_id' => $this->request->getVar('valas'),
                 'keterangan' =>  $this->request->getVar('keterangan'),
@@ -482,7 +500,8 @@ class PembayaranInvoice extends BaseController
                 'total_bayar' => repairDouble($this->request->getVar('total_bayar')),
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
-                'status_posting' => '0'
+                'status_posting' => '0',
+                'payment_method' => $this->request->getVar('payment_methods')
             ]);
             return response()->setJSON([
                 'id' => encrypt($id),
@@ -522,6 +541,7 @@ class PembayaranInvoice extends BaseController
         $id = decrypt($id);
         $tipe_invoice = $this->pembayaranInvoiceModel->getTipeInvoice($id);
         $subAkunsModel = $this->Sub_AkunsModel->asObject()
+            ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
             ->findAll();
         $customers = $this->customerModel->getCustomerLokal($this->user_id, $this->this_company_id);
@@ -573,5 +593,60 @@ class PembayaranInvoice extends BaseController
 
             return view('Pembayaran/pembayaranInvoice/formLain', $data);
         }
+    }
+
+    public function getCustomer()
+    {
+
+        $invoice_id =  decrypt($this->request->getVar('invoice_id'));
+        $tipe_invoice = $this->request->getVar('type_invoice');
+
+        $customer = "";
+        if ($tipe_invoice == "LOKAL") {
+            $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel
+                ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+                ->where('id', $invoice_id)
+                ->first();
+            $customer = $salesOrderLokalInvoiceData['name'];
+        } elseif ($tipe_invoice == "EKSPOR") {
+            $salesOrderExportData = $this->salesOrderExportModel
+                ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                ->join('customers', 'customers.id = sales_contract.customer_id')
+                ->where('sales_order_export_id', $invoice_id)
+                ->first();
+            $customer = $salesOrderExportData['name'];
+        } elseif ($tipe_invoice == "LAIN-LAIN") {
+            $salesOrderLainData = $this->salesOrderLainModel
+                ->join('customers', 'customers.id = sales_order_lain.customer_id')
+                ->where('sales_order_lain.id', $invoice_id)
+                ->first();
+            $customer = $salesOrderLainData['name'];
+        }
+
+        return json_encode($customer);
+    }
+
+    public function deletePembayaranInvoice()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->pembayaranInvoiceModel->where('id', $id)->delete();
+
+        return response()->setJSON([
+            'message' => "Pembayaran Invoice berhasil dihapus",
+            'status' => true
+        ]);
+    }
+
+    public function posting()
+    {
+
+        $id = decrypt($this->request->getVar('id'));
+        $this->pembayaranInvoiceModel->update($id, ['status_posting' => '1']);
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'message' => "Pembayaran berhasil diposting"
+        ]);
     }
 }

@@ -31,6 +31,7 @@ class PembayaranInvoiceModel extends Model
         'status_posting',
         'akun_kas',
         'akun_selisih',
+        'payment_method'
 
     ];
 
@@ -73,21 +74,20 @@ class PembayaranInvoiceModel extends Model
 
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'pembayaran_invoice.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
-        $selectQry = "pembayaran_invoice.*, customers.name";
+        $selectQry = "pembayaran_invoice.*";
         $dataQry = $this
             ->select($selectQry)
-            ->join("customers", "customers.id = pembayaran_invoice.customer_id", 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['search'] != ""  || $addCondition['dateStart'] != "" || $addCondition['dateEnd'] != "" || $addCondition['type_invoice'] != "") {
+        if ($addCondition['search'] != ""  || $addCondition['dateStart'] != "" || $addCondition['dateEnd'] != "" || $addCondition['type_invoice'] != "" || $addCondition['status_posting']) {
             $dataQry->groupStart();
         }
 
         if ($addCondition['search'] != "") {
-            $dataQry->like('no_pembayaran', $addCondition['search'])->orLike('name', $addCondition['search']);
+            $dataQry->like('no_pembayaran', $addCondition['search']);
         }
 
         if ($addCondition['dateStart']) {
@@ -100,6 +100,15 @@ class PembayaranInvoiceModel extends Model
         if ($addCondition['type_invoice']) {
             $dataQry->whereIn('type_invoice', $addCondition['type_invoice']);
         }
+
+        if ($addCondition['status_posting']) {
+            if ($addCondition['status_posting'] != "ALL") {
+                $addCondition['status_posting'] = $addCondition['status_posting'] == "SUDAH POSTING" ? '1' : '0';
+                $dataQry->where('pembayaran_invoice.status_posting', $addCondition['status_posting']);
+            }
+        }
+
+
 
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['type_invoice']) {
             $dataQry->groupEnd();
@@ -130,11 +139,44 @@ class PembayaranInvoiceModel extends Model
 
     public function getPembayaranInvoiceDetail($id)
     {
+        $salesOrderInvoiceModel = new SalesOrderInvoiceModel();
+        $salesOrderExportModel = new SalesOrderExportModel();
+        $salesOrderLainModel = new SalesOrderLainModel();
+
+        $customer_name = "";
+
+        $data = [];
         $detail = $this
-            ->select('pembayaran_invoice.*, customers.name')
-            ->join('customers', 'customers.id = pembayaran_invoice.customer_id', 'left')
+            ->select('pembayaran_invoice.*')
             ->where('pembayaran_invoice.id', $id)
             ->first();
+
+
+
+
+        if ($detail['type_invoice'] == "LOKAL") {
+            $namaCustomer = $salesOrderInvoiceModel
+                ->select("name")
+                ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+                ->where('sales_order_invoice.id', $detail['invoice_id'])
+                ->first();
+            $detail['customer_name'] = $namaCustomer['name'];
+        } elseif ($detail['type_invoice'] == "EKSPOR") {
+            $namaCustomer = $salesOrderExportModel
+                ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                ->join('customers', 'customers.id = sales_contract.customer_id')
+                ->where('sales_order_export_id', $detail['invoice_id'])
+                ->first();
+            $detail['customer_name'] = $namaCustomer['name'];
+        } elseif ($detail['type_invoice'] == "LAIN-LAIN") {
+            $namaCustomer = $salesOrderLainModel
+                ->select("name")
+                ->join('customers', 'customers.id = sales_order_lain.customer_id')
+                ->where('sales_order_lain.id', $detail['invoice_id'])
+                ->first();
+            $detail['customer_name'] = $namaCustomer['name'];
+        }
+
 
         return $detail;
     }

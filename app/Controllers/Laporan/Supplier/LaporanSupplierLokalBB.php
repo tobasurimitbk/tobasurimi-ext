@@ -136,13 +136,21 @@ class LaporanSupplierLokalBB extends BaseController
 
 
         foreach ($dataBBLokal['data'] as $row) {
-            $row->no = $no++;  // Add the 'No' field
+            $row->no = $no++;
+
             $row->pphUmum       = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
-            $row->totalUmum     = $row->dppUmum - $row->pphUmum;
+            $row->totalUmum     = ($row->dppUmum + $row->pphUmum) * $row->qtyPO;
+            $row->pphUmum       = $row->pphUmum * $row->qtyPO;
+
             $row->pphHarian     = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppHarian * 0.0025) : ($row->dppHarian * 0.005)) : 0;
-            $row->totalHarian   = $row->dppHarian - $row->pphHarian;
+            $row->totalHarian   = ($row->dppHarian + $row->pphHarian) * $row->qtyPO;
+            $row->pphHarian       = $row->pphHarian * $row->qtyPO;
+
             $row->pphBulanan    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppBulanan * 0.0025) : ($row->dppBulanan * 0.005)) : 0;
-            $row->totalBulanan  = $row->dppBulanan - $row->pphBulanan;
+            $row->totalBulanan  = ($row->dppBulanan + $row->pphBulanan) * $row->qtyPO;
+            $row->pphBulanan = $row->pphBulanan * $row->qtyPO;
+
+
             $row->pphSubsidi    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
             $row->totalSubsidi  = $row->subsidi - $row->pphSubsidi;
             $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
@@ -159,19 +167,19 @@ class LaporanSupplierLokalBB extends BaseController
             $totalDppSubsidi += $row->subsidi;
             $totalPphSubsidi += $row->pphSubsidi;
             $totalTotalSubsidi += $row->totalSubsidi;
-            $row->pphUmum = number_format($row->pphUmum);
-            $row->dppUmum = number_format($row->dppUmum);
-            $row->totalUmum = number_format($row->totalUmum);
-            $row->dppHarian = number_format($row->dppHarian);
-            $row->pphHarian = number_format($row->pphHarian);
-            $row->totalHarian = number_format($row->totalHarian);
-            $row->dppBulanan = number_format($row->dppBulanan);
-            $row->pphBulanan = number_format($row->pphBulanan);
-            $row->totalBulanan = number_format($row->totalBulanan);
-            $row->subsidi = number_format($row->subsidi);
-            $row->pphSubsidi = number_format($row->pphSubsidi);
-            $row->totalSubsidi = number_format($row->totalSubsidi);
-            $row->totalRow = number_format($row->totalRow);
+            $row->pphUmum = number_format($row->pphUmum, 2);
+            $row->dppUmum = number_format($row->dppUmum, 2);
+            $row->totalUmum = number_format($row->totalUmum, 2);
+            $row->dppHarian = number_format($row->dppHarian, 2);
+            $row->pphHarian = number_format($row->pphHarian, 2);
+            $row->totalHarian = number_format($row->totalHarian, 2);
+            $row->dppBulanan = number_format($row->dppBulanan, 2);
+            $row->pphBulanan = number_format($row->pphBulanan, 2);
+            $row->totalBulanan = number_format($row->totalBulanan, 2);
+            $row->subsidi = number_format($row->subsidi, 2);
+            $row->pphSubsidi = number_format($row->pphSubsidi, 2);
+            $row->totalSubsidi = number_format($row->totalSubsidi, 2);
+            $row->totalRow = number_format($row->totalRow, 2);
         }
         $totalTotalRow = $totalTotalUmum + $totalTotalHarian + $totalTotalBulanan + $totalTotalSubsidi;
 
@@ -236,12 +244,18 @@ class LaporanSupplierLokalBB extends BaseController
         $dataTotalBBLokal = [];
         if (!empty($dataBBLokal)) {
             foreach ($dataBBLokal as $row) {
-                $row->pphUmum = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
-                $row->totalUmum = $row->dppUmum - $row->pphUmum;
-                $row->pphHarian = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppHarian * 0.0025) : ($row->dppHarian * 0.005)) : 0;
-                $row->totalHarian = $row->dppHarian - $row->pphHarian;
-                $row->pphBulanan = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppBulanan * 0.0025) : ($row->dppBulanan * 0.005)) : 0;
-                $row->totalBulanan = $row->dppBulanan - $row->pphBulanan;
+                $row->pphUmum       = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
+                $row->totalUmum     = ($row->dppUmum + $row->pphUmum) * $row->qtyPO;
+                $row->pphUmum       = $row->pphUmum * $row->qtyPO;
+
+                $row->pphHarian     = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppHarian * 0.0025) : ($row->dppHarian * 0.005)) : 0;
+                $row->totalHarian   = ($row->dppHarian + $row->pphHarian) * $row->qtyPO;
+                $row->pphHarian       = $row->pphHarian * $row->qtyPO;
+
+                $row->pphBulanan    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppBulanan * 0.0025) : ($row->dppBulanan * 0.005)) : 0;
+                $row->totalBulanan  = ($row->dppBulanan + $row->pphBulanan) * $row->qtyPO;
+                $row->pphBulanan = $row->pphBulanan * $row->qtyPO;
+
                 $row->pphSubsidi = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
                 $row->totalSubsidi = $row->subsidi - $row->pphSubsidi;
                 $row->totalRow = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
@@ -630,15 +644,45 @@ class LaporanSupplierLokalBB extends BaseController
 
         foreach ($dataBBLokal['data'] as $row) {
             $row->no = $no++;  // Add the 'No' field
-            $row->pphUmum       = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
-            $row->totalUmum     = $row->dppUmum - $row->pphUmum;
-            $row->pphHarian     = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppHarian * 0.0025) : ($row->dppHarian * 0.005)) : 0;
-            $row->totalHarian   = $row->dppHarian - $row->pphHarian;
-            $row->pphBulanan    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppBulanan * 0.0025) : ($row->dppBulanan * 0.005)) : 0;
-            $row->totalBulanan  = $row->dppBulanan - $row->pphBulanan;
-            $row->pphSubsidi    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
+
+            $pphDetailGeneralPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                $this->this_company_id,
+                $row->supplier_id,
+                $row->barang_id,
+                $addCondition['dateStart'],
+                $addCondition['dateEnd'],
+                'general_price'
+            );
+
+            $pphDetailDailyPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                $this->this_company_id,
+                $row->supplier_id,
+                $row->barang_id,
+                $addCondition['dateStart'],
+                $addCondition['dateEnd'],
+                'daily_price'
+            );
+
+            $pphDetailMonthlyPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                $this->this_company_id,
+                $row->supplier_id,
+                $row->barang_id,
+                $addCondition['dateStart'],
+                $addCondition['dateEnd'],
+                'monthly_price'
+            );
+
+            $row->pphUmum = $pphDetailGeneralPrice['pphTotal'];
+            $row->totalUmum = $pphDetailGeneralPrice['dibayarkan'];
+            $row->pphHarian = $pphDetailDailyPrice['pphTotal'];
+            $row->totalHarian = $pphDetailDailyPrice['dibayarkan'];
+            $row->pphBulanan = $pphDetailMonthlyPrice['pphTotal'];
+            $row->totalBulanan = $pphDetailMonthlyPrice['dibayarkan'];
+
+            $row->pphSubsidi    = ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
             $row->totalSubsidi  = $row->subsidi - $row->pphSubsidi;
             $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
+
             $totalDppUmum += $row->dppUmum;
             $totalPphUmum += $row->pphUmum;
             $totalTotalUmum += $row->totalUmum;
@@ -694,7 +738,6 @@ class LaporanSupplierLokalBB extends BaseController
         return;
     }
 
-
     public function exportPDFLaporanRekapAllSupplier()
     {
 
@@ -727,15 +770,44 @@ class LaporanSupplierLokalBB extends BaseController
         $dataTotalBBLokal = [];
         if (!empty($dataBBLokal)) {
             foreach ($dataBBLokal as $row) {
-                $row->pphUmum       = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
-                $row->totalUmum     = $row->dppUmum - $row->pphUmum;
-                $row->pphHarian     = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppHarian * 0.0025) : ($row->dppHarian * 0.005)) : 0;
-                $row->totalHarian   = $row->dppHarian - $row->pphHarian;
-                $row->pphBulanan    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppBulanan * 0.0025) : ($row->dppBulanan * 0.005)) : 0;
-                $row->totalBulanan  = $row->dppBulanan - $row->pphBulanan;
-                $row->pphSubsidi    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
+                $pphDetailGeneralPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                    $this->this_company_id,
+                    $row->supplier_id,
+                    $row->barang_id,
+                    $newDateStart,
+                    $newDateEnd,
+                    'general_price'
+                );
+
+                $pphDetailDailyPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                    $this->this_company_id,
+                    $row->supplier_id,
+                    $row->barang_id,
+                    $newDateStart,
+                    $newDateEnd,
+                    'daily_price'
+                );
+
+                $pphDetailMonthlyPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                    $this->this_company_id,
+                    $row->supplier_id,
+                    $row->barang_id,
+                    $newDateStart,
+                    $newDateEnd,
+                    'monthly_price'
+                );
+
+                $row->pphUmum = $pphDetailGeneralPrice['pphTotal'];
+                $row->totalUmum = $pphDetailGeneralPrice['dibayarkan'];
+                $row->pphHarian = $pphDetailDailyPrice['pphTotal'];
+                $row->totalHarian = $pphDetailDailyPrice['dibayarkan'];
+                $row->pphBulanan = $pphDetailMonthlyPrice['pphTotal'];
+                $row->totalBulanan = $pphDetailMonthlyPrice['dibayarkan'];
+
+                $row->pphSubsidi    = ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
                 $row->totalSubsidi  = $row->subsidi - $row->pphSubsidi;
                 $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
+
                 $totalDppUmum += $row->dppUmum;
                 $totalPphUmum += $row->pphUmum;
                 $totalTotalUmum += $row->totalUmum;
@@ -826,15 +898,44 @@ class LaporanSupplierLokalBB extends BaseController
         $dataTotalBBLokal = [];
         if (!empty($dataBBLokal)) {
             foreach ($dataBBLokal as $row) {
-                $row->pphUmum       = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
-                $row->totalUmum     = $row->dppUmum - $row->pphUmum;
-                $row->pphHarian     = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppHarian * 0.0025) : ($row->dppHarian * 0.005)) : 0;
-                $row->totalHarian   = $row->dppHarian - $row->pphHarian;
-                $row->pphBulanan    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppBulanan * 0.0025) : ($row->dppBulanan * 0.005)) : 0;
-                $row->totalBulanan  = $row->dppBulanan - $row->pphBulanan;
-                $row->pphSubsidi    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
+                $pphDetailGeneralPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                    $this->this_company_id,
+                    $row->supplier_id,
+                    $row->barang_id,
+                    $newDateStart,
+                    $newDateEnd,
+                    'general_price'
+                );
+
+                $pphDetailDailyPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                    $this->this_company_id,
+                    $row->supplier_id,
+                    $row->barang_id,
+                    $newDateStart,
+                    $newDateEnd,
+                    'daily_price'
+                );
+
+                $pphDetailMonthlyPrice = $this->RMPurchaseOrderModel->pphPendapatanSupplier(
+                    $this->this_company_id,
+                    $row->supplier_id,
+                    $row->barang_id,
+                    $newDateStart,
+                    $newDateEnd,
+                    'monthly_price'
+                );
+
+                $row->pphUmum = $pphDetailGeneralPrice['pphTotal'];
+                $row->totalUmum = $pphDetailGeneralPrice['dibayarkan'];
+                $row->pphHarian = $pphDetailDailyPrice['pphTotal'];
+                $row->totalHarian = $pphDetailDailyPrice['dibayarkan'];
+                $row->pphBulanan = $pphDetailMonthlyPrice['pphTotal'];
+                $row->totalBulanan = $pphDetailMonthlyPrice['dibayarkan'];
+
+                $row->pphSubsidi    = ($row->poPPH != 'None') ? (($row->supplierNpwp != "") ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
                 $row->totalSubsidi  = $row->subsidi - $row->pphSubsidi;
                 $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
+
                 $totalDppUmum += $row->dppUmum;
                 $totalPphUmum += $row->pphUmum;
                 $totalTotalUmum += $row->totalUmum;
@@ -1260,8 +1361,8 @@ class LaporanSupplierLokalBB extends BaseController
 
         $availableSort = [
             'barangName'             => 'barang_master.barang_name',
-            'bagianName'             => 'bagian.nama_bagian',
-
+            'spekName'             => 'spekName',
+            'bagianName' => 'bagianName'
         ];
 
         $totalDppUmum = 0;
@@ -1290,15 +1391,24 @@ class LaporanSupplierLokalBB extends BaseController
 
         foreach ($dataBBLokal['data'] as $row) {
             $row->no = $no++;  // Add the 'No' field
+
             $row->pphUmum       = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
-            $row->totalUmum     = $row->dppUmum - $row->pphUmum;
+            $row->totalUmum     = ($row->dppUmum + $row->pphUmum) * $row->qtyPO;
+            $row->pphUmum       = $row->pphUmum * $row->qtyPO;
+
             $row->pphHarian     = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppHarian * 0.0025) : ($row->dppHarian * 0.005)) : 0;
-            $row->totalHarian   = $row->dppHarian - $row->pphHarian;
+            $row->totalHarian   = ($row->dppHarian + $row->pphHarian) * $row->qtyPO;
+            $row->pphHarian       = $row->pphHarian * $row->qtyPO;
+
             $row->pphBulanan    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppBulanan * 0.0025) : ($row->dppBulanan * 0.005)) : 0;
-            $row->totalBulanan  = $row->dppBulanan - $row->pphBulanan;
+            $row->totalBulanan  = ($row->dppBulanan + $row->pphBulanan) * $row->qtyPO;
+            $row->pphBulanan = $row->pphBulanan * $row->qtyPO;
+
             $row->pphSubsidi    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
             $row->totalSubsidi  = $row->subsidi - $row->pphSubsidi;
             $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
+
+
             $totalDppUmum += $row->dppUmum;
             $totalPphUmum += $row->pphUmum;
             $totalTotalUmum += $row->totalUmum;
@@ -1324,6 +1434,7 @@ class LaporanSupplierLokalBB extends BaseController
             $row->pphSubsidi = number_format($row->pphSubsidi);
             $row->totalSubsidi = number_format($row->totalSubsidi);
             $row->totalRow = number_format($row->totalRow);
+            $row->qtyPO = number_format($row->qtyPO);
         }
         $totalTotalRow = $totalTotalUmum + $totalTotalHarian + $totalTotalBulanan + $totalTotalSubsidi;
 

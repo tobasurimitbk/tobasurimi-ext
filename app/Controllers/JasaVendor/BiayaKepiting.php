@@ -428,7 +428,7 @@ class BiayaKepiting extends BaseController
             'tanggal' => date('Y-m-d'),
             'biayaKepiting' => $this->biayaKepitingModel->find($id),
             'biayaKepitingBonus' => $this->biayaKepitingBonusModel->dropdownBarang($biayaKepiting['jasa_vendor_in_id'], $id),
-            'biayaKepitingDetail' => $this->biayaKepitingModel->dropdownBarang($biayaKepiting['jasa_vendor_in_id'], $id),
+            'biayaKepitingDetail' => $this->biayaKepitingModel->dropdownBarangPrint($biayaKepiting['jasa_vendor_in_id'], $id),
             'dataPerolehanGaji' => $this->biayaKepitingModel->dropdownPerolehanGaji($id)
         ];
 
