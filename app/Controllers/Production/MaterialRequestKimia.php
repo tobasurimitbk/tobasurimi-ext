@@ -198,6 +198,7 @@ class MaterialRequestKimia extends BaseController
         ];
 
         $condition = [
+            'material_requests_penolong.company_id' => $this->this_company_id,
             'parent_barang.parent_name' => "KIMIA"
         ];
 
