@@ -102,7 +102,7 @@ class SalesOrderModel extends Model
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'sales_order.updatedAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "sales_order.*";

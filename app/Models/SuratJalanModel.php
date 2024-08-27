@@ -66,7 +66,7 @@ class SuratJalanModel extends Model
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'surat_jalan_so.updatedAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'surat_jalan_so.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "surat_jalan_so.*,  
