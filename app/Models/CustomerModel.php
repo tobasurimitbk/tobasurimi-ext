@@ -224,7 +224,7 @@ class CustomerModel extends Model
             ->where('customers.deletedAt', null)
             ->where('customers.tipe_customer', 'LOKAL')
             ->where('employees.deletedAt', null)
-            ->where('customers.sales_id', $user_id)
+            ->where('customers.user_id', $user_id)
             ->where('customers.company_id', $companyID)
             ->orderBy('createdAt', "DESC")
             ->findAll();
