@@ -2220,7 +2220,7 @@
                 'nama_satuan': "<?= $d->nama_satuan ?>",
                 'satuan_id': "<?= $d->unit ?>",
                 'qty': "<?= $d->qty ?>",
-                'keterangan': "<?= $d->note ?>"
+                'keterangan': "<?= trim($d->note) ?>"
             });
         <?php endforeach; ?>
         drawTableDetail();
