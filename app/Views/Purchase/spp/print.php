@@ -131,7 +131,7 @@
         <div>
             <div class="mt-5">Keterangan: <?= $dataSPP->note ?></div>
         </div>
-        <div class="footer">
+        <div class="footer" style="margin-bottom:120px;">
             <div style="text-align:left">
                 <div>Barang tersebut agar kami terima dalam keadaan baik.</div>
                 <div>Pada tanggal:</div>
