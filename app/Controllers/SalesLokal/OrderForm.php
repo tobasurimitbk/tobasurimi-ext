@@ -954,10 +954,12 @@ class OrderForm extends BaseController
 
     public function generateNomorSalesOrder()
     {
-        $code = "SLL";
-        $currentYear = date('Y');
-        $currentMonth = date('m');
-        $numberTemplate = $code . "/" . $currentMonth . "/" . $currentYear . "/";
+        $code = "TSI";
+        $currentYear = date('y'); // Get last two digits of the year
+        $currentMonth = date('n'); // Get numeric month without leading zeros
+        $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+        $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
+
         $lastData = $this->SalesOrderModel->asObject()
             ->where('id_company', $this->this_company_id)
             ->like('no_sales_order', $numberTemplate)

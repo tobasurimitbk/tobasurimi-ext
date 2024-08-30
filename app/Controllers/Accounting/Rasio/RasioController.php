@@ -305,34 +305,39 @@ class RasioController extends BaseController
                     'barang2_id' => $s->barang2_id,
                     'barang_name' => $s->barang_name,
                     'spesifikasi' => $s->spesifikasi,
-                    'qty' => $s->totalQty ?? 0,
-                    'harga_total' => $s->totalHarga ?? 0,
-                    'harga_satuan' => $s->hargaSatuan ?? 0,
+                    'qty' => $s->totalQty,
+                    'harga_total' => $s->totalHarga,
+                    'harga_satuan' => $s->hargaSatuan,
                     'satuan' => $s->satuanPO  ?? "-",
                     // 'no_dokumen' => $s->no_dokumen,
                     'stock_dokumen' => $s->stock_dokumen,
                 ]);
             }
+
             if (!empty($barang_jadi)) {
                 foreach ($barang_jadi as $s) {
                     $this->rasioBarangJadiModel->insert([
-                        'rasio_id' => $id,
-                        'barang_name' => $s->barang_name,
-                        'kode_barang' => $s->kode_barang,
-                        'spesifikasi' => $s->spesifikasi,
-                        'production_result_detail_id' => $s->production_result_detail_id,
-                        'production_result_id' => $s->production_result_id,
-                        'barang1_id' => $s->barang1_id,
-                        'barang2_id' => $s->barang2_id,
-                        'bc_id' => $s->bc_id,
-                        'stock_id' => $s->stock_id,
-                        'no_aju' => $s->no_aju,
-                        'stock_dokumen' => $s->stock_dokumen,
-                        'qty_barang' => $s->qty,
-                        'rasio_barang' => $s->rasio,
-                        'harga_barang' => $s->harga,
-                        'kode_satuan' => $s->kode_satuan,
-                        'tipe_bahan' => $s->tipe_bahan,
+                        'rasio_id'                      => $id,
+                        'barang_name'                   => $s->barang_name,
+                        'kode_barang'                   => $s->kode_barang,
+                        'spesifikasi'                   => $s->spesifikasi,
+                        'production_result_detail_id'   => $s->production_result_detail_id,
+                        'production_result_id'          => $s->production_result_id,
+                        'barang1_id'                    => $s->barang1_id,
+                        'barang2_id'                    => $s->barang2_id,
+                        'bc_id'                         => $s->bc_id,
+                        'stock_id'                      => $s->stock_id,
+                        'no_aju'                        => $s->no_aju,
+                        'stock_dokumen'                 => $s->stock_dokumen,
+                        'qty_barang'                    => $s->qty,
+                        'qty2'                          => $s->qty2,
+                        'qty_isi'                       => $s->qty_isi,
+                        'rasio_barang'                  => $s->rasio,
+                        'harga_barang'                  => $s->harga,
+                        'kode_satuan'                   => $s->kode_satuan,
+                        'tipe_bahan'                    => $s->tipe_bahan,
+                        'hasilWithPersentase'           => $s->hasilWithPersentase,
+                        'banyakData'                    => $s->banyakData,
                     ]);
                 }
             } else {
@@ -340,23 +345,27 @@ class RasioController extends BaseController
                     foreach ($f as $i) {
                         $this->rasioBarangJadiModel->insert([
                             'rasio_id' => $id,
-                            'barang_name' => $i->barang_name,
-                            'kode_barang' => $i->kode_barang,
-                            'spesifikasi' => $i->spesifikasi,
-                            'production_result_detail_id' => $i->production_result_detail_id,
-                            'production_result_id' => $i->production_result_id,
-                            'barang1_id' => $i->barang1_id,
-                            'barang2_id' => $i->barang2_id,
-                            'bc_id' => $i->bc_id,
-                            'stock_id' => $i->stock_id,
-                            'no_aju' => $i->no_aju,
-                            'stock_dokumen' => $i->stock_dokumen,
-                            'qty_barang' => $i->qty,
-                            'rasio_barang' => $i->rasio,
-                            'harga_barang' => $i->harga_satuan,
-                            'kode_satuan' => $i->kode_satuan,
-                            'tipe_bahan' => $i->tipe_bahan,
-                            'satuan_id' => $i->satuan_id
+                            'barang_name'                   => $i->barang_name,
+                            'kode_barang'                   => $i->kode_barang,
+                            'spesifikasi'                   => $i->spesifikasi,
+                            'production_result_detail_id'   => $i->production_result_detail_id,
+                            'production_result_id'          => $i->production_result_id,
+                            'barang1_id'                    => $i->barang1_id,
+                            'barang2_id'                    => $i->barang2_id,
+                            'bc_id'                         => $i->bc_id,
+                            'stock_id'                      => $i->stock_id,
+                            'no_aju'                        => $i->no_aju,
+                            'stock_dokumen'                 => $i->stock_dokumen,
+                            'qty_barang'                    => $i->qty,
+                            'qty2'                          => $i->qty2,
+                            'qty_isi'                       => $i->qty_isi,
+                            'rasio_barang'                  => $i->rasio,
+                            'harga_barang'                  => $i->harga_satuan,
+                            'kode_satuan'                   => $i->kode_satuan,
+                            'tipe_bahan'                    => $i->tipe_bahan,
+                            'satuan_id'                     => $i->satuan_id,
+                            'hasilWithPersentase'           => $i->hasilWithPersentase,
+                            'banyakData'                    => $i->banyakData,
                         ]);
                     }
                 }
@@ -520,7 +529,8 @@ class RasioController extends BaseController
         $subAkunsModel = $this->subAkunModel->asObject()->findAll();
         $rasioModel = $this->rasioModel->asObject()->find($id);
         $rasioBarangDigunakanAlokasiModel = $this->rasioBarangDigunakanAlokasiModel->asObject()->where('rasio_id', $id)->findAll();
-        $rasioBarangDigunakanModel = $this->rasioBarangDigunakanModel->asObject()->where('rasio_id', $id)->findAll();
+        $rasioBarangDigunakanModel = $this->rasioBarangDigunakanModel->asObject()->where('rasio_id', $id)->where('type', 'digunakan')->findAll();
+        $rasioBarangPembelianModel = $this->rasioBarangDigunakanModel->asObject()->where('rasio_id', $id)->where('type', 'pembelian')->findAll();
         $rasioBarangJadiModel = $this->rasioBarangJadiModel->asObject()->where('rasio_id', $id)->findAll();
         $rasioBarangPenolongModel = $this->rasioBarangPenolongModel->asObject()->where('rasio_id', $id)->findAll();
         $rasioCostModel = $this->rasioCostModel->asObject()->where('rasio_id', $id)->findAll();
@@ -537,7 +547,8 @@ class RasioController extends BaseController
             "rasio" => $rasioModel,
             "rasioBarangDigunakanAlokasi" => $rasioBarangDigunakanAlokasiModel,
             "rasioBarangDigunakan" => $rasioBarangDigunakanModel,
-            // "rasioBarangJadi" => $rasioBarangJadiModel,
+            "rasioBarangPembelian" => $rasioBarangPembelianModel,
+            "rasioBarangJadi" => $rasioBarangJadiModel,
             // "rasioBarangPenolong" => $rasioBarangPenolongModel,
             // "rasioCost" => $rasioCostModel,
         ];
