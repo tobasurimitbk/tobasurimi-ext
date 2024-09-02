@@ -1192,30 +1192,39 @@ class RasioController extends BaseController
             $productionResultDataTitleJadi = $this->productionResultModel->getDataProductionResultWithDetail($conditionProduction);
             $productionResultDataBBTitle = $this->productionResultModel->getDataBBForResult($conditionProduction);
 
-            $totalQtyAll = 0;
-            foreach ($productionResultDataTitleJadi as &$value) {
-                $totalQtyAll += $value['qtyTotal'];
-            }
-
             $totalSumQtyBB = 0;
             foreach ($productionResultDataTitleJadi as &$value) {
+                $totalQtyAll = 0;
                 $productionResultIds = explode(',', $value['production_result_id']);
                 $productionResultQty = explode(',', $value['qtyProduksi']);
 
-                $oldBarang1ID = "";
-                $oldBarang2ID = "";
-                $persentasePerBarangJadi = round(floatval($value['qtyTotal']) / floatval($totalQtyAll), 2);
-
                 foreach ($productionResultIds as $key => $productionResultId) {
                     $sumQtyBB = 0;
-                    $oldBarang1ID = $value['barang1_id'];
-                    $oldBarang2ID = $value['barang2_id'];
                     foreach ($productionResultDataBBTitle as $valueBB) {
-                        $sumQtyBB += $valueBB['qty'];
+                        if ($productionResultId == $valueBB['production_result_id']) {
+                            $sumQtyBB += $valueBB['qty'];
+                        }
+                    }
+
+                    foreach ($productionResultDataTitleJadi as &$valueProduction) {
+                        $valueProductionResultIds = explode(',', $valueProduction['production_result_id']);
+
+                        foreach ($valueProductionResultIds as $key => $valueProductionResultId) {
+                            if ($productionResultId == $valueProductionResultId) {
+                                $totalQtyAll += $value['qtyTotal'];
+                            }
+                        }
                     }
                 }
+                $persentasePerBarangJadi = floatval($value['qtyTotal']) / floatval($totalQtyAll);
+
                 $totalSumQtyBB = $sumQtyBB;
                 $hasilWithPersentase = round($persentasePerBarangJadi * $totalSumQtyBB, 2);
+                // var_dump($value['qtyTotal']);
+                // var_dump($totalQtyAll);
+                // var_dump($persentasePerBarangJadi);
+                // var_dump($totalSumQtyBB);
+                // var_dump($hasilWithPersentase);
                 $value['totalQtyAll'] = $totalQtyAll;
                 $value['hasilWithPersentase'] = $hasilWithPersentase;
             }
