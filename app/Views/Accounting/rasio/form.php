@@ -2644,7 +2644,7 @@
                 
                         <td></td>
                         <td>
-                            <input class="form-control rasio-sub-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${(parseFloat(totalQtyPerBarangMaster)/totalHasilPerBarangMaster).toFixed(2)}%">
+                            <input class="form-control rasio-sub-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${((parseFloat(totalQtyPerBarangMaster)/parseFloat(totalHasilPerBarangMaster)) * 100).toFixed(2)}%">
                         </td>
                            <td>
                             <input class="form-control harga-satuan-sub-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-index="${outerIndex}"  type="text" value="${formatRupiah(totalHargaSatuanPerBarangMaster) }">
@@ -2679,7 +2679,7 @@
                 </td>
                 <td></td>
                 <td>
-                    <input class="form-control rasio-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${(parseFloat(grandTotalQty)/grandTotalHasil).toFixed(2) }%">
+                    <input class="form-control rasio-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="-">
                 </td>
                 <td></td>
                 <td>
