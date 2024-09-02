@@ -3462,6 +3462,16 @@
         <?php endforeach; ?>
         drawTableDigunakanAlokasi(list_items_barang_digunakan_alokasi);
 
+        <?php foreach ($rasioSaldoAwalModel as $value) : ?>
+            list_items_saldo_awal.push(<?= json_encode($value) ?>);
+        <?php endforeach; ?>
+        drawTableSaldoAwal();
+
+        <?php foreach ($rasioSaldoAkhirModel as $value) : ?>
+            list_items_saldo_akhir.push(<?= json_encode($value) ?>);
+        <?php endforeach; ?>
+        drawTableSaldoAkhir();
+
         let barang1Id = "";
         let barang2Id = "";
         <?php foreach ($rasioBarangJadi as $value) : ?>

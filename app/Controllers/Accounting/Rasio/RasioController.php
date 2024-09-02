@@ -531,6 +531,8 @@ class RasioController extends BaseController
         $rasioBarangDigunakanAlokasiModel = $this->rasioBarangDigunakanAlokasiModel->asObject()->where('rasio_id', $id)->findAll();
         $rasioBarangDigunakanModel = $this->rasioBarangDigunakanModel->asObject()->where('rasio_id', $id)->where('type', 'digunakan')->findAll();
         $rasioBarangPembelianModel = $this->rasioBarangDigunakanModel->asObject()->where('rasio_id', $id)->where('type', 'pembelian')->findAll();
+        $rasioSaldoAwalModel = $this->rasioSaldoAwalModel->asObject()->where('rasio_id', $id)->findAll();
+        $rasioSaldoAkhirModel = $this->rasioSaldoAkhirModel->asObject()->where('rasio_id', $id)->findAll();
         $rasioBarangJadiModel = $this->rasioBarangJadiModel->asObject()->where('rasio_id', $id)->findAll();
         $rasioBarangPenolongModel = $this->rasioBarangPenolongModel->asObject()->where('rasio_id', $id)->findAll();
         $rasioCostModel = $this->rasioCostModel->asObject()->where('rasio_id', $id)->findAll();
@@ -549,6 +551,8 @@ class RasioController extends BaseController
             "rasioBarangDigunakan" => $rasioBarangDigunakanModel,
             "rasioBarangPembelian" => $rasioBarangPembelianModel,
             "rasioBarangJadi" => $rasioBarangJadiModel,
+            "rasioSaldoAwalModel" => $rasioSaldoAwalModel,
+            "rasioSaldoAkhirModel" => $rasioSaldoAkhirModel,
             // "rasioBarangPenolong" => $rasioBarangPenolongModel,
             // "rasioCost" => $rasioCostModel,
         ];
