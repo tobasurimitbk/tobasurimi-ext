@@ -138,20 +138,20 @@ class Barang extends BaseController
             ]);
         }
 
-        $barangName = $barangModel->where('UPPER(barang_name)', strtoupper($this->request->getVar('barang_name')))
-            ->where('company_id', $this->this_company_id)
-            ->where('type_barang', $type)
-            ->where('parent_type_id', decrypt($this->request->getVar('parent_type_id')) == 0 ? $this->request->getVar('parent_type_id') : decrypt($this->request->getVar('parent_type_id')))
-            ->where('deletedAt', null)
-            ->first();
+        // $barangName = $barangModel->where('UPPER(barang_name)', strtoupper($this->request->getVar('barang_name')))
+        //     ->where('company_id', $this->this_company_id)
+        //     ->where('type_barang', $type)
+        //     ->where('parent_type_id', decrypt($this->request->getVar('parent_type_id')) == 0 ? $this->request->getVar('parent_type_id') : decrypt($this->request->getVar('parent_type_id')))
+        //     ->where('deletedAt', null)
+        //     ->first();
 
-        if ($barangName != null) {
-            return response()->setJSON([
-                'status' => false,
-                'token' => csrf_hash(),
-                'message' => "Nama barang sudah ada"
-            ]);
-        }
+        // if ($barangName != null) {
+        //     return response()->setJSON([
+        //         'status' => false,
+        //         'token' => csrf_hash(),
+        //         'message' => "Nama barang sudah ada"
+        //     ]);
+        // }
 
         $barangMasterID = $barangModel->insert([
             'company_id' => $this->this_company_id,
