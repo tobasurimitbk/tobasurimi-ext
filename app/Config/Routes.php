@@ -2071,6 +2071,13 @@ $routes->get('/laporan-warehouse/material-request/print', 'Laporan\Warehouse\Lap
 $routes->get('/laporan-warehouse/stock-kartu', 'Laporan\Warehouse\LaporanWarehouse::laporanKartuStock', ['filter' => 'Auth']);
 $routes->get('/laporan-warehouse/stock-kartu/all-stock-kartu', 'Laporan\Warehouse\LaporanWarehouse::allLaporanKartuStock', ['filter' => 'Auth']);
 $routes->get('/laporan-warehouse/stock-kartu/print', 'Laporan\Warehouse\LaporanWarehouse::exportSheetLaporanKartuStock', ['filter' => 'Auth']);
+// LAPORAN 
+$routes->get('/laporan-bea-cukai', 'Laporan\BeaCukai\LaporanBeaCukai::index', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/laporan-pemasukan-barang', 'Laporan\BeaCukai\LaporanBeaCukai::laporanPemasukanBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/all-masuk-keluar', 'Laporan\BeaCukai\LaporanBeaCukai::allMasukKeluarBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/laporan-pemasukan-barang/print', 'Laporan\BeaCukai\LaporanBeaCukai::exportPDFLaporanMasukBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/laporan-pemasukan-barang/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelLaporanMasukBarang', ['filter' => 'Auth']);
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing
