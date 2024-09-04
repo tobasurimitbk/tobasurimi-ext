@@ -47,7 +47,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control phone" id="phone" name="phone" placeholder="No. Telepon (Opsional)">
+                                <textarea name="phone" id="phone" class="form-control phone"></textarea>
                                 <label for="floatingInput">No. Telepon (Opsional)</label>
                             </div>
                         </div>
@@ -219,7 +219,7 @@
 
         $(".fax").mask("0000000000")
 
-        $(".phone").mask("0000000000000")
+        // $(".phone").mask("0000000000000")
 
         $(".search").keyup(function() {
             table.ajax.reload();

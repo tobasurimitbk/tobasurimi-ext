@@ -241,7 +241,7 @@ class POLokalBahanPenolong extends BaseController
                 "companyName"  => $data->companyName,
                 "divisiName"   => $data->divisi,
                 "supplierName"  => $data->supplierName,
-                "total"         => "" . number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),
+                "total"         => number_format($data->total, 2),
                 "is_posted"     => $data->is_posted,
                 "itemCount"     => $data->itemCount,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
@@ -559,7 +559,7 @@ class POLokalBahanPenolong extends BaseController
                     $value->nilaiPpn = number_format($totalan * (float)$value->ppnValue / 100);
                     $value->nilaiPph = number_format($totalan * (float)$value->pphValue / 100);
                     $totalTambahan += formatter($value->additional_cost, "CURR_TO_INT");
-                    $totalPrice += $totalan;
+                    $totalPrice += $value->totalPriceWithoutAdditional;
                     $totalDisc += ($totalan) * (float)$value->disc / 100;
                     $totalPpn += $totalan * (float)$value->ppnValue / 100;
                     $keterangan[] = $value->note;

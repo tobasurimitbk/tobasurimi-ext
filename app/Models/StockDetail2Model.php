@@ -562,4 +562,115 @@ class StockDetail2Model extends Model
 
         return $dataQry;
     }
+
+    // LAPORAN BEA CUKAI
+    public function getListStokMasukKeluar($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'stock_details2.createdAt' => 'stock_details2.createdAt',
+            'stock_details2.bc_id' => 'stock_details2.bc_id',
+            'stock_details.sumber' => 'stock_details.sumber',
+            'stock_details2.no_po' => 'stock_details2.no_po',
+            'stock.divisi_id' => 'stock.divisi_id',
+            'stock.warehouse_id' => 'stock.warehouse_id',
+            'stock_details2.supplier_id' => 'stock_details2.supplier_id',
+            'stock_details2.no_aju' => 'stock_details2.no_aju',
+            'stock_details.keterangan' => 'stock_details.keterangan',
+            'stock.tipe_barang' => 'stock.tipe_barang'
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'stock_details2.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = '
+            divisis.divisi as divisiName,
+            warehouses.warehouse_name as warehouseName,
+            stock_details2.id,
+            stock_details2.bc_id,
+            stock_details2.no_aju,
+            stock_details2.no_po,
+            stock_details2.qty,
+            stock_details2.supplier_id,
+            stock_details2.harga_umum,
+            stock_details2.harga_harian,
+            stock_details2.harga_bulanan,
+            stock_details.no_dokumen,
+            stock_details.stock_date,
+            stock_details.keterangan,
+            stock_details.sumber,
+            stock.company_id,
+            stock.divisi_id,
+            stock.warehouse_id ,
+            stock.barang1_id,
+            stock.barang2_id,
+            stock.kemasan_id,
+            stock.tipe_barang
+
+        ';
+
+        $dataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id', 'left')
+            ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
+            ->join('divisis', 'divisis.id = stock.divisi_id', 'left')
+            ->join('warehouses', 'warehouses.id = stock.warehouse_id', 'left')
+            ->where($condition)
+            ->whereIn('sumber', $addCondition['sumber'])
+            ->orderBy($sort, $sortType);
+
+        $totalData = $dataQry->countAllResults(false);
+
+        if ($addCondition['divisi_id'] != "" || $addCondition['warehouse_id'] != "" || $addCondition['tipe_barang'] != "" || $addCondition['supplier_id'] || $addCondition['bc_id'] != "" || $addCondition['no_aju'] != "" || $addCondition['date_start'] != "" || $addCondition['date_end'] != "") {
+            $dataQry->groupStart();
+        }
+
+        if (isset($addCondition['bc_id']) && $addCondition['bc_id'] !== "" || $addCondition['bc_id'] === '0') {
+            $dataQry->where('stock_details2.bc_id', $addCondition['bc_id']);
+        }
+
+        if (isset($addCondition['no_aju']) && $addCondition['no_aju'] !== "") {
+            $dataQry->where('stock_details2.no_aju', $addCondition['no_aju']);
+        }
+
+        if (isset($addCondition['supplier_id']) && $addCondition['supplier_id'] !== "") {
+            $dataQry->where('stock_details2.supplier_id', $addCondition['supplier_id']);
+        }
+
+        if (isset($addCondition['tipe_barang']) && $addCondition['tipe_barang'] !== "") {
+            $dataQry->where('stock.tipe_barang', $addCondition['tipe_barang']);
+        }
+
+        if (isset($addCondition['divisi_id']) && $addCondition['divisi_id'] !== "") {
+            $dataQry->where('stock.divisi_id', $addCondition['divisi_id']);
+        }
+
+
+        if (isset($addCondition['warehouse_id']) && $addCondition['warehouse_id'] !== "") {
+            $dataQry->where('stock.warehouse_id', $addCondition['warehouse_id']);
+        }
+
+        if (isset($addCondition['date_start']) && $addCondition['date_start'] !== "") {
+            $dataQry->where('stock_details.stock_date >=', $addCondition['date_start']);
+        }
+
+        if (isset($addCondition['date_end']) && $addCondition['date_end'] !== "") {
+            $dataQry->where('stock_details.stock_date <=', $addCondition['date_end']);
+        }
+
+        if ($addCondition['divisi_id'] != "" || $addCondition['warehouse_id'] != "" || $addCondition['tipe_barang'] != "" || $addCondition['supplier_id'] || $addCondition['bc_id'] != "" || $addCondition['no_aju'] != "" || $addCondition['date_start'] != "" || $addCondition['date_end'] != "") {
+            $dataQry->groupEnd();
+        }
+
+
+        $totalFilteredData = $dataQry->countAllResults(false);
+        $data = $dataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }
