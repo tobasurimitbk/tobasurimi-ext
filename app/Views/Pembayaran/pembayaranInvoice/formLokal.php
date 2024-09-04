@@ -99,7 +99,7 @@
                                 <option value=""></option>
                                 <?php if (!empty($dokumenList)): ?>
                                     <?php foreach ($dokumenList as $l): ?>
-                                        <option <?= (!empty($detail)) ?  (($detail['invoice_id']) == $l['id'] ? "selected" : "") : '' ?> value="<?= encrypt($l['id']); ?>"><?= $l['document_no']; ?></option>
+                                        <option <?= (!empty($detail)) ?  (($detail['invoice_id']) == $l['id'] ? "selected" : "") : '' ?> value="<?= encrypt($l['id']); ?>"><?= $l['no_faktur']; ?></option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>

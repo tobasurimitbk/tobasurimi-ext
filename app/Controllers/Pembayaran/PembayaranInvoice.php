@@ -79,9 +79,6 @@ class PembayaranInvoice extends BaseController
         foreach ($salesOrderExportData as $s) {
             array_push($dokumenList, $s);
         }
-
-
-
         $data = [
             "customers" => $customers,
             "divisi" => $divisi,
@@ -127,7 +124,7 @@ class PembayaranInvoice extends BaseController
         $divisi = $this->divisiModel->getDivisiAccess();
         $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel->where('deletedAt', null)->where('id_company', $this->this_company_id)->findAll();
         foreach ($salesOrderLokalInvoiceData as $s) {
-            $s['document_no'] = str_replace(['[', ']', '"'], '', $s['document_no']);
+            // $s['no_faktur'] = str_replace(['[', ']', '"'], '', $s['no_faktur']);
             array_push($dokumenList, $s);
         }
 
@@ -605,7 +602,7 @@ class PembayaranInvoice extends BaseController
         if ($tipe_invoice == "LOKAL") {
             $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel
                 ->join('customers', 'customers.id = sales_order_invoice.id_customer')
-                ->where('id', $invoice_id)
+                ->where('sales_order_invoice.id', $invoice_id)
                 ->first();
             $customer = $salesOrderLokalInvoiceData['name'];
         } elseif ($tipe_invoice == "EKSPOR") {

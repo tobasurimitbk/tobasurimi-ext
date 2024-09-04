@@ -13,7 +13,10 @@ use App\Models\SalesOrderDetailModel;
 use App\Models\SuratJalanModel;
 use App\Models\TaxModel;
 use App\Models\AllNoModel;
+use App\Models\PembayaranInvoiceModel;
 use App\Models\SalesOrderInvoiceDetailModel;
+use App\Models\SalesOrderPaymentDetailModel;
+use App\Models\SalesOrderPaymentModel;
 use Config\Services;
 use Dompdf\Dompdf;
 use ErrorException;
@@ -36,6 +39,7 @@ class Invoice extends BaseController
     protected $SuratJalanModel;
     protected $SalesOrderInvoiceDetailModel;
     protected $taxModel;
+    protected $pembayaranInvoiceModel;
 
     public function __construct()
     {
@@ -56,6 +60,7 @@ class Invoice extends BaseController
         $this->SuratJalanModel = new SuratJalanModel();
         $this->SalesOrderInvoiceDetailModel = new SalesOrderInvoiceDetailModel();
         $this->taxModel = new TaxModel();
+        $this->pembayaranInvoiceModel = new PembayaranInvoiceModel();
     }
 
     public function index()
@@ -139,6 +144,16 @@ class Invoice extends BaseController
             // Gantikan karakter tidak diinginkan dengan string kosong
             $cleaned_string_document_no = str_replace($unwanted_characters, ' ', $data->doc_no);
 
+            $pembayaranInvoice = $this->pembayaranInvoiceModel->where('invoice_id', $data->id)->where('status_posting', "1")->findAll();
+            $statusPembayaranInvoice = "";
+
+            if ($pembayaranInvoice) {
+                $statusPembayaranInvoice = "LUNAS";
+            } else {
+                $statusPembayaranInvoice = "BELUM LUNAS";
+            }
+
+
             array_push($dataAllSalesOrderInvoice, [
                 "no"                => $no++,
                 "id"                => encrypt($data->id),
@@ -154,6 +169,7 @@ class Invoice extends BaseController
                 "tipe_invoice"      => $data->tipe_invoice,
                 "status"            => ($data->status_posting == 0) ? 'Waiting' : 'Posting',
                 "counter_print"     => $data->counter_print,
+                "status_pembayaran"     => $statusPembayaranInvoice,
             ]);
         }
 
@@ -1202,24 +1218,11 @@ class Invoice extends BaseController
 
         if (!$validate) {
             $errorList = $this->validator->getErrors();
-            // $error = validation_errors();
-            //echo json_encode($error);
             throw new ErrorException($errorList[array_keys($errorList)[0]]);
-            //return;
-            // return redirect()->to('/invoice-penjualan-lokal/create')->back()->withInput();
         }
 
         $postData = $this->request->getPost();
         $postItemsData = json_decode($this->request->getPost('items'), true);
-
-        // var_dump($postItemsData);
-        // die();
-
-        // var_dump($postItemsData['id_detail_invoice'][0]);
-        // die();
-
-        // var_dump($postItemsData);
-        // die();
 
 
         $soInvData = $this->SalesOrderInvoiceModel->asObject()
@@ -1245,10 +1248,8 @@ class Invoice extends BaseController
             return;
         }
 
-
         $values = [
             "id_user"           => $this->userId,
-            // "document_type"     => $soInvData->document_type,
             "document_id"       => str_replace(['\\"', '\\', '"'], '', json_encode($postData['doc_id'])),
             "id_customer"       => $postData['id_customer'],
             "document_no"       => $postData['noDocument'],
@@ -1267,8 +1268,6 @@ class Invoice extends BaseController
         $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->update($payload['id'], $values);
 
         $this->SalesOrderInvoiceModel->db->transComplete();
-
-
 
         //jika document tidak berubah
         if ($soInvData->document_no == $postData['noDocument']) {
@@ -1290,18 +1289,13 @@ class Invoice extends BaseController
                 }
             }
         } else {
-
             // jika ada perubahan
             $this->SalesOrderInvoiceDetailModel->where('id_sales_order_invoice', $payload['id'])->delete();
             //setelah hapus kembalikan kondisi sales_order_invoice_id pada sales order detail semula mejadi null
             foreach (json_decode($soInvData->document_id) as $id) {
-
-
                 if ($soInvData->document_type === 'pesanan') {
-
                     $this->SalesOrderModel->where('id', $id)->set(['sales_order_invoice_id' => NULL])->update();
                 } else {
-
                     $this->SuratJalanModel->where('id', $id)->set(['sales_order_invoice_id' => NULL])->update();
                 }
             }
@@ -1332,9 +1326,6 @@ class Invoice extends BaseController
                 }
             }
         }
-
-
-
         // Periksa apakah $postItemsData tidak kosong sebelum melakukan iterasi
         if (!empty($postItemsData)) {
             foreach ($postItemsData as $value) {
