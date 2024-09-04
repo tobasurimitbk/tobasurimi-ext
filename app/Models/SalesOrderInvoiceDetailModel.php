@@ -53,4 +53,18 @@ class SalesOrderInvoiceDetailModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getSumAmount($id_invoice)
+    {
+        $selectQry = "sales_order_invoice_detail.*,
+                      SUM(sales_order_invoice_detail.amount_invoice) AS sum_amount_invoice";
+
+        $dataSumAmount = $this->asObject()
+            ->select($selectQry)
+            ->where('id_sales_order_invoice', $id_invoice)
+            ->groupBy('id_sales_order_invoice')
+            ->first();
+
+        return $dataSumAmount;
+    }
 }

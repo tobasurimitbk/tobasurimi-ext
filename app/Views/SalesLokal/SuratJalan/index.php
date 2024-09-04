@@ -70,7 +70,9 @@
                                 <th onclick="changeSort('tipe_sales_order')" class="sort">Tipe</th>
                                 <th onclick="changeSort('shipping_date')" class="sort">Shipping Date</th>
                                 <th onclick="changeSort('sales_order_invoice_id')" class="sort">Invoice</th>
+                                <th onclick="changeSort('print')" class="sort">Print</th>
                                 <th onclick="changeSort('total_harga')" class="sort">Total Harga</th>
+                                <th onclick="changeSort('total_invoice')" class="sort">Total Invoice</th>
                                 <th class="sort">Action</th>
                             </tr>
                         </thead>
@@ -229,7 +231,20 @@
                 }
             }
         }, {
+            data: "print",
+            className: "text-center",
+            render: function(data, type, row) {
+                if (data && data !== "0") {
+                    return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
+                } else { // Otherwise, display a dash "-"
+                    return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
+                }
+            }
+        }, {
             data: "total_harga",
+            className: "text-center"
+        }, {
+            data: "total_invoice",
             className: "text-center"
         }, {
             data: "id",

@@ -14,6 +14,7 @@ use App\Models\CustomerModel;
 use App\Models\AllNoModel;
 use App\Models\SuratJalanModel;
 use App\Models\EmployeesModel;
+use App\Models\SalesOrderInvoiceDetailModel;
 
 class SuratJalan extends BaseController
 {
@@ -26,6 +27,7 @@ class SuratJalan extends BaseController
     private $CustomerModel;
     private $SalesOrderModel;
     private $SalesOrderDetailModel;
+    private $SalesOrderInvoiceDetailModel;
     private $encrypter;
     private $SuratJalanModel;
     private $EmployeesModel;
@@ -43,6 +45,7 @@ class SuratJalan extends BaseController
         $this->CustomerModel = new CustomerModel();
         $this->SalesOrderModel = new SalesOrderModel();
         $this->SalesOrderDetailModel = new SalesOrderDetailModel();
+        $this->SalesOrderInvoiceDetailModel = new SalesOrderInvoiceDetailModel();
         $this->AllNoModel = new AllNoModel();
         $this->SuratJalanModel = new SuratJalanModel();
         $this->EmployeesModel = new EmployeesModel();
@@ -123,7 +126,9 @@ class SuratJalan extends BaseController
         $dataAllSuratJalan = [];
         foreach ($dataSuratJalan['data'] as $data) {
             $dataNo = json_decode($data->multiple_no_so, true);
-
+            if ($data->sales_order_invoice_id) {
+                $dataSumAmount = $this->SalesOrderInvoiceDetailModel->getSumAmount($data->sales_order_invoice_id);
+            }
             if ($data->sales_id == NULL || $data->sales_id == "0") {
                 $customerSales = "-";
             } else {
@@ -141,7 +146,9 @@ class SuratJalan extends BaseController
                 "customerSales" => $customerSales,
                 "shipping_date"         => date("d-m-Y", strtotime($data->shipping_date)),
                 "sales_order_invoice_id" => $data->sales_order_invoice_id,
+                "print" => $data->counter_print,
                 "total_harga" => formatRupiah($data->estimated_freight + $data->total_harga),
+                "total_invoice" => formatRupiah($data->sales_order_invoice_id ? $dataSumAmount->sum_amount_invoice : 0),
             ]);
         }
         //dd($dataAllSuratJalan);
@@ -567,6 +574,8 @@ class SuratJalan extends BaseController
             ->select('surat_jalan_so.*, DATE_FORMAT(surat_jalan_so.shipping_date, "%d %b %Y") AS shipping_date')
             // ->join()
             ->find($id);
+
+        $this->SuratJalanModel->update($id, ['counter_print' => $sjData->counter_print + 1]);
 
         $soIds = json_decode($sjData->multiple_id_so);
 
