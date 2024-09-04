@@ -217,7 +217,7 @@ class WorkOrder extends BaseController
         try {
             $id = ($this->request->getPost("id"));
             $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-            $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day);
+            $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day, $this->this_company_id);
             // $no = $this->workOrdersModel->get_no();
             $payload = [
                 "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
