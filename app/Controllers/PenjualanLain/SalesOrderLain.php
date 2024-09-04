@@ -348,7 +348,6 @@ class SalesOrderLain extends BaseController
         $salesOrderLainList = $this->salesOrderLainDetailModel->where('sales_order_lain_id', $id)->findAll();
 
         $this->jurnalUmumController->insertDataPenjualan($id, "LAIN");
-        exit;
         if ($salesOrderLain['bc_id'] === "0") {
             foreach ($salesOrderLainList as $s) {
                 $stock = $this->stockModel->find($s['stock_id']);

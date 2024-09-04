@@ -15,6 +15,8 @@ use App\Models\BC41Model;
 use App\Models\DivisisModel;
 use App\Models\KemasanModel;
 use App\Models\MetadataModel;
+use App\Models\MutasiGlobalModel;
+use App\Models\MutasiModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\PPBKBModel;
 use App\Models\RMImportPOModel;
@@ -46,6 +48,8 @@ class LaporanBeaCukai extends BaseController
     protected $satuanModel;
     protected $divisiModel;
     protected $supplierModel;
+    protected $mutasiModel;
+    protected $mutasiGlobalModel;
 
     public function __construct()
     {
@@ -69,6 +73,8 @@ class LaporanBeaCukai extends BaseController
         $this->satuanModel = new SatuansModel();
         $this->divisiModel = new DivisisModel();
         $this->supplierModel = new SupplierModel();
+        $this->mutasiModel = new MutasiModel();
+        $this->mutasiGlobalModel = new MutasiGlobalModel();
     }
 
     public function index()
@@ -84,7 +90,7 @@ class LaporanBeaCukai extends BaseController
             'dataDivisi' => $this->divisiModel->getDivisiAccess(),
             'dataSupplier' => $this->supplierModel->where('company_id', $this->this_company_id)->findAll(),
             'dataDokumen' => $this->metadataModel->where('name', 'jenis_dok_aju')->whereIn('value', ['BC 2.3', 'BC 2.7', 'BC 4.0', 'PPB-KB'])->findAll(),
-            'dataPemasukan' => ["LPB", "JASA VENDOR", "MUTASI", "REBUS"],
+            'dataPemasukan' => ["LPB", "JASA VENDOR", "MUTASI", "REBUS", "ADJUSMENT"],
             'dataDivisi' => $this->divisiModel->getDivisiAccess()
         ];
 
@@ -125,7 +131,7 @@ class LaporanBeaCukai extends BaseController
 
         $dataBarang = $this->stockDetail2Model->getListStokMasukKeluar($condition, $addCondition, 10000000, 0);
 
-        $jsonData = $this->getListMasukKeluarBarang($dataBarang, $payload, $addCondition);
+        $jsonData = $this->getListMasukBarang($dataBarang, $payload, $addCondition);
         $domPdf = new Dompdf();
 
         $fileName = 'Laporan Pemasukan Barang';
@@ -172,7 +178,7 @@ class LaporanBeaCukai extends BaseController
 
         $dataBarang = $this->stockDetail2Model->getListStokMasukKeluar($condition, $addCondition, 10000000, 0);
 
-        $jsonData = $this->getListMasukKeluarBarang($dataBarang, $payload, $addCondition);
+        $jsonData = $this->getListMasukBarang($dataBarang, $payload, $addCondition);
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -209,7 +215,7 @@ class LaporanBeaCukai extends BaseController
             ->setCellValue('L1', 'No Invoice')
             ->setCellValue('M1', 'Departemen')
             ->setCellValue('N1', 'Warehouse')
-            ->setCellValue('O1', 'Supplier')
+            ->setCellValue('O1', 'Supplier / Pengirim')
             ->setCellValue('P1', 'Kode Barang')
             ->setCellValue('Q1', 'Barang')
             ->setCellValue('R1', 'Spesifikasi')
@@ -242,7 +248,7 @@ class LaporanBeaCukai extends BaseController
                 ->setCellValue('L' . $column, $row['noInvoice'])
                 ->setCellValue('M' . $column, $row['divisi'])
                 ->setCellValue('N' . $column, $row['warehouse'])
-                ->setCellValue('O' . $column, $row['supplier'])
+                ->setCellValue('O' . $column, $row['pengirim'])
                 ->setCellValue('P' . $column, $row['kodeBarang'])
                 ->setCellValue('Q' . $column, $row['barang'])
                 ->setCellValue('R' . $column, $row['spesifikasi'])
@@ -275,7 +281,7 @@ class LaporanBeaCukai extends BaseController
         die;
     }
 
-    public function allMasukKeluarBarang()
+    public function allMasukBarang()
     {
         $payload = [
             "pageSize" => $this->request->getVar("length"),
@@ -315,12 +321,12 @@ class LaporanBeaCukai extends BaseController
         $offset = $this->request->getVar("start");
         $dataBarang = $this->stockDetail2Model->getListStokMasukKeluar($condition, $addCondition, $limit, $offset);
 
-        $jsonData = $this->getListMasukKeluarBarang($dataBarang, $payload, $addCondition);
+        $jsonData = $this->getListMasukBarang($dataBarang, $payload, $addCondition);
         return response()->setJSON($jsonData);
     }
 
 
-    private function getListMasukKeluarBarang($dataBarang, $payload, $addCondition)
+    private function getListMasukBarang($dataBarang, $payload, $addCondition)
     {
         $dataBarangList = [];
 
@@ -330,32 +336,33 @@ class LaporanBeaCukai extends BaseController
             $jenisDokumen = ($data->bc_id == 0) ? "NON PABEAN" : $this->metadataModel->find($data->bc_id)['value'];
             // GET BC DETAIL
             if ($jenisDokumen == "NON PABEAN") {
+                // NON PABEAN
                 $noDaftar = "-";
             } elseif ($data->bc_id == 48) {
+                // BC 2.3
                 $bcDetail = $this->bc23Model->select('no_daftar')
                     ->join('bc_purchase_order', 'bc_purchase_order.id = bc_23.bc_purchase_order_id', 'left')
                     ->where('no_aju', $data->no_aju)
                     ->first();
-            } elseif ($data->bc_id == 49) {
-                $bcDetail = $this->bc25Model->where('no_aju', $data->no_aju)->first();
             } elseif ($data->bc_id == 52) {
+                // BC 2.7
                 $bcDetail = $this->bc27Model->where('no_aju', $data->no_aju)->first();
             } elseif ($data->bc_id == 53) {
+                // BC 4.0
                 $bcDetail = $this->bc40Model->select('no_daftar')
                     ->join('bc_purchase_order', 'bc_purchase_order.id = bc_40.bc_purchase_order_id', 'left')
                     ->first();
-            } elseif ($data->bc_id == 54) {
-                $bcDetail = $this->bc41Model->where('no_aju', $data->no_aju)->first();
             } elseif ($data->bc_id == 1426) {
+                // PPBKB
                 $bcDetail = $this->ppbkbModel->where('no_ppbkb', $data->no_aju)->first();
-            } else {
-                $bcDetail = $this->bc30Model->where('no_aju', $data->no_aju)->first();
             }
 
 
             if ($data->sumber === "LPB") {
                 $data->sumber = "PEMBELIAN";
                 $penerimaanBarang = $this->penerimaanBarangModel->where('no_penerimaan_barang', $data->no_dokumen)->first();
+                //
+
             }
 
             if ($data->kemasan_id == 0) {
@@ -401,9 +408,35 @@ class LaporanBeaCukai extends BaseController
                 $valas = "IDR";
             }
 
-            if ($data->supplier_id != null) {
-                $supplier = $this->supplierModel->find($data->supplier_id);
+            if ($data->sumber != "MUTASI") {
+                if ($data->supplier_id != null) {
+                    $supplier = $this->supplierModel->find($data->supplier_id);
+                    $pengirimName = $supplier != null ? $supplier['name'] : "-";
+                } else {
+                    $pengirimName = "-";
+                }
+            } elseif ($data->sumber === "MUTASI") {
+                $mutasi = $this->mutasiModel
+                    ->select('companies.company, divisis.divisi')
+                    ->join('companies', 'companies.id = mutasi.company_id', 'left')
+                    ->join('divisis', 'divisis.id = mutasi.divisi_asal_id', 'left')
+                    ->where('no_mutasi', $data->no_dokumen2)
+                    ->first();
+                $mutasiGlobal = $this->mutasiGlobalModel
+                    ->select('companies.company, divisis.divisi')
+                    ->join('companies', 'companies.id = mutasi_global.company_asal_id', 'left')
+                    ->join('divisis', 'divisis.id = mutasi_global.divisi_asal_id', 'left')
+                    ->where('no_mutasi', $data->no_dokumen2)
+                    ->first();
+
+                if ($mutasi != null) {
+                    $pengirimName = $mutasi['company'] . " / " . $mutasi['divisi'];
+                } elseif ($mutasiGlobal != null) {
+                    $pengirimName = $mutasiGlobal['company'] . " / " . $mutasiGlobal['divisi'];
+                }
             }
+
+
             $hargaBarang = ($data->harga_umum + $data->harga_harian + $data->harga_bulanan) * $data->qty;
 
             // FILTERAN
@@ -417,15 +450,15 @@ class LaporanBeaCukai extends BaseController
                         "noAju"         => $data->no_aju,
                         "noDaftar"      => isset($noDaftar) ? $noDaftar : ($bcDetail == null ? "-" : $bcDetail['no_daftar']),
                         "tglDaftar"     => date('d/m/Y', strtotime($data->stock_date)),
-                        "noPenerimaan"  => isset($penerimaanBarang) ? ($penerimaanBarang != null ? $penerimaanBarang['no_penerimaan_barang'] : '') : '',
-                        "tglPenerimaan" => isset($penerimaanBarang) ? ($penerimaanBarang != null ? date('d/m/Y', strtotime($penerimaanBarang['tanggal'])) : '') : '',
-                        "suratJalan"    => isset($penerimaanBarang) ? ($penerimaanBarang != null ? $penerimaanBarang['no_surat_jalan'] : '') : '',
+                        "noPenerimaan"  => isset($penerimaanBarang) ? ($penerimaanBarang != null ? $penerimaanBarang['no_penerimaan_barang'] : $data->no_dokumen) : $data->no_dokumen,
+                        "tglPenerimaan" => isset($penerimaanBarang) ? ($penerimaanBarang != null ? date('d/m/Y', strtotime($penerimaanBarang['tanggal'])) : date('d/m/Y', strtotime($data->stock_date))) : date('d/m/Y', strtotime($data->stock_date)),
+                        "suratJalan"    => isset($penerimaanBarang) ? ($penerimaanBarang != null ? $penerimaanBarang['no_surat_jalan'] : $data->no_dokumen2) : $data->no_dokumen2,
                         "jenisSumber"   => $data->sumber,
                         "noOrder"       => $data->no_po,
                         "noInvoice"     => isset($penerimaanBarang) ? ($penerimaanBarang != null ? $penerimaanBarang['no_invoice'] : '') : '',
                         "divisi"        => $data->divisiName,
                         "warehouse"     => $data->warehouseName,
-                        "supplier"      => isset($supplier) ? ($supplier != null ? $supplier['name'] : "-") : "-",
+                        "pengirim"      => $pengirimName,
                         "kodeBarang"    => $kodeBarang,
                         "barang"        => $barangName,
                         "spesifikasi"   => $spesifikasiName,
@@ -448,15 +481,15 @@ class LaporanBeaCukai extends BaseController
                             "noAju"         => $data->no_aju,
                             "noDaftar"      => isset($noDaftar) ? $noDaftar : ($bcDetail == null ? "-" : $bcDetail['no_daftar']),
                             "tglDaftar"     => date('d/m/Y', strtotime($data->stock_date)),
-                            "noPenerimaan"  => isset($penerimaanBarang) ? ($penerimaanBarang != null ? $penerimaanBarang['no_penerimaan_barang'] : '') : '',
-                            "tglPenerimaan" => isset($penerimaanBarang) ? ($penerimaanBarang != null ? date('d/m/Y', strtotime($penerimaanBarang['tanggal'])) : '') : '',
-                            "suratJalan"    => isset($penerimaanBarang) ? ($penerimaanBarang != null ? $penerimaanBarang['no_surat_jalan'] : '') : '',
+                            "noPenerimaan"  => isset($penerimaanBarang) ? ($penerimaanBarang != null ? $penerimaanBarang['no_penerimaan_barang'] : $data->no_dokumen) : $data->no_dokumen,
+                            "tglPenerimaan" => isset($penerimaanBarang) ? ($penerimaanBarang != null ? date('d/m/Y', strtotime($penerimaanBarang['tanggal'])) : date('d/m/Y', strtotime($data->stock_date))) : date('d/m/Y', strtotime($data->stock_date)),
+                            "suratJalan"    => isset($penerimaanBarang) ? ($penerimaanBarang != null ? $penerimaanBarang['no_surat_jalan'] : $data->no_dokumen2) : $data->no_dokumen2,
                             "jenisSumber"   => $data->sumber,
                             "noOrder"       => $data->no_po,
                             "noInvoice"     => isset($penerimaanBarang) ? ($penerimaanBarang != null ? $penerimaanBarang['no_invoice'] : '') : '',
                             "divisi"        => $data->divisiName,
                             "warehouse"     => $data->warehouseName,
-                            "supplier"      => isset($supplier) ? ($supplier != null ? $supplier['name'] : "-") : "-",
+                            "pengirim"      => $pengirimName,
                             "kodeBarang"    => $kodeBarang,
                             "barang"        => $barangName,
                             "spesifikasi"   => $spesifikasiName,
@@ -480,15 +513,15 @@ class LaporanBeaCukai extends BaseController
                     "noAju"         => $data->no_aju,
                     "noDaftar"      => isset($noDaftar) ? $noDaftar : ($bcDetail == null ? "-" : $bcDetail['no_daftar']),
                     "tglDaftar"     => date('d/m/Y', strtotime($data->stock_date)),
-                    "noPenerimaan"  => isset($penerimaanBarang) ? ($penerimaanBarang != null ? $penerimaanBarang['no_penerimaan_barang'] : '') : '',
-                    "tglPenerimaan" => isset($penerimaanBarang) ? ($penerimaanBarang != null ? date('d/m/Y', strtotime($penerimaanBarang['tanggal'])) : '') : '',
-                    "suratJalan"    => isset($penerimaanBarang) ? ($penerimaanBarang != null ? $penerimaanBarang['no_surat_jalan'] : '') : '',
+                    "noPenerimaan"  => isset($penerimaanBarang) ? ($penerimaanBarang != null ? $penerimaanBarang['no_penerimaan_barang'] : $data->no_dokumen) : $data->no_dokumen,
+                    "tglPenerimaan" => isset($penerimaanBarang) ? ($penerimaanBarang != null ? date('d/m/Y', strtotime($penerimaanBarang['tanggal'])) : date('d/m/Y', strtotime($data->stock_date))) : date('d/m/Y', strtotime($data->stock_date)),
+                    "suratJalan"    => isset($penerimaanBarang) ? ($penerimaanBarang != null ? $penerimaanBarang['no_surat_jalan'] : $data->no_dokumen2) : $data->no_dokumen2,
                     "jenisSumber"   => $data->sumber,
                     "noOrder"       => $data->no_po,
                     "noInvoice"     => isset($penerimaanBarang) ? ($penerimaanBarang != null ? $penerimaanBarang['no_invoice'] : '') : '',
                     "divisi"        => $data->divisiName,
                     "warehouse"     => $data->warehouseName,
-                    "supplier"      => isset($supplier) ? ($supplier != null ? $supplier['name'] : "-") : "-",
+                    "pengirim"      => $pengirimName,
                     "kodeBarang"    => $kodeBarang,
                     "barang"        => $barangName,
                     "spesifikasi"   => $spesifikasiName,
@@ -513,5 +546,32 @@ class LaporanBeaCukai extends BaseController
         ];
 
         return $data;
+    }
+
+    public function laporanPengeluaranBarang()
+    {
+        $data = [
+            'tipeBarang' => $this->metadataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
+            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
+            'dataSupplier' => $this->supplierModel->where('company_id', $this->this_company_id)->findAll(),
+            'dataDokumen' => $this->metadataModel->where('name', 'jenis_dok_aju')->whereIn('value', ['BC 2.3', 'BC 2.7', 'BC 4.0', 'PPB-KB'])->findAll(),
+            'dataPemasukan' => ["PENJUALAN", "JASA VENDOR", "MUTASI", "REBUS", "ADJUSMENT"],
+            'dataDivisi' => $this->divisiModel->getDivisiAccess()
+        ];
+
+        return view('Laporan/LaporanBeaCukai/pengeluaranBarang/index', $data);
+    }
+
+    private function getListKeluarBarang($dataBarang, $payload, $addCondition)
+    {
+
+        // META DATA -> jenis_dok_aju
+        // BC 2.5 -> 49
+        // BC 2.7 -> 52
+        // BC 3.0 -> 1445
+        // BC 4.1 -> 54
+        // PPBKB -> 1426
+
+
     }
 }
