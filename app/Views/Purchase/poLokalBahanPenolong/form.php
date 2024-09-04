@@ -984,7 +984,7 @@
         }
         $('#barang_id, #barang_update_id').val(item.spesifikasi_id).change();
         $('#harga_satuan').val(formatRupiah(item.harga_satuan));
-        $('#qty').val(parseFloat(item.qty).toFixed());
+        $('#qty').val(parseFloat(item.qty));
         $('#diskon').val(parseFloat(item.diskon));
         $('#biaya_tambahan').val((item.biaya_tambahan == 0) ? formatRupiah(0) : formatRupiah(item.biaya_tambahan));
         $('#keterangan').val(item.keterangan);
