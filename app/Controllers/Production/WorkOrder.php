@@ -3,6 +3,7 @@
 namespace App\Controllers\Production;
 
 use App\Controllers\BaseController;
+use App\Models\AccountBarangModel;
 // use App\Models\BarangModel;
 use App\Models\DivisisModel;
 use App\Models\MaterialRequestDetailsModel;
@@ -28,6 +29,7 @@ class WorkOrder extends BaseController
     protected $materialRequestDetailsModel;
     protected $productionResultModel;
     protected $productionResultDetailsModel;
+    protected $accountBarangModel;
 
     public function __construct()
     {
@@ -43,6 +45,7 @@ class WorkOrder extends BaseController
         $this->materialRequestDetailsModel = new MaterialRequestDetailsModel();
         $this->productionResultModel = new ProductionResultModel();
         $this->productionResultDetailsModel = new ProductionResultDetailModel();
+        $this->accountBarangModel = new AccountBarangModel();
     }
 
     public function index()
@@ -188,7 +191,9 @@ class WorkOrder extends BaseController
                     'qty' => $s->qty,
                     'note' => $s->keterangan,
                 ]);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('department_id'), $s->barang_id);
             }
+
 
             return response()->setJSON([
                 "id"      => encrypt($id),
@@ -212,7 +217,7 @@ class WorkOrder extends BaseController
         try {
             $id = ($this->request->getPost("id"));
             $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-            $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day);
+            $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day, $this->this_company_id);
             // $no = $this->workOrdersModel->get_no();
             $payload = [
                 "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
