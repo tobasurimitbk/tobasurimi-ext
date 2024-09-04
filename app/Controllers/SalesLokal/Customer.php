@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\BanksModel;
 use App\Models\CustomerModel;
 use App\Models\EmployeesModel;
+use App\Models\MetadataModel;
 use App\Models\ProvincesModel;
 
 class Customer extends BaseController
@@ -20,6 +21,7 @@ class Customer extends BaseController
     protected $countryModel;
     protected $CustomerModel;
     protected $employeeModel;
+    protected $metadataModel;
 
     public function __construct()
     {
@@ -31,6 +33,7 @@ class Customer extends BaseController
         $this->BanksModel = new BanksModel();
         $this->CustomerModel = new CustomerModel();
         $this->employeeModel = new EmployeesModel();
+        $this->metadataModel = new MetadataModel();
     }
 
     public function index()
@@ -96,7 +99,17 @@ class Customer extends BaseController
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
+        // var_dump($customerData['data']);
+        // exit;
+
         foreach ($customerData['data'] as $data) {
+            $termin = "-";
+            if ($data->termin == "0" || $data->termin == null) {
+                $termin = "-";
+            } else {
+                $termin = $this->metadataModel->find($data->termin)['value'];
+            }
+
             array_push($dataCustomer, [
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
@@ -108,7 +121,9 @@ class Customer extends BaseController
                 "saldo"         => number_format($data->saldo),
                 "currencyName"  => $data->currencyName,
                 "countryName"   => $data->countryName,
-                "address"       => $data->address
+                "address"       => $data->address,
+                "termin"        => $termin,
+                "limit"       => number_format($data->piutang),
             ]);
         }
 

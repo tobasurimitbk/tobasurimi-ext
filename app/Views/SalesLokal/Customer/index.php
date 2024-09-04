@@ -201,6 +201,8 @@
                                 <th onclick="changeSort('phone')" class="sort">Kontak</th>
                                 <th onclick="changeSort('address')" class="sort">Alamat</th>
                                 <th onclick="changeSort('nameSales')" class="sort">Nama Sales</th>
+                                <th onclick="changeSort('nameSales')" class="sort">Termin</th>
+                                <th onclick="changeSort('nameSales')" class="sort">Limit</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -270,6 +272,12 @@
             className: "text-center",
         }, {
             data: "namaSales",
+            className: "text-center"
+        }, {
+            data: "termin",
+            className: "text-center"
+        }, {
+            data: "piutang",
             className: "text-center"
         }, ],
         columnDefs: [{
