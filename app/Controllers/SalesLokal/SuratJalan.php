@@ -636,14 +636,36 @@ class SuratJalan extends BaseController
 
     public function generateNomorSuratJalan()
     {
-        $code = "SJ";
-        $currentYear = date('Y');
-        $currentMonth = date('m');
-        $number = $this->SuratJalanModel->getNumber($currentMonth . "/" . $currentYear . "/", $this->this_company_id);
-        $noSuratJalan = "TSI/" . $code . "/" . $currentMonth . "/" . $currentYear . "/" . $number;
+        // $code = "SJ";
+        // $currentYear = date('Y');
+        // $currentMonth = date('m');
+        // $number = $this->SuratJalanModel->getNumber($currentMonth . "/" . $currentYear . "/", $this->this_company_id);
+        // $noSuratJalan = "TSI/" . $code . "/" . $currentMonth . "/" . $currentYear . "/" . $number;
+
+        $code = "TSI/SJ";
+        $currentYear = date('y'); // Get last two digits of the year
+        $currentMonth = date('n'); // Get numeric month without leading zeros
+        $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+        $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
+
+        $lastData = $this->SuratJalanModel->asObject()
+            ->where('id_company', $this->this_company_id)
+            ->like('no_surat_jalan', $numberTemplate)
+            ->orderBy('createdAt', 'DESC')
+            ->first();
+
+        if (!empty($lastData)) {
+            $asd = explode('/', $lastData->no_surat_jalan);
+            $lastIncrement = intval($asd[4]) + 1;
+            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+
+            $invNumber = $numberTemplate . $paddedNumber;
+        } else {
+            $invNumber = $numberTemplate . '001';
+        }
 
         return response()->setJSON([
-            'data' => $noSuratJalan,
+            'data' => $invNumber,
             'token' => csrf_hash(),
             'status' => true
         ]);

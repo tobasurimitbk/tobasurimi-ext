@@ -44,7 +44,7 @@
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input readonly autocomplete="one-time-code" type="text" class="form-control no_faktur" id="no_faktur" name="no_faktur" value="<?= !empty($data) ? $data->no_faktur : $noFaktur; ?>" placeholder="Auto Generate">
+                                <input readonly autocomplete="one-time-code" type="text" class="form-control no_faktur" id="no_faktur" name="no_faktur" value="<?= !empty($data) ? $data->no_faktur : ""; ?>" placeholder="Auto Generate">
                                 <label for="floatingInput">No Faktur</label>
                             </div>
                             <div style="<?= !empty($data) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -398,8 +398,11 @@
             getTerminList(this.value);
         <?php endif; ?>
 
-        <?php if (!empty($data->dpp) || !empty($data->ppn) || !empty($data->total_invoice)) : ?>
+        <?php if (empty($data)) : ?>
+            changeStatus()
+        <?php endif; ?>
 
+        <?php if (!empty($data->dpp) || !empty($data->ppn) || !empty($data->total_invoice)) : ?>
             $('#taxTotal').html(<?= $data->ppn; ?>.toLocaleString());
             $('#itemSubTotal').html(<?= $data->dpp; ?>.toLocaleString());
             $('#grandTotal').html(<?= $data->total_invoice; ?>.toLocaleString());
@@ -408,11 +411,6 @@
             <?php endif; ?>
         <?php endif; ?>
 
-        // $(".tanggal_faktur").val(formattedDateFront);
-
-
-
-        // via
         $('.ship_via, .termin').select2({
             placeholder: "",
             theme: "bootstrap-5"
@@ -1182,8 +1180,8 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-                    if (res) {
-                        $("#no_faktur").val(res);
+                    if (res.status) {
+                        $("#no_faktur").val(res.data);
                         $("#no_faktur").attr("readonly", true);
                     } else {
                         Swal.fire({

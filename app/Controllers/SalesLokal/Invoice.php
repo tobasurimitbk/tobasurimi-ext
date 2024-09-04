@@ -72,10 +72,10 @@ class Invoice extends BaseController
         // $customers = $this->CustomerModel->asObject()->select(['id', 'name'])->where('company_id', $this->this_company_id)->findAll();
         $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
         $tipeShipping = $this->MetadataModel->asObject()->select(['id', 'value'])->where('name', 'tipe_shipping_via')->findAll();
-        $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur($this->this_company_id);
+        // $noFaktur = $this->getNomorFaktur();
         $taxData = $this->taxModel->getTaxByType('ppn');
         $data = [
-            "noFaktur" => $noFaktur,
+            // "noFaktur" => $noFaktur,
             "dataCustomers" => $customers,
             "id_user" => session()->get('login')->user_id,
             "seller_name" => session()->get('login')->name,
@@ -1364,7 +1364,35 @@ class Invoice extends BaseController
 
     public function getNomorFaktur()
     {
-        $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur($this->this_company_id);
-        return json_encode($noFaktur);
+        // $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur($this->this_company_id);
+        // return json_encode($noFaktur);
+
+        $code = "LKL/INV";
+        $currentYear = date('y'); // Get last two digits of the year
+        $currentMonth = date('n'); // Get numeric month without leading zeros
+        $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+        $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
+
+        $lastData = $this->SalesOrderInvoiceModel->asObject()
+            ->where('id_company', $this->this_company_id)
+            ->like('no_faktur', $numberTemplate)
+            ->orderBy('createdAt', 'DESC')
+            ->first();
+
+        if (!empty($lastData)) {
+            $asd = explode('/', $lastData->no_faktur);
+            $lastIncrement = intval($asd[4]) + 1;
+            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+
+            $invNumber = $numberTemplate . $paddedNumber;
+        } else {
+            $invNumber = $numberTemplate . '001';
+        }
+
+        return response()->setJSON([
+            'data' => $invNumber,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
     }
 }
