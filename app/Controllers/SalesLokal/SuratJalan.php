@@ -574,7 +574,7 @@ class SuratJalan extends BaseController
             // ->join()
             ->find($id);
 
-        $this->SuratJalanModel->update($id, ['counter_print' => $sjData->counter_print + 1]);
+        $this->SuratJalanModel->update($id, ['counter_print' => (int) $sjData->counter_print + 1]);
 
         $soIds = json_decode($sjData->multiple_id_so);
 
