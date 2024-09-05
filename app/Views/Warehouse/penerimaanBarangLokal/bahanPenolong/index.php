@@ -197,7 +197,7 @@
                         string = `
                         <div class="mt-0" style="text-align:center;">
                             <button data-toggle="tooltip" title="Return Out" class="btn btn-success return-out" onclick="" style="box-shadow: none !important;">
-                                <i class="fa fa-undo fa-sm" aria-hidden="true"></i>
+                                <i class="fa fa-truck fa-sm" aria-hidden="true"></i>
                             </button>
                             <?php if (can('Warehouse', 'P. Barang Lokal BP', 'p')) : ?>
                                 <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
