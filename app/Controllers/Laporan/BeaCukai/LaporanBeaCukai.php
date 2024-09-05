@@ -391,7 +391,7 @@ class LaporanBeaCukai extends BaseController
                 // INI BARANG
                 $barangMaster = $this->barangMasterModel->find($data->barang1_id);
                 $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($data->barang2_id);
-                $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+                $satuan = $barangMasterSpesifikasi != null ? $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']) : "";
 
                 $kodeBarang = $barangMaster == null ? "-" : $barangMaster['kode_barang'];
                 $barangName = $barangMaster == null ? "-" : $barangMaster['barang_name'];
@@ -400,7 +400,7 @@ class LaporanBeaCukai extends BaseController
             } else {
                 // INI KEMASAN
                 $kemasan = $this->kemasanModel->find($data->kemasan_id);
-                $satuan = $this->satuanModel->find($kemasan['satuan_id']);
+                $satuan = $kemasan != null ? $this->satuanModel->find($kemasan['satuan_id']) : "-";
 
                 $kodeBarang = $kemasan == null ? "-" : $kemasan['kode'];
                 $barangName = $kemasan['name'];
@@ -992,7 +992,7 @@ class LaporanBeaCukai extends BaseController
                 // INI BARANG
                 $barangMaster = $this->barangMasterModel->find($data->barang1_id);
                 $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($data->barang2_id);
-                $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+                $satuan = $barangMasterSpesifikasi != null ? $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']) : "";
 
                 $kodeBarang = $barangMaster == null ? "-" : $barangMaster['kode_barang'];
                 $barangName = $barangMaster == null ? "-" : $barangMaster['barang_name'];
@@ -1001,7 +1001,7 @@ class LaporanBeaCukai extends BaseController
             } else {
                 // INI KEMASAN
                 $kemasan = $this->kemasanModel->find($data->kemasan_id);
-                $satuan = $this->satuanModel->find($kemasan['satuan_id']);
+                $satuan = $kemasan != null ? $this->satuanModel->find($kemasan['satuan_id']) : "-";
 
                 $kodeBarang = $kemasan == null ? "-" : $kemasan['kode'];
                 $barangName = $kemasan['name'];
