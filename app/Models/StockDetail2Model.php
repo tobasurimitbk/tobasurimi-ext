@@ -596,6 +596,7 @@ class StockDetail2Model extends Model
             stock_details2.harga_umum,
             stock_details2.harga_harian,
             stock_details2.harga_bulanan,
+            stock_details2.no_dokumen as no_dokumen2,
             stock_details.no_dokumen,
             stock_details.stock_date,
             stock_details.keterangan,

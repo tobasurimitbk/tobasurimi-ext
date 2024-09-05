@@ -115,7 +115,7 @@
             <th>No Invoice</th>
             <th>Departemen</th>
             <th>Warehouse</th>
-            <th>Supplier</th>
+            <th>Supplier / Pengirim</th>
             <th>Kode Barang</th>
             <th>Barang</th>
             <th>Spesifikasi</th>
@@ -144,7 +144,7 @@
                 <td><?= $row['noInvoice']; ?></td>
                 <td><?= $row['divisi']; ?></td>
                 <td><?= $row['warehouse']; ?></td>
-                <td><?= $row['supplier']; ?></td>
+                <td><?= $row['pengirim']; ?></td>
                 <td><?= $row['kodeBarang']; ?></td>
                 <td><?= $row['barang']; ?></td>
                 <td><?= $row['spesifikasi']; ?></td>
