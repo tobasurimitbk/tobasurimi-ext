@@ -836,6 +836,7 @@ class LaporanBeaCukai extends BaseController
             $jenisDokumen = ($data->bc_id == 0) ? "NON PABEAN" : $this->metadataModel->find($data->bc_id)['value'];
             $valas = "IDR";
             $noInvoice = "-";
+            $penerimaName = "-";
 
             // GET BC DETAIL
             if ($jenisDokumen == "NON PABEAN") {
