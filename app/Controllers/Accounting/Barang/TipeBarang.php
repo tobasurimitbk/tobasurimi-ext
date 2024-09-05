@@ -97,7 +97,7 @@ class TipeBarang extends BaseController
         //     ->where('divisi_id', $divisiId)
         //     ->first();
         $dataAccountBarang = $this->accountBarangModel
-            ->select('barang_master.*,account_barang.divisi_id,account_barang.ar_id,account_barang.ap_id,account_barang.kategori_id,account_barang.pemakaian_id')
+            ->select('barang_master.*,account_barang.divisi_id,account_barang.ar_id,account_barang.ap_id,account_barang.kategori_id,account_barang.pemakaian_id, account_barang.barang_master_id')
             ->join('barang_master', 'barang_master.id = account_barang.barang_master_id', 'left')
             ->where('account_barang.id', $id)
             ->where('account_barang.divisi_id', $divisiId)
