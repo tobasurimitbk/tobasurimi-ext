@@ -55,15 +55,13 @@ class TipeBarang extends BaseController
 
     public function saveTipeBarang()
     {
-        $barangMasterId = $this->request->getVar('id');
+        $barangMasterId = $this->request->getVar('barang_id');
+        $accountBarangId = $this->request->getVar('id');
         $divisiId = $this->request->getVar('divisi_id');
-        $getDataAccountBarang = $this->accountBarangModel->where('divisi_id', $divisiId)->where('barang_master_id', $barangMasterId)->where('deleted_at', NULL)->first();
+        $getDataAccountBarang = $this->accountBarangModel->where('divisi_id', $divisiId)->where('id', $accountBarangId)->where('deleted_at', NULL)->first();
 
         if ($getDataAccountBarang != null) {
             $this->accountBarangModel->update($getDataAccountBarang['id'], [
-                'barang_master_id' => $barangMasterId,
-                'company_id' => $this->this_company_id,
-                'divisi_id' => $divisiId,
                 'ap_id' => $this->request->getVar('akun_ap_id'),
                 'ar_id' => $this->request->getVar('akun_ar_id'),
                 'pemakaian_id' => $this->request->getVar('akun_pemakaian_id'),
@@ -171,23 +169,22 @@ class TipeBarang extends BaseController
             if ($data['ar_id'] != null) {
                 $dataAR = $this->Sub_AkunsModel->where('id', $data['ar_id'])->first();
                 $dataNamaAR = $dataAR['no_sub'];
-            } else {
-                $dataNamaAR = "-";
             }
 
             if ($data['ap_id'] != null) {
                 $dataAP = $this->Sub_AkunsModel->where('id', $data['ap_id'])->first();
                 $dataNamaAP = $dataAP['no_sub'];
-            } else {
-                $dataNamaAP = "-";
             }
 
             if ($data['pemakaian_id'] != null) {
                 $dataPemakaian = $this->Sub_AkunsModel->where('id', $data['pemakaian_id'])->first();
                 $dataNamaPemakaian = $dataPemakaian['no_sub'];
-            } else {
-                $dataNamaPemakaian = "-";
             }
+
+            // var_dump($data['ar_id']);
+            // var_dump($data['ap_id']);
+            // var_dump($data['pemakaian_id']);
+            // var_dump($data);
 
             if ($addCondition['filter_coa'] == "belum") {
                 if ($dataNamaAP == "-" || $dataAP == "-") {

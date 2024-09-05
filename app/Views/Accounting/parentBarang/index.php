@@ -94,6 +94,7 @@
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data" onSubmit="return false">
                     <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
                     <input type="hidden" name="divisi_id" class="divisi_id" id="divisi_id">
+                    <input type="hidden" name="barang_id" class="barang_id" id="barang_id">
                     <input type="hidden" name="type" id="type" value="<?= $type ?>">
                     <?= csrf_field() ?>
                     <div class="row">
@@ -315,11 +316,13 @@
                     csrf.val();
                     if (res.status) {
                         if (res.data != null) {
+                            $("#barang_id").val(res.data.barang_master_id).change();
                             $("#akun_ap_id").val(res.data.ap_id).change();
                             $("#akun_ar_id").val(res.data.ar_id).change();
                             $("#akun_pemakaian_id").val(res.data.pemakaian_id).change();
                             $("#kategori").val(res.data.kategori_id).change();
                         } else {
+                            $("#barang_id").val(null).change();
                             $("#akun_ap_id").val(null).change();
                             $("#akun_ar_id").val(null).change();
                             $("#akun_pemakaian_id").val(null).change();
