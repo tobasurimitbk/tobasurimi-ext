@@ -153,6 +153,10 @@ class Invoice extends BaseController
                 $statusPembayaranInvoice = "BELUM LUNAS";
             }
 
+            if ($data->id) {
+                $dataSumAmount = $this->SalesOrderInvoiceDetailModel->getSumAmount($data->id);
+            }
+
 
             array_push($dataAllSalesOrderInvoice, [
                 "no"                => $no++,
@@ -161,6 +165,7 @@ class Invoice extends BaseController
                 "tanggal_faktur"    => $data->tanggal_faktur,
                 "document_type"     => $data->doc_type,
                 "document_no"       => $cleaned_string_document_no,
+                "total_invoice"     => formatRupiah($data->id ? $dataSumAmount->sum_amount_invoice : 0),
                 "total_invoice"     => number_format(floatval($data->total_invoice)),
                 "kode_pelanggan"    => $data->kode_pelanggan,
                 "keterangan"        => $data->keterangan,

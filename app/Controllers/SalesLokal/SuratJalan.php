@@ -148,7 +148,6 @@ class SuratJalan extends BaseController
                 "sales_order_invoice_id" => $data->sales_order_invoice_id,
                 "print" => $data->counter_print,
                 "total_harga" => formatRupiah($data->estimated_freight + $data->total_harga),
-                "total_invoice" => formatRupiah($data->sales_order_invoice_id ? $dataSumAmount->sum_amount_invoice : 0),
             ]);
         }
         //dd($dataAllSuratJalan);

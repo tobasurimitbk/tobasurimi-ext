@@ -70,6 +70,7 @@
                                 <th onclick="changeSort('tipe_invoice')" class="sort">Jenis Invoice</th>
                                 <th onclick="changeSort('document_type')" class="sort">Jenis Dokumen</th>
                                 <th onclick="changeSort('document_no')" class="sort">No Dokumen</th>
+                                <th onclick="changeSort('total_invoice')" class="sort">Total Invoice</th>
                                 <th onclick="changeSort('status')" class="sort">Status Pembayaran</th>
                                 <th onclick="changeSort('status')" class="sort">Status</th>
                                 <th onclick="changeSort('counter_print')" class="sort">Print</th>
@@ -229,6 +230,10 @@
             },
             {
                 data: "document_no",
+                className: "text-center"
+            },
+            {
+                data: "total_invoice",
                 className: "text-center"
             },
             {

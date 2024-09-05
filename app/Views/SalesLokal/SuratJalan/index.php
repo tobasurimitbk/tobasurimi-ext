@@ -72,7 +72,6 @@
                                 <th onclick="changeSort('sales_order_invoice_id')" class="sort">Invoice</th>
                                 <th onclick="changeSort('print')" class="sort">Print</th>
                                 <th onclick="changeSort('total_harga')" class="sort">Total Harga</th>
-                                <th onclick="changeSort('total_invoice')" class="sort">Total Invoice</th>
                                 <th class="sort">Action</th>
                             </tr>
                         </thead>
@@ -242,9 +241,6 @@
             }
         }, {
             data: "total_harga",
-            className: "text-center"
-        }, {
-            data: "total_invoice",
             className: "text-center"
         }, {
             data: "id",
