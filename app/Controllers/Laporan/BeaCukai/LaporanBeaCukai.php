@@ -194,7 +194,7 @@ class LaporanBeaCukai extends BaseController
             "stock_details.deletedAt" => null,
             "stock.deletedAt" => null,
             "stock_details.status" => "In",
-            "stocl.company_id" => $this->this_company_id
+            "stock.company_id" => $this->this_company_id
         ];
 
         $dataBarang = $this->stockDetail2Model->getListStokMasukKeluar($condition, $addCondition, 10000000, 0);
