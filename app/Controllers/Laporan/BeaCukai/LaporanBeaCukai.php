@@ -16,12 +16,15 @@ use App\Models\DivisisModel;
 use App\Models\JasaVendorInModel;
 use App\Models\JasaVendorOutModel;
 use App\Models\KemasanModel;
+use App\Models\MaterialRequestDetailsModel;
 use App\Models\MetadataModel;
 use App\Models\MutasiGlobalModel;
 use App\Models\MutasiModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\PenerimaanMutasiGlobalModel;
 use App\Models\PPBKBModel;
+use App\Models\ProductionResultDetailModel;
+use App\Models\ProductionResultModel;
 use App\Models\RMImportPOModel;
 use App\Models\SalesOrderInvoiceModel;
 use App\Models\SatuansModel;
@@ -65,6 +68,9 @@ class LaporanBeaCukai extends BaseController
     protected $jasaVendorOutModel;
     protected $salesOrderInvoiceModel;
     protected $penerimaanMutasiGlobalModel;
+    protected $materialRequestDetailsModel;
+    protected $productionResultModel;
+    protected $productionResultDetailModel;
 
     public function __construct()
     {
@@ -94,6 +100,9 @@ class LaporanBeaCukai extends BaseController
         $this->jasaVendorOutModel = new JasaVendorOutModel();
         $this->salesOrderInvoiceModel = new SalesOrderInvoiceModel();
         $this->penerimaanMutasiGlobalModel = new PenerimaanMutasiGlobalModel();
+        $this->materialRequestDetailsModel = new MaterialRequestDetailsModel();
+        $this->productionResultModel = new ProductionResultModel();
+        $this->productionResultDetailModel = new ProductionResultDetailModel();
     }
 
     public function index()
@@ -1023,7 +1032,7 @@ class LaporanBeaCukai extends BaseController
                         "noAju"         => $data->no_aju,
                         "noDaftar"      => isset($noDaftar) ? $noDaftar : "-",
                         "tglDaftar"     => date('d/m/Y', strtotime($data->stock_date)),
-                        "noPengeluaran" => $data->no_dokumen2,
+                        "noPengeluaran" => ($data->sumber === "PENJUALAN") ? $data->no_dokumen2 : "-",
                         "tglPengeluaran" => date('d/m/Y', strtotime($data->stock_date)),
                         "suratJalan"    => isset($noSuratJalan) ? $noSuratJalan : "-",
                         "jenisSumber"   => $data->sumber,
@@ -1054,7 +1063,7 @@ class LaporanBeaCukai extends BaseController
                             "noAju"         => $data->no_aju,
                             "noDaftar"      => isset($noDaftar) ? $noDaftar : "-",
                             "tglDaftar"     => date('d/m/Y', strtotime($data->stock_date)),
-                            "noPengeluaran" => $data->no_dokumen2,
+                            "noPengeluaran" => ($data->sumber === "PENJUALAN") ? $data->no_dokumen2 : "-",
                             "tglPengeluaran" => date('d/m/Y', strtotime($data->stock_date)),
                             "suratJalan"    => isset($noSuratJalan) ? $noSuratJalan : "-",
                             "jenisSumber"   => $data->sumber,
@@ -1086,7 +1095,7 @@ class LaporanBeaCukai extends BaseController
                     "noAju"         => $data->no_aju,
                     "noDaftar"      => isset($noDaftar) ? $noDaftar : "-",
                     "tglDaftar"     => date('d/m/Y', strtotime($data->stock_date)),
-                    "noPengeluaran" => $data->no_dokumen2,
+                    "noPengeluaran" => ($data->sumber === "PENJUALAN") ? $data->no_dokumen2 : "-",
                     "tglPengeluaran" => date('d/m/Y', strtotime($data->stock_date)),
                     "suratJalan"    => isset($noSuratJalan) ? $noSuratJalan : "-",
                     "jenisSumber"   => $data->sumber,
@@ -1119,5 +1128,409 @@ class LaporanBeaCukai extends BaseController
         ];
 
         return $data;
+    }
+
+    public function laporanWip()
+    {
+        $data = [
+            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
+        ];
+
+        return view('Laporan/LaporanBeaCukai/wip/index', $data);
+    }
+
+    public function allWip()
+    {
+        $payload = [
+            "pageSize" => $this->request->getVar("length"),
+            "currentPage" => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
+            "search" => $this->request->getVar("search"),
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+        ];
+
+        $addCondition = [
+            "status_produksi"   => $this->request->getVar('status_produksi'),
+            "date_start"        => $this->request->getVar("date_start") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_start")))) : "",
+            "date_end"          => $this->request->getVar("date_end") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_end")))) : "",
+            "divisi_id"         => $this->request->getVar("divisi_id"),
+            "nama_barang"       => $this->request->getVar("nama_barang"),
+            "kode_produksi"     => $this->request->getVar("kode_produksi"),
+            "sort"              => $this->request->getVar("sort"),
+            "sortType"          => $this->request->getVar("sortType")
+        ];
+
+        $condition = [
+            "material_request_details.deletedAt" => null,
+            "material_requests.deletedAt" => null,
+            "work_orders.deletedAt" => null,
+            "work_orders.company_id" => $this->this_company_id,
+        ];
+
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
+        $dataWip = $this->materialRequestDetailsModel->getListBarangWorkInProgres($condition, $addCondition, $limit, $offset);
+
+        $dataWipResult = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($dataWip['data'] as $data) {
+            array_push($dataWipResult, [
+                "no"            => $no++,
+                "id"            => encrypt($data->id),
+                "tipeBarang"    => strtoupper(str_replace('_', ' ', $data->barang_type)),
+                "kodeBarang"    => $data->kode_barang,
+                "namaBarang"    => $data->barang_name,
+                "satuan"    => $data->satuan,
+                "qty"           => $data->total_qty_now,
+                "keterangan"    => $data->note,
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getVar("draw")),
+            "recordsTotal"      => $dataWip['totalData'],
+            "recordsFiltered"   => $dataWip['totalFilteredData'],
+            "data"              => $dataWipResult,
+            "payload"           => $payload
+        ];
+        return response()->setJSON($data);
+    }
+
+    public function exportPDFLaporanWip()
+    {
+        $payload = [
+            "pageSize" => 10000000,
+            "currentPage" => 1,
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+        ];
+
+        $addCondition = [
+            "status_produksi"   => $this->request->getVar('status_produksi') != 'null' ? $this->request->getVar('status_produksi') : '',
+            "date_start"        => $this->request->getVar("date_start") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_start")))) : "",
+            "date_end"          => $this->request->getVar("date_end") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_end")))) : "",
+            "divisi_id"         => $this->request->getVar("divisi_id") != 'null' ? $this->request->getVar("divisi_id") : '',
+            "nama_barang"       => $this->request->getVar("nama_barang") != 'null' ? $this->request->getVar("nama_barang") : '',
+            "kode_produksi"     => $this->request->getVar("kode_produksi") != 'null' ? $this->request->getVar("kode_produksi") : '',
+            "sort"              => $this->request->getVar("sort"),
+            "sortType"          => $this->request->getVar("sortType")
+        ];
+
+        $condition = [
+            "material_request_details.deletedAt" => null,
+            "material_requests.deletedAt" => null,
+            "work_orders.deletedAt" => null,
+            "work_orders.company_id" => $this->this_company_id,
+        ];
+
+        $dataWip = $this->materialRequestDetailsModel->getListBarangWorkInProgres($condition, $addCondition, 10000000, 0);
+
+        $dataWipResult = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($dataWip['data'] as $data) {
+            array_push($dataWipResult, [
+                "no"            => $no++,
+                "id"            => encrypt($data->id),
+                "tipeBarang"    => strtoupper(str_replace('_', ' ', $data->barang_type)),
+                "kodeBarang"    => $data->kode_barang,
+                "namaBarang"    => $data->barang_name,
+                "satuan"    => $data->satuan,
+                "qty"           => $data->total_qty_now,
+                "keterangan"    => $data->note,
+            ]);
+        }
+
+        $domPdf = new Dompdf();
+
+        $fileName = 'Laporan Pemasukan Barang';
+        $domPdf->loadHtml(view('Laporan/LaporanBeaCukai/wip/print', [
+            'dataWipResult' => $dataWipResult,
+            'condition' => $addCondition
+        ]));
+        $domPdf->setPaper('legal', 'landscape');
+        $domPdf->render();
+        $domPdf->stream($fileName, array("Attachment" => false));
+    }
+
+    public function exportExcelLaporanWip()
+    {
+        $payload = [
+            "pageSize" => 10000000,
+            "currentPage" => 1,
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+        ];
+
+        $addCondition = [
+            "status_produksi"   => $this->request->getVar('status_produksi') != 'null' ? $this->request->getVar('status_produksi') : '',
+            "date_start"        => $this->request->getVar("date_start") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_start")))) : "",
+            "date_end"          => $this->request->getVar("date_end") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_end")))) : "",
+            "divisi_id"         => $this->request->getVar("divisi_id") != 'null' ? $this->request->getVar("divisi_id") : '',
+            "nama_barang"       => $this->request->getVar("nama_barang") != 'null' ? $this->request->getVar("nama_barang") : '',
+            "kode_produksi"     => $this->request->getVar("kode_produksi") != 'null' ? $this->request->getVar("kode_produksi") : '',
+            "sort"              => $this->request->getVar("sort"),
+            "sortType"          => $this->request->getVar("sortType")
+        ];
+
+        $condition = [
+            "material_request_details.deletedAt" => null,
+            "material_requests.deletedAt" => null,
+            "work_orders.deletedAt" => null,
+            "work_orders.company_id" => $this->this_company_id,
+        ];
+
+        $dataWip = $this->materialRequestDetailsModel->getListBarangWorkInProgres($condition, $addCondition, 10000000, 0);
+
+        $dataWipResult = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($dataWip['data'] as $data) {
+            array_push($dataWipResult, [
+                "no"            => $no++,
+                "id"            => encrypt($data->id),
+                "tipeBarang"    => strtoupper(str_replace('_', ' ', $data->barang_type)),
+                "kodeBarang"    => $data->kode_barang,
+                "namaBarang"    => $data->barang_name,
+                "satuan"    => $data->satuan,
+                "qty"           => $data->total_qty_now,
+                "keterangan"    => $data->note,
+            ]);
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $headerStyleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+        $dataStyleArray = [
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+        $column = 2;
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('B1', 'Tipe Barang')
+            ->setCellValue('C1', 'Kode Barang')
+            ->setCellValue('D1', 'Nama Barang')
+            ->setCellValue('E1', 'Qty / Jumlah')
+            ->setCellValue('F1', 'Satuan')
+            ->setCellValue('G1', 'Keterangan');
+
+        $sheet->getStyle('A1:G1')->applyFromArray($headerStyleArray);
+
+        // Fill data
+        $column = 2; // Start from the second row
+        $totalQty = 0;
+        foreach ($dataWipResult as $row) {
+            $totalQty += $row['qty'];
+
+            $sheet->setCellValue('A' . $column, $row['no'])
+                ->setCellValue('B' . $column, $row['tipeBarang'])
+                ->setCellValue('C' . $column, $row['kodeBarang'])
+                ->setCellValue('D' . $column, $row['namaBarang'])
+                ->setCellValue('E' . $column, $row['qty'])
+                ->setCellValue('F' . $column, $row['satuan'])
+                ->setCellValue('G' . $column, $row['keterangan']);
+
+            $sheet->getStyle('A' . $column . ':G' . $column)->applyFromArray($dataStyleArray);
+            $column++;
+        }
+
+        $sheet->setCellValue('D' . $column, "TOTAL QTY");
+        $sheet->setCellValue('E' . $column, $totalQty);
+        $sheet->getStyle('A' . $column . ':G' . $column)->applyFromArray($headerStyleArray);
+
+        $writer = new Xlsx($spreadsheet);
+        foreach (range('A', 'Z') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Laporan_Barang_Posisi_WIP';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
+    }
+
+    public function allWipProduksiDashboard()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+        $condition = [
+            "production_results.company_id"  => $this->this_company_id,
+        ];
+        $addCondition = [
+            "month"     => $this->request->getGet('month'),
+            "search"    => $this->request->getGet("kodeProduksi"),
+            "sort"      => $this->request->getGet("sort"),
+            "sortType"  => $this->request->getGet("sortType"),
+            "dateStart"    =>  "",
+            "dateEnd"    =>   "",
+        ];
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $productionResultData = $this->productionResultModel->getProductResultList($condition, $addCondition, $limit, $offset);
+
+        $dataProductionResult = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($productionResultData['data'] as &$data) {
+            $qtyHasilProduksi = 0;
+            $productionResDetailData = $this->productionResultDetailModel->where('production_result_id', $data->id)->where('type', 'JADI')->findAll();
+            foreach ($productionResDetailData as $value) {
+                $qtyHasilProduksi += (float) $value['qty_isi'];
+            }
+            $data->qtyHasilProduksi = $qtyHasilProduksi;
+            array_push($dataProductionResult, [
+                "no"            => $no++,
+                "id"            => encrypt($data->id),
+                "productionDate" => date('d/m/Y', strtotime($data->receive_date)),
+                "productionCode" => $data->wo_no,
+                "barangCode"    => $data->barangCode,
+                "barangName"    => $data->barangName,
+                "hasilProduksi"  => number_format($data->qtyHasilProduksi, 2),
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $productionResultData['totalData'],
+            "recordsFiltered"   => $productionResultData['totalFilteredData'],
+            "data"              => $dataProductionResult,
+            "payload"           => $payload
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function allWipProduksiDashboardExcel()
+    {
+        $payload = [
+            "pageSize" => 10000000,
+            "currentPage" => 1,
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+        ];
+
+        $condition = [
+            "production_results.company_id"  => $this->this_company_id,
+        ];
+        $addCondition = [
+            "month"     => $this->request->getGet('month'),
+            "search"    => $this->request->getGet('kodeProduksi') == 'null' ? '' : $this->request->getGet("kodeProduksi"),
+            "sort"      => $this->request->getGet("sort"),
+            "sortType"  => $this->request->getGet("sortType"),
+            "dateStart" =>  "",
+            "dateEnd"   =>   "",
+        ];
+        $productionResultData = $this->productionResultModel->getProductResultList($condition, $addCondition, 10000000, 0);
+
+        $dataProductionResult = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($productionResultData['data'] as &$data) {
+            $qtyHasilProduksi = 0;
+            $productionResDetailData = $this->productionResultDetailModel->where('production_result_id', $data->id)->where('type', 'JADI')->findAll();
+            foreach ($productionResDetailData as $value) {
+                $qtyHasilProduksi += (float) $value['qty_isi'];
+            }
+            $data->qtyHasilProduksi = $qtyHasilProduksi;
+            array_push($dataProductionResult, [
+                "no"            => $no++,
+                "id"            => encrypt($data->id),
+                "productionDate" => date('d/m/Y', strtotime($data->receive_date)),
+                "productionCode" => $data->wo_no,
+                "barangCode"    => $data->barangCode,
+                "barangName"    => $data->barangName,
+                "hasilProduksi"  => number_format($data->qtyHasilProduksi, 2),
+            ]);
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $headerStyleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+        $dataStyleArray = [
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+        $column = 2;
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('B1', 'Tanggal Produksi')
+            ->setCellValue('C1', 'Kode Produksi')
+            ->setCellValue('D1', 'Kode Barang')
+            ->setCellValue('E1', 'Nama Barang')
+            ->setCellValue('F1', 'Hasil Produksi');
+
+        $sheet->getStyle('A1:F1')->applyFromArray($headerStyleArray);
+
+        $column = 2;
+        foreach ($dataProductionResult as $row) {
+
+            $sheet->setCellValue('A' . $column, $row['no'])
+                ->setCellValue('B' . $column, $row['productionDate'])
+                ->setCellValue('C' . $column, $row['productionCode'])
+                ->setCellValue('D' . $column, $row['barangCode'])
+                ->setCellValue('E' . $column, $row['barangName'])
+                ->setCellValue('F' . $column, $row['hasilProduksi']);
+
+            $sheet->getStyle('A' . $column . ':F' . $column)->applyFromArray($dataStyleArray);
+            $column++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        foreach (range('A', 'Z') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Laporan_Hasil_Produksi';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
     }
 }

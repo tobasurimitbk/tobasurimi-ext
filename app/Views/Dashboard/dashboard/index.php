@@ -243,51 +243,44 @@
         </div>
         <div class="row p-3">
             <div class="col-sm-8">
-                <!-- <div class="card-body text-black text-bold">
+                <div class="card-header bg-danger text-white text-bold">
+                    <b>WORK IN PROGRESS</b>
+                </div>
+                <div class="card-body bg-danger" style="margin-top: -20px; margin-bottom: -20px;">
                     <div class="row">
-                        <div class="col-sm-3">
-                            <span class="m-0" style="vertical-align: middle; font-size: 25px; "><i class="fas fa-th text-sm mr-2" style="font-size: 25px;"></i> Work In Progress </span>
+                        <div class="col-sm">
+                            <div class="input-group input-group-password align-items-center">
+                                <input autocomplete="one-time-code" class="form-control input-picker p-4 bulanProduksi" id="bulanProduksi" name="bulanProduksi" placeholder="Pilih Bulan" value="<?= date('m/Y') ?>">
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99;  margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-sm-9">
-                            <div class="row">
-                                <div class="col-sm-5">
-                                    <div class="input-group mb-3">
-                                        <input autocomplete="one-time-code" class="form-control input-picker p-4 dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Pembayaran">
-                                        <div class="input-group-prepend group-prepend-password align-items-center">
-                                            <i style="cursor: pointer; z-index: 99;  margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-5">
-                                    <div class="input-group mb-3">
-                                        <input autocomplete="one-time-code" class="form-control input-picker p-4 searchCode" id="searchCode" name="searchCode" placeholder="Mulai Tanggal Pembayaran">
-                                        <div class="input-group-prepend group-prepend-password align-items-center">
-                                            <i style="cursor: pointer; z-index: 99;  margin-left: -30px; border: 0px" class="fa fa-search icon-form"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-2">
-                                    <button type="button" class="btn btn-lg bg-warning dropdown-toggle float-right  ml-4 p-3" data-toggle="dropdown" aria-expanded="false"><i class="fas fa-download mr-1"></i> Export
+                        <div class="col-sm">
+                            <div class="input-group input-group-password align-items-center" id="sea">
+                                <input autocomplete="one-time-code" class="form-control input-picker p-4 kodeProduksi" id="kodeProduksi" name="kodeProduksi" placeholder="Cari Kode Produksi" value="">
+                                <div class="input-group-append" style="height:50px;">
+                                    <button class="btn btn-success" type="button" onclick="excel('<?= base_url("/dashboard/list-wip/excel"); ?>')">
+                                        <i class="fas fa-file-excel fa-lg"></i>
                                     </button>
-                                    <ul class="dropdown-menu text-xs" style="">
-                                        <li class="dropdown-item" id="excel" onclick="actionExport('Excel')">Excel</li>
-                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
 
                 <div class="card-body">
                     <div class="row">
                         <div class="table-responsive">
-                            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable2" width="100%" cellspacing="0">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th>Production Date</th>
-                                        <th>Production Code</th>
-                                        <th>QTY order</th>
-                                        <th>Finish Good</th>
+                                        <th onclick="changeSort('createdAt')">Production Date</th>
+                                        <th onclick="changeSort('productionCode')">Production Code</th>
+                                        <th onclick="changeSort('barangCode')"> Kode Barang</th>
+                                        <th onclick="changeSort('barangName')">Nama Barang</th>
+                                        <th>Hasil Produksi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -295,7 +288,7 @@
                             </table>
                         </div>
                     </div>
-                </div> -->
+                </div>
             </div>
             <div class="col-sm-4">
                 <div class="card-header bg-danger text-white text-bold">
@@ -303,7 +296,7 @@
                 </div>
                 <div class="card-body bg-danger" style="margin-top: -20px; margin-bottom: -20px;">
                     <div class="input-group input-group-password align-items-center" id="dateBCPicker">
-                        <input autocomplete="one-time-code" class="form-control input-picker p-4 dateBC" id="dateBC" name="dateBC" placeholder="Pilih Tanggal" value="">
+                        <input autocomplete="one-time-code" class="form-control input-picker p-4 dateBC" id="dateBC" name="dateBC" placeholder="Pilih Bulan" value="">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99;  margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -424,71 +417,102 @@
 
 </section>
 <script>
-    // const table = $('.dataTable').DataTable({
-    //     dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-    //     processing: true,
-    //     serverSide: true,
-    //     ordering: true,
-    //     order: [
-    //         [1, 'asc']
-    //     ],
+    document.addEventListener("DOMContentLoaded", function() {
+        document.body.style.zoom = "80%";
+    });
 
-    //     fixedHeader: true,
-    //     lengthMenu: [
-    //         [25],
-    //         [25],
-    //     ],
-    //     pageLength: 25,
-    //     ajax: {
-    //         url: "<?= base_url(""); ?>",
-    //         dataSrc: "data",
-    //         data: function(data) {
-    //             data.search = $(".search").val();
-    //             data.startDate = $(".startDate").val();
-    //             data.paymentDate = $(".paymentDate").val();
-    //             // data.type_po = "Bahan Baku";
-    //             data.type_bayar = $(".type_bayar").val();
-    //             data.status_posting = $(".status_posting").val();
-    //             data.sort = sort;
-    //             data.sortType = sortType;
-    //         }
-    //     },
-    //     // scrollX: true,
-    //     "initComplete": function(settings, json) {
-    //         $('.dataTables_length').empty();
-    //         $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-    //         $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-    //     },
-    //     //responsive: true,
-    //     display: "stripe",
-    //     searching: false,
-    //     columns: [],
-    //     columnDefs: [{
-    //         defaultContent: "-",
-    //         targets: "_all"
-    //     }],
-    //     language: {
-    //         emptyTable: "Tidak Ada Data",
-    //         lengthMenu: "Show _MENU_ entries",
-    //         paginate: {
-    //             previous: '<i class="fa fa-angle-left"></i>',
-    //             next: '<i class="fa fa-angle-right"></i>'
-    //         }
-    //     }
-    // });
+    let sort = "production_results.createdAt";
+    let sortType = "desc";
+
+    const table = $('#dataTable2').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [
+            [1, 'asc']
+        ],
+
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("dashboard/list-wip"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.kodeProduksi = $(".kodeProduksi").val();
+                data.month = $(".bulanProduksi").val();
+                data.sort = sort;
+                data.sortType = sortType;
+            }
+        },
+        // scrollX: true,
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        //responsive: true,
+        display: "stripe",
+        searching: false,
+        columns: [{
+                data: "productionDate",
+                className: "text-center",
+
+            },
+            {
+                data: "productionCode",
+                className: "text-center",
+            },
+            {
+                data: "barangCode",
+                className: "text-center",
+            },
+            {
+                data: "barangName",
+                className: "text-center",
+            },
+
+            {
+                data: "hasilProduksi",
+                className: "text-center",
+            },
+        ],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+
+    $('.kodeProduksi').keyup(function() {
+        table.ajax.reload();
+    });
+    $('.bulanProduksi').change(function() {
+        table.ajax.reload();
+    })
 
     $(document).ready(function() {
         var currentDate = new Date();
         var formattedDate = (currentDate.getMonth() + 1).toString().padStart(2, '0') + '/' + currentDate.getFullYear();
         $("#dateBC").val(formattedDate);
+        $('#bulanProduksi').val(formattedDate);
         $('#profile-tab').click(function() {
             $('#dateBCPicker').hide();
         });
         $('#home-tab').click(function() {
             $('#dateBCPicker').show();
         });
-
-
 
         dataBC();
         var BCarr = ['bc-23', 'bc-25', 'bc-27', 'bc-30', 'bc-40', 'bc-41', 'ppbkb'];
@@ -511,7 +535,7 @@
         autoclose: true,
         minViewMode: "months"
     });
-    $("#dateBC").datepicker({
+    $("#dateBC,#bulanProduksi").datepicker({
         todayHighlight: true,
         format: "mm/yyyy",
         orientation: "bottom auto",
@@ -558,6 +582,21 @@
 
         location.href = "<?= base_url('dashboard/list-dokumen-') ?>" + bc;
 
+    }
+
+    function changeSort(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
+
+    function excel(url) {
+        let month = $(".bulanProduksi").val();
+        let kodeProduksi = $(".kodeProduksi").val();
+        window.open(url + `?month=${month}&kodeProduksi=${kodeProduksi}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 
