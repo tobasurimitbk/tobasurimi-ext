@@ -50,8 +50,8 @@
                                 <th class="sort">Satuan 1</th>
                                 <th class="sort">Satuan 2</th>
                                 <th class="sort">Satuan 3</th>
-                                <th class="sort">Supplier Terakhir</th>
                                 <th class="sort">Harga Terakhir</th>
+                                <th class="sort">Supplier Terakhir</th>
                                 <th class="sort">Akun COA</th>
                                 <th class="sort" style="text-align: center;">Histori</th>
                             </tr>
@@ -416,12 +416,12 @@
                 sortable: false,
             },
             {
-                data: "supplier_terakhir",
+                data: "harga_terakhir",
                 className: "text-center",
                 sortable: false,
             },
             {
-                data: "harga_terakhir",
+                data: "supplier_terakhir",
                 className: "text-center",
                 sortable: false,
             },
