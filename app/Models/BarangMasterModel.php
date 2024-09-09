@@ -68,7 +68,7 @@ class BarangMasterModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'barang_master.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "barang_master.*, barang_master_spesifikasi.spesifikasi, barang_master_spesifikasi.satuan_1, barang_master_spesifikasi.satuan_2, barang_master_spesifikasi.konversi_satuan_2, barang_master_spesifikasi.satuan_3, barang_master_spesifikasi.konversi_satuan_3,
+        $selectQry = "barang_master.*, barang_master_spesifikasi.id as spesifikasi_id, barang_master_spesifikasi.spesifikasi, barang_master_spesifikasi.satuan_1, barang_master_spesifikasi.satuan_2, barang_master_spesifikasi.konversi_satuan_2, barang_master_spesifikasi.satuan_3, barang_master_spesifikasi.konversi_satuan_3,
                     parent_barang.parent_name AS kelompok_barang";
 
         $barangDataQry = $this->asArray()

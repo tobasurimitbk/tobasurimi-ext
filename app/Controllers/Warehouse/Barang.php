@@ -389,8 +389,8 @@ class Barang extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($res['data'] as $data) {
-            $lokalDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], "", "Lokal", $this->this_company_id);
-            $importDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], "", "Import", $this->this_company_id);
+            $lokalDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], $data['spesifikasi_id'], "Lokal", $this->this_company_id);
+            $importDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], $data['spesifikasi_id'], "Import", $this->this_company_id);
             $satuan1 = $satuanModel->asObject()->where('id', $data['satuan_1'])->where('deletedAt', null)->first();
             $satuan2 = $satuanModel->asObject()->where('id', $data['satuan_2'])->where('deletedAt', null)->first();
             $satuan3 = $satuanModel->asObject()->where('id', $data['satuan_3'])->where('deletedAt', null)->first();
@@ -399,6 +399,21 @@ class Barang extends BaseController
             $satuan2_kode = (isset($satuan2) && $data['satuan_2'] != 0) ? $satuan2->kode_satuan : "-";
             $satuan3_kode = (isset($satuan3) && $data['satuan_3'] != 0) ? $satuan3->kode_satuan : "-";
             $accountBarang = $accountBarangModel->asObject()->where('barang_master_id', $data['id'])->where('deleted_at', null)->first();
+
+            if (strtotime($lokalDetail['createdAt']) > strtotime($importDetail['createdAt']) && $lokalDetail['createdAt'] != null) {
+                // LOKAL 
+                $hargaTerakhir = $lokalDetail['hargaTerakhir'];
+                $supplierTerakhir = $lokalDetail['supplierTerakhir'] . " (PO LOKAL)";
+            } elseif (strtotime($lokalDetail['createdAt']) < strtotime($importDetail['createdAt']) && $importDetail['createdAt'] != null) {
+                // IMPORT 
+                $hargaTerakhir = $importDetail['hargaTerakhir'];
+                $supplierTerakhir = $importDetail['supplierTerakhir'] . " (PO IMPORT)";
+            } else {
+                $hargaTerakhir = "-";
+                $supplierTerakhir = "-";
+            }
+
+            // HARGA TERAKHIR
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data['id']),
@@ -409,10 +424,8 @@ class Barang extends BaseController
                 "satuan2"               => $satuan2_kode == "-" ? "-" : $satuan2_kode . " (" . $data['konversi_satuan_2'] . " " . $satuan1_kode . ")",
                 "satuan3"               => $satuan3_kode == "-" ? "-" : $satuan3_kode . " (" . $data['konversi_satuan_3'] . " " . $satuan1_kode . ")",
                 "akun_coa"               => $accountBarang ? $accountBarang : "",
-                "harga_terakhir_lokal"  => $lokalDetail['hargaTerakhir'],
-                "supplier_terakhir_lokal" => $lokalDetail['supplierTerakhir'],
-                "harga_terakhir_import" => $importDetail['hargaTerakhir'],
-                "supplier_terakhir_import" => $importDetail['supplierTerakhir']
+                "harga_terakhir"  => $hargaTerakhir,
+                "supplier_terakhir" => $supplierTerakhir,
             ]);
         }
 

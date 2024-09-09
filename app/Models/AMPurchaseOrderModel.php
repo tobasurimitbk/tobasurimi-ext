@@ -276,18 +276,21 @@ class AMPurchaseOrderModel extends Model
         return $query->getResultArray();
     }
 
-    public function getNoPenerimaanBarangBySPP($po_type, $supplier_id, $spp_id)
+    public function getNoPenerimaanBarangBySPP($po_type, $supplier_id, $multiple_spp_id)
     {
         $arrCondition = [
-            'deletedAt' => null,
+            'am_purchase_orders.deletedAt' => null,
             'supplier_id' => $supplier_id,
-            'is_posted' => 1,
+            'am_purchase_orders.is_posted' => 1,
             'status_penerimaan' => 0,
             'po_type' => $po_type,
-            'purchase_request_id' => $spp_id
+            // 'purchase_request_id' => $spp_id
         ];
 
         $builder = $this->db->table('am_purchase_orders');
+        $builder->select('am_purchase_orders.*,purchase_requests.spp_no');
+        $builder->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left');
+        $builder->whereIn('purchase_request_id', $multiple_spp_id);
         $builder->where($arrCondition);
         $query = $builder->get();
 
@@ -461,9 +464,10 @@ class AMPurchaseOrderModel extends Model
         ];
 
         $selectQry = "
-            barang_master.barang_name as nama_barang, 
+            CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) as nama_barang, 
             am_purchase_orders.po_no,
             am_purchase_orders.po_date,
+            am_purchase_orders.createdAt,
             suppliers.name as nama_supplier,
             am_purchase_order_details.price
         ";
@@ -473,17 +477,21 @@ class AMPurchaseOrderModel extends Model
             ->where($condition)
             ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id')
             ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id')
             ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
+            ->orderBy('am_purchase_orders.createdAt', "DESC")
             ->first();
 
         if ($res == null) {
             return [
+                'createdAt' => null,
                 'hargaTerakhirNumber' => 0,
                 'hargaTerakhir' => '-',
                 'supplierTerakhir' => '-'
             ];
         } else {
             return [
+                'createdAt' => $res['createdAt'],
                 'hargaTerakhirNumber' => $res['price'],
                 'hargaTerakhir' => number_format($res['price'], 2, ',', '.'),
                 'supplierTerakhir' => $res['nama_supplier']
@@ -535,9 +543,10 @@ class AMPurchaseOrderModel extends Model
 
     public function getSPP($multiplePoId)
     {
-        $result = $this->select('purchase_requests.*')
+        $result = $this->distinct()
+            ->select('purchase_requests.*')
             ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
-            ->where('am_purchase_orders.id', $multiplePoId[0])
+            ->whereIn('am_purchase_orders.id', $multiplePoId)
             ->findAll();
 
         return $result;
