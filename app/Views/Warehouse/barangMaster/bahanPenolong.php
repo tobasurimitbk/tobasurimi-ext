@@ -272,7 +272,9 @@
                                 </tbody>
                             </table>
                         <?php else : ?>
-                            <p class="text-bold">Anda Tidak Punya Akses</p>
+                            <div class="alert alert-secondary text-black" role="alert">
+                                <b>Maaf Anda Tidak Punya Akses</b>
+                            </div>
                         <?php endif; ?>
                     </div>
 
@@ -299,7 +301,9 @@
                                 </tbody>
                             </table>
                         <?php else : ?>
-                            <p class="text-bold">Anda Tidak Punya Akses</p>
+                            <div class="alert alert-secondary text-black" role="alert">
+                                <b>Maaf Anda Tidak Punya Akses</b>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>

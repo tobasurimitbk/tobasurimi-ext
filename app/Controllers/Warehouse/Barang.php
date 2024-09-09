@@ -400,18 +400,23 @@ class Barang extends BaseController
             $satuan3_kode = (isset($satuan3) && $data['satuan_3'] != 0) ? $satuan3->kode_satuan : "-";
             $accountBarang = $accountBarangModel->asObject()->where('barang_master_id', $data['id'])->where('deleted_at', null)->first();
 
-            if (strtotime($lokalDetail['createdAt']) > strtotime($importDetail['createdAt']) && $lokalDetail['createdAt'] != null) {
+            $aksesSupplierLokalBP = can('Pembelian', 'PO Lokal BP', 'r');
+            $aksesSupplierImportBP = can('Pembelian', 'PO Import BP', 'r');
+
+            if ($lokalDetail['createdAt'] != null && $aksesSupplierLokalBP) {
                 // LOKAL 
                 $hargaTerakhir = $lokalDetail['hargaTerakhir'];
-                $supplierTerakhir = $lokalDetail['supplierTerakhir'] . " (PO LOKAL)";
-            } elseif (strtotime($lokalDetail['createdAt']) < strtotime($importDetail['createdAt']) && $importDetail['createdAt'] != null) {
+                $supplierTerakhir = $lokalDetail['supplierTerakhir'];
+            } elseif ($importDetail['createdAt'] != null && $aksesSupplierImportBP) {
                 // IMPORT 
                 $hargaTerakhir = $importDetail['hargaTerakhir'];
-                $supplierTerakhir = $importDetail['supplierTerakhir'] . " (PO IMPORT)";
+                $supplierTerakhir = $importDetail['supplierTerakhir'];
             } else {
                 $hargaTerakhir = "-";
                 $supplierTerakhir = "-";
             }
+
+
 
             // HARGA TERAKHIR
             array_push($rdata, [
