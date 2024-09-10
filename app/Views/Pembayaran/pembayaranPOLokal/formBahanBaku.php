@@ -191,7 +191,7 @@
                                     <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_kas'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
                                 <?php endforeach ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Debit</label>
+                            <label for="floatingInput" style="z-index: 1;">Debit (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -202,7 +202,7 @@
                                     <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_selisih'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
                                 <?php endforeach ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Kredit (Opsional)</label>
+                            <label for="floatingInput" style="z-index: 1;">Kredit</label>
                         </div>
                     </div>
                 </div>
@@ -394,7 +394,7 @@
             payment_method: {
                 required: true
             },
-            akun_kas: {
+            akun_selisih: {
                 required: true
             },
             bayar_panjar: {
@@ -432,8 +432,8 @@
             payment_method: {
                 required: "Metode pembayaran wajib diisi"
             },
-            akun_kas: {
-                required: "Akun kas wajib diisi"
+            akun_selisih: {
+                required: "Akun kredit wajib diisi"
             },
             bayar_panjar: {
                 digits: "harus berupa angka"
@@ -499,7 +499,7 @@
     });
 
     $('#payment_method').select2({
-        placeholder: "Pilih akun kredit",
+        placeholder: "Pilih metode pembayaran",
         theme: "bootstrap-5"
     })
 

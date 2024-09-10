@@ -770,9 +770,6 @@ class PembayaranPOLokal extends BaseController
         ]);
     }
 
-
-
-
     public function getPembayaranPOLokalBB($id)
     {
         $supplierModel = new SupplierModel();
@@ -1138,11 +1135,12 @@ class PembayaranPOLokal extends BaseController
 
     public function posting()
     {
-        $localPOPaymentBPModel = new LocalPOPaymentBPModel();
+        $localPOPaymentModel = new LocalPOPaymentModel();
 
         $id = decrypt($this->request->getVar('id'));
-        $localPOPaymentBPModel->update($id, ['status_posting' => '1']);
-        // $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL");
+        $localPOPaymentModel->update($id, ['status_posting' => '1']);
+        $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL");
+        // exit;
 
         return response()->setJSON([
             'token' => csrf_hash(),

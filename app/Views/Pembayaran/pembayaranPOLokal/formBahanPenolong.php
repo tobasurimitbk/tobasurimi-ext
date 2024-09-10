@@ -286,7 +286,7 @@
                 drawPaidPanjarTable(res);
                 listPanjar = [];
                 listPanjar = res.panjar_list;
-                console.log(listPanjar);
+                console.log(res);
             }
         })
     <?php endif; ?>
