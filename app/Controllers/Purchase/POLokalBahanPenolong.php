@@ -668,13 +668,19 @@ class POLokalBahanPenolong extends BaseController
     public function dropdownPOBySpp()
     {
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
-        $spp_id =  $this->request->getVar('spp_id');
+        $spp_id = json_decode($this->request->getVar('spp_id'));
 
-        $dataPOLokal = $this->aMPurchaseOrderModel->getNoPenerimaanBarangBySPP("LOKAL", $id, $spp_id);
+        if (count($spp_id) == 0) {
+            return response()->setJSON([
+                'data' => []
+            ]);
+        } else {
+            $dataPOLokal = $this->aMPurchaseOrderModel->getNoPenerimaanBarangBySPP("LOKAL", $id, $spp_id);
 
-        return response()->setJSON([
-            'data' => $dataPOLokal
-        ]);
+            return response()->setJSON([
+                'data' => $dataPOLokal
+            ]);
+        }
     }
 
     public function dropdownBarangPOLokalBahanPenolong()

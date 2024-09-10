@@ -562,4 +562,13 @@ class PenerimaanMutasiGlobalModel extends Model
             'totalFilteredData' => $totalFilteredData,
         ];
     }
+
+    public function getFirstLikeByNoMutasi($noMutasi)
+    {
+        return $this->asArray()
+            ->select('penerimaan_mutasi_global.*,divisis.divisi')
+            ->join('divisis', 'divisis.id = penerimaan_mutasi_global.divisi_penerima_id', 'left')
+            ->like('multiple_no_mutasi', $noMutasi)
+            ->first();
+    }
 }

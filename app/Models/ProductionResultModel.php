@@ -72,7 +72,7 @@ class ProductionResultModel extends Model
 
         $totalData = $productionResDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['month']) {
             $productionResDataQry->groupStart();
         }
 
@@ -80,18 +80,22 @@ class ProductionResultModel extends Model
             $productionResDataQry
                 ->like('production_results.pr_no', $addCondition['search'], 'after')
                 ->orLike('work_orders.wo_no', $addCondition['search'], 'after')
-                ->orLike('barang_master.nama_barang', $addCondition['search'], 'after');
+                ->orLike('barang_master.barang_name', $addCondition['search'], 'after');
         }
 
         if ($addCondition['dateStart']) {
             $productionResDataQry->where('production_results.receive_date >=', $addCondition['dateStart']);
         }
 
+        if ($addCondition['month']) {
+            $productionResDataQry->where('MONTH(production_results.receive_date)', $addCondition['month']);
+        }
+
         if ($addCondition['dateEnd']) {
             $productionResDataQry->where('production_results.receive_date <=', $addCondition['dateEnd']);
         }
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['month']) {
             $productionResDataQry->groupEnd();
         }
 

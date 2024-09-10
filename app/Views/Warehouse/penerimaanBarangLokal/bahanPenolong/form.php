@@ -94,7 +94,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating" style="height: 50px;">
-                            <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select spp_id" id="spp_id" name="spp_id" aria-label="Floating label select example">
+                            <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select multiple_spp_id" id="multiple_spp_id[]" multiple name="multiple_spp_id[]" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php if (!empty($dataPenerimaanBarang)) : ?>
                                     <?php foreach ($dataSPP as $d) : ?>
@@ -214,6 +214,7 @@
                                 <th style="text-align: center;">No</th>
                                 <th style="text-align: center;">Kode Barang</th>
                                 <th style="text-align: center;">Nama Barang</th>
+                                <th style="text-align: center;">No SPP</th>
                                 <th style="text-align: center;">No PO</th>
                                 <th style="text-align: center;">Satuan</th>
                                 <th style="text-align: center;">Jml. Order</th>
@@ -233,13 +234,13 @@
                             <tr>
                                 <td></td>
                                 <td></td>
-                                <td colspan="3" style="text-align: right;">GRAND TOTAL</td>
-                                <td style="text-align: center;"><b>0</b></td>
-                                <td style="text-align: center;"><b>0</b></td>
-                                <td style="text-align: center;"><b>0</b></td>
-                                <td style="text-align: center;"><b>0</b></td>
-                                <td style="text-align: center;"><b>0.0</b></td>
-                                <td style="text-align: center;"><b>0.0</b></td>
+                                <td colspan="4" style="text-align: right;">GRAND TOTAL</td>
+                                <td style="text-align: center;"><b>0.00</b></td>
+                                <td style="text-align: center;"><b>0.00</b></td>
+                                <td style="text-align: center;"><b>0.00</b></td>
+                                <td style="text-align: center;"><b>0.00</b></td>
+                                <td style="text-align: center;"><b>0.00</b></td>
+                                <td style="text-align: center;"><b>0.00</b></td>
                                 <td style="text-align: center;"><b></b></td>
                                 <td style="text-align: center;"></td>
                             </tr>
@@ -475,12 +476,12 @@
             },
             dataType: "json",
             success: function(res) {
-                $(".spp_id").empty()
-                $(".spp_id").append(`<option value=""></option>`)
+                $(".multiple_spp_id").empty()
+                $(".multiple_spp_id").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
-                    $(".spp_id").append(`<option value="${item.id}">${item.spp_no}</option>`)
+                    $(".multiple_spp_id").append(`<option value="${item.id}">${item.spp_no}</option>`)
                 })
-                $(".spp_id").val();
+                $(".multiple_spp_id").val();
             }
         });
 
@@ -537,11 +538,12 @@
 
     });
 
-    $(".spp_id").select2({
+    $(".multiple_spp_id").select2({
         placeholder: "Pilih Nomor SPP",
         theme: "bootstrap-5",
-        allowClear: true
+        allowClear: false
     }).change(function() {
+        let arr = $('.multiple_spp_id').val();
         // GET PO
         $.ajax({
             url: `<?= base_url('penerimaan-barang-lokal-bp/get-po'); ?>`,
@@ -555,7 +557,7 @@
             data: {
                 id: $(".supplier_id option:selected").val(),
                 divisi_id: $(".divisi_id option:selected").val(),
-                spp_id: $('#spp_id option:selected').val()
+                spp_id: JSON.stringify(arr)
             },
             dataType: "json",
             success: function(res) {
@@ -569,14 +571,14 @@
         });
     });
 
-    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id, .spp_id')
+    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id, .multiple_spp_id')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id, .spp_id')
+    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id, .multiple_spp_id')
         .parent('div')
         .children('span')
         .children('span')
@@ -584,7 +586,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id, .spp_id')
+    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id, .multiple_spp_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -902,7 +904,7 @@
             var newRow = $('<tr>');
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
-            newRow.append($('<td style="text-align:right;" colspan="3"><b>GRAND TOTAL</b></td>'));
+            newRow.append($('<td style="text-align:right;" colspan="4"><b>GRAND TOTAL</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
@@ -923,6 +925,7 @@
                 newRow.append($('<td>').text(no++));
                 newRow.append($('<td>').text(v.kode_barang));
                 newRow.append($('<td>').text(v.nama_barang));
+                newRow.append($('<td>').text(v.spp_no));
                 newRow.append($('<td>').text(v.po_no));
                 newRow.append($('<td>').text(v.satuan));
                 newRow.append($('<td>').text(v.jml_order));
@@ -956,7 +959,7 @@
             var newRow = $('<tr>');
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
-            newRow.append($('<td style="text-align:right;" colspan="3"><b>GRAND TOTAL</b></td>'));
+            newRow.append($('<td style="text-align:right;" colspan="4"><b>GRAND TOTAL</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + listData.jml_order_total.toFixed(2) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaLPBTotal.toFixed(2) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaTotal.toFixed(2) + '</b></td>'));

@@ -206,7 +206,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("laporan-bea-cukai/all-masuk-keluar"); ?>",
+            url: "<?= base_url("laporan-bea-cukai/all-masuk"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.status = "In";

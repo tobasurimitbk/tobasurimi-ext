@@ -68,6 +68,8 @@ $routes->get('/dashboard/list-dokumen-bc41/exportsheet', 'Dashboard\RekapBeaCuka
 $routes->get('/dashboard/list-dokumen-ppbkb/', 'Dashboard\RekapBeaCukai::rekapPPBKB', ['filter' => 'Auth']);
 $routes->get('/dashboard/list-dokumen-ppbkb/all', 'Dashboard\RekapBeaCukai::rekapPPBKBall', ['filter' => 'Auth']);
 $routes->get('/dashboard/list-dokumen-ppbkb/exportsheet', 'Dashboard\RekapBeaCukai::rekapPPBKBSheet', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-wip', 'Laporan\BeaCukai\LaporanBeaCukai::allWipProduksiDashboard', ['filter' => 'Auth']);
+$routes->get('/dashboard/list-wip/excel', 'Laporan\BeaCukai\LaporanBeaCukai::allWipProduksiDashboardExcel', ['filter' => 'Auth']);
 
 
 // MASTER DATA
@@ -2074,10 +2076,17 @@ $routes->get('/laporan-warehouse/stock-kartu/print', 'Laporan\Warehouse\LaporanW
 // LAPORAN 
 $routes->get('/laporan-bea-cukai', 'Laporan\BeaCukai\LaporanBeaCukai::index', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-pemasukan-barang', 'Laporan\BeaCukai\LaporanBeaCukai::laporanPemasukanBarang', ['filter' => 'Auth']);
-$routes->get('/laporan-bea-cukai/all-masuk-keluar', 'Laporan\BeaCukai\LaporanBeaCukai::allMasukBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/all-masuk', 'Laporan\BeaCukai\LaporanBeaCukai::allMasukBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-pemasukan-barang/print', 'Laporan\BeaCukai\LaporanBeaCukai::exportPDFLaporanMasukBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-pemasukan-barang/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelLaporanMasukBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-pengeluaran-barang', 'Laporan\BeaCukai\LaporanBeaCukai::laporanPengeluaranBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/all-keluar', 'Laporan\BeaCukai\LaporanBeaCukai::allKeluarBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/laporan-pengeluaran-barang/print', 'Laporan\BeaCukai\LaporanBeaCukai::exportPDFLaporanKeluarBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/laporan-pengeluaran-barang/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelLaporanKeluarBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/laporan-wip', 'Laporan\BeaCukai\LaporanBeaCukai::laporanWip', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/all-wip', 'Laporan\BeaCukai\LaporanBeaCukai::allWip', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/laporan-wip/print', 'Laporan\BeaCukai\LaporanBeaCukai::exportPDFLaporanWip', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/laporan-wip/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelLaporanWip', ['filter' => 'Auth']);
 
 /*
  * --------------------------------------------------------------------

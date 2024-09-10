@@ -142,6 +142,7 @@ class AMPurchaseOrderDetailModel extends Model
         ];
 
         $selectQry = "
+            purchase_requests.spp_no,
             am_purchase_orders.po_no,
             am_purchase_order_details.*,
             barang_master.barang_name AS nama_barang,
@@ -159,6 +160,7 @@ class AMPurchaseOrderDetailModel extends Model
             ->where($condition)
             ->whereIn('am_purchase_orders.id', $amPurchaseOrderID)
             ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id', 'left')
+            ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
             ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
             ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
             ->join('barang_master_spesifikasi', 'am_purchase_order_details.spesifikasi_id = barang_master_spesifikasi.id', 'left')
@@ -226,6 +228,7 @@ class AMPurchaseOrderDetailModel extends Model
                         'spesifikasi_name' => $b['spesifikasi'],
                         'nama_barang_master' => $b['nama_barang'],
                         'po_no' => $b['po_no'],
+                        'spp_no' => $b['spp_no'],
                         'satuan' => $b['kode_satuan'],
                         'jml_order' => $b['qty'],
                         'jml_diterima_lpb' => $inLPB,
@@ -259,6 +262,7 @@ class AMPurchaseOrderDetailModel extends Model
                         'spesifikasi_name' => $b['spesifikasi'],
                         'nama_barang_master' => $b['nama_barang'],
                         'po_no' => $b['po_no'],
+                        'spp_no' => $b['spp_no'],
                         'satuan' => $b['kode_satuan'],
                         'jml_order' => $b['qty'],
                         'jml_diterima_lpb' => $inLPB,

@@ -129,8 +129,14 @@ class PenerimaanBarangLokalBP extends BaseController
 
 
         foreach ($penerimaanBarangData['data'] as $data) {
-            $spp = $this->amPurchaseOrderModel->getSPP(json_decode($data->multiple_po_id));
+            $multiSpp = $this->amPurchaseOrderModel->getSPP(json_decode($data->multiple_po_id));
             $bc_purchase_order_detail_list = $this->bcPurchaseOrder->like('multiple_lpb_id', $data->id)->where('deletedAt', null)->findAll();
+
+            $sppNo = "";
+            foreach ($multiSpp as $s) {
+                $sppNo .= $s['spp_no'] . ", ";
+            }
+
             array_push($dataPenerimaanBarang, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
@@ -141,7 +147,7 @@ class PenerimaanBarangLokalBP extends BaseController
                 "createdAt"             => $data->tanggal ? date("d/m/Y", strtotime($data->tanggal)) : "",
                 "supplier_name"         => $data->supplier_name,
                 "itemCount"             => $data->itemCount,
-                "spp_no"                => count($spp) == 0 ? "-" : $spp[0]['spp_no'],
+                "spp_no"                => $sppNo,
                 "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
                 "status_post"           => $data->status_post,
                 "bc_type"               => $data->bc_type,

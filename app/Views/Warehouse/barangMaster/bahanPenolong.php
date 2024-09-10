@@ -50,6 +50,8 @@
                                 <th class="sort">Satuan 1</th>
                                 <th class="sort">Satuan 2</th>
                                 <th class="sort">Satuan 3</th>
+                                <th class="sort">Harga Terakhir</th>
+                                <th class="sort">Supplier Terakhir</th>
                                 <th class="sort">Akun COA</th>
                                 <th class="sort" style="text-align: center;">Histori</th>
                             </tr>
@@ -270,7 +272,9 @@
                                 </tbody>
                             </table>
                         <?php else : ?>
-                            <p class="text-bold">Anda Tidak Punya Akses</p>
+                            <div class="alert alert-secondary text-black" role="alert">
+                                <b>Maaf Anda Tidak Punya Akses</b>
+                            </div>
                         <?php endif; ?>
                     </div>
 
@@ -297,7 +301,9 @@
                                 </tbody>
                             </table>
                         <?php else : ?>
-                            <p class="text-bold">Anda Tidak Punya Akses</p>
+                            <div class="alert alert-secondary text-black" role="alert">
+                                <b>Maaf Anda Tidak Punya Akses</b>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -409,7 +415,17 @@
                 sortable: false,
             },
             {
-                data: "satuan3",
+                data: "satua3",
+                className: "text-center",
+                sortable: false,
+            },
+            {
+                data: "harga_terakhir",
+                className: "text-center",
+                sortable: false,
+            },
+            {
+                data: "supplier_terakhir",
                 className: "text-center",
                 sortable: false,
             },

@@ -366,4 +366,9 @@ class SalesOrderInvoiceModel extends Model
             'totalFilteredData' => $totalFilteredData
         ];
     }
+
+    public function getFirstLikeByDocumentNo($documentNo)
+    {
+        return $this->asArray()->like('document_no', $documentNo)->first();
+    }
 }
