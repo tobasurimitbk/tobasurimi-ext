@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Mutasi Bahan Baku dan Penolong</title>
+    <title><?= $label ?></title>
     <style>
         .company-name {
             font-weight: 700;
@@ -82,8 +82,8 @@
 </head>
 
 <body>
-    <h4>PT TOBASURIMI INDUSTRIES, Tbk (<?= $_SESSION['login']->this_company ?>)</h4>
-    <p style="margin-top: -15px;">Laporan Mutasi Bahan Baku dan Penolong</p>
+    <h4><?= $company['holding_company'] ?> (<?= $_SESSION['login']->this_company ?>)</h4>
+    <p style="margin-top: -15px;"><?= $label ?></p>
     <?php if ($condition['date_start'] != "" && $condition['date_end'] != "") : ?>
         <p style="margin-top: -15px;">Periode : <?= date('d/m/Y', strtotime($condition['date_start'])); ?> / <?= date('d/m/Y', strtotime($condition['date_end'])); ?></p>
     <?php else : ?>

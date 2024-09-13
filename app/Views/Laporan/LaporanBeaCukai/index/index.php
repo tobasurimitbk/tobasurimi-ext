@@ -63,7 +63,7 @@
             </a>
         </div>
         <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-            <a href="#">
+            <a href="<?= base_url('/laporan-bea-cukai/laporan-mutasi-barang-jadi') ?>">
                 <div class="card card-statistic-1">
                     <div class="card-icon bg-danger">
                         <i class="far fa-file"></i>
@@ -77,7 +77,7 @@
             </a>
         </div>
         <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-            <a href="#">
+            <a href="<?= base_url('/laporan-bea-cukai/laporan-mutasi-barang-scrap') ?>">
                 <div class="card card-statistic-1">
                     <div class="card-icon bg-danger">
                         <i class="far fa-file"></i>
@@ -91,7 +91,7 @@
             </a>
         </div>
         <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-            <a href="#">
+            <a href="<?= base_url('/laporan-bea-cukai/laporan-mutasi-barang-modal') ?>">
                 <div class="card card-statistic-1">
                     <div class="card-icon bg-danger">
                         <i class="far fa-file"></i>

@@ -12,6 +12,7 @@ use App\Models\BC27Model;
 use App\Models\BC30Model;
 use App\Models\BC40Model;
 use App\Models\BC41Model;
+use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\JasaVendorInModel;
 use App\Models\JasaVendorOutModel;
@@ -71,6 +72,7 @@ class LaporanBeaCukai extends BaseController
     protected $materialRequestDetailsModel;
     protected $productionResultModel;
     protected $productionResultDetailModel;
+    protected $companiesModel;
 
     public function __construct()
     {
@@ -103,6 +105,7 @@ class LaporanBeaCukai extends BaseController
         $this->materialRequestDetailsModel = new MaterialRequestDetailsModel();
         $this->productionResultModel = new ProductionResultModel();
         $this->productionResultDetailModel = new ProductionResultDetailModel();
+        $this->companiesModel = new CompaniesModel();
     }
 
     public function index()
@@ -1544,6 +1547,36 @@ class LaporanBeaCukai extends BaseController
         return view('Laporan/LaporanBeaCukai/mutasi/bahanBakuPenolong', $data);
     }
 
+    public function laporanMutasiBarangJadi()
+    {
+        $data = [
+            'tipeBarang' => $this->metadataModel->where('deletedAt', null)->where('name', "Kategori Barang")->whereIn('description', ['bahan_jadi'])->findAll(),
+            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
+        ];
+
+        return view('Laporan/LaporanBeaCukai/mutasi/barangJadi', $data);
+    }
+
+    public function laporanMutasiBarangScrap()
+    {
+        $data = [
+            'tipeBarang' => $this->metadataModel->where('deletedAt', null)->where('name', "Kategori Barang")->whereIn('description', ['bahan_scrap'])->findAll(),
+            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
+        ];
+
+        return view('Laporan/LaporanBeaCukai/mutasi/barangScrap', $data);
+    }
+
+    public function laporanMutasiBarangModal()
+    {
+        $data = [
+            'tipeBarang' => $this->metadataModel->where('deletedAt', null)->where('name', "Kategori Barang")->whereIn('description', ['bahan_modal'])->findAll(),
+            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
+        ];
+
+        return view('Laporan/LaporanBeaCukai/mutasi/barangModal', $data);
+    }
+
     public function allMutasiBarang()
     {
 
@@ -1607,14 +1640,27 @@ class LaporanBeaCukai extends BaseController
         );
         $domPdf = new Dompdf();
 
-        $fileName = 'Laporan Mutasi Bahan Baku dan Penolong';
+
+        $label = "";
+        if (in_array('bahan_baku', $addCondition['parent_type']) || in_array('kemasan', $addCondition['parent_type'])) {
+            $label = "Laporan Mutasi Bahan Baku dan Penolong : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
+        } elseif (in_array('bahan_jadi', $addCondition['parent_type'])) {
+            $label = "Laporan Mutasi Barang Jadi : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
+        } elseif (in_array('bahan_scrap', $addCondition['parent_type'])) {
+            $label = "Laporan Mutasi Barang Scrap : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
+        } elseif (in_array('bahan_modal', $addCondition['parent_type'])) {
+            $label = "Laporan Mutasi Barang Modal : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
+        }
+
         $domPdf->loadHtml(view('Laporan/LaporanBeaCukai/mutasi/printMutasi', [
             'data' => $listMutasiBarang['data'],
-            'condition' => $addCondition
+            'condition' => $addCondition,
+            'company' => $this->companiesModel->find($_SESSION['login']->this_company_id),
+            'label' => $label
         ]));
         $domPdf->setPaper('legal', 'landscape');
         $domPdf->render();
-        $domPdf->stream($fileName, array("Attachment" => false));
+        $domPdf->stream($label, array("Attachment" => false));
     }
 
     public function exportExcelLaporanMutasi()
@@ -1638,9 +1684,18 @@ class LaporanBeaCukai extends BaseController
             "date_end" => $this->request->getVar("date_end") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_end")))) : "",
         ];
 
+        $company = $this->companiesModel->find($_SESSION['login']->this_company_id);
+
+
         $label = "";
         if (in_array('bahan_baku', $addCondition['parent_type']) || in_array('kemasan', $addCondition['parent_type'])) {
             $label = "Laporan Mutasi Bahan Baku dan Penolong : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
+        } elseif (in_array('bahan_jadi', $addCondition['parent_type'])) {
+            $label = "Laporan Mutasi Barang Jadi : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
+        } elseif (in_array('bahan_scrap', $addCondition['parent_type'])) {
+            $label = "Laporan Mutasi Barang Scrap : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
+        } elseif (in_array('bahan_modal', $addCondition['parent_type'])) {
+            $label = "Laporan Mutasi Barang Modal : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
         }
 
         $listMutasiBarang = $this->getListMutasiBarang(
@@ -1684,7 +1739,7 @@ class LaporanBeaCukai extends BaseController
 
         // Menambah isi pada cell A1 - A4
         $sheet->setCellValue('A1', $label);
-        $sheet->setCellValue('A2', "PT TOBA SURIMI INDUSTRIES, Tbk (" . session()->get('login')->this_company . ')');
+        $sheet->setCellValue('A2', $company['holding_company'] . " (" . session()->get('login')->this_company . ')');
         $sheet->setCellValue('A3', '---');
         $sheet->setCellValue('A4', '--');
 
@@ -1829,6 +1884,10 @@ class LaporanBeaCukai extends BaseController
 
                 $totalStokAkhirDead = ($totalStockAwal + $totalStokPemasukan) - $totalStokPengeluaran;
 
+
+                if ($data->parent_type == "bahan_jadi") {
+                    $data->parent_type = "barang_jadi";
+                }
 
                 $satuan1 = $this->satuanModel->find($data->satuan_1);
 
