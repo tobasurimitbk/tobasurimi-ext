@@ -295,7 +295,7 @@ class RMImportPOModel extends Model
         }
     }
 
-    public function getPOBBCondition($divisi_id, $po_date_awal, $po_date_akhir, $kategori_id)
+    public function getPOBBCondition($divisi_id, $po_date_awal, $po_date_akhir, $kategori_id, $company_id)
     {
         $selectQry = "
             barang_master.barang_name AS barangName, 
@@ -326,8 +326,9 @@ class RMImportPOModel extends Model
             ->where('rm_import_pos.po_date <=', date('Y-m-d', strtotime($po_date_akhir)))
             // ->where('account_barang.kategori_id', $kategori_id)
             ->where('account_barang.divisi_id', $divisi_id)
+            ->where('rm_import_pos.company_id', $company_id)
             ->where('rm_import_po_details.deletedAt', null)
-            ->groupBy('rm_import_po_details.barang_id, rm_import_po_details.spesifikasi_id')
+            ->groupBy('rm_import_po_details.barang_id, rm_import_po_details.spesifikasi_id, rm_import_pos.company_id')
             ->findAll();
 
         return $poBBImportData;

@@ -889,7 +889,7 @@ class RMPurchaseOrderModel extends Model
         }
     }
 
-    public function getPOBBCondition($divisi_id, $po_date_awal, $po_date_akhir, $kategori_id)
+    public function getPOBBCondition($divisi_id, $po_date_awal, $po_date_akhir, $kategori_id, $company_id)
     {
         $selectQry = "
         barang_master.barang_name AS barangName, 
@@ -903,7 +903,7 @@ class RMPurchaseOrderModel extends Model
         rm_purchase_order_details.barang2_id AS barang2_id,
         rm_purchase_orders.pph AS poPPH,
         satuans.kode_satuan AS satuanName, 
-        GROUP_CONCAT(rm_purchase_orders.po_no) AS po_no, 
+        CONCAT(rm_purchase_orders.po_no) AS po_no, 
         (SUM(rm_purchase_order_details.daily_price + rm_purchase_order_details.monthly_price + rm_purchase_order_details.general_price) / SUM(rm_purchase_order_details.qty)) AS avg_price_per_qty
     ";
 
@@ -920,8 +920,10 @@ class RMPurchaseOrderModel extends Model
             ->where('rm_purchase_orders.po_date <=', date('Y-m-d', strtotime($po_date_akhir)))
             // ->where('account_barang.kategori_id', $kategori_id)
             ->where('account_barang.divisi_id', $divisi_id)
+            ->where('rm_purchase_orders.company_id', $company_id)
+            ->where('rm_purchase_orders.deletedAt', null)
             ->where('rm_purchase_order_details.deletedAt', null)
-            ->groupBy('rm_purchase_order_details.barang1_id, rm_purchase_order_details.barang2_id')
+            ->groupBy('rm_purchase_order_details.barang1_id, rm_purchase_order_details.barang2_id, rm_purchase_orders.company_id')
             ->findAll();
 
         return $poBBLokalData;

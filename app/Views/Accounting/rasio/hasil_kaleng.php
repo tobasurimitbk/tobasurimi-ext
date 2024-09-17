@@ -16,7 +16,7 @@
                         <th style="text-align: center;">Nama Barang</th>
                         <th style="text-align: center;">Satuan</th>
                         <th style="text-align: center;">Jumlah Barang</th>
-                        <th style="text-align: center;">Harga Satuan</th>
+                        <th style="text-align: center;">Harga Satuan BJ</th>
                         <th style="text-align: center;">Total</th>
                     </tr>
                 </thead>
@@ -62,7 +62,7 @@
                     <th style="text-align: center;">Bhn Tersedia</th>
                     <th style="text-align: center;">Filling Weight</th>
                     <th style="text-align: center;">Rasio</th>
-                    <th style="text-align: center;">Harga Satuan</th>
+                    <th style="text-align: center;">Harga Satuan BJ</th>
                     <th style="text-align: center;">Total</th>
                     <th style="text-align: center;">Harga BB</th>
                 </tr>

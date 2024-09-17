@@ -2466,7 +2466,7 @@
                 </td>
                 <td></td>
                 <td>
-                    <input class="form-control rasio-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${rasioTotal.toFixed(2)}%">
+                    
                 </td>
                 <td></td>
                 <td>

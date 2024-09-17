@@ -647,12 +647,16 @@ class RasioController extends BaseController
 
             $kursValue = 1;
             // definisi untuk bahan digunakan
-            $poBBLokal = $this->rmPurchaseOrderModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID);
-            $poBBImport = $this->rmImportPOModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID);
+            $poBBLokal = $this->rmPurchaseOrderModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID, $this->this_company_id);
+            $poBBImport = $this->rmImportPOModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID, $this->this_company_id);
             $dataBahanDigunakanPO = array_merge($dataBahanDigunakanPO, $poBBLokal, $poBBImport);
             // var_dump($poBBLokal);
             // var_dump($poBBImport);
             // var_dump($dataBahanDigunakanPO);
+
+            // var_dump($this->this_company_id);
+            // var_dump($divisiID);
+            // exit;
             $dataProduksiBahanDigunakan = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
             // awal fungsi untuk bahan digunakan
             foreach ($dataBahanDigunakanPO as &$value) {
@@ -679,10 +683,8 @@ class RasioController extends BaseController
                 $value->barang_name =  $value->barangName;
                 $value->spesifikasi =  $value->spekName;
 
-                // var_dump(explode(',', $poNo));
 
                 $parsePoNo = explode(',', $poNo);
-
                 $totalQty = 0;
                 $totalHarga = 0;
                 $hargaSatuan = 0;
@@ -690,6 +692,7 @@ class RasioController extends BaseController
                 foreach ($parsePoNo as $key => $valuePoNo) {
                     $penerimaanBarang = $this->penerimaanBarangModel
                         ->where("JSON_CONTAINS(multiple_po_no, '\"" . $valuePoNo . "\"')")
+                        ->where("company_id", $this->this_company_id)
                         ->first();
 
                     // var_dump($penerimaanBarang);
@@ -699,6 +702,7 @@ class RasioController extends BaseController
                             ->select('penerimaan_barang_detail.*, SUM(penerimaan_barang_detail.harga) AS harga, SUM(penerimaan_barang_detail.harga_harian) AS harga_harian, SUM(penerimaan_barang_detail.harga_bulanan) AS harga_bulanan, SUM(penerimaan_barang_detail.qty) AS qty, satuans.kode_satuan')
                             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
                             ->where('penerimaan_barang_id', $penerimaanBarang['id'])
+                            ->where('penerimaan_barang_detail.deletedAt', null)
                             ->where('barang_id', $barang1_id)
                             ->where('spesifikasi_id', $barang2_id)
                             ->groupBy('barang_id, spesifikasi_id')
@@ -1300,8 +1304,8 @@ class RasioController extends BaseController
                 'kategori_id' => $this->request->getVar('kategori'),
             ];
             $kursValue = 1;
-            $poBBLokal = $this->rmPurchaseOrderModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID);
-            $poBBImport = $this->rmImportPOModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID);
+            $poBBLokal = $this->rmPurchaseOrderModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID, $this->this_company_id);
+            $poBBImport = $this->rmImportPOModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID, $this->this_company_id);
 
             $dataResultPO = array_merge($dataResultPO, $poBBLokal, $poBBImport);
             $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
