@@ -920,57 +920,6 @@ class RasioController extends BaseController
             // definisi Saldo Awal
             // awal fungsi untuk saldo Awal
             $dataBahanBakuDigunakanSaldoAwal = $this->stockTutupBukuModel->getStockTutupBukuWithAddCondition($conditionProduction);
-            // var_dump($dataBahanBakuDigunakanSaldoAwal);
-            // exit;
-            // $dataSaldoAwal = [];
-            // $dataStockAwalModel = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
-            //     "bahan_baku",
-            //     $divisiID
-            // );
-
-            // foreach ($dataStockAwalModel as $value) {
-            //     $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
-            //         $value['stock_id']
-            //     );
-            //     // var_dump($value);
-            //     $stock = $this->stockModel->find($value['stock_id']);
-            //     if ($stock['kemasan_id'] == 0) {
-            //         $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
-            //         $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
-            //         $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
-            //         $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
-            //     } else {
-            //         $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
-            //         $satuan = $this->satuanModel->find($kemasan['satuan_id']);
-            //         $barangName = $kemasan['name'];
-            //     }
-            //     for ($i = 0; $i < count($dataResult); $i++) {
-            //         $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
-
-            //         $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
-            //         $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
-            //         $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
-            //         $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
-            //         $dataResult[$i]['barang'] = strtoupper($barangName);
-            //         $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
-            //         $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-            //         $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
-            //         $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-            //         $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
-
-            //         $dataResult[$i]['stok_produksi'] = 0;
-
-            //         foreach ($dataBahanBakuDigunakanSaldoAwal as $valueProductionResultData) {
-            //             if ($valueProductionResultData['stock_id'] == $dataResult[$i]['stock_id']) {
-            //                 $dataResult[$i]['stok_produksi'] = $valueProductionResultData['qty'];
-            //                 break;
-            //             }
-            //         }
-            //     }
-            //     $dataSaldoAwal = array_merge($dataSaldoAwal, $dataResult);
-            // }
-            // exit;
-            // akhir fungsi untuk saldo Awal
 
             // definisi saldo akhir
             // awal fungsi untuk saldo akhir
@@ -1215,8 +1164,8 @@ class RasioController extends BaseController
                         $valueProductionResultIds = explode(',', $valueProduction['production_result_id']);
 
                         foreach ($valueProductionResultIds as $key => $valueProductionResultId) {
-                            if ($productionResultId == $valueProductionResultId) {
-                                $totalQtyAll += $value['qtyTotal'];
+                            if ($productionResultId == $valueProductionResultId && $value['barang1_id'] == $valueProduction['barang1_id']) {
+                                $totalQtyAll += $valueProduction['qtyTotal'];
                             }
                         }
                     }
@@ -1235,8 +1184,6 @@ class RasioController extends BaseController
             }
             // akhir fungsi untuk bahan jadi
 
-            // var_dump($dataBahanDigunakanPO);
-            // var_dump($dataProduksiBahanDigunakanKopek);
             // var_dump($productionResultDataTitleJadi);
             // exit;
 

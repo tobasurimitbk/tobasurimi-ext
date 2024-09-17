@@ -1,7 +1,7 @@
 <div class="col-subtitle-modal">
     <div class="row mt-3">
         <div class="col-md-6">
-            <label class="form-label font-weight-bold modal-sub-title">Barang Jadi Awal</label>
+            <label class="form-label font-weight-bold modal-sub-title">Barang Hasil Produksi</label>
         </div>
     </div>
 </div>
