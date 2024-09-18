@@ -279,7 +279,7 @@ class ReturnBarangPOBB extends BaseController
                     "Out",
                     date('Y-m-d'),
                     $this->this_user_id,
-                    "LPB",
+                    "RETUR",
                     $penerimaanBarang['no_surat_jalan'],
                     $p['keterangan_return'] ? $p['keterangan_return'] : "-"
                 );

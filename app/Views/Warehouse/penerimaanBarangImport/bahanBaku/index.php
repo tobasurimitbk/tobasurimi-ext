@@ -160,8 +160,10 @@
                     let id = row.id;
                     let status = row.status_post;
                     let tipe_bahan = row.tipe_bahan;
+                    let status_post = row.status_post;
                     let bc_type = row.bc_type;
                     let in_bc = row.in_bc;
+                    let retur_status = row.retur_status;
 
                     if (status == "WAITING") {
                         return `
@@ -186,22 +188,64 @@
                     } else {
                         buttonUnpost = `<button data-toggle="tooltip" title="Unpost" class="btn btn-danger btn-print" onclick="unposting('${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-ban fa-sm" aria-hidden="true"></i>
-                                </button>
+                                </button>`;
+                        // UNTUK YANG BELUM DIPOSTING (kelap-kelip)
+                        buttonReturnWaiting = `
+                            <button data-toggle="tooltip" title="Return Out" class="btn btn-info return-out" onclick="" style="box-shadow: none !important; position: relative;">
+                                <i class="fa fa-truck fa-sm" aria-hidden="true"></i>
+                                <span style="position: absolute; top: -5px; right: -5px; padding: 5px; background-color: red; color: white; border-radius: 50%; border: 2px solid white; animation: blink 1s infinite;">
+                                
+                                </span>
+                            </button>
                         `;
-                        string = `
-                        <div class="mt-0" style="text-align:center;">
-                            <button data-toggle="tooltip" title="Return Out" class="btn btn-success return-out" onclick="" style="box-shadow: none !important;">
+
+                        // UNTUK YANG SUDAH DIPOSTING (badge hijau)
+                        buttonReturnPosting = `
+                            <button data-toggle="tooltip" title="Return Out" class="btn btn-info return-out" onclick="" style="box-shadow: none !important; position: relative;">
+                                <i class="fa fa-truck fa-sm" aria-hidden="true"></i>
+                                <span style="position: absolute; top: -5px; right: -5px; padding: 5px; background-color: green; color: white; border-radius: 50%; border: 2px solid white;">
+                                
+                                </span>
+                            </button>
+                        `;
+
+                        // UNTUK YANG BELUM DIISI KAN
+                        buttonReturn = `
+                            <button data-toggle="tooltip" title="Return Out" class="btn btn-info return-out" onclick="" style="box-shadow: none !important;">
                                 <i class="fa fa-truck fa-sm" aria-hidden="true"></i>
                             </button>
+                        `;
+
+                        const style = document.createElement('style');
+                        style.innerHTML = `
+                            @keyframes blink {
+                                0% { opacity: 1; }
+                                50% { opacity: 0; }
+                                100% { opacity: 1; }
+                            }
+                        `;
+                        document.head.appendChild(style);
+
+                        string = `
+                        <div class="mt-0" >
                             <?php if (can('Warehouse', 'P. Barang Import BB', 'p')) : ?>
-                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-import-bb/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bb/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
-                       
-                    `;
+                           `;
                         if (bc_type !== '0' && in_bc === 'out') {
-                            string += buttonUnpost
+                            string += buttonUnpost;
+                        }
+                        if (bc_type === '0' || in_bc === 'in') {
+                            if (retur_status == null) {
+                                string += buttonReturn;
+                            } else if (retur_status == 1) {
+                                string += buttonReturnPosting;
+                            } else {
+                                string += buttonReturnWaiting;
+                            }
+
                         }
                         return string + `</div>`;
                     }

@@ -25,6 +25,7 @@ use App\Models\StockModel;
 use App\Models\SupplierHargaModel;
 use App\Models\ReturAmPoDetailModel;
 use App\Models\BCPurchaseOrderModel;
+use App\Models\PengembalianBarangModel;
 use Dompdf\Dompdf;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -58,6 +59,7 @@ class PenerimaanBarangImportBP extends BaseController
     protected $jurnalUmumController;
     protected $this_user_id;
     protected $dompdf;
+    protected $pengembalianBarangModel;
 
     public function __construct()
     {
@@ -87,6 +89,7 @@ class PenerimaanBarangImportBP extends BaseController
         $this->bcPurchaseOrder = new BCPurchaseOrderModel();
         $this->jurnalUmumController = new JurnalUmum();
         $this->dompdf = new Dompdf();
+        $this->pengembalianBarangModel = new PengembalianBarangModel();
     }
 
     public function index()
@@ -136,6 +139,8 @@ class PenerimaanBarangImportBP extends BaseController
 
         foreach ($penerimaanBarangData['data'] as $data) {
             $bc_purchase_order_detail_list = $this->bcPurchaseOrder->like('multiple_lpb_id', $data->id)->where('deletedAt', null)->findAll();
+            $pengembalianBarang = $this->pengembalianBarangModel->where('penerimaan_barang_id', $data->id)->first();
+
             array_push($dataPenerimaanBarang, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
@@ -150,7 +155,7 @@ class PenerimaanBarangImportBP extends BaseController
                 "status_post"           => $data->status_post,
                 "bc_type"               => $data->bc_type,
                 "in_bc"                 => $bc_purchase_order_detail_list != null ? 'in' : 'out',
-
+                "retur_status"          => ($pengembalianBarang != null) ? ($pengembalianBarang['status_post'] == "WAITING" ? 0 : 1) : null,
             ]);
         }
 

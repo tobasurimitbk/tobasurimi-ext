@@ -22,7 +22,7 @@ use App\Models\StockModel;
 use App\Models\SupplierHargaModel;
 use App\Models\ReturAmPoDetailModel;
 use App\Models\BCPurchaseOrderModel;
-
+use App\Models\PengembalianBarangModel;
 use Dompdf\Dompdf;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -54,6 +54,7 @@ class PenerimaanBarangLokalBP extends BaseController
     protected $this_user_id;
     protected $dompdf;
     protected $jurnalUmumController;
+    protected $pengembalianBarangModel;
 
     public function __construct()
     {
@@ -81,6 +82,7 @@ class PenerimaanBarangLokalBP extends BaseController
         $this->bcPurchaseOrder = new BCPurchaseOrderModel();
         $this->jurnalUmumController = new JurnalUmum();
         $this->dompdf = new Dompdf();
+        $this->pengembalianBarangModel = new PengembalianBarangModel();
     }
 
     public function index()
@@ -131,6 +133,7 @@ class PenerimaanBarangLokalBP extends BaseController
         foreach ($penerimaanBarangData['data'] as $data) {
             $multiSpp = $this->amPurchaseOrderModel->getSPP(json_decode($data->multiple_po_id));
             $bc_purchase_order_detail_list = $this->bcPurchaseOrder->like('multiple_lpb_id', $data->id)->where('deletedAt', null)->findAll();
+            $pengembalianBarang = $this->pengembalianBarangModel->where('penerimaan_barang_id', $data->id)->first();
 
             $sppNo = "";
             foreach ($multiSpp as $s) {
@@ -152,6 +155,7 @@ class PenerimaanBarangLokalBP extends BaseController
                 "status_post"           => $data->status_post,
                 "bc_type"               => $data->bc_type,
                 "in_bc"                 => $bc_purchase_order_detail_list != null ? 'in' : 'out',
+                "retur_status"          => ($pengembalianBarang != null) ? ($pengembalianBarang['status_post'] == "WAITING" ? 0 : 1) : null,
             ]);
         }
 
