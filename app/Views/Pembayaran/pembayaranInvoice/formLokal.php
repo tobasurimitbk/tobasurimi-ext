@@ -48,13 +48,16 @@
         <div class="card-body">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Form Pembayaran Invoice Lokal</a>
+                    <a class="nav-link active" href="#">Pembayaran Invoice Lokal</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-ekspor') ?>">Form Pembayaran Invoice Ekspor</a>
+                    <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-ekspor') ?>">Pembayaran Invoice Ekspor</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-lain') ?>">Form Pembayaran Invoice Lain Lain</a>
+                    <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-lain') ?>">Pembayaran Invoice Lain Lain</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-return') ?>">Pembayaran Return</a>
                 </li>
             </ul>
 

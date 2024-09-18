@@ -920,6 +920,7 @@ class RMPurchaseOrderModel extends Model
             ->where('rm_purchase_orders.po_date <=', date('Y-m-d', strtotime($po_date_akhir)))
             // ->where('account_barang.kategori_id', $kategori_id)
             ->where('account_barang.divisi_id', $divisi_id)
+            ->where('rm_purchase_order_details.deletedAt', null)
             ->groupBy('rm_purchase_order_details.barang1_id, rm_purchase_order_details.barang2_id')
             ->findAll();
 

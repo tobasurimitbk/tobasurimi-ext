@@ -650,6 +650,9 @@ class RasioController extends BaseController
             $poBBLokal = $this->rmPurchaseOrderModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID);
             $poBBImport = $this->rmImportPOModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID);
             $dataBahanDigunakanPO = array_merge($dataBahanDigunakanPO, $poBBLokal, $poBBImport);
+            // var_dump($poBBLokal);
+            // var_dump($poBBImport);
+            // var_dump($dataBahanDigunakanPO);
             $dataProduksiBahanDigunakan = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
             // awal fungsi untuk bahan digunakan
             foreach ($dataBahanDigunakanPO as &$value) {
@@ -688,6 +691,8 @@ class RasioController extends BaseController
                     $penerimaanBarang = $this->penerimaanBarangModel
                         ->where("JSON_CONTAINS(multiple_po_no, '\"" . $valuePoNo . "\"')")
                         ->first();
+
+                    // var_dump($penerimaanBarang);
 
                     if ($penerimaanBarang) {
                         $penerimaanBarangDetail = $this->penerimaanBarangDetailModel
@@ -1230,7 +1235,10 @@ class RasioController extends BaseController
             }
             // akhir fungsi untuk bahan jadi
 
+            // var_dump($dataBahanDigunakanPO);
             // var_dump($dataProduksiBahanDigunakanKopek);
+            // var_dump($productionResultDataTitleJadi);
+            // exit;
 
 
             if ($dataProduksiBahanDigunakan) {

@@ -16,10 +16,31 @@ class RMImportPOModel extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'id', 'purchase_request_id', 'company_id', 'supplier_id', 'division_id', 'po_no', 'po_date', 'payment_date',
-        'currency',  'total', 'payment_term', 'note', 'shipper', 'consigne', 'port_origin', 'potongan_harga',
+        'id',
+        'purchase_request_id',
+        'company_id',
+        'supplier_id',
+        'division_id',
+        'po_no',
+        'po_date',
+        'payment_date',
+        'currency',
+        'total',
+        'payment_term',
+        'note',
+        'shipper',
+        'consigne',
+        'port_origin',
+        'potongan_harga',
         'direktur',
-        'port_destination', 'location_transaction', 'shipment', 'latest_shipment_date', 'attn', 'createdBy', 'status_penerimaan', 'is_posted',
+        'port_destination',
+        'location_transaction',
+        'shipment',
+        'latest_shipment_date',
+        'attn',
+        'createdBy',
+        'status_penerimaan',
+        'is_posted',
     ];
 
     // Dates
@@ -305,6 +326,7 @@ class RMImportPOModel extends Model
             ->where('rm_import_pos.po_date <=', date('Y-m-d', strtotime($po_date_akhir)))
             // ->where('account_barang.kategori_id', $kategori_id)
             ->where('account_barang.divisi_id', $divisi_id)
+            ->where('rm_import_po_details.deletedAt', null)
             ->groupBy('rm_import_po_details.barang_id, rm_import_po_details.spesifikasi_id')
             ->findAll();
 

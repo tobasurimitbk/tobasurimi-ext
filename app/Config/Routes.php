@@ -496,11 +496,13 @@ $routes->get('/pembayaran-invoice/all', 'Pembayaran\PembayaranInvoice::getAllPem
 $routes->get('/pembayaran-invoice/create', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceLokal', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/create-ekspor', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceEkspor', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/create-lain', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceLain', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/create-return', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceReturn', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-dokumen-list', 'Pembayaran\PembayaranInvoice::getDokumenList', ['filter' => 'Auth']);
 $routes->get('pembayaran-invoice/get-valas-sales-ekspor', 'Pembayaran\PembayaranInvoice::getValas', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-barang-sales-lokal', 'Pembayaran\PembayaranInvoice::getBarangSalesLokal', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-barang-sales-ekspor', 'Pembayaran\PembayaranInvoice::getBarangSalesEkspor', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-barang-sales-lain', 'Pembayaran\PembayaranInvoice::getBarangSalesLain', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/get-barang-sales-return', 'Pembayaran\PembayaranInvoice::getBarangSalesReturn', ['filter' => 'Auth']);
 $routes->post('/pembayaran-invoice/generate-no-pembayaran', 'Pembayaran\PembayaranInvoice::generateNoPembayaranInvoice', ['filter' => 'Auth']);
 $routes->post('/pembayaran-invoice/save', 'Pembayaran\PembayaranInvoice::saveLokalInvoice', ['filter' => 'Auth']);
 $routes->post('/pembayaran-invoice/update', 'Pembayaran\PembayaranInvoice::updateInvoice', ['filter' => 'Auth']);

@@ -47,13 +47,16 @@
         <div class="card-body">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= base_url('pembayaran-invoice/create') ?>">Form Pembayaran Invoice Lokal</a>
+                    <a class="nav-link" href="<?= base_url('pembayaran-invoice/create') ?>">Pembayaran Invoice Lokal</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Form Pembayaran Invoice Ekspor</a>
+                    <a class="nav-link active" href="#">Pembayaran Invoice Ekspor</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-lain') ?>">Form Pembayaran Invoice Lain Lain</a>
+                    <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-lain') ?>">Pembayaran Invoice Lain Lain</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-return') ?>">Pembayaran Return</a>
                 </li>
             </ul>
             <div class="row mt-3">
@@ -790,18 +793,20 @@
         let invoice_id = $("#no_dokumen").val();
         let type_invoice = $("#tipe_invoice").val();
 
-        $.ajax({
-            url: '<?= base_url('pembayaran-invoice/get-customer') ?>',
-            method: "GET",
-            data: {
-                invoice_id: invoice_id,
-                type_invoice: type_invoice
-            },
-            dataType: "json",
-            success: function(res) {
-                $('#customer').val(res).change();
-            }
-        })
+        if (invoice_id && type_invoice) {
+            $.ajax({
+                url: '<?= base_url('pembayaran-invoice/get-customer') ?>',
+                method: "GET",
+                data: {
+                    invoice_id: invoice_id,
+                    type_invoice: type_invoice
+                },
+                dataType: "json",
+                success: function(res) {
+                    $('#customer').val(res).change();
+                }
+            })
+        }
     }
     <?php if (!empty($detail)) : ?>
         drawTable();
