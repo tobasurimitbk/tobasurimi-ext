@@ -674,4 +674,231 @@ class StockDetail2Model extends Model
             'totalFilteredData' => $totalFilteredData
         ];
     }
+
+
+    public function getListLaporanMutasiBarang($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode_barang' => 'barang_master.kode_barang',
+            'nama_barang' => 'barang_master.barang_name',
+            'satuan' => '  barang_master_spesifikasi.satuan_1',
+            'kategori_barang' =>  'parent_barang.parent_type',
+            'divisi' => 'divisis.divisi',
+            'warehouse' => 'warehouses.warehouse_name',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'parent_barang.parent_type';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = '
+            stock.id,
+            stock.qty,
+            parent_barang.parent_type,
+            parent_barang.parent_name,
+            barang_master.id as barang1_id,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            divisis.divisi,
+            warehouses.warehouse_name AS warehouse,
+            barang_master_spesifikasi.id as barang2_id,
+            barang_master_spesifikasi.spesifikasi,
+            barang_master_spesifikasi.satuan_1,
+            barang_master_spesifikasi.satuan_2,
+            barang_master_spesifikasi.satuan_3,
+            barang_master_spesifikasi.konversi_satuan_2,
+            barang_master_spesifikasi.konversi_satuan_3
+        ';
+
+        $dataQry = $this->db->table('stock')
+            ->select($selectQry)
+            ->join('barang_master', 'barang_master.id = stock.barang1_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
+            ->join('warehouses', 'warehouses.id = stock.warehouse_id')
+            ->join('divisis', 'divisis.id = stock.divisi_id')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
+            ->whereIn('parent_barang.parent_type', $addCondition['parent_type'])
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $dataQry->countAllResults(false);
+
+        if (
+            $addCondition['divisi_id'] ||
+            $addCondition['warehouse_id'] ||
+            $addCondition['search']
+        ) {
+            $dataQry->groupStart();
+        }
+        if ($addCondition['divisi_id']) {
+            $dataQry->where('stock.divisi_id', $addCondition['divisi_id']);
+        }
+
+        if ($addCondition['warehouse_id']) {
+            $dataQry->where('stock.warehouse_id', $addCondition['warehouse_id']);
+        }
+
+        if ($addCondition['search']) {
+            $dataQry->groupStart()
+                ->like("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
+                ->groupEnd()
+                ->orWhere('barang_master.kode_barang', $addCondition['search']);
+        }
+
+        if (
+            $addCondition['divisi_id'] ||
+            $addCondition['warehouse_id'] ||
+            $addCondition['search']
+        ) {
+            $dataQry->groupEnd();
+        }
+
+        $totalFilteredData = $dataQry->countAllResults(false);
+        $data = $dataQry->get($limit, $offset)->getResult();
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
+
+    public function getListLaporanMutasiKemasan($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode_barang' => 'kemasan.kode',
+            'nama_barang' => 'kemasan.name',
+            'satuan' => 'kemasan.satuan_id',
+            'kategori_barang' =>  'parent_barang.parent_type',
+            'divisi' => 'divisis.divisi',
+            'warehouse' => 'warehouses.warehouse_name',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'parent_barang.parent_type';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = '
+            stock.id,
+            stock.qty,
+            parent_barang.parent_type,
+            parent_barang.parent_name,
+            kemasan.kode,
+            kemasan.name,
+            kemasan.satuan_id,
+            divisis.divisi,
+            warehouses.warehouse_name AS warehouse,
+        ';
+
+        $dataQry = $this->db->table('stock')
+            ->select($selectQry)
+            ->join('kemasan', 'kemasan.id = stock.kemasan_id')
+            ->join('warehouses', 'warehouses.id = stock.warehouse_id')
+            ->join('divisis', 'divisis.id = stock.divisi_id')
+            ->join('parent_barang', 'parent_barang.id = kemasan.parent_type_id')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $dataQry->countAllResults(false);
+
+        if (
+            $addCondition['parent_type'] ||
+            $addCondition['divisi_id'] ||
+            $addCondition['warehouse_id'] ||
+            $addCondition['search']
+        ) {
+            $dataQry->groupStart();
+        }
+
+        if ($addCondition['parent_type']) {
+            $dataQry->whereIn('parent_barang.parent_type', $addCondition['parent_type']);
+        }
+
+        if ($addCondition['divisi_id']) {
+            $dataQry->where('stock.divisi_id', $addCondition['divisi_id']);
+        }
+
+        if ($addCondition['warehouse_id']) {
+            $dataQry->where('stock.warehouse_id', $addCondition['warehouse_id']);
+        }
+
+        if ($addCondition['search']) {
+            $dataQry->where('kemasan.kode', $addCondition['kode']);
+            $dataQry->orLike('kemasan.name', $addCondition['kode_barang']);
+        }
+
+        if (
+            $addCondition['parent_type'] ||
+            $addCondition['divisi_id'] ||
+            $addCondition['warehouse_id'] ||
+            $addCondition['search']
+        ) {
+            $dataQry->groupEnd();
+        }
+
+        $totalFilteredData = $dataQry->countAllResults(false);
+        $data = $dataQry->get($limit, $offset)->getResult();
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
+
+    public function getTotalStokLogLaporanMutasi($condition, $addCondition)
+    {
+
+        if (isset($addCondition['stock_sum'])) {
+            // SUM KHUSUS OUTOR IN DI SUM
+            $selectQry = '
+            SUM(stock_details2.qty)
+            AS stok_total,   
+    ';
+        } else {
+            // SUM IN - OUT
+            $selectQry = '
+            (SUM(CASE WHEN stock_details.status = "In" 
+            THEN stock_details2.qty ELSE 0 END) - 
+            SUM(CASE WHEN stock_details.status = "Out" 
+            THEN stock_details2.qty ELSE 0 END)) 
+            AS stok_total,   
+    ';
+        }
+
+
+
+        $dataQry = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('stock', 'stock.id = stock_details.stock_id')
+            ->where($condition)
+            ->where('stock.deletedAt', null)
+            ->where('stock_details.deletedAt', null)
+            ->where('stock_details2.deletedAt', null);
+
+        if (isset($addCondition['stock_awal'])) {
+            $dataQry->where('stock_details.stock_date <=', $addCondition['date_start']);
+        } else {
+
+            if (isset($addCondition['date_start']) && $addCondition['date_start'] !== "") {
+                $dataQry->where('stock_details.stock_date >=', $addCondition['date_start']);
+            }
+
+            if (isset($addCondition['date_end']) && $addCondition['date_end'] !== "") {
+                $dataQry->where('stock_details.stock_date <=', $addCondition['date_end']);
+            }
+        }
+
+
+        $resultData = $dataQry->findAll();
+
+        if (count($resultData) == 0) {
+            return 0;
+        } else {
+            return $resultData[0]['stok_total'];
+        }
+    }
 }

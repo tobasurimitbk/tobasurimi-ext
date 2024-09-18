@@ -151,7 +151,7 @@
                 <th class="txt-left" style="text-align:center; width: 30px;">Satuan</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">@ Rp</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Jumlah</th>
-                <th class="txt-left" style=" text-align:center; width: 150px;">No PO</th>
+                <th class="txt-left" style=" text-align:center; width: 150px;">No SPP</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Keterangan</th>
             </tr>
 
@@ -171,7 +171,7 @@
                     <td class="txt-left" style="text-align:center;"><?= $detail["kode_satuan"]; ?></td>
                     <td class="txt-right" style="text-align:center;"><?= number_format($detail['harga'], 2, '.', ',') ?></td>
                     <td class="txt-right" style="text-align:center;"><?= number_format($jumlah, 2, '.', ','); ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["po_no"]; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["spp_no"]; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["keterangan"]; ?></td>
                 </tr>
             <?php endforeach; ?>

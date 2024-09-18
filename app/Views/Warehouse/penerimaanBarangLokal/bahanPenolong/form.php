@@ -93,7 +93,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="form-floating" style="height: 50px;">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select multiple_spp_id" id="multiple_spp_id[]" multiple name="multiple_spp_id[]" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php if (!empty($dataPenerimaanBarang)) : ?>
@@ -366,8 +366,8 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    var listData = [];
-    var listFromDatabase = [];
+    var listData = []; // UNTUK FRONT END
+    var listDataServer = []; // YANG DIKIRIM KE PHP
 
     $(".tanggal_penerimaan_lpb").datepicker({
         todayHighlight: true,
@@ -392,10 +392,12 @@
             },
             dataType: "json",
             success: function(res) {
+                // INIT KOSONG
                 listData = [];
-                listFromDatabase = [];
+                listDataServer = [];
+                // ISI DATA
                 listData = res;
-                listFromDatabase = res.result;
+                listDataServer = res;
                 drawTable(listData);
             }
         })
@@ -920,6 +922,8 @@
             var jmlDiterimaTotal = 0;
             var sisaTotal = 0;
             var subTotal = 0;
+            var jmlOrderTotal = 0;
+            var hargaTotal = 0;
             $.each(listData.result, function(i, v) {
                 var newRow = $('<tr>');
                 newRow.append($('<td>').text(no++));
@@ -946,25 +950,31 @@
                 <button class="btn btn-warning posting-spp mr-1" onclick="editModal('${v.am_purchase_order_id}', '${v.am_purchase_order_details_id}')">
                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                 </button>
+                 <button class="btn btn-danger posting-spp mr-1" onclick="deleteDetail('${v.am_purchase_order_id}', '${v.am_purchase_order_details_id}')">
+                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                </button>
                 `
                     <?php endif; ?>
                 ));
                 table.find('tbody').append(newRow);
+
                 jmlDiterimaLPBTotal += Number(v.jml_diterima_lpb) || 0;
                 jmlDiterimaTotal += Number(v.jml_diterima_total) || 0;
                 sisaTotal += Number(v.sisa_total) || 0;
                 subTotal += Number(v.sub_total) || 0;
+                jmlOrderTotal += Number(v.jml_order) || 0;
+                hargaTotal += Number(v.harga) || 0;
             });
             table.find('tfoot').empty();
             var newRow = $('<tr>');
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td style="text-align:right;" colspan="4"><b>GRAND TOTAL</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + listData.jml_order_total.toFixed(2) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + jmlOrderTotal.toFixed(2) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaLPBTotal.toFixed(2) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaTotal.toFixed(2) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + sisaTotal.toFixed(2) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(listData.harga_per_barang_total).toFixed(2) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(hargaTotal).toFixed(2) || 0) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(subTotal).toFixed(2) || 0) + '</b></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
@@ -999,6 +1009,20 @@
         $('.harga_satuan').val("" + formatRupiah(Number(item.harga) || 0));
         $('.sub_total').val("" + formatRupiah(Number(item.sub_total) || 0));
         $('.jml_diterima_lpb_last').val(item.jml_diterima_lpb);
+    }
+
+    function deleteDetail(am_purchase_order_id, am_purchase_order_details_id) {
+        var indexToRemove = -1;
+        for (var i = 0; i < listData.result.length; i++) {
+            if (Number(listData.result[i].am_purchase_order_details_id) == Number(am_purchase_order_details_id) && Number(listData.result[i].am_purchase_order_id) == Number(am_purchase_order_id)) {
+                indexToRemove = i;
+                break;
+            }
+        }
+        if (indexToRemove !== -1) {
+            listData.result.splice(indexToRemove, 1);
+        }
+        drawTable(listData);
     }
 
     function changeStatus() {

@@ -2089,6 +2089,14 @@ $routes->get('/laporan-bea-cukai/laporan-wip', 'Laporan\BeaCukai\LaporanBeaCukai
 $routes->get('/laporan-bea-cukai/all-wip', 'Laporan\BeaCukai\LaporanBeaCukai::allWip', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-wip/print', 'Laporan\BeaCukai\LaporanBeaCukai::exportPDFLaporanWip', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-wip/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelLaporanWip', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/laporan-mutasi-bahan-baku-penolong', 'Laporan\BeaCukai\LaporanBeaCukai::laporanMutasiBahanBakuPenolong', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/laporan-mutasi-barang-jadi', 'Laporan\BeaCukai\LaporanBeaCukai::laporanMutasiBarangJadi');
+$routes->get('/laporan-bea-cukai/laporan-mutasi-barang-scrap', 'Laporan\BeaCukai\LaporanBeaCukai::laporanMutasiBarangScrap', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/laporan-mutasi-barang-modal', 'Laporan\BeaCukai\LaporanBeaCukai::laporanMutasiBarangModal', ['filter' => 'Auth']);
+
+$routes->get('/laporan-bea-cukai/laporan-mutasi/print', 'Laporan\BeaCukai\LaporanBeaCukai::exportPDFLaporanMutasi', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/laporan-mutasi/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelLaporanMutasi', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/all-mutasi-barang', 'Laporan\BeaCukai\LaporanBeaCukai::allMutasiBarang', ['filter' => 'Auth']);
 
 /*
  * --------------------------------------------------------------------
