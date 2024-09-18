@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name"><?= !empty($detail) ? "Update Pembayaran Invoice Lain Lain" : "Tambah Pembayaran Invoice Lain Lain" ?></h1>
+        <h1 class="title-name"><?= !empty($detail) ? "Update Pembayaran Return Lokal" : "Tambah Pembayaran Return Lokal" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-invoice"); ?>">
                 Kembali
@@ -54,10 +54,10 @@
                     <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-ekspor') ?>">Pembayaran Invoice Ekspor</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Pembayaran Invoice Lain Lain</a>
+                    <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-lain') ?>">Pembayaran Invoice Lain Lain</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-return') ?>">Pembayaran Return</a>
+                    <a class="nav-link active" href="#">Pembayaran Return</a>
                 </li>
             </ul>
 
@@ -68,7 +68,7 @@
             </div>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($detail) ? encrypt($detail['id']) : ""; ?>">
-                <input autocomplete="one-time-code" type="hidden" class="tipe_invoice" name="tipe_invoice" id="tipe_invoice" value="<?= !empty($detail) ? encrypt($detail['type_invoice']) : "LAIN-LAIN"; ?>">
+                <input autocomplete="one-time-code" type="hidden" class="tipe_invoice" name="tipe_invoice" id="tipe_invoice" value="<?= !empty($detail) ? encrypt($detail['type_invoice']) : "RETURN"; ?>">
 
                 <?= csrf_field() ?>
                 <div class="row">
@@ -103,7 +103,7 @@
                                 <option value=""></option>
                                 <?php if (!empty($dokumenList)): ?>
                                     <?php foreach ($dokumenList as $l): ?>
-                                        <option <?= (!empty($detail)) ?  (($detail['invoice_id']) == $l['id'] ? "selected" : "") : '' ?> value="<?= encrypt($l['id']); ?>"><?= $l['no_sales_order']; ?></option>
+                                        <option <?= (!empty($detail)) ?  (($detail['invoice_id']) == $l['id'] ? "selected" : "") : '' ?> value="<?= encrypt($l['id']); ?>"><?= $l['no_return']; ?></option>
                                     <?php endforeach; ?>
 
                                 <?php endif; ?>
@@ -702,7 +702,7 @@
         // const csrfToken = '<?= csrf_token() ?>';
         // const csrf = $(`[name="${csrfToken}"]`);
         $.ajax({
-            url: "<?= base_url("pembayaran-invoice/get-barang-sales-lain"); ?>",
+            url: "<?= base_url("pembayaran-invoice/get-barang-sales-return"); ?>",
             method: "GET",
             dataSrc: "data",
             data: {
@@ -758,9 +758,6 @@
                     $('input.total-bayar').attr('oninput', `limitInputBayar(this, ${limit_bayar})`);
 
                 });
-
-
-
             }
         })
     }

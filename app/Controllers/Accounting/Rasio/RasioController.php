@@ -647,9 +647,16 @@ class RasioController extends BaseController
 
             $kursValue = 1;
             // definisi untuk bahan digunakan
-            $poBBLokal = $this->rmPurchaseOrderModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID);
-            $poBBImport = $this->rmImportPOModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID);
+            $poBBLokal = $this->rmPurchaseOrderModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID, $this->this_company_id);
+            $poBBImport = $this->rmImportPOModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID, $this->this_company_id);
             $dataBahanDigunakanPO = array_merge($dataBahanDigunakanPO, $poBBLokal, $poBBImport);
+            // var_dump($poBBLokal);
+            // var_dump($poBBImport);
+            // var_dump($dataBahanDigunakanPO);
+
+            // var_dump($this->this_company_id);
+            // var_dump($divisiID);
+            // exit;
             $dataProduksiBahanDigunakan = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
             // awal fungsi untuk bahan digunakan
             foreach ($dataBahanDigunakanPO as &$value) {
@@ -676,10 +683,8 @@ class RasioController extends BaseController
                 $value->barang_name =  $value->barangName;
                 $value->spesifikasi =  $value->spekName;
 
-                // var_dump(explode(',', $poNo));
 
                 $parsePoNo = explode(',', $poNo);
-
                 $totalQty = 0;
                 $totalHarga = 0;
                 $hargaSatuan = 0;
@@ -687,13 +692,17 @@ class RasioController extends BaseController
                 foreach ($parsePoNo as $key => $valuePoNo) {
                     $penerimaanBarang = $this->penerimaanBarangModel
                         ->where("JSON_CONTAINS(multiple_po_no, '\"" . $valuePoNo . "\"')")
+                        ->where("company_id", $this->this_company_id)
                         ->first();
+
+                    // var_dump($penerimaanBarang);
 
                     if ($penerimaanBarang) {
                         $penerimaanBarangDetail = $this->penerimaanBarangDetailModel
                             ->select('penerimaan_barang_detail.*, SUM(penerimaan_barang_detail.harga) AS harga, SUM(penerimaan_barang_detail.harga_harian) AS harga_harian, SUM(penerimaan_barang_detail.harga_bulanan) AS harga_bulanan, SUM(penerimaan_barang_detail.qty) AS qty, satuans.kode_satuan')
                             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
                             ->where('penerimaan_barang_id', $penerimaanBarang['id'])
+                            ->where('penerimaan_barang_detail.deletedAt', null)
                             ->where('barang_id', $barang1_id)
                             ->where('spesifikasi_id', $barang2_id)
                             ->groupBy('barang_id, spesifikasi_id')
@@ -915,57 +924,6 @@ class RasioController extends BaseController
             // definisi Saldo Awal
             // awal fungsi untuk saldo Awal
             $dataBahanBakuDigunakanSaldoAwal = $this->stockTutupBukuModel->getStockTutupBukuWithAddCondition($conditionProduction);
-            // var_dump($dataBahanBakuDigunakanSaldoAwal);
-            // exit;
-            // $dataSaldoAwal = [];
-            // $dataStockAwalModel = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
-            //     "bahan_baku",
-            //     $divisiID
-            // );
-
-            // foreach ($dataStockAwalModel as $value) {
-            //     $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
-            //         $value['stock_id']
-            //     );
-            //     // var_dump($value);
-            //     $stock = $this->stockModel->find($value['stock_id']);
-            //     if ($stock['kemasan_id'] == 0) {
-            //         $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
-            //         $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
-            //         $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
-            //         $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
-            //     } else {
-            //         $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
-            //         $satuan = $this->satuanModel->find($kemasan['satuan_id']);
-            //         $barangName = $kemasan['name'];
-            //     }
-            //     for ($i = 0; $i < count($dataResult); $i++) {
-            //         $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
-
-            //         $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
-            //         $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
-            //         $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
-            //         $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
-            //         $dataResult[$i]['barang'] = strtoupper($barangName);
-            //         $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
-            //         $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-            //         $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
-            //         $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-            //         $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
-
-            //         $dataResult[$i]['stok_produksi'] = 0;
-
-            //         foreach ($dataBahanBakuDigunakanSaldoAwal as $valueProductionResultData) {
-            //             if ($valueProductionResultData['stock_id'] == $dataResult[$i]['stock_id']) {
-            //                 $dataResult[$i]['stok_produksi'] = $valueProductionResultData['qty'];
-            //                 break;
-            //             }
-            //         }
-            //     }
-            //     $dataSaldoAwal = array_merge($dataSaldoAwal, $dataResult);
-            // }
-            // exit;
-            // akhir fungsi untuk saldo Awal
 
             // definisi saldo akhir
             // awal fungsi untuk saldo akhir
@@ -1210,8 +1168,8 @@ class RasioController extends BaseController
                         $valueProductionResultIds = explode(',', $valueProduction['production_result_id']);
 
                         foreach ($valueProductionResultIds as $key => $valueProductionResultId) {
-                            if ($productionResultId == $valueProductionResultId) {
-                                $totalQtyAll += $value['qtyTotal'];
+                            if ($productionResultId == $valueProductionResultId && $value['barang1_id'] == $valueProduction['barang1_id']) {
+                                $totalQtyAll += $valueProduction['qtyTotal'];
                             }
                         }
                     }
@@ -1230,7 +1188,8 @@ class RasioController extends BaseController
             }
             // akhir fungsi untuk bahan jadi
 
-            // var_dump($dataProduksiBahanDigunakanKopek);
+            // var_dump($productionResultDataTitleJadi);
+            // exit;
 
 
             if ($dataProduksiBahanDigunakan) {
@@ -1345,8 +1304,8 @@ class RasioController extends BaseController
                 'kategori_id' => $this->request->getVar('kategori'),
             ];
             $kursValue = 1;
-            $poBBLokal = $this->rmPurchaseOrderModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID);
-            $poBBImport = $this->rmImportPOModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID);
+            $poBBLokal = $this->rmPurchaseOrderModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID, $this->this_company_id);
+            $poBBImport = $this->rmImportPOModel->getPOBBCondition($divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID, $this->this_company_id);
 
             $dataResultPO = array_merge($dataResultPO, $poBBLokal, $poBBImport);
             $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);

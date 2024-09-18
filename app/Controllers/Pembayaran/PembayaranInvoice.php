@@ -19,6 +19,8 @@ use App\Models\SalesOrderLainDetailModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SalesOrderExportDetailModel;
 use App\Models\MetadataModel;
+use App\Models\SalesOrderReturnDetailModel;
+use App\Models\SalesOrderReturnModel;
 use Exception;
 
 class PembayaranInvoice extends BaseController
@@ -37,6 +39,8 @@ class PembayaranInvoice extends BaseController
     protected $salesOrderExportDetailModel;
     protected $salesOrderInvoiceModel;
     protected $salesOrderInvoiceDetailModel;
+    protected $salesOrderReturnModel;
+    protected $salesOrderReturnDetailModel;
     protected $metaDataModel;
 
 
@@ -57,6 +61,8 @@ class PembayaranInvoice extends BaseController
         $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
         $this->salesOrderInvoiceModel = new SalesOrderInvoiceModel();
         $this->salesOrderInvoiceDetailModel = new SalesOrderInvoiceDetailModel();
+        $this->salesOrderReturnModel = new SalesOrderReturnModel();
+        $this->salesOrderReturnDetailModel = new SalesOrderReturnDetailModel();
         $this->metaDataModel = new MetadataModel();
     }
 
@@ -111,6 +117,30 @@ class PembayaranInvoice extends BaseController
             "detail" => ""
         ];
         return view('Pembayaran/pembayaranInvoice/formLain', $data);
+    }
+
+    public function createPembayaranInvoiceReturn()
+    {
+        $subAkunsModel = $this->Sub_AkunsModel->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+        $dokumenList = [];
+        $customers = $this->customerModel->getCustomerLokal($this->user_id, $this->this_company_id);
+        $divisi = $this->divisiModel->getDivisiAccess();
+        $salesOrderReturnData = $this->salesOrderReturnModel->where('deletedAt', null)->where('id_company', $this->this_company_id)->findAll();
+        foreach ($salesOrderReturnData as $s) {
+            array_push($dokumenList, $s);
+        }
+
+        $data = [
+            "customers" => $customers,
+            "divisi" => $divisi,
+            "subsAkuns" => $subAkunsModel,
+            "dokumenList" => $dokumenList,
+            "detail" => ""
+        ];
+        return view('Pembayaran/pembayaranInvoice/formReturn', $data);
     }
 
     public function createPembayaranInvoiceLokal()
@@ -356,6 +386,27 @@ class PembayaranInvoice extends BaseController
             ->where('sales_order_lain_detail.sales_order_lain_id', $id)
             ->findAll();
         foreach ($salesOrderLainDetailData as $s) {
+            array_push($dataBarang, $s);
+        }
+
+        return response()->setJSON([
+            'data' => $dataBarang,
+            'status' => true
+        ]);
+    }
+
+    public function getBarangSalesReturn()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $dataBarang = [];
+        $salesOrderReturnDetailData = $this->salesOrderReturnDetailModel
+            ->select('kode_barang, barang_name, qty_konversi, harga_satuan, total_harga')
+            ->join('stock', 'stock.id = sales_order_lain_detail.stock_id')
+            ->join('barang_master', 'barang_master.id = stock.barang1_id')
+            ->where('sales_order_lain_detail.deletedAt', null)
+            ->where('sales_order_lain_detail.sales_order_lain_id', $id)
+            ->findAll();
+        foreach ($salesOrderReturnDetailData as $s) {
             array_push($dataBarang, $s);
         }
 
@@ -618,6 +669,13 @@ class PembayaranInvoice extends BaseController
                 ->where('sales_order_lain.id', $invoice_id)
                 ->first();
             $customer = $salesOrderLainData['name'];
+        } elseif ($tipe_invoice == "RETURN") {
+            $salesOrderReturnData = $this->salesOrderReturnModel
+                ->join('sales_order_invoice', 'sales_order_invoice.id = sales_order_return.id_invoice')
+                ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+                ->where('sales_order_return.id', $invoice_id)
+                ->first();
+            $customer = $salesOrderReturnData['name'];
         }
 
         return json_encode($customer);
