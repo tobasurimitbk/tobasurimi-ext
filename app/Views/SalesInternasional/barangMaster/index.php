@@ -510,7 +510,10 @@
         allowClear: true,
         dropdownParent: $(".add-modal .modal-content")
     }).change(function() {
-        generateNewCode();
+        let value = document.getElementById('generate_new_code').checked ? true : false;
+        if (value) {
+            generateNewCode();
+        }
     });
 
 
