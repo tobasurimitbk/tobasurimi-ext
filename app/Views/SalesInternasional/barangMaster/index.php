@@ -68,8 +68,8 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select type_barang" name="type_barang" id="type_barang">
                                     <option value="">Pilih Tipe Barang</option>
-                                    <option value="bahan_jadi">Bahan Jadi</option>
-                                    <option value="kemasan">Kemasan</option>
+                                    <option value="bahan_jadi">BARANG JADI</option>
+                                    <option value="kemasan">KEMASAN</option>
 
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
