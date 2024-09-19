@@ -119,6 +119,7 @@ class SupplierHargaModel extends Model
     public function getSupplierHarga($supplier_id, $bahan_baku_id)
     {
         $satuanModel = new SatuansModel();
+        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
 
         $condition = [
             'supplier_harga.deletedAt' => null,
@@ -151,6 +152,20 @@ class SupplierHargaModel extends Model
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.satuan_1 = satuans.id')
                 ->where('barang_master_spesifikasi.id', $result[0]['spesifikasi_id'])
                 ->first();
+
+            $poLast = $rmPurchaseOrderDetailModel
+                ->select('rm_purchase_order_details.*')
+                ->join('rm_purchase_orders', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id')
+                ->where('rm_purchase_orders.supplier_id', $supplier_id)
+                ->where('rm_purchase_order_details.barang2_id', $result[$i]['spesifikasi_id'])
+                ->orderBy('rm_purchase_orders.createdAt', "DESC")
+                ->first();
+
+            if ($poLast != null) {
+                $result[$i]['harga_umum'] = $poLast['general_price'];
+                $result[$i]['harga_harian'] = $poLast['daily_price'];
+                $result[$i]['harga_bulanan'] = $poLast['monthly_price'];
+            }
 
             $result[$i]['nama_barang'] = $result[$i]['barang_name'] . " " . $result[$i]['spesifikasi'];
             $result[$i]['satuan_id'] = ($spesifikaiDetail != null) ? $spesifikaiDetail['id'] : '';
