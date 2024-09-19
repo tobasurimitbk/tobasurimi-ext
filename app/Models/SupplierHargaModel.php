@@ -157,7 +157,7 @@ class SupplierHargaModel extends Model
                 ->select('rm_purchase_order_details.*')
                 ->join('rm_purchase_orders', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id')
                 ->where('rm_purchase_orders.supplier_id', $supplier_id)
-                ->where('rm_purchase_orders.barang_id', $bahan_baku_id)
+                ->where('rm_purchase_order_details.barang2_id', $result[$i]['spesifikasi_id'])
                 ->orderBy('rm_purchase_orders.createdAt', "DESC")
                 ->first();
 
