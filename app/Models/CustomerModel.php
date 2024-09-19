@@ -17,6 +17,7 @@ class CustomerModel extends Model
     protected $allowedFields = [
         'id',
         'company_id',
+        'user_id',
         'kode',
         'name',
         'address',
