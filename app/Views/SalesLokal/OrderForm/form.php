@@ -883,11 +883,13 @@
             const tipePelanggan = $(this).find(':selected').data('tipepelanggan') ? $(this).find(':selected').data('tipepelanggan') : "";
             const jenis_penjualan = $(this).find(':selected').data('jenis_penjualan') ? $(this).find(':selected').data('jenis_penjualan') : "";
 
+            console.log(decodeURIComponent(salesName));
+
             $('#customerphone').val(decodeURIComponent(customerPhone));
             $('#tagihan_ke').val(decodeURIComponent(customerAddress));
             $('#termin').val(decodeURIComponent(termin)).change();
 
-            $('#sales_name').val(decodeURIComponent(salesName));
+            $('#id_sales').val(decodeURIComponent(salesName)).trigger('change');
             $('#hidden_tipe_pelanggan').val(decodeURIComponent(tipePelanggan)).change();
             $('#jenis_penjualan').val(decodeURIComponent(jenis_penjualan)).change();
         });
@@ -1027,18 +1029,22 @@
             if (isi == 1) {
                 $('.id_sales').prop('disabled', false);
                 $('.nama_ecommerce').prop('readonly', true);
+                $('.nama_ecommerce').val('');
             } else if (isi == 2) {
                 $('.id_sales').prop('disabled', true);
                 $('.nama_ecommerce').prop('readonly', true);
+                $('.id_sales').val('').change();
+                $('.nama_ecommerce').val('');
             } else if (isi == 3) {
                 $('.id_sales').prop('disabled', true);
                 $('.nama_ecommerce').prop('readonly', false);
+                $('.id_sales').val('').change();
             } else {
                 $('.id_sales').prop('disabled', true);
                 $('.nama_ecommerce').prop('readonly', true);
+                $('.id_sales').val('').change();
+                $('.nama_ecommerce').val('');
             }
-            $('.id_sales').val('').change();
-            $('.nama_ecommerce').val('');
         });
 
         //CSS SELECT2 FLOATING LABEL

@@ -220,7 +220,7 @@ class CustomerModel extends Model
     public function getCustomerLokal($user_id, $companyID)
     {
         return $this->asArray()
-            ->select('customers.*, CONCAT(employees.nip , " - ", employees.name) AS salesName')
+            ->select('customers.*, customers.sales_id AS salesName')
             ->join('employees', 'employees.id = customers.sales_id', 'left')
             ->where('customers.deletedAt', null)
             ->where('customers.tipe_customer', 'LOKAL')

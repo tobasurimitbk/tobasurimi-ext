@@ -457,7 +457,7 @@ class OrderForm extends BaseController
         }
 
         $customers = $this->CustomerModel
-            ->select('customers.*, CONCAT(employees.nip , " - ", employees.name) AS salesName, metadata.value AS termin')
+            ->select('customers.*, customers.sales_id AS salesName, metadata.value AS termin')
             ->join('employees', 'employees.id = customers.sales_id', 'left')
             ->join('metadata', 'metadata.id = customers.termin', 'left')
             ->findAll();
