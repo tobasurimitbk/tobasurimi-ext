@@ -131,15 +131,19 @@
                     <div><span class="txt-bold">Tanggal : <?= $dataPenerimaanBarang->tanggal ? date("d/m/Y", strtotime($dataPenerimaanBarang->tanggal)) : ""; ?></span></div>
                 </td>
                 <td>
-                    <div><span class="txt-bold">Ket. Kemasan : <?= $dataPenerimaanBarang->kemasan; ?></span></div>
+                    <div><span class="txt-bold">Departemen : <?= $dataPenerimaanBarang->divisi ?></span></div>
                 </td>
+
                 <td class="txt-right">
                     <div><span class="txt-bold">Gudang: <?= $dataPenerimaanBarang->warehouse_name; ?></span></div>
                 </td>
             </tr>
             <tr>
-                <td>
+                <!-- <td>
                     <div><span class="txt-bold">Dokumen : <?= ($dataPenerimaanBarang->bc_type == '0') ? "Non Pabean - 0" : $dataPenerimaanBarang->bc_type ?></span></div>
+                </td> -->
+                <td>
+                    <div><span class="txt-bold">Ket. Kemasan : <?= $dataPenerimaanBarang->kemasan; ?></span></div>
                 </td>
             </tr>
         </table>

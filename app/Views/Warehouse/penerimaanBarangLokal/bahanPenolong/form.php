@@ -215,7 +215,7 @@
                                 <th style="text-align: center;">Kode Barang</th>
                                 <th style="text-align: center;">Nama Barang</th>
                                 <th style="text-align: center;">No SPP</th>
-                                <th style="text-align: center;">No PO</th>
+                                <!-- <th style="text-align: center;">No PO</th> -->
                                 <th style="text-align: center;">Satuan</th>
                                 <th style="text-align: center;">Jml. Order</th>
                                 <th style="text-align: center;">Jml. Diterima LPB ini</th>
@@ -234,7 +234,7 @@
                             <tr>
                                 <td></td>
                                 <td></td>
-                                <td colspan="4" style="text-align: right;">GRAND TOTAL</td>
+                                <td colspan="3" style="text-align: right;">GRAND TOTAL</td>
                                 <td style="text-align: center;"><b>0.00</b></td>
                                 <td style="text-align: center;"><b>0.00</b></td>
                                 <td style="text-align: center;"><b>0.00</b></td>
@@ -906,7 +906,7 @@
             var newRow = $('<tr>');
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
-            newRow.append($('<td style="text-align:right;" colspan="4"><b>GRAND TOTAL</b></td>'));
+            newRow.append($('<td style="text-align:right;" colspan="3"><b>GRAND TOTAL</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
@@ -930,7 +930,7 @@
                 newRow.append($('<td>').text(v.kode_barang));
                 newRow.append($('<td>').text(v.nama_barang));
                 newRow.append($('<td>').text(v.spp_no));
-                newRow.append($('<td>').text(v.po_no));
+                // newRow.append($('<td>').text(v.po_no));
                 newRow.append($('<td>').text(v.satuan));
                 newRow.append($('<td>').text(v.jml_order));
                 newRow.append($('<td>').text(v.jml_diterima_lpb));
@@ -969,7 +969,7 @@
             var newRow = $('<tr>');
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
-            newRow.append($('<td style="text-align:right;" colspan="4"><b>GRAND TOTAL</b></td>'));
+            newRow.append($('<td style="text-align:right;" colspan="3"><b>GRAND TOTAL</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + jmlOrderTotal.toFixed(2) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaLPBTotal.toFixed(2) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaTotal.toFixed(2) + '</b></td>'));

@@ -747,11 +747,11 @@ class BeaCukaiApi
             ];
 
             $entitasArr[] = [
-                'alamatEntitas' => $b['alamat_entitas'],
+                'alamatEntitas' => $b['alamat_pemasok'],
                 'kodeEntitas' => '7',
                 'kodeJenisApi' => '2',
                 'kodeJenisEntitas' => $b['kode_jenis_entitas'],
-                'namaEntitas' => $b['alamat_pemasok'],
+                'namaEntitas' => $b['nama_pemasok'],
                 'nibEntitas' => $b['nib_entitas'],
                 'nomorIdentitas' => $b['npwp_pemasok'],
                 'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
