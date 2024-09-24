@@ -142,6 +142,7 @@ class PembayaranInvoiceModel extends Model
         $salesOrderInvoiceModel = new SalesOrderInvoiceModel();
         $salesOrderExportModel = new SalesOrderExportModel();
         $salesOrderLainModel = new SalesOrderLainModel();
+        $salesOrderReturnModel = new SalesOrderReturnModel();
 
         $customer_name = "";
 
@@ -175,9 +176,15 @@ class PembayaranInvoiceModel extends Model
                 ->where('sales_order_lain.id', $detail['invoice_id'])
                 ->first();
             $detail['customer_name'] = $namaCustomer['name'];
+        } elseif ($detail['type_invoice'] == "RETURN") {
+            $namaCustomer = $salesOrderReturnModel
+                ->select("name")
+                ->join('sales_order_invoice', 'sales_order_invoice.id = sales_order_return.id_invoice')
+                ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+                ->where('sales_order_return.id', $detail['invoice_id'])
+                ->first();
+            $detail['customer_name'] = $namaCustomer['name'];
         }
-
-
         return $detail;
     }
 }

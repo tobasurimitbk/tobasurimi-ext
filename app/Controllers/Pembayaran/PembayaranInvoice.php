@@ -66,7 +66,6 @@ class PembayaranInvoice extends BaseController
         $this->metaDataModel = new MetadataModel();
     }
 
-
     public function index()
     {
         return view('Pembayaran/pembayaranInvoice/index');
@@ -169,7 +168,10 @@ class PembayaranInvoice extends BaseController
         $dokumenList = [];
         $customers = $this->customerModel->getCustomerLokal($this->user_id, $this->this_company_id);
         $divisi = $this->divisiModel->getDivisiAccess();
-        $salesOrderReturnData = $this->salesOrderReturnModel->where('deletedAt', null)->where('id_company', $this->this_company_id)->findAll();
+        $salesOrderReturnData = $this->salesOrderReturnModel
+            ->where('deletedAt', null)
+            ->where('id_company', $this->this_company_id)
+            ->findAll();
         foreach ($salesOrderReturnData as $s) {
             array_push($dokumenList, $s);
         }
@@ -425,8 +427,6 @@ class PembayaranInvoice extends BaseController
                 'status' => false
             ];
         }
-
-
         return response()->setJSON($data);
     }
 
@@ -521,21 +521,44 @@ class PembayaranInvoice extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $dataBarang = [];
+        $totalPembayaran = 0;
+        $totalAmountInvoice = 0;
         $salesOrderReturnDetailData = $this->salesOrderReturnDetailModel
-            ->select('kode_barang, barang_name, qty_konversi, harga_satuan, total_harga')
-            ->join('stock', 'stock.id = sales_order_lain_detail.stock_id')
-            ->join('barang_master', 'barang_master.id = stock.barang1_id')
-            ->where('sales_order_lain_detail.deletedAt', null)
-            ->where('sales_order_lain_detail.sales_order_lain_id', $id)
+            ->select('kode_barang, barang_name, qty_return AS qty_konversi, harga_barang_return AS harga_satuan, amount_return AS total_harga')
+            // ->join('stock', 'stock.id = sales_order_return_detail.stock_id')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_return_detail.id_barang_return')
+            ->where('sales_order_return_detail.deletedAt', null)
+            ->where('sales_order_return_detail.id_sales_order_return', $id)
             ->findAll();
         foreach ($salesOrderReturnDetailData as $s) {
             array_push($dataBarang, $s);
         }
+        $pembayaranInvoiceData = $this->pembayaranInvoiceModel
+            ->where('pembayaran_invoice.company_id', $this->this_company_id)
+            ->where('pembayaran_invoice.invoice_id', $id)
+            ->where('pembayaran_invoice.deletedAt', null)
+            ->where('pembayaran_invoice.type_invoice', "RETURN")
+            ->findAll();
+        foreach ($pembayaranInvoiceData as $s) {
+            $totalPembayaran += $s['total_bayar'];
+        }
 
-        return response()->setJSON([
-            'data' => $dataBarang,
-            'status' => true
-        ]);
+        if ($totalAmountInvoice >= $totalPembayaran) {
+            $data = [
+                'data' => $dataBarang,
+                'totalPembayaran' => $totalPembayaran,
+                'status' => true
+            ];
+        } else {
+            $data = [
+                'data' => [],
+                'totalPembayaran' => $totalPembayaran,
+                'status' => false
+            ];
+        }
+
+
+        return response()->setJSON($data);
     }
 
     public function saveLokalInvoice()
@@ -634,6 +657,31 @@ class PembayaranInvoice extends BaseController
                     'id' => encrypt($id),
                     'status' => true,
                     'message' => "Pembayaran Invoice Ekspor berhasil disimpan",
+                    'token' => csrf_hash()
+                ]);
+            } elseif ($tipe_invoice == "RETURN") {
+                $id = $this->pembayaranInvoiceModel->insert([
+                    'company_id' => $this->this_company_id,
+                    'user_id' => $this->user_id,
+                    'payment_method' => $this->request->getVar('payment_methods'),
+                    'invoice_id' => decrypt($this->request->getVar('no_dokumen')),
+                    'valas_id' => $this->request->getVar('valas'),
+                    'no_pembayaran' => $this->request->getVar('no_bukti_pembayaran'),
+                    'keterangan' =>  $this->request->getVar('keterangan'),
+                    'type_invoice' => "RETURN",
+                    'tanggal' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
+                    'total_invoice' => repairDouble($this->request->getVar('total_amount_invoice')),
+                    'potongan' => $this->request->getVar('potongan') ? repairDouble($this->request->getVar('potongan')) : 0,
+                    'total_bayar' => repairDouble($this->request->getVar('total_bayar')),
+                    'akun_kas' => $this->request->getVar('akun_kas'),
+                    'akun_selisih' => $this->request->getVar('akun_selisih'),
+                    'status_posting' => '0'
+                ]);
+
+                return response()->setJSON([
+                    'id' => encrypt($id),
+                    'status' => true,
+                    'message' => "Pembayaran Invoice Return berhasil disimpan",
                     'token' => csrf_hash()
                 ]);
             }
@@ -762,6 +810,24 @@ class PembayaranInvoice extends BaseController
             ];
 
             return view('Pembayaran/pembayaranInvoice/formLain', $data);
+        } elseif ($tipe_invoice == "RETURN") {
+
+            $salesOrderReturnData = $this->salesOrderReturnModel
+                ->where('deletedAt', null)
+                ->where('id_company', $this->this_company_id)
+                ->findAll();
+            foreach ($salesOrderReturnData as $s) {
+                array_push($dokumenList, $s);
+            }
+            $data = [
+                "customers" => $customers,
+                "divisi" => $divisi,
+                "subsAkuns" => $subAkunsModel,
+                "dokumenList" => $dokumenList,
+                "detail" => $this->pembayaranInvoiceModel->getPembayaranInvoiceDetail($id),
+            ];
+
+            return view('Pembayaran/pembayaranInvoice/formReturn', $data);
         }
     }
 

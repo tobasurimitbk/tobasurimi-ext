@@ -735,7 +735,7 @@
                 total_invoice = res.totalPembayaran;
                 var newRow1 = $('<tr style="color:whitesmoke;">');
                 newRow1.append($('<td colspan="4" style="text-align: right;">').text("Total Sudah Dibayar"));
-                newRow1.append($('<td class="total_amount_invoice" style="text-align:center;">').text(formatRupiah(total_invoice)));
+                newRow1.append($('<td class="total_dibayar" style="text-align:center;">').text(formatRupiah(total_invoice)));
                 table.find('tbody').append(newRow1);
 
                 var newRow2 = $('<tr style="color:whitesmoke;">');
