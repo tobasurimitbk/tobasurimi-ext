@@ -744,6 +744,7 @@
                 const table = $('#dataTable');
                 table.find('tbody').empty();
                 var total_amount = 0;
+                var total_invoice = 0;
                 var limit_bayar = 0;
                 $.each(res.data, function(index, item) {
                     var newRow = $('<tr style="color:whitesmoke;">');
@@ -755,15 +756,23 @@
                     table.find('tbody').append(newRow);
                     total_amount += parseFloat(item.total_harga_barang);
                 });
+                total_invoice = res.totalPembayaran;
+                var newRow1 = $('<tr style="color:whitesmoke;">');
+                newRow1.append($('<td colspan="4" style="text-align: right;">').text("Total Sudah Dibayar"));
+                newRow1.append($('<td class="total_amount_invoice" style="text-align:center;">').text(formatRupiah(total_invoice)));
+                table.find('tbody').append(newRow1);
+
                 var newRow2 = $('<tr style="color:whitesmoke;">');
                 newRow2.append($('<td colspan="4" style="text-align: right;">').text("Total Amount Invoice"));
                 newRow2.append($('<td class="total_amount_invoice" style="text-align:center;">').text(formatRupiah(total_amount)));
                 table.find('tbody').append(newRow2);
 
+                limit_bayar = parseFloat(total_amount) - parseFloat(total_invoice);
+
                 var newRow3 = $('<tr style="color:whitesmoke;">');
                 newRow3.append($('<td colspan="4" style="text-align: right;">').text("Potongan"));
                 newRow3.append($('<td style="text-align:center;"><b>' +
-                    `<input autocomplete="one-time-code" data-id="" <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = formatRupiah(this.value)" class="form-control potongan trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['potongan'])  : '' ?>" name="potongan" oninput="limitInputBayar(this, ${total_amount})">` +
+                    `<input autocomplete="one-time-code" data-id="" <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = formatRupiah(this.value)" class="form-control potongan trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['potongan'])  : '' ?>" name="potongan" oninput="limitInputBayar(this, ${limit_bayar})">` +
                     '</b></td>'));
                 table.find('tbody').append(newRow3);
 
@@ -774,16 +783,16 @@
                     '</b></td>'));
                 table.find('tbody').append(newRow4);
 
-                $(document).on("input", ".total-bayar", function() {
+                $(document).on("input", ".total-bayar, .potongan", function() {
                     var potongan = $('.potongan').val() ? convertRupiahToNumber($('.potongan').val()) : 0;
-                    limit_bayar = parseFloat(total_amount) - parseFloat(potongan);
+                    limit_bayar = parseFloat(total_amount) - parseFloat(total_invoice) - parseFloat(potongan);
 
                     $('input.total-bayar').attr('oninput', `limitInputBayar(this, ${limit_bayar})`);
 
+                    if ($('.potongan').val() != "" || $('.potongan').val() != 0) {
+                        $('.total-bayar').val(limit_bayar).change()
+                    }
                 });
-
-
-
             }
         })
     }

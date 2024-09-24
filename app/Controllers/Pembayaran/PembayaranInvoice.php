@@ -81,9 +81,28 @@ class PembayaranInvoice extends BaseController
         $dokumenList = [];
         $customers = $this->customerModel->getCustomerLokal($this->user_id, $this->this_company_id);
         $divisi = $this->divisiModel->getDivisiAccess();
-        $salesOrderExportData = $this->salesOrderExportModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll();
+        $salesOrderExportData = $this->salesOrderExportModel
+            ->select('sales_order_export.*, SUM(sales_order_detail_export.total_harga_barang) AS total_invoice')
+            ->join('sales_order_detail_export', 'sales_order_detail_export.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
+            ->where('sales_order_export.deletedAt', null)
+            ->where('sales_order_detail_export.deletedAt', null)
+            ->where('sales_order_export.company_id', $this->this_company_id)
+            ->groupBy('sales_order_detail_export.sales_order_export_id')
+            ->findAll();
         foreach ($salesOrderExportData as $s) {
-            array_push($dokumenList, $s);
+            $totalPembayaran = 0;
+            $pembayaranInvoiceData = $this->pembayaranInvoiceModel
+                ->where('pembayaran_invoice.company_id', $this->this_company_id)
+                ->where('pembayaran_invoice.invoice_id', $s['sales_order_export_id'])
+                ->where('pembayaran_invoice.deletedAt', null)
+                ->where('pembayaran_invoice.type_invoice', "EKSPOR")
+                ->findAll();
+            foreach ($pembayaranInvoiceData as $ss) {
+                $totalPembayaran += $ss['total_bayar'];
+            }
+            if (floatval($s['total_invoice']) > floatval($totalPembayaran)) {
+                array_push($dokumenList, $s);
+            }
         }
         $data = [
             "customers" => $customers,
@@ -104,10 +123,32 @@ class PembayaranInvoice extends BaseController
         $dokumenList = [];
         $customers = $this->customerModel->getCustomerLokal($this->user_id, $this->this_company_id);
         $divisi = $this->divisiModel->getDivisiAccess();
-        $salesOrderLainData = $this->salesOrderLainModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll();
+        $salesOrderLainData = $this->salesOrderLainModel
+            ->select('sales_order_lain.*, SUM(sales_order_lain_detail.total_harga) AS total_invoice')
+            ->join('sales_order_lain_detail', 'sales_order_lain_detail.sales_order_lain_id = sales_order_lain.id', 'left')
+            ->where('sales_order_lain.deletedAt', null)
+            ->where('sales_order_lain_detail.deletedAt', null)
+            ->where('sales_order_lain.company_id', $this->this_company_id)
+            ->groupBy('sales_order_lain_detail.sales_order_lain_id')
+            ->findAll();
         foreach ($salesOrderLainData as $s) {
-            array_push($dokumenList, $s);
+            $totalPembayaran = 0;
+            $pembayaranInvoiceData = $this->pembayaranInvoiceModel
+                ->where('pembayaran_invoice.company_id', $this->this_company_id)
+                ->where('pembayaran_invoice.invoice_id', $s['id'])
+                ->where('pembayaran_invoice.deletedAt', null)
+                ->where('pembayaran_invoice.type_invoice', "LAIN-LAIN")
+                ->findAll();
+            foreach ($pembayaranInvoiceData as $ss) {
+                $totalPembayaran += floatval($ss['total_bayar']);
+            }
+            // var_dump(floatval($s['total_invoice']));
+            // var_dump(floatval($totalPembayaran));
+            if (floatval($s['total_invoice']) > floatval($totalPembayaran)) {
+                array_push($dokumenList, $s);
+            }
         }
+        // exit;
 
         $data = [
             "customers" => $customers,
@@ -154,8 +195,19 @@ class PembayaranInvoice extends BaseController
         $divisi = $this->divisiModel->getDivisiAccess();
         $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel->where('deletedAt', null)->where('id_company', $this->this_company_id)->findAll();
         foreach ($salesOrderLokalInvoiceData as $s) {
-            // $s['no_faktur'] = str_replace(['[', ']', '"'], '', $s['no_faktur']);
-            array_push($dokumenList, $s);
+            $totalPembayaran = 0;
+            $pembayaranInvoiceData = $this->pembayaranInvoiceModel
+                ->where('pembayaran_invoice.company_id', $this->this_company_id)
+                ->where('pembayaran_invoice.invoice_id', $s['id'])
+                ->where('pembayaran_invoice.deletedAt', null)
+                ->where('pembayaran_invoice.type_invoice', "LOKAL")
+                ->findAll();
+            foreach ($pembayaranInvoiceData as $ss) {
+                $totalPembayaran += $ss['total_bayar'];
+            }
+            if (floatval($s['total_invoice']) > floatval($totalPembayaran)) {
+                array_push($dokumenList, $s);
+            }
         }
 
         $data = [
@@ -337,6 +389,8 @@ class PembayaranInvoice extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $dataBarang = [];
+        $totalPembayaran = 0;
+        $totalAmountInvoice = 0;
         $salesOrderInvoiceData = $this->salesOrderInvoiceModel->where('id', $id)->first();
         $salesOrderInvoiceDetailData = $this->salesOrderInvoiceDetailModel
             ->select('qty_invoice, harga_barang_invoice, qty_invoice, amount_invoice, kode_barang, barang_name')
@@ -345,19 +399,43 @@ class PembayaranInvoice extends BaseController
             ->where('sales_order_invoice_detail.deletedAt', null)
             ->findAll();
         foreach ($salesOrderInvoiceDetailData as $s) {
+            $totalAmountInvoice += $s['amount_invoice'];
             array_push($dataBarang, $s);
         }
+        $pembayaranInvoiceData = $this->pembayaranInvoiceModel
+            ->where('pembayaran_invoice.company_id', $this->this_company_id)
+            ->where('pembayaran_invoice.invoice_id', $id)
+            ->where('pembayaran_invoice.deletedAt', null)
+            ->where('pembayaran_invoice.type_invoice', "LOKAL")
+            ->findAll();
+        foreach ($pembayaranInvoiceData as $s) {
+            $totalPembayaran += $s['total_bayar'];
+        }
 
-        return response()->setJSON([
-            'data' => $dataBarang,
-            'status' => true
-        ]);
+        if ($totalAmountInvoice >= $totalPembayaran) {
+            $data = [
+                'data' => $dataBarang,
+                'totalPembayaran' => $totalPembayaran,
+                'status' => true
+            ];
+        } else {
+            $data = [
+                'data' => [],
+                'totalPembayaran' => $totalPembayaran,
+                'status' => false
+            ];
+        }
+
+
+        return response()->setJSON($data);
     }
 
     public function getBarangSalesEkspor()
     {
         $id = decrypt($this->request->getVar('id'));
         $dataBarang = [];
+        $totalPembayaran = 0;
+        $totalAmountInvoice = 0;
         $salesOrderInvoiceData = $this->salesOrderInvoiceModel->where('id', $id)->first();
         $salesOrderExportDetailData = $this->salesOrderExportDetailModel
             ->select('harga_barang, qty, total_harga_barang, barang_kode, barang_name')
@@ -365,19 +443,41 @@ class PembayaranInvoice extends BaseController
             ->where('sales_order_detail_export.deletedAt', null)
             ->findAll();
         foreach ($salesOrderExportDetailData as $s) {
+            $totalAmountInvoice += $s['total_harga_barang'];
             array_push($dataBarang, $s);
         }
+        $pembayaranInvoiceData = $this->pembayaranInvoiceModel
+            ->where('pembayaran_invoice.company_id', $this->this_company_id)
+            ->where('pembayaran_invoice.invoice_id', $id)
+            ->where('pembayaran_invoice.deletedAt', null)
+            ->where('pembayaran_invoice.type_invoice', "EKSPOR")
+            ->findAll();
+        foreach ($pembayaranInvoiceData as $s) {
+            $totalPembayaran += $s['total_bayar'];
+        }
 
-        return response()->setJSON([
-            'data' => $dataBarang,
-            'status' => true
-        ]);
+        if ($totalAmountInvoice >= $totalPembayaran) {
+            $data = [
+                'data' => $dataBarang,
+                'totalPembayaran' => $totalPembayaran,
+                'status' => true
+            ];
+        } else {
+            $data = [
+                'data' => [],
+                'totalPembayaran' => $totalPembayaran,
+                'status' => false
+            ];
+        }
+        return response()->setJSON($data);
     }
 
     public function getBarangSalesLain()
     {
         $id = decrypt($this->request->getVar('id'));
         $dataBarang = [];
+        $totalPembayaran = 0;
+        $totalAmountInvoice = 0;
         $salesOrderLainDetailData = $this->salesOrderLainDetailModel
             ->select('kode_barang, barang_name, qty_konversi, harga_satuan, total_harga')
             ->join('stock', 'stock.id = sales_order_lain_detail.stock_id')
@@ -386,13 +486,35 @@ class PembayaranInvoice extends BaseController
             ->where('sales_order_lain_detail.sales_order_lain_id', $id)
             ->findAll();
         foreach ($salesOrderLainDetailData as $s) {
+            $totalAmountInvoice += $s['total_harga'];
             array_push($dataBarang, $s);
         }
+        $pembayaranInvoiceData = $this->pembayaranInvoiceModel
+            ->where('pembayaran_invoice.company_id', $this->this_company_id)
+            ->where('pembayaran_invoice.invoice_id', $id)
+            ->where('pembayaran_invoice.deletedAt', null)
+            ->where('pembayaran_invoice.type_invoice', "LAIN-LAIN")
+            ->findAll();
+        foreach ($pembayaranInvoiceData as $s) {
+            $totalPembayaran += $s['total_bayar'];
+        }
 
-        return response()->setJSON([
-            'data' => $dataBarang,
-            'status' => true
-        ]);
+        if ($totalAmountInvoice >= $totalPembayaran) {
+            $data = [
+                'data' => $dataBarang,
+                'totalPembayaran' => $totalPembayaran,
+                'status' => true
+            ];
+        } else {
+            $data = [
+                'data' => [],
+                'totalPembayaran' => $totalPembayaran,
+                'status' => false
+            ];
+        }
+
+
+        return response()->setJSON($data);
     }
 
     public function getBarangSalesReturn()
