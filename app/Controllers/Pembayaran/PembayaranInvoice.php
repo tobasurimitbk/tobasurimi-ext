@@ -279,7 +279,7 @@ class PembayaranInvoice extends BaseController
         $typeInvoice = [];
         $type = $this->request->getGet('type_invoice');
         if ($type == "ALL") {
-            $typeInvoice = ['EKSPOR', 'LOKAL', 'LAIN-LAIN'];
+            $typeInvoice = ['EKSPOR', 'LOKAL', 'LAIN-LAIN', 'RETURN'];
         } else {
             $typeInvoice = [$type];
         }
@@ -331,6 +331,14 @@ class PembayaranInvoice extends BaseController
                     ->first();
                 $nomor_invoice = $salesOrderLainData['no_sales_order'];
                 $customer_name = $salesOrderLainData['name'];
+            } elseif ($p['type_invoice'] == "RETURN") {
+                $salesOrderReturnData = $this->salesOrderReturnModel
+                    ->join('sales_order_invoice', 'sales_order_invoice.id = sales_order_return.id_invoice')
+                    ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+                    ->where('sales_order_return.id', $p['invoice_id'])
+                    ->first();
+                $nomor_invoice = $salesOrderReturnData['no_return'];
+                $customer_name = $salesOrderReturnData['name'];
             }
 
             array_push($dataPembayaran, [
@@ -414,19 +422,19 @@ class PembayaranInvoice extends BaseController
             $totalPembayaran += $s['total_bayar'];
         }
 
-        if ($totalAmountInvoice >= $totalPembayaran) {
-            $data = [
-                'data' => $dataBarang,
-                'totalPembayaran' => $totalPembayaran,
-                'status' => true
-            ];
-        } else {
-            $data = [
-                'data' => [],
-                'totalPembayaran' => $totalPembayaran,
-                'status' => false
-            ];
-        }
+        // if ($totalAmountInvoice >= $totalPembayaran) {
+        $data = [
+            'data' => $dataBarang,
+            'totalPembayaran' => $totalPembayaran,
+            'status' => true
+        ];
+        // } else {
+        //     $data = [
+        //         'data' => [],
+        //         'totalPembayaran' => $totalPembayaran,
+        //         'status' => false
+        //     ];
+        // }
         return response()->setJSON($data);
     }
 
@@ -456,19 +464,19 @@ class PembayaranInvoice extends BaseController
             $totalPembayaran += $s['total_bayar'];
         }
 
-        if ($totalAmountInvoice >= $totalPembayaran) {
-            $data = [
-                'data' => $dataBarang,
-                'totalPembayaran' => $totalPembayaran,
-                'status' => true
-            ];
-        } else {
-            $data = [
-                'data' => [],
-                'totalPembayaran' => $totalPembayaran,
-                'status' => false
-            ];
-        }
+        // if ($totalAmountInvoice >= $totalPembayaran) {
+        $data = [
+            'data' => $dataBarang,
+            'totalPembayaran' => $totalPembayaran,
+            'status' => true
+        ];
+        // } else {
+        //     $data = [
+        //         'data' => [],
+        //         'totalPembayaran' => $totalPembayaran,
+        //         'status' => false
+        //     ];
+        // }
         return response()->setJSON($data);
     }
 
@@ -499,19 +507,19 @@ class PembayaranInvoice extends BaseController
             $totalPembayaran += $s['total_bayar'];
         }
 
-        if ($totalAmountInvoice >= $totalPembayaran) {
-            $data = [
-                'data' => $dataBarang,
-                'totalPembayaran' => $totalPembayaran,
-                'status' => true
-            ];
-        } else {
-            $data = [
-                'data' => [],
-                'totalPembayaran' => $totalPembayaran,
-                'status' => false
-            ];
-        }
+        // if ($totalAmountInvoice >= $totalPembayaran) {
+        $data = [
+            'data' => $dataBarang,
+            'totalPembayaran' => $totalPembayaran,
+            'status' => true
+        ];
+        // } else {
+        //     $data = [
+        //         'data' => [],
+        //         'totalPembayaran' => $totalPembayaran,
+        //         'status' => false
+        //     ];
+        // }
 
 
         return response()->setJSON($data);
@@ -543,19 +551,19 @@ class PembayaranInvoice extends BaseController
             $totalPembayaran += $s['total_bayar'];
         }
 
-        if ($totalAmountInvoice >= $totalPembayaran) {
-            $data = [
-                'data' => $dataBarang,
-                'totalPembayaran' => $totalPembayaran,
-                'status' => true
-            ];
-        } else {
-            $data = [
-                'data' => [],
-                'totalPembayaran' => $totalPembayaran,
-                'status' => false
-            ];
-        }
+        // if ($totalAmountInvoice >= $totalPembayaran) {
+        $data = [
+            'data' => $dataBarang,
+            'totalPembayaran' => $totalPembayaran,
+            'status' => true
+        ];
+        // } else {
+        //     $data = [
+        //         'data' => [],
+        //         'totalPembayaran' => $totalPembayaran,
+        //         'status' => false
+        //     ];
+        // }
 
 
         return response()->setJSON($data);

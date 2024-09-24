@@ -108,8 +108,6 @@ class PembayaranInvoiceModel extends Model
             }
         }
 
-
-
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['type_invoice']) {
             $dataQry->groupEnd();
         }
@@ -151,9 +149,6 @@ class PembayaranInvoiceModel extends Model
             ->select('pembayaran_invoice.*')
             ->where('pembayaran_invoice.id', $id)
             ->first();
-
-
-
 
         if ($detail['type_invoice'] == "LOKAL") {
             $namaCustomer = $salesOrderInvoiceModel
