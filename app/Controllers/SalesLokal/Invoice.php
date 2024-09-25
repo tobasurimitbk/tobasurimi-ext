@@ -88,7 +88,7 @@ class Invoice extends BaseController
             "termin"        => "",
             "taxData"       => $taxData
         ];
-        echo json_encode($data);
+        // echo json_encode($data);
         return view('SalesLokal/Invoice/form', $data);
     }
 
