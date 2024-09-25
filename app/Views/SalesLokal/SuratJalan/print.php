@@ -98,7 +98,7 @@
                         <tr>
                             <td style="width: 1px;vertical-align: top">Customer: </td>
                             <td style="border: 1px solid;border-radius: 7px;padding: 5px">
-                                <div><?= $soData[0]->customerCode ?> - <?= $soData[0]->customerName ?></div>
+                                <div><?= @$soData[0]->phone ?> - <?= $soData[0]->customerName ?></div>
                                 <div><?= $soData[0]->customerAddress ?></div>
                             </td>
                         </tr>
