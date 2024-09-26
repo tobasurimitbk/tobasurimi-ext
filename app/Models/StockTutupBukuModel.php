@@ -55,18 +55,18 @@ class StockTutupBukuModel extends Model
         ];
 
         $selectQry = ' 
-        tutup_buku.bulan,    
-        UPPER(CONCAT(barang_master.barang_name, " - ", barang_master_spesifikasi.spesifikasi)) AS barang,    
-        stock_tutup_buku.divisi_id,    
-        stock_tutup_buku.stock_id,    
-        stock_tutup_buku.barang1_id,    
-        stock_tutup_buku.barang2_id,    
-        satuans.kode_satuan AS satuan,    
-        SUM(stock_tutup_buku.avg_harga_umum) AS harga_umum,    
-        SUM(stock_tutup_buku.avg_harga_harian) AS harga_harian,    
-        SUM(stock_tutup_buku.avg_harga_bulanan) AS harga_bulanan,    
-        SUM(stock_tutup_buku.qty) AS stok_total    
-    ';
+            tutup_buku.bulan,    
+            UPPER(CONCAT(barang_master.barang_name, " - ", barang_master_spesifikasi.spesifikasi)) AS barang,    
+            stock_tutup_buku.divisi_id,    
+            stock_tutup_buku.stock_id,    
+            stock_tutup_buku.barang1_id,    
+            stock_tutup_buku.barang2_id,    
+            satuans.kode_satuan AS satuan,    
+            SUM(stock_tutup_buku.avg_harga_umum) AS harga_umum,    
+            SUM(stock_tutup_buku.avg_harga_harian) AS harga_harian,    
+            SUM(stock_tutup_buku.avg_harga_bulanan) AS harga_bulanan,    
+            SUM(stock_tutup_buku.qty) AS stok_total    
+        ';
 
         $dataQry = $this->asArray()
             ->select($selectQry)

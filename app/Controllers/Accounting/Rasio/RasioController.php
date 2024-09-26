@@ -28,7 +28,9 @@ use App\Models\JasaVendorOutModel;
 use App\Models\JurnalUmumModel;
 use App\Models\KemasanModel;
 use App\Models\KursModel;
+use App\Models\MaterialRequestDetailsModel;
 use App\Models\MaterialRequestPenolongDetailsModel;
+use App\Models\MaterialRequestsModel;
 use App\Models\MaterialRequestsPenolongModel;
 use App\Models\MutasiDetailModel;
 use App\Models\MutasiModel;
@@ -106,6 +108,8 @@ class RasioController extends BaseController
     protected $jasaVendorOutDetailModel;
     protected $tutupBukuModel;
     protected $stockTutupBukuModel;
+    protected $materialRequestsModel;
+    protected $materialRequestsDetailsModel;
 
     public function __construct()
     {
@@ -158,6 +162,9 @@ class RasioController extends BaseController
         $this->mutasiDetailModel = new MutasiDetailModel();
         $this->tutupBukuModel = new TutupBukuModel();
         $this->stockTutupBukuModel = new StockTutupBukuModel();
+
+        $this->materialRequestsModel = new MaterialRequestsModel();
+        $this->materialRequestsDetailsModel = new MaterialRequestDetailsModel();
     }
 
     public function index()
@@ -643,6 +650,7 @@ class RasioController extends BaseController
                 'tanggal_akhir' => $tanggal_akhir,
                 'divisi_id' => $divisiID,
                 'kategori_id' => $kategoriID,
+                'company_id' => $this->this_company_id,
             ];
 
             $kursValue = 1;
@@ -923,15 +931,27 @@ class RasioController extends BaseController
 
             // definisi Saldo Awal
             // awal fungsi untuk saldo Awal
+            $dataSaldoAwal = [];
             $dataBahanBakuDigunakanSaldoAwal = $this->stockTutupBukuModel->getStockTutupBukuWithAddCondition($conditionProduction);
+            $dataRequest = $this->materialRequestsDetailsModel->getMaterialRequestForRasio($conditionProduction);
+            foreach ($dataBahanBakuDigunakanSaldoAwal as $key => $valueSaldoAwal) {
+                foreach ($dataRequest as $valueRequest) {
+                    if ($valueSaldoAwal['barang1_id'] == $valueRequest['barang1_id'] && $valueSaldoAwal['barang2_id'] == $valueRequest['barang2_id'] && $valueSaldoAwal['stock_id'] == $valueRequest['stock_tujuan_id']) {
+                        $dataSaldoAwal[] = $valueSaldoAwal;
+                    }
+                }
+            }
+            // akhir fungsi untuk saldo Awal
 
             // definisi saldo akhir
             // awal fungsi untuk saldo akhir
             $dataSaldoAkhir = [];
+            $dataSaldoAkhirDone = [];
             $dataSaldoAkhirModel = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
                 "bahan_baku",
                 $divisiID
             );
+            $dataRequest = $this->materialRequestsDetailsModel->getMaterialRequestForRasio($conditionProduction);
             foreach ($dataSaldoAkhirModel as $value) {
                 $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
                     $value['stock_id']
@@ -964,6 +984,15 @@ class RasioController extends BaseController
 
                 // Merge current dataResult into dataResults
                 $dataSaldoAkhir = array_merge($dataSaldoAkhir, $dataResult);
+            }
+            foreach ($dataSaldoAkhir as $value) {
+                foreach ($dataRequest as $valueRequest) {
+                    // var_dump($value);
+                    if ($value['barang1_id'] == $valueRequest['barang1_id'] && $value['barang2_id'] == $valueRequest['barang2_id']) {
+                        $dataSaldoAkhirDone[] = $value;
+                        // var_dump($value);
+                    }
+                }
             }
             // akhir fungsi untuk saldo akhir
 
@@ -1197,8 +1226,8 @@ class RasioController extends BaseController
                     'dataProduksiBahanDigunakan'            => $dataProduksiBahanDigunakan,
                     'dataBahanDigunakanPO'                  => $dataBahanDigunakanPO,
                     'dataProduksiBahanDigunakanProsesUlang' => $dataProduksiBahanDigunakanProsesUlang,
-                    'dataSaldoAwal'                         => $dataBahanBakuDigunakanSaldoAwal,
-                    'dataSaldoAkhir'                        => $dataSaldoAkhir,
+                    'dataSaldoAwal'                         => $dataSaldoAwal,
+                    'dataSaldoAkhir'                        => $dataSaldoAkhirDone,
                     'dataSaldoAdjusment'                    => $dataSaldoAdjusment,
                     'dataSaldoMutasi'                       => $dataSaldoMutasi,
                     'dataSaldoKopek'                        => $dataProduksiBahanDigunakanKopek,

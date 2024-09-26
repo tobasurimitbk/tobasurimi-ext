@@ -145,4 +145,31 @@ class MaterialRequestDetailsModel extends Model
             'totalFilteredData' => $totalFilteredData
         ];
     }
+
+    public function getMaterialRequestForRasio($where)
+    {
+        $where['deletedAt'] = null;
+        $selectQryJadi = '
+            material_requests.*,
+            material_request_details.*,
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQryJadi)
+            ->join('material_requests', 'material_requests.id = material_request_details.material_request_id', 'left')
+            ->join('account_barang', 'account_barang.barang_master_id = material_request_details.barang1_id', 'left')
+            ->where('material_requests.request_date >=', $where['tanggal_awal'])
+            ->where('material_requests.request_date <=', $where['tanggal_akhir'])
+            ->where('material_requests.company_id', $where['company_id'])
+            ->where('account_barang.company_id', $where['company_id'])
+            ->where('material_request_details.divisi_tujuan_id', $where['divisi_id'])
+            ->where('account_barang.divisi_id', $where['divisi_id'])
+            ->where('account_barang.kategori_id', $where['kategori_id'])
+            ->where('material_request_details.deletedAt', $where['deletedAt'])
+            ->where('material_requests.deletedAt', $where['deletedAt'])
+            ->groupBy('material_request_details.barang1_id, material_request_details.barang2_id')
+            ->findAll();
+
+        return $dataQry;
+    }
 }

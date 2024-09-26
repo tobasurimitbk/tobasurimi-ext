@@ -1348,6 +1348,11 @@
             var hargaBulanan = 0;
             var stok = 0;
             var totalHarga = 0;
+            var totalHargaSatuan = 0;
+
+            var summaryStok = 0;
+            var summaryTotalHarga = 0;
+            var summaryTotalHargaSatuan = 0;
             list_items_saldo_akhir.map((item, index) => {
                 // counting total
                 hargaUmum += item.harga_umum !== null ? parseFloat(item.harga_umum) : 0;
@@ -1355,17 +1360,33 @@
                 hargaBulanan += item.harga_bulanan !== null ? parseFloat(item.harga_bulanan) : 0;
                 stok = item.stok_total !== null ? parseFloat(item.stok_total) : 0;
                 totalHarga = (hargaUmum + hargaHarian + hargaBulanan) * stok;
+                totalHargaSatuan = (hargaUmum + hargaHarian + hargaBulanan);
+
+                summaryStok += stok;
+                summaryTotalHargaSatuan += totalHargaSatuan;
+                summaryTotalHarga += totalHarga;
                 // end counting
                 row += '<tr style="color:whitesmoke;text-align: center;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.barang + '</td>';
                 row += '<td>' + (stok !== 0 ? parseFloat(stok).toLocaleString() : 0) + '</td>';
                 row += '<td>' + (item.satuan !== undefined ? item.satuan : strip) + '</td>';
+                row += '<td>' + (totalHargaSatuan !== 0 ? formatRupiah(parseFloat(totalHargaSatuan)) : formatRupiah(parseFloat(0))) + '</td>';
                 row += '<td>' + (totalHarga !== 0 ? formatRupiah(parseFloat(totalHarga)) : formatRupiah(parseFloat(0))) + '</td>';
                 row += '</tr>';
                 no++;
             });
+
+            rowFooter += '<tr style="text-align: center;">';
+            rowFooter += '<td style="text-align: center; font-weight: bold;" colspan="2">Total</td>';
+            rowFooter += '<td style="text-align: center; font-weight: bold;">' + (summaryStok !== 0 ? parseFloat(summaryStok).toLocaleString() : 0) + '</td>';
+            rowFooter += '<td style="text-align: center; font-weight: bold;"></td>';
+            rowFooter += '<td style="text-align: center; font-weight: bold;">' + (summaryTotalHargaSatuan !== 0 ? formatRupiah(parseFloat(summaryTotalHargaSatuan)) : formatRupiah(parseFloat(0))) + '</td>';
+            rowFooter += '<td style="text-align: center; font-weight: bold;">' + (summaryTotalHarga !== 0 ? formatRupiah(parseFloat(summaryTotalHarga)) : formatRupiah(parseFloat(0))) + '</td>';
+            rowFooter += '</tr>';
+
             $('.body-detail-table-saldo-akhir').append(row);
+            $('.tfoot-detail-table-saldo-akhir').append(rowFooter);
         }
     }
 
@@ -1387,26 +1408,48 @@
             var stok = 0;
             var stokProduksi = 0;
             var totalHarga = 0;
+            var totalHargaSatuan = 0;
+
+            var summaryStok = 0;
+            var summaryTotalHarga = 0;
+            var summaryTotalHargaSatuan = 0;
+
             list_items_saldo_awal.map((item, index) => {
                 // console.log(item);
 
                 // counting total
-                hargaUmum += item.harga_umum !== null ? parseFloat(item.harga_umum) : 0;
-                hargaHarian += item.harga_harian !== null ? parseFloat(item.harga_harian) : 0;
-                hargaBulanan += item.harga_bulanan !== null ? parseFloat(item.harga_bulanan) : 0;
+                hargaUmum = item.harga_umum !== null ? parseFloat(item.harga_umum) : 0;
+                hargaHarian = item.harga_harian !== null ? parseFloat(item.harga_harian) : 0;
+                hargaBulanan = item.harga_bulanan !== null ? parseFloat(item.harga_bulanan) : 0;
                 stok = item.stok_total !== null ? parseFloat(item.stok_total) : 0;
                 totalHarga = (hargaUmum + hargaHarian + hargaBulanan) * stok;
+                totalHargaSatuan = (hargaUmum + hargaHarian + hargaBulanan);
+
+                summaryStok += stok;
+                summaryTotalHargaSatuan += totalHargaSatuan;
+                summaryTotalHarga += totalHarga;
                 // end counting
                 row += '<tr style="color:whitesmoke;text-align: center;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.barang + '</td>';
                 row += '<td>' + (stok !== 0 ? parseFloat(stok).toLocaleString() : 0) + '</td>';
                 row += '<td>' + (item.satuan !== undefined ? item.satuan : strip) + '</td>';
+                row += '<td>' + (totalHargaSatuan !== 0 ? formatRupiah(parseFloat(totalHargaSatuan)) : formatRupiah(parseFloat(0))) + '</td>';
                 row += '<td>' + (totalHarga !== 0 ? formatRupiah(parseFloat(totalHarga)) : formatRupiah(parseFloat(0))) + '</td>';
                 row += '</tr>';
                 no++;
             });
+
+            rowFooter += '<tr style="text-align: center;">';
+            rowFooter += '<td style="text-align: center; font-weight: bold;" colspan="2">Total</td>';
+            rowFooter += '<td style="text-align: center; font-weight: bold;">' + (summaryStok !== 0 ? parseFloat(summaryStok).toLocaleString() : 0) + '</td>';
+            rowFooter += '<td style="text-align: center; font-weight: bold;"></td>';
+            rowFooter += '<td style="text-align: center; font-weight: bold;">' + (summaryTotalHargaSatuan !== 0 ? formatRupiah(parseFloat(summaryTotalHargaSatuan)) : formatRupiah(parseFloat(0))) + '</td>';
+            rowFooter += '<td style="text-align: center; font-weight: bold;">' + (summaryTotalHarga !== 0 ? formatRupiah(parseFloat(summaryTotalHarga)) : formatRupiah(parseFloat(0))) + '</td>';
+            rowFooter += '</tr>';
+
             $('.body-detail-table-saldo-awal').append(row);
+            $('.tfoot-detail-table-saldo-awal').append(rowFooter);
         }
     }
 

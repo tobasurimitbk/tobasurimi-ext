@@ -237,8 +237,6 @@ class ProductionResultModel extends Model
             ->groupBy('production_result_details.barang1_id, production_result_details.barang2_id')
             ->findAll();
 
-        // var_dump($dataQry);
-
         return $dataQry;
     }
 
