@@ -88,7 +88,7 @@ class Invoice extends BaseController
             "termin"        => "",
             "taxData"       => $taxData
         ];
-        //echo json_encode($data);
+        // echo json_encode($data);
         return view('SalesLokal/Invoice/form', $data);
     }
 
@@ -320,7 +320,7 @@ class Invoice extends BaseController
                 "id_customer"       => $postData['id_customer'],
                 "document_no"       => $postData['noDocument'],
                 // "id_surat_jalan"    => $postData['id_surat_jalan'],
-                // "no_surat_jalan"    => $postData['no_surat_jalan'],
+                "jenis_penjualan"    => $postData['jenis_penjualan'],
                 "no_faktur"         => $noFaktur,
                 "tanggal_faktur"    => date('Y-m-d', strtotime(str_replace('/', '-', $postData['tanggal_faktur']))),
                 "terms"             => $postData['termin'] ?? '',
@@ -453,6 +453,7 @@ class Invoice extends BaseController
         $id = decrypt($id);
         //Get data sales order
         $dataSalesInvoiceOrder = $this->SalesOrderInvoiceModel->getSalesOrderInvoiceLokalById(($id));
+        // dd($dataSalesInvoiceOrder);
         $dataSalesInvoiceOrderDetail = $this->SalesOrderInvoiceDetailModel->withDeleted()->where('id_sales_order_invoice', $id)->findAll();
 
         $taxData = $this->taxModel->getTaxByType('ppn');
@@ -546,7 +547,7 @@ class Invoice extends BaseController
             "taxData"       => $taxData
             // 'dataSo'        => $dataSo
 
-        ]; //dd($data);
+        ]; 
         return view('SalesLokal/Invoice/form', $data);
     }
 
@@ -633,6 +634,7 @@ class Invoice extends BaseController
                 "terms"             => $postData['termin'] ?? '',
                 "ship_via_id"       => $postData['ship_via'],
                 "keterangan"        => $postData['keterangan'],
+                "jenis_penjualan"   => $postData['jenis_penjualan'],
                 "dpp"               => str_replace(',', '', $postData['dpp']),
                 "ppn"               => str_replace(',', '', $postData['ppn']),
                 "total_invoice"     => str_replace(',', '', $postData['total_invoice']),

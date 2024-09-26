@@ -46,6 +46,7 @@ class SalesOrderInvoiceModel extends Model
         'status_posting',
         'tax_id',
         'tax_value',
+        'jenis_penjualan',
     ];
 
     // Dates
@@ -160,7 +161,7 @@ class SalesOrderInvoiceModel extends Model
                       customers.name AS customer_name,
                       sales_order_invoice.status_tax AS status_tax,
                       sales_order_invoice.termasuk_pa AS termasuk_pa,
-                      sales_order.jenis_penjualan,
+                      sales_order_invoice.jenis_penjualan AS jenis_penjualan,
                       sales_order.no_po, 
                       sales_order.nama_ecommerce";
 
