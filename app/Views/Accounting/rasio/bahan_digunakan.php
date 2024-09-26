@@ -309,17 +309,23 @@
     $('#select-item-btn-alokasi-biaya').click(function() {
         list_items_barang_digunakan_alokasi = [];
 
-        var amount = $('#hargaTotalPenerimaan').val() ? parseFloat($('#hargaTotalPenerimaan').val().replace(/Rp|\./g, "")) : 0;
-        var qtyTotalPenerimaan = $('#qtyTotalPenerimaan').val() ? parseFloat($('#qtyTotalPenerimaan').val().replace(/Rp|\./g, "")) : 0;
-        var biayaSubsidi = $('#biayaSubsidi').val() ? parseFloat($('#biayaSubsidi').val().replace(/Rp|\./g, "")) : 0;
-        var biayaLain = $('#biayaLain').val() ? parseFloat($('#biayaLain').val().replace(/Rp|\./g, "")) : 0;
-        var biayaKopek = $('#biayaKopek').val() ? parseFloat($('#biayaKopek').val().replace(/Rp|\./g, "")) : 0;
+        var amount = $('#hargaTotalDigunakan').val() ? parseFloat($('#hargaTotalDigunakan').val().replace(/[Rp.]/g, '')) : 0;
+        var qtyTotalPenerimaan = $('#qtyTotalDigunakan').val() ? parseFloat($('#qtyTotalDigunakan').val().replace(/[Rp.]/g, '')) : 0;
+        var biayaSubsidi = $('#biayaSubsidi').val() ? parseFloat($('#biayaSubsidi').val().replace(/[Rp.]/g, '')) : 0;
+        var biayaLain = $('#biayaLain').val() ? parseFloat($('#biayaLain').val().replace(/[Rp.]/g, '')) : 0;
+        var biayaKopek = $('#biayaKopek').val() ? parseFloat($('#biayaKopek').val().replace(/[Rp.]/g, '')) : 0;
 
         var hargaTotalBiaya = biayaSubsidi + biayaLain + biayaKopek;
+
+        console.log(amount);
+        console.log(qtyTotalPenerimaan);
+        console.log(hargaTotalBiaya);
+        console.log(list_items_barang_digunakan.length);
+
         var hargaSatuan = 0;
         list_items_barang_digunakan.forEach((item, index) => {
-            hargaSatuan = parseFloat(item.hargaSatuanPO) + (parseFloat(hargaTotalBiaya) / list_items_barang_pembelian.length);
-            totalHarga = parseFloat(item.totalQtyPO) * parseFloat(hargaSatuan);
+            totalHarga = (parseFloat(item.totalHargaPO) + parseFloat(hargaTotalBiaya)) / parseFloat(list_items_barang_digunakan.length);
+            hargaSatuan = parseFloat(totalHarga) / parseFloat(item.totalQtyPO);
             list_items_barang_digunakan_alokasi.push({
                 'barang1_id': item.barang1_id,
                 'barang2_id': item.barang2_id,

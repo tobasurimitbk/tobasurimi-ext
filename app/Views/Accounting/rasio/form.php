@@ -1308,6 +1308,16 @@
                 no++;
             });
             $('.body-detail-table-alokasi').append(row);
+
+            let qtyTotalDigunakan = parseFloat($('#qtyTotalDigunakan').val()) || 0;
+            let hargaTotalDigunakan = parseFloat($('#hargaTotalDigunakan').val().replace(/[Rp.]/g, '')) || 0;
+            let biayaSubsidi = parseFloat($('#biayaSubsidi').val().replace(/[Rp.]/g, '')) || 0;
+            let biayaLain = parseFloat($('#biayaLain').val().replace(/[Rp.]/g, '')) || 0;
+            let biayaKopek = parseFloat($('#biayaKopek').val().replace(/[Rp.]/g, '')) || 0;
+
+            $('#qtyTotalSetelahAlokasi').val(qtyTotalDigunakan.toLocaleString());
+            $('#hargaTotalSetelahAlokasi').val(formatRupiah(hargaTotalDigunakan + biayaSubsidi + biayaLain + biayaKopek));
+            $('#hargaSatuanSetelahAlokasi').val(formatRupiah((hargaTotalDigunakan + biayaSubsidi + biayaLain + biayaKopek) / qtyTotalDigunakan));
         }
     }
 
