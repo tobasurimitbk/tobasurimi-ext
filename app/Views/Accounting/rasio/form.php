@@ -156,7 +156,7 @@
                                     <thead class="thead-dark">
                                         <tr>
                                             <th style="text-align: center;" rowspan="2">No</th>
-                                            <th style="text-align: center;" colspan="5">Data Pembelian</th>
+                                            <th style="text-align: center;" colspan="5">Data Pemakaian</th>
                                         </tr>
                                         <tr>
                                             <th style="text-align: center;">Spesifikasi</th>
@@ -181,7 +181,7 @@
                     </div>
                     <div class="row">
                         <div class="col mb-3">
-                            <label class="form-label font-weight-bold lable-title">Data Total Pembelian Barang</label>
+                            <label class="form-label font-weight-bold lable-title">Data Total Pemakaian Barang</label>
                         </div>
                     </div>
                     <div class="row mb-2">
@@ -479,8 +479,16 @@
                 success: function(res) {
                     stopLoading()
                     if (res.status) {
-                        $('#biayaSubsidi').val(formatRupiah(parseFloat(res.data)));
-                        drawTableRasio();
+                        let qtyTotalDigunakan = parseFloat($('#qtyTotalDigunakan').val()) || 0;
+                        let hargaTotalDigunakan = parseFloat($('#hargaTotalDigunakan').val().replace(/[Rp.]/g, '')) || 0;
+                        let biayaSubsidi = parseFloat(res.data);
+                        let biayaLain = parseFloat($('#biayaLain').val().replace(/[Rp.]/g, '')) || 0;
+                        let biayaKopek = parseFloat($('#biayaKopek').val().replace(/[Rp.]/g, '')) || 0;
+                        $('#biayaSubsidi').val(formatRupiah(biayaSubsidi));
+
+                        $('#qtyTotalSetelahAlokasi').val(qtyTotalDigunakan.toLocaleString());
+                        $('#hargaTotalSetelahAlokasi').val(formatRupiah(hargaTotalDigunakan + biayaSubsidi + biayaLain + biayaKopek));
+                        $('#hargaSatuanSetelahAlokasi').val(formatRupiah((hargaTotalDigunakan + biayaSubsidi + biayaLain + biayaKopek) / qtyTotalDigunakan));
                     } else {
                         stopLoading()
                         $('#biayaSubsidi').val("");
@@ -516,8 +524,16 @@
                 success: function(res) {
                     stopLoading()
                     if (res.status) {
-                        $('#biayaLain').val(formatRupiah(parseFloat(res.data)));
-                        drawTableRasio();
+                        let qtyTotalDigunakan = parseFloat($('#qtyTotalDigunakan').val()) || 0;
+                        let hargaTotalDigunakan = parseFloat($('#hargaTotalDigunakan').val().replace(/[Rp.]/g, '')) || 0;
+                        let biayaSubsidi = parseFloat($('#biayaSubsidi').val().replace(/[Rp.]/g, '')) || 0;
+                        let biayaLain = parseFloat(res.data);
+                        let biayaKopek = parseFloat($('#biayaKopek').val().replace(/[Rp.]/g, '')) || 0;
+                        $('#biayaLain').val(formatRupiah(biayaLain));
+
+                        $('#qtyTotalSetelahAlokasi').val(qtyTotalDigunakan.toLocaleString());
+                        $('#hargaTotalSetelahAlokasi').val(formatRupiah(hargaTotalDigunakan + biayaSubsidi + biayaLain + biayaKopek));
+                        $('#hargaSatuanSetelahAlokasi').val(formatRupiah((hargaTotalDigunakan + biayaSubsidi + biayaLain + biayaKopek) / qtyTotalDigunakan));
                     } else {
                         stopLoading()
                         $('#biayaLain').val("");
@@ -553,8 +569,16 @@
                 success: function(res) {
                     stopLoading()
                     if (res.status) {
-                        $('#biayaKopek').val(formatRupiah(parseFloat(res.data)));
-                        drawTableRasio();
+                        let qtyTotalDigunakan = parseFloat($('#qtyTotalDigunakan').val()) || 0;
+                        let hargaTotalDigunakan = parseFloat($('#hargaTotalDigunakan').val().replace(/[Rp.]/g, '')) || 0;
+                        let biayaSubsidi = parseFloat($('#biayaSubsidi').val().replace(/[Rp.]/g, '')) || 0;
+                        let biayaLain = parseFloat($('#biayaLain').val().replace(/[Rp.]/g, '')) || 0;
+                        let biayaKopek = parseFloat(res.data);
+                        $('#biayaKopek').val(formatRupiah(biayaKopek));
+
+                        $('#qtyTotalSetelahAlokasi').val(qtyTotalDigunakan.toLocaleString());
+                        $('#hargaTotalSetelahAlokasi').val(formatRupiah(hargaTotalDigunakan + biayaSubsidi + biayaLain + biayaKopek));
+                        $('#hargaSatuanSetelahAlokasi').val(formatRupiah((hargaTotalDigunakan + biayaSubsidi + biayaLain + biayaKopek) / qtyTotalDigunakan));
                     } else {
                         stopLoading()
                         $('#biayaKopek').val("");
@@ -1218,14 +1242,18 @@
             var totalQtyPO = 0;
             var totalHargaPO = 0;
             var hargaSatuanPO = 0;
-            var totalQtyLPB = 0;
-            var totalHargaLPB = 0;
-            var hargaSatuanLPB = 0;
+            var totalQtySummary = 0;
+            var totalHargaSummary = 0;
+            var hargaSatuanSummary = 0;
             list_items_barang_digunakan.map((item, index) => {
                 // counting total
-                totalQtyPO += item.totalQtyPO !== undefined ? item.totalQtyPO : 0;
-                totalHargaPO += item.totalHargaPO !== undefined ? item.totalHargaPO : 0;
-                hargaSatuanPO += item.hargaSatuanPO !== undefined ? item.hargaSatuanPO : 0;
+                totalQtyPO = item.totalQtyPO !== undefined ? parseFloat(item.totalQtyPO) : 0;
+                totalHargaPO = item.totalHargaPO !== undefined ? parseFloat(item.totalHargaPO) : 0;
+                hargaSatuanPO = item.hargaSatuanPO !== undefined ? parseFloat(item.hargaSatuanPO) : 0;
+
+                totalQtySummary += totalQtyPO;
+                totalHargaSummary += totalHargaPO;
+                hargaSatuanSummary += hargaSatuanPO;
                 // end counting
                 row += '<tr style="color:whitesmoke;text-align: center;">';
                 row += '<td>' + no + '</td>';
@@ -1239,6 +1267,9 @@
             });
 
             $('.body-detail-table-digunakan').append(row);
+            $('.qtyTotalDigunakan').val(parseFloat(totalQtySummary).toLocaleString());
+            $('.hargaTotalDigunakan').val(formatRupiah(parseFloat(totalHargaSummary)));
+            $('.hargaSatuanDigunakan').val(formatRupiah(parseFloat(hargaSatuanSummary)));
         }
     }
 

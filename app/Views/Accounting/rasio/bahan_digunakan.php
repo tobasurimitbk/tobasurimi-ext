@@ -39,36 +39,6 @@
         </div>
     </div>
 </div>
-<div class="row mb-2">
-    <div class="col-md-12">
-        <div class="table-responsive">
-            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="selectedItemTableDigunakan" width="100%" border="1" cellspacing="0">
-                <thead class="thead-dark">
-                    <tr>
-                        <th style="text-align: center;" rowspan="2">No</th>
-                        <th style="text-align: center;" colspan="5">Data Bahan Digunakan</th>
-                    </tr>
-                    <tr>
-                        <th style="text-align: center;">Spesifikasi</th>
-                        <th style="text-align: center;">Qty</th>
-                        <th style="text-align: center;">Harga Total</th>
-                        <th style="text-align: center;">Harga Satuan</th>
-                        <th style="text-align: center;">Satuan</th>
-                    </tr>
-                </thead>
-                <tbody class="body-detail-table-digunakan">
-                </tbody>
-                <tfoot style="background: #ffffff !important;" class="tfoot-detail-table-digunakan" id="tfoot-detail-table-digunakan">
-                    <tr>
-                        <td colspan="7" style="text-align: center;">
-                            Tidak Ada Barang
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-    </div>
-</div>
 <div class="row">
     <div class="col mb-3">
         <label class="form-label font-weight-bold lable-title">Data Total Pembelian Barang</label>
@@ -115,6 +85,61 @@
     <div class="col-md-4">
         <div class="form-floating mb-3" style="height: 50px;">
             <input readonly placeholder="Rata-rata Harga Satuan" value="" class="form-control hargaSatuanPenerimaan" id="hargaSatuanPenerimaan" name="hargaSatuanPenerimaan" aria-label="Floating label select example" />
+            <label for="floatingInput" style="z-index: 1;">Rata-rata Harga Satuan</label>
+        </div>
+    </div>
+</div>
+<div class="row mb-2">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="selectedItemTableDigunakan" width="100%" border="1" cellspacing="0">
+                <thead class="thead-dark">
+                    <tr>
+                        <th style="text-align: center;" rowspan="2">No</th>
+                        <th style="text-align: center;" colspan="5">Data Bahan Digunakan</th>
+                    </tr>
+                    <tr>
+                        <th style="text-align: center;">Spesifikasi</th>
+                        <th style="text-align: center;">Qty</th>
+                        <th style="text-align: center;">Harga Total</th>
+                        <th style="text-align: center;">Harga Satuan</th>
+                        <th style="text-align: center;">Satuan</th>
+                    </tr>
+                </thead>
+                <tbody class="body-detail-table-digunakan">
+                </tbody>
+                <tfoot style="background: #ffffff !important;" class="tfoot-detail-table-digunakan" id="tfoot-detail-table-digunakan">
+                    <tr>
+                        <td colspan="7" style="text-align: center;">
+                            Tidak Ada Barang
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col mb-3">
+        <label class="form-label font-weight-bold lable-title">Data Total Barang Digunakan</label>
+    </div>
+</div>
+<div class="row mb-2">
+    <div class="col-md-4">
+        <div class="form-floating mb-3" style="height: 50px;">
+            <input readonly placeholder="Qty" value="" class="form-control qtyTotalDigunakan" id="qtyTotalDigunakan" name="qtyTotalDigunakan" aria-label="Floating label select example" />
+            <label for="floatingInput" style="z-index: 1;">Qty</label>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-floating mb-3" style="height: 50px;">
+            <input readonly placeholder="Harga Total" value="" class="form-control hargaTotalDigunakan" id="hargaTotalDigunakan" name="hargaTotalDigunakan" aria-label="Floating label select example" />
+            <label for="floatingInput" style="z-index: 1;">Harga Total</label>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-floating mb-3" style="height: 50px;">
+            <input readonly placeholder="Rata-rata Harga Satuan" value="" class="form-control hargaSatuanDigunakan" id="hargaSatuanDigunakan" name="hargaSatuanDigunakan" aria-label="Floating label select example" />
             <label for="floatingInput" style="z-index: 1;">Rata-rata Harga Satuan</label>
         </div>
     </div>
@@ -202,6 +227,31 @@
         <button class="btn btn-show-detail btn-add" data-btn="detail-modal" id="select-item-btn-alokasi-biaya" type="button">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Hitung Alokasi Biaya
         </button>
+    </div>
+</div>
+<div class="row">
+    <div class="col mb-3">
+        <label class="form-label font-weight-bold lable-title">Data Total Setelah Alokasi</label>
+    </div>
+</div>
+<div class="row mb-2">
+    <div class="col-md-4">
+        <div class="form-floating mb-3" style="height: 50px;">
+            <input readonly placeholder="Qty" value="" class="form-control qtyTotalSetelahAlokasi" id="qtyTotalSetelahAlokasi" name="qtyTotalSetelahAlokasi" aria-label="Floating label select example" />
+            <label for="floatingInput" style="z-index: 1;">Qty</label>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-floating mb-3" style="height: 50px;">
+            <input readonly placeholder="Harga Total" value="" class="form-control hargaTotalSetelahAlokasi" id="hargaTotalSetelahAlokasi" name="hargaTotalSetelahAlokasi" aria-label="Floating label select example" />
+            <label for="floatingInput" style="z-index: 1;">Harga Total</label>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-floating mb-3" style="height: 50px;">
+            <input readonly placeholder="Rata-rata Harga Satuan" value="" class="form-control hargaSatuanSetelahAlokasi" id="hargaSatuanSetelahAlokasi" name="hargaSatuanSetelahAlokasi" aria-label="Floating label select example" />
+            <label for="floatingInput" style="z-index: 1;">Rata-rata Harga Satuan</label>
+        </div>
     </div>
 </div>
 <div class="row">
