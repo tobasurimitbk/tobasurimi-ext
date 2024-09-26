@@ -86,6 +86,7 @@ class BarangMasterModel extends Model
 
         if ($addCondition['search']) {
             $barangDataQry->like('barang_master.barang_name', $addCondition['search']);
+            $barangDataQry->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search']);
         }
 
         if ($addCondition['search']) {
