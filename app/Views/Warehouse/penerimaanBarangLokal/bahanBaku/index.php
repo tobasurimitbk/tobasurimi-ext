@@ -190,42 +190,6 @@
                         buttonUnpost = `<button data-toggle="tooltip" title="Unpost" class="btn btn-danger btn-print" onclick="unposting('${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-ban fa-sm" aria-hidden="true"></i>
                                 </button>`;
-                        // UNTUK YANG BELUM DIPOSTING (kelap-kelip)
-                        buttonReturnWaiting = `
-                            <button data-toggle="tooltip" title="Return Out" class="btn btn-info return-out" onclick="" style="box-shadow: none !important; position: relative;">
-                                <i class="fa fa-truck fa-sm" aria-hidden="true"></i>
-                                <span style="position: absolute; top: -5px; right: -5px; padding: 5px; background-color: red; color: white; border-radius: 50%; border: 2px solid white; animation: blink 1s infinite;">
-                                
-                                </span>
-                            </button>
-                        `;
-
-                        // UNTUK YANG SUDAH DIPOSTING (badge hijau)
-                        buttonReturnPosting = `
-                            <button data-toggle="tooltip" title="Return Out" class="btn btn-info return-out" onclick="" style="box-shadow: none !important; position: relative;">
-                                <i class="fa fa-truck fa-sm" aria-hidden="true"></i>
-                                <span style="position: absolute; top: -5px; right: -5px; padding: 5px; background-color: green; color: white; border-radius: 50%; border: 2px solid white;">
-                                
-                                </span>
-                            </button>
-                        `;
-
-                        // UNTUK YANG BELUM DIISI KAN
-                        buttonReturn = `
-                            <button data-toggle="tooltip" title="Return Out" class="btn btn-info return-out" onclick="" style="box-shadow: none !important;">
-                                <i class="fa fa-truck fa-sm" aria-hidden="true"></i>
-                            </button>
-                        `;
-
-                        const style = document.createElement('style');
-                        style.innerHTML = `
-                            @keyframes blink {
-                                0% { opacity: 1; }
-                                50% { opacity: 0; }
-                                100% { opacity: 1; }
-                            }
-                        `;
-                        document.head.appendChild(style);
 
                         string = `
                         <div class="mt-0" >
@@ -237,16 +201,6 @@
                            `;
                         if (bc_type !== '0' && in_bc === 'out') {
                             string += buttonUnpost;
-                        }
-                        if (bc_type === '0' || in_bc === 'in') {
-                            if (retur_status == null) {
-                                string += buttonReturn;
-                            } else if (retur_status == 1) {
-                                string += buttonReturnPosting;
-                            } else {
-                                string += buttonReturnWaiting;
-                            }
-
                         }
                         return string + `</div>`;
                     }
