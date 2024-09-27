@@ -157,7 +157,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select coa_id_sub" name="coa_id_sub" id="coa_id_sub">
@@ -166,7 +166,7 @@
                                 <label for="floatingInput">COA (opsional)</label>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="row">
                         <div class="col">
                             <div class="mb-3" style="height: 50px;">
@@ -817,9 +817,6 @@
                 header_id_sub: {
                     required: true
                 },
-                // coa_id_sub: {
-                //     required: true
-                // },
                 kode_akun_sub: {
                     required: true
                 },
@@ -831,9 +828,6 @@
                 header_id_sub: {
                     required: "Header Akun wajib diisi"
                 },
-                // coa_id_sub: {
-                //     required: "COA wajib diisi"
-                // },
                 kode_akun_sub: {
                     required: "Kode Sub Akun wajib diisi"
                 },

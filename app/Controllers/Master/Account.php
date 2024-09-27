@@ -970,9 +970,6 @@ class Account extends BaseController
                 "header_id_sub" => [
                     "rules" => "required"
                 ],
-                "coa_id_sub" => [
-                    "rules" => "required"
-                ],
                 "kode_akun_sub" => [
                     "rules" => "required"
                 ],
@@ -1036,9 +1033,6 @@ class Account extends BaseController
         try {
             $rules = [
                 "header_id_sub" => [
-                    "rules" => "required"
-                ],
-                "coa_id_sub" => [
                     "rules" => "required"
                 ],
                 "kode_akun_sub" => [
