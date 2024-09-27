@@ -65,19 +65,6 @@
             border: 1px solid;
         }
 
-        /* .sign-row {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 0rem;
-            width: 100%;
-        }
-
-        .sign-row>div {
-            width: 120px;
-            border-top: 1px solid;
-            margin-top: 2rem
-        } */
-
         .txt-bold {
             font-weight: 700;
         }
@@ -138,75 +125,61 @@
                 <td class="txt-right">
                     <div><span class="txt-bold">Tipe: <?= $dataPenerimaanBarang->tipe_bahan; ?></span></div>
                 </td>
-                <!-- <td class="txt-right">
-                    <div><span class="txt-bold">Jenis Dokumen:    <?php // $dataPenerimaanBarang->aju_type_name; 
-                                                                    ?></span></div>
-                </td> -->
             </tr>
             <tr>
                 <td>
-                    <div><span class="txt-bold">Tanggal : <?= $dataPenerimaanBarang->createdAt ? date("d/m/Y", strtotime($dataPenerimaanBarang->createdAt)) : ""; ?></span></div>
+                    <div><span class="txt-bold">Tanggal : <?= $dataPenerimaanBarang->tanggal ? date("d/m/Y", strtotime($dataPenerimaanBarang->tanggal)) : ""; ?></span></div>
                 </td>
                 <td>
-                    <div><span class="txt-bold">No. PO &nbsp; : <?= implode(", ", json_decode($dataPenerimaanBarang->multiple_po_no)); ?></span></div>
+                    <div><span class="txt-bold">Ket. Kemasan : <?= $dataPenerimaanBarang->kemasan; ?></span></div>
                 </td>
                 <td class="txt-right">
                     <div><span class="txt-bold">Gudang: <?= $dataPenerimaanBarang->warehouse_name; ?></span></div>
                 </td>
+            </tr>
             <tr>
                 <td>
-                    <div><span class="txt-bold">Dokumen : <?= ($dataPenerimaanBarang->bc_type == 0) ? "Non Pabean - 0" : $dataPenerimaanBarang->bc_type ?></span></div>
+                    <div><span class="txt-bold">Dokumen : <?= ($dataPenerimaanBarang->bc_type == '0') ? "Non Pabean - 0" : $dataPenerimaanBarang->bc_type ?></span></div>
                 </td>
-            </tr>
             </tr>
         </table>
         <table class="item-table mt-050">
             <tr>
-                <th class="txt-left" style="padding-left: 5px; width: 30px;">No.</th>
-                <th class="txt-left" style="padding-left: 5px; width: 100px;">Nama Barang</th>
-                <th class="txt-left" style="padding-left: 5px; width: 40px;">Kemasan</th>
-                <th class="txt-left" style="padding-left: 5px; width: 40px;">Qty</th>
-                <th class="txt-left" style="padding-left: 5px; width: 30px;">Satuan</th>
-                <th class="txt-left" style="padding-left: 5px; width: 60px;">@ Rp</th>
-                <th class="txt-left" style="padding-left: 5px; width: 60px;">Jumlah</th>
-                <th class="txt-left" style="padding-left: 5px; width: 150px;">No. SPP</th>
-                <th class="txt-left" style="padding-left: 5px; width: 60px;">Keterangan</th>
+                <th class="txt-left" style="text-align:center; width: 30px;">No</th>
+                <th class="txt-left" style="text-align:center; width: 100px;">Nama Barang</th>
+                <th class="txt-left" style="text-align:center; width: 40px;">Qty</th>
+                <th class="txt-left" style="text-align:center; width: 30px;">Satuan</th>
+                <th class="txt-left" style="text-align:center; width: 60px;">@ Rp</th>
+                <th class="txt-left" style="text-align:center; width: 60px;">Jumlah</th>
+                <th class="txt-left" style=" text-align:center; width: 150px;">No PO</th>
+                <th class="txt-left" style="text-align:center; width: 60px;">Keterangan</th>
             </tr>
 
             <?php
             $no = 1;
-            $jml_masuk = 0;
-            $jml_order = 0;
-            $jml_harga = 0;
             $jml_sub_total = 0;
-
-            foreach ($dataPenerimaanBarangDetail as $detail) {
-                $jml_masuk = $jml_masuk + formatter($detail["jml_masuk"], "STR_TO_FLOAT");
-                $jml_order = $jml_order + formatter($detail["qty"], "STR_TO_FLOAT");
-                $jml_harga = $jml_harga + formatter($detail["harga"], "STR_TO_INT");
-                $jml_sub_total = $jml_sub_total + formatter($detail["sub_total"], "STR_TO_INT");
             ?>
+            <?php foreach ($dataPenerimaanBarangDetail as $detail) : ?>
+                <?php
+                $jumlah = $detail['harga'] * $detail['jml_masuk'];
+                $jml_sub_total += $jumlah;
+                ?>
                 <tr>
-                    <td class="txt-center" style="padding-left: 5px;"><?= $no++; ?></td>
-                    <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_barang"]; ?></td>
-                    <td class="txt-left" style="padding-left: 5px;"><?= $detail["packaging"] . "/" . $detail["packaging_qty"]; ?></td>
-                    <td class="txt-right" style="padding-left: 5px;"><?= $detail["jml_masuk"]; ?></td>
-                    <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_satuan"]; ?></td>
-                    <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["harga"], "STR_TO_INT")); ?></td>
-                    <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["sub_total"], "STR_TO_INT")); ?></td>
-                    <td class="txt-left" style="padding-left: 5px;"><?= !empty($detail["spp_no"]) ? $detail["spp_no"] : ""; ?></td>
-                    <td class="txt-left" style="padding-left: 5px;"><?= $detail["keterangan"]; ?></td>
+                    <td class="txt-center" style="text-align:center;"><?= $no++; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= strtoupper($detail["nama_barang"] . " " . $detail['spesifikasi']); ?></td>
+                    <td class="txt-right" style="text-align:center;"><?= $detail["jml_masuk"]; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["kode_satuan"]; ?></td>
+                    <td class="txt-right" style="text-align:center;"><?= number_format($detail['harga'], 2, '.', ',') ?></td>
+                    <td class="txt-right" style="text-align:center;"><?= number_format($jumlah, 2, '.', ','); ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["po_no"]; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["keterangan"]; ?></td>
                 </tr>
-            <?php } ?>
+            <?php endforeach; ?>
             <tr>
-                <td class="txt-left" style="padding-left: 5px" colspan="6"><b>TOTAL</b></td>
-                <td class="txt-right" style="padding-left: 5px;"><?= number_format($jml_sub_total); ?></td>
-                <td style="padding-left: 5px;" colspan="2"></td>
-            </tr>
-            <tr>
-                <td class="txt-left" style="padding-left: 5px" colspan="6"><b>ONGKOS KIRIM</b></td>
-                <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($dataPenerimaanBarang->shipping_cost, "STR_TO_INT")); ?></td>
-                <td style="padding-left: 5px;" colspan="2"></td>
+                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>TOTAL</b></td>
+                <td class="txt-right" style="text-align:center;"><?= number_format($jml_sub_total, 2, '.', ','); ?></td>
+                <td></td>
+                <td></td>
             </tr>
         </table>
         <div class="header mt-050">
