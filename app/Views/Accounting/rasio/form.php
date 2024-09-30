@@ -150,10 +150,10 @@
                                 <select class="form-select akun_pemakaian" name="akun_pemakaian" id="akun_pemakaian">
                                     <option value="" data-code=""></option>
                                     <?php
-                                    if (!empty($kategoriBarangAkun)) {
-                                        foreach ($kategoriBarangAkun as $kategoriBarang) {
+                                    if (!empty($subAkuns)) {
+                                        foreach ($subAkuns as $sub) {
                                     ?>
-                                            <option value="<?= $kategoriBarang->id; ?>" <?= !empty($rasio) && $rasio->kategori_barang_id == $kategoriBarang->id ? "selected" : "" ?>><?= $kategoriBarang->description; ?></option>
+                                            <option value="<?= $sub->id; ?>"><?= $sub->no_sub; ?> <?= $sub->nama_sub; ?></option>
                                     <?php
                                         }
                                     }

@@ -1645,6 +1645,7 @@ class RasioController extends BaseController
                 'tanggal_awal' => $tanggal_awal,
                 'tanggal_akhir' => $tanggal_akhir,
                 'divisi_id' => $this->request->getVar('department'),
+                'akun_pemakaian' => $this->request->getVar('akun_pemakaian'),
             ];
             $productionResultDataTitle = $this->materialRequestsPenolongModel->getDataProductionResultBahanPenolongWithDetail($conditionProduction);
             // $totalQtyAll = 0;
