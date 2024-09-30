@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Penerimaan Barang Purchase Order Import Bahan Penolong</title>
+    <title>Penerimaan Barang Purchase Order Lokal Bahan Baku</title>
     <style>
         @page {
             size: landscape;

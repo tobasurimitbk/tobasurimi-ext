@@ -362,6 +362,7 @@ class MaterialRequest extends BaseController
                         'harga_harian' => (float)$s->harga_harian,
                         'harga_bulanan' => (float)$s->harga_bulanan,
                         'kondisi_barang' => 'request',
+                        'keterangan' => $s->keterangan,
                     ];
                 } else {
                     $dataMaterialDetail = [
@@ -390,6 +391,7 @@ class MaterialRequest extends BaseController
                         'harga_harian' => (float)$s->harga_harian,
                         'harga_bulanan' => (float)$s->harga_bulanan,
                         'kondisi_barang' => 'request',
+                        'keterangan' => $s->keterangan,
                     ];
                 }
                 $this->materialRequestDetailsModel->insert($dataMaterialDetail);
@@ -468,6 +470,7 @@ class MaterialRequest extends BaseController
                             'harga_harian' => (float)$s->harga_harian,
                             'harga_bulanan' => (float)$s->harga_bulanan,
                             'kondisi_barang' => 'request',
+                            'keterangan' => $s->keterangan,
                         ];
                     } else {
                         $dataMaterialDetail = [
@@ -496,6 +499,7 @@ class MaterialRequest extends BaseController
                             'harga_harian' => (float)$s->harga_harian,
                             'harga_bulanan' => (float)$s->harga_bulanan,
                             'kondisi_barang' => 'request',
+                            'keterangan' => $s->keterangan,
                         ];
                     }
                     $this->materialRequestDetailsModel->insert($dataMaterialDetail);

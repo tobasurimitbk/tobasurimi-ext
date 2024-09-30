@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Penerimaan Barang Import</title>
+    <title><?= $title ?></title>
     <style>
         body {
             font-size: 12px;
@@ -112,34 +112,29 @@
 </head>
 
 <body>
-    <?php if (!empty($dataPenerimaanBarang)) { ?>
-        <div class="txt-center"><span class="title">LAPORAN PENERIMAAN BARANG</span></div>
+    <?php if (!empty($dataPengembalianBarang)) { ?>
+        <div class="txt-center"><span class="title"> <?= strtoupper($title) ?></span></div>
         <table class="w-100 mt-050">
             <tr>
                 <td>
-                    <div><span class="txt-bold">No. LPB : <?= $dataPenerimaanBarang->no_penerimaan_barang; ?></span></div>
+                    <div><span class="txt-bold">No. Surat Jalan : <?= $dataPengembalianBarang['no_surat_jalan']; ?></span></div>
                 </td>
                 <td>
-                    <div><span class="txt-bold">Supplier : <?= $dataPenerimaanBarang->supplier_name; ?></span></div>
+                    <div><span class="txt-bold">Supplier : <?= $dataPenerimaanBarang[0]['supplier_name']; ?></span></div>
                 </td>
-                <td class="txt-right">
-                    <div><span class="txt-bold">Tipe: <?= $dataPenerimaanBarang->tipe_bahan; ?></span></div>
+                <td>
+                    <div><span class="txt-bold">Tanggal Retur: <?= date('d/m/Y', strtotime($dataPengembalianBarang['tanggal_surat_jalan'])) ?></span></div>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <div><span class="txt-bold">Tanggal : <?= $dataPenerimaanBarang->tanggal ? date("d/m/Y", strtotime($dataPenerimaanBarang->tanggal)) : ""; ?></span></div>
+                    <div><span class="txt-bold">Departemen : <?= $dataPenerimaanBarang[0]['divisi'] ?></span></div>
                 </td>
                 <td>
-                    <div><span class="txt-bold">Ket. Kemasan : <?= $dataPenerimaanBarang->kemasan; ?></span></div>
+                    <div><span class="txt-bold">Gudang: <?= $dataPenerimaanBarang[0]['warehouse_name']; ?></span></div>
                 </td>
-                <td class="txt-right">
-                    <div><span class="txt-bold">Gudang: <?= $dataPenerimaanBarang->warehouse_name; ?></span></div>
-                </td>
-            </tr>
-            <tr>
                 <td>
-                    <div><span class="txt-bold">Dokumen : <?= ($dataPenerimaanBarang->bc_type == '0') ? "Non Pabean - 0" : $dataPenerimaanBarang->bc_type ?></span></div>
+                    <div><span class="txt-bold">Keterangan: <?= $dataPengembalianBarang['keterangan']; ?></span></div>
                 </td>
             </tr>
         </table>
@@ -147,37 +142,37 @@
             <tr>
                 <th class="txt-left" style="text-align:center; width: 30px;">No</th>
                 <th class="txt-left" style="text-align:center; width: 100px;">Nama Barang</th>
-                <th class="txt-left" style="text-align:center; width: 40px;">Qty</th>
-                <th class="txt-left" style="text-align:center; width: 30px;">Satuan</th>
-                <th class="txt-left" style="text-align:center; width: 60px;">@ Rp</th>
-                <th class="txt-left" style="text-align:center; width: 60px;">Jumlah</th>
-                <th class="txt-left" style=" text-align:center; width: 150px;">No PO</th>
-                <th class="txt-left" style="text-align:center; width: 60px;">Keterangan</th>
+                <th class="txt-left" style="text-align:center; width: 40px;">No PO</th>
+                <th class="txt-left" style="text-align:center; width: 30px;">Jml Diterima</th>
+                <th class="txt-left" style="text-align:center; width: 60px;">Jml Retur</th>
+                <th class="txt-left" style="text-align:center; width: 60px;">Satuan</th>
+                <th class="txt-left" style=" text-align:center; width: 150px;">Keterangan</th>
             </tr>
 
             <?php
             $no = 1;
-            $jml_sub_total = 0;
+            $jml_diterima = 0;
+            $jml_retur = 0;
             ?>
-            <?php foreach ($dataPenerimaanBarangDetail as $detail) : ?>
+            <?php foreach ($dataPengembalianBarangDetail as $detail) : ?>
                 <?php
-                $jumlah = $detail['harga'] * $detail['jml_masuk'];
-                $jml_sub_total += $jumlah;
+                $jml_diterima += $detail['jml_diterima'];
+                $jml_retur += $detail['jml_retur'];
                 ?>
                 <tr>
                     <td class="txt-center" style="text-align:center;"><?= $no++; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= strtoupper($detail["nama_barang"] . " " . $detail['spesifikasi']); ?></td>
-                    <td class="txt-right" style="text-align:center;"><?= $detail["jml_masuk"]; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail['nama_barang'] ?></td>
+                    <td class="txt-right" style="text-align:center;"><?= $detail["no_po"]; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["jml_diterima"]; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["jml_retur"]; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["kode_satuan"]; ?></td>
-                    <td class="txt-right" style="text-align:center;"><?= number_format($detail['harga'], 2, '.', ',') ?></td>
-                    <td class="txt-right" style="text-align:center;"><?= number_format($jumlah, 2, '.', ','); ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["po_no"]; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["keterangan"]; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["ket_retur"]; ?></td>
                 </tr>
             <?php endforeach; ?>
             <tr>
-                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>TOTAL</b></td>
-                <td class="txt-right" style="text-align:center;"><?= number_format($jml_sub_total, 2, '.', ','); ?></td>
+                <td class="txt-left" style="padding-left: 5px" colspan="3"><b>TOTAL</b></td>
+                <td class="txt-right" style="text-align:center;"><?= $jml_diterima ?></td>
+                <td class="txt-right" style="text-align:center;"><?= $jml_retur ?></td>
                 <td></td>
                 <td></td>
             </tr>

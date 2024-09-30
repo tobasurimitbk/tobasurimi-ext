@@ -4,42 +4,12 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <?php if (isset($ids)) { ?>
-            <h1 class="title-name">Edit Material Request</h1>
-        <?php } else { ?>
-            <h1 class="title-name">Tambah Material Request</h1>
-        <?php } ?>
+       
+        <h1 class="title-name">Detail Request Stock</h1>
         <div class="col-button-tambah-spp text-right">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("request-stock"); ?>">
                 Kembali
             </a>
-            <?php if (isset($dataMaterialRequests)) { ?>
-                <?php if ($dataMaterialRequests->is_posted != 1) { ?>
-                    <?php if (can('Produksi', 'Material Request', 'a')) : ?>
-                        <button class="btn btn-success mr-1" onclick="posting('<?= !empty($ids) ? $ids : ''; ?>', 1)">
-                            Posting
-                        </button>
-                    <?php endif; ?>
-                    <?php if (can('Produksi', 'Material Request', 'd')) : ?>
-                        <button class="btn btn-hapus delete-parent float-right" onclick="handleDelete('<?= !empty($ids) ? $ids : ''; ?>')">
-                            Hapus
-                        </button>
-                    <?php endif; ?>
-                    <button class="btn btn-show-form btn-save btn-submit-form mr-1">
-                        Simpan
-                    </button>
-                <?php } ?>
-                <?php if (can('Produksi', 'Material Request', 'p')) : ?>
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("material-request/print/"); ?><?= encrypt($dataMaterialRequests->id) ?>')">
-                        Print
-                    </button>
-                <?php endif; ?>
-            <?php } else if (!isset($dataMaterialRequests)) { ?>
-                <button class="btn btn-show-form btn-save btn-submit-form mr-1">
-                    Simpan
-                </button>
-            <?php } else { ?>
-            <?php } ?>
         </div>
     </div>
     <div class="card">
@@ -118,122 +88,6 @@
                     </div>
                 </div>
             </form>
-            <div class="col-subtitle-modal">
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label class="form-label font-weight-bold modal-sub-title">Data Barang</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_asal_id" id="divisi_asal_id" name="divisi_asal_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php foreach ($dataDivisi as $d) : ?>
-                                <option <?= !empty($mutasi) ? ($mutasi['divisi_asal_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
-                                    <?= $d['divisi']; ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Departemen Asal</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_asal_id" id="warehouse_asal_id" name="warehouse_asal_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php if (!empty($warehouseAsal)) : ?>
-                                <?php foreach ($warehouseAsal as $w) : ?>
-                                    <option <?= !empty($mutasi) ? ($mutasi['warehouse_asal_id'] == $w['id'] ? 'selected' : '') : '' ?> value="<?= $w['id'] ?>">
-                                        <?= $w['warehouse_name']; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            <?php endif ?>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Warehouse Asal</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_tujuan_id" id="divisi_tujuan_id" name="divisi_tujuan_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php foreach ($dataDivisi as $d) : ?>
-                                <option <?= !empty($mutasi) ? ($mutasi['divisi_tujuan_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
-                                    <?= $d['divisi']; ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_tujuan_id" id="warehouse_tujuan_id" name="warehouse_tujuan_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php if (!empty($warehouseTujuan)) : ?>
-                                <?php foreach ($warehouseTujuan as $w) : ?>
-                                    <option <?= !empty($mutasi) ? ($mutasi['warehouse_tujuan_id'] == $w['id'] ? 'selected' : '') : '' ?> value="<?= $w['id'] ?>">
-                                        <?= $w['warehouse_name']; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            <?php endif ?>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Warehouse Tujuan</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">PABEAN</option>
-                            <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO">FIFO</option>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating" style="height: 50px;">
-                        <input placeholder="Qty" readonly oninput="preventNegativeInput(this)" class="form-control qty_mutasi_fifo" id="qty_mutasi_fifo" name="qty_mutasi_fifo" aria-label="Floating label select example" />
-                        <label for="floatingInput" style="z-index: 1;">Qty Mutasi Keluar</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select select_tipe_bahan" name="select_tipe_bahan" id="select_tipe_bahan" disabled>
-                            <option value=""></option>
-                            <?php foreach ($tipeBarang as $t) : ?>
-                                <option value="<?= $t['description'] ?>">
-                                    <?= strtoupper($t['value']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label for="floatingInput">Tipe Bahan</label>
-                    </div>
-                </div>
-                <div class="col-md-6">  
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input placeholder="Keterangan (Optional)" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
-                        <label for="floatingInput" style="z-index: 1;">Keterangan (Optional)</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select select_nama_barang" name="select_nama_barang" id="select_nama_barang" disabled>
-                            <option value=""></option>
-                        </select>
-                        <label for="floatingInput">Nama Barang</label>
-                    </div>
-                </div>
-            </div>
             <div class="row">
                 <div class="col-md-12 col-table-button-tts">
                     <div class="table-responsive">
@@ -256,13 +110,6 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-2">
-                    <button class="btn btn-show-detail btn-add btn-submit-barang" data-btn="detail-modal" id="select-item-btn">
-                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Barang
-                    </button>
                 </div>
             </div>
             <div class="col-subtitle-modal">
@@ -966,7 +813,7 @@
                                 if (id) {
                                     // UPDATE
                                     $.ajax({
-                                        url: "<?= base_url("material-request/update"); ?>",
+                                        url: "<?= base_url("request-stock/update"); ?>",
                                         data: data,
                                         beforeSend: function(xhr) {
                                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -995,7 +842,7 @@
                                 } else {
                                     // INSERT
                                     $.ajax({
-                                        url: "<?= base_url("material-request/save"); ?>",
+                                        url: "<?= base_url("request-stock/save"); ?>",
                                         data: data,
                                         beforeSend: function(xhr) {
                                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -1016,7 +863,7 @@
                                                 confirmButtonText: 'Ok'
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
-                                                    window.location.href = "<?= base_url('material-request/details/') ?>" + response.id
+                                                    window.location.href = "<?= base_url('request-stock/details/') ?>" + response.id
                                                 }
                                             });
                                         },
@@ -1092,7 +939,7 @@
     function getListBarang() {
         // GET LIST BARANG
         $.ajax({
-            url: `<?= base_url('material-request/list-barang-stock-init'); ?>`,
+            url: `<?= base_url('request-stock/list-barang-stock-init'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -1204,7 +1051,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "<?= base_url("material-request/update-status"); ?>",
+                    url: "<?= base_url("request-stock/update-status"); ?>",
                     data: {
                         id: id,
                         status_posting: status_posting
@@ -1227,7 +1074,7 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    window.location.href = "<?= base_url('material-request/details/') ?>" + response.id
+                                    window.location.href = "<?= base_url('request-stock/details/') ?>" + response.id
                                 })
                         } else {
                             Swal.fire({
@@ -1979,7 +1826,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "<?= base_url("material-request/delete-detail"); ?>",
+                        url: "<?= base_url("request-stock/delete-detail"); ?>",
                         data: {
                             id: iddetail,
                         },
@@ -2039,7 +1886,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "<?= base_url("material-request/delete-detail"); ?>",
+                        url: "<?= base_url("request-stock/delete-detail"); ?>",
                         data: {
                             id: iddetail,
                         },
@@ -2099,7 +1946,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "<?= base_url("material-request/delete-detail"); ?>",
+                        url: "<?= base_url("request-stock/delete-detail"); ?>",
                         data: {
                             id: iddetail,
                         },
@@ -2159,7 +2006,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "<?= base_url("material-request/delete-detail"); ?>",
+                        url: "<?= base_url("request-stock/delete-detail"); ?>",
                         data: {
                             id: iddetail,
                         },
@@ -2208,7 +2055,7 @@
 
                 setLoading()
                 $.ajax({
-                    url: "<?= base_url("material-request/delete"); ?>",
+                    url: "<?= base_url("request-stock/delete"); ?>",
                     data: {
                         id: id
                     },
@@ -2227,7 +2074,7 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    window.location.href = "<?= base_url('material-request') ?>"
+                                    window.location.href = "<?= base_url('request-stock') ?>"
                                 })
                         } else {
                             Swal.fire({

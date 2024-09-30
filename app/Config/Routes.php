@@ -694,6 +694,15 @@ $routes->post('/work-order/update', 'Production\WorkOrder::update', ['filter' =>
 $routes->post('/work-order/delete', 'Production\WorkOrder::deleteWO', ['filter' => 'Auth']);
 $routes->post('/work-order/delete-detail', 'Production\WorkOrder::deleteWODetail', ['filter' => 'Auth']);
 
+// Request Stock
+$routes->get('/request-stock', 'Production\RequestStock::index', ['filter' => 'Auth']);
+$routes->get('/request-stock/all', 'Production\RequestStock::all', ['filter' => 'Auth']);
+$routes->post('/request-stock/all', 'Production\RequestStock::all', ['filter' => 'Auth']);
+$routes->post('/request-stock/update-approve', 'Production\RequestStock::approve', ['filter' => 'Auth']);
+$routes->post('/request-stock/update-approve-penolong', 'Production\RequestStock::approvePenolong', ['filter' => 'Auth']);
+$routes->get('/request-stock/details/(:segment)', 'Production\RequestStock::getById/$1', ['filter' => 'Auth']);
+$routes->get('/request-stock/data-detail-material', 'Production\MaterialRequest::allDetailMaterialRequest', ['filter' => 'Auth']);
+
 // Material Request
 $routes->get('/material-request', 'Production\MaterialRequest::index', ['filter' => 'Auth']);
 $routes->get('/material-request/details/(:segment)', 'Production\MaterialRequest::getById/$1', ['filter' => 'Auth']);
@@ -1202,39 +1211,6 @@ $routes->post('/penerimaan-barang-import/update-status', 'Warehouse\PenerimaanBa
 $routes->post('/penerimaan-barang-import/delete', 'Warehouse\PenerimaanBarangImport::deletePenerimaanBarangImport', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-import/receivedItemsBySupplier/(:num)', 'Warehouse\PenerimaanBarangImport::getReceivedItemsBySupplier/$1', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-import/generate', 'Warehouse\PenerimaanBarangImport::generatePenerimaanBarang', ['filter' => 'Auth']);
-
-// RETURN BARANG
-$routes->get('/penerimaan-barang-lokal-bb/return-barang/id/(:segment)', 'Warehouse\ReturnBarangPOBB::update/$1', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-lokal-bb/return-barang/generate-po-no', 'Warehouse\ReturnBarangPOBB::generatePONo', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-lokal-bb/return-barang/list-barang', 'Warehouse\ReturnBarangPOBB::listBarangLPB', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-lokal-bb/return-barang/insert', 'Warehouse\ReturnBarangPOBB::createAction', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-lokal-bb/return-barang/update', 'Warehouse\ReturnBarangPOBB::updateAction', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-lokal-bb/return-barang/posting', 'Warehouse\ReturnBarangPOBB::posting', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-lokal-bb/return-barang/delete', 'Warehouse\ReturnBarangPOBB::delete', ['filter' => 'Auth']);
-
-$routes->get('/penerimaan-barang-import-bb/return-barang/id/(:segment)', 'Warehouse\ReturnBarangImportPOBB::update/$1', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-import-bb/return-barang/generate-po-no', 'Warehouse\ReturnBarangImportPOBB::generatePONo', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-import-bb/return-barang/list-barang', 'Warehouse\ReturnBarangImportPOBB::listBarangLPB', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-import-bb/return-barang/insert', 'Warehouse\ReturnBarangImportPOBB::createAction', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-import-bb/return-barang/update', 'Warehouse\ReturnBarangImportPOBB::updateAction', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-import-bb/return-barang/posting', 'Warehouse\ReturnBarangImportPOBB::posting', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-import-bb/return-barang/delete', 'Warehouse\ReturnBarangImportPOBB::delete', ['filter' => 'Auth']);
-
-$routes->get('/penerimaan-barang-lokal-bp/return-barang/id/(:segment)', 'Warehouse\ReturnBarangPOBP::update/$1', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-lokal-bp/return-barang/generate-po-no', 'Warehouse\ReturnBarangPOBP::generatePONo', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-lokal-bp/return-barang/list-barang', 'Warehouse\ReturnBarangPOBP::listBarangLPB', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-lokal-bp/return-barang/insert', 'Warehouse\ReturnBarangPOBP::createAction', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-lokal-bp/return-barang/update', 'Warehouse\ReturnBarangPOBP::updateAction', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-lokal-bp/return-barang/posting', 'Warehouse\ReturnBarangPOBP::posting', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-lokal-bp/return-barang/delete', 'Warehouse\ReturnBarangPOBP::delete', ['filter' => 'Auth']);
-
-$routes->get('/penerimaan-barang-import-bp/return-barang/id/(:segment)', 'Warehouse\ReturnBarangImportPOBP::update/$1', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-import-bp/return-barang/generate-po-no', 'Warehouse\ReturnBarangImportPOBP::generatePONo', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-import-bp/return-barang/list-barang', 'Warehouse\ReturnBarangImportPOBP::listBarangLPB', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-import-bp/return-barang/insert', 'Warehouse\ReturnBarangImportPOBP::createAction', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-import-bp/return-barang/update', 'Warehouse\ReturnBarangImportPOBP::updateAction', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-import-bp/return-barang/posting', 'Warehouse\ReturnBarangImportPOBP::posting', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-import-bp/return-barang/delete', 'Warehouse\ReturnBarangImportPOBP::delete', ['filter' => 'Auth']);
 
 // ROUTE BEA CUKAI REVAMP
 // SETTING AKUN BEA CUKAI
@@ -2097,7 +2073,62 @@ $routes->get('/laporan-bea-cukai/laporan-mutasi-barang-modal', 'Laporan\BeaCukai
 $routes->get('/laporan-bea-cukai/laporan-mutasi/print', 'Laporan\BeaCukai\LaporanBeaCukai::exportPDFLaporanMutasi', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-mutasi/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelLaporanMutasi', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/all-mutasi-barang', 'Laporan\BeaCukai\LaporanBeaCukai::allMutasiBarang', ['filter' => 'Auth']);
-
+// RETUR LOKAL BB
+$routes->get('/retur-po-lokal-bb', 'ReturPembelian\ReturPembelianLokalBB::index', ['filter' => 'Auth']);
+$routes->get('/retur-po-lokal-bb/all', 'ReturPembelian\ReturPembelianLokalBB::all', ['filter' => 'Auth']);
+$routes->post('/retur-po-lokal-bb/delete', 'ReturPembelian\ReturPembelianLokalBB::delete', ['filter' => 'Auth']);
+$routes->post('/retur-po-lokal-bb/posting', 'ReturPembelian\ReturPembelianLokalBB::posting', ['filter' => 'Auth']);
+$routes->post('/retur-po-lokal-bb/unposting', 'ReturPembelian\ReturPembelianLokalBB::unposting', ['filter' => 'Auth']);
+$routes->get('/retur-po-lokal-bb/create', 'ReturPembelian\ReturPembelianLokalBB::create', ['filter' => 'Auth']);
+$routes->get('/retur-po-lokal-bb/generate-number', 'ReturPembelian\ReturPembelianLokalBB::generateNumber', ['filter' => 'Auth']);
+$routes->get('/retur-po-lokal-bb/dropdown-penerimaan-barang', 'ReturPembelian\ReturPembelianLokalBB::dropdownPenerimaanBarang', ['filter' => 'Auth']);
+$routes->get('/retur-po-lokal-bb/retur-detail', 'ReturPembelian\ReturPembelianLokalBB::detailBarang', ['filter' => 'Auth']);
+$routes->post('/retur-po-lokal-bb/save', 'ReturPembelian\ReturPembelianLokalBB::createAction', ['filter' => 'Auth']);
+$routes->post('/retur-po-lokal-bb/update', 'ReturPembelian\ReturPembelianLokalBB::updateAction', ['filter' => 'Auth']);
+$routes->get('/retur-po-lokal-bb/id/(:segment)', 'ReturPembelian\ReturPembelianLokalBB::update/$1', ['filter' => 'Auth']);
+$routes->get('/retur-po-lokal-bb/print/(:segment)', 'ReturPembelian\ReturPembelianLokalBB::print/$1', ['filter' => 'Auth']);
+// RETUR LOKAL BP
+$routes->get('/retur-po-lokal-bp', 'ReturPembelian\ReturPembelianLokalBP::index', ['filter' => 'Auth']);
+$routes->get('/retur-po-lokal-bp/all', 'ReturPembelian\ReturPembelianLokalBP::all', ['filter' => 'Auth']);
+$routes->post('/retur-po-lokal-bp/delete', 'ReturPembelian\ReturPembelianLokalBB::delete', ['filter' => 'Auth']);
+$routes->post('/retur-po-lokal-bp/posting', 'ReturPembelian\ReturPembelianLokalBB::posting', ['filter' => 'Auth']);
+$routes->post('/retur-po-lokal-bp/unposting', 'ReturPembelian\ReturPembelianLokalBB::unposting', ['filter' => 'Auth']);
+$routes->get('/retur-po-lokal-bp/create', 'ReturPembelian\ReturPembelianLokalBP::create', ['filter' => 'Auth']);
+$routes->get('/retur-po-lokal-bp/generate-number', 'ReturPembelian\ReturPembelianLokalBB::generateNumber', ['filter' => 'Auth']);
+$routes->get('/retur-po-lokal-bp/dropdown-penerimaan-barang', 'ReturPembelian\ReturPembelianLokalBP::dropdownPenerimaanBarang', ['filter' => 'Auth']);
+$routes->get('/retur-po-lokal-bp/retur-detail', 'ReturPembelian\ReturPembelianLokalBB::detailBarang', ['filter' => 'Auth']);
+$routes->post('/retur-po-lokal-bp/save', 'ReturPembelian\ReturPembelianLokalBB::createAction', ['filter' => 'Auth']);
+$routes->post('/retur-po-lokal-bp/update', 'ReturPembelian\ReturPembelianLokalBB::updateAction', ['filter' => 'Auth']);
+$routes->get('/retur-po-lokal-bp/id/(:segment)', 'ReturPembelian\ReturPembelianLokalBP::update/$1', ['filter' => 'Auth']);
+$routes->get('/retur-po-lokal-bp/print/(:segment)', 'ReturPembelian\ReturPembelianLokalBP::print/$1', ['filter' => 'Auth']);
+// RETUR IMPORT BB
+$routes->get('/retur-po-import-bb', 'ReturPembelian\ReturPembelianImportBB::index', ['filter' => 'Auth']);
+$routes->get('/retur-po-import-bb/all', 'ReturPembelian\ReturPembelianImportBB::all', ['filter' => 'Auth']);
+$routes->post('/retur-po-import-bb/delete', 'ReturPembelian\ReturPembelianLokalBB::delete', ['filter' => 'Auth']);
+$routes->post('/retur-po-import-bb/posting', 'ReturPembelian\ReturPembelianLokalBB::posting', ['filter' => 'Auth']);
+$routes->post('/retur-po-import-bb/unposting', 'ReturPembelian\ReturPembelianLokalBB::unposting', ['filter' => 'Auth']);
+$routes->get('/retur-po-import-bb/create', 'ReturPembelian\ReturPembelianImportBB::create', ['filter' => 'Auth']);
+$routes->get('/retur-po-import-bb/generate-number', 'ReturPembelian\ReturPembelianLokalBB::generateNumber', ['filter' => 'Auth']);
+$routes->get('/retur-po-import-bb/dropdown-penerimaan-barang', 'ReturPembelian\ReturPembelianImportBB::dropdownPenerimaanBarang', ['filter' => 'Auth']);
+$routes->get('/retur-po-import-bb/retur-detail', 'ReturPembelian\ReturPembelianLokalBB::detailBarang', ['filter' => 'Auth']);
+$routes->post('/retur-po-import-bb/save', 'ReturPembelian\ReturPembelianLokalBB::createAction', ['filter' => 'Auth']);
+$routes->post('/retur-po-import-bb/update', 'ReturPembelian\ReturPembelianLokalBB::updateAction', ['filter' => 'Auth']);
+$routes->get('/retur-po-import-bb/id/(:segment)', 'ReturPembelian\ReturPembelianImportBB::update/$1', ['filter' => 'Auth']);
+$routes->get('/retur-po-import-bb/print/(:segment)', 'ReturPembelian\ReturPembelianImportBB::print/$1', ['filter' => 'Auth']);
+// RETUR IMPORT BP
+$routes->get('/retur-po-import-bp', 'ReturPembelian\ReturPembelianImportBP::index', ['filter' => 'Auth']);
+$routes->get('/retur-po-import-bp/all', 'ReturPembelian\ReturPembelianImportBP::all', ['filter' => 'Auth']);
+$routes->post('/retur-po-import-bp/delete', 'ReturPembelian\ReturPembelianLokalBB::delete', ['filter' => 'Auth']);
+$routes->post('/retur-po-import-bp/posting', 'ReturPembelian\ReturPembelianLokalBB::posting', ['filter' => 'Auth']);
+$routes->post('/retur-po-import-bp/unposting', 'ReturPembelian\ReturPembelianLokalBB::unposting', ['filter' => 'Auth']);
+$routes->get('/retur-po-import-bp/create', 'ReturPembelian\ReturPembelianImportBP::create', ['filter' => 'Auth']);
+$routes->get('/retur-po-import-bp/generate-number', 'ReturPembelian\ReturPembelianLokalBB::generateNumber', ['filter' => 'Auth']);
+$routes->get('/retur-po-import-bp/dropdown-penerimaan-barang', 'ReturPembelian\ReturPembelianImportBP::dropdownPenerimaanBarang', ['filter' => 'Auth']);
+$routes->get('/retur-po-import-bp/retur-detail', 'ReturPembelian\ReturPembelianLokalBB::detailBarang', ['filter' => 'Auth']);
+$routes->post('/retur-po-import-bp/save', 'ReturPembelian\ReturPembelianLokalBB::createAction', ['filter' => 'Auth']);
+$routes->post('/retur-po-import-bp/update', 'ReturPembelian\ReturPembelianLokalBB::updateAction', ['filter' => 'Auth']);
+$routes->get('/retur-po-import-bp/id/(:segment)', 'ReturPembelian\ReturPembelianImportBP::update/$1', ['filter' => 'Auth']);
+$routes->get('/retur-po-import-bp/print/(:segment)', 'ReturPembelian\ReturPembelianImportBP::print/$1', ['filter' => 'Auth']);
 /*
  * --------------------------------------------------------------------
  * Additional Routing
