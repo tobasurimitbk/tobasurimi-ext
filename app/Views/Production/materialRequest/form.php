@@ -217,6 +217,14 @@
                         <label for="floatingInput">Tipe Bahan</label>
                     </div>
                 </div>
+                <div class="col-md-6">  
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input placeholder="Keterangan (Optional)" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
+                        <label for="floatingInput" style="z-index: 1;">Keterangan (Optional)</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select select_nama_barang" name="select_nama_barang" id="select_nama_barang" disabled>
@@ -624,7 +632,7 @@
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.select_tipe_bahan')
+        $('.select_tipe_bahan, .keterangan')
             .parent('div')
             .children('span')
             .children('span')
@@ -1328,6 +1336,7 @@
         var departmentTujuanID = $("#divisi_tujuan_id").val();
         var departmentTujuanText = $("#divisi_tujuan_id option:selected").text();
         var warehouseTujuanID = $("#warehouse_tujuan_id").val();
+        var keterangan = $("#keterangan").val();
         var warehouseTujuanText = $("#warehouse_tujuan_id option:selected").text();
         var checkedCheckboxes = $(".child:checked");
         var dataIds = checkedCheckboxes.map(function() {
@@ -1353,6 +1362,7 @@
                         listStockAsal[i].departmentText = departmentText;
                         listStockAsal[i].warehouseID = warehouseID;
                         listStockAsal[i].warehouseText = warehouseText;
+                        listStockAsal[i].keterangan = keterangan;
                         listStockAsal[i].departmentTujuanID = departmentTujuanID;
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1375,6 +1385,7 @@
                         listStockAsal[i].departmentText = departmentText;
                         listStockAsal[i].warehouseID = warehouseID;
                         listStockAsal[i].warehouseText = warehouseText;
+                        listStockAsal[i].keterangan = keterangan;
                         listStockAsal[i].departmentTujuanID = departmentTujuanID;
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1396,6 +1407,7 @@
                         listStockAsal[i].departmentText = departmentText;
                         listStockAsal[i].warehouseID = warehouseID;
                         listStockAsal[i].warehouseText = warehouseText;
+                        listStockAsal[i].keterangan = keterangan;
                         listStockAsal[i].departmentTujuanID = departmentTujuanID;
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1419,6 +1431,7 @@
                         listStockAsal[i].departmentText = departmentText;
                         listStockAsal[i].warehouseID = warehouseID;
                         listStockAsal[i].warehouseText = warehouseText;
+                        listStockAsal[i].keterangan = keterangan;
                         listStockAsal[i].departmentTujuanID = departmentTujuanID;
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1441,7 +1454,7 @@
         var departmentText = $("#divisi_asal_id option:selected").text();
         var warehouseID = $("#warehouse_asal_id").val();
         var warehouseText = $("#warehouse_asal_id option:selected").text();
-
+        var keterangan = $("#keterangan").val();
         var departmentTujuanID = $("#divisi_tujuan_id").val();
         var departmentTujuanText = $("#divisi_tujuan_id option:selected").text();
         var warehouseTujuanID = $("#warehouse_tujuan_id").val();
@@ -1492,6 +1505,7 @@
                                 listStockAsal[i].departmentText = departmentText;
                                 listStockAsal[i].warehouseID = warehouseID;
                                 listStockAsal[i].warehouseText = warehouseText;
+                                listStockAsal[i].keterangan = keterangan;
                                 listStockAsal[i].departmentTujuanID = departmentTujuanID;
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1515,6 +1529,7 @@
                                 listStockAsal[i].departmentText = departmentText;
                                 listStockAsal[i].warehouseID = warehouseID;
                                 listStockAsal[i].warehouseText = warehouseText;
+                                listStockAsal[i].keterangan = keterangan;
                                 listStockAsal[i].departmentTujuanID = departmentTujuanID;
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1538,6 +1553,7 @@
                                 listStockAsal[i].departmentText = departmentText;
                                 listStockAsal[i].warehouseID = warehouseID;
                                 listStockAsal[i].warehouseText = warehouseText;
+                                listStockAsal[i].keterangan = keterangan;
                                 listStockAsal[i].departmentTujuanID = departmentTujuanID;
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1561,6 +1577,7 @@
                                 listStockAsal[i].departmentText = departmentText;
                                 listStockAsal[i].warehouseID = warehouseID;
                                 listStockAsal[i].warehouseText = warehouseText;
+                                listStockAsal[i].keterangan = keterangan;
                                 listStockAsal[i].departmentTujuanID = departmentTujuanID;
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;

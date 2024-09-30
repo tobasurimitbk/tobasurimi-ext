@@ -694,6 +694,14 @@ $routes->post('/work-order/update', 'Production\WorkOrder::update', ['filter' =>
 $routes->post('/work-order/delete', 'Production\WorkOrder::deleteWO', ['filter' => 'Auth']);
 $routes->post('/work-order/delete-detail', 'Production\WorkOrder::deleteWODetail', ['filter' => 'Auth']);
 
+// Request Stock
+$routes->get('/request-stock', 'Production\RequestStock::index', ['filter' => 'Auth']);
+$routes->get('/request-stock/all', 'Production\RequestStock::all', ['filter' => 'Auth']);
+$routes->post('/request-stock/all', 'Production\RequestStock::all', ['filter' => 'Auth']);
+$routes->post('/request-stock/update-approve', 'Production\RequestStock::approve', ['filter' => 'Auth']);
+$routes->post('/request-stock/update-approve-penolong', 'Production\RequestStock::approvePenolong', ['filter' => 'Auth']);
+
+
 // Material Request
 $routes->get('/material-request', 'Production\MaterialRequest::index', ['filter' => 'Auth']);
 $routes->get('/material-request/details/(:segment)', 'Production\MaterialRequest::getById/$1', ['filter' => 'Auth']);
