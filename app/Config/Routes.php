@@ -700,7 +700,8 @@ $routes->get('/request-stock/all', 'Production\RequestStock::all', ['filter' => 
 $routes->post('/request-stock/all', 'Production\RequestStock::all', ['filter' => 'Auth']);
 $routes->post('/request-stock/update-approve', 'Production\RequestStock::approve', ['filter' => 'Auth']);
 $routes->post('/request-stock/update-approve-penolong', 'Production\RequestStock::approvePenolong', ['filter' => 'Auth']);
-
+$routes->get('/request-stock/details/(:segment)', 'Production\RequestStock::getById/$1', ['filter' => 'Auth']);
+$routes->get('/request-stock/data-detail-material', 'Production\MaterialRequest::allDetailMaterialRequest', ['filter' => 'Auth']);
 
 // Material Request
 $routes->get('/material-request', 'Production\MaterialRequest::index', ['filter' => 'Auth']);

@@ -12,7 +12,7 @@
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-4 mb-3">
                     <div class="form-floating">
-                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Kode Request / Nama Barang" value="" />
+                        <input style="height: 50px" autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Kode Request / Nama Barang" value="" />
                         <label style="z-index: 1;" style="z-index: 1;">Ketik Kode Request / Nama Barang </label>
                     </div>
                 </div>
@@ -33,6 +33,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
+                                <th onclick="changeSort('type')" class="sort">Material Type</th>
                                 <th onclick="changeSort('wo_no')" class="sort">Kode Work Order</th>
                                 <th onclick="changeSort('req_no')" class="sort">Kode Request</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
@@ -61,7 +62,6 @@
     $('#material_type').select2({
         placeholder: "Pilih material_type",
         theme: "bootstrap-5",
-        allowClear: true
     }).change(function() {
         table.ajax.reload();
     });
@@ -116,6 +116,10 @@
                 data: "no",
                 className: "text-center",
                 orderable: false
+            },
+            {
+                data: "type",
+                className: "text-center"
             },
             {
                 data: "wo_no",
@@ -220,7 +224,7 @@
 
             // Redirect to the detail page using the data ID
             if (data) {
-                location.replace(`<?= base_url("material-request/details"); ?>/${data.id}`);
+                location.replace(`<?= base_url("request-stock/details"); ?>/${data.id}`);
             }
         });
     })
