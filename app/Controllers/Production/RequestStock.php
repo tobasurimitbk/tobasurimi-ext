@@ -30,7 +30,7 @@ class RequestStock extends BaseController
 
     public function index()
     {
-        return view('Production/RequestStock/index');
+        return view('Production/requestStock/index');
     }
 
     public function all()
