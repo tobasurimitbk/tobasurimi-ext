@@ -88,30 +88,6 @@
                     </div>
                 </div>
             </form>
-            <div class="row">
-                <div class="col-md-12 col-table-button-tts">
-                    <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th style="text-align: center;">#</th>
-                                    <th style="text-align: center;">Asal Barang</th>
-                                    <th style="text-align: center;">No Dokumen</th>
-                                    <th style="text-align: center;">Supplier</th>
-                                    <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">No Aju</th>
-                                    <th style="text-align: center;">Tanggal Penerimaan</th>
-                                    <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Satuan</th>
-                                    <th style="text-align: center;">Qty</th>
-                                </tr>
-                            </thead>
-                            <tbody class="body-table">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
                     <div class="col-md-6">
@@ -136,7 +112,6 @@
                                 <th style="text-align: center;">Qty Awal</th>
                                 <th style="text-align: center;">Qty Direquest</th>
                                 <!-- <th style="text-align: center;">Qty Sortir</th> -->
-                                <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table">
@@ -172,7 +147,6 @@
                                 <th style="text-align: center;">Satuan</th>
                                 <th style="text-align: center;">Qty Awal</th>
                                 <th style="text-align: center;">Qty Direquest</th>
-                                <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table">
@@ -208,7 +182,6 @@
                                 <th style="text-align: center;">Satuan</th>
                                 <th style="text-align: center;">Qty Awal</th>
                                 <th style="text-align: center;">Qty Direquest</th>
-                                <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table">
@@ -245,7 +218,6 @@
                                 <th style="text-align: center;">Qty Kaleng</th>
                                 <th style="text-align: center;">Qty Kaleng Direquest</th>
                                 <th style="text-align: center;">Qty Isi Direquest</th>
-                                <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table">
@@ -1473,9 +1445,6 @@
             newRow.append($('<td style="text-align: center;">').html(`
             <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" data-index="${i}" type="text" value="${v.qty2}">
         `));
-            newRow.append($('<td style="text-align: center;">').html(`
-            <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanBaku(${v.id}, ${v.id_material_request_detail})"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-        `));
             table.find('tbody').append(newRow);
             parseFloat(v.qty2)
             totalQtyRequest += parseFloat(v.qty2) || 0; // Ensure the value is a number
@@ -1554,11 +1523,6 @@
             newRow.append($('<td style="text-align: center;">').html(
                 `
                 <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" data-index="${i}" class="form-control" type="text" value="${v.qty2}">
-            `
-            ));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanSetengahJadi(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
             `
             ));
             table.find('tbody').append(newRow);
@@ -1640,11 +1604,6 @@
             newRow.append($('<td style="text-align: center;">').html(
                 `
                 <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" data-index="${i}" class="form-control" type="text" value="${v.qty2}">
-            `
-            ));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahan(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
             `
             ));
             table.find('tbody').append(newRow);
@@ -1730,11 +1689,6 @@
             newRow.append($('<td style="text-align: center;">').html(
                 `
                 <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-jadi-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty_isi}">
-            `
-            ));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanJadi(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
             `
             ));
             table.find('tbody').append(newRow);
