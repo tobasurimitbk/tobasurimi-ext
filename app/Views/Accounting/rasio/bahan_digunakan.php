@@ -317,11 +317,6 @@
 
         var hargaTotalBiaya = biayaSubsidi + biayaLain + biayaKopek;
 
-        console.log(amount);
-        console.log(qtyTotalPenerimaan);
-        console.log(hargaTotalBiaya);
-        console.log(list_items_barang_digunakan.length);
-
         var hargaSatuan = 0;
         list_items_barang_digunakan.forEach((item, index) => {
             totalHarga = (parseFloat(item.totalHargaPO) + parseFloat(hargaTotalBiaya)) / parseFloat(list_items_barang_digunakan.length);

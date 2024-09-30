@@ -144,6 +144,25 @@
                 <!-- end card raw material I -->
                 <!-- card raw material II -->
                 <div id="rawMaterialIICard" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select akun_pemakaian" name="akun_pemakaian" id="akun_pemakaian">
+                                    <option value="" data-code=""></option>
+                                    <?php
+                                    if (!empty($kategoriBarangAkun)) {
+                                        foreach ($kategoriBarangAkun as $kategoriBarang) {
+                                    ?>
+                                            <option value="<?= $kategoriBarang->id; ?>" <?= !empty($rasio) && $rasio->kategori_barang_id == $kategoriBarang->id ? "selected" : "" ?>><?= $kategoriBarang->description; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Akun Pemakaian</label>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row justify-content-end">
                         <div class="col mb-3">
                             <label class="form-label font-weight-bold lable-title">Data Raw Material II</label>
@@ -375,6 +394,29 @@
     }).change(function() {
         list_items_barang_jadi_trimming = [];
         list_items_barang_jadi_kaleng = [];
+        list_items_barang_jadi_frozen = [];
+        list_items_barang_filling = [];
+        list_items_barang_jadi_material_2 = [];
+        list_items_barang_digunakan = [];
+        list_items_barang_pembelian = [];
+        list_items_barang_digunakan_material_2 = [];
+        list_items_labor_cost = [];
+        list_items_title_cost = [];
+        list_items_overhead_cost = [];
+        list_items_fixed_cost = [];
+
+        getDataRawMaterialI();
+        getDataRawMaterialII();
+        getDataCost();
+        // getListWarehouseAsal()
+    });
+
+    $('#akun_pemakaian').select2({
+        placeholder: "Pilih Akun",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        list_items_barang_jadi_trimming = [];
         list_items_barang_jadi_frozen = [];
         list_items_barang_filling = [];
         list_items_barang_jadi_material_2 = [];
@@ -763,215 +805,6 @@
                     }
                 },
             });
-            // $.ajax({
-            //     url: `<?= base_url('rasio/get-barang-digunakan'); ?>`,
-            //     method: "GET",
-            //     data: {
-            //         department: department_id,
-            //         tanggal_awal: tanggal_awal,
-            //         tanggal_akhir: tanggal_akhir,
-            //         kategori: kategori,
-            //     },
-            //     dataType: "json",
-            //     success: function(res) {
-            //         stopLoading()
-            //         if (res.status) {
-            //             list_items_barang_digunakan = [];
-            //             list_items_barang_pembelian = [];
-            //             let no = 0;
-            //             // Iterate over each item in the response data
-            //             res.dataResultPO.forEach(function(item) {
-            //                 list_items_barang_pembelian.push(item);
-            //             });
-            //             res.data.forEach(function(item) {
-            //                 list_items_barang_digunakan.push(item);
-            //             });
-            //             drawTablePembelian();
-            //             drawTableDigunakan();
-            //         } else {
-            //             stopLoading()
-            //             list_items_barang_digunakan = [];
-            //             list_items_barang_pembelian = [];
-            //             drawTablePembelian();
-            //             drawTableDigunakan();
-            //         }
-            //     },
-            // });
-            // $.ajax({
-            //     url: `<?= base_url('rasio/get-barang-digunakan-jadi'); ?>`,
-            //     method: "GET",
-            //     data: {
-            //         department: department_id,
-            //         tanggal_awal: tanggal_awal,
-            //         tanggal_akhir: tanggal_akhir,
-            //         kategori: kategori,
-            //     },
-            //     dataType: "json",
-            //     success: function(res) {
-            //         stopLoading()
-            //         if (res.status) {
-            //             list_items_barang_digunakan_ulang = [];
-            //             let no = 0;
-            //             // Iterate over each item in the response data
-            //             res.data.forEach(function(item) {
-            //                 list_items_barang_digunakan_ulang.push(item);
-            //             });
-            //             drawTableDigunakanJadi();
-            //         } else {
-            //             stopLoading()
-            //             list_items_barang_digunakan_ulang = [];
-            //             drawTableDigunakanJadi();
-            //         }
-            //     },
-            // });
-            // $.ajax({
-            //     url: `<?= base_url('rasio/get-barang-jadi'); ?>`,
-            //     method: "GET",
-            //     data: {
-            //         department: department_id,
-            //         tanggal_awal: tanggal_awal,
-            //         tanggal_akhir: tanggal_akhir,
-            //         kategori: kategori,
-            //     },
-            //     dataType: "json",
-            //     success: function(res) {
-            //         stopLoading()
-            //         if (res.status) {
-            //             list_items_barang_jadi = [];
-            //             let no = 0;
-            //             // Iterate over each item in the response data
-            //             res.data.forEach(function(item) {
-            //                 list_items_barang_jadi.push(item);
-            //             });
-            //             drawTableRasio();
-            //         } else {
-            //             stopLoading()
-            //             list_items_barang_jadi = [];
-            //             list_items_barang_digunakan = [];
-
-            //             drawTableRasio();
-            //             drawTableDigunakan();
-            //         }
-            //     },
-            // });
-            // $.ajax({
-            //     url: `<?= base_url('rasio/get-saldo-akhir'); ?>`,
-            //     method: "GET",
-            //     data: {
-            //         divisi_id: department_id,
-            //     },
-            //     dataType: "json",
-            //     success: function(res) {
-            //         stopLoading()
-            //         if (res.status) {
-            //             list_items_saldo_akhir = [];
-            //             list_items_saldo_akhir = res.data;
-            //             drawTableSaldoAkhir();
-            //         } else {
-            //             stopLoading()
-            //             list_items_saldo_akhir = [];
-            //             drawTableSaldoAkhir();
-            //         }
-            //     },
-            // });
-            // $.ajax({
-            //     url: `<?= base_url('rasio/get-saldo-awal'); ?>`,
-            //     method: "GET",
-            //     data: {
-            //         divisi_id: department_id,
-            //         tanggal_awal: tanggal_awal,
-            //         tanggal_akhir: tanggal_akhir,
-            //         kategori: kategori,
-            //     },
-            //     dataType: "json",
-            //     success: function(res) {
-            //         stopLoading()
-            //         if (res.status) {
-            //             list_items_saldo_awal = [];
-            //             list_items_saldo_awal = res.data;
-            //             drawTableSaldoAwal();
-            //         } else {
-            //             stopLoading()
-            //             list_items_saldo_awal = [];
-            //             drawTableSaldoAwal();
-            //         }
-            //     },
-            // });
-            // $.ajax({
-            //     url: `<?= base_url('rasio/get-saldo-adjusment'); ?>`,
-            //     method: "GET",
-            //     data: {
-            //         divisi_id: department_id,
-            //         tanggal_awal: tanggal_awal,
-            //         tanggal_akhir: tanggal_akhir,
-            //         kategori: kategori,
-            //     },
-            //     dataType: "json",
-            //     success: function(res) {
-            //         stopLoading()
-            //         if (res.status) {
-            //             list_items_saldo_adjusment = [];
-            //             list_items_saldo_adjusment = res.data;
-            //             drawTableSaldoAdjusmentAnalisa();
-            //             drawTableSaldoAdjusmentSample();
-            //             drawTableSaldoAdjusmentBonus();
-            //             drawTableSaldoAdjusmentLainnya();
-            //         } else {
-            //             stopLoading()
-            //             list_items_saldo_adjusment = [];
-            //             drawTableSaldoAdjusmentAnalisa();
-            //             drawTableSaldoAdjusmentSample();
-            //             drawTableSaldoAdjusmentBonus();
-            //             drawTableSaldoAdjusmentLainnya();
-            //         }
-            //     },
-            // });
-            // $.ajax({
-            //     url: `<?= base_url('rasio/get-saldo-jual'); ?>`,
-            //     method: "GET",
-            //     data: {
-            //         divisi_id: department_id,
-            //         tanggal_awal: tanggal_awal,
-            //         tanggal_akhir: tanggal_akhir,
-            //         kategori: kategori,
-            //     },
-            //     dataType: "json",
-            //     success: function(res) {
-            //         stopLoading()
-            //         if (res.status) {
-            //             list_items_saldo_jual = [];
-            //             list_items_saldo_jual = res.data;
-            //             drawTableSaldoJual();
-            //         } else {
-            //             stopLoading()
-            //             list_items_saldo_jual = [];
-            //             drawTableSaldoJual();
-            //         }
-            //     },
-            // });
-            // $.ajax({
-            //     url: `<?= base_url('rasio/get-saldo-trimming'); ?>`,
-            //     method: "GET",
-            //     data: {
-            //         divisi_id: department_id,
-            //         tanggal_awal: tanggal_awal,
-            //         tanggal_akhir: tanggal_akhir,
-            //         kategori: kategori,
-            //     },
-            //     dataType: "json",
-            //     success: function(res) {
-            //         stopLoading()
-            //         if (res.status) {
-            //             list_items_saldo_trimming = [];
-            //             list_items_saldo_trimming = res.data;
-            //             drawTableSaldoTrimming();
-            //         } else {
-            //             stopLoading()
-            //             list_items_saldo_trimming = [];
-            //             drawTableSaldoTrimming();
-            //         }
-            //     },
-            // });
         }
     }
 
@@ -980,7 +813,8 @@
         var tanggal_awal = $('#tanggal_awal').val();
         var tanggal_akhir = $('#tanggal_akhir').val();
         var kategori = $('#kategori').val();
-        if (department_id && tanggal_awal && tanggal_akhir && kategori) {
+        var akun_pemakaian = $('#akun_pemakaian').val();
+        if (department_id && tanggal_awal && tanggal_akhir && kategori && akun_pemakaian) {
             setLoading();
             $.ajax({
                 url: `<?= base_url('rasio/get-barang-digunakan-penolong'); ?>`,
@@ -1310,10 +1144,10 @@
             $('.body-detail-table-alokasi').append(row);
 
             let qtyTotalDigunakan = parseFloat($('#qtyTotalDigunakan').val()) || 0;
-            let hargaTotalDigunakan = parseFloat($('#hargaTotalDigunakan').val().replace(/[Rp.]/g, '')) || 0;
-            let biayaSubsidi = parseFloat($('#biayaSubsidi').val().replace(/[Rp.]/g, '')) || 0;
-            let biayaLain = parseFloat($('#biayaLain').val().replace(/[Rp.]/g, '')) || 0;
-            let biayaKopek = parseFloat($('#biayaKopek').val().replace(/[Rp.]/g, '')) || 0;
+            let hargaTotalDigunakan = parseFloat(($('#hargaTotalDigunakan').val() || '').replace(/[Rp.]/g, '')) || 0;
+            let biayaSubsidi = parseFloat(($('#biayaSubsidi').val() || '').replace(/[Rp.]/g, '')) || 0;
+            let biayaLain = parseFloat(($('#biayaLain').val() || '').replace(/[Rp.]/g, '')) || 0;
+            let biayaKopek = parseFloat(($('#biayaKopek').val() || '').replace(/[Rp.]/g, '')) || 0;
 
             $('#qtyTotalSetelahAlokasi').val(qtyTotalDigunakan.toLocaleString());
             $('#hargaTotalSetelahAlokasi').val(formatRupiah(hargaTotalDigunakan + biayaSubsidi + biayaLain + biayaKopek));
@@ -1456,7 +1290,6 @@
             var summaryTotalHargaSatuan = 0;
 
             list_items_saldo_awal.map((item, index) => {
-                // console.log(item);
 
                 // counting total
                 hargaUmum = item.harga_umum !== null ? parseFloat(item.harga_umum) : 0;
@@ -2560,7 +2393,6 @@
             </tr>`;
             $('.tfoot-rasio-akhir').append(rowFooter);
             $('.body-table-rasio-akhir').append(row);
-            $('.body-table-rasio-akhir').append(rowSubTotal);
 
             // Update total harga if any input with class 'harga' changes
             $('.harga').on('change', function() {
@@ -2576,7 +2408,6 @@
         }
     };
     const drawTableRasioAkhirFrozen = function(data) {
-        // console.log(data);
         $('.body-table-rasio-akhir').empty();
         $('.tfoot-rasio-akhir').empty();
 
@@ -3614,8 +3445,6 @@
                 list_items_barang_jadi_frozen.push(barang1IdArr);
             }
         }
-
-        console.log(list_items_barang_jadi_frozen);
         if (list_items_barang_jadi_frozen.length != 0) {
             drawTableRasioAkhirFrozen(list_items_barang_jadi_frozen);
         }

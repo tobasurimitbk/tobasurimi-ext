@@ -214,36 +214,4 @@ class TutupBukuController extends BaseController
             'message' => "Tutup Buku Berhasil Ditambahkan"
         ]);
     }
-
-    public function updateAccountSupplier()
-    {
-        $id = $this->request->getVar('id');
-
-        $this->AccountSupplierModel->update($id, [
-            'supplier_id' => $this->request->getVar('supplier_id'),
-            'ap_id' => $this->request->getVar('akun_ap_id'),
-            'ar_id' => $this->request->getVar('akun_ar_id')
-        ]);
-
-        return response()->setJSON([
-            'token' => \csrf_hash(),
-            'status' => true,
-            'message' => "Account Supplier Berhasil Diupdate"
-        ]);
-    }
-
-    public function deleteAccountSupplier()
-    {
-        $id = $this->request->getVar('id');
-
-        $this->AccountSupplierModel->update($id, [
-            'deleted_at' => date('Y-m-d H:i:s')
-        ]);
-
-        return response()->setJSON([
-            'token' => csrf_hash(),
-            'status' => true,
-            'message' => "Account Supplier Berhasil Dihapus"
-        ]);
-    }
 }
