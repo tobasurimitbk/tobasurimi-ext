@@ -54,32 +54,38 @@
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="form-floating mb-3 mt-1" style="height: 50px;">
-                            <select <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select sales_order_lain_id" id="sales_order_lain_id" name="sales_order_lain_id" aria-label="Floating label select example">
+                            <select <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select asal_pengeluaran" id="asal_pengeluaran" name="asal_pengeluaran">
                                 <option value=""></option>
-                                <?php foreach ($salesOrderLain as $s) : ?>
-                                    <option <?= (!empty($bc25) ? ($bc25['sales_order_lain_id'] == $s['id'] ? 'selected' : '') : '') ?> data-sales_order_lain_id="<?= encrypt($s['id']) ?>" data-nama_customer="<?= $s['nama_customer'] ?>" data-country_name="<?= $s['country_name'] ?>" data-alamat_customer="<?= $s['alamat_customer'] ?>" data-tanggal_sales_order="<?= date('d/m/Y', strtotime($s['tanggal'])) ?>" data-divisi="<?= $s['divisi'] ?>" data-warehouse_name="<?= $s['warehouse_name'] ?>" data-keterangan="<?= $s['keterangan'] ?>" value="<?= $s['id'] ?>">
-                                        <?= $s['no_sales_order'] ?>
-                                    </option>
-                                <?php endforeach; ?>
+                                <option <?= !empty($bc25) ? ($bc25['pengembalian_barang_id'] != null ? 'selected' : '') : '' ?> value="RETUR">RETUR</option>
+                                <option <?= !empty($bc25) ? ($bc25['sales_order_lain_id'] != null ? 'selected' : '') : '' ?> value="PENJUALAN">PENJUALAN</option>
                             </select>
-                            <label style="z-index: 1;">Pilih Order Form</label>
+                            <label style="z-index: 1;">Pilih Asal Pengeluaran</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-floating mb-3 mt-1" style="height: 50px;">
+                            <select <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select reference_id" id="reference_id" name="reference_id">
+                                <option value=""></option>
+                                <?php if (isset($reference)): ?>
+                                    <?php foreach ($reference as $s) : ?>
+                                        <option <?= (!empty($bc25) ? ($bc25['reference_id'] == $s['id'] ? 'selected' : '') : '') ?> data-nama_penerima="<?= $s['nama_penerima'] ?>" data-alamat_penerima="<?= $s['alamat_penerima'] ?>" data-tanggal_reference="<?= $s['tanggal_reference'] ?>" data-divisi="<?= $s['divisi'] ?>" data-warehouse_name="<?= $s['warehouse_name'] ?>" data-keterangan="<?= $s['keterangan'] ?>" value="<?= $s['id'] ?>">
+                                            <?= $s['no_reference'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                            <label style="z-index: 1;">Pilih Nomor Reference</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input disabled placeholder="Nama Customer" value="<?= !empty($bc25) ? $bc25['nama_customer'] : '' ?>" class="form-control nama_customer" id="nama_customer" aria-label="Floating label select example" />
-                            <label for="floatingInput" style="z-index: 1;">Nama Customer</label>
+                            <input disabled placeholder="Nama Penerima" value="<?= !empty($bc25) ? $bc25['nama_penerima'] : '' ?>" class="form-control nama_penerima" id="nama_penerima" />
+                            <label for="floatingInput" style="z-index: 1;">Nama Penerima</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input disabled placeholder="Negara" value="<?= !empty($bc25) ? $bc25['country_name'] : '' ?>" class="form-control country_name" id="country_name" aria-label="Floating label select example" />
-                            <label for="floatingInput" style="z-index: 1;">Negara</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input disabled placeholder="Company Asal" value="<?= !empty($bc25) ? $bc25['alamat_customer'] : '' ?>" class="form-control alamat_customer" id="alamat_customer" aria-label="Floating label select example" />
+                            <input disabled placeholder="Company Asal" value="<?= !empty($bc25) ? $bc25['alamat_penerima'] : '' ?>" class="form-control alamat_penerima" id="alamat_penerima" />
                             <label for="floatingInput" style="z-index: 1;">Alamat</label>
                         </div>
                     </div>
@@ -105,8 +111,8 @@
                     <div class="col-sm-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3">
-                                <input disabled <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc25) ? $bc25['no_daftar'] : "" ?>" autocomplete="one-time-code" type="text" class="form-control tanggal_sales_order" id="tanggal_sales_order" name="tanggal_sales_order" placeholder="No Daftar">
-                                <label for="floatingInput">Tanggal Order</label>
+                                <input disabled <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc25) ? date('d/m/Y', strtotime($bc25['tanggal_reference'])) : "" ?>" autocomplete="one-time-code" type="text" class="form-control tanggal_reference" id="tanggal_reference" name="tanggal_reference" placeholder="Tanggal Reference">
+                                <label for="floatingInput">Tanggal Reference</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
                                 <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
@@ -115,19 +121,19 @@
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3">
-                            <input disabled <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc25) ? $bc25['no_daftar'] : "" ?>" autocomplete="one-time-code" type="text" class="form-control divisi" id="divisi" name="divisi" placeholder="Departemen">
+                            <input disabled <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc25) ? $bc25['divisi'] : "" ?>" autocomplete="one-time-code" type="text" class="form-control divisi" id="divisi" name="divisi" placeholder="Departemen">
                             <label for="floatingInput">Departemen</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3">
-                            <input disabled <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc25) ? $bc25['no_daftar'] : "" ?>" autocomplete="one-time-code" type="text" class="form-control warehouse_name" id="warehouse_name" name="warehouse_name" placeholder="Warehouse">
+                            <input disabled <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc25) ? $bc25['warehouse_name'] : "" ?>" autocomplete="one-time-code" type="text" class="form-control warehouse_name" id="warehouse_name" name="warehouse_name" placeholder="Warehouse">
                             <label for="floatingInput">Warehouse</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3">
-                            <input disabled <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc25) ? $bc25['no_daftar'] : "" ?>" autocomplete="one-time-code" type="text" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan">
+                            <input disabled <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc25) ? $bc25['keterangan'] : "" ?>" autocomplete="one-time-code" type="text" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan">
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
@@ -242,10 +248,11 @@
     // INIT PAS EDIT
     <?php if (!empty($bc25)) : ?>
         $.ajax({
-            url: `<?= base_url('order-form-lain/list-sales-order-detail'); ?>`,
+            url: `<?= base_url('bea-cukai-bc-25/list-reference-detail'); ?>`,
             method: "GET",
             data: {
-                sales_order_lain_id: "<?= encrypt($bc25['sales_order_lain_id']) ?>"
+                reference_id: "<?= $bc25['reference_id'] ?>",
+                asal_pengeluaran: $('#asal_pengeluaran option:selected').val(),
             },
             dataType: "json",
             success: function(res) {
@@ -257,16 +264,45 @@
         });
     <?php endif; ?>
 
-    $('#sales_order_lain_id').select2({
-        placeholder: "Pilih Order Form",
+    $('#asal_pengeluaran').select2({
+        placeholder: "Pilih Asal Pengeluaran",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        var selected = $('#sales_order_lain_id option:selected');
-        $('#nama_customer').val(selected.data('nama_customer'));
-        $('#country_name').val(selected.data('country_name'));
-        $('#alamat_customer').val(selected.data('alamat_customer'));
-        $('#tanggal_sales_order').val(selected.data('tanggal_sales_order'));
+        var asal_pengeluaran = $('#asal_pengeluaran option:selected').val();
+        $.ajax({
+            url: `<?= base_url('bea-cukai-bc-25/list-reference'); ?>`,
+            method: "GET",
+            data: {
+                asal_pengeluaran: asal_pengeluaran,
+            },
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            dataType: "json",
+            success: function(res) {
+                $("#reference_id").empty()
+                $("#reference_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $("#reference_id").append(`<option data-nama_penerima="${item.nama_penerima}" data-alamat_penerima="${item.alamat_penerima}" data-tanggal_reference="${item.tanggal_reference}" data-divisi="${item.divisi}" data-warehouse_name="${item.warehouse_name}" data-keterangan="${item.keterangan}" value="${item.id}">${item.no_reference}</option>`)
+                })
+                $("#reference_id").val();
+            }
+        });
+    });
+
+    $('#reference_id').select2({
+        placeholder: "Pilih Nomor Reference",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        var selected = $('#reference_id option:selected');
+        $('#nama_penerima').val(selected.data('nama_penerima'));
+        $('#alamat_penerima').val(selected.data('alamat_penerima'));
+        $('#tanggal_reference').val(selected.data('tanggal_reference'));
         $('#divisi').val(selected.data('divisi'));
         $('#warehouse_name').val(selected.data('warehouse_name'));
         $('#keterangan').val(selected.data('keterangan'));
@@ -277,7 +313,7 @@
     // VALIDATOR
     var validator = $(".create-form").validate({
         rules: {
-            sales_order_lain_id: {
+            reference_id: {
                 required: true
             },
             no_aju: {
@@ -288,7 +324,7 @@
             },
         },
         messages: {
-            sales_order_lain_id: {
+            reference_id: {
                 required: "Pilih sales order"
             },
             no_aju: {
@@ -320,7 +356,7 @@
         },
     });
 
-    $("#sales_order_lain_id")
+    $("#reference_id,#asal_pengeluaran")
         .parent('div')
         .children('span')
         .children('span')
@@ -507,7 +543,7 @@
 
     function getListBarang() {
         $.ajax({
-            url: `<?= base_url('order-form-lain/list-sales-order-detail'); ?>`,
+            url: `<?= base_url('bea-cukai-bc-25/list-reference-detail'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -516,7 +552,8 @@
                 stopLoading();
             },
             data: {
-                sales_order_lain_id: $('#sales_order_lain_id option:selected').data('sales_order_lain_id')
+                asal_pengeluaran: $('#asal_pengeluaran option:selected').val(),
+                reference_id: $('#reference_id option:selected').val()
             },
             dataType: "json",
             success: function(res) {
@@ -540,6 +577,7 @@
             table.find('tfoot').append(newRow);
         } else {
             var totalHarga = 0;
+            var sumberBarang = "-";
             $.each(listData, function(i, v) {
                 var newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append($('<td style="text-align: center;">').html(
@@ -552,18 +590,31 @@
                 newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
                 newRow.append($('<td style="text-align: center;">').text(v.bc_type + '/' + v.no_aju));
                 newRow.append($('<td style="text-align: center;">').text(v.stock_date));
-                newRow.append($('<td style="text-align: center;">').text(v.barang));
+                newRow.append($('<td style="text-align: center;">').text(v.kode_barang + " " + v.barang));
                 newRow.append($('<td style="text-align: center;">').text(v.qty_konversi + " " + v.satuan));
                 newRow.append($('<td style="text-align: center;">').text(formatRupiah(v.total_harga)));
                 table.find('tbody').append(newRow);
 
                 totalHarga = totalHarga + parseFloat(v.total_harga);
+                sumberBarang = v.sumber;
             });
             // GRAND TOTAL
             var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996">');
             newRow.append($('<td style="text-align: right;" colspan="8">').html("<b>GRAND TOTAL</b>"));
             newRow.append($('<td style="text-align: center;">').text(formatRupiah(totalHarga)));
             table.find('tbody').append(newRow);
+
+            if (sumberBarang === "-") {
+                Swal.fire({
+                    icon: 'error',
+                    title: "LPB yang anda pilih belum dibuatkan dokumen pemasukan barang, silahkan dicek kembali",
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+                $('.btn-submit-parent').attr('disabled', true);
+            } else {
+                $('.btn-submit-parent').attr('disabled', false);
+            }
         }
     }
 

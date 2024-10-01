@@ -50,7 +50,9 @@ class BC25Model extends Model
             'bc_25.no_aju' => 'bc_25.no_aju',
             'bc_25.createdAt' => 'bc_25.createdAt',
             'bc_25.status_posting' => 'bc_25.status_posting',
-            'bc_25.status_dokumen' => 'bc_25.status_dokumen'
+            'bc_25.status_dokumen' => 'bc_25.status_dokumen',
+            'pengembalian_barang.no_surat_jalan' => 'pengembalian_barang.no_surat_jalan',
+            'suppliers.name' => 'suppliers.name'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -61,7 +63,9 @@ class BC25Model extends Model
         sales_order_lain.no_sales_order,
         divisis.divisi,
         warehouses.warehouse_name,
-        customers.name AS customer_name";
+        customers.name AS customer_name,
+        suppliers.name as supplier_name,
+        pengembalian_barang.no_surat_jalan";
 
         $bcDataQry = $this->asObject()
             ->select($selectQry)
@@ -69,6 +73,9 @@ class BC25Model extends Model
             ->join('divisis', 'divisis.id = sales_order_lain.divisi_id', 'left')
             ->join('warehouses', 'warehouses.id = sales_order_lain.warehouse_id', 'left')
             ->join('customers', 'customers.id = sales_order_lain.customer_id', 'left')
+            ->join('pengembalian_barang', 'pengembalian_barang.id = bc_25.pengembalian_barang_id', 'left')
+            ->join('penerimaan_barang', 'pengembalian_barang.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
@@ -85,6 +92,15 @@ class BC25Model extends Model
                 $bcDataQry->where('bc_25.status_posting', "1");
             } else if ($addCondition['statusPosting'] == "BELUM POSTING") {
                 $bcDataQry->where('bc_25.status_POSTING', "0");
+            }
+        }
+
+        if ($addCondition['asalPengeluaran']) {
+            if ($addCondition['asalPengeluaran'] == "RETUR") {
+                $bcDataQry->where('pengembalian_barang_id !=', null);
+            } else
+            if ($addCondition['asalPengeluaran'] == "PENJUALAN") {
+                $bcDataQry->where('sales_order_id !=', null);
             }
         }
 
@@ -124,30 +140,59 @@ class BC25Model extends Model
 
     public function detail($id)
     {
-        $selectQry = "
-            bc_25.*,
-            sales_order_lain.no_sales_order,
-            customers.name AS nama_customer,
-            customers.address AS alamat_customer,
-            country.country_name,
-            divisis.divisi,
-            warehouses.warehouse_name
-        ";
+        $bc25 = $this->find($id);
 
-        $result = $this->asArray()->select($selectQry)
-            ->join('sales_order_lain', 'sales_order_lain.id = bc_25.sales_order_lain_id', 'left')
-            ->join('customers', 'customers.id = sales_order_lain.customer_id', 'left')
-            ->join('country', 'country.id = customers.country_id', 'left')
-            ->join('divisis', 'divisis.id = sales_order_lain.divisi_id', 'left')
-            ->join('warehouses', 'warehouses.id = sales_order_lain.warehouse_id')
-            ->where('bc_25.id', $id)
-            ->where('bc_25.deletedAt', null)
-            ->first();
+        if ($bc25['sales_order_lain_id'] != null) {
+            $selectQry = "
+                bc_25.*,
+                bc_25.sales_order_lain_id as reference_id,
+                sales_order_lain.no_sales_order as no_reference,
+                sales_order_lain.tanggal as tanggal_reference,
+                sales_order_lain.keterangan,
+                customers.name AS nama_penerima,
+                customers.address AS alamat_penerima,
+                country.country_name,
+                divisis.divisi,
+                warehouses.warehouse_name
+            ";
+
+            $result = $this->asArray()->select($selectQry)
+                ->join('sales_order_lain', 'sales_order_lain.id = bc_25.sales_order_lain_id', 'left')
+                ->join('customers', 'customers.id = sales_order_lain.customer_id', 'left')
+                ->join('country', 'country.id = customers.country_id', 'left')
+                ->join('divisis', 'divisis.id = sales_order_lain.divisi_id', 'left')
+                ->join('warehouses', 'warehouses.id = sales_order_lain.warehouse_id', 'left')
+                ->where('bc_25.id', $id)
+                ->where('bc_25.deletedAt', null)
+                ->first();
+        } else {
+            $selectQry = "
+                bc_25.*,
+                bc_25.pengembalian_barang_id as reference_id,
+                pengembalian_barang.no_surat_jalan as no_reference,
+                pengembalian_barang.tanggal_surat_jalan as tanggal_reference,
+                pengembalian_barang.keterangan,                
+                suppliers.name AS nama_penerima,
+                suppliers.address AS alamat_penerima,
+                divisis.divisi,
+                warehouses.warehouse_name
+            ";
+
+            $result = $this->asArray()->select($selectQry)
+                ->join('pengembalian_barang', 'pengembalian_barang.id = bc_25.pengembalian_barang_id', 'left')
+                ->join('penerimaan_barang', 'penerimaan_barang.id = pengembalian_barang.penerimaan_barang_id', 'left')
+                ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+                ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+                ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+                ->where('bc_25.id', $id)
+                ->where('bc_25.deletedAt', null)
+                ->first();
+        }
 
         return $result;
     }
 
-    public function getListSalesOrderLain($salesOrderLainId = null)
+    public function getListSalesOrderLain($companyId, $salesOrderLainId = null)
     {
         $metaDataModel = new MetadataModel();
         $salesOrderLainModel = new SalesOrderLainModel();
@@ -155,8 +200,8 @@ class BC25Model extends Model
         $bcFirst = $metaDataModel->getBCFirst("BC 2.5");
         $selectQry = "
             sales_order_lain.*,
-            customers.name AS nama_customer,
-            customers.address AS alamat_customer,
+            customers.name AS nama_penerima,
+            customers.address AS alamat_penerima,
             country.country_name,
             divisis.divisi,
             warehouses.warehouse_name
@@ -170,6 +215,7 @@ class BC25Model extends Model
             ->where('status_posting', '1')
             ->where('sales_order_lain.bc_id', $bcFirst['id'])
             ->where('sales_order_lain.deletedAt', null)
+            ->where('sales_order_lain.company_id', $companyId)
             ->findAll();
 
         $result = array();
@@ -188,7 +234,79 @@ class BC25Model extends Model
             }
         }
 
-        return $result;
+        $resultData = array();
+        foreach ($result as $r) {
+            $resultData[] = [
+                'id' => ($r['id']),
+                'no_reference' => $r['no_sales_order'],
+                'nama_penerima' => $r['nama_penerima'],
+                'alamat_penerima' => $r['alamat_penerima'],
+                'tanggal_reference' => date('d/m/Y', strtotime('tanggal_sales_order')),
+                'divisi' => $r['divisi'],
+                'warehouse_name' => $r['warehouse_name'],
+                'keterangan' => $r['keterangan']
+            ];
+        }
+
+        return $resultData;
+    }
+
+    public function getListPengembalianBarang($companyId, $pengembalianBarangId = null)
+    {
+        $metaDataModel = new MetadataModel();
+        $pengembalianBarangModel = new PengembalianBarangModel();
+
+        $bcFirst = $metaDataModel->getBCFirst("BC 2.5");
+        $selectQry = "
+            pengembalian_barang.*,
+            suppliers.name AS nama_penerima,
+            suppliers.address AS alamat_penerima,
+            divisis.divisi,
+            warehouses.warehouse_name,
+            penerimaan_barang.no_penerimaan_barang
+        ";
+
+        $pengeluaranBarang = $pengembalianBarangModel->select($selectQry)
+            ->join('penerimaan_barang', 'penerimaan_barang.id = pengembalian_barang.penerimaan_barang_id', 'left')
+            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id')
+            ->where('pengembalian_barang.status_post', 'FINISH')
+            ->where('pengembalian_barang.bc_pengeluaran_id', $bcFirst['id'])
+            ->where('pengembalian_barang.deletedAt', null)
+            ->where('pengembalian_barang.company_id', $companyId)
+            ->findAll();
+        $result = array();
+
+        foreach ($pengeluaranBarang as $s) {
+            $bc25 = $this->where('pengembalian_barang_id', $s['id'])->first();
+            if ($pengembalianBarangId != null) {
+                if ($bc25 == null || $pengembalianBarangId == $s['id']) {
+                    array_push($result, $s);
+                }
+            } else {
+                if ($bc25 == null) {
+                    array_push($result, $s);
+                }
+            }
+        }
+
+        $resultData = array();
+        foreach ($result as $r) {
+            $resultData[] = [
+                'id' => ($r['id']),
+                'no_reference' => $r['no_surat_jalan'] . " (" . $r['no_penerimaan_barang'] . ")",
+                'nama_penerima' => $r['nama_penerima'],
+                'alamat_penerima' => $r['alamat_penerima'],
+                'tanggal_reference' => date('d/m/Y', strtotime($r['tanggal_surat_jalan'])),
+                'divisi' => $r['divisi'],
+                'warehouse_name' => $r['warehouse_name'],
+                'keterangan' => $r['keterangan'],
+
+            ];
+        }
+
+        return $resultData;
     }
 
     public function dropdownKemasan($salesOrderLainId)
@@ -215,9 +333,10 @@ class BC25Model extends Model
     }
 
     // BEA CUKAI FUNCTION
-    public function detailBarang($bcId, $kodeBarang, $salesOrderLainId)
+    public function detailBarang($bcId, $kodeBarang, $salesOrderLainId, $pengembalianBarangId)
     {
-        $listBarang = $this->barang($salesOrderLainId);
+        $listBarang = $this->barang($salesOrderLainId, $pengembalianBarangId);
+
         $payload = json_decode($this->find($bcId)['payload']);
         $result = null;
 
@@ -239,10 +358,17 @@ class BC25Model extends Model
         return $result;
     }
 
-    public function barang($salesOrderLainId)
+    public function barang($salesOrderLainId, $pengembalianBarangId)
     {
+        $pengembalianBarangDetailModel = new PengembalianBarangModel();
         $salesOrderLainDetailModel = new SalesOrderLainDetailModel();
-        $detailBarang = $salesOrderLainDetailModel->detail($salesOrderLainId);
+
+        if ($salesOrderLainId != null) {
+            $detailBarang = $salesOrderLainDetailModel->detail($salesOrderLainId);
+        } else {
+            $detailBarang = $pengembalianBarangDetailModel->getReturBeaCukaiDetail($pengembalianBarangId);
+        }
+
         $result = [];
 
         foreach ($detailBarang as $item) {

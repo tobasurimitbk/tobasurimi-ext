@@ -1571,6 +1571,8 @@ $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
     $routes->post('delete', 'BeaCukai\BC25::delete');
     $routes->post('posting', 'BeaCukai\BC25::posting');
     $routes->get('check-no-aju', 'BeaCukai\BC25::checkNoAju');
+    $routes->get('list-reference', 'BeaCukai\BC25::getReference');
+    $routes->get('list-reference-detail', 'BeaCukai\BC25::getDetailReference');
     // HEADER
     $routes->get('id/header/(:segment)', 'BeaCukai\BC25::header/$1');
     $routes->post('id/header', 'BeaCukai\BC25::updateHeader');

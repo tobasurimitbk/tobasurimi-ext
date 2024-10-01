@@ -901,4 +901,66 @@ class StockDetail2Model extends Model
             return $resultData[0]['stok_total'];
         }
     }
+
+    public function getStockDetailByStockDokumen($stockDokumen, $sumber, $companyId, $divisiId, $warehouseId, $barangId, $spesifikasiId, $kemasanId)
+    {
+        $selectQry = '
+            suppliers.name AS supplier_name,
+            stock.barang1_id,
+            stock.barang2_id,
+            stock.kemasan_id,
+            stock_details2.id,
+            stock_details2.bc_id,
+            stock_details2.stock_detail_id,
+            stock_details2.no_aju,
+            stock_details2.stock_id,
+            stock_details2.stock_dokumen,
+            stock_details2.supplier_id,
+            stock_details2.harga_umum,
+            stock_details2.harga_harian,
+            stock_details2.harga_bulanan,
+            stock_details2.no_po,
+            stock_details.stock_date,
+            stock_details.sumber,
+            stock_details.no_dokumen AS no_dokumen_1,
+            (SUM(CASE WHEN stock_details.status = "In" 
+            THEN stock_details2.qty ELSE 0 END) - 
+            SUM(CASE WHEN stock_details.status = "Out" 
+            THEN stock_details2.qty ELSE 0 END)) 
+            AS stok_total,        
+        ';
+
+        if ($kemasanId == null) {
+            $dataQry = $this->asArray()
+                ->select($selectQry)
+                ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id', 'left')
+                ->join('stock', 'stock.id = stock_details.stock_id', 'left')
+                ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+                ->where('stock_details.sumber', $sumber)
+                ->where('stock_details2.stock_dokumen', $stockDokumen)
+                ->where('stock.barang1_id', $barangId)
+                ->where('stock.barang2_id', $spesifikasiId)
+                ->where('stock.company_id', $companyId)
+                ->where('stock.divisi_id', $divisiId)
+                ->where('stock.warehouse_id', $warehouseId)
+                ->groupBy('stock_details2.stock_dokumen')
+                ->first();
+        } else {
+            $dataQry = $this->asArray()
+                ->select($selectQry)
+                ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id', 'left')
+                ->join('stock', 'stock.id = stock_details.stock_id', 'left')
+                ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+                ->where('stock_details.sumber', $sumber)
+                ->where('stock_details2.stock_dokumen', $stockDokumen)
+                ->where('stock.kemasan_id', $kemasanId)
+                ->where('stock.company_id', $companyId)
+                ->where('stock.divisi_id', $divisiId)
+                ->where('stock.warehouse_id', $warehouseId)
+                ->groupBy('stock_details2.stock_dokumen')
+                ->first();
+        }
+
+        return $dataQry;
+    }
 }
