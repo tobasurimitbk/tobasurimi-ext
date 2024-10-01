@@ -72,13 +72,14 @@
                         <thead class="thead-dark">
                             <tr style="text-align: center;">
                                 <th style="text-align:center;">No</th>
-                                <th style="text-align:center;">Nama Customer</th>
+                                <th style="text-align:center;">Asal Pengeluaran</th>
+                                <th style="text-align:center;">Nama Customer / Supplier</th>
                                 <th style="text-align:center;">No Sales Order</th>
                                 <th style="text-align:center;">Department / Warehouse Pengeluaran</th>
                                 <th style="text-align:center;">Tanggal</th>
                                 <th style="text-align:center;">Jumlah Barang</th>
                                 <th style="text-align:center;">Nilai Barang</th>
-                                <th style="text-align:center;">DETAIL BARANG</th>
+                                <th style="text-align:center;">Detail Barang</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
@@ -120,17 +121,16 @@
                     $.each(res, function(i, v) {
                         var newRow = $('<tr style="border: none">');
                         newRow.append($('<td style="text-align:center;">').text(no++));
+                        newRow.append($('<td style="text-align:center;">').text(v.asal_pengeluaran));
                         newRow.append($('<td style="text-align:center;">').text(v.customer));
                         newRow.append($('<td style="text-align:center;">').text(v.no_sales_order));
                         newRow.append($('<td style="text-align:center;">').text(v.divisi + " / " + v.warehouse_name));
-
                         newRow.append($('<td style="text-align:center;">').text(v.tanggal));
                         newRow.append($('<td style="text-align:center;">').text(v.jumlah_barang));
-                        newRow.append($('<td style="text-align:center;">').text(v.total_harga));
-
+                        newRow.append($('<td style="text-align:center;">').text(v.harga_barang));
                         newRow.append($('<td style="text-align:center;">').html(`
                             <div class="mt-0">
-                                <button  data-toggle="tooltip" title="Histori LPB" onclick="displayDetails('${v.id}')" class="btn btn-success posting-spp">
+                                <button  data-toggle="tooltip" title="Detail" onclick="displayDetails('${v.id}','${v.asal_pengeluaran}')" class="btn btn-success posting-spp">
                                     <i class="fa-solid fa-box"></i>
                                 </button>
                             <div>`));
@@ -138,7 +138,7 @@
                     });
                 } else {
                     var newRow = $('<tr style="border: none">');
-                    newRow.append($('<td colspan ="10"  style="text-align:center;">').text("Tidak ada Dokumen Bea Cukai"));
+                    newRow.append($('<td colspan ="11"  style="text-align:center;">').text("Tidak ada Dokumen Bea Cukai"));
                     table.find('tbody').append(newRow);
                 }
 
@@ -147,14 +147,9 @@
         })
     }
 
-
-
-
-    function displayDetails(id) {
-        var salesOrderLain = id;
-        console.log(salesOrderLain);
+    function displayDetails(reference_id, asal_pengeluaran) {
         $.ajax({
-            url: `<?= base_url('order-form-lain/list-sales-order-detail'); ?>`,
+            url: `<?= base_url('bea-cukai-bc-41/list-reference-detail'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -163,7 +158,8 @@
                 stopLoading();
             },
             data: {
-                sales_order_lain_id: salesOrderLain
+                reference_id: reference_id,
+                asal_pengeluaran: asal_pengeluaran,
             },
             dataType: "json",
             success: function(res) {

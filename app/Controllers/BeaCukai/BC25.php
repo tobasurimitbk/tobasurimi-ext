@@ -1810,6 +1810,7 @@ class BC25 extends BaseController
 
         $pengembalianBarangAll = $this->pengembalianBarangModel
             ->where('company_id', $this->this_company_id)
+            ->where('status_post', 'FINISH')
             ->where('deletedAt', null)
             ->where('bc_pengeluaran_id', '49')
             ->findAll();

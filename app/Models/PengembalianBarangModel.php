@@ -355,7 +355,6 @@ class PengembalianBarangModel extends Model
                     'kemasan_id' => $dataStock == null ? null : $dataStock['kemasan_id'],
                     'stock_id' => $dataStock == null ? null : $dataStock['stock_id'],
                     'bc_id' => $dataStock == null ? null : $dataStock['bc_id'],
-                    'no_aju' => $dataStock == null ? null : $dataStock['no_aju'],
                     'stock_dokumen' => $dataStock == null ? null : $dataStock['stock_dokumen'],
                 ];
             }

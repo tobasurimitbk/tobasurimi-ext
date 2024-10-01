@@ -100,7 +100,7 @@ class BC25Model extends Model
                 $bcDataQry->where('pengembalian_barang_id !=', null);
             } else
             if ($addCondition['asalPengeluaran'] == "PENJUALAN") {
-                $bcDataQry->where('sales_order_id !=', null);
+                $bcDataQry->where('sales_order_lain_id !=', null);
             }
         }
 
