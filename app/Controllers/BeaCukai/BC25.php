@@ -1076,9 +1076,9 @@ class BC25 extends BaseController
             $indexLast = count($payload->barang) == 0 ? 0 : count($payload->barang) - 1;
             $seriBarang = count($payload->barang) == 0 ? 1 : $payload->barang[$indexLast]->seriBarang + 1;
 
-            $ndpbm = $payload->ndpbm / $totalBarang;
-            $cif = $payload->cif / $totalBarang;
-            $bruto = $payload->bruto / $totalBarang;
+            $ndpbm = $payload->ndpbm ?? 0 / $totalBarang;
+            $cif = $payload->cif  ?? 0 / $totalBarang;
+            $bruto = $payload->bruto ?? 0 / $totalBarang;
 
             array_push($payload->barang, [
                 'bruto' => $bruto,

@@ -248,11 +248,11 @@
                                     <label>Nilai CIF</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input readonly id="hargaEkspor" name="hargaEkspor" type="text" class="form-control hargaEkspor" value="<?= formatRupiah($barang['bcDetail']->cif * $barang['bcDetail']->ndpbm) ?>" placeholder="">
+                                    <input readonly id="hargaEkspor" name="hargaEkspor" type="text" class="form-control hargaEkspor" value="<?= formatRupiah($barang['bcDetail']->cif ?? 0 * $barang['bcDetail']->ndpbm ?? 0) ?>" placeholder="">
                                     <label>Nilai Pabean</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input id="hargaPenyerahan" name="hargaPenyerahan" onchange="this.value = formatRupiah(this.value)" type="text" class="form-control hargaPenyerahan" value="<?= formatRupiah($barang['bcDetail']->hargaPenyerahan) ?>" placeholder="">
+                                    <input id="hargaPenyerahan" name="hargaPenyerahan" onchange="this.value = formatRupiah(this.value)" type="text" class="form-control hargaPenyerahan" value="<?= formatRupiah($barang['bcDetail']->hargaPenyerahan ?? 0) ?>" placeholder="">
                                     <label>Harga Penyerahan / Harga Jual</label>
                                 </div>
                             </div>
