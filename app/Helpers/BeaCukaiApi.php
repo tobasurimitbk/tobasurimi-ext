@@ -747,13 +747,13 @@ class BeaCukaiApi
             ];
 
             $entitasArr[] = [
-                'alamatEntitas' => $b['alamat_pemasok'],
+                'alamatEntitas' => $b['alamat_pemilik_barang'],
                 'kodeEntitas' => '7',
                 'kodeJenisApi' => '2',
                 'kodeJenisEntitas' => $b['kode_jenis_entitas'],
-                'namaEntitas' => $b['nama_pemasok'],
+                'namaEntitas' => $b['nama_pemilik_barang'],
                 'nibEntitas' => $b['nib_entitas'],
-                'nomorIdentitas' => $b['npwp_pemasok'],
+                'nomorIdentitas' => $b['npwp_pemilik_barang'],
                 'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
                 'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
                 'seriEntitas' => 2,
@@ -761,13 +761,13 @@ class BeaCukaiApi
             ];
 
             $entitasArr[] = [
-                'alamatEntitas' => $b['alamat_pemilik_barang'],
+                'alamatEntitas' => $b['alamat_pemasok'],
                 'kodeEntitas' => '9',
                 'kodeJenisApi' => '2',
                 'kodeJenisEntitas' => $b['kode_jenis_entitas'],
-                'namaEntitas' => $b['nama_pemilik_barang'],
+                'namaEntitas' => $b['nama_pemasok'],
                 'nibEntitas' => $b['nib_entitas'],
-                'nomorIdentitas' => $b['npwp_pemilik_barang'],
+                'nomorIdentitas' => $b['npwp_pemasok'],
                 'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
                 'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
                 'seriEntitas' => 3,
