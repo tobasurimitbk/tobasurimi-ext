@@ -286,10 +286,8 @@
                                             <td><?= number_format($b['hargaPenyerahan'], 2); ?></td>
                                             <td><?= $b['kodeSatuanBarang']; ?></td>
                                             <td>
-                                                <?php if (count($bahanBakuImpor) - 1 == $i) : ?>
 
-                                                    <button type="button" class="btn btn-danger" onclick="removeBahanBaku('<?= $b['indexDelete'] ?>')"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-                                                <?php endif; ?>
+                                                <button type="button" class="btn btn-danger" onclick="removeBahanBaku('<?= $b['indexDelete'] ?>')"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                                             </td>
                                         </tr>
                                     <?php $i++;
