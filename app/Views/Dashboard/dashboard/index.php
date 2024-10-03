@@ -216,7 +216,7 @@
                                 <li><a class="dropdown-item" href="<?= base_url("barang-setengah-jadi");  ?>">BAHAN SETENGAH JADI</a></li>
                             <?php endif; ?>
                             <?php if (can('Master Barang', 'Kemasan', 'r')) : ?>
-                                <li><a class="dropdown-item" href="<?= base_url("kemasan");  ?>">KEMANASAN</a></li>
+                                <li><a class="dropdown-item" href="<?= base_url("kemasan");  ?>">KEMASAN</a></li>
                             <?php endif; ?>
                         </ul>
                     </div>
@@ -418,7 +418,7 @@
 </section>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        document.body.style.zoom = "80%";
+        document.body.style.zoom = "70%";
     });
 
     let sort = "production_results.createdAt";

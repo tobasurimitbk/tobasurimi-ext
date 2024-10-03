@@ -19,7 +19,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
-                <div class="col-sm-2 mb-3">
+                <div class="col-sm-4 mb-3">
                     <div class="input-group input-group-password align-items-center">
                         <input autocomplete="one-time-code" class="form-control input-picker date " id="date" name="date" placeholder="Pilih Bulan">
                         <div class="input-group-prepend group-prepend-password align-items-center" style="display: flex; justify-content: center; align-items: center;">
