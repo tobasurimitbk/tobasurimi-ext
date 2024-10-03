@@ -122,7 +122,7 @@ class BeaCukaiApi
     }
 
 
-    public function getListKodePelabuhan($kodeKantor)
+    public function getListKodePelabuhan($params)
     {
         $token = $this->getTokenApi();
 
@@ -133,7 +133,7 @@ class BeaCukaiApi
             ];
         }
 
-        $endPoint = $this->baseUrl . "/openapi/pelabuhan/kodeKantor/" . $kodeKantor;
+        $endPoint = $this->baseUrl . "/openapi/pelabuhan/kata/" . $params;
         $headers = array(
             'Content-Type: application/json',
             'Authorization: Bearer ' . $token['token'],
@@ -150,7 +150,7 @@ class BeaCukaiApi
                 'status' => false
             ];
         } else {
-            $responseData = json_decode($response);
+            $responseData = json_decode($response);            
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
             if ($httpCode == 200) {
