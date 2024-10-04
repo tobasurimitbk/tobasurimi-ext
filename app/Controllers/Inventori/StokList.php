@@ -1114,7 +1114,7 @@ class StokList extends BaseController
                 // KEMASAN
                 $lpb = $this->penerimaanBarangModel->where('no_penerimaan_barang', $data->no_dokumen2)->first();
             }
-            $supplier = $this->supplierModel->find($lpb['supplier_id']);
+            $supplier = $lpb == null ? null : $this->supplierModel->find($lpb['supplier_id']);
             $dokumenBC = $this->metaDataModel->find($data->bc_id);
             $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
 
@@ -1124,7 +1124,7 @@ class StokList extends BaseController
                 $satuan_3 = $this->satuanModel->find($barang['satuan_3']);
                 $barangMaster = $this->barangMasterModel->find($data->barang1_id);
                 $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($data->barang2_id);
-                $harga = $this->penerimaanBarangDetailModel->getHargaTotalPenerimaan($lpb['id']);
+                $harga = $lpb != null ? $this->penerimaanBarangDetailModel->getHargaTotalPenerimaan($lpb['id']) : 0;
                 $satuan_1 = $this->satuanModel->find($barang['satuan_1']);
 
                 array_push($dataResult, [
@@ -1138,7 +1138,7 @@ class StokList extends BaseController
                     "stok_1" => $data->stok_total . " " . $satuan_1['kode_satuan'],
                     "stok_2" => $satuan_2 == null ? "-" : (sprintf("%.2f", $data->stok_total / $barang['konversi_satuan_2'])) . " " . $satuan_2['kode_satuan'],
                     "stok_3" => $satuan_3 == null ? "-" : (sprintf("%.2f", $data->stok_total / $barang['konversi_satuan_3'])) . " " . $satuan_3['kode_satuan'],
-                    "harga" => number_format($harga[0]['harga'])
+                    "harga" => $harga == null ? 0 : number_format($harga[0]['harga'])
                 ]);
             } else {
                 $satuan_1 = $this->satuanModel->find($barang['satuan_id']);

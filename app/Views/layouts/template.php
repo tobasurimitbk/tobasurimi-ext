@@ -92,7 +92,7 @@
         <!-- {% endif %} -->
     </div>
     <script>
-        function isNumberKey(evt) {
+        const isNumberKey = function(evt) {
             var charCode = (evt.which) ? evt.which : event.keyCode;
             if (charCode > 31 && (charCode < 48 || charCode > 57)) {
                 return false;

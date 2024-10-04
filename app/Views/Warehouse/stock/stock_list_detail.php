@@ -1,16 +1,5 @@
-<?= $this->extend('layouts/template'); ?>
-<?= $this->Section('content'); ?>
-
+<?= $this->include('layouts/template_pop_up.php') ?>
 <section class="section">
-    <div class="section-header">
-        <h1>Detail Stok</h1>
-        <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("stock-list"); ?>">
-                Kembali
-            </a>
-
-        </div>
-    </div>
     <div class="card">
         <div class="card-body">
             <div class="row">
@@ -58,99 +47,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- <div class="row">
-                <div class="col mb-3">
-                    <div class="alert alert-secondary">
-                        <label class="form-label font-weight-bold text-black lable-title">DATA STOK SEKARANG</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= ($detail['stokInisiasi'] == 0 ? 0 : $detail['stokInisiasi']['qty']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
-                        <label for="floatingInput">Qty Awal</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= ($detail['stok']['stokMasuk']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
-                        <label for="floatingInput">Qty Masuk</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= ($detail['stok']['stokKeluar']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
-                        <label for="floatingInput">Qty Keluar</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= ($detail['stok']['stokSekarang']) . " " . $detail['barang']['kode_satuan'] ?>" type="text" class="form-control " id="" name="" placeholder="">
-                        <label for="floatingInput">Qty Akhir</label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col mb-3">
-                    <div class="alert alert-secondary">
-                        <label class="form-label font-weight-bold text-black lable-title">DATA STOK PER DOKUMEN</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <div class="form-floating" style="height: 50px;">
-                        <select class="form-select bc_id_stok_per_dokumen" id="bc_id_stok_per_dokumen" name="bc_id_stok_per_dokumen" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <option value="0">NON PABEAN</option>
-                            <?php foreach ($jenisDokAju as $j) : ?>
-                                <option value="<?= $j->id ?>">
-                                    <?= $j->value ?>
-                                </option>
-                            <?php endforeach; ?>
-
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Dokumen Pabean</label>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control search_no_aju_stok_per_dokumen" id="search_no_aju_stok_per_dokumen" name="search_no_aju_stok_per_dokumen" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Aju </label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable stok-dokumen-bc-table" id="dataTable" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>No</th>
-                                <th onclick="changeSortStokPerDokumen('bc_id')">Dokumen Pabean</th>
-                                <th onclick="changeSortStokPerDokumen('no_aju')">No Aju</th>
-                                <th>Barang - Spesifikasi</th>
-                                <th onclick="changeSortStokPerDokumen('stok_total')">Qty</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-detail-table" id="body-detail-table">
-
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="3"></td>
-                                <td style="float: right;"><b>TOTAL</b></td>
-                                <td><b><?= ($total['totalPerDokumen']) . ' ' . $detail['barang']['kode_satuan'] ?></b></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div> -->
-
-
-
             <div class="row">
                 <div class="col mb-3">
                     <div class="alert alert-secondary">
@@ -2514,7 +2410,3 @@
         stokTablePenjualan.ajax.reload();
     }
 </script>
-
-
-
-<?= $this->endSection(); ?>
