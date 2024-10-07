@@ -314,6 +314,20 @@ class POLokalBahanBaku extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
 
+        $first = $this->RMPurchaseOrderModel
+            ->where('company_id', $this->this_company_id)
+            ->where('po_no', $this->request->getVar("po_no"))
+            ->where('id !=', $id)
+            ->first();
+
+        if ($first != null) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "No Purchase Order Sudah Ada",
+                'status' => false
+            ]);
+        }
+
         $firstData = $this->RMPurchaseOrderModel->find($id);
 
         $this->sppModel->update($firstData['purchase_request_id'], [
@@ -331,12 +345,7 @@ class POLokalBahanBaku extends BaseController
             "jumlah_kemasan" => $this->request->getVar('jumlah_kemasan'),
             "kemasan_tambahan" => $this->request->getVar('kemasan_tambahan'),
             "bc_type" => $this->request->getVar("bc_type"),
-            "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->get_new_no_po(
-                date('m'),
-                date('Y'),
-                getLastDay(),
-                $this->this_company_id
-            ) : $this->request->getVar("po_no"),
+            "po_no" =>  $this->request->getVar("po_no"),
             "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
             "pph" => $this->request->getVar("pph"),
             "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
