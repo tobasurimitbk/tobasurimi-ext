@@ -9,8 +9,8 @@
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-dua-tiga/print"); ?>')">PDF</button></li>
-            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-dua-tiga/excel"); ?>')">Excel</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-2.3/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-2.3/excel"); ?>')">Excel</button></li>
         </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-bea-cukai"); ?>">
@@ -23,16 +23,7 @@
         <div class="card-body">
 
             <div class="row ">
-                <div class="col-md-2">
-                    <div class="form-floating mb-3">
-                        <select class="form-select status_produksi" name="status_produksi" id="status_produksi">
-                            <option value="ALL" selected>SEMUA PRODUKSI</option>
-                            <option value="ACTIVE">PRODUKSI AKTIF</option>
-                        </select>
-                        <label style="z-index: 1;">Status Produksi</label>
-                    </div>
-                </div>
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
                             <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
@@ -45,7 +36,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
                             <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
@@ -58,56 +49,39 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <div class="form-floating mb-3">
-                        <select class="form-select divisi_id" name="divisi_id" id="divisi_id">
-                            <option disabled selected value=""></option>
-                            <?php foreach ($dataDivisi as $d) : ?>
-                                <option value="<?= $d['id'] ?>">
-                                    <?= $d['divisi']; ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label style="z-index: 1;">Pilih Departemen</label>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-floating mb-3">
-                        <input type="text" name="nama_barang" id="nama_barang" class="form-control nama_barang" placeholder="Kode / Nama Barang">
-                        <label style="z-index: 1;">Kode / Nama Barang</label>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-floating mb-3">
-                        <input type="text" name="kode_produksi" id="kode_produksi" class="form-control kode_produksi" placeholder="Kode Produksi">
-                        <label style="z-index: 1;">Kode Produksi</label>
-                    </div>
-                </div>
             </div>
 
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                        <tr>
-                            <th onclick="changeSort('material_request_details.barang_type')" class="sort" rowspan="2">No</th>
-                            <th onclick="changeSort('barang_master.kode_barang')" class="sort" rowspan="2">Nama Supplier</th>
-                            <th onclick="changeSort('barang_master.kode_barang')" class="sort" rowspan="2">Tanggal</th>
-                            <th onclick="changeSort('barang_master.kode_barang')" class="sort" rowspan="2">No Aju</th>
-                            <th onclick="changeSort('barang_master.kode_barang')" class="sort" rowspan="2">No Daftar</th>
-                            <th onclick="changeSort('barang_master.kode_barang')" class="sort" rowspan="2">Tipe PO</th>
-                            <th onclick="changeSort('barang_master.kode_barang')" class="sort text-center" colspan="3">PPN</th>
-                            <th onclick="changeSort('barang_master.kode_barang')" class="sort text-center" colspan="3">PPH</th>
-                        </tr>
-                        <tr>
-                            <th>Tidak Dipungut</th>
-                            <th>Di Bebaskan</th>
-                            <th>Di Tangguuhkan</th>
-                            <th>Tidak Dipungut</th>
-                            <th>Di Bebaskan</th>
-                            <th>Di Tangguuhkan</th>
-                        </tr>
-                        </thead>
+                    <thead class="thead-dark">
+                    <tr>
+                        <th rowspan="2">No</th>
+                        <th rowspan="2">Nama Supplier</th>
+                        <th rowspan="2">Tanggal</th>
+                        <th rowspan="2">No Aju</th>
+                        <th rowspan="2">No Daftar</th>
+                        <th rowspan="2">Tipe PO</th>
+                        
+                        <th colspan="3" class="text-center">PPN</th>
+                        <th colspan="3" class="text-center">PPH</th>
+                        <th colspan="3" class="text-center">BM</th>
+                    </tr>
+                    <tr>
+                        <th class="text-center">Tidak Dipungut</th>
+                        <th class="text-center">Di Bebaskan</th>
+                        <th class="text-center">Di Tangguuhkan</th>
+                        
+                        <th class="text-center">Tidak Dipungut</th>
+                        <th class="text-center">Di Bebaskan</th>
+                        <th class="text-center">Di Tangguuhkan</th>
+                        
+                        <th class="text-center">Tidak Dipungut</th>
+                        <th class="text-center">Di Bebaskan</th>
+                        <th class="text-center">Di Tangguuhkan</th>
+                    </tr>
+                    </thead>
+
                         <tbody class="body-table" id="body-table">
                         </tbody>
                     </table>
@@ -119,7 +93,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "material_request_details.createdAt";
+    let sort = "bc23.createdAt";
     let sortType = "desc";
     var row = 0;
 
@@ -132,15 +106,11 @@
             [1, 'asc']
         ],
         ajax: {
-            url: "<?= base_url('laporan-bea-cukai/all-dua-tiga'); ?>",
+            url: "<?= base_url('laporan-bea-cukai/all-2.3'); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.status_produksi = $(".status_produksi").val();
                 data.date_start = $(".dateStart").val();
                 data.date_end = $(".dateEnd").val();
-                data.divisi_id = $('.divisi_id').val();
-                data.nama_barang = $('.nama_barang').val();
-                data.kode_produksi = $('.kode_produksi').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -152,10 +122,40 @@
             { data: "no_aju", className: "text-center" },
             { data: "no_daftar", className: "text-center" },
             { data: "po_type", className: "text-center" },
-            { data: "dataBCTarif.nilai_bayar", className: "text-center", render: function(data, type, row) {
-                return (row.dataBCTarif && row.dataBCTarif.kode_jenis_tarif == 1) ? data : '-';
+            
+           // PPN columns
+            { data: "dataBCTarif.PPN.tidak_dipungut", className: "text-center", render: function(data) {
+                return data > 0 ? data : '0';
             }},
-            // ... tambahkan kolom lainnya untuk kode jenis tarif yang berbeda
+            { data: "dataBCTarif.PPN.di_bebaskan", className: "text-center", render: function(data) {
+                return data > 0 ? data : '0';
+            }},
+            { data: "dataBCTarif.PPN.di_tangguhkan", className: "text-center", render: function(data) {
+                return data > 0 ? data : '0';
+            }},
+
+            // PPH columns
+            { data: "dataBCTarif.PPH.tidak_dipungut", className: "text-center", render: function(data) {
+                return data > 0 ? data : '0';
+            }},
+            { data: "dataBCTarif.PPH.di_bebaskan", className: "text-center", render: function(data) {
+                return data > 0 ? data : '0';
+            }},
+            { data: "dataBCTarif.PPH.di_tangguhkan", className: "text-center", render: function(data) {
+                return data > 0 ? data : '0';
+            }},
+
+            // BM columns
+            { data: "dataBCTarif.BM.tidak_dipungut", className: "text-center", render: function(data) {
+                return data > 0 ? data : '0';
+            }},
+            { data: "dataBCTarif.BM.di_bebaskan", className: "text-center", render: function(data) {
+                return data > 0 ? data : '0';
+            }},
+            { data: "dataBCTarif.BM.di_tangguhkan", className: "text-center", render: function(data) {
+                return data > 0 ? data : '0';
+            }},
+
         ],
         rowCallback: function(row, data) {
             var rowSpan = 1; // Mengatur rowSpan
@@ -198,16 +198,6 @@
         orientation: "bottom auto",
         autoclose: true
     })
-    $('#status_produksi').select2({
-        placeholder: "Pilih Status Produksi",
-        theme: "bootstrap-5",
-        allowClear: false
-    });
-    $('#divisi_id').select2({
-        placeholder: "Pilih Departemen",
-        theme: "bootstrap-5",
-        allowClear: true
-    });
     $('.icon-dateStart').click(function() {
         $(".dateStart").focus();
     });
@@ -216,11 +206,7 @@
         $(".dateEnd").focus();
     });
 
-    $('.divisi_id, .dateStart, .dateEnd, .status_produksi').change(function() {
-        table.ajax.reload();
-    });
-
-    $('.nama_barang,.kode_produksi').keyup(function() {
+    $('.dateStart, .dateEnd').change(function() {
         table.ajax.reload();
     });
 
@@ -233,24 +219,13 @@
         }
     }
 
-    $("#status_produksi")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
     const pdfExcel = function(url) {
-        let status_produksi = $(".status_produksi").val();
+       
         let date_start = $(".dateStart").val();
         let date_end = $(".dateEnd").val();
-        let divisi_id = $(".divisi_id").val();
-        let nama_barang = $(".nama_barang").val();
-        let kode_produksi = $(".kode_produksi").val();
         // let sort = "stock_details2.createdAt";
         // let sortType = "desc";
-        window.open(url + `?status_produksi=${status_produksi}&date_start=${date_start}&date_end=${date_end}&divisi_id=${divisi_id}&bnama_barang=${nama_barang}&kode_produksi=${kode_produksi}&sort=${sort}&sortType=${sortType}`, "_blank");
+        window.open(url + `?date_start=${date_start}&date_end=${date_end}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 

@@ -4,75 +4,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Barang Work In Progress</title>
+    <title>Laporan Bea Cukai BC 2.3</title>
     <style>
-        .company-name {
-            font-weight: 700;
-            border: 1px solid;
-            padding: 5px;
-            border-radius: 7px;
-            margin-bottom: 10px;
-            display: inline-block;
-            min-width: 70px
+        body {
+            font-family: Arial, sans-serif;
         }
 
-        .description-container {
-            border: 1px solid;
-            border-radius: 7px;
-            height: 65px;
-            margin-top: 20px;
-            width: 60%;
-            position: relative;
-            padding-top: 7px;
-            padding-left: 17px;
-        }
-
-        .description-label {
-            position: absolute;
-            top: -10px;
-            background: white;
-            left: 15px;
-            padding-left: 3px;
-            padding-right: 5px;
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
         }
 
         .item-table {
             border: 1px solid;
             width: 100%;
-            height: 230px;
-            margin-top: 10px;
             border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .item-table th,
+        .item-table td {
+            border: 1px solid;
+            font-size: 12px;
+            padding: 5px;
+            text-align: center; /* Center align text */
         }
 
         .item-table th {
-            border-right: 1px solid;
-            border-bottom: 1px solid;
-            font-size: 13px;
-            font-weight: normal;
-            padding: 2px
-        }
-
-        .item-table td {
-            border: 1px solid;
-            font-size: 10px;
-            padding: 2px
-        }
-
-        .signature-table {
-            border-spacing: 30px 0;
-            margin-top: 10px;
-        }
-
-        .txt-bold {
-            font-weight: 700;
-        }
-
-        .txt-center {
-            text-align: center;
-        }
-
-        .txt-right {
-            text-align: right;
+            background-color: #f2f2f2;
+            font-weight: bold;
         }
 
         .w-100 {
@@ -82,16 +42,17 @@
 </head>
 
 <body>
-    <h2>LAPORAN BARANG WORK IN PROGRESS</h2>
+    <h2>LAPORAN BEA CUKAI BC 2.3</h2>
+
     <table class="w-100">
         <tbody>
             <tr>
                 <td style="width:150px">Tgl Mulai / Tgl Akhir</td>
                 <td style="width:10px">:</td>
-                <?php if ($condition['date_start'] != "" && $condition['date_end'] != "") : ?>
-                    <td style="width:80px"><?= date('d/m/Y', strtotime($condition['date_start'])); ?></td>
+                <?php if ($condition['mulaiTanggalBC23'] != "" && $condition['selesaiTanggalBC23'] != "") : ?>
+                    <td style="width:80px"><?= date('d/m/Y', strtotime($condition['mulaiTanggalBC23'])); ?></td>
                     <td style="width:10px"> S/D </td>
-                    <td><?= date('d/m/Y', strtotime($condition['date_end'])); ?></td>
+                    <td><?= date('d/m/Y', strtotime($condition['selesaiTanggalBC23'])); ?></td>
                 <?php else : ?>
                     <td colspan="3" style="width:80px">ALL</td>
                 <?php endif; ?>
@@ -99,30 +60,53 @@
         </tbody>
     </table>
 
-    <table class="w-100 item-table">
-        <tr>
-            <th>No</th>
-            <th>Tipe Barang</th>
-            <th>Kode Barang</th>
-            <th>Nama Barang</th>
-            <th>Qty</th>
-            <th>Satuan</th>
-            <th>Keterangan</th>
-        </tr>
-        <?php foreach ($dataWipResult as $row) : ?>
+    <table class="item-table">
+        <thead class="thead-dark">
             <tr>
-                <td><?= $row['no']; ?></td>
-                <td><?= $row['tipeBarang']; ?></td>
-                <td><?= $row['kodeBarang']; ?></td>
-                <td><?= $row['namaBarang']; ?></td>
-                <td><?= $row['qty']; ?></td>
-                <td><?= $row['satuan']; ?></td>
-                <td><?= $row['keterangan']; ?></td>
+                <th rowspan="2">No</th>
+                <th rowspan="2">Nama Supplier</th>
+                <th rowspan="2">Tanggal</th>
+                <th rowspan="2">No Aju</th>
+                <th rowspan="2">No Daftar</th>
+                <th rowspan="2">Tipe PO</th>
+                <th colspan="3">PPN</th>
+                <th colspan="3">PPH</th>
+                <th colspan="3">BM</th>
             </tr>
-        <?php endforeach; ?>
-
+            <tr>
+                <th>Tidak Dipungut</th>
+                <th>Di Bebaskan</th>
+                <th>Di Tangguuhkan</th>
+                <th>Tidak Dipungut</th>
+                <th>Di Bebaskan</th>
+                <th>Di Tangguuhkan</th>
+                <th>Tidak Dipungut</th>
+                <th>Di Bebaskan</th>
+                <th>Di Tangguuhkan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($data as $row) : ?>
+                <tr>
+                    <td><?= $row['no']; ?></td>
+                    <td><?= $row['supplier_name']; ?></td>
+                    <td><?= date('d/m/Y', strtotime($row['date'])); ?></td>
+                    <td><?= $row['no_aju']; ?></td>
+                    <td><?= $row['no_daftar']; ?></td>
+                    <td><?= $row['po_type']; ?></td>
+                    <td><?= $row['dataBCTarif']['PPN']['tidak_dipungut']; ?></td>
+                    <td><?= $row['dataBCTarif']['PPN']['di_bebaskan']; ?></td>
+                    <td><?= $row['dataBCTarif']['PPN']['di_tangguhkan']; ?></td>
+                    <td><?= $row['dataBCTarif']['PPH']['tidak_dipungut']; ?></td>
+                    <td><?= $row['dataBCTarif']['PPH']['di_bebaskan']; ?></td>
+                    <td><?= $row['dataBCTarif']['PPH']['di_tangguhkan']; ?></td>
+                    <td><?= $row['dataBCTarif']['BM']['tidak_dipungut']; ?></td>
+                    <td><?= $row['dataBCTarif']['BM']['di_bebaskan']; ?></td>
+                    <td><?= $row['dataBCTarif']['BM']['di_tangguhkan']; ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
     </table>
-
 </body>
 
 </html>

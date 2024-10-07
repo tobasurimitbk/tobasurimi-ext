@@ -69,7 +69,7 @@ class BCBarangTarifModel extends Model
 
     public function getByBcPurchaseOrder($id)
     {
-        $selectQry = "kode_jenis_pungutan, nilai_bayar, kode_jenis_tarif";
+        $selectQry = "kode_jenis_pungutan, nilai_bayar, kode_fasilitas_tarif";
     
         $result = $this->asArray()
                        ->select($selectQry)
