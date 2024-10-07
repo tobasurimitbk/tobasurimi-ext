@@ -177,12 +177,9 @@ class MaterialRequestPenolong extends BaseController
             }
             $data["dataMaterialRequests"] = $dataMaterialRequests;
             $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
-            $data["dataMaterialRequestswithwo"] = $dataMaterialRequestswithwo;
+            $data["dataMaterialRequestswithwo"] = $dataMaterialRequestswithwo[0];
             $data["ids"] = $ids;
         }
-
-        // var_dump($data);
-        // exit;
 
         return view('Production/materialRequestPenolong/form', $data);
     }
@@ -304,7 +301,7 @@ class MaterialRequestPenolong extends BaseController
             $no = $this->materialRequestModel->get_no(date('d'), date('m'), date('Y'), $last_day, $this->this_company_id);
 
             $dataMaterial = [
-                // "work_order_id" => $this->request->getPost("kode_produksi"),
+                "work_order_id" => $this->request->getPost("kode_produksi"),
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar("department_id"),
                 'warehouse_id' => $this->request->getVar("warehouse_id"),

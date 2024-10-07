@@ -47,7 +47,7 @@
             <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" value="<?= !empty($ids) ? $ids : ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
-                <!-- <div class="col-subtitle-modal">
+                <div class="col-subtitle-modal">
                     <div class="row mt-3">
                         <div class="col-md-6">
                             <label class="form-label font-weight-bold modal-sub-title">Data Produksi</label>
@@ -58,7 +58,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <?php if (isset($dataMaterialRequestswithwo)) { ?>
-                                <input value="<?= !empty($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo->wo_no : "" ?>" autocomplete="one-time-code" type="text" class="form-control kode_produksi_detail" name="kode_produksi_detail" id="kode_produksi_detail" placeholder="Kode Produksi" readonly>
+                                <input value="<?= ($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo->wo_no : "" ?>" autocomplete="one-time-code" type="text" class="form-control kode_produksi_detail" name="kode_produksi_detail" id="kode_produksi_detail" placeholder="Kode Produksi" readonly>
                             <?php } else { ?>
                                 <select class="form-select kode_produksi" name="kode_produksi" id="kode_produksi" aria-label="Floating label select example">
                                     <option value=""></option>
@@ -82,7 +82,7 @@
                             <label for="floatingInput">Jumlah Standart Produksi</label>
                         </div>
                     </div> -->
-                <!-- </div> -->
+                </div>
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
                         <div class="col-md-6">

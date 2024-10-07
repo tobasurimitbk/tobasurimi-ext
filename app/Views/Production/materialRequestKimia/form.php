@@ -47,7 +47,7 @@
             <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" value="<?= !empty($ids) ? $ids : ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
-                <!-- <div class="col-subtitle-modal">
+                <div class="col-subtitle-modal">
                     <div class="row mt-3">
                         <div class="col-md-6">
                             <label class="form-label font-weight-bold modal-sub-title">Data Produksi</label>
@@ -82,7 +82,7 @@
                             <label for="floatingInput">Jumlah Standart Produksi</label>
                         </div>
                     </div> -->
-                <!-- </div> -->
+                </div>
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
                         <div class="col-md-6">

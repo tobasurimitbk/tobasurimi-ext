@@ -177,7 +177,7 @@ class MaterialRequestKimia extends BaseController
             }
             $data["dataMaterialRequests"] = $dataMaterialRequests;
             $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
-            $data["dataMaterialRequestswithwo"] = $dataMaterialRequestswithwo;
+            $data["dataMaterialRequestswithwo"] = $dataMaterialRequestswithwo[0];
             $data["ids"] = $ids;
         }
 
@@ -302,7 +302,7 @@ class MaterialRequestKimia extends BaseController
         try {
 
             $dataMaterial = [
-                // "work_order_id" => $this->request->getPost("kode_produksi"),
+                "work_order_id" => $this->request->getPost("kode_produksi"),
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar("department_id"),
                 'warehouse_id' => $this->request->getVar("warehouse_id"),
