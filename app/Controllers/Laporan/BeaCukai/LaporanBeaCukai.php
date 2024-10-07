@@ -3,6 +3,7 @@
 namespace App\Controllers\Laporan\BeaCukai;
 
 use App\Controllers\BaseController;
+use App\Controllers\Setting\Auth;
 use App\Models\AMPurchaseOrderModel;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
@@ -12,6 +13,7 @@ use App\Models\BC27Model;
 use App\Models\BC30Model;
 use App\Models\BC40Model;
 use App\Models\BC41Model;
+use App\Models\BCBarangTarifModel;
 use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\JasaVendorInModel;
@@ -53,6 +55,7 @@ class LaporanBeaCukai extends BaseController
     protected $bc30Model;
     protected $bc40Model;
     protected $bc41Model;
+    protected $bcTarifModel;
     protected $ppbkbModel;
     protected $penerimaanBarangModel;
     protected $barangMasterModel;
@@ -85,6 +88,7 @@ class LaporanBeaCukai extends BaseController
         $this->bc30Model = new BC30Model();
         $this->bc40Model = new BC40Model();
         $this->bc41Model = new BC41Model();
+        $this->bcTarifModel = new BCBarangTarifModel();
         $this->ppbkbModel = new PPBKBModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->supplierModel = new SupplierModel();
@@ -110,7 +114,6 @@ class LaporanBeaCukai extends BaseController
 
     public function index()
     {
-
         return view('Laporan/LaporanBeaCukai/index/index');
     }
 
@@ -1372,6 +1375,121 @@ class LaporanBeaCukai extends BaseController
 
         $writer->save('php://output');
         die;
+    }
+
+    public function laporanDuaTiga()
+    {
+        $data = [
+            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
+        ];
+
+        return view('Laporan/LaporanBeaCukai/2.3/index', $data);
+    }
+
+
+    public function allDuaTiga()
+    {
+        $payload = [
+            "pageSize" => $this->request->getVar("length"),
+            "currentPage" => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
+            "search" => $this->request->getVar("search"),
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+             "type"          => "BC 2.3"
+        ];
+
+        $addCondition = [
+            "statusBC"    => $this->request->getVar('statusBC'),
+            "statusLPB"         => $this->request->getVar('statusLPB'),
+            "mulaiTanggalBC23" => $this->request->getGet("dateStart"),
+            "selesaiTanggalBC23" => $this->request->getGet('dateEnd'),
+            "supplierName"         => $this->request->getVar("supllierName"),
+            "noAju"       => $this->request->getVar("noAju"),
+            "noPenerimaanBarang"     => $this->request->getVar("noPenerimaanBarang"),
+        ];
+
+        $condition = [
+            "bc_purchase_order.deletedAt" => null,
+            "bc_purchase_order.company_id" => $this->this_company_id,
+            "bc_23.deletedAt" => null,
+            "bc_purchase_order.status_posting" => 1,
+        ];
+
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
+        $dataBC23 = $this->bc23Model->getList($condition, $addCondition, $limit, $offset);
+
+        // Pastikan datanya ada sebelum lanjut
+        if (!empty($dataBC23['data'])) {
+            $dataBC23Result = [];
+
+            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+            // Loop data utama dari $dataBC23
+            foreach ($dataBC23['data'] as $data) {
+                // Default data tanpa tarif
+                $entry = [
+                    "no" => $no++,
+                    "id" => encrypt($data->id),
+                    "supplier_name" => $data->supplier_name,
+                    "no_aju" => $data->no_aju,
+                    "no_daftar" => $data->no_daftar,
+                    "po_type" => $data->po_type,
+                    "date" => $data->createdAt,
+                    "dataBCTarif" => [] // Inisialisasi kosong, kalau ada tarif nanti diisi
+                ];
+
+                // Ambil data tarif dari purchase order (kalau ada)
+               
+                $dataBCTarif = $this->bcTarifModel->getByBcPurchaseOrder($data->bc_purchase_order_id);
+                
+                
+                // Kalau ada data tarif, kelompokkan berdasarkan kode dan tarifnya
+                if (!empty($dataBCTarif)) {
+                    $groupedData = [];
+                    foreach ($dataBCTarif as $tarif) {
+                        $key = $tarif['kode_jenis_pungutan'] . '-' . $tarif['kode_jenis_tarif'];
+                        if (!isset($groupedData[$key])) {
+                            $groupedData[$key] = [
+                                'kode_jenis_pungutan' => $tarif['kode_jenis_pungutan'],
+                                'kode_jenis_tarif' => $tarif['kode_jenis_tarif'],
+                                'nilai_bayar' => $tarif['nilai_bayar']
+                            ];
+                        } else {
+                            // Menjumlahkan nilai_bayar jika sudah ada data yang sama
+                            $groupedData[$key]['nilai_bayar'] += $tarif['nilai_bayar'];
+                        }
+                    }
+                    // Masukkan data tarif yang sudah dikelompokkan ke entri utama
+                    $entry['dataBCTarif'] = array_values($groupedData);
+                }
+
+                // Masukkan entry ke hasil akhir
+                $dataBC23Result[] = $entry;
+            }
+
+            // Format response untuk DataTables
+            $data = [
+                "draw"              => intval($this->request->getVar("draw")),
+                "recordsTotal"      => $dataBC23['totalData'],
+                "recordsFiltered"   => $dataBC23['totalFilteredData'],
+                "data"              => $dataBC23Result,
+                "payload"           => $payload
+            ];
+
+            return response()->setJSON($data);
+
+        } else {
+            // Jika data kosong, kirim response kosong juga
+            return response()->setJSON([
+                "draw"              => intval($this->request->getVar("draw")),
+                "recordsTotal"      => 0,
+                "recordsFiltered"   => 0,
+                "data"              => [],
+                "payload"           => $payload
+            ]);
+        }
+
     }
 
     public function allWipProduksiDashboard()
