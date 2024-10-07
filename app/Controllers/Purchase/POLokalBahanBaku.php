@@ -202,6 +202,12 @@ class POLokalBahanBaku extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($poData['data'] as $data) {
+            $detailPurchase = $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $data->id)->where('deletedAt', null)->findAll();
+            $totalHarga = 0;
+            foreach ($detailPurchase as $d) {
+                $totalHarga += ($d['general_price'] + $d['daily_price'] + $d['monthly_price']) * $d['qty'];
+            }
+
             array_push($dataPOLokal, [
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
@@ -211,7 +217,7 @@ class POLokalBahanBaku extends BaseController
                 "companyName"   => $data->companyName,
                 "supplierName"  => $data->supplierName,
                 "itemCount"     => $data->itemCount,
-                "total"         => "" . number_format(formatter($data->total + $data->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ','),
+                "total"         => "" . number_format(formatter($totalHarga + $data->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ','),
                 "is_posted"     => $data->is_posted,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
             ]);
