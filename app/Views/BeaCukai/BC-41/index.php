@@ -28,22 +28,29 @@
         <?= csrf_field() ?>
         <div class="card-body">
             <div class="row justify-content-start row-col-spp">
-                <div class="col-md-3 mb-3">
+                <div class="col-md-2 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC41" id="mulaiTanggalBC41" name="mulaiTanggalBC41" placeholder="Mulai Tanggal BC 4.1 Dibuat">
+                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC41" id="mulaiTanggalBC41" name="mulaiTanggalBC41" placeholder="Mulai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-mulaiTanggalBC41"></i>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
+                <div class="col-md-2 mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC41" id="selesaiTanggalBC41" name="selesaiTanggalBC41" placeholder="Selesai Tanggal BC 4.1 Dibuat">
+                        <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC41" id="selesaiTanggalBC41" name="selesaiTanggalBC41" placeholder="Selesai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-selesaiTanggalBC41"></i>
                         </div>
                     </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <select name="asalPengeluaran" class="form-select asalPengeluaran" id="asalPengeluaran">
+                        <option selected value="ALL">PILIH ASAL PENGELUARAN</option>
+                        <option value="RETUR">ASAL : RETUR</option>
+                        <option value="PENJUALAN">ASAL : PENJUALAN</option>
+                    </select>
                 </div>
                 <div class="col-md-3 mb-3">
                     <select name="statusPosting" class="form-select statusPosting" id="statusPosting">
@@ -52,8 +59,8 @@
                         <option value="BELUM POSTING">STATUS POSTING : BELUM POSTING</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 4.1 / No Daftar" value="" />
+                <div class="col-md-2 mb-3">
+                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Data" value="" />
                 </div>
             </div>
             <?php if ($akunCeisa == null) : ?>
@@ -73,10 +80,13 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center;">No</th>
+                                <th style="text-align: center;">Asal Pengeluaran</th>
                                 <th onclick="changeSort('sales_order_lain.divisi_id')" style="text-align: center;">Departemen</th>
                                 <th onclick="changeSort('sales_order_lain.warehouse_id')" style="text-align: center;">Warehouse</th>
                                 <th onclick="changeSort('sales_order_lain.no_sales_order')" class="sort" style="text-align: center;">No Order Form</th>
+                                <th onclick="changeSort('pengembalian_barang.no_surat_jalan')" class="sort" style="text-align: center;">No Retur</th>
                                 <th onclick="changeSort('customers.name')" style="text-align: center;">Customer</th>
+                                <th onclick="changeSort('suppliers.name')" style="text-align: center;">Supplier</th>
                                 <th onclick="changeSort('bc_41.no_aju')" class="sort" style="text-align: center;">No Aju / Daftar</th>
                                 <th onclick="changeSort('bc_41.createdAt')" class="sort" style="text-align: center;">Tanggal BC 4.1</th>
                                 <th onclick="changeSort('bc_41.status_posting')" style="text-align: center;">Status Posting</th>
@@ -123,6 +133,7 @@
                 data.statusPosting = $('.statusPosting').val();
                 data.noAju = $('.noAju').val();
                 data.tipeSalesOrder = $('.tipeSalesOrder').val();
+                data.asalPengeluaran = $('.asalPengeluaran').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -141,6 +152,11 @@
                 width: "5%"
             },
             {
+                data: "asal_pengeluaran",
+                className: "text-center",
+                sortable: false,
+            },
+            {
                 data: "divisi",
                 className: "text-center"
             },
@@ -153,7 +169,15 @@
                 className: "text-center",
             },
             {
+                data: "no_surat_jalan",
+                className: "text-center",
+            },
+            {
                 data: "customer_name",
+                className: "text-center",
+            },
+            {
+                data: "supplier_name",
                 className: "text-center",
             },
             {
@@ -294,7 +318,7 @@
     });
 
 
-    $('.mulaiTanggalBC41, .selesaiTanggalBC41,.statusPosting').change(function() {
+    $('.mulaiTanggalBC41, .selesaiTanggalBC41,.statusPosting,.asalPengeluaran').change(function() {
         table.ajax.reload();
     });
 

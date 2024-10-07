@@ -32,7 +32,7 @@
                 <div class="col-md-3 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC27" id="mulaiTanggalBC27" name="mulaiTanggalBC27" placeholder="Mulai Tanggal BC 2.7 Dibuat">
+                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC27" id="mulaiTanggalBC27" name="mulaiTanggalBC27" placeholder="Mulai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-mulaiTanggalBC27"></i>
                         </div>
@@ -40,7 +40,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC27" id="selesaiTanggalBC27" name="selesaiTanggalBC27" placeholder="Selesai Tanggal BC 2.7 Dibuat">
+                        <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC27" id="selesaiTanggalBC27" name="selesaiTanggalBC27" placeholder="Selesai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-selesaiTanggalBC27"></i>
                         </div>
@@ -78,7 +78,6 @@
                                 <th onclick="changeSort('mutasi_global.divisi_asal_id')" class="sort" style="text-align: center;">Departemen Asal</th>
                                 <th onclick="changeSort('mutasi_global.warehouse_asal_id')" class="sort" style="text-align: center;">Warehouse Asal</th>
                                 <th onclick="changeSort('bc_27.company_tujuan_id')" class="sort" style="text-align: center;">Company Tujuan</th>
-                                <th onclick="changeSort('mutasi_global.no_mutasi')" class="sort" style="text-align: center;">No Mutasi</th>
                                 <th onclick="changeSort('bc_27.createdAt')" class="sort" style="text-align: center;">Tanggal BC 2.7</th>
                                 <th onclick="changeSort('bc_27.no_aju')" class="sort" style="text-align: center;">No Aju BC 2.7 / No Daftar</th>
                                 <th onclick="changeSort('bc_27.status_posting')" style="text-align: center;">Status Posting</th>
@@ -156,10 +155,6 @@
             {
                 data: "company_tujuan_name",
                 className: "text-center"
-            },
-            {
-                data: "no_mutasi",
-                className: "text-center",
             },
             {
                 data: "tanggal_bc_27",

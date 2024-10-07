@@ -44,7 +44,7 @@
                             $bc41Model = new BC41Model();
                             ?>
                             <?php foreach ($barang as $b) : ?>
-                                <?php $detailBarang = $bc41Model->detailBarang($bc41['id'], $b['kode_barang'], $bc41['sales_order_lain_id']); ?>
+                                <?php $detailBarang = $bc41Model->detailBarang($bc41['id'], $b['kode_barang'], $bc41['sales_order_lain_id'], $bc41['pengembalian_barang_id']); ?>
                                 <?php $totalHarga += $b['total_harga']; ?>
                                 <tr style="text-align: center; cursor:pointer;" data-kode_barang="<?= encrypt($b['kode_barang']) ?>" data-id="<?= encrypt($bc41['id']) ?>">
                                     <td><?= $i++; ?></td>

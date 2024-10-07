@@ -242,7 +242,7 @@
                     let id = row.id;
                     return `
                         <div class="mt-0 actions">
-                            <a href="<?= base_url('stock-list/id/') ?>${id}'" data-toggle="tooltip" title="Detail Stok" class="btn btn-success posting-spp actions">
+                            <a href="javascript:void(0)" onclick="stockDetail('${id}')" data-toggle="tooltip" title="Detail Stok" class="btn btn-success posting-spp actions">
                                 <i class="fas fa-eye"></i>
                             </a>
                         </div>
@@ -447,8 +447,18 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    const stokDetail = function(id) {
-        location.replace("<?= base_url('stock-list/id/') ?>" + id, "");
+    const stockDetail = function(id) {
+        const width = 800;
+        const height = 600;
+        const left = window.innerWidth / 2 - width / 2;
+        const top = window.innerHeight / 2 - height / 2;
+
+        window.open(
+            "<?= base_url('stock-list/id/') ?>" + id,
+            "_blank",
+            `width=${width},height=${height},top=${top},left=${left},resizable=yes`
+        );
+
     }
 
     const changeSort = function(val) {

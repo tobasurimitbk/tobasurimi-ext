@@ -258,4 +258,107 @@ class PengembalianBarangModel extends Model
         }
         return $result;
     }
+
+    public function getReturBeaCukaiDetail($id)
+    {
+        $result = [];
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $pengembalianBarangDetailModel = new PengembalianBarangDetailModel();
+        $rmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $rmImportPoModel = new RMImportPOModel();
+        $amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $stockDetail2Model = new StockDetail2Model();
+        $metaDataModel = new MetadataModel();
+        $satuanModel = new SatuansModel();
+        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+
+        $pengembalianBarang = $this->where('id', $id)->first();
+        if ($pengembalianBarang == null) {
+            return [];
+        }
+        $penerimaanBarangId = $pengembalianBarang['penerimaan_barang_id'];
+        $penerimanBarang = $penerimaanBarangModel
+            ->select('penerimaan_barang.*,divisis.divisi,warehouses.warehouse_name')
+            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+            ->where('penerimaan_barang.id', $penerimaanBarangId)
+            ->first();
+        if ($penerimanBarang == null) {
+            return [];
+        }
+
+        $selectQry = "
+            penerimaan_barang_detail.*,
+            barang_master.barang_name as barang,
+            barang_master.kode_barang,
+            barang_master_spesifikasi.spesifikasi,
+            satuans.kode_satuan
+        ";
+        $query = $penerimaanBarangDetailModel->select($selectQry);
+        $query->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left');
+        $query->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left');
+        $query->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left');
+        $query->where('penerimaan_barang_id', $penerimaanBarangId);
+
+        foreach ($query->findAll() as $q) {
+
+            $pengembalianBarangDetail = $pengembalianBarangDetailModel->where('pengembalian_barang_id', $id)->where('penerimaan_barang_detail_id', $q['id'])->first();
+
+            if ($penerimanBarang['status_penerimaan'] == "LOKAL" && $penerimanBarang['tipe_bahan'] == "BAKU") {
+                // LOKAL BB
+                $po = $rmPurchaseOrderModel->where('id', $q['purchase_order_id'])->first();
+            } elseif ($penerimanBarang['status_penerimaan'] == "IMPORT" && $penerimanBarang['tipe_bahan'] == "BAKU") {
+                // IMPORT BB
+                $po = $rmImportPoModel->where('id', $q['purchase_order_id'])->first();
+            } else {
+                // LOKAL BP DAN IMPORT BP
+                $po = $amPurchaseOrderModel->where('id', $q['purchase_order_id'])->first();
+            }
+
+            if ($pengembalianBarangDetail != null) {
+                $dataStock = $stockDetail2Model->getStockDetailByStockDokumen(
+                    $po['po_no'],
+                    "LPB",
+                    $penerimanBarang['company_id'],
+                    $penerimanBarang['divisi_id'],
+                    $penerimanBarang['warehouse_id'],
+                    $q['barang_id'],
+                    $q['spesifikasi_id'],
+                    null
+                );
+
+                $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($q['spesifikasi_id']);
+                $satuan = $satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+                $satuanName = $satuan == null ? "-" : $satuan['kode_satuan'];
+
+
+                $result[] = [
+                    'kode_barang' => $q['kode_barang'],
+                    'barang' => $q['barang'] . " - " . $q['spesifikasi'],
+                    'barang_master_name' => $q['barang'],
+                    'no_surat_jalan' => $pengembalianBarang['no_surat_jalan'],
+                    'tanggal' => date('d/m/Y', strtotime('tanggal_surat_jalan')),
+                    'divisi' => $penerimanBarang['divisi'],
+                    'warehouse_name' => $penerimanBarang['warehouse_name'],
+                    'sumber' => $dataStock == null ? "-" : $dataStock['sumber'],
+                    'stock_dokumen' => $dataStock == null ? "-" : $dataStock['stock_dokumen'],
+                    'bc_type' =>  $dataStock == null ? "-" : $metaDataModel->find($dataStock['bc_id'])['value'],
+                    'no_aju' => $dataStock == null ? "-" : $dataStock['no_aju'],
+                    'stock_date' => $dataStock == null ? "-" : date('d/m/Y', strtotime($dataStock['stock_date'])),
+                    'qty_konversi' => $pengembalianBarangDetail == null ? 0 : $pengembalianBarangDetail['jumlah_return'],
+                    'satuan' => $satuanName,
+                    'total_harga' => $dataStock == null ? 0 : ($dataStock['harga_umum'] + $dataStock['harga_harian'] + $dataStock['harga_bulanan']),
+                    'supplier_name' => $dataStock == null ? "-" : $dataStock['supplier_name'],
+                    'barang1_id' => $dataStock == null ? null : $dataStock['barang1_id'],
+                    'barang2_id' => $dataStock == null ? null : $dataStock['barang2_id'],
+                    'kemasan_id' => $dataStock == null ? null : $dataStock['kemasan_id'],
+                    'stock_id' => $dataStock == null ? null : $dataStock['stock_id'],
+                    'bc_id' => $dataStock == null ? null : $dataStock['bc_id'],
+                    'stock_dokumen' => $dataStock == null ? null : $dataStock['stock_dokumen'],
+                ];
+            }
+        }
+        return $result;
+    }
 }

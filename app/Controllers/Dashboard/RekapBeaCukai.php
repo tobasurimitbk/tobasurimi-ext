@@ -33,6 +33,8 @@ use App\Models\MutasiGlobalModel;
 use App\Models\MutasiGlobalDetailModel;
 use App\Models\MutasiModel;
 use App\Models\MutasiDetailModel;
+use App\Models\PengembalianBarangDetailModel;
+use App\Models\PengembalianBarangModel;
 use App\Models\SalesOrderExportDetailModel;
 use PDO;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -206,6 +208,8 @@ class RekapBeaCukai extends BaseController
         $bc25Model = new BC25Model();
         $salesOrderLainModel = new SalesOrderLainModel();
         $salesOrderLainDetailModel = new SalesOrderLainDetailModel();
+        $pengembalianBarangDetailModel = new PengembalianBarangDetailModel();
+        $pengembalianBarangModel = new PengembalianBarangModel();
 
         $condition = [
             "bc_25.company_id"  => $this->this_company_id,
@@ -213,26 +217,42 @@ class RekapBeaCukai extends BaseController
             "DATE_FORMAT(bc_25.createdAt, '%m/%Y')" => $month
         ];
 
-        $selectQry = "bc_25.*,
-        sales_order_lain.no_sales_order,
-        divisis.divisi,
-        warehouses.warehouse_name,
-        customers.name AS customer_name";
+        $selectQrySalesOrderLain = "bc_25.*,
+            sales_order_lain.no_sales_order,
+            divisis.divisi,
+            warehouses.warehouse_name,
+            customers.name AS customer_name";
 
-        $bcDataQry = $bc25Model
-            ->select($selectQry)
+        $bcDataQrySalesOrderLain = $bc25Model
+            ->select($selectQrySalesOrderLain)
             ->join('sales_order_lain', 'sales_order_lain.id = bc_25.sales_order_lain_id', 'left')
             ->join('divisis', 'divisis.id = sales_order_lain.divisi_id', 'left')
             ->join('warehouses', 'warehouses.id = sales_order_lain.warehouse_id', 'left')
             ->join('customers', 'customers.id = sales_order_lain.customer_id', 'left')
+            ->where('bc_25.sales_order_lain_id !=', null)
             ->where($condition)
             ->findAll();
 
+        $selectQryPengembalianBarang = "bc_25.*,
+            pengembalian_barang.no_surat_jalan,
+            divisis.divisi,
+            warehouses.warehouse_name,
+            suppliers.name AS supplier_name";
 
+        $bcDataQryPengembalianBarang = $bc25Model
+            ->select($selectQryPengembalianBarang)
+            ->join('pengembalian_barang', 'pengembalian_barang.id = bc_25.pengembalian_barang_id', 'left')
+            ->join('penerimaan_barang', 'pengembalian_barang.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+            ->where('bc_25.pengembalian_barang_id !=', null)
+            ->where($condition)
+            ->findAll();
 
         $list = [];
 
-        foreach ($bcDataQry as $d) {
+        foreach ($bcDataQrySalesOrderLain as $d) {
             $dataSalesOrderLainDetail = $salesOrderLainDetailModel
                 ->select('count(id) as jumlah_barang, sum(qty_order) as total_barang')
                 ->where('sales_order_lain_id', $d['sales_order_lain_id'])
@@ -242,11 +262,8 @@ class RekapBeaCukai extends BaseController
                 ->where('id', $d['sales_order_lain_id'])
                 ->first();
 
-
-
-
-
             array_push($list, [
+                'asal_pengeluaran' => "SALES ORDER",
                 'no_sales_order' => $dataSalesOrderLain['no_sales_order'],
                 'no_aju' => $d['no_aju'],
                 'no_dokumen' => $d['no_daftar'],
@@ -254,11 +271,30 @@ class RekapBeaCukai extends BaseController
                 'customer_nama' => $d['customer_name'],
                 'jumlah_barang' => $dataSalesOrderLainDetail['jumlah_barang'],
                 'total_barang' => number_format($dataSalesOrderLainDetail['total_barang'], 2)
-
-
-
             ]);
         }
+
+        foreach ($bcDataQryPengembalianBarang as $d) {
+            $dataPengembalianBarangDetail = $pengembalianBarangDetailModel
+                ->select('count(id) as jumlah_barang, sum(jumlah_return) as total_barang')
+                ->where('pengembalian_barang_id', $d['pengembalian_barang_id'])
+                ->first();
+            $dataPengembalianBarang = $pengembalianBarangModel
+                ->select('no_surat_jalan')
+                ->where('id', $d['pengembalian_barang_id'])
+                ->first();
+            array_push($list, [
+                'asal_pengeluaran' => "RETUR",
+                'no_sales_order' => $dataPengembalianBarang['no_surat_jalan'],
+                'no_aju' => $d['no_aju'],
+                'no_dokumen' => $d['no_daftar'],
+                'tgl_dokumen' => date('d/m/Y', strtotime($d['createdAt'])),
+                'customer_nama' => $d['supplier_name'],
+                'jumlah_barang' => $dataPengembalianBarangDetail['jumlah_barang'],
+                'total_barang' => number_format($dataPengembalianBarangDetail['total_barang'], 2)
+            ]);
+        }
+
 
         return json_encode($list);
     }
@@ -272,29 +308,27 @@ class RekapBeaCukai extends BaseController
 
         $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue('A1', 'No.')
-            ->setCellValue('B1', 'No Sales Order')
-            ->setCellValue('C1', 'No Aju')
-            ->setCellValue('D1', 'No Daftar')
-            ->setCellValue('E1', 'Tgl Dokumen')
-            ->setCellValue('F1', 'Customer')
-            ->setCellValue('G1', 'Jumlah Barang')
-            ->setCellValue('H1', 'Total Barang');
-
-
+            ->setCellValue('B1', 'Asal Pengeluaran')
+            ->setCellValue('C1', 'No Sales Order / No Surat Jalan')
+            ->setCellValue('D1', 'No Aju')
+            ->setCellValue('E1', 'No Daftar')
+            ->setCellValue('F1', 'Tgl Dokumen')
+            ->setCellValue('G1', 'Customer / Supplier')
+            ->setCellValue('H1', 'Jumlah Barang')
+            ->setCellValue('I1', 'Total Barang');
         $no = 1;
         $column = 2;
-
-
         foreach ($list as $l) {
             $spreadsheet->setActiveSheetIndex(0)
                 ->setCellValue('A' . $column, $no++)
-                ->setCellValue('B' . $column,  $l->no_sales_order)
-                ->setCellValue('C' . $column,  $l->no_aju)
-                ->setCellValue('D' . $column,  $l->no_dokumen)
-                ->setCellValue('E' . $column,  $l->tgl_dokumen)
-                ->setCellValue('F' . $column,  $l->customer_nama)
-                ->setCellValue('G' . $column,  $l->jumlah_barang)
-                ->setCellValue('H' . $column,  $l->total_barang);
+                ->setCellValue('B' . $column,  $l->asal_pengeluaran)
+                ->setCellValue('C' . $column,  $l->no_sales_order)
+                ->setCellValue('D' . $column,  $l->no_aju)
+                ->setCellValue('E' . $column,  $l->no_dokumen)
+                ->setCellValue('F' . $column,  $l->tgl_dokumen)
+                ->setCellValue('G' . $column,  $l->customer_nama)
+                ->setCellValue('H' . $column,  $l->jumlah_barang)
+                ->setCellValue('I' . $column,  $l->total_barang);
 
             $column++;
         }
@@ -791,6 +825,8 @@ class RekapBeaCukai extends BaseController
         $bc41Model = new BC41Model();
         $salesOrderLainModel = new SalesOrderLainModel();
         $salesOrderLainDetailModel = new SalesOrderLainDetailModel();
+        $pengembalianBarangDetailModel = new PengembalianBarangDetailModel();
+        $pengembalianBarangModel = new PengembalianBarangModel();
 
         $condition = [
             "bc_41.company_id"  => $this->this_company_id,
@@ -798,26 +834,42 @@ class RekapBeaCukai extends BaseController
             "DATE_FORMAT(bc_41.createdAt, '%m/%Y')" => $month
         ];
 
-        $selectQry = "bc_41.*,
+        $selectQrySalesOrderLain = "bc_41.*,
         sales_order_lain.no_sales_order,
         divisis.divisi,
         warehouses.warehouse_name,
         customers.name AS customer_name";
 
-        $bcDataQry = $bc41Model
-            ->select($selectQry)
+        $bcDataQrySalesOrderLain = $bc41Model
+            ->select($selectQrySalesOrderLain)
             ->join('sales_order_lain', 'sales_order_lain.id = bc_41.sales_order_lain_id', 'left')
             ->join('divisis', 'divisis.id = sales_order_lain.divisi_id', 'left')
             ->join('warehouses', 'warehouses.id = sales_order_lain.warehouse_id', 'left')
             ->join('customers', 'customers.id = sales_order_lain.customer_id', 'left')
+            ->where('bc_41.sales_order_lain_id !=', null)
             ->where($condition)
             ->findAll();
 
+        $selectQryPengembalianBarang = "bc_41.*,
+            pengembalian_barang.no_surat_jalan,
+            divisis.divisi,
+            warehouses.warehouse_name,
+            suppliers.name AS supplier_name";
 
+        $bcDataQryPengembalianBarang = $bc41Model
+            ->select($selectQryPengembalianBarang)
+            ->join('pengembalian_barang', 'pengembalian_barang.id = bc_41.pengembalian_barang_id', 'left')
+            ->join('penerimaan_barang', 'pengembalian_barang.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+            ->where('bc_41.pengembalian_barang_id !=', null)
+            ->where($condition)
+            ->findAll();
 
         $list = [];
 
-        foreach ($bcDataQry as $d) {
+        foreach ($bcDataQrySalesOrderLain as $d) {
             $dataSalesOrderLainDetail = $salesOrderLainDetailModel
                 ->select('count(id) as jumlah_barang, sum(qty_order) as total_barang')
                 ->where('sales_order_lain_id', $d['sales_order_lain_id'])
@@ -827,6 +879,7 @@ class RekapBeaCukai extends BaseController
                 ->where('id', $d['sales_order_lain_id'])
                 ->first();
             array_push($list, [
+                'asal_pengeluaran' => "SALES ORDER",
                 'no_sales_order' => $dataSalesOrderLain['no_sales_order'],
                 'no_aju' => $d['no_aju'],
                 'no_dokumen' => $d['no_daftar'],
@@ -834,6 +887,27 @@ class RekapBeaCukai extends BaseController
                 'customer_nama' => $d['customer_name'],
                 'jumlah_barang' => $dataSalesOrderLainDetail['jumlah_barang'],
                 'total_barang' => number_format($dataSalesOrderLainDetail['total_barang'], 2)
+            ]);
+        }
+
+        foreach ($bcDataQryPengembalianBarang as $d) {
+            $dataPengembalianBarangDetail = $pengembalianBarangDetailModel
+                ->select('count(id) as jumlah_barang, sum(jumlah_return) as total_barang')
+                ->where('pengembalian_barang_id', $d['pengembalian_barang_id'])
+                ->first();
+            $dataPengembalianBarang = $pengembalianBarangModel
+                ->select('no_surat_jalan')
+                ->where('id', $d['pengembalian_barang_id'])
+                ->first();
+            array_push($list, [
+                'asal_pengeluaran' => "RETUR",
+                'no_sales_order' => $dataPengembalianBarang['no_surat_jalan'],
+                'no_aju' => $d['no_aju'],
+                'no_dokumen' => $d['no_daftar'],
+                'tgl_dokumen' => date('d/m/Y', strtotime($d['createdAt'])),
+                'customer_nama' => $d['supplier_name'],
+                'jumlah_barang' => $dataPengembalianBarangDetail['jumlah_barang'],
+                'total_barang' => number_format($dataPengembalianBarangDetail['total_barang'], 2)
             ]);
         }
 
@@ -850,13 +924,14 @@ class RekapBeaCukai extends BaseController
 
         $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue('A1', 'No.')
-            ->setCellValue('B1', 'No Sales Order')
-            ->setCellValue('C1', 'No Aju')
-            ->setCellValue('D1', 'No Daftar')
-            ->setCellValue('E1', 'Tgl Dokumen')
-            ->setCellValue('F1', 'Customer')
-            ->setCellValue('G1', 'Jumlah Barang')
-            ->setCellValue('H1', 'Total Barang');
+            ->setCellValue('B1', 'Asal Pengeluaran')
+            ->setCellValue('C1', 'No Sales Order / No Surat Jalan')
+            ->setCellValue('D1', 'No Aju')
+            ->setCellValue('E1', 'No Daftar')
+            ->setCellValue('F1', 'Tgl Dokumen')
+            ->setCellValue('G1', 'Customer / Supplier')
+            ->setCellValue('H1', 'Jumlah Barang')
+            ->setCellValue('I1', 'Total Barang');
 
 
         $no = 1;
@@ -866,19 +941,20 @@ class RekapBeaCukai extends BaseController
         foreach ($list as $l) {
             $spreadsheet->setActiveSheetIndex(0)
                 ->setCellValue('A' . $column, $no++)
-                ->setCellValue('B' . $column,  $l->no_sales_order)
-                ->setCellValue('C' . $column,  $l->no_aju)
-                ->setCellValue('D' . $column,  $l->no_dokumen)
-                ->setCellValue('E' . $column,  $l->tgl_dokumen)
-                ->setCellValue('F' . $column,  $l->customer_nama)
-                ->setCellValue('G' . $column,  $l->jumlah_barang)
-                ->setCellValue('H' . $column,  $l->total_barang);
+                ->setCellValue('B' . $column,  $l->asal_pengeluaran)
+                ->setCellValue('C' . $column,  $l->no_sales_order)
+                ->setCellValue('D' . $column,  $l->no_aju)
+                ->setCellValue('E' . $column,  $l->no_dokumen)
+                ->setCellValue('F' . $column,  $l->tgl_dokumen)
+                ->setCellValue('G' . $column,  $l->customer_nama)
+                ->setCellValue('H' . $column,  $l->jumlah_barang)
+                ->setCellValue('I' . $column,  $l->total_barang);
 
             $column++;
         }
         $writer = new Xlsx($spreadsheet);
-        $filename = 'Rekap BC23';
-        foreach (range('A', 'H') as $columnID) {
+        $filename = 'Rekap BC41';
+        foreach (range('A', 'I') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
 

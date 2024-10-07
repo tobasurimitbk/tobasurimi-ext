@@ -19,7 +19,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
-                <div class="col-sm-2 mb-3">
+                <div class="col-sm-4 mb-3">
                     <div class="input-group input-group-password align-items-center">
                         <input autocomplete="one-time-code" class="form-control input-picker date " id="date" name="date" placeholder="Pilih Bulan">
                         <div class="input-group-prepend group-prepend-password align-items-center" style="display: flex; justify-content: center; align-items: center;">
@@ -34,12 +34,12 @@
                         <thead class="thead-dark">
                             <tr style="text-align: center;">
                                 <th style="text-align:center;">No</th>
-                                <th style="text-align:center;">No Sales Order</th>
+                                <th style="text-align:center;">Asal Pengeluaran</th>
+                                <th style="text-align:center;">No Sales Order / No Surat Jalan</th>
                                 <th style="text-align:center;">No Aju</th>
                                 <th style="text-align:center;">No Daftar</th>
                                 <th style="text-align:center;">Tgl Dokumen</th>
-                                <!-- <th>No Penerimaan Barang</th> -->
-                                <th style="text-align:center;">Customer</th>
+                                <th style="text-align:center;">Customer / Supplier</th>
                                 <th style="text-align:center;">Jumlah Barang</th>
                                 <th style="text-align:center;">Total Barang</th>
                             </tr>
@@ -99,13 +99,14 @@
 
                         var newRow = $('<tr style="border: none">');
                         newRow.append($('<td style="text-align:center;">').text(no++));
+                        newRow.append($('<td style="text-align:center;">').text(v.asal_pengeluaran));
                         newRow.append($('<td style="text-align:center;">').text(v.no_sales_order));
                         newRow.append($('<td style="text-align:center;">').text(v.no_aju));
                         newRow.append($('<td style="text-align:center;">').text(v.no_dokumen));
                         newRow.append($('<td style="text-align:center;">').text(v.tgl_dokumen))
 
                         newRow.append($('<td style="text-align:center;">').text(v.customer_nama));
-                        newRow.append($('<td style="text-align:center;">').text(v.jumlah_barang + " Barang"));
+                        newRow.append($('<td style="text-align:center;">').text(v.jumlah_barang));
                         newRow.append($('<td style="text-align:center;">').text(v.total_barang));
                         table.find('tbody').append(newRow);
                     });

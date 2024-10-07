@@ -1155,6 +1155,8 @@ class BC27 extends BaseController
     public function barangDetail($id, $kodeBarang)
     {
         $id = decrypt($id);
+        $this->setFlashDataNavigatorSession($id);
+
         $kodeBarang = decrypt($kodeBarang);
         $bc27 = $this->bc27Model->find($id);
         $payload = json_decode($this->bc27Model->find($id)['payload']);
@@ -1328,8 +1330,10 @@ class BC27 extends BaseController
         foreach ($payload->barang as $i => $b) {
             if ($b->seriBarang == $seriBarang) {
                 $indexBarang = $i;
+                break;
             }
         }
+
 
         if (count($payload->barang[$indexBarang]->bahanBaku) != 0) {
             $seriBahanBakuLast = count($payload->barang[$indexBarang]->bahanBaku) + 1;
@@ -1369,14 +1373,14 @@ class BC27 extends BaseController
                 'bahanBakuTarif' => $b->barangTarif,
 
             ]);
-            foreach ($payload->barang[$indexBarang]->bahanBaku as $bb) {
-                foreach ($bb['bahanBakuTarif'] as $i  => $t) {
-                    $t->seriBahanBaku = $seriBahanBakuLast;
-                    $t->kodeAsalBahanBaku = $b->kodeAsalBahanBaku;
-                    // $bb[$i]['seriBahanBaku'] = $seriBahanBakuLast;
-                    // $bb[$i]['kodeAsalBahanBaku'] = $b->kodeAsalBahanBaku;
-                }
-            }
+            // foreach ($payload->barang[$indexBarang]->bahanBaku as $bb) {
+            //     foreach ($bb->bahanBakuTarif as $bf) {
+            //         $bf->seriBahanBaku = $seriBahanBakuLast;
+            //         $bf->kodeAsalBahanBaku = $b->kodeAsalBahanBaku;
+            //         // $bb[$i]['seriBahanBaku'] = $seriBahanBakuLast;
+            //         // $bb[$i]['kodeAsalBahanBaku'] = $b->kodeAsalBahanBaku;
+            //     }
+            // }
 
             $seriBahanBakuLast++;
         }
@@ -1423,6 +1427,8 @@ class BC27 extends BaseController
         }
 
         $this->setFlashDataNavigatorSession($id);
+        $this->generatePungutan($id);
+        $bc27 = $this->bc27Model->find($id);
         $payload = json_decode($bc27['payload']);
         $kodeJenisPungutan = $this->metaDataModel
             ->where('name', "Kode Jenis Pungutan BC")
@@ -1515,15 +1521,13 @@ class BC27 extends BaseController
         return view('BeaCukai/bc-27/form-pungutan', $data);
     }
 
-    public function generatePungutan()
+    private function generatePungutan($id)
     {
-        $id = decrypt($this->request->getVar('id'));
         $bc27 = $this->bc27Model->find($id);
         $payload = json_decode($bc27['payload']);
         $idPungutan = 1;
 
         $payload->pungutan = [];
-
         foreach ($payload->barang as $b) {
             foreach ($b->bahanBaku as $bb) {
                 foreach ($bb->bahanBakuTarif as $t) {
@@ -1538,11 +1542,6 @@ class BC27 extends BaseController
             }
         }
         $this->bc27Model->update($id, ['payload' => json_encode($payload)]);
-
-        return response()->setJSON([
-            'message' => "Generating Pungutan",
-            'status' => true,
-        ]);
     }
 
     public function pernyataan($id)

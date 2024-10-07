@@ -66,4 +66,16 @@ class BCBarangTarifModel extends Model
             'sortType'          => $sortType
         ];
     }
+
+    public function getByBcPurchaseOrder($id)
+    {
+        $selectQry = "kode_jenis_pungutan, nilai_bayar, kode_jenis_tarif";
+    
+        $result = $this->asArray()
+                       ->select($selectQry)
+                       ->where('bc_purchase_order_id', $id)
+                       ->findAll();
+        
+        return $result;
+    }
 }

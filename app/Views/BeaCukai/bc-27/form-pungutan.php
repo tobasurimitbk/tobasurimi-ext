@@ -11,7 +11,7 @@
     <?php include('header.php') ?>
     <div class="card">
         <div class="card-header" style="font-weight: bold; color:black;">
-            BC 2.5 - PEMBERITAHUAN IMPOR BARANG DARI TEMPAT PENIMBUNAN BERIKAT
+            BC 2.7 - PEMBERITAHUAN PENGELUARAN UNTUK DIANGKUT DARI TEMPAT PENIMBUNAN BERIKAT KE TEMPAT PENIMBUNAN BERIKAT LAINNYA
         </div>
         <div class="card-body">
             <?php include_once('nav.php') ?>
@@ -23,9 +23,7 @@
                     </label>
                 </div>
                 <div class="col-sm">
-                    <a href="#" type="button" class="btn btn-primary mt-4 mb-2" id="generate-pungutan" style="float: right;">
-                        Generate Pungutan
-                    </a>
+
                 </div>
             </div>
             <div class="table-responsive">
@@ -57,6 +55,12 @@
                                 </tr>
                             <?php endforeach; ?>
 
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="9" style="text-align: center;">
+                                    Belum Ada Data Pungutan
+                                </td>
+                            </tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -72,31 +76,31 @@
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
 
-    // var tableListInformasiPungutan = $('.table-list-pungutan').DataTable({
-    //     dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-    //     lengthChange: true,
-    //     info: false,
-    //     paging: false,
-    //     searching: false,
-    //     ordering: false,
-    //     order: [],
-    //     fixedHeader: true,
-    //     "initComplete": function(settings, json) {
-    //         $('.dataTables_length').empty();
-    //         $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-    //         $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-    //     },
-    //     display: "stripe",
-    //     searching: false,
-    //     language: {
-    //         emptyTable: "Tidak Ada Data",
-    //         lengthMenu: "Show _MENU_ entries",
-    //         paginate: {
-    //             previous: '<i class="fa fa-angle-left"></i>',
-    //             next: '<i class="fa fa-angle-right"></i>'
-    //         }
-    //     }
-    // });
+    var tableListInformasiPungutan = $('.table-list-pungutan').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        lengthChange: true,
+        info: false,
+        paging: false,
+        searching: false,
+        ordering: false,
+        order: [],
+        fixedHeader: true,
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        display: "stripe",
+        searching: false,
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
 
 
     $("#generate-pungutan").click(function(e) {

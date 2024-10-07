@@ -134,17 +134,31 @@ class StokHistori extends BaseController
                     ->where('bc_30.company_id', $this->this_company_id)
                     ->first();
 
-                $bc25 = $this->bc25Model
+                $bc25SalesOrderLain = $this->bc25Model
                     ->select('bc_25.no_aju, sales_order_lain.bc_id')
                     ->join('sales_order_lain', 'sales_order_lain.id = bc_25.sales_order_lain_id', 'left')
                     ->where('sales_order_lain.no_sales_order', $data->no_dokumen2)
                     ->where('bc_25.company_id', $this->this_company_id)
                     ->first();
 
-                $bc41 = $this->bc41Model
+                $bc25PengeluaranBarang = $this->bc25Model
+                    ->select('bc_25.no_aju, pengembalian_barang.bc_pengeluaran_id as bc_id')
+                    ->join('pengembalian_barang', 'pengembalian_barang.id = bc_25.pengembalian_barang_id', 'left')
+                    ->where('pengembalian_barang.no_surat_jalan', $data->no_dokumen2)
+                    ->where('bc_25.company_id', $this->this_company_id)
+                    ->first();
+
+                $bc41SalesOrderLain = $this->bc41Model
                     ->select('bc_41.no_aju, sales_order_lain.bc_id')
                     ->join('sales_order_lain', 'sales_order_lain.id = bc_41.sales_order_lain_id', 'left')
                     ->where('sales_order_lain.no_sales_order', $data->no_dokumen2)
+                    ->where('bc_41.company_id', $this->this_company_id)
+                    ->first();
+
+                $bc41PengeluaranBarang = $this->bc41Model
+                    ->select('bc_41.no_aju, pengembalian_barang.bc_pengeluaran_id as bc_id')
+                    ->join('pengembalian_barang', 'pengembalian_barang.id = bc_41.pengembalian_barang_id', 'left')
+                    ->where('pengembalian_barang.no_surat_jalan', $data->no_dokumen2)
                     ->where('bc_41.company_id', $this->this_company_id)
                     ->first();
 
@@ -158,16 +172,26 @@ class StokHistori extends BaseController
                     $dokumenBC = $this->metaDataModel->find($bc30Internasional['bc_type']);
                     $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
                     $data->no_aju = $bc30Internasional['no_aju'];
-                } elseif ($bc25 != null) {
-                    // BEA CUKAI 2.5
-                    $dokumenBC = $this->metaDataModel->find($bc25['bc_id']);
+                } elseif ($bc25SalesOrderLain != null) {
+                    // BEA CUKAI 2.5 SALES ORDER
+                    $dokumenBC = $this->metaDataModel->find($bc25SalesOrderLain['bc_id']);
                     $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
-                    $data->no_aju = $bc25['no_aju'];
-                } elseif ($bc41 != null) {
-                    // BEA CUKAI 4.1
-                    $dokumenBC = $this->metaDataModel->find($bc41['bc_id']);
+                    $data->no_aju = $bc25SalesOrderLain['no_aju'];
+                } elseif ($bc25PengeluaranBarang != null) {
+                    // BEA CUKAI 2.5 PENGEMBALIAN BARANG
+                    $dokumenBC = $this->metaDataModel->find($bc25PengeluaranBarang['bc_id']);
                     $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
-                    $data->no_aju = $bc41['no_aju'];
+                    $data->no_aju = $bc25PengeluaranBarang['no_aju'];
+                } elseif ($bc41SalesOrderLain != null) {
+                    // BEA CUKAI 4.1 SALES ORDER LAIN
+                    $dokumenBC = $this->metaDataModel->find($bc41SalesOrderLain['bc_id']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc41SalesOrderLain['no_aju'];
+                } elseif ($bc41PengeluaranBarang != null) {
+                    // BEA CUKAI 4.1 PENGELUARAN BARANG
+                    $dokumenBC = $this->metaDataModel->find($bc41PengeluaranBarang['bc_id']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc41PengeluaranBarang['no_aju'];
                 } else {
                     // BELUM DIBUAT SAMA SEKALI DOKUMEN BC 3.O NYA
                     $dokumenBC = $this->metaDataModel->find($data->bc_id);

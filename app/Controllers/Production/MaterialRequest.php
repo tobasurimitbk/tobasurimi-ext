@@ -537,18 +537,15 @@ class MaterialRequest extends BaseController
             ];
 
             if (!empty($id)) {
-                $materialRequestData = $this->materialRequestModel->find($id);
 
-                $this->workOrdersModel->update($materialRequestData['work_order_id'], [
-                    'is_posted' => 1
-                ]);
+                $this->materialRequestModel->update($id, $payload);
                 
                 $data = [
                     "status"    => true,
                     "message"   => "Status Posting Berhasil Diperbaharui",
                     'token'     => csrf_hash()
                 ];
-
+                
                 echo json_encode($data);
             } else {
                 $data = [
