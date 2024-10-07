@@ -2357,13 +2357,30 @@
                         <input style="width: 150px;" class="form-control rasio text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${rasio.toFixed(2)}%">
                     </td>
                     <td>
-                        <input style="width: 200px;" class="form-control harga-satuan text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${formatRupiah(hargaSatuan)}">
+                        <input style="width: 200px;" class="form-control harga-satuans text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${formatRupiah(hargaSatuan)}">
                     </td>
                     <td>
                         <input style="width: 200px;" class="form-control harga text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 || item.harga_total == undefined ? formatRupiah(calculatedHargaTotal) : formatRupiah(item.harga_total)}">
                     </td>
                     <td>
                         <input style="width: 200px;" class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.harga_total == 0 || item.harga_total == undefined ? formatRupiah(calculatedHargaTotal / item.hasilWithPersentase) : formatRupiah(item.harga_total / item.hasilWithPersentase)}">
+                    </td>
+                    <td>
+                        <select class="form-control select2-valas" style="width: 200px!important;" data-index="${index}">
+                            <option value="></option>
+                        <?php foreach ($dataMetadata as $meta) : ?>
+                            <option value="<?= $meta['id'] ?>" data-id="${index}" <?= $meta['id'] == "32" ? "selected" : "" ?>><?= $meta['value'] ?></option>
+                        <?php endforeach; ?>
+                        </select>
+                    </td>
+                    <td>
+                        <input style="width: 200px;" class="form-control text-center kurs" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="">
+                    </td>
+                    <td>
+                        <input style="width: 200px;" class="form-control text-center hargaSatuanKurs" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="">
+                    </td>
+                    <td>
+                        <input style="width: 200px;" class="form-control text-center hargaTotalKurs" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="">
                     </td>
                 </tr>`;
                 no++;
@@ -2382,9 +2399,7 @@
                     <input class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${totalBhnTersedia.toFixed(2)}">
                 </td>
                 <td></td>
-                <td>
-                    
-                </td>
+                <td></td>
                 <td></td>
                 <td>
                     <input class="form-control harga-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${formatRupiah(totalTotalHargaRasio)}">
@@ -2392,21 +2407,55 @@
                 <td></td>
             </tr>`;
             $('.tfoot-rasio-akhir').append(rowFooter);
+            // Append rows to the table body
             $('.body-table-rasio-akhir').append(row);
 
-            // Update total harga if any input with class 'harga' changes
+            $('.select2-valas').each(function() {
+                if ($(this).data('select2')) {
+                    $(this).select2('destroy');
+                }
+            });
+
+            // Reinitialize Select2 after the rows have been added to the DOM
+            $('.select2-valas').select2({
+                placeholder: 'Pilih Valas',
+                allowClear: true,
+                width: '100%'
+            });
+
+
+            // Manually clear the selection to ensure it starts unselected
+            $('.select2-valas').val(null).trigger('change');
+
+            // Update total harga and kurs calculations
             $('.harga').on('change', function() {
                 let totalHarga = 0;
                 $('.harga').each(function() {
                     const harga = parseFloat($(this).val().replace(/Rp|\./g, ""));
-                    var index = $(this).data('index');
                     totalHarga += isNaN(harga) ? 0 : harga;
                     $(this).val(formatRupiah(harga));
                 });
                 $('.harga-total').val(formatRupiah(totalHarga));
             });
+
+            $('.kurs').on('change', function() {
+                var index = $(this).data('index');
+                const kurs = parseFloat($(this).val().replace(/Rp|\./g, ""));
+
+                const hargaSatuan = parseFloat($('input[data-index="' + index + '"].harga-satuans').val().replace(/Rp|\./g, ""));
+                const harga = parseFloat($('input[data-index="' + index + '"].harga').val().replace(/Rp|\./g, ""));
+
+                if (!isNaN(kurs)) {
+                    $('input[data-index="' + index + '"].hargaSatuanKurs').val(formatRupiah(kurs * hargaSatuan));
+                    $('input[data-index="' + index + '"].hargaTotalKurs').val(formatRupiah(kurs * harga));
+                }
+
+                $(this).val(formatRupiah(kurs));
+            });
+
         }
     };
+
     const drawTableRasioAkhirFrozen = function(data) {
         $('.body-table-rasio-akhir').empty();
         $('.tfoot-rasio-akhir').empty();
@@ -3039,15 +3088,21 @@
                     var rasioBarang = $('input[data-index="' + i + '"].rasio');
                     var hargaSatuanBarang = $('input[data-index="' + i + '"].harga-satuan');
                     var hargaBarang = $('input[data-index="' + i + '"].harga');
+                    var valas = $('select[data-index="' + i + '"].select2-valas');
+                    var kurs = $('input[data-index="' + i + '"].kurs');
                     var qtyBarangVal = parseFloat(qtyBarang.val());
                     var rasioBarangVal = parseFloat(rasioBarang.val());
                     var hargaSatuanBarangVal = parseFloat(hargaSatuanBarang.val().replace(/Rp|\./g, ""));
                     var hargaBarangVal = parseFloat(hargaBarang.val().replace(/Rp|\./g, ""));
+                    var valasVal = parseFloat(valas.val().replace(/Rp|\./g, ""));
+                    var kursVal = parseFloat(kurs.val().replace(/Rp|\./g, ""));
 
                     list_items_barang_jadi[i].qty = qtyBarangVal;
                     list_items_barang_jadi[i].rasio = rasioBarangVal;
                     list_items_barang_jadi[i].harga_satuan = hargaSatuanBarangVal;
                     list_items_barang_jadi[i].harga = hargaBarangVal;
+                    list_items_barang_jadi[i].valas = valasVal;
+                    list_items_barang_jadi[i].kurs = kursVal;
                 });
 
                 // $.each(list_items_barang_digunakan_material_2, function(i, v) {

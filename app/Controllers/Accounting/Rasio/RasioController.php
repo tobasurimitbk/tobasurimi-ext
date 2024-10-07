@@ -180,10 +180,16 @@ class RasioController extends BaseController
     public function createRasio()
     {
         $subAkunsModel = $this->subAkunModel->asObject()->findAll();
+        $values = [
+            "name" => 'Valuta',
+            "company_id"    => $this->this_company_id
+        ];
+        $dataMetadata = $this->metadataModel->search_list($values, "value");
         $data = [
             'dataDivisi' => $this->divisisModel->getDivisiAccess(),
             'kategoriBarangAkun' => $this->metadataModel->asObject()->where('name', 'kategori_barang_akun')->findAll(),
-            "subAkuns" => $subAkunsModel
+            "subAkuns" => $subAkunsModel,
+            "dataMetadata" => $dataMetadata,
         ];
         return view('Accounting/rasio/form', $data);
     }
@@ -345,6 +351,8 @@ class RasioController extends BaseController
                         'tipe_bahan'                    => $s->tipe_bahan,
                         'hasilWithPersentase'           => $s->hasilWithPersentase,
                         'banyakData'                    => $s->banyakData,
+                        'valas'                    => $s->valas,
+                        'kurs'                    => $s->kurs,
                     ]);
                 }
             } else {
