@@ -855,14 +855,14 @@
         var jml_diterima_lpb_last = Number($('.jml_diterima_lpb_last').val()) || 0;
         if (jml_diterima_lpb == 0) {
             for (var i = 0; i < listData.result.length; i++) {
-                if (Number(listData.result[i].am_purchase_order_details_id) == Number($('.am_purchase_order_details_id').val()) && Number(listData.result[i].am_purchase_order_id) == Number($('.am_purchase_order_id').val())) {
+                if (Number(listData.result[i].rm_purchase_order_details_id) == Number($('.rm_purchase_order_details_id').val()) && Number(listData.result[i].rm_purchase_order_id) == Number($('.rm_purchase_order_id').val())) {
                     item = listData.result[i];
                     var jml_diterima_total_now = Number(item.jml_diterima_total - jml_diterima_lpb_last);
                     var sisa_total_now = Number(item.sisa_total + jml_diterima_lpb_last);
                     $('.sub_total').val('' +
-                        formatRupiah(Number(jml_diterima_lpb) * Number(item.harga)));
-                    $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(2));
-                    $('.sisa_total').val(sisa_total_now.toFixed(2));
+                        formatRupiah(Number(jml_diterima_lpb) * (Number(item.harga_harian) + Number(item.harga_bulanan) + Number(item.harga_umum))));
+                    $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(4));
+                    $('.sisa_total').val(sisa_total_now.toFixed(4));
 
                     break;
                 }
@@ -871,14 +871,14 @@
 
         } else {
             for (var i = 0; i < listData.result.length; i++) {
-                if (Number(listData.result[i].am_purchase_order_details_id) == Number($('.am_purchase_order_details_id').val()) && Number(listData.result[i].am_purchase_order_id) == Number($('.am_purchase_order_id').val())) {
+                if (Number(listData.result[i].rm_purchase_order_details_id) == Number($('.rm_purchase_order_details_id').val()) && Number(listData.result[i].rm_purchase_order_id) == Number($('.rm_purchase_order_id').val())) {
                     item = listData.result[i];
                     var jml_diterima_total_now = (Number(item.jml_diterima_total) + Number(jml_diterima_lpb) - jml_diterima_lpb_last);
                     var sisa_total_now = item.jml_order - jml_diterima_total_now;
                     $('.sub_total').val('' +
-                        formatRupiah(Number(jml_diterima_lpb) * Number(item.harga)));
-                    $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(2));
-                    $('.sisa_total').val(sisa_total_now.toFixed(2));
+                        formatRupiah(Number(jml_diterima_lpb) * (Number(item.harga_harian) + Number(item.harga_bulanan) + Number(item.harga_umum))));
+                    $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(4));
+                    $('.sisa_total').val(sisa_total_now.toFixed(4));
                     break;
                 }
             }
@@ -932,12 +932,12 @@
                 newRow.append($('<td>').text(v.spp_no));
                 // newRow.append($('<td>').text(v.po_no));
                 newRow.append($('<td>').text(v.satuan));
-                newRow.append($('<td>').text(v.jml_order));
-                newRow.append($('<td>').text(v.jml_diterima_lpb));
-                newRow.append($('<td>').text(v.jml_diterima_total));
-                newRow.append($('<td>').text(v.sisa_total.toFixed(2)));
-                newRow.append($('<td>').text(formatRupiah(parseInt(v.harga) || 0)));
-                newRow.append($('<td>').text(formatRupiah(parseInt(v.sub_total) || 0)));
+                newRow.append($('<td>').text(parseFloat(v.jml_order).toFixed(4)));
+                newRow.append($('<td>').text(parseFloat(v.jml_diterima_lpb).toFixed(4)));
+                newRow.append($('<td>').text(parseFloat(v.jml_diterima_total).toFixed(4)));
+                newRow.append($('<td>').text(parseFloat(v.sisa_total).toFixed(4)));
+                newRow.append($('<td>').text(formatRupiah(parseFloat(v.harga).toFixed(2) || 0)));
+                newRow.append($('<td>').text(formatRupiah(parseFloat(v.sub_total).toFixed(2) || 0)));
                 newRow.append($('<td>').text(v.keterangan));
                 newRow.append($('<td>').html(
                     <?php if (!empty($dataPenerimaanBarang)) : ?> <?php if ($dataPenerimaanBarang['status_post'] === "FINISH") : ?> `-`
@@ -970,12 +970,12 @@
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td style="text-align:right;" colspan="3"><b>GRAND TOTAL</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + jmlOrderTotal.toFixed(2) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaLPBTotal.toFixed(2) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaTotal.toFixed(2) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + sisaTotal.toFixed(2) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(hargaTotal).toFixed(2) || 0) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(subTotal).toFixed(2) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + jmlOrderTotal.toFixed(4) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaLPBTotal.toFixed(4) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaTotal.toFixed(4) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + sisaTotal.toFixed(4) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseFloat(hargaTotal).toFixed(2) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseFloat(subTotal).toFixed(2) || 0) + '</b></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
@@ -1003,11 +1003,11 @@
         $('.jml_order').val(item.jml_order);
         $('.keterangan').val(item.keterangan);
         $('.jml_diterima_lpb').val(item.jml_diterima_lpb);
-        $('.jml_diterima_total').val(item.jml_diterima_total);
-        $('.sisa_total').val(item.sisa_total.toFixed(2));
+        $('.jml_diterima_total').val(parseFloat(item.jml_diterima_total).toFixed(4));
+        $('.sisa_total').val(parseFloat(item.sisa_total).toFixed(4));
         $('.nama_barang_dokumen').val(item.nama_barang_master);
-        $('.harga_satuan').val("" + formatRupiah(Number(item.harga) || 0));
-        $('.sub_total').val("" + formatRupiah(Number(item.sub_total) || 0));
+        $('.harga_satuan').val("" + formatRupiah(Number(item.harga).toFixed(2) || 0));
+        $('.sub_total').val("" + formatRupiah(Number(item.sub_total).toFixed(2) || 0));
         $('.jml_diterima_lpb_last').val(item.jml_diterima_lpb);
     }
 
