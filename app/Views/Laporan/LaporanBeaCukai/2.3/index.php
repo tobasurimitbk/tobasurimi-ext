@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Laporan Bea Cukai 2.3</h1>
+        <h1>Laporan Pungutan Bea Cukai 2.3</h1>
         <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: -1px;">
             Export
         </button>
@@ -23,7 +23,7 @@
         <div class="card-body">
 
             <div class="row justify-content-start row-col-spp">
-                <div class="col-md-3 mb-3">
+                <div class="col-md-4 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC23" id="mulaiTanggalBC23" name="mulaiTanggalBC23" placeholder="Mulai Tanggal BC 2.3 Dibuat">
@@ -32,7 +32,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
+                <div class="col-md-4 mb-3">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC23" id="selesaiTanggalBC23" name="selesaiTanggalBC23" placeholder="Selesai Tanggal BC 2.3 Dibuat">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -40,29 +40,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <select name="statusBC" class="form-select statusBC" id="statusBC">
-                        <option value="ALL">STATUS BC : ALL</option>
-                        <option value="Belum Lengkap">STATUS BC : BELUM LENGKAP</option>
-                        <option value="Siap Kirim">STATUS BC : SIAP KIRIM CEISA 4.0</option>
-                        <option value="Sudah Kirim">STATUS BC : SUDAH KIRIM CEISA 4.0</option>
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <select name="statusLPB" class="form-select statusLPB" id="statusLPB">
-                        <option value="SEMUA">JENIS LPB : SEMUA</option>
-                        <option value="IMPORT BAKU">JENIS LPB : IMPORT BB</option>
-                        <option value="IMPORT PENOLONG">JENIS LPB : IMPORT BP</option>
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control supplierName search form-out-search" placeholder="Cari Nama Supplier" value="" />
-                </div>
-                <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control noPenerimaanBarang search form-out-search" placeholder="Cari Nomor LPB" value="" />
-                </div>
-                <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 2.3 / No Daftar" value="" />
+                <div class="col-md-4 mb-3">
+                    <input autocomplete="one-time-code" class="form-control searchData search form-out-search" placeholder="Cari" value="" />
                 </div>
             </div>
 
@@ -112,8 +91,10 @@
     let sortType = "desc";
 
     var table = $('.dataTable').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         serverSide: true,
         ordering: true,
+        searching: false, // Menghilangkan fitur pencarian
         order: [
             [1, 'asc'] // Urutan default berdasarkan kolom kedua
         ],
@@ -134,6 +115,7 @@
                 data.statusBC = $('.statusBC').val();
                 data.noPenerimaanBarang = $('.noPenerimaanBarang').val();
                 data.noAju = $('.noAju').val();
+                data.search = $('.searchData').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -186,11 +168,7 @@
         table.ajax.reload();
     });
 
-    $('.supplierName, .noPenerimaanBarang, .noAju').keyup(function() {
-        table.ajax.reload();
-    });
-
-    $('.statusBC, .statusLPB').change(function() {
+    $('.searchData').keyup(function() {
         table.ajax.reload();
     });
 

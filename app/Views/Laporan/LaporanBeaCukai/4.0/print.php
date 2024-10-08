@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Bea Cukai BC 4.0</title>
+    <title>Laporan Pungutan Bea Cukai 4.0</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,7 +42,7 @@
 </head>
 
 <body>
-    <h2>LAPORAN BEA CUKAI BC 2.3</h2>
+    <h2>LAPORAN BEA CUKAI BC 4.0</h2>
 
     <table class="w-100">
         <tbody>
@@ -74,7 +74,7 @@
             <tr>
                 <th>Tidak Dipungut</th>
                 <th>Di Bebaskan</th>
-                <th>Di Tangguuhkan</th>
+                <th>Di Tangguhkan</th>
             </tr>
         </thead>
         <tbody>
@@ -86,9 +86,9 @@
                     <td><?= $row['no_aju']; ?></td>
                     <td><?= $row['no_daftar']; ?></td>
                     <td><?= $row['po_type']; ?></td>
-                    <td><?= $row['dataBCTarif']['PPN']['tidak_dipungut']; ?></td>
-                    <td><?= $row['dataBCTarif']['PPN']['di_bebaskan']; ?></td>
-                    <td><?= $row['dataBCTarif']['PPN']['di_tangguhkan']; ?></td>
+                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['tidak_dipungut']); ?></td>
+                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['di_bebaskan']); ?></td>
+                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['di_tangguhkan']); ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

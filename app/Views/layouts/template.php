@@ -136,7 +136,7 @@
             el.value = value;
         }
 
-        
+
         function formatRupiah(angka, prefix = "Rp ") {
             var number_string = angka.toString().replace(/[^,\d]/g, ""),
                 split = number_string.split(","),
@@ -151,7 +151,7 @@
             }
 
             rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
-            return prefix + rupiah;
+            return rupiah;
         }
 
 

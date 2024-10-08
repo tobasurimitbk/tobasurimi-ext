@@ -112,7 +112,7 @@
                     </div>
                     <div class="card-wrap">
                         <div class="card-header">
-                            <h4>Beacukai 2.3</h4>
+                            <h4>Pungutan Bea Cukai 2.3</h4>
                         </div>
                     </div>
                 </div>
@@ -126,7 +126,7 @@
                     </div>
                     <div class="card-wrap">
                         <div class="card-header">
-                            <h4>Beacukai 4.0</h4>
+                            <h4>Pungutan Bea Cukai 4.0</h4>
                         </div>
                     </div>
                 </div>

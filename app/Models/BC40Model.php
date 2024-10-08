@@ -111,6 +111,16 @@ class BC40Model extends Model
             $bcDataQry->groupEnd();
         }
 
+        if (!empty($addCondition['search'])) {
+            $searchTerm = $addCondition['search'];
+            $bcDataQry->groupStart();
+            $bcDataQry->like('suppliers.name', $searchTerm)
+                    ->orLike('bc_23.no_aju', $searchTerm)
+                    ->orLike('bc_purchase_order.multiple_lpb_no', $searchTerm)
+                    ->orLike('bc_purchase_order.no_daftar', $searchTerm);
+            $bcDataQry->groupEnd();
+        }
+        
         if ($addCondition['mulaiTanggalBC40'] && $addCondition['selesaiTanggalBC40']) {
             $bcDataQry->groupStart();
             $mulaiTanggalBC40Timestamp = date_format(date_create_from_format("d/m/Y", $addCondition['mulaiTanggalBC40']), "Y-m-d");
