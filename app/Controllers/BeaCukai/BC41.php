@@ -258,6 +258,7 @@ class BC41 extends BaseController
             'no_aju' => $this->request->getVar('no_aju'),
             'no_daftar' => $this->request->getVar('no_daftar'),
             'status_posting' => '0',
+            'createdAt' => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))))
         ]);
 
         return response()->setJSON([
@@ -277,6 +278,7 @@ class BC41 extends BaseController
             'no_aju' => $this->request->getVar('no_aju'),
             'no_daftar' => $this->request->getVar('no_daftar'),
             'status_posting' => '0',
+            'createdAt' => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))))
         ]);
         return response()->setJSON([
             'status' => true,

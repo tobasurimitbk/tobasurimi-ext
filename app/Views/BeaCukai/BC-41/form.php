@@ -111,6 +111,17 @@
                     <div class="col-sm-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3">
+                                <input <?= !empty($bc41) ? ($bc41['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc41) ? date('d/m/Y', strtotime($bc41['createdAt'])) : "" ?>" autocomplete="one-time-code" type="text" class="form-control tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dokumen">
+                                <label for="floatingInput">Tanggal Dokumen</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-1">
                                 <input disabled <?= !empty($bc41) ? ($bc41['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc41) ? date('d/m/Y', strtotime($bc41['tanggal_reference'])) : "" ?>" autocomplete="one-time-code" type="text" class="form-control tanggal_reference" id="tanggal_reference" name="tanggal_reference" placeholder="Tanggal Reference">
                                 <label for="floatingInput">Tanggal Reference</label>
                             </div>
@@ -118,6 +129,11 @@
                                 <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
                             </div>
                         </div>
+                        <small class="mb-3">
+                            <i>
+                                Tanggal Reference Diambil Dari Tanggal Sales Order atau Tanggal Retur Pembelian
+                            </i>
+                        </small>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3">
@@ -323,6 +339,9 @@
             no_daftar: {
                 required: true
             },
+            tanggal: {
+                required: true
+            },
         },
         messages: {
             reference_id: {
@@ -333,6 +352,9 @@
             },
             no_daftar: {
                 required: "No daftar wajib diisi"
+            },
+            tanggal: {
+                required: "Tanggal dokumen wajib diisi"
             },
         },
         errorElement: 'span',
@@ -480,6 +502,13 @@
         var tanggalPengajuanSplit = tanggalPengajuan.split("/");
         var noPengajuanSplit = noAju.split("-");
         $('#no_pengajuan').val(noPengajuanSplit[0] + '-' + noPengajuanSplit[1] + '-' + tanggalPengajuanSplit[2] + '' + tanggalPengajuanSplit[1] + '' + tanggalPengajuanSplit[0] + '-' + noPengajuanSplit[3]);
+    });
+
+    $('#tanggal').datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
     });
 
     $('#ubahNoAjuButton').click(function(e) {

@@ -32,7 +32,7 @@
                 <div class="col-md-3 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC23" id="mulaiTanggalBC23" name="mulaiTanggalBC23" placeholder="Mulai Tanggal BC 2.3 Dibuat">
+                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC23" id="mulaiTanggalBC23" name="mulaiTanggalBC23" placeholder="Mulai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-mulaiTanggalBC23"></i>
                         </div>
@@ -40,7 +40,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC23" id="selesaiTanggalBC23" name="selesaiTanggalBC23" placeholder="Selesai Tanggal BC 2.3 Dibuat">
+                        <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC23" id="selesaiTanggalBC23" name="selesaiTanggalBC23" placeholder="Sampai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-selesaiTanggalBC23"></i>
                         </div>
@@ -71,7 +71,7 @@
                     <input autocomplete="one-time-code" class="form-control noPo search form-out-search" placeholder="Cari Nomor Purchase Order" value="" />
                 </div>
                 <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 2.3 / No Daftar" value="" />
+                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju / No Daftar" value="" />
                 </div>
             </div>
             <?php if ($akunCeisa == null) : ?>
@@ -92,13 +92,13 @@
                             <tr>
                                 <th style="text-align: center;">No</th>
                                 <th onclick="changeSort('bc_purchase_order.supplier_id')" class="sort" style="text-align: center;">Supplier</th>
-                                <th onclick="changeSort('bc_23.createdAt')" class="sort" style="text-align: center;">Tanggal BC 2.3</th>
-                                <th onclick="changeSort('bc_23.no_aju')" class="sort" style="text-align: center;">No Aju BC 2.3 / No Daftar</th>
+                                <th onclick="changeSort('bc_23.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
+                                <th onclick="changeSort('bc_23.no_aju')" class="sort" style="text-align: center;">No Aju / No Daftar</th>
                                 <th onclick="changeSort('bc_purchase_order.po_type')" style="text-align: center;">Jenis PO</th>
                                 <th onclick="changeSort('bc_purchase_order.multiple_lpb_id')" class="sort" style="text-align: center;">No LPB</th>
                                 <th onclick="changeSort('bc_purchase_order.multiple_po_id')" class="sort" style="text-align: center;">No PO</th>
                                 <th style="text-align: center;">Status Posting</th>
-                                <th style="text-align: center;">Status Kirim BC 2.3</th>
+                                <th style="text-align: center;">Status Kirim</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>

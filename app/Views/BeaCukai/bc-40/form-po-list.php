@@ -76,6 +76,17 @@
                             <label for="floatingInput">Nomor Daftar</label>
                         </div>
                     </div>
+                    <div class="col-sm-4">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3">
+                                <input <?= !empty($bcPo) ? ($bcPo['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bcPo) ? date('d/m/Y', strtotime($bcPo['createdAt'])) : "" ?>" autocomplete="one-time-code" type="text" class="form-control tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dokumen">
+                                <label for="floatingInput">Tanggal Dokumen</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 21px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </form>
 
@@ -302,6 +313,45 @@
         drawTablePurchaseOrderUsed(listDataSelected);
     });
 
+    var validator = $(".create-form").validate({
+        rules: {
+            no_daftar: {
+                required: true
+            },
+            tanggal: {
+                required: true
+            },
+        },
+        messages: {
+            no_daftar: {
+                required: "Nomor Daftar Wajib Diisi"
+            },
+            tanggal: {
+                required: "Tanggal Wajib Diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
     $('.btn-submit-parent').click(function() {
         if (listDataSelected.length == 0) {
             Swal.fire({
@@ -311,53 +361,55 @@
                 confirmButtonText: 'Ok'
             });
         } else {
-            let data = new FormData(document.querySelector(".create-form"));
-            data.append('listBarang', JSON.stringify(listDataSelected));
+            if ($('.create-form').valid()) {
+                let data = new FormData(document.querySelector(".create-form"));
+                data.append('listBarang', JSON.stringify(listDataSelected));
 
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Data ?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    let data = new FormData(document.querySelector(".create-form"));
-                    data.append('listData', JSON.stringify(listDataSelected));
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data ?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Kembali',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let data = new FormData(document.querySelector(".create-form"));
+                        data.append('listData', JSON.stringify(listDataSelected));
 
-                    $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-40/po/update"); ?>",
-                        data: data,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading()
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                                confirmButtonText: 'Ok'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    location.reload();
-                                }
-                            });
+                        $.ajax({
+                            url: "<?= base_url("bea-cukai-bc-40/po/update"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading()
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    confirmButtonText: 'Ok'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        location.reload();
+                                    }
+                                });
 
-                        },
-                    });
-                }
-            })
+                            },
+                        });
+                    }
+                })
+            }
         }
     })
 
@@ -386,6 +438,13 @@
         var tanggalPengajuanSplit = tanggalPengajuan.split("/");
         var noPengajuanSplit = noAju.split("-");
         $('#no_pengajuan').val(noPengajuanSplit[0] + '-' + noPengajuanSplit[1] + '-' + tanggalPengajuanSplit[2] + '' + tanggalPengajuanSplit[1] + '' + tanggalPengajuanSplit[0] + '-' + noPengajuanSplit[3]);
+    });
+
+    $('#tanggal').datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
     });
 
     $('#ubahNoAjuButton').click(function(e) {
