@@ -353,6 +353,10 @@ function convertRupiahToNumber($rupiah)
    return $angkaTanpaKoma;
 }
 
+function formatRupiahPdfExcel($angka) {
+   return 'Rp ' . number_format($angka, 0, ',', '.');
+}
+
 function formatRupiah($angka)
 {
    $formatter = new NumberFormatter('id-ID', NumberFormatter::CURRENCY);

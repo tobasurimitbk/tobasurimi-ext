@@ -76,13 +76,13 @@
             <tr>
                 <th>Tidak Dipungut</th>
                 <th>Di Bebaskan</th>
-                <th>Di Tangguuhkan</th>
+                <th>Di Tangguhkan</th>
                 <th>Tidak Dipungut</th>
                 <th>Di Bebaskan</th>
-                <th>Di Tangguuhkan</th>
+                <th>Di Tangguhkan</th>
                 <th>Tidak Dipungut</th>
                 <th>Di Bebaskan</th>
-                <th>Di Tangguuhkan</th>
+                <th>Di Tangguhkan</th>
             </tr>
         </thead>
         <tbody>
@@ -94,15 +94,15 @@
                     <td><?= $row['no_aju']; ?></td>
                     <td><?= $row['no_daftar']; ?></td>
                     <td><?= $row['po_type']; ?></td>
-                    <td><?= $row['dataBCTarif']['PPN']['tidak_dipungut']; ?></td>
-                    <td><?= $row['dataBCTarif']['PPN']['di_bebaskan']; ?></td>
-                    <td><?= $row['dataBCTarif']['PPN']['di_tangguhkan']; ?></td>
-                    <td><?= $row['dataBCTarif']['PPH']['tidak_dipungut']; ?></td>
-                    <td><?= $row['dataBCTarif']['PPH']['di_bebaskan']; ?></td>
-                    <td><?= $row['dataBCTarif']['PPH']['di_tangguhkan']; ?></td>
-                    <td><?= $row['dataBCTarif']['BM']['tidak_dipungut']; ?></td>
-                    <td><?= $row['dataBCTarif']['BM']['di_bebaskan']; ?></td>
-                    <td><?= $row['dataBCTarif']['BM']['di_tangguhkan']; ?></td>
+                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['tidak_dipungut']); ?></td>
+                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['di_bebaskan']); ?></td>
+                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['di_tangguhkan']); ?></td>
+                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPH']['tidak_dipungut']); ?></td>
+                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPH']['di_bebaskan']); ?></td>
+                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPH']['di_tangguhkan']); ?></td>
+                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['BM']['tidak_dipungut']); ?></td>
+                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['BM']['di_bebaskan']); ?></td>
+                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['BM']['di_tangguhkan']); ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
