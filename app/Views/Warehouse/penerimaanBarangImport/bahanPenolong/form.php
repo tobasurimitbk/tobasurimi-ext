@@ -874,8 +874,8 @@
                 newRow.append($('<td>').text(parseFloat(v.jml_diterima_lpb).toFixed(4)));
                 newRow.append($('<td>').text(parseFloat(v.jml_diterima_total).toFixed(4)));
                 newRow.append($('<td>').text(parseFloat(v.sisa_total).toFixed(4)));
-                newRow.append($('<td>').text(formatRupiah(parseInt(v.harga).toFixed(2) || 0)));
-                newRow.append($('<td>').text(formatRupiah(parseInt(v.sub_total).toFixed(2) || 0)));
+                newRow.append($('<td>').text(formatRupiah(parseFloat(v.harga) || 0)));
+                newRow.append($('<td>').text(formatRupiah(parseFloat(v.sub_total) || 0)));
                 newRow.append($('<td>').text(v.keterangan));
                 newRow.append($('<td>').html(
                     <?php if (!empty($dataPenerimaanBarang)) : ?> <?php if ($dataPenerimaanBarang['status_post'] === "FINISH") : ?> `-`
@@ -908,8 +908,8 @@
             newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaLPBTotal.toFixed(4) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaTotal.toFixed(4) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + sisaTotal.toFixed(4) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(hargaTotal).toFixed(2) || 0) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(subTotal).toFixed(2) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseFloat(hargaTotal) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseFloat(subTotal) || 0) + '</b></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
@@ -978,19 +978,15 @@
     }
 
     function formatRupiah(angka) {
-        if (angka === null) {
-            angka = 0;
+        var formatter = new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR'
+        });
+        var parsedNumber = parseFloat(angka);
+        if (isNaN(parsedNumber)) {
+            return "0,00";
         }
-
-        angka = angka.toString();
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return ribuanFormatted + ',' + desimal;
+        return formatter.format(parsedNumber).replace('Rp', '').trim();
     }
 
     function formatCurrency(str) {

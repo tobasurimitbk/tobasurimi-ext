@@ -855,12 +855,12 @@
         var jml_diterima_lpb_last = Number($('.jml_diterima_lpb_last').val()) || 0;
         if (jml_diterima_lpb == 0) {
             for (var i = 0; i < listData.result.length; i++) {
-                if (Number(listData.result[i].rm_purchase_order_details_id) == Number($('.rm_purchase_order_details_id').val()) && Number(listData.result[i].rm_purchase_order_id) == Number($('.rm_purchase_order_id').val())) {
+                if (Number(listData.result[i].am_purchase_order_details_id) == Number($('.am_purchase_order_details_id').val()) && Number(listData.result[i].am_purchase_order_id) == Number($('.am_purchase_order_id').val())) {
                     item = listData.result[i];
                     var jml_diterima_total_now = Number(item.jml_diterima_total - jml_diterima_lpb_last);
                     var sisa_total_now = Number(item.sisa_total + jml_diterima_lpb_last);
                     $('.sub_total').val('' +
-                        formatRupiah(Number(jml_diterima_lpb) * (Number(item.harga_harian) + Number(item.harga_bulanan) + Number(item.harga_umum))));
+                        formatRupiah(Number(jml_diterima_lpb) * Number(item.harga)));
                     $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(4));
                     $('.sisa_total').val(sisa_total_now.toFixed(4));
 
@@ -871,12 +871,12 @@
 
         } else {
             for (var i = 0; i < listData.result.length; i++) {
-                if (Number(listData.result[i].rm_purchase_order_details_id) == Number($('.rm_purchase_order_details_id').val()) && Number(listData.result[i].rm_purchase_order_id) == Number($('.rm_purchase_order_id').val())) {
+                if (Number(listData.result[i].am_purchase_order_details_id) == Number($('.am_purchase_order_details_id').val()) && Number(listData.result[i].am_purchase_order_id) == Number($('.am_purchase_order_id').val())) {
                     item = listData.result[i];
                     var jml_diterima_total_now = (Number(item.jml_diterima_total) + Number(jml_diterima_lpb) - jml_diterima_lpb_last);
                     var sisa_total_now = item.jml_order - jml_diterima_total_now;
                     $('.sub_total').val('' +
-                        formatRupiah(Number(jml_diterima_lpb) * (Number(item.harga_harian) + Number(item.harga_bulanan) + Number(item.harga_umum))));
+                        formatRupiah(Number(jml_diterima_lpb) * Number(item.harga)));
                     $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(4));
                     $('.sisa_total').val(sisa_total_now.toFixed(4));
                     break;
@@ -936,8 +936,8 @@
                 newRow.append($('<td>').text(parseFloat(v.jml_diterima_lpb).toFixed(4)));
                 newRow.append($('<td>').text(parseFloat(v.jml_diterima_total).toFixed(4)));
                 newRow.append($('<td>').text(parseFloat(v.sisa_total).toFixed(4)));
-                newRow.append($('<td>').text(formatRupiah(parseFloat(v.harga).toFixed(2) || 0)));
-                newRow.append($('<td>').text(formatRupiah(parseFloat(v.sub_total).toFixed(2) || 0)));
+                newRow.append($('<td>').text(formatRupiah(parseFloat(v.harga) || 0)));
+                newRow.append($('<td>').text(formatRupiah(parseFloat(v.sub_total) || 0)));
                 newRow.append($('<td>').text(v.keterangan));
                 newRow.append($('<td>').html(
                     <?php if (!empty($dataPenerimaanBarang)) : ?> <?php if ($dataPenerimaanBarang['status_post'] === "FINISH") : ?> `-`
@@ -974,8 +974,8 @@
             newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaLPBTotal.toFixed(4) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaTotal.toFixed(4) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + sisaTotal.toFixed(4) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseFloat(hargaTotal).toFixed(2) || 0) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseFloat(subTotal).toFixed(2) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseFloat(hargaTotal) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseFloat(subTotal) || 0) + '</b></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
@@ -1006,8 +1006,8 @@
         $('.jml_diterima_total').val(parseFloat(item.jml_diterima_total).toFixed(4));
         $('.sisa_total').val(parseFloat(item.sisa_total).toFixed(4));
         $('.nama_barang_dokumen').val(item.nama_barang_master);
-        $('.harga_satuan').val("" + formatRupiah(Number(item.harga).toFixed(2) || 0));
-        $('.sub_total').val("" + formatRupiah(Number(item.sub_total).toFixed(2) || 0));
+        $('.harga_satuan').val("" + formatRupiah(Number(item.harga) || 0));
+        $('.sub_total').val("" + formatRupiah(Number(item.sub_total) || 0));
         $('.jml_diterima_lpb_last').val(item.jml_diterima_lpb);
     }
 
@@ -1058,20 +1058,15 @@
     }
 
     function formatRupiah(angka) {
-        if (angka === null) {
-            angka = 0;
+        var formatter = new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR'
+        });
+        var parsedNumber = parseFloat(angka);
+        if (isNaN(parsedNumber)) {
+            return "0,00";
         }
-
-
-        angka = angka.toString();
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return ribuanFormatted;
+        return formatter.format(parsedNumber).replace('Rp', '').trim();
     }
 
     function formatCurrency(str) {
