@@ -111,6 +111,18 @@ class BC23Model extends Model
             $bcDataQry->groupEnd();
         }
 
+        // Inside your existing getList method
+        if (!empty($addCondition['search'])) {
+            $searchTerm = $addCondition['search'];
+            $bcDataQry->groupStart();
+            $bcDataQry->like('suppliers.name', $searchTerm)
+                    ->orLike('bc_23.no_aju', $searchTerm)
+                    ->orLike('bc_purchase_order.multiple_lpb_no', $searchTerm)
+                    ->orLike('bc_purchase_order.no_daftar', $searchTerm);
+            $bcDataQry->groupEnd();
+        }
+
+
         if ($addCondition['mulaiTanggalBC23'] && $addCondition['selesaiTanggalBC23']) {
             $bcDataQry->groupStart();
             $mulaiTanggalBC23Timestamp = date_format(date_create_from_format("d/m/Y", $addCondition['mulaiTanggalBC23']), "Y-m-d");

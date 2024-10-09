@@ -801,8 +801,8 @@
                     var sisa_total_now = Number(item.sisa_total + jml_diterima_lpb_last);
                     $('.sub_total').val('' +
                         formatRupiah(Number(jml_diterima_lpb) * Number(item.harga)));
-                    $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(2));
-                    $('.sisa_total').val(sisa_total_now.toFixed(2));
+                    $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(4));
+                    $('.sisa_total').val(sisa_total_now.toFixed(4));
 
                     break;
                 }
@@ -817,8 +817,8 @@
                     var sisa_total_now = item.jml_order - jml_diterima_total_now;
                     $('.sub_total').val('' +
                         formatRupiah(Number(jml_diterima_lpb) * Number(item.harga)));
-                    $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(2));
-                    $('.sisa_total').val(sisa_total_now.toFixed(2));
+                    $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(4));
+                    $('.sisa_total').val(sisa_total_now.toFixed(4));
                     break;
                 }
             }
@@ -842,7 +842,7 @@
         const table = $('#dataTable');
         table.find('tbody').empty();
 
-        if (listData.result.length == 0) {
+        if (listData.length == 0) {
             table.find('tfoot').empty();
             var newRow = $('<tr>');
             newRow.append($('<td></td>'));
@@ -863,6 +863,8 @@
             var jmlDiterimaTotal = 0;
             var sisaTotal = 0;
             var subTotal = 0;
+            var jmlOrderTotal = 0;
+            var hargaTotal = 0;
             $.each(listData.result, function(i, v) {
                 var newRow = $('<tr>');
                 newRow.append($('<td>').text(no++));
@@ -870,10 +872,10 @@
                 newRow.append($('<td>').text(v.nama_barang));
                 newRow.append($('<td>').text(v.po_no));
                 newRow.append($('<td>').text(v.satuan));
-                newRow.append($('<td>').text(v.jml_order));
-                newRow.append($('<td>').text(v.jml_diterima_lpb));
-                newRow.append($('<td>').text(v.jml_diterima_total));
-                newRow.append($('<td>').text(v.sisa_total.toFixed(2)));
+                newRow.append($('<td>').text(parseFloat(v.jml_order).toFixed(4)));
+                newRow.append($('<td>').text(parseFloat(v.jml_diterima_lpb).toFixed(4)));
+                newRow.append($('<td>').text(parseFloat(v.jml_diterima_total).toFixed(4)));
+                newRow.append($('<td>').text(parseFloat(v.sisa_total).toFixed(4)));
                 newRow.append($('<td>').text(formatRupiah(parseFloat(v.harga) || 0)));
                 newRow.append($('<td>').text(formatRupiah(parseFloat(v.sub_total) || 0)));
                 newRow.append($('<td>').text(v.keterangan));
@@ -896,18 +898,20 @@
                 jmlDiterimaTotal += Number(v.jml_diterima_total) || 0;
                 sisaTotal += Number(v.sisa_total) || 0;
                 subTotal += Number(v.sub_total) || 0;
+                jmlOrderTotal += Number(v.jml_order) || 0;
+                hargaTotal += Number(v.harga) || 0;
             });
             table.find('tfoot').empty();
             var newRow = $('<tr>');
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td style="text-align:right;" colspan="3"><b>GRAND TOTAL</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + listData.jml_order_total.toFixed(2) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaLPBTotal.toFixed(2) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaTotal.toFixed(2) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + sisaTotal.toFixed(2) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(listData.harga_per_barang_total).toFixed(2) || 0) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseInt(subTotal).toFixed(2) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + jmlOrderTotal.toFixed(4) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaLPBTotal.toFixed(4) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaTotal.toFixed(4) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + sisaTotal.toFixed(4) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseFloat(hargaTotal) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseFloat(subTotal) || 0) + '</b></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
@@ -977,20 +981,17 @@
     }
 
     function formatRupiah(angka) {
-        if (angka === null) {
-            angka = 0;
+        var formatter = new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR'
+        });
+        var parsedNumber = parseFloat(angka);
+        if (isNaN(parsedNumber)) {
+            return "0,00";
         }
-
-        angka = angka.toString();
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return ribuanFormatted;
+        return formatter.format(parsedNumber).replace('Rp', '').trim();
     }
+
 
     function formatCurrency(str) {
         var strs = str.replace(/,..$/, '');

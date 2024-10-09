@@ -1379,93 +1379,130 @@ class LaporanBeaCukai extends BaseController
 
     public function laporanDuaTiga()
     {
-        $data = [
-            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
-        ];
 
-        return view('Laporan/LaporanBeaCukai/2.3/index', $data);
+        return view('Laporan/LaporanBeaCukai/2.3/index');
     }
 
-
-    public function allDuaTiga()
+    public function allBCDuaTiga()
     {
         $payload = [
-            "pageSize" => $this->request->getVar("length"),
-            "currentPage" => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
-            "search" => $this->request->getVar("search"),
-            "sort" => $this->request->getVar("sort"),
-            "sortType" => $this->request->getVar("sortType"),
-             "type"          => "BC 2.3"
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "company_id"    => $this->this_company_id,
+            "type"          => "BC 2.3"
         ];
 
         $addCondition = [
-            "statusBC"    => $this->request->getVar('statusBC'),
-            "statusLPB"         => $this->request->getVar('statusLPB'),
-            "mulaiTanggalBC23" => $this->request->getGet("dateStart"),
-            "selesaiTanggalBC23" => $this->request->getGet('dateEnd'),
-            "supplierName"         => $this->request->getVar("supllierName"),
-            "noAju"       => $this->request->getVar("noAju"),
-            "noPenerimaanBarang"     => $this->request->getVar("noPenerimaanBarang"),
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            "statusBC" => $this->request->getGet("statusBC"),
+            "statusLPB" => $this->request->getGet("statusLPB"),
+            "supplierName" => $this->request->getGet("supplierName"),
+            "mulaiTanggalBC23" => $this->request->getGet("mulaiTanggalBC23"),
+            "selesaiTanggalBC23" => $this->request->getGet('selesaiTanggalBC23'),
+            "noPenerimaanBarang" => $this->request->getGet('noPenerimaanBarang'),
+            "noAju" => $this->request->getGet('noAju'),
+            "search" => $this->request->getGet('search')
         ];
 
         $condition = [
             "bc_purchase_order.deletedAt" => null,
             "bc_purchase_order.company_id" => $this->this_company_id,
             "bc_23.deletedAt" => null,
-            "bc_purchase_order.status_posting" => 1,
         ];
 
         $limit = $this->request->getVar("length");
         $offset = $this->request->getVar("start");
-        $dataBC23 = $this->bc23Model->getList($condition, $addCondition, $limit, $offset);
 
+        $dataBC23 = $this->bc23Model->getList($condition, $addCondition, $limit, $offset);
         // Pastikan datanya ada sebelum lanjut
         if (!empty($dataBC23['data'])) {
             $dataBC23Result = [];
-
+            // Inisialisasi variabel $no di luar loop dan hitung dari posisi awal
             $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
+            
             // Loop data utama dari $dataBC23
             foreach ($dataBC23['data'] as $data) {
-                // Default data tanpa tarif
                 $entry = [
-                    "no" => $no++,
+                    "no" => $no++,  // Nomor akan selalu bertambah untuk setiap entry
                     "id" => encrypt($data->id),
                     "supplier_name" => $data->supplier_name,
                     "no_aju" => $data->no_aju,
                     "no_daftar" => $data->no_daftar,
                     "po_type" => $data->po_type,
-                    "date" => $data->createdAt,
-                    "dataBCTarif" => [] // Inisialisasi kosong, kalau ada tarif nanti diisi
+                    "date" => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
+                    "dataBCTarif" => [
+                        'PPN' => [
+                            'tidak_dipungut' => 0,
+                            'di_bebaskan' => 0,
+                            'di_tangguhkan' => 0
+                        ],
+                        'PPH' => [
+                            'tidak_dipungut' => 0,
+                            'di_bebaskan' => 0,
+                            'di_tangguhkan' => 0
+                        ],
+                        'BM' => [
+                            'tidak_dipungut' => 0,
+                            'di_bebaskan' => 0,
+                            'di_tangguhkan' => 0
+                        ],
+                    ]
                 ];
-
-                // Ambil data tarif dari purchase order (kalau ada)
-               
+                
+                // Looping dataBCTarif untuk mengisi nilai
                 $dataBCTarif = $this->bcTarifModel->getByBcPurchaseOrder($data->bc_purchase_order_id);
-                
-                
-                // Kalau ada data tarif, kelompokkan berdasarkan kode dan tarifnya
+                $tarifUpdated = false; // Flag untuk cek apakah ada perubahan pada dataBCTarif
+
                 if (!empty($dataBCTarif)) {
-                    $groupedData = [];
                     foreach ($dataBCTarif as $tarif) {
-                        $key = $tarif['kode_jenis_pungutan'] . '-' . $tarif['kode_jenis_tarif'];
-                        if (!isset($groupedData[$key])) {
-                            $groupedData[$key] = [
-                                'kode_jenis_pungutan' => $tarif['kode_jenis_pungutan'],
-                                'kode_jenis_tarif' => $tarif['kode_jenis_tarif'],
-                                'nilai_bayar' => $tarif['nilai_bayar']
-                            ];
-                        } else {
-                            // Menjumlahkan nilai_bayar jika sudah ada data yang sama
-                            $groupedData[$key]['nilai_bayar'] += $tarif['nilai_bayar'];
+                        $jenisPungutan = '';
+                        // Tentukan jenis pungutan berdasarkan string
+                        switch ($tarif['kode_jenis_pungutan']) {
+                            case '1':
+                            case 'PPN': // handle kalau ada kode 'PPN'
+                                $jenisPungutan = 'PPN';
+                                break;
+                            case '2':
+                            case 'PPH': // handle kalau ada kode 'PPH'
+                                $jenisPungutan = 'PPH';
+                                break;
+                            case '3':
+                            case 'BM': // handle kalau ada kode 'BM'
+                                $jenisPungutan = 'BM';
+                                break;
+                            default:
+                                $jenisPungutan = ''; // pastikan default kosong kalau nggak ada yang match
+                        }
+                
+                        // Cek apakah $jenisPungutan valid sebelum masuk ke array
+                        if (!empty($jenisPungutan)) {
+                            // Tambah nilai ke entry sesuai dengan jenis fasilitas tarif
+                            switch ($tarif['kode_fasilitas_tarif']) {
+                                case '3':
+                                    $entry['dataBCTarif'][$jenisPungutan]['di_tangguhkan'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                                case '5':
+                                    $entry['dataBCTarif'][$jenisPungutan]['di_bebaskan'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                                case '6':
+                                    $entry['dataBCTarif'][$jenisPungutan]['tidak_dipungut'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                            }
                         }
                     }
-                    // Masukkan data tarif yang sudah dikelompokkan ke entri utama
-                    $entry['dataBCTarif'] = array_values($groupedData);
                 }
 
-                // Masukkan entry ke hasil akhir
-                $dataBC23Result[] = $entry;
+                // Hanya tambahkan entry jika ada perubahan di dataBCTarif (artinya ada tarif yang diisi)
+                if ($tarifUpdated) {
+                    $dataBC23Result[] = $entry;
+                }
             }
 
             // Format response untuk DataTables
@@ -1491,6 +1528,1252 @@ class LaporanBeaCukai extends BaseController
         }
 
     }
+
+    public function exportExcelLaporanBCDuaTiga()
+    {
+        $payload = [
+            "pageSize" => 10000000,
+            "currentPage" => 1,
+            "search" => $this->request->getVar("search"),
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+            "type" => "BC 2.3"
+        ];
+    
+        $addCondition = [
+            "statusBC" => $this->request->getVar('statusBC'),
+            "statusLPB" => $this->request->getVar('statusLPB'),
+            "mulaiTanggalBC23" => $this->request->getGet("dateStart"),
+            "selesaiTanggalBC23" => $this->request->getGet('dateEnd'),
+            "supplierName" => $this->request->getVar("supplierName"),
+            "noAju" => $this->request->getVar("noAju"),
+            "noPenerimaanBarang" => $this->request->getVar("noPenerimaanBarang"),
+        ];
+    
+        $condition = [
+            "bc_purchase_order.deletedAt" => null,
+            "bc_purchase_order.company_id" => $this->this_company_id,
+            "bc_23.deletedAt" => null,
+        ];
+    
+        // Retrieve all data based on the conditions without pagination
+        $dataBC23 = $this->bc23Model->getList($condition, $addCondition, 10000000, 0);   
+    
+        // Prepare data for Excel
+        $dataBC23Result = [];
+        $no = 1; // Resetting no for Excel export
+    
+        // Loop data utama dari $dataBC23
+        foreach ($dataBC23['data'] as $data) {
+            $entry = [
+                "no" => $no++,
+                "id" => encrypt($data->id),
+                "supplier_name" => $data->supplier_name,
+                "no_aju" => $data->no_aju,
+                "no_daftar" => $data->no_daftar,
+                "po_type" => $data->po_type,
+                "date" => $data->createdAt,
+                "dataBCTarif" => [
+                    'PPN' => [
+                        'tidak_dipungut' => 0,
+                        'di_bebaskan' => 0,
+                        'di_tangguhkan' => 0
+                    ],
+                    'PPH' => [
+                        'tidak_dipungut' => 0,
+                        'di_bebaskan' => 0,
+                        'di_tangguhkan' => 0
+                    ],
+                    'BM' => [
+                        'tidak_dipungut' => 0,
+                        'di_bebaskan' => 0,
+                        'di_tangguhkan' => 0
+                    ],
+                ]
+            ];
+            
+            // Looping dataBCTarif untuk mengisi nilai
+            $dataBCTarif = $this->bcTarifModel->getByBcPurchaseOrder($data->bc_purchase_order_id);
+                $tarifUpdated = false; // Flag untuk cek apakah ada perubahan pada dataBCTarif
+        
+                if (!empty($dataBCTarif)) {
+                    foreach ($dataBCTarif as $tarif) {
+                        $jenisPungutan = '';
+                        // Tentukan jenis pungutan berdasarkan string
+                        switch ($tarif['kode_jenis_pungutan']) {
+                            case '1':
+                            case 'PPN': // handle kalau ada kode 'PPN'
+                                $jenisPungutan = 'PPN';
+                                break;
+                            case '2':
+                            case 'PPH': // handle kalau ada kode 'PPH'
+                                $jenisPungutan = 'PPH';
+                                break;
+                            case '3':
+                            case 'BM': // handle kalau ada kode 'BM'
+                                $jenisPungutan = 'BM';
+                                break;
+                            default:
+                                $jenisPungutan = ''; // pastikan default kosong kalau nggak ada yang match
+                        }
+                
+                        // Cek apakah $jenisPungutan valid sebelum masuk ke array
+                        if (!empty($jenisPungutan)) {
+                            // Tambah nilai ke entry sesuai dengan jenis fasilitas tarif
+                            switch ($tarif['kode_fasilitas_tarif']) {
+                                case '3':
+                                    $entry['dataBCTarif'][$jenisPungutan]['di_tangguhkan'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                                case '5':
+                                    $entry['dataBCTarif'][$jenisPungutan]['di_bebaskan'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                                case '6':
+                                    $entry['dataBCTarif'][$jenisPungutan]['tidak_dipungut'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                            }
+                        }
+                    }
+                }
+        
+                // Hanya tambahkan entry jika ada perubahan di dataBCTarif (artinya ada tarif yang diisi)
+                if ($tarifUpdated) {
+                    $dataBC23Result[] = $entry;
+                }
+        }
+    
+        // Generate the spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+    
+        // Header style
+        $headerStyleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+    
+        // Set the headers
+        $sheet->setCellValue('A1', 'No')
+            ->setCellValue('B1', 'Nama Supplier')
+            ->setCellValue('C1', 'Tanggal')
+            ->setCellValue('D1', 'No Aju')
+            ->setCellValue('E1', 'No Daftar')
+            ->setCellValue('F1', 'Tipe PO');
+    
+        // Merging cells for PPN, PPH, and BM
+        $sheet->setCellValue('G1', 'PPN')->mergeCells('G1:I1');
+        $sheet->setCellValue('J1', 'PPH')->mergeCells('J1:L1');
+        $sheet->setCellValue('M1', 'BM')->mergeCells('M1:O1');
+    
+        // Second row headers for PPN, PPH, and BM
+        $sheet->setCellValue('G2', 'Tidak Dipungut')
+            ->setCellValue('H2', 'Di Bebaskan')
+            ->setCellValue('I2', 'Di Tangguhkan')
+            ->setCellValue('J2', 'Tidak Dipungut')
+            ->setCellValue('K2', 'Di Bebaskan')
+            ->setCellValue('L2', 'Di Tangguhkan')
+            ->setCellValue('M2', 'Tidak Dipungut')
+            ->setCellValue('N2', 'Di Bebaskan')
+            ->setCellValue('O2', 'Di Tangguhkan');
+    
+        // Applying header style
+        $sheet->getStyle('A1:O2')->applyFromArray($headerStyleArray);
+    
+        // Set thick borders for separating sections
+        $thickBorderStyle = [
+            'borders' => [
+                'right' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
+                    'color' => ['argb' => '000000'],
+                ],
+            ],
+        ];
+    
+        // Apply thick borders to the right side of the PPN and PPH sections
+        $sheet->getStyle('I1:I2')->applyFromArray($thickBorderStyle); // Between PPN and PPH
+        $sheet->getStyle('L1:L2')->applyFromArray($thickBorderStyle); // Between PPH and BM
+    
+        // Fill the data rows
+        $row = 3; // Starting from row 3 after the headers
+        foreach ($dataBC23Result as $result) {
+            $sheet->setCellValue('A' . $row, $result['no'])
+                ->setCellValue('B' . $row, $result['supplier_name'])
+                ->setCellValue('C' . $row, $result['date'])
+                ->setCellValue('D' . $row, $result['no_aju'])
+                ->setCellValue('E' . $row, $result['no_daftar'])
+                ->setCellValue('F' . $row, $result['po_type'])
+                ->setCellValue('G' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['tidak_dipungut']))
+                ->setCellValue('H' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_bebaskan']))
+                ->setCellValue('I' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_tangguhkan']))
+                ->setCellValue('J' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPH']['tidak_dipungut']))
+                ->setCellValue('K' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPH']['di_bebaskan']))
+                ->setCellValue('L' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPH']['di_tangguhkan']))
+                ->setCellValue('M' . $row, formatRupiahPdfExcel($result['dataBCTarif']['BM']['tidak_dipungut']))
+                ->setCellValue('N' . $row, formatRupiahPdfExcel($result['dataBCTarif']['BM']['di_bebaskan']))
+                ->setCellValue('O' . $row, formatRupiahPdfExcel($result['dataBCTarif']['BM']['di_tangguhkan']));
+    
+            $row++;
+        }
+    
+        // Auto size columns
+        foreach (range('A', 'O') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+    
+        // Set filename and output
+        $filename = 'Laporan_Pungutan_BC_Dua_Tiga_' . date('Y-m-d_H-i-s') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+    
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+    
+    public function exportPDFLaporanBCDuaTiga()
+    {
+        $payload = [
+            "pageSize" => 10000000,
+            "currentPage" => 1,
+            "search" => $this->request->getVar("search"),
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+            "type" => "BC 2.3"
+        ];
+
+        $addCondition = [
+            "statusBC" => $this->request->getVar('statusBC'),
+            "statusLPB" => $this->request->getVar('statusLPB'),
+            "mulaiTanggalBC23" => $this->request->getGet("dateStart"),
+            "selesaiTanggalBC23" => $this->request->getGet('dateEnd'),
+            "supplierName" => $this->request->getVar("supplierName"),
+            "noAju" => $this->request->getVar("noAju"),
+            "noPenerimaanBarang" => $this->request->getVar("noPenerimaanBarang"),
+        ];
+
+        $condition = [
+            "bc_purchase_order.deletedAt" => null,
+            "bc_purchase_order.company_id" => $this->this_company_id,
+            "bc_23.deletedAt" => null,
+        ];
+
+        // Retrieve all data based on the conditions without pagination
+        $dataBC23 = $this->bc23Model->getList($condition, $addCondition, 10000000, 0);
+
+        // Prepare data for PDF
+        $dataBC23Result = [];
+        $no = 1; // Resetting no for PDF export
+
+        // Loop data utama dari $dataBC23
+        foreach ($dataBC23['data'] as $data) {
+            $entry = [
+                "no" => $no++,
+                "supplier_name" => $data->supplier_name,
+                "no_aju" => $data->no_aju,
+                "no_daftar" => $data->no_daftar,
+                "po_type" => $data->po_type,
+                "date" => $data->createdAt,
+                "dataBCTarif" => [
+                    'PPN' => [
+                        'tidak_dipungut' => 0,
+                        'di_bebaskan' => 0,
+                        'di_tangguhkan' => 0
+                    ],
+                    'PPH' => [
+                        'tidak_dipungut' => 0,
+                        'di_bebaskan' => 0,
+                        'di_tangguhkan' => 0
+                    ],
+                    'BM' => [
+                        'tidak_dipungut' => 0,
+                        'di_bebaskan' => 0,
+                        'di_tangguhkan' => 0
+                    ],
+                ]
+            ];
+
+            $dataBCTarif = $this->bcTarifModel->getByBcPurchaseOrder($data->bc_purchase_order_id);
+                $tarifUpdated = false; // Flag untuk cek apakah ada perubahan pada dataBCTarif
+        
+                if (!empty($dataBCTarif)) {
+                    foreach ($dataBCTarif as $tarif) {
+                        $jenisPungutan = '';
+                        // Tentukan jenis pungutan berdasarkan string
+                        switch ($tarif['kode_jenis_pungutan']) {
+                            case '1':
+                            case 'PPN': // handle kalau ada kode 'PPN'
+                                $jenisPungutan = 'PPN';
+                                break;
+                            case '2':
+                            case 'PPH': // handle kalau ada kode 'PPH'
+                                $jenisPungutan = 'PPH';
+                                break;
+                            case '3':
+                            case 'BM': // handle kalau ada kode 'BM'
+                                $jenisPungutan = 'BM';
+                                break;
+                            default:
+                                $jenisPungutan = ''; // pastikan default kosong kalau nggak ada yang match
+                        }
+                
+                        // Cek apakah $jenisPungutan valid sebelum masuk ke array
+                        if (!empty($jenisPungutan)) {
+                            // Tambah nilai ke entry sesuai dengan jenis fasilitas tarif
+                            switch ($tarif['kode_fasilitas_tarif']) {
+                                case '3':
+                                    $entry['dataBCTarif'][$jenisPungutan]['di_tangguhkan'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                                case '5':
+                                    $entry['dataBCTarif'][$jenisPungutan]['di_bebaskan'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                                case '6':
+                                    $entry['dataBCTarif'][$jenisPungutan]['tidak_dipungut'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                            }
+                        }
+                    }
+                }
+        
+                // Hanya tambahkan entry jika ada perubahan di dataBCTarif (artinya ada tarif yang diisi)
+                if ($tarifUpdated) {
+                    $dataBC23Result[] = $entry;
+                }
+        }
+
+        // Inisialisasi Dompdf
+        $domPdf = new Dompdf();
+
+        // Label untuk laporan
+        $label = "Laporan Bea Cukai BC 2.3 : " . $this->request->getVar('dateStart') . " / " . $this->request->getVar('dateEnd');
+
+        // Load view untuk PDF
+        $domPdf->loadHtml(view('Laporan/LaporanBeaCukai/2.3/print', [
+            'data' => $dataBC23Result,
+            'condition' => $addCondition,
+            'company' => $this->companiesModel->find($_SESSION['login']->this_company_id),
+            'label' => $label
+        ]));
+        
+        // Set kertas untuk PDF
+        $domPdf->setPaper('legal', 'landscape');
+        $domPdf->render();
+        $domPdf->stream($label, ["Attachment" => false]);
+    }
+
+
+    public function laporanDuaLima()
+    {
+
+        return view('Laporan/LaporanBeaCukai/2.5/index');
+    }
+
+    public function allBCDuaLima()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "company_id"    => $this->this_company_id,
+            "type"          => "BC 2.5"
+        ];
+
+        $condition = [
+            "bc_25.company_id"  => $this->this_company_id,
+            "bc_25.deletedAt" => null,
+        ];
+
+        $addCondition = [
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            "statusPosting" => $this->request->getGet("statusPosting"),
+            "mulaiTanggalBC25" => $this->request->getGet("mulaiTanggalBC25"),
+            "selesaiTanggalBC25" => $this->request->getGet('selesaiTanggalBC25'),
+            "noAju" => $this->request->getGet('noAju'),
+            'asalPengeluaran' => $this->request->getGet('asalPengeluaran'),
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $dataBC25 = $this->bc25Model->getList($condition, $addCondition, $limit, $offset);
+
+        // Pastikan datanya ada sebelum lanjut
+        if (!empty($dataBC25['data'])) {
+            $dataBC25Result = [];
+            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+            foreach ($dataBC25['data'] as $data) {
+                // Decode payload JSON
+                $payloadData = json_decode($data->payload, true);
+            
+                if (empty($payloadData)) {
+                    continue;
+                }
+            
+                if (isset($payloadData['barang']) && !empty($payloadData['barang'])) {
+                    foreach ($payloadData['barang'] as $barang) {
+                        if (isset($barang['barangTarif']) && !empty($barang['barangTarif'])) {
+                            
+                            // Jika id sudah ada, tambahkan tarifnya
+                            if (!isset($dataBC25Result[$data->id])) {
+                                $dataBC25Result[$data->id] = [
+                                    "no" => $no++,  // Nomor akan selalu bertambah
+                                    "id" => $data->id,
+                                    "supplier_name" => $data->supplier_name,
+                                    "no_aju" => $data->no_aju,
+                                    "no_daftar" => $data->no_daftar,
+                                    "date" => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
+                                    "dataBCTarif" => [
+                                        'PPN' => [
+                                            'di_bebaskan' => 0,
+                                            'di_bayar' => 0,
+                                            'di_tanggung_pemerintah' => 0,
+                                            'di_lunasi' => 0
+                                        ],
+                                        'PPH' => [
+                                            'di_bebaskan' => 0,
+                                            'di_bayar' => 0,
+                                            'di_tanggung_pemerintah' => 0,
+                                            'di_lunasi' => 0
+                                        ],
+                                        'BM' => [
+                                            'di_bebaskan' => 0,
+                                            'di_bayar' => 0,
+                                            'di_tanggung_pemerintah' => 0,
+                                            'di_lunasi' => 0
+                                        ],
+                                    ]
+                                ];
+                            }
+            
+                            // Loop data barangTarif dan tambahkan nilai ke entri yang sudah ada
+                            foreach ($barang['barangTarif'] as $tarif) {
+                                $jenisPungutan = '';
+            
+                                switch ($tarif['kodeJenisPungutan']) {
+                                    case 'PPN':
+                                        $jenisPungutan = 'PPN';
+                                        break;
+                                    case 'PPH':
+                                        $jenisPungutan = 'PPH';
+                                        break;
+                                    case 'BM':
+                                        $jenisPungutan = 'BM';
+                                        break;
+                                }
+            
+                                if (!empty($jenisPungutan)) {
+                                    switch ($tarif['kodeFasilitasTarif']) {
+                                        case '1':
+                                            $dataBC25Result[$data->id]['dataBCTarif'][$jenisPungutan]['di_bayar'] += (int)$tarif['nilaiBayar'];
+                                            break;
+                                        case '5':
+                                            $dataBC25Result[$data->id]['dataBCTarif'][$jenisPungutan]['di_bebaskan'] += (int)$tarif['nilaiBayar'];
+                                            break;
+                                        case '2':
+                                            $dataBC25Result[$data->id]['dataBCTarif'][$jenisPungutan]['di_tanggung_pemerintah'] += (int)$tarif['nilaiBayar'];
+                                            break;
+                                        case '7':
+                                            $dataBC25Result[$data->id]['dataBCTarif'][$jenisPungutan]['di_lunasi'] += (int)$tarif['nilaiBayar'];
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Ubah array asosiatif menjadi array numerik untuk respons DataTables
+            $dataBC25Result = array_values($dataBC25Result);
+
+            // Format response untuk DataTables
+            $data = [
+                "draw" => intval($this->request->getVar("draw")),
+                "recordsTotal" => $dataBC25['totalData'],
+                "recordsFiltered" => $dataBC25['totalFilteredData'],
+                "data" => $dataBC25Result,
+                "payload" => $payload
+            ];
+
+            return response()->setJSON($data);
+
+        } else {
+            // Jika data kosong, kirim response kosong juga
+            return response()->setJSON([
+                "draw" => intval($this->request->getVar("draw")),
+                "recordsTotal" => 0,
+                "recordsFiltered" => 0,
+                "data" => [],
+                "payload" => $payload
+            ]);
+        }
+
+    }
+
+    public function exportExcelLaporanBCDuaLima()
+    {
+        $payload = [
+            "pageSize" => 10000000,
+            "currentPage" => 1,
+            "search" => $this->request->getVar("search"),
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+            "type" => "BC 2.5" // Ensure correct type is used here
+        ];
+
+        $addCondition = [
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            "statusPosting" => $this->request->getGet("statusPosting"),
+            "mulaiTanggalBC25" => $this->request->getGet("mulaiTanggalBC25"),
+            "selesaiTanggalBC25" => $this->request->getGet('selesaiTanggalBC25'),
+            "noAju" => $this->request->getGet('noAju'),
+            'asalPengeluaran' => $this->request->getGet('asalPengeluaran'),
+        ];
+
+        $condition = [
+            "bc_25.company_id"  => $this->this_company_id,
+            "bc_25.deletedAt" => null, // Adjust for BC 25
+        ];
+
+        // Retrieve all data based on the conditions without pagination
+        $dataBC25 = $this->bc25Model->getList($condition, $addCondition, 10000000, 0);
+
+        // Prepare data for Excel
+        $dataBC25Result = [];
+        $no = 1; // Resetting no for Excel export
+
+        // Loop data utama dari $dataBC25
+        foreach ($dataBC25['data'] as $data) {
+            $entry = [
+                "no" => $no++,
+                "id" => encrypt($data->id),
+                "supplier_name" => $data->supplier_name,
+                "no_aju" => $data->no_aju,
+                "no_daftar" => $data->no_daftar,
+                "date" => $data->createdAt,
+                "dataBCTarif" => [
+                    'PPN' => [
+                        'di_bebaskan' => 0,
+                        'di_bayar' => 0,
+                        'di_tanggung_pemerintah' => 0,
+                        'di_lunasi' => 0
+                    ],
+                    'PPH' => [
+                        'di_bebaskan' => 0,
+                        'di_bayar' => 0,
+                        'di_tanggung_pemerintah' => 0,
+                        'di_lunasi' => 0
+                    ],
+                    'BM' => [
+                        'di_bebaskan' => 0,
+                        'di_bayar' => 0,
+                        'di_tanggung_pemerintah' => 0,
+                        'di_lunasi' => 0
+                    ],
+                ]
+            ];
+
+            // Looping dataBCTarif untuk mengisi nilai
+            $payloadData = json_decode($data->payload, true);
+
+            if (isset($payloadData['barang']) && !empty($payloadData['barang'])) {
+                foreach ($payloadData['barang'] as $barang) {
+                    if (isset($barang['barangTarif']) && !empty($barang['barangTarif'])) {
+                        foreach ($barang['barangTarif'] as $tarif) {
+                            $jenisPungutan = '';
+
+                            switch ($tarif['kodeJenisPungutan']) {
+                                case 'PPN':
+                                    $jenisPungutan = 'PPN';
+                                    break;
+                                case 'PPH':
+                                    $jenisPungutan = 'PPH';
+                                    break;
+                                case 'BM':
+                                    $jenisPungutan = 'BM';
+                                    break;
+                            }
+
+                            if (!empty($jenisPungutan)) {
+                                switch ($tarif['kodeFasilitasTarif']) {
+                                    case '1':
+                                        $entry['dataBCTarif'][$jenisPungutan]['di_bayar'] += (int)$tarif['nilaiBayar'];
+                                        break;
+                                    case '5':
+                                        $entry['dataBCTarif'][$jenisPungutan]['di_bebaskan'] += (int)$tarif['nilaiBayar'];
+                                        break;
+                                    case '2':
+                                        $entry['dataBCTarif'][$jenisPungutan]['di_tanggung_pemerintah'] += (int)$tarif['nilaiBayar'];
+                                        break;
+                                    case '7':
+                                        $entry['dataBCTarif'][$jenisPungutan]['di_lunasi'] += (int)$tarif['nilaiBayar'];
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            $dataBC25Result[] = $entry;
+        }
+
+        // Generate the spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header style
+        $headerStyleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+        // Set the headers
+        $sheet->setCellValue('A1', 'No')
+            ->setCellValue('B1', 'Nama Supplier')
+            ->setCellValue('C1', 'Tanggal')
+            ->setCellValue('D1', 'No Aju')
+            ->setCellValue('E1', 'No Daftar');
+
+        // Merging cells for PPN, PPH, and BM
+        $sheet->setCellValue('F1', 'PPN')->mergeCells('F1:I1');
+        $sheet->setCellValue('J1', 'PPH')->mergeCells('J1:M1');
+        $sheet->setCellValue('N1', 'BM')->mergeCells('N1:Q1');
+
+        // Second row headers for PPN, PPH, and BM
+        $sheet->setCellValue('F2', 'Di Bayar')
+            ->setCellValue('G2', 'Di Bebaskan')
+            ->setCellValue('H2', 'Di Tanggung Pemerintah')
+            ->setCellValue('I2', 'Di Lunasi')
+            ->setCellValue('J2', 'Di Bayar')
+            ->setCellValue('K2', 'Di Bebaskan')
+            ->setCellValue('L2', 'Di Tanggung Pemerintah')
+            ->setCellValue('M2', 'Di Lunasi')
+            ->setCellValue('N2', 'Di Bayar')
+            ->setCellValue('O2', 'Di Bebaskan')
+            ->setCellValue('P2', 'Di Tanggung Pemerintah')
+            ->setCellValue('Q2', 'Di Lunasi');
+
+        // Applying header style
+        $sheet->getStyle('A1:Q2')->applyFromArray($headerStyleArray);
+
+        // Fill the data rows
+        $row = 3; // Starting from row 3 after the headers
+        foreach ($dataBC25Result as $result) {
+            $sheet->setCellValue('A' . $row, $result['no'])
+                ->setCellValue('B' . $row, $result['supplier_name'])
+                ->setCellValue('C' . $row, $result['date'])
+                ->setCellValue('D' . $row, $result['no_aju'])
+                ->setCellValue('E' . $row, $result['no_daftar'])
+                ->setCellValue('F' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_bayar']))
+                ->setCellValue('G' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_bebaskan']))
+                ->setCellValue('H' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_tanggung_pemerintah']))
+                ->setCellValue('I' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_lunasi']))
+                ->setCellValue('J' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPH']['di_bayar']))
+                ->setCellValue('K' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPH']['di_bebaskan']))
+                ->setCellValue('L' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPH']['di_tanggung_pemerintah']))
+                ->setCellValue('M' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPH']['di_lunasi']))
+                ->setCellValue('N' . $row, formatRupiahPdfExcel($result['dataBCTarif']['BM']['di_bayar']))
+                ->setCellValue('O' . $row, formatRupiahPdfExcel($result['dataBCTarif']['BM']['di_bebaskan']))
+                ->setCellValue('P' . $row, formatRupiahPdfExcel($result['dataBCTarif']['BM']['di_tanggung_pemerintah']))
+                ->setCellValue('Q' . $row, formatRupiahPdfExcel($result['dataBCTarif']['BM']['di_lunasi']));
+
+            $row++;
+        }
+
+        // Set auto column width
+        foreach (range('A', 'Q') as $column) {
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+        }
+
+        // Export the file
+        $filename = "Laporan_BC_25_" . date('Y-m-d-His') . ".xlsx";
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit();
+    }
+
+    
+    public function exportPDFLaporanBCDuaLima()
+    {
+        $payload = [
+            "pageSize" => 10000000,
+            "currentPage" => 1,
+            "search" => $this->request->getVar("search"),
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+            "type" => "BC 2.5" // Ensure correct type is used here
+        ];
+
+        $addCondition = [
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            "statusPosting" => $this->request->getGet("statusPosting"),
+            "mulaiTanggalBC25" => $this->request->getGet("mulaiTanggalBC25"),
+            "selesaiTanggalBC25" => $this->request->getGet('selesaiTanggalBC25'),
+            "noAju" => $this->request->getGet('noAju'),
+            'asalPengeluaran' => $this->request->getGet('asalPengeluaran'),
+        ];
+
+        $condition = [
+            "bc_25.company_id"  => $this->this_company_id,
+            "bc_25.deletedAt" => null, // Adjust for BC 25
+        ];
+
+        // Retrieve all data based on the conditions without pagination
+        $dataBC25 = $this->bc25Model->getList($condition, $addCondition, 10000000, 0);
+
+        // Prepare data for Excel
+        $dataBC25Result = [];
+        $no = 1; // Resetting no for Excel export
+
+        // Loop data utama dari $dataBC25
+        foreach ($dataBC25['data'] as $data) {
+            $entry = [
+                "no" => $no++,
+                "id" => encrypt($data->id),
+                "supplier_name" => $data->supplier_name,
+                "no_aju" => $data->no_aju,
+                "no_daftar" => $data->no_daftar,
+                "date" => $data->createdAt,
+                "dataBCTarif" => [
+                    'PPN' => [
+                        'di_bebaskan' => 0,
+                        'di_bayar' => 0,
+                        'di_tanggung_pemerintah' => 0,
+                        'di_lunasi' => 0
+                    ],
+                    'PPH' => [
+                        'di_bebaskan' => 0,
+                        'di_bayar' => 0,
+                        'di_tanggung_pemerintah' => 0,
+                        'di_lunasi' => 0
+                    ],
+                    'BM' => [
+                        'di_bebaskan' => 0,
+                        'di_bayar' => 0,
+                        'di_tanggung_pemerintah' => 0,
+                        'di_lunasi' => 0
+                    ],
+                ]
+            ];
+
+            // Looping dataBCTarif untuk mengisi nilai
+            $payloadData = json_decode($data->payload, true);
+
+            if (isset($payloadData['barang']) && !empty($payloadData['barang'])) {
+                foreach ($payloadData['barang'] as $barang) {
+                    if (isset($barang['barangTarif']) && !empty($barang['barangTarif'])) {
+                        foreach ($barang['barangTarif'] as $tarif) {
+                            $jenisPungutan = '';
+
+                            switch ($tarif['kodeJenisPungutan']) {
+                                case 'PPN':
+                                    $jenisPungutan = 'PPN';
+                                    break;
+                                case 'PPH':
+                                    $jenisPungutan = 'PPH';
+                                    break;
+                                case 'BM':
+                                    $jenisPungutan = 'BM';
+                                    break;
+                            }
+
+                            if (!empty($jenisPungutan)) {
+                                switch ($tarif['kodeFasilitasTarif']) {
+                                    case '1':
+                                        $entry['dataBCTarif'][$jenisPungutan]['di_bayar'] += (int)$tarif['nilaiBayar'];
+                                        break;
+                                    case '5':
+                                        $entry['dataBCTarif'][$jenisPungutan]['di_bebaskan'] += (int)$tarif['nilaiBayar'];
+                                        break;
+                                    case '2':
+                                        $entry['dataBCTarif'][$jenisPungutan]['di_tanggung_pemerintah'] += (int)$tarif['nilaiBayar'];
+                                        break;
+                                    case '7':
+                                        $entry['dataBCTarif'][$jenisPungutan]['di_lunasi'] += (int)$tarif['nilaiBayar'];
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            $dataBC25Result[] = $entry;
+        }
+
+        // Inisialisasi Dompdf
+        $domPdf = new Dompdf();
+
+        // Label untuk laporan
+        $label = "Laporan Bea Cukai BC 2.5 : " . $this->request->getVar('dateStart') . " / " . $this->request->getVar('dateEnd');
+
+        // Load view untuk PDF
+        $domPdf->loadHtml(view('Laporan/LaporanBeaCukai/2.5/print', [
+            'data' => $dataBC25Result,
+            'condition' => $addCondition,
+            'company' => $this->companiesModel->find($_SESSION['login']->this_company_id),
+            'label' => $label
+        ]));
+        
+        // Set kertas untuk PDF
+        $domPdf->setPaper('legal', 'landscape');
+        $domPdf->render();
+        $domPdf->stream($label, ["Attachment" => false]);
+    }
+
+
+    public function laporanEmpatKosong()
+    {
+        return view('Laporan/LaporanBeaCukai/4.0/index');
+    }
+
+    public function allBCEmpatKosong()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "company_id"    => $this->this_company_id,
+            "type"          => "BC 4.0"
+        ];
+
+        $addCondition = [
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            "statusBC" => $this->request->getGet("statusBC"),
+            "statusLPB" => $this->request->getGet("statusLPB"),
+            "supplierName" => $this->request->getGet("supplierName"),
+            "mulaiTanggalBC40" => $this->request->getGet("mulaiTanggalBC40"),
+            "selesaiTanggalBC40" => $this->request->getGet('selesaiTanggalBC40'),
+            "noPenerimaanBarang" => $this->request->getGet('noPenerimaanBarang'),
+            "noAju" => $this->request->getGet('noAju'),
+            "search" => $this->request->getGet('search')
+        ];
+
+        $condition = [
+            "bc_purchase_order.deletedAt" => null,
+            "bc_purchase_order.company_id" => $this->this_company_id,
+            "bc_40.deletedAt" => null,
+        ];
+
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
+
+        $dataBC40 = $this->bc40Model->getList($condition, $addCondition, $limit, $offset);
+        // Pastikan datanya ada sebelum lanjut
+        if (!empty($dataBC40['data'])) {
+            $dataBC40Result = [];
+            // Inisialisasi variabel $no di luar loop dan hitung dari posisi awal
+            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+            
+            // Loop data utama dari $dataBC40
+            foreach ($dataBC40['data'] as $data) {
+                $entry = [
+                    "no" => $no++,  // Nomor akan selalu bertambah untuk setiap entry
+                    "id" => encrypt($data->id),
+                    "supplier_name" => $data->supplier_name,
+                    "no_aju" => $data->no_aju,
+                    "no_daftar" => $data->no_daftar,
+                    "po_type" => $data->po_type,
+                    "date" => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
+                    "dataBCTarif" => [
+                        'PPN' => [
+                            'tidak_dipungut' => 0,
+                            'di_bebaskan' => 0,
+                            'di_tangguhkan' => 0
+                        ],
+                    ]
+                ];
+                
+                // Looping dataBCTarif untuk mengisi nilai
+                $dataBCTarif = $this->bcTarifModel->getByBcPurchaseOrder($data->bc_purchase_order_id);
+                $tarifUpdated = false; // Flag untuk cek apakah ada perubahan pada dataBCTarif
+
+                if (!empty($dataBCTarif)) {
+                    foreach ($dataBCTarif as $tarif) {
+                        $jenisPungutan = '';
+                        // Tentukan jenis pungutan berdasarkan string
+                        switch ($tarif['kode_jenis_pungutan']) {
+                            case '1':
+                            case 'PPN': // handle kalau ada kode 'PPN'
+                                $jenisPungutan = 'PPN';
+                                break;
+                            default:
+                                $jenisPungutan = ''; // pastikan default kosong kalau nggak ada yang match
+                        }
+                
+                        // Cek apakah $jenisPungutan valid sebelum masuk ke array
+                        if (!empty($jenisPungutan)) {
+                            // Tambah nilai ke entry sesuai dengan jenis fasilitas tarif
+                            switch ($tarif['kode_fasilitas_tarif']) {
+                                case '3':
+                                    $entry['dataBCTarif'][$jenisPungutan]['di_tangguhkan'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                                case '5':
+                                    $entry['dataBCTarif'][$jenisPungutan]['di_bebaskan'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                                case '6':
+                                    $entry['dataBCTarif'][$jenisPungutan]['tidak_dipungut'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                // Hanya tambahkan entry jika ada perubahan di dataBCTarif (artinya ada tarif yang diisi)
+                if ($tarifUpdated) {
+                    $dataBC40Result[] = $entry;
+                }
+            }
+
+            // Format response untuk DataTables
+            $data = [
+                "draw"              => intval($this->request->getVar("draw")),
+                "recordsTotal"      => $dataBC40['totalData'],
+                "recordsFiltered"   => $dataBC40['totalFilteredData'],
+                "data"              => $dataBC40Result,
+                "payload"           => $payload
+            ];
+
+            return response()->setJSON($data);
+
+        } else {
+            // Jika data kosong, kirim response kosong juga
+            return response()->setJSON([
+                "draw"              => intval($this->request->getVar("draw")),
+                "recordsTotal"      => 0,
+                "recordsFiltered"   => 0,
+                "data"              => [],
+                "payload"           => $payload
+            ]);
+        }
+    }
+    
+
+    public function exportExcelLaporanBCEmpatKosong()
+    {
+        
+        $payload = [
+            "pageSize" => 10000000,
+            "currentPage" => 1,
+            "search" => $this->request->getVar("search"),
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+            "type" => "BC 4.0"
+        ];
+    
+        $addCondition = [
+            "statusBC" => $this->request->getVar('statusBC'),
+            "statusLPB" => $this->request->getVar('statusLPB'),
+            "mulaiTanggalBC40" => $this->request->getGet("dateStart"),
+            "selesaiTanggalBC40" => $this->request->getGet('dateEnd'),
+            "supplierName" => $this->request->getVar("supplierName"),
+            "noAju" => $this->request->getVar("noAju"),
+            "noPenerimaanBarang" => $this->request->getVar("noPenerimaanBarang"),
+        ];
+    
+        $condition = [
+            "bc_purchase_order.deletedAt" => null,
+            "bc_purchase_order.company_id" => $this->this_company_id,
+            "bc_40.deletedAt" => null,
+        ];
+    
+        // Retrieve all data based on the conditions without pagination
+        $dataBC40 = $this->bc40Model->getList($condition, $addCondition, 10000000, 0);   
+    
+        // Prepare data for Excel
+        $dataBC40Result = [];
+        $no = 1; // Resetting no for Excel export
+        
+        // Loop data utama dari $dataBC40
+        foreach ($dataBC40['data'] as $data) {
+            $entry = [
+                "no" => $no++,
+                "id" => encrypt($data->id),
+                "supplier_name" => $data->supplier_name,
+                "no_aju" => $data->no_aju,
+                "no_daftar" => $data->no_daftar,
+                "po_type" => $data->po_type,
+                "date" => $data->createdAt,
+                "dataBCTarif" => [
+                    'PPN' => [
+                        'tidak_dipungut' => 0,
+                        'di_bebaskan' => 0,
+                        'di_tangguhkan' => 0
+                    ],
+                ]
+            ];
+            
+            // Looping dataBCTarif untuk mengisi nilai
+            $dataBCTarif = $this->bcTarifModel->getByBcPurchaseOrder($data->bc_purchase_order_id);
+                $tarifUpdated = false; // Flag untuk cek apakah ada perubahan pada dataBCTarif
+        
+                if (!empty($dataBCTarif)) {
+                    foreach ($dataBCTarif as $tarif) {
+                        $jenisPungutan = '';
+                        // Tentukan jenis pungutan berdasarkan string
+                        switch ($tarif['kode_jenis_pungutan']) {
+                            case '1':
+                            case 'PPN': // handle kalau ada kode 'PPN'
+                                $jenisPungutan = 'PPN';
+                                break;
+                            default:
+                                $jenisPungutan = ''; // pastikan default kosong kalau nggak ada yang match
+                        }
+                
+                        // Cek apakah $jenisPungutan valid sebelum masuk ke array
+                        if (!empty($jenisPungutan)) {
+                            // Tambah nilai ke entry sesuai dengan jenis fasilitas tarif
+                            switch ($tarif['kode_fasilitas_tarif']) {
+                                case '3':
+                                    $entry['dataBCTarif'][$jenisPungutan]['di_tangguhkan'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                                case '5':
+                                    $entry['dataBCTarif'][$jenisPungutan]['di_bebaskan'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                                case '6':
+                                    $entry['dataBCTarif'][$jenisPungutan]['tidak_dipungut'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                            }
+                        }
+                    }
+                }
+        
+                // Hanya tambahkan entry jika ada perubahan di dataBCTarif (artinya ada tarif yang diisi)
+                if ($tarifUpdated) {
+                    $dataBC40Result[] = $entry;
+                }
+        }
+    
+        // Generate the spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+    
+        // Header style
+        $headerStyleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+    
+        // Set the headers
+        $sheet->setCellValue('A1', 'No')
+            ->setCellValue('B1', 'Nama Supplier')
+            ->setCellValue('C1', 'Tanggal')
+            ->setCellValue('D1', 'No Aju')
+            ->setCellValue('E1', 'No Daftar')
+            ->setCellValue('F1', 'Tipe PO');
+    
+        // Merging cells for PPN, PPH, and BM
+        $sheet->setCellValue('G1', 'PPN')->mergeCells('G1:I1');
+    
+        // Second row headers for PPN, PPH, and BM
+        $sheet->setCellValue('G2', 'Tidak Dipungut')
+            ->setCellValue('H2', 'Di Bebaskan')
+            ->setCellValue('I2', 'Di Tangguhkan');
+    
+        // Applying header style
+        $sheet->getStyle('A1:O2')->applyFromArray($headerStyleArray);
+    
+        // Set thick borders for separating sections;
+        $thickBorderStyle = [
+            'borders' => [
+                'right' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
+                    'color' => ['argb' => '000000'],
+                ],
+            ],
+        ];
+    
+        // Apply thick borders to the right side of the PPN and PPH sections
+        $sheet->getStyle('I1:I2')->applyFromArray($thickBorderStyle); // Between PPN and PPH
+        $sheet->getStyle('L1:L2')->applyFromArray($thickBorderStyle); // Between PPH and BM
+    
+        // Fill the data rows
+        $row = 3; // Starting from row 3 after the headers
+        foreach ($dataBC40Result as $result) {
+            $sheet->setCellValue('A' . $row, $result['no'])
+                ->setCellValue('B' . $row, $result['supplier_name'])
+                ->setCellValue('C' . $row, $result['date'])
+                ->setCellValue('D' . $row, $result['no_aju'])
+                ->setCellValue('E' . $row, $result['no_daftar'])
+                ->setCellValue('F' . $row, $result['po_type'])
+                ->setCellValue('G' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['tidak_dipungut']))
+                ->setCellValue('H' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_bebaskan']))
+                ->setCellValue('I' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_tangguhkan']));    
+            $row++;
+        }
+    
+        // Auto size columns
+        foreach (range('A', 'O') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+    
+        // Set filename and output
+        $filename = 'Laporan_pungutan_bc_empat_kosong_' . date('Y-m-d_H-i-s') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+    
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function exportPDFLaporanBCEmpatKosong()
+    {
+        $payload = [
+            "pageSize" => 10000000,
+            "currentPage" => 1,
+            "search" => $this->request->getVar("search"),
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+            "type" => "BC 4.0"
+        ];
+
+        $addCondition = [
+            "statusBC" => $this->request->getVar('statusBC'),
+            "statusLPB" => $this->request->getVar('statusLPB'),
+            "mulaiTanggalBC40" => $this->request->getGet("dateStart"),
+            "selesaiTanggalBC40" => $this->request->getGet('dateEnd'),
+            "supplierName" => $this->request->getVar("supplierName"),
+            "noAju" => $this->request->getVar("noAju"),
+            "noPenerimaanBarang" => $this->request->getVar("noPenerimaanBarang"),
+        ];
+
+        $condition = [
+            "bc_purchase_order.deletedAt" => null,
+            "bc_purchase_order.company_id" => $this->this_company_id,
+            "bc_40.deletedAt" => null,
+        ];
+
+        // Retrieve all data based on the conditions without pagination
+        $dataBC40 = $this->bc40Model->getList($condition, $addCondition, 10000000, 0);
+
+        // Prepare data for PDF
+        $dataBC40Result = [];
+        $no = 1; // Resetting no for PDF export
+
+        // Loop data utama dari $dataBC40
+        foreach ($dataBC40['data'] as $data) {
+            $entry = [
+                "no" => $no++,
+                "supplier_name" => $data->supplier_name,
+                "no_aju" => $data->no_aju,
+                "no_daftar" => $data->no_daftar,
+                "po_type" => $data->po_type,
+                "date" => $data->createdAt,
+                "dataBCTarif" => [
+                    'PPN' => [
+                        'tidak_dipungut' => 0,
+                        'di_bebaskan' => 0,
+                        'di_tangguhkan' => 0
+                    ],
+                ]
+            ];
+
+            // Looping dataBCTarif untuk mengisi nilai
+            $dataBCTarif = $this->bcTarifModel->getByBcPurchaseOrder($data->bc_purchase_order_id);
+            $tarifUpdated = false; // Flag untuk cek apakah ada perubahan pada dataBCTarif
+        
+                if (!empty($dataBCTarif)) {
+                    foreach ($dataBCTarif as $tarif) {
+                        $jenisPungutan = '';
+                        // Tentukan jenis pungutan berdasarkan string
+                        switch ($tarif['kode_jenis_pungutan']) {
+                            case '1':
+                            case 'PPN': // handle kalau ada kode 'PPN'
+                                $jenisPungutan = 'PPN';
+                                break;
+                            default:
+                                $jenisPungutan = ''; // pastikan default kosong kalau nggak ada yang match
+                        }
+                
+                        // Cek apakah $jenisPungutan valid sebelum masuk ke array
+                        if (!empty($jenisPungutan)) {
+                            // Tambah nilai ke entry sesuai dengan jenis fasilitas tarif
+                            switch ($tarif['kode_fasilitas_tarif']) {
+                                case '3':
+                                    $entry['dataBCTarif'][$jenisPungutan]['di_tangguhkan'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                                case '5':
+                                    $entry['dataBCTarif'][$jenisPungutan]['di_bebaskan'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                                case '6':
+                                    $entry['dataBCTarif'][$jenisPungutan]['tidak_dipungut'] += (int)$tarif['nilai_bayar'];
+                                    $tarifUpdated = true; // Set flag kalau ada perubahan
+                                    break;
+                            }
+                        }
+                    }
+                }
+        
+                // Hanya tambahkan entry jika ada perubahan di dataBCTarif (artinya ada tarif yang diisi)
+                if ($tarifUpdated) {
+                    $dataBC40Result[] = $entry;
+                }
+        }
+
+        // Inisialisasi Dompdf
+        $domPdf = new Dompdf();
+
+        // Label untuk laporan
+        $label = "Laporan Bea Cukai BC 4.0 : " . $this->request->getVar('dateStart') . " / " . $this->request->getVar('dateEnd');
+
+        // Load view untuk PDF
+        $domPdf->loadHtml(view('Laporan/LaporanBeaCukai/4.0/print', [
+            'data' => $dataBC40Result,
+            'condition' => $addCondition,
+            'company' => $this->companiesModel->find($_SESSION['login']->this_company_id),
+            'label' => $label
+        ]));
+        
+        // Set kertas untuk PDF
+        $domPdf->setPaper('legal', 'landscape');
+        $domPdf->render();
+        $domPdf->stream($label, ["Attachment" => false]);
+    }
+    
+    
 
     public function allWipProduksiDashboard()
     {

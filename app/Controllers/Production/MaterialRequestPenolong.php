@@ -177,7 +177,7 @@ class MaterialRequestPenolong extends BaseController
             }
             $data["dataMaterialRequests"] = $dataMaterialRequests;
             $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
-            $data["dataMaterialRequestswithwo"] = $dataMaterialRequestswithwo[0];
+            $data["dataMaterialRequestswithwo"] = isset($dataMaterialRequestswithwo[0]) ? $dataMaterialRequestswithwo[0] : null;
             $data["ids"] = $ids;
         }
 

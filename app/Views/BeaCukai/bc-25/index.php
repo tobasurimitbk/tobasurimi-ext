@@ -89,7 +89,7 @@
                                 <th onclick="changeSort('customers.name')" style="text-align: center;">Customer</th>
                                 <th onclick="changeSort('suppliers.name')" style="text-align: center;">Supplier</th>
                                 <th onclick="changeSort('bc_25.no_aju')" class="sort" style="text-align: center;">No Aju / Daftar</th>
-                                <th onclick="changeSort('bc_25.createdAt')" class="sort" style="text-align: center;">Tanggal BC 2.5</th>
+                                <th onclick="changeSort('bc_25.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
                                 <th onclick="changeSort('bc_25.status_posting')" style="text-align: center;">Status Posting</th>
                                 <th onclick="changeSort('bc_25.status_dokumen')" style="text-align: center;">Status Dokumen</th>
                                 <th style="text-align: center;">Action</th>

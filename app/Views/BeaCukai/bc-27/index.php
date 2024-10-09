@@ -54,7 +54,7 @@
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 2.7 / No Daftar" value="" />
+                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari No Aju / No Daftar" value="" />
                 </div>
             </div>
             <?php if ($akunCeisa == null) : ?>
@@ -78,8 +78,8 @@
                                 <th onclick="changeSort('mutasi_global.divisi_asal_id')" class="sort" style="text-align: center;">Departemen Asal</th>
                                 <th onclick="changeSort('mutasi_global.warehouse_asal_id')" class="sort" style="text-align: center;">Warehouse Asal</th>
                                 <th onclick="changeSort('bc_27.company_tujuan_id')" class="sort" style="text-align: center;">Company Tujuan</th>
-                                <th onclick="changeSort('bc_27.createdAt')" class="sort" style="text-align: center;">Tanggal BC 2.7</th>
-                                <th onclick="changeSort('bc_27.no_aju')" class="sort" style="text-align: center;">No Aju BC 2.7 / No Daftar</th>
+                                <th onclick="changeSort('bc_27.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
+                                <th onclick="changeSort('bc_27.no_aju')" class="sort" style="text-align: center;">No Aju / No Daftar</th>
                                 <th onclick="changeSort('bc_27.status_posting')" style="text-align: center;">Status Posting</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>

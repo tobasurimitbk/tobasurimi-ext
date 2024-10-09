@@ -198,6 +198,10 @@ class PengembalianBarangModel extends Model
         $rmImportPoModel = new RMImportPOModel();
         $amPurchaseOrderModel = new AMPurchaseOrderModel();
         $sppModel = new SppModel();
+        $stockDetail2Model = new StockDetail2Model();
+        $bc23Model = new BC23Model();
+        $bc40Model = new BC40Model();
+        $metaDataModel = new MetadataModel();
 
         $penerimanBarang = $penerimaanBarangModel->where('id', $penermaanBarangId)->first();
         if ($penerimanBarang == null) {
@@ -241,7 +245,34 @@ class PengembalianBarangModel extends Model
                 }
             }
 
+            $dataStock = $stockDetail2Model->getStockDetailByStockDokumen(
+                $po['po_no'],
+                "LPB",
+                $penerimanBarang['company_id'],
+                $penerimanBarang['divisi_id'],
+                $penerimanBarang['warehouse_id'],
+                $q['barang_id'],
+                $q['spesifikasi_id'],
+                null
+            );
+
+            $dokumenAsal = null;
+            if ($penerimanBarang['bc_type'] == 53 && $dataStock != null) {
+                //  BC 4.0
+                $dokumenAsal = $bc40Model->select('bc_40.no_aju,bc_purchase_order.no_daftar')
+                    ->join('bc_purchase_order', 'bc_purchase_order.id = bc_40.bc_purchase_order_id', 'left')
+                    ->where('bc_40.no_aju', $dataStock['no_aju'])
+                    ->first();
+            } elseif ($penerimanBarang['bc_type'] == 48 && $dataStock != null) {
+                // BC 2.3
+                $dokumenAsal = $bc23Model->select('bc_23.no_aju,bc_purchase_order.no_daftar')
+                    ->join('bc_purchase_order', 'bc_purchase_order.id = bc_23.bc_purchase_order_id', 'left')
+                    ->where('bc_23.no_aju', $dataStock['no_aju'])
+                    ->first();
+            }
+
             $harga = ($q['harga'] + $q['harga_harian'] + $q['harga_bulanan']);
+
             $result[] = [
                 'id' => $q['id'],
                 'kode_barang' => $q['kode_barang'],
@@ -254,6 +285,12 @@ class PengembalianBarangModel extends Model
                 'jml_diterima' => (float)$q['jml_masuk'],
                 'jml_retur' => $pengembalianBarangDetail == null ? 0 : $pengembalianBarangDetail['jumlah_return'],
                 'ket_retur' =>  $pengembalianBarangDetail == null ? "" : $pengembalianBarangDetail['keterangan_return'],
+                'bc_type' =>  $dataStock == null ? "-" : ($dataStock['bc_id'] == 0 ? "NON PABEAN" : $metaDataModel->find($dataStock['bc_id'])['value']),
+                'no_aju' => $dataStock == null ? "-" : $dataStock['no_aju'],
+                'stock_date' => $dataStock == null ? "-" : date('d/m/Y', strtotime($dataStock['stock_date'])),
+                'sumber' => $dataStock == null ? "-" : $dataStock['sumber'],
+                'no_daftar' => $dokumenAsal == null ? "-" : $dokumenAsal['no_daftar']
+
             ];
         }
         return $result;

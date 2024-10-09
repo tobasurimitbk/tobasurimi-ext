@@ -211,8 +211,6 @@ class BC27 extends BaseController
 
     public function createAction()
     {
-        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-
         $this->bc27Model->insert([
             'company_asal_id' => $this->this_company_id,
             'company_tujuan_id' => $this->request->getVar('company_tujuan_id'),
@@ -220,6 +218,7 @@ class BC27 extends BaseController
             'no_aju' => $this->request->getVar('no_aju'),
             'status_posting' => '0',
             'no_daftar' => $this->request->getVar('no_daftar'),
+            'createdAt' => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))))
         ]);
 
         return response()->setJSON([
@@ -238,6 +237,7 @@ class BC27 extends BaseController
             'mutasi_global_id' => $this->request->getVar('mutasi_global_id'),
             'no_aju' => $this->request->getVar('no_aju'),
             'no_daftar' => $this->request->getVar('no_daftar'),
+            'createdAt' => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))))
         ]);
 
         return response()->setJSON([

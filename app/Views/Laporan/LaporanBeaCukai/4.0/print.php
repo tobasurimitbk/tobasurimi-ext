@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Pungutan Bea Cukai 2.3</title>
+    <title>Laporan Pungutan Bea Cukai 4.0</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,17 +42,17 @@
 </head>
 
 <body>
-    <h2>LAPORAN BEA CUKAI BC 2.3</h2>
+    <h2>LAPORAN BEA CUKAI BC 4.0</h2>
 
     <table class="w-100">
         <tbody>
             <tr>
                 <td style="width:150px">Tgl Mulai / Tgl Akhir</td>
                 <td style="width:10px">:</td>
-                <?php if ($condition['mulaiTanggalBC23'] != "" && $condition['selesaiTanggalBC23'] != "") : ?>
-                    <td style="width:80px"><?= date('d/m/Y', strtotime($condition['mulaiTanggalBC23'])); ?></td>
+                <?php if ($condition['mulaiTanggalBC40'] != "" && $condition['selesaiTanggalBC40'] != "") : ?>
+                    <td style="width:80px"><?= date('d/m/Y', strtotime($condition['mulaiTanggalBC40'])); ?></td>
                     <td style="width:10px"> S/D </td>
-                    <td><?= date('d/m/Y', strtotime($condition['selesaiTanggalBC23'])); ?></td>
+                    <td><?= date('d/m/Y', strtotime($condition['selesaiTanggalBC40'])); ?></td>
                 <?php else : ?>
                     <td colspan="3" style="width:80px">ALL</td>
                 <?php endif; ?>
@@ -70,16 +70,8 @@
                 <th rowspan="2">No Daftar</th>
                 <th rowspan="2">Tipe PO</th>
                 <th colspan="3">PPN</th>
-                <th colspan="3">PPH</th>
-                <th colspan="3">BM</th>
             </tr>
             <tr>
-                <th>Tidak Dipungut</th>
-                <th>Di Bebaskan</th>
-                <th>Di Tangguhkan</th>
-                <th>Tidak Dipungut</th>
-                <th>Di Bebaskan</th>
-                <th>Di Tangguhkan</th>
                 <th>Tidak Dipungut</th>
                 <th>Di Bebaskan</th>
                 <th>Di Tangguhkan</th>
@@ -97,12 +89,6 @@
                     <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['tidak_dipungut']); ?></td>
                     <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['di_bebaskan']); ?></td>
                     <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['di_tangguhkan']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPH']['tidak_dipungut']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPH']['di_bebaskan']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPH']['di_tangguhkan']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['BM']['tidak_dipungut']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['BM']['di_bebaskan']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['BM']['di_tangguhkan']); ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

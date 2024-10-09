@@ -27,7 +27,7 @@
                 <div class="col-md-3 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalPPBKB" id="mulaiTanggalPPBKB" name="mulaiTanggalPPBKB" placeholder="Mulai Tanggal PPBKB Dibuat">
+                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalPPBKB" id="mulaiTanggalPPBKB" name="mulaiTanggalPPBKB" placeholder="Mulai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-mulaiTanggalPPBKB"></i>
                         </div>
@@ -35,7 +35,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalPPBKB" id="selesaiTanggalPPBKB" name="selesaiTanggalPPBKB" placeholder="Selesai Tanggal PPBKB Dibuat">
+                        <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalPPBKB" id="selesaiTanggalPPBKB" name="selesaiTanggalPPBKB" placeholder="Selesai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-selesaiTanggalPPBKB"></i>
                         </div>
@@ -75,7 +75,7 @@
                                 <th onclick="changeSort('mutasi.warehouse_tujuan_id')" class="sort" style="text-align: center;">Warehouse Tujuan</th>
                                 <th onclick="changeSort('mutasi.no_mutasi')" class="sort" style="text-align: center;">No Mutasi</th>
                                 <th onclick="changeSort('ppbkb.no_ppbkb')" class="sort" style="text-align: center;">No PPBKB / Daftar</th>
-                                <th onclick="changeSort('ppbkb.createdAt')" class="sort" style="text-align: center;">Tanggal PPBKB</th>
+                                <th onclick="changeSort('ppbkb.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
                                 <th onclick="changeSort('ppbkb.status_posting')" style="text-align: center;">Status Posting</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>

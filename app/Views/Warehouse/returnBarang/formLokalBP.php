@@ -147,9 +147,18 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
+                                <th colspan="4"></th>
+                                <th colspan="3" style="text-align: center;">Dokumen Pemasukan</th>
+                                <th colspan="8"></th>
+                            </tr>
+                            <tr>
                                 <th style="text-align: center;">No</th>
+                                <th style="text-align: center;">Asal Barang</th>
                                 <th style="text-align: center;">Kode Barang</th>
                                 <th style="text-align: center;">Nama Barang</th>
+                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">No Daftar</th>
+                                <th style="text-align: center;">Tgl Daftar</th>
                                 <th style="text-align: center;">No SPP</th>
                                 <th style="text-align: center;">Jml Diterima</th>
                                 <th style="text-align: center;">Satuan</th>
@@ -165,7 +174,7 @@
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td colspan="4" style="text-align: right;"><b>GRAND TOTAL</b></td>
+                                <td colspan="8" style="text-align: right;"><b>GRAND TOTAL</b></td>
                                 <td style="text-align: center;"><b>0</td>
                                 <td style="text-align: center;"></td>
                                 <td style="text-align: center;"><b>0</td>
@@ -199,6 +208,10 @@
                 kode_satuan: "<?= $d['kode_satuan'] ?>",
                 nama_barang: "<?= $d['nama_barang'] ?>",
                 no_spp: "<?= $d['no_spp'] ?>",
+                sumber: "<?= $d['sumber'] ?>",
+                no_aju: "<?= $d['no_aju'] ?>",
+                no_daftar: "<?= $d['no_daftar'] ?>",
+                stock_date: "<?= $d['stock_date'] ?>",
             });
         <?php endforeach; ?>
         drawTable(listBarang);
@@ -538,7 +551,7 @@
         if (listBarang.length == 0) {
             table.find('tfoot').empty();
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align:right;" colspan="4"><b>GRAND TOTAL</b></td>'));
+            newRow.append($('<td style="text-align:right;" colspan="8"><b>GRAND TOTAL</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
             newRow.append($('<td style="text-align:left;"></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
@@ -554,12 +567,17 @@
             var totalHarga = 0;
             var totalSubTotal = 0;
             var totalJmlRetur = 0;
+            var sumberBarang = "-";
 
             $.each(listBarang, function(i, v) {
                 var newRow = $('<tr style="border:0;border-color:whitesmoke;">');
                 newRow.append($('<td>').text(no++));
+                newRow.append($('<td>').text(v.sumber));
                 newRow.append($('<td>').text(v.kode_barang));
                 newRow.append($('<td>').text(v.nama_barang));
+                newRow.append($('<td>').text(v.no_aju));
+                newRow.append($('<td>').text(v.no_daftar));
+                newRow.append($('<td>').text(v.stock_date));
                 newRow.append($('<td>').text(v.no_spp));
                 newRow.append($('<td>').text(v.jml_diterima));
                 newRow.append($('<td>').text(v.kode_satuan));
@@ -586,10 +604,11 @@
                 totalHarga += Number(v.harga) || 0;
                 totalSubTotal += Number(v.sub_total) || 0;
                 totalJmlRetur += Number(v.jml_retur) || 0;
+                sumberBarang = v.sumber;
             });
             table.find('tfoot').empty();
             var newRow = $('<tr style="border:0;border-color:whitesmoke;">');
-            newRow.append($('<td style="text-align:right;" colspan="4"><b>GRAND TOTAL</b></td>'));
+            newRow.append($('<td style="text-align:right;" colspan="8"><b>GRAND TOTAL</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + totalJmlDiterima + '</b></td>'));
             newRow.append($('<td style="text-align:left;"></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(totalHarga) + '</b></td>'));
@@ -598,6 +617,19 @@
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
+
+            // VALIDASI
+            if (sumberBarang === "-") {
+                Swal.fire({
+                    icon: 'error',
+                    title: "LPB yang anda pilih untuk retur belum dibuatkan dokumen pemasukan barang, silahkan dicek kembali",
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+                $('.btn-submit-parent').attr('disabled', true);
+            } else {
+                $('.btn-submit-parent').attr('disabled', false);
+            }
         }
     }
 

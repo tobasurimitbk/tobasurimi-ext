@@ -326,7 +326,8 @@ class BC40 extends BaseController
             'multiple_lpb_id' => str_replace(['\\"', '\\', '"'], '', json_encode($lpbIdArr)),
             'multiple_po_no' => str_replace(['\\"', '\\'], '', json_encode($poNoArr)),
             'multiple_lpb_no' => str_replace(['\\"', '\\'], '', json_encode($lpbNoArr)),
-            'no_daftar' => $this->request->getVar('no_daftar')
+            'no_daftar' => $this->request->getVar('no_daftar'),
+            'createdAt' => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))))
         ]);
 
         return response()->setJSON([

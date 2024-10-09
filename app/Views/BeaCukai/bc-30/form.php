@@ -114,6 +114,17 @@
                             <label for="floatingInput">Nomor Daftar</label>
                         </div>
                     </div>
+                    <div class="col-sm-4">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3">
+                                <input <?= !empty($bc30) ? ($bc30['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc30) ? date('d/m/Y', strtotime($bc30['createdAt'])) : "" ?>" autocomplete="one-time-code" type="text" class="form-control tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dokumen">
+                                <label for="floatingInput">Tanggal Dokumen</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 21px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </form>
 
@@ -283,6 +294,9 @@
             no_daftar: {
                 required: true
             },
+            tanggal: {
+                required: true
+            }
         },
         messages: {
             tipe_sales_order: {
@@ -296,7 +310,10 @@
             },
             no_daftar: {
                 required: "No Daftar wajib diisi"
-            }
+            },
+            tanggal: {
+                required: "Tanggal dokumen wajib diisi"
+            },
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -444,6 +461,14 @@
         var noPengajuanSplit = noAju.split("-");
         $('#no_pengajuan').val(noPengajuanSplit[0] + '-' + noPengajuanSplit[1] + '-' + tanggalPengajuanSplit[2] + '' + tanggalPengajuanSplit[1] + '' + tanggalPengajuanSplit[0] + '-' + noPengajuanSplit[3]);
     });
+
+    $('#tanggal').datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
 
     $('#ubahNoAjuButton').click(function(e) {
         e.preventDefault();

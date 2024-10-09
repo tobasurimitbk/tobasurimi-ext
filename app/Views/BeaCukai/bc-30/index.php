@@ -32,7 +32,7 @@
                 <div class="col-md-2 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC30" id="mulaiTanggalBC30" name="mulaiTanggalBC30" placeholder="Mulai Tanggal BC 3.0 Dibuat">
+                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC30" id="mulaiTanggalBC30" name="mulaiTanggalBC30" placeholder="Mulai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-mulaiTanggalBC30"></i>
                         </div>
@@ -40,28 +40,28 @@
                 </div>
                 <div class="col-md-2 mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC30" id="selesaiTanggalBC30" name="selesaiTanggalBC30" placeholder="Selesai Tanggal BC 3.0 Dibuat">
+                        <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC30" id="selesaiTanggalBC30" name="selesaiTanggalBC30" placeholder="Selesai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-selesaiTanggalBC30"></i>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2 mb-3">
+                <div class="col-md-3 mb-3">
                     <select name="statusPosting" class="form-select statusPosting" id="statusPosting">
                         <option selected value="ALL">STATUS POSTING : SEMUA</option>
                         <option value="SUDAH POSTING">STATUS POSTING : SUDAH POSTING</option>
                         <option value="BELUM POSTING">STATUS POSTING : BELUM POSTING</option>
                     </select>
                 </div>
-                <div class="col-md-2 mb-3">
+                <div class="col-md-3 mb-3">
                     <select name="tipeSalesOrder" class="form-select tipeSalesOrder" id="tipeSalesOrder">
                         <option value="ALL" selected>TIPE PENGELUARAN : SEMUA</option>
                         <option value="LOKAL">LOKAL</option>
                         <option value="INTERNASIONAL">INTERNASIONAL</option>
                     </select>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju BC 3.0 / No Daftar" value="" />
+                <div class="col-md-2 mb-3">
+                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju / No Daftar" value="" />
                 </div>
             </div>
             <?php if ($akunCeisa == null) : ?>
@@ -86,7 +86,7 @@
                                 <th style="text-align: center;">No Stuffing / Pengeluaran</th>
                                 <th style="text-align: center;">Customer</th>
                                 <th onclick="changeSort('bc_30.no_aju')" class="sort" style="text-align: center;">No Aju / Daftar</th>
-                                <th onclick="changeSort('bc_30.createdAt')" class="sort" style="text-align: center;">Tanggal BC 3.0</th>
+                                <th onclick="changeSort('bc_30.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
                                 <th onclick="changeSort('bc_30.status_posting')" style="text-align: center;">Status Posting</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
