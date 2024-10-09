@@ -4,13 +4,13 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Laporan Pungutan Bea Cukai 2.5</h1>
+        <h1>Laporan Pungutan Bea Cukai 3.0</h1>
         <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: -1px;">
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-2.5/print"); ?>')">PDF</button></li>
-            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-2.5/excel"); ?>')">Excel</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-3.0/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-3.0/excel"); ?>')">Excel</button></li>
         </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-bea-cukai"); ?>">
@@ -26,36 +26,43 @@
                 <div class="col-md-3 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC25" id="mulaiTanggalBC25" name="mulaiTanggalBC25" placeholder="Mulai Tanggal">
+                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC30" id="mulaiTanggalBC30" name="mulaiTanggalBC30" placeholder="Mulai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-mulaiTanggalBC25"></i>
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-mulaiTanggalBC30"></i>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC25" id="selesaiTanggalBC25" name="selesaiTanggalBC25" placeholder="Selesai Tanggal">
+                        <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC30" id="selesaiTanggalBC30" name="selesaiTanggalBC30" placeholder="Selesai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-selesaiTanggalBC25"></i>
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-selesaiTanggalBC30"></i>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari No Aju / No Daftar" value="" />
+                    <select name="tipeSalesOrder" class="form-select tipeSalesOrder" id="tipeSalesOrder">
+                        <option value="ALL" selected>TIPE PENGELUARAN : SEMUA</option>
+                        <option value="LOKAL">LOKAL</option>
+                        <option value="INTERNASIONAL">INTERNASIONAL</option>
+                    </select>
                 </div>
-            </div>
+                <div class="col-md-3 mb-3">
+                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju / No Daftar" value="" />
+                </div>
+        </div>
 
-            <div class="row">
+        <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th rowspan="2">No</th>
-                                <th rowspan="2" onclick="changeSort('bc_25.asal_penjualan')" class="sort" style="text-align: center;">Asal Penjualan</th>
-                                <th rowspan="2" onclick="changeSort('bc_25.supplier_id')" class="sort" style="text-align: center;">Nama Supplier / Customer</th>
+                                <th rowspan="2" onclick="changeSort('bc_purchase_order.supplier_id')" class="sort" style="text-align: center;">Nama Supplier</th>
                                 <th rowspan="2" onclick="changeSort('bc_25.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
                                 <th rowspan="2" onclick="changeSort('bc_25.no_aju')" class="sort" style="text-align: center;">No Aju</th>
-                                <th rowspan="2" onclick="changeSort('bc_25.no_daftar')" style="text-align: center;">No Daftar</th>
+                                <th rowspan="2" onclick="changeSort('bc_purchase_order.no_daftar')" style="text-align: center;">No Daftar</th>
+                                <th rowspan="2" onclick="changeSort('bc_purchase_order.po_type')" style="text-align: center;">Tipe PO</th>
 
                                 <th colspan="4" class="text-center">PPN</th>
                                 <th colspan="4" class="text-center">PPH</th>
@@ -84,13 +91,13 @@
                     </table>
                 </div>
             </div>
-        </div>
+
     </div>
 </section>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "bc25.id";
+    let sort = "bc30.id";
     let sortType = "desc";
 
     var table = $('.dataTable').DataTable({
@@ -108,49 +115,25 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url('laporan-bea-cukai/all-2.5'); ?>",
+            url: "<?= base_url('laporan-bea-cukai/all-3.0'); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.mulaiTanggalBC25 = $('.mulaiTanggalBC25').val();
-                data.selesaiTanggalBC25 = $('.selesaiTanggalBC25').val();
+                data.mulaiTanggalBC30 = $('.mulaiTanggalBC30').val();
+                data.selesaiTanggalBC30 = $('.selesaiTanggalBC30').val();
                 data.statusPosting = $('.statusPosting').val();
                 data.noAju = $('.noAju').val();
+                data.tipeSalesOrder = $('.tipeSalesOrder').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
         },
         columns: [
             { data: null, className: "text-center", sortable: false }, // Nomor urut
-            {
-                data: "tipe_sales_order",
-                className: "text-center"
-            },
-            {
-                data: "no_order_form",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "no_stuffing",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "customer_name",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "no_aju",
-                className: "text-center",
-            },
-            {
-                data: "tanggal_bc_30",
-                className: "text-center"
-            },
+            { data: "supplier_name", className: "text-center" },
+            { data: "date", className: "text-center" },
+            { data: "no_aju", className: "text-center" },
+            { data: "no_daftar", className: "text-center" },
+            { data: "po_type", className: "text-center" },
             { data: "dataBCTarif.PPN.di_bebaskan", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
             { data: "dataBCTarif.PPN.di_bayar", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
             { data: "dataBCTarif.PPN.di_lunasi", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
@@ -193,15 +176,11 @@
     });
 
                                  
-    $('.mulaiTanggalBC25, .selesaiTanggalBC25').change(function() {
+    $('.mulaiTanggalBC30, .selesaiTanggalBC30, .tipeSalesOrder').change(function() {
         table.ajax.reload();
     });
 
-    $('.searchData').keyup(function() {
-        table.ajax.reload();
-    });
-
-    $(".mulaiTanggalBC25, .selesaiTanggalBC25").datepicker({
+    $(".mulaiTanggalBC30, .selesaiTanggalBC30").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
