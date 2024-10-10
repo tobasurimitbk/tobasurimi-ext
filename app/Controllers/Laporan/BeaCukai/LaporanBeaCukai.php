@@ -3249,7 +3249,246 @@ class LaporanBeaCukai extends BaseController
         $domPdf->stream($label, ["Attachment" => false]);
     }
     
-    
+    public function laporanEmpatSatu()
+    {
+        return view('Laporan/LaporanBeaCukai/4.1/index');
+    }
+
+    public function allBCEmpatSatu()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "company_id"    => $this->this_company_id,
+            "type"          => "BC 4.1"
+        ];
+
+        $condition = [
+            "bc_41.company_id"  => $this->this_company_id,
+            "bc_41.deletedAt" => null,
+        ];
+
+        $addCondition = [
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            "statusPosting" => $this->request->getGet("statusPosting"),
+            "mulaiTanggalBC41" => $this->request->getGet("mulaiTanggalBC41"),
+            "selesaiTanggalBC41" => $this->request->getGet('selesaiTanggalBC41'),
+            "noAju" => $this->request->getGet('noAju'),
+            'asalPengeluaran' => $this->request->getGet('asalPengeluaran'),
+        ];
+
+
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
+        
+        $beaCukaiData = $this->bc41Model->getList($condition, $addCondition, $limit, $offset);
+
+        $dataBeaCukai = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($beaCukaiData['data'] as $data) {
+            $payloadData = json_decode($data->payload, true);
+            
+            array_push($dataBeaCukai, [
+                "no"            => $no++,
+                "id"            => encrypt($data->id),
+                "no_aju"    => $data->no_aju,
+                "no_daftar"    => $data->no_daftar,
+                "date"    => $data->createdAt,
+                "tanggal_bayar"    => $payloadData["tanggalBuktiBayar"],
+                "no_bayar"    => $payloadData["nomorBuktiBayar"],
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getVar("draw")),
+            "recordsTotal"      => $beaCukaiData['totalData'],
+            "recordsFiltered"   => $beaCukaiData['totalFilteredData'],
+            "data"              => $dataBeaCukai,
+            "payload"           => $payload
+        ];
+        return response()->setJSON($data);
+    }
+
+    public function exportPDFLaporanBCEmpatSatu()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "company_id"    => $this->this_company_id,
+            "type"          => "BC 4.1"
+        ];
+
+        $condition = [
+            // "bc_41.company_id"  => $this->this_company_id,
+            "bc_41.deletedAt" => null,
+        ];
+
+        $addCondition = [
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            "statusPosting" => $this->request->getGet("statusPosting"),
+            "mulaiTanggalBC41" => $this->request->getGet("mulaiTanggalBC41"),
+            "selesaiTanggalBC41" => $this->request->getGet('selesaiTanggalBC41'),
+            "noAju" => $this->request->getGet('noAju'),
+            'asalPengeluaran' => $this->request->getGet('asalPengeluaran'),
+        ];
+
+
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
+        
+        $beaCukaiData = $this->bc41Model->getList($condition, $addCondition, 1000000, 0);
+
+        $dataBeaCukai = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($beaCukaiData['data'] as $data) {
+            $payloadData = json_decode($data->payload, true);
+            
+            array_push($dataBeaCukai, [
+                "no"            => $no++,
+                "id"            => encrypt($data->id),
+                "no_aju"    => $data->no_aju,
+                "no_daftar"    => $data->no_daftar,
+                "date"    => $data->createdAt,
+                "tanggal_bayar"    => $payloadData["tanggalBuktiBayar"],
+                "no_bayar"    => $payloadData["nomorBuktiBayar"],
+            ]);
+        }
+
+        $domPdf = new Dompdf();
+
+        $fileName = 'Laporan Pemasukan Barang';
+        $domPdf->loadHtml(view('Laporan/LaporanBeaCukai/4.1/print', [
+            'dataBeaCukai' => $dataBeaCukai,
+            'condition' => $addCondition
+        ]));
+        $domPdf->setPaper('legal', 'landscape');
+        $domPdf->render();
+        $domPdf->stream($fileName, array("Attachment" => false));
+    }
+
+    public function exportExcelLaporanBCEmpatSatu()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "company_id"    => $this->this_company_id,
+            "type"          => "BC 4.1"
+        ];
+
+        $condition = [
+            "bc_41.company_id"  => $this->this_company_id,
+            "bc_41.deletedAt" => null,
+        ];
+
+        $addCondition = [
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            "statusPosting" => $this->request->getGet("statusPosting"),
+            "mulaiTanggalBC41" => $this->request->getGet("mulaiTanggalBC41"),
+            "selesaiTanggalBC41" => $this->request->getGet('selesaiTanggalBC41'),
+            "noAju" => $this->request->getGet('noAju'),
+            'asalPengeluaran' => $this->request->getGet('asalPengeluaran'),
+        ];
+        
+        $beaCukaiData = $this->bc41Model->getList($condition, $addCondition, 1000000, 0);
+
+        $dataBeaCukai = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($beaCukaiData['data'] as $data) {
+            $payloadData = json_decode($data->payload, true);
+            
+            array_push($dataBeaCukai, [
+                "no"            => $no++,
+                "id"            => encrypt($data->id),
+                "no_aju"    => $data->no_aju,
+                "no_daftar"    => $data->no_daftar,
+                "date"    => $data->createdAt,
+                "tanggal_bayar"    => $payloadData["tanggalBuktiBayar"],
+                "no_bayar"    => $payloadData["nomorBuktiBayar"],
+            ]);
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $headerStyleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+        $dataStyleArray = [
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+        $column = 2;
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'No')
+            ->setCellValue('B1', 'Tanggal')
+            ->setCellValue('C1', 'No Aju')
+            ->setCellValue('D1', 'No Daftar')
+            ->setCellValue('E1', 'No Bukti Bayar')
+            ->setCellValue('F1', 'Tanggal Bukti Bayar');
+
+        $sheet->getStyle('A1:F1')->applyFromArray($headerStyleArray);
+
+        // Fill data
+        $column = 2; // Start from the second row
+       
+        foreach ($dataBeaCukai as $row) {
+
+            $sheet->setCellValue('A' . $column, $row['no'])
+                ->setCellValue('B' . $column, $row['date'])
+                ->setCellValue('C' . $column, $row['no_aju'])
+                ->setCellValue('D' . $column, $row['no_daftar'])
+                ->setCellValue('E' . $column, $row['no_bayar'])
+                ->setCellValue('F' . $column, $row['tanggal_bayar']);
+
+            $sheet->getStyle('A' . $column . ':F' . $column)->applyFromArray($dataStyleArray);
+            $column++;
+        }
+
+        $sheet->getStyle('A' . $column . ':F' . $column)->applyFromArray($headerStyleArray);
+
+        $writer = new Xlsx($spreadsheet);
+        foreach (range('A', 'Z') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Laporan_Pungutan_BC_41';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
+    }
 
     public function allWipProduksiDashboard()
     {

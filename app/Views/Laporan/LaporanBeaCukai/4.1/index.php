@@ -4,13 +4,13 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Laporan Pungutan Bea Cukai 2.5</h1>
+        <h1>Laporan Pungutan Bea Cukai 4.1</h1>
         <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: -1px;">
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-2.5/print"); ?>')">PDF</button></li>
-            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-2.5/excel"); ?>')">Excel</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-4.1/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-4.1/excel"); ?>')">Excel</button></li>
         </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-bea-cukai"); ?>">
@@ -22,7 +22,7 @@
     <div class="card">
         <div class="card-body">
 
-            <div class="row justify-content-start row-col-spp">
+        <div class="row justify-content-start row-col-spp">
                 <div class="col-md-4 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
@@ -50,33 +50,13 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th rowspan="2">No</th>
-                                <th rowspan="2" onclick="changeSort('bc_25.asal_penjualan')" class="sort" style="text-align: center;">Asal Penjualan</th>
-                                <th rowspan="2" onclick="changeSort('bc_25.supplier_id')" class="sort" style="text-align: center;">Nama Supplier / Customer</th>
-                                <th rowspan="2" onclick="changeSort('bc_25.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
-                                <th rowspan="2" onclick="changeSort('bc_25.no_aju')" class="sort" style="text-align: center;">No Aju</th>
-                                <th rowspan="2" onclick="changeSort('bc_25.no_daftar')" class="sort" style="text-align: center;">No Daftar</th>
-
-                                <th colspan="4" class="text-center">PPN</th>
-                                <th colspan="4" class="text-center">PPH</th>
-                                <th colspan="4" class="text-center">BM</th>
-                            </tr>
-                            <tr>
-                                <th class="text-center">Di Bebaskan</th>
-                                <th class="text-center">Di Bayar</th>
-                                <th class="text-center">Di Lunasi</th>
-                                <th class="text-center">Di Tanggung Pemerintah</th>
-
-                                <th class="text-center">Di Bebaskan</th>
-                                <th class="text-center">Di Bayar</th>
-                                <th class="text-center">Di Lunasi</th>
-                                <th class="text-center">Di Tanggung Pemerintah</th>
-
-                                <th class="text-center">Di Bebaskan</th>
-                                <th class="text-center">Di Bayar</th>
-                                <th class="text-center">Di Lunasi</th>
-                                <th class="text-center">Di Tanggung Pemerintah</th>
-                            </tr>
+                                <th>No</th>
+                                <th onclick="changeSort('bc_41.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
+                                <th onclick="changeSort('bc_41.no_aju')" class="sort" style="text-align: center;">No Aju</th>
+                                <th onclick="changeSort('bc_41.daftar')" class="sort" style="text-align: center;">No Daftar</th>
+                                <th style="text-align: center;">No Bukti Bayar</th>
+                                <th style="text-align: center;">Tanggal Bukti Bayar</th>
+                            </tr>                           
                         </thead>
 
                         <tbody class="body-table" id="body-table">
@@ -90,7 +70,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "bc25.id";
+    let sort = "bc41.id";
     let sortType = "desc";
 
     var table = $('.dataTable').DataTable({
@@ -103,17 +83,16 @@
         ],
         fixedHeader: true,
         lengthMenu: [
-            [25],
-            [25],
+            [41],
+            [41],
         ],
-        pageLength: 25,
+        pageLength: 41,
         ajax: {
-            url: "<?= base_url('laporan-bea-cukai/all-2.5'); ?>",
+            url: "<?= base_url('laporan-bea-cukai/all-4.1'); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.mulaiTanggalBC25 = $('.mulaiTanggalBC25').val();
-                data.selesaiTanggalBC25 = $('.selesaiTanggalBC25').val();
-                data.statusPosting = $('.statusPosting').val();
+                data.mulaiTanggalBC41 = $('.mulaiTanggalBC41').val();
+                data.selesaiTanggalBC41 = $('.selesaiTanggalBC41').val();
                 data.noAju = $('.noAju').val();
                 data.sort = sort;
                 data.sortType = sortType;
@@ -122,18 +101,8 @@
         columns: [
             { data: null, className: "text-center", sortable: false }, // Nomor urut
             {
-                data: "asal_pengeluaran",
-                className: "text-center"
-            },
-            {
-                data: "supplier_name",
+                data: "date",
                 className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "tanggal_bc_30",
-                className: "text-center"
             },
             {
                 data: "no_aju",
@@ -141,23 +110,16 @@
             },
             {
                 data: "no_daftar",
-                className: "text-center",
+                className: "text-center"
             },
-            
-            { data: "dataBCTarif.PPN.di_bebaskan", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPN.di_bayar", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPN.di_lunasi", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPN.di_tanggung_pemerintah", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-
-            { data: "dataBCTarif.PPH.di_bebaskan", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPH.di_bayar", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPH.di_lunasi", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPH.di_tanggung_pemerintah", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-
-            { data: "dataBCTarif.BM.di_bebaskan", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.BM.di_bayar", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.BM.di_lunasi", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.BM.di_tanggung_pemerintah", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
+            {
+                data: "no_bayar",
+                className: "text-center"
+            },
+            {
+                data: "tanggal_bayar",
+                className: "text-center"
+            },
         ],
         rowCallback: function(row, data, displayNum, displayIndex, dataIndex) {
             var pageInfo = table.page.info();
@@ -186,7 +148,7 @@
     });
 
                                  
-    $('.mulaiTanggalBC25, .selesaiTanggalBC25').change(function() {
+    $('.mulaiTanggalBC41, .selesaiTanggalBC41').change(function() {
         table.ajax.reload();
     });
 
@@ -194,7 +156,7 @@
         table.ajax.reload();
     });
 
-    $(".mulaiTanggalBC25, .selesaiTanggalBC25").datepicker({
+    $(".mulaiTanggalBC41, .selesaiTanggalBC41").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
