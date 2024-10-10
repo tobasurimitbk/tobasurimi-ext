@@ -2517,7 +2517,7 @@ class LaporanBeaCukai extends BaseController
             "mulaiTanggalBC30" => $this->request->getGet("mulaiTanggalBC30"),
             "selesaiTanggalBC30" => $this->request->getGet('selesaiTanggalBC30'),
             "noAju" => $this->request->getGet('noAju'),
-            'asalPengeluaran' => $this->request->getGet('asalPengeluaran'),
+            "tipeSalesOrder" => $this->request->getGet('tipeSalesOrder')
         ];
 
         $condition = [
@@ -2537,10 +2537,10 @@ class LaporanBeaCukai extends BaseController
             $entry = [
                 "no" => $no++,
                 "id" => encrypt($data->id),
-                "tipe_sales_order" => $data->tipe_sales_order,
-                "no_aju" => $data->no_aju . " / " . $data->no_daftar,
-                "tanggal_bc_30" => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
-                "status_posting" => $data->status_posting,
+                "no_aju" => $data->no_aju,
+                "no_daftar" =>  $data->no_daftar,
+                "date"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
+               
                 "dataBCTarif" => [
                     'PPN' => [
                         'di_bebaskan' => 0,
@@ -2625,10 +2625,10 @@ class LaporanBeaCukai extends BaseController
 
         // Set the headers
         $sheet->setCellValue('A1', 'No')
-            ->setCellValue('B1', 'Tipe Sales Order')
+            ->setCellValue('B1', 'Tanggal')
             ->setCellValue('C1', 'No Aju')
-            ->setCellValue('D1', 'Tanggal BC 30')
-            ->setCellValue('E1', 'Status Posting');
+            ->setCellValue('D1', 'No Daftar');
+           
 
         // Merging cells for PPN, PPH, and BM
         $sheet->setCellValue('F1', 'PPN')->mergeCells('F1:I1');
@@ -2656,22 +2656,21 @@ class LaporanBeaCukai extends BaseController
         $row = 3; // Starting from row 3 after the headers
         foreach ($dataBC30Result as $result) {
             $sheet->setCellValue('A' . $row, $result['no'])
-                ->setCellValue('B' . $row, $result['tipe_sales_order'])
+                ->setCellValue('B' . $row, $result['date'])
                 ->setCellValue('C' . $row, $result['no_aju'])
-                ->setCellValue('D' . $row, $result['tanggal_bc_30'])
-                ->setCellValue('E' . $row, $result['status_posting'])
-                ->setCellValue('F' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_bayar']))
-                ->setCellValue('G' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_bebaskan']))
-                ->setCellValue('H' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_tanggung_pemerintah']))
-                ->setCellValue('I' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_lunasi']))
-                ->setCellValue('J' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPH']['di_bayar']))
-                ->setCellValue('K' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPH']['di_bebaskan']))
-                ->setCellValue('L' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPH']['di_tanggung_pemerintah']))
-                ->setCellValue('M' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPH']['di_lunasi']))
-                ->setCellValue('N' . $row, formatRupiahPdfExcel($result['dataBCTarif']['BM']['di_bayar']))
-                ->setCellValue('O' . $row, formatRupiahPdfExcel($result['dataBCTarif']['BM']['di_bebaskan']))
-                ->setCellValue('P' . $row, formatRupiahPdfExcel($result['dataBCTarif']['BM']['di_tanggung_pemerintah']))
-                ->setCellValue('Q' . $row, formatRupiahPdfExcel($result['dataBCTarif']['BM']['di_lunasi']));
+                ->setCellValue('D' . $row, $result['no_daftar'])
+                ->setCellValue('E' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_bayar']))
+                ->setCellValue('F' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_bebaskan']))
+                ->setCellValue('G' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_tanggung_pemerintah']))
+                ->setCellValue('H' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPN']['di_lunasi']))
+                ->setCellValue('I' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPH']['di_bayar']))
+                ->setCellValue('J' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPH']['di_bebaskan']))
+                ->setCellValue('K' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPH']['di_tanggung_pemerintah']))
+                ->setCellValue('L' . $row, formatRupiahPdfExcel($result['dataBCTarif']['PPH']['di_lunasi']))
+                ->setCellValue('M' . $row, formatRupiahPdfExcel($result['dataBCTarif']['BM']['di_bayar']))
+                ->setCellValue('N' . $row, formatRupiahPdfExcel($result['dataBCTarif']['BM']['di_bebaskan']))
+                ->setCellValue('O' . $row, formatRupiahPdfExcel($result['dataBCTarif']['BM']['di_tanggung_pemerintah']))
+                ->setCellValue('P' . $row, formatRupiahPdfExcel($result['dataBCTarif']['BM']['di_lunasi']));
 
             $row++;
         }
@@ -2732,10 +2731,10 @@ class LaporanBeaCukai extends BaseController
             $entry = [
                 "no" => $no++,
                 "id"                    => encrypt($data->id),
-                "tipe_sales_order"      => $data->tipe_sales_order,
-                "no_aju"                => $data->no_aju . " / " . $data->no_daftar,
-                "tanggal_bc_30"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
-                "status_posting"        => $data->status_posting,
+                "date"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
+                "no_aju"                => $data->no_aju,
+                "no_daftar"                => $data->no_daftar,
+              
                 "dataBCTarif" => [
                     'PPN' => [
                         'di_bebaskan' => 0,
@@ -2763,7 +2762,7 @@ class LaporanBeaCukai extends BaseController
 
             if (isset($payloadData['barang']) && !empty($payloadData['barang'])) {
                 foreach ($payloadData['barang'] as $barang) {
-                    if (isset($barang['barangTarif']) && !empty($barang['barangTarif'])) {
+                   
                         foreach ($barang['barangTarif'] as $tarif) {
                             $jenisPungutan = '';
 
@@ -2796,7 +2795,7 @@ class LaporanBeaCukai extends BaseController
                                 }
                             }
                         }
-                    }
+                    
                 }
             }
 

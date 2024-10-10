@@ -64,7 +64,6 @@
         <thead>
             <tr>
                 <th rowspan="2">No</th>
-                <th rowspan="2">Nama Supplier</th>
                 <th rowspan="2">Tanggal</th>
                 <th rowspan="2">No Aju</th>
                 <th rowspan="2">No Daftar</th>
@@ -92,7 +91,6 @@
                 <?php foreach ($dataBC25Result as $row) : ?>
                     <tr>
                         <td><?= isset($row['no']) ? $row['no'] : '-'; ?></td>
-                        <td><?= isset($row['supplier_name']) ? $row['supplier_name'] : '-'; ?></td>
                         <td><?= isset($row['date']) ? date('d/m/Y', strtotime($row['date'])) : '-'; ?></td>
                         <td><?= isset($row['no_aju']) ? $row['no_aju'] : '-'; ?></td>
                         <td><?= isset($row['no_daftar']) ? $row['no_daftar'] : '-'; ?></td>
