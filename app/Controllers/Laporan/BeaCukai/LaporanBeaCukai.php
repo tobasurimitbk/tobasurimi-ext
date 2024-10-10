@@ -1924,7 +1924,7 @@ class LaporanBeaCukai extends BaseController
             
                 if (isset($payloadData['barang']) && !empty($payloadData['barang'])) {
                     foreach ($payloadData['barang'] as $barang) {
-                        if (isset($barang['barangTarif']) && !empty($barang['barangTarif'])) {
+                      
                             
                             // Jika id sudah ada, tambahkan tarifnya
                             if (!isset($dataBC25Result[$data->id])) {
@@ -1992,7 +1992,7 @@ class LaporanBeaCukai extends BaseController
                                     }
                                 }
                             }
-                        }
+                        
                     }
                 }
             }
@@ -2095,7 +2095,7 @@ class LaporanBeaCukai extends BaseController
 
             if (isset($payloadData['barang']) && !empty($payloadData['barang'])) {
                 foreach ($payloadData['barang'] as $barang) {
-                    if (isset($barang['barangTarif']) && !empty($barang['barangTarif'])) {
+                  
                         foreach ($barang['barangTarif'] as $tarif) {
                             $jenisPungutan = '';
 
@@ -2128,7 +2128,7 @@ class LaporanBeaCukai extends BaseController
                                 }
                             }
                         }
-                    }
+                    
                 }
             }
 
@@ -2290,7 +2290,7 @@ class LaporanBeaCukai extends BaseController
 
             if (isset($payloadData['barang']) && !empty($payloadData['barang'])) {
                 foreach ($payloadData['barang'] as $barang) {
-                    if (isset($barang['barangTarif']) && !empty($barang['barangTarif'])) {
+                    
                         foreach ($barang['barangTarif'] as $tarif) {
                             $jenisPungutan = '';
 
@@ -2323,7 +2323,7 @@ class LaporanBeaCukai extends BaseController
                                 }
                             }
                         }
-                    }
+                    
                 }
             }
 
