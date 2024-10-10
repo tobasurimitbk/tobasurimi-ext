@@ -58,11 +58,9 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th rowspan="2">No</th>
-                                <th rowspan="2" onclick="changeSort('bc_purchase_order.supplier_id')" class="sort" style="text-align: center;">Nama Supplier</th>
-                                <th rowspan="2" onclick="changeSort('bc_25.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
-                                <th rowspan="2" onclick="changeSort('bc_25.no_aju')" class="sort" style="text-align: center;">No Aju</th>
-                                <th rowspan="2" onclick="changeSort('bc_purchase_order.no_daftar')" style="text-align: center;">No Daftar</th>
-                                <th rowspan="2" onclick="changeSort('bc_purchase_order.po_type')" style="text-align: center;">Tipe PO</th>
+                                <th rowspan="2" onclick="changeSort('bc_40.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
+                                <th rowspan="2" onclick="changeSort('bc_40.no_aju')" class="sort" style="text-align: center;">No Aju</th>
+                                <th rowspan="2" onclick="changeSort('bc_40.no_daftar')" class="sort" style="text-align: center;">No Daftar</th>
 
                                 <th colspan="4" class="text-center">PPN</th>
                                 <th colspan="4" class="text-center">PPH</th>
@@ -129,11 +127,10 @@
         },
         columns: [
             { data: null, className: "text-center", sortable: false }, // Nomor urut
-            { data: "supplier_name", className: "text-center" },
-            { data: "date", className: "text-center" },
+            { data: "tanggal_bc_30", className: "text-center" },
             { data: "no_aju", className: "text-center" },
             { data: "no_daftar", className: "text-center" },
-            { data: "po_type", className: "text-center" },
+            
             { data: "dataBCTarif.PPN.di_bebaskan", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
             { data: "dataBCTarif.PPN.di_bayar", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
             { data: "dataBCTarif.PPN.di_lunasi", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},

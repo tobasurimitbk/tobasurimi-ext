@@ -2402,17 +2402,16 @@ class LaporanBeaCukai extends BaseController
             
                 if (isset($payloadData['barang']) && !empty($payloadData['barang'])) {
                     foreach ($payloadData['barang'] as $barang) {
-                        if (isset($barang['barangTarif']) && !empty($barang['barangTarif'])) {
+                       
                             
                             // Jika id sudah ada, tambahkan tarifnya
                             if (!isset($dataBC30Result[$data->id])) {
                                 $dataBC30Result[$data->id] = [
                                     "no" => $no++,
                                     "id"                    => encrypt($data->id),
-                                    "tipe_sales_order"      => $data->tipe_sales_order,
                                     "no_aju"                => $data->no_aju . " / " . $data->no_daftar,
                                     "tanggal_bc_30"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
-                                    "status_posting"        => $data->status_posting,
+                                    "no_daftar"        => $data->no_daftar,
                                     "dataBCTarif" => [
                                         'PPN' => [
                                             'di_bebaskan' => 0,
@@ -2469,7 +2468,6 @@ class LaporanBeaCukai extends BaseController
                                     }
                                 }
                             }
-                        }
                     }
                 }
             }
