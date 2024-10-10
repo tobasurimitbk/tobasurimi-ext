@@ -55,7 +55,7 @@
                                 <th rowspan="2" onclick="changeSort('bc_25.supplier_id')" class="sort" style="text-align: center;">Nama Supplier / Customer</th>
                                 <th rowspan="2" onclick="changeSort('bc_25.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
                                 <th rowspan="2" onclick="changeSort('bc_25.no_aju')" class="sort" style="text-align: center;">No Aju</th>
-                                <th rowspan="2" onclick="changeSort('bc_25.no_daftar')" style="text-align: center;">No Daftar</th>
+
 
                                 <th colspan="4" class="text-center">PPN</th>
                                 <th colspan="4" class="text-center">PPH</th>
@@ -124,18 +124,6 @@
             {
                 data: "tipe_sales_order",
                 className: "text-center"
-            },
-            {
-                data: "no_order_form",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "no_stuffing",
-                className: "text-center",
-                searchable: false,
-                sortable: false
             },
             {
                 data: "customer_name",
