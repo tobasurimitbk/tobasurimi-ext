@@ -61,6 +61,7 @@
                                 <th rowspan="2" onclick="changeSort('bc_40.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
                                 <th rowspan="2" onclick="changeSort('bc_40.no_aju')" class="sort" style="text-align: center;">No Aju</th>
                                 <th rowspan="2" onclick="changeSort('bc_40.no_daftar')" class="sort" style="text-align: center;">No Daftar</th>
+                                <th rowspan="2" onclick="changeSort('stuffing_lokal.no_stuffing')" class="sort" style="text-align: center;">No Stuffing</th>
 
                                 <th colspan="4" class="text-center">PPN</th>
                                 <th colspan="4" class="text-center">PPH</th>
@@ -130,6 +131,7 @@
             { data: "tanggal_bc_30", className: "text-center" },
             { data: "no_aju", className: "text-center" },
             { data: "no_daftar", className: "text-center" },
+            { data: "no_stuffing", className: "text-center" },
             
             { data: "dataBCTarif.PPN.di_bebaskan", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
             { data: "dataBCTarif.PPN.di_bayar", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},

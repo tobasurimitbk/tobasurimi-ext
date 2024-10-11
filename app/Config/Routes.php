@@ -2092,6 +2092,10 @@ $routes->get('/laporan-bea-cukai/laporan-4.1', 'Laporan\BeaCukai\LaporanBeaCukai
 $routes->get('/laporan-bea-cukai/all-4.1', 'Laporan\BeaCukai\LaporanBeaCukai::allBCEmpatSatu', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-4.1/print', 'Laporan\BeaCukai\LaporanBeaCukai::exportPDFLaporanBCEmpatSatu', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-4.1/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelLaporanBCEmpatSatu', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/laporan-2.7', 'Laporan\BeaCukai\LaporanBeaCukai::laporanDuaTujuh', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/all-2.7', 'Laporan\BeaCukai\LaporanBeaCukai::allBCDuaTujuh', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/laporan-2.7/print', 'Laporan\BeaCukai\LaporanBeaCukai::exportPDFLaporanBCDuaTujuh', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/laporan-2.7/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelLaporanBCDuaTujuh', ['filter' => 'Auth']);
 
 $routes->get('/laporan-bea-cukai/laporan-mutasi/print', 'Laporan\BeaCukai\LaporanBeaCukai::exportPDFLaporanMutasi', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-mutasi/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelLaporanMutasi', ['filter' => 'Auth']);
