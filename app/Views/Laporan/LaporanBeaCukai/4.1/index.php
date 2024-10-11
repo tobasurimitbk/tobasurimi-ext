@@ -121,6 +121,11 @@
                 className: "text-center"
             },
         ],
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
         rowCallback: function(row, data, displayNum, displayIndex, dataIndex) {
             var pageInfo = table.page.info();
             var no = pageInfo.start + displayIndex + 1; // Menentukan nomor urut berdasarkan halaman dan posisi data

@@ -92,7 +92,7 @@
                             </tr>
                         </thead>
 
-                        <tbody class="body-table" id="body-table">
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
                         </tbody>
                     </table>
                 </div>
@@ -166,6 +166,11 @@
             { data: "pungutan.BM.di_tunda", className: "text-center", render: formatRupiah },
             { data: "pungutan.BM.di_tangguhkan", className: "text-center", render: formatRupiah }
         ],
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
         rowCallback: function(row, data, displayNum, displayIndex, dataIndex) {
             var pageInfo = table.page.info();
             var no = pageInfo.start + displayIndex + 1; // Menentukan nomor urut berdasarkan halaman dan posisi data
@@ -198,7 +203,7 @@
         }
         return 'Rp ' + parseInt(value).toLocaleString('id-ID');
     }
-    
+
     $('.mulaiTanggalBC27, .selesaiTanggalBC27, .tipeSalesOrder').change(function() {
         table.ajax.reload();
     });
