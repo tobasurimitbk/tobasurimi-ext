@@ -564,8 +564,8 @@
                     newRow.append($('<td style="text-align:center;">').text(v.po_no));
                     newRow.append($('<td style="text-align:center;">').text(v.kode_barang));
                     newRow.append($('<td style="text-align:center;">').text(v.barang_name));
-                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_po).toFixed(2)));
-                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_lpb).toFixed(2)));
+                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_po).toFixed(4)));
+                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_lpb).toFixed(4)));
                     newRow.append($('<td style="text-align:center;">').text(v.harga));
                     table.find('tbody').append(newRow);
                 });
@@ -627,8 +627,8 @@
                 newRow.append($('<td style="text-align: center;">').text(v.po_no));
                 newRow.append($('<td style="text-align: center;">').text(v.kode_barang));
                 newRow.append($('<td style="text-align: center;">').text(v.barang_name));
-                newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_po).toFixed(2)));
-                newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_lpb).toFixed(2)));
+                newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_po).toFixed(4)));
+                newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_lpb).toFixed(4)));
                 newRow.append($('<td style="text-align: center;">').text(formatRupiah(v.harga_number)));
 
                 newRow.append($('<td style="text-align: center;">').html(
