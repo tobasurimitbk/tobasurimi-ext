@@ -2,8 +2,11 @@
 
 namespace App\Controllers\Production;
 
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Controllers\BaseController;
+use App\Controllers\Master\Account;
 use App\Controllers\Master\Divisi;
+use App\Models\AccountBarangModel;
 use App\Models\BarangMasterModel;
 use App\Models\DivisisModel;
 use App\Models\MaterialRequestDetailsModel;
@@ -37,6 +40,8 @@ class ProductionResult extends BaseController
     protected $stockDetailModel;
     protected $stockDetail2Model;
     protected $metaDataModel;
+    protected $jurnalUmumController;
+    protected $accountBarangModel;
 
     public function __construct()
     {
@@ -55,6 +60,8 @@ class ProductionResult extends BaseController
         $this->stockDetailModel = new StockDetailModel();
         $this->stockDetail2Model = new StockDetail2Model();
         $this->metaDataModel = new MetadataModel();
+        $this->accountBarangModel = new AccountBarangModel();
+        $this->jurnalUmumController = new JurnalUmum();
     }
 
     public function index()
@@ -809,124 +816,137 @@ class ProductionResult extends BaseController
                         }
                     }
 
-                    if ($value['type'] == 'JADI') {
-                        // -----
-                        // BARANG IN KE INVENTORI
-                        $stokIn = $this->stockModel->insertStok(
-                            $resultData['company_id'],
-                            $value['warehouse_id'],
-                            $value['divisi_id'],
-                            $value['barang_type'],
-                            $value['barang1_id'],
-                            $value['barang2_id'],
-                            $value['qty']
-                        );
+                    $cekAccount = $this->accountBarangModel->checkAccountBarang($this->this_company_id, $value['divisi_id'], $value['barang1_id']);
 
-                        $this->productionResultDetailModel->update($value['id'], [
-                            'stock_id' => $stokIn
-                        ]);
+                    if ($cekAccount) {
+                        $data = [
+                            "status"    => false,
+                            "message"   => "Barang belum memiliki Akun COA",
+                            'token'     => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                        return;
+                    } else {
+                        if ($value['type'] == 'JADI') {
+                            // -----
+                            // BARANG IN KE INVENTORI
+                            $stokIn = $this->stockModel->insertStok(
+                                $resultData['company_id'],
+                                $value['warehouse_id'],
+                                $value['divisi_id'],
+                                $value['barang_type'],
+                                $value['barang1_id'],
+                                $value['barang2_id'],
+                                $value['qty']
+                            );
 
-                        $checkStokDetailIn =  $this->stockModel->isDefinedStockSubDetail(
-                            $resultData['company_id'],
-                            $value['warehouse_id'],
-                            $value['divisi_id'],
-                            $value['barang_type'],
-                            $value['barang1_id'],
-                            $value['barang2_id'],
-                            $value['bc_id'],
-                            $value['no_aju'],
-                            $stokIn
-                        );
+                            $this->productionResultDetailModel->update($value['id'], [
+                                'stock_id' => $stokIn
+                            ]);
 
-                        if ($checkStokDetailIn == null) {
-                            // INSERT STOK INISIASI
+                            $checkStokDetailIn =  $this->stockModel->isDefinedStockSubDetail(
+                                $resultData['company_id'],
+                                $value['warehouse_id'],
+                                $value['divisi_id'],
+                                $value['barang_type'],
+                                $value['barang1_id'],
+                                $value['barang2_id'],
+                                $value['bc_id'],
+                                $value['no_aju'],
+                                $stokIn
+                            );
+
+                            if ($checkStokDetailIn == null) {
+                                // INSERT STOK INISIASI
+                                $stokDetailIn = $this->stockDetailModel->insertStokDetail(
+                                    $stokIn,
+                                    0,
+                                    "In",
+                                    date('Y-m-d'),
+                                    $this->this_user_id,
+                                    "INISIASI",
+                                    "-",
+                                    "-"
+                                );
+                                $this->stockDetail2Model->insertStokDetail2(
+                                    $value['bc_id'],
+                                    $value['stock_id'],
+                                    $stokDetailIn,
+                                    0,
+                                    $value['no_aju'],
+                                    "-"
+                                );
+                            }
+
+                            $stockRebusDetailIn = $this->stockDetail2Model->getStockListDetail(
+                                $value['bc_id'],
+                                $value['stock_id'],
+                                $value['no_aju'],
+                                $value['stock_dokumen']
+                            );
+
+                            // DETAIL
                             $stokDetailIn = $this->stockDetailModel->insertStokDetail(
                                 $stokIn,
-                                0,
+                                $value['qty'],
                                 "In",
                                 date('Y-m-d'),
                                 $this->this_user_id,
-                                "INISIASI",
-                                "-",
+                                "PRODUKSI",
+                                $resultData['pr_no'],
                                 "-"
                             );
+
+                            // SUB DETAIL
+                            $this->stockDetail2Model->insertStokDetail2(
+                                $value['bc_id'],
+                                $stokIn,
+                                $stokDetailIn,
+                                $value['qty'],
+                                $value['no_aju'],
+                                $resultData['pr_no'],
+                                $value['stock_dokumen'],
+                            );
+                        } else {
+                            // Stok OUT
+                            $stok = $this->stockModel->insertStok(
+                                $resultData['company_id'],
+                                $value['warehouse_id'],
+                                $value['divisi_id'],
+                                $value['barang_type'],
+                                $value['barang1_id'],
+                                $value['barang2_id'],
+                                ($value['qty'] * -1)
+                            );
+
+                            // DETAIL
+                            $stokDetail = $this->stockDetailModel->insertStokDetail(
+                                $stok,
+                                $value['qty'],
+                                "Out",
+                                date('Y-m-d'),
+                                $this->this_user_id,
+                                "PRODUKSI",
+                                $resultData['pr_no'],
+                                "-"
+                            );
+
+                            // SUB DETAIL
                             $this->stockDetail2Model->insertStokDetail2(
                                 $value['bc_id'],
                                 $value['stock_id'],
-                                $stokDetailIn,
-                                0,
+                                $stokDetail,
+                                $value['qty'],
                                 $value['no_aju'],
-                                "-"
+                                $resultData['pr_no'],
+                                $value['stock_dokumen'],
                             );
                         }
-
-                        $stockRebusDetailIn = $this->stockDetail2Model->getStockListDetail(
-                            $value['bc_id'],
-                            $value['stock_id'],
-                            $value['no_aju'],
-                            $value['stock_dokumen']
-                        );
-
-                        // DETAIL
-                        $stokDetailIn = $this->stockDetailModel->insertStokDetail(
-                            $stokIn,
-                            $value['qty'],
-                            "In",
-                            date('Y-m-d'),
-                            $this->this_user_id,
-                            "PRODUKSI",
-                            $resultData['pr_no'],
-                            "-"
-                        );
-
-                        // SUB DETAIL
-                        $this->stockDetail2Model->insertStokDetail2(
-                            $value['bc_id'],
-                            $stokIn,
-                            $stokDetailIn,
-                            $value['qty'],
-                            $value['no_aju'],
-                            $resultData['pr_no'],
-                            $value['stock_dokumen'],
-                        );
-                    } else {
-                        // Stok OUT
-                        $stok = $this->stockModel->insertStok(
-                            $resultData['company_id'],
-                            $value['warehouse_id'],
-                            $value['divisi_id'],
-                            $value['barang_type'],
-                            $value['barang1_id'],
-                            $value['barang2_id'],
-                            ($value['qty'] * -1)
-                        );
-
-                        // DETAIL
-                        $stokDetail = $this->stockDetailModel->insertStokDetail(
-                            $stok,
-                            $value['qty'],
-                            "Out",
-                            date('Y-m-d'),
-                            $this->this_user_id,
-                            "PRODUKSI",
-                            $resultData['pr_no'],
-                            "-"
-                        );
-
-                        // SUB DETAIL
-                        $this->stockDetail2Model->insertStokDetail2(
-                            $value['bc_id'],
-                            $value['stock_id'],
-                            $stokDetail,
-                            $value['qty'],
-                            $value['no_aju'],
-                            $resultData['pr_no'],
-                            $value['stock_dokumen'],
-                        );
                     }
                 }
                 // exit;
                 $this->productionResultModel->update($id, $payload);
+
 
                 // $this->workOrdersModel->update($resultData['work_order_id'], [
                 //     'is_posted' => 1
