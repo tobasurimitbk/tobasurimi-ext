@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Pungutan Bea Cukai BC 2.5</title>
+    <title>Laporan Pungutan Bea Cukai BC 3.0</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -64,11 +64,10 @@
         <thead>
             <tr>
                 <th rowspan="2">No</th>
-                <th rowspan="2">Asal Pengeluaran</th>
-                <th rowspan="2">Nama Supplier</th>
                 <th rowspan="2">Tanggal</th>
                 <th rowspan="2">No Aju</th>
                 <th rowspan="2">No Daftar</th>
+                <th rowspan="2">No Stuffing</th>
                 <th colspan="4">PPN</th>
                 <th colspan="4">PPH</th>
                 <th colspan="4">BM</th>
@@ -93,11 +92,10 @@
                 <?php foreach ($dataBC25Result as $row) : ?>
                     <tr>
                         <td><?= isset($row['no']) ? $row['no'] : '-'; ?></td>
-                        <td><?= isset($row['asal_pengeluaran']) ? $row['asal_pengeluaran'] : '-'; ?></td>
-                        <td><?= isset($row['supplier_name']) ? $row['supplier_name'] : '-'; ?></td>
                         <td><?= isset($row['date']) ? date('d/m/Y', strtotime($row['date'])) : '-'; ?></td>
                         <td><?= isset($row['no_aju']) ? $row['no_aju'] : '-'; ?></td>
                         <td><?= isset($row['no_daftar']) ? $row['no_daftar'] : '-'; ?></td>
+                        <td><?= isset($row['no_stuffing']) ? $row['no_stuffing'] : '-'; ?></td>
                         <td><?= isset($row['dataBCTarif']['PPN']['di_bayar']) ? formatRupiahPdfExcel($row['dataBCTarif']['PPN']['di_bayar']) : '0'; ?></td>
                         <td><?= isset($row['dataBCTarif']['PPN']['di_bebaskan']) ? formatRupiahPdfExcel($row['dataBCTarif']['PPN']['di_bebaskan']) : '0'; ?></td>
                         <td><?= isset($row['dataBCTarif']['PPN']['di_tanggung_pemerintah']) ? formatRupiahPdfExcel($row['dataBCTarif']['PPN']['di_tanggung_pemerintah']) : '0'; ?></td>

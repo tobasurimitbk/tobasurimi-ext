@@ -4,13 +4,13 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Laporan Pungutan Bea Cukai 4.0</h1>
+        <h1>Laporan Pungutan Bea Cukai 4.1</h1>
         <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: -1px;">
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-4.0/print"); ?>')">PDF</button></li>
-            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-4.0/excel"); ?>')">Excel</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-4.1/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-4.1/excel"); ?>')">Excel</button></li>
         </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-bea-cukai"); ?>">
@@ -22,49 +22,42 @@
     <div class="card">
         <div class="card-body">
 
-            <div class="row justify-content-start row-col-spp">
+        <div class="row justify-content-start row-col-spp">
                 <div class="col-md-4 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC40" id="mulaiTanggalBC40" name="mulaiTanggalBC40" placeholder="Mulai Tanggal BC 4.0 Dibuat">
+                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC25" id="mulaiTanggalBC25" name="mulaiTanggalBC25" placeholder="Mulai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-mulaiTanggalBC40"></i>
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-mulaiTanggalBC25"></i>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4 mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC40" id="selesaiTanggalBC40" name="selesaiTanggalBC40" placeholder="Selesai Tanggal BC 4.0 Dibuat">
+                        <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC25" id="selesaiTanggalBC25" name="selesaiTanggalBC25" placeholder="Selesai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-selesaiTanggalBC40"></i>
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-selesaiTanggalBC25"></i>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <input autocomplete="one-time-code" class="form-control searchData search form-out-search" placeholder="Cari" value="" />
+                    <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari No Aju / No Daftar" value="" />
                 </div>
             </div>
 
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-dark">
-                    <tr>
-                        <th rowspan="2">No</th>
-                        <th rowspan="2" onclick="changeSort('bc_purchase_order.supplier_id')" class="sort" style="text-align: center;" >Nama Supplier</th>
-                        <th rowspan="2" onclick="changeSort('bc_40.createdAt')" class="sort" style="text-align: center;" >Tanggal</th>
-                        <th rowspan="2" onclick="changeSort('bc_40.no_aju')" class="sort" style="text-align: center;" >No Aju</th>
-                        <th rowspan="2" onclick="changeSort('bc_purchase_order.no_daftar')" style="text-align: center;">No Daftar</th>
-                        <th rowspan="2" onclick="changeSort('bc_purchase_order.po_type')" style="text-align: center;" >Tipe PO</th>
-                        
-                        <th colspan="3" class="text-center">PPN</th>
-                    </tr>
-                    <tr>
-                        <th class="text-center">Tidak Dipungut</th>
-                        <th class="text-center">Di Bebaskan</th>
-                        <th class="text-center">Di Tangguhkan</th>
-                    </tr>
-                    </thead>
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No</th>
+                                <th onclick="changeSort('bc_41.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
+                                <th onclick="changeSort('bc_41.no_aju')" class="sort" style="text-align: center;">No Aju</th>
+                                <th onclick="changeSort('bc_41.daftar')" class="sort" style="text-align: center;">No Daftar</th>
+                                <th style="text-align: center;">No Bukti Bayar</th>
+                                <th style="text-align: center;">Tanggal Bukti Bayar</th>
+                            </tr>                           
+                        </thead>
 
                         <tbody class="body-table" id="body-table">
                         </tbody>
@@ -77,49 +70,56 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "bc40.id";
+    let sort = "bc41.id";
     let sortType = "desc";
 
     var table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        searching: false, // Menghilangkan fitur pencarian
         serverSide: true,
         ordering: true,
+        searching: false, // Menghilangkan fitur pencarian
         order: [
             [1, 'asc'] // Urutan default berdasarkan kolom kedua
         ],
         fixedHeader: true,
         lengthMenu: [
-            [25],
-            [25],
+            [41],
+            [41],
         ],
-        pageLength: 25,
+        pageLength: 41,
         ajax: {
-            url: "<?= base_url('laporan-bea-cukai/all-4.0'); ?>",
+            url: "<?= base_url('laporan-bea-cukai/all-4.1'); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.mulaiTanggalBC40 = $('.mulaiTanggalBC40').val();
-                data.selesaiTanggalBC40 = $('.selesaiTanggalBC40').val();
-                data.supplierName = $('.supplierName').val();
-                data.statusLPB = $('.statusLPB').val();
-                data.statusBC = $('.statusBC').val();
-                data.noPenerimaanBarang = $('.noPenerimaanBarang').val();
+                data.mulaiTanggalBC41 = $('.mulaiTanggalBC41').val();
+                data.selesaiTanggalBC41 = $('.selesaiTanggalBC41').val();
                 data.noAju = $('.noAju').val();
-                data.search = $('.searchData').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
         },
         columns: [
             { data: null, className: "text-center", sortable: false }, // Nomor urut
-            { data: "supplier_name", className: "text-center" },
-            { data: "date", className: "text-center" },
-            { data: "no_aju", className: "text-center" },
-            { data: "no_daftar", className: "text-center" },
-            { data: "po_type", className: "text-center" },
-            { data: "dataBCTarif.PPN.tidak_dipungut", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPN.di_bebaskan", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPN.di_tangguhkan", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
+            {
+                data: "date",
+                className: "text-center",
+            },
+            {
+                data: "no_aju",
+                className: "text-center",
+            },
+            {
+                data: "no_daftar",
+                className: "text-center"
+            },
+            {
+                data: "no_bayar",
+                className: "text-center"
+            },
+            {
+                data: "tanggal_bayar",
+                className: "text-center"
+            },
         ],
         "initComplete": function(settings, json) {
             $('.dataTables_length').empty();
@@ -153,7 +153,7 @@
     });
 
                                  
-    $('.mulaiTanggalBC40, .selesaiTanggalBC40').change(function() {
+    $('.mulaiTanggalBC41, .selesaiTanggalBC41').change(function() {
         table.ajax.reload();
     });
 
@@ -161,7 +161,7 @@
         table.ajax.reload();
     });
 
-    $(".mulaiTanggalBC40, .selesaiTanggalBC40").datepicker({
+    $(".mulaiTanggalBC41, .selesaiTanggalBC41").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
