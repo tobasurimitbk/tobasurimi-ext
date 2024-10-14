@@ -816,8 +816,9 @@ class ProductionResult extends BaseController
                     }
 
                     $cekAccount = $this->accountBarangModel->checkAccountBarang($this->this_company_id, $value['divisi_id'], $value['barang1_id']);
-
-                    if ($cekAccount) {
+                    // var_dump($this->this_company_id, $value['divisi_id'], $value['barang1_id']);
+                    // exit;
+                    if (!$cekAccount) {
                         $data = [
                             "status"    => false,
                             "message"   => "Barang belum memiliki Akun COA",
