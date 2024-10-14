@@ -272,7 +272,6 @@ class ProductionResult extends BaseController
             ->where('company_id', $this->this_company_id)
             ->where('work_orders.deletedAt', null)
             ->where('work_orders.id', $productionResData->work_order_id)
-            ->where('work_orders.is_posted', "1")
             ->where('work_order_details.deletedAt', null)
             ->groupBy('work_order_details.work_order_id')
             ->find();
