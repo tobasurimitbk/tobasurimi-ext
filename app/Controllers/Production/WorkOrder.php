@@ -191,9 +191,8 @@ class WorkOrder extends BaseController
                     'qty' => $s->qty,
                     'note' => $s->keterangan,
                 ]);
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('department_id'), $s->barang_id);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('department_id'), decrypt($s->barang_id));
             }
-
 
             return response()->setJSON([
                 "id"      => encrypt($id),
@@ -259,6 +258,7 @@ class WorkOrder extends BaseController
                         'qty' => $s->qty,
                         'note' => $s->keterangan,
                     ]);
+                    $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('department_id'), decrypt($s->barang_id));
                 } else {
                     $this->workOrderDetailsModel->insert([
                         'work_order_id' => $id,
@@ -267,6 +267,7 @@ class WorkOrder extends BaseController
                         'qty' => $s->qty,
                         'note' => $s->keterangan,
                     ]);
+                    $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('department_id'), decrypt($s->barang_id));
                 }
             }
 
