@@ -2292,7 +2292,7 @@ class LaporanWarehouse extends BaseController
                     ->join('satuans', 'satuans.id = kemasan.satuan_id')
                     ->where('kemasan.id', $data['kemasan_id'])
                     ->first();
-                $satuan = $kemasanData['nama_satuan'];
+                $satuan = $kemasanData == null ? "" : $kemasanData['nama_satuan'];
                 $namaBarang = $kemasanData['name'];
                 $kodeBarang = $kemasanData['kode'];
             } else {
@@ -2306,10 +2306,10 @@ class LaporanWarehouse extends BaseController
                     ->where('barang_master_spesifikasi.id', $data['barang2_id'])
                     ->first();
 
-                $satuan = $barangSpesifikasiData['nama_satuan'];
-                $namaBarang = $barangData['barang_name'];
-                $kodeBarang = $barangData['kode_barang'];
-                $spesifikasi = $barangSpesifikasiData['spesifikasi'];
+                $satuan = $barangSpesifikasiData == null ? "" : $barangSpesifikasiData['nama_satuan'];
+                $namaBarang = $barangData == null ? "" : $barangData['barang_name'];
+                $kodeBarang = $barangData == null ? "" : $barangData['kode_barang'];
+                $spesifikasi = $barangSpesifikasiData == null ? "" : $barangSpesifikasiData['spesifikasi'];
             }
 
 
