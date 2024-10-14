@@ -1977,7 +1977,8 @@
             var total_harga_satuan = 0;
             var total_harga_total = 0;
             list_items_barang_jadi_trimming.map((item, index) => {
-                var qty = parseFloat(item.qtyTotal);
+
+                var qty = item.qtyTotal != undefined ? parseFloat(item.qtyTotal) : parseFloat(item.qty_barang);
                 var harga_satuan = 0;
                 var harga_total = 0;
 
@@ -2269,7 +2270,7 @@
         const hargaTotalPenerimaan = amount + biayaSubsidi + biayaLain + biayaKopek;
 
         if (data.length === 0) {
-            row += '<tr><td colspan="12" class="text-center">Data Barang Tidak Ada</td></tr>';
+            row += '<tr><td colspan="16" class="text-center">Data Barang Tidak Ada</td></tr>';
             $('.tfoot-rasio-akhir').append(row);
         } else {
             let rasioTotal = 0;
@@ -2293,6 +2294,7 @@
                 let itemHargaTotal = 0;
                 let hargaSatuan = 0;
                 let totalQtyAll = 0;
+                let qtyTotal = item.qtyTotal != undefined ? item.qtyTotal : item.qty_barang;
                 let rasio = 0;
                 let rasioTanpaManual = 0;
 
@@ -2301,15 +2303,15 @@
                     itemHargaTotal = 0;
                     hargaSatuan = 0;
                     totalQtyAll = parseFloat(item.totalQtyAll);
-                    rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyAll) * 100;
-                    rasioTanpaManual = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyTanpaManual) * 100;
+                    rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(qtyTotal) / totalQtyAll) * 100;
+                    rasioTanpaManual = item.rasio ? parseFloat(item.rasio) : (parseFloat(qtyTotal) / totalQtyTanpaManual) * 100;
                 } else {
                     calculatedHargaTotal = 0;
                     itemHargaTotal = 0;
                     hargaSatuan = 0;
                     totalQtyAll = parseFloat(item.totalQtyAll);
-                    rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / parseFloat(item.hasilWithPersentase));
-                    rasioTanpaManual = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / parseFloat(item.hasilWithPersentase));
+                    rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(qtyTotal) / parseFloat(item.hasilWithPersentase));
+                    rasioTanpaManual = item.rasio ? parseFloat(item.rasio) : (parseFloat(qtyTotal) / parseFloat(item.hasilWithPersentase));
                 }
 
                 if (isNaN(totalHargaTotalManual)) {
@@ -2326,14 +2328,14 @@
                 }
 
                 if (item.harga_satuan == 0 || item.harga_satuan == undefined) {
-                    hargaSatuan = (parseFloat(calculatedHargaTotal) / parseFloat(item.qtyTotal));
+                    hargaSatuan = (parseFloat(calculatedHargaTotal) / parseFloat(qtyTotal));
                 } else {
                     hargaSatuan = (parseFloat(item.harga_satuan));
                 }
 
                 rasioTotal += rasio;
                 totalTotalHargaRasio += itemHargaTotal;
-                totalBhnTersedia += item.hasilWithPersentase;
+                totalBhnTersedia += parseFloat(item.hasilWithPersentase);
 
                 row += `
                 <tr style="color:whitesmoke;text-align: center;">
@@ -2342,7 +2344,7 @@
                     <td>${item.barang_name} - ${item.spesifikasi}</td>
                     <td>${item.kode_satuan}</td>
                     <td>
-                        <input style="width: 150px;" class="form-control jumlah-barang text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qtyTotal}">
+                        <input style="width: 150px;" class="form-control jumlah-barang text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${qtyTotal ?? item.qty}">
                     </td>
                     <td>
                         <input style="width: 150px;" class="form-control jumlah-barang-berat text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty_isi}">
@@ -2390,13 +2392,13 @@
             <tr>
                 <td colspan="4">GrandTotal</td>
                 <td>
-                    <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${data.reduce((sum, item) => sum + parseFloat(item.qtyTotal), 0)}">
+                    <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${data.reduce((sum, item) => sum + parseFloat(item.qtyTotal != undefined ? item.qtyTotal: item.qty_barang), 0)}">
                 </td>
                 <td>
                     <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${data.reduce((sum, item) => sum + parseFloat(item.qty_isi), 0)}">
                 </td>
                 <td>
-                    <input class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${totalBhnTersedia.toFixed(2)}">
+                    <input class="form-control text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${totalBhnTersedia}">
                 </td>
                 <td></td>
                 <td></td>
@@ -2756,7 +2758,7 @@
             data.forEach(item => {
                 totalHargaTotalManual += parseFloat(item.harga_total);
                 if (item.harga_satuan == 0) {
-                    totalQtyTanpaManual += parseFloat(item.qtyTotal);
+                    totalQtyTanpaManual += parseFloat(qtyTotal);
                 }
             });
 
@@ -2764,9 +2766,10 @@
 
                 let calculatedHargaTotal = 0;
                 let itemHargaTotal = 0;
+                let qtyTotal = item.qtyTotal != undefined ? item.qtyTotal : item.qty_barang;
                 const totalQtyAll = parseFloat(qtyTotalPenerimaan);
-                const rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyAll) * 100;
-                const rasioTanpaManual = item.rasio ? parseFloat(item.rasio) : (parseFloat(item.qtyTotal) / totalQtyTanpaManual) * 100;
+                const rasio = item.rasio ? parseFloat(item.rasio) : (parseFloat(qtyTotal) / totalQtyAll) * 100;
+                const rasioTanpaManual = item.rasio ? parseFloat(item.rasio) : (parseFloat(qtyTotal) / totalQtyTanpaManual) * 100;
 
 
                 if (isNaN(totalHargaTotalManual)) {
@@ -2792,7 +2795,7 @@
                     <td>${item.barang_name} - ${item.spesifikasi}</td>
                     <td>${item.kode_satuan}</td>
                     <td>
-                        <input style="width: 150px;" class="form-control jumlah-barang text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qtyTotal}">
+                        <input style="width: 150px;" class="form-control jumlah-barang text-center" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${qtyTotal}">
                     </td>
                     <td>
                         <input style="width: 150px;" class="form-control rasio text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${rasio.toFixed(2)}%">
@@ -2808,7 +2811,7 @@
             <tr>
                 <td colspan="4"></td>
                 <td>
-                    <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${data.reduce((sum, item) => sum + parseFloat(item.qtyTotal), 0)}">
+                    <input class="form-control jumlah-barang-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${data.reduce((sum, item) => sum + parseFloat(item.qtyTotal != undefined ? item.qtyTotal: item.qty_barang), 0)}">
                 </td>
                 <td>
                     <input class="form-control rasio-total text-center" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" value="${rasioTotal.toFixed(2)}%">
@@ -3083,27 +3086,74 @@
                 //     isValid = false;
                 // }
 
-                $.each(list_items_barang_jadi, function(i, v) {
-                    var qtyBarang = $('input[data-index="' + i + '"].jumlah-barang');
-                    var rasioBarang = $('input[data-index="' + i + '"].rasio');
-                    var hargaSatuanBarang = $('input[data-index="' + i + '"].harga-satuan');
-                    var hargaBarang = $('input[data-index="' + i + '"].harga');
-                    var valas = $('select[data-index="' + i + '"].select2-valas');
-                    var kurs = $('input[data-index="' + i + '"].kurs');
-                    var qtyBarangVal = parseFloat(qtyBarang.val());
-                    var rasioBarangVal = parseFloat(rasioBarang.val());
-                    var hargaSatuanBarangVal = parseFloat(hargaSatuanBarang.val().replace(/Rp|\./g, ""));
-                    var hargaBarangVal = parseFloat(hargaBarang.val().replace(/Rp|\./g, ""));
-                    var valasVal = parseFloat(valas.val().replace(/Rp|\./g, ""));
-                    var kursVal = parseFloat(kurs.val().replace(/Rp|\./g, ""));
+                if (list_items_barang_jadi_trimming.length != 0) {
+                    $.each(list_items_barang_jadi_trimming, function(i, v) {
+                        var qtyBarang = $('input[data-index="' + i + '"].jumlah-barang');
+                        var rasioBarang = $('input[data-index="' + i + '"].rasio');
+                        var hargaSatuanBarang = $('input[data-index="' + i + '"].harga-satuan');
+                        var hargaBarang = $('input[data-index="' + i + '"].harga');
+                        var valas = $('select[data-index="' + i + '"].select2-valas');
+                        var kurs = $('input[data-index="' + i + '"].kurs');
+                        var qtyBarangVal = parseFloat(qtyBarang.val());
+                        var rasioBarangVal = parseFloat(rasioBarang.val());
+                        var hargaSatuanBarangVal = parseFloat(hargaSatuanBarang.val().replace(/Rp|\./g, ""));
+                        var hargaBarangVal = parseFloat(hargaBarang.val().replace(/Rp|\./g, ""));
+                        var valasVal = parseFloat(valas.val().replace(/Rp|\./g, ""));
+                        var kursVal = parseFloat(kurs.val().replace(/Rp|\./g, ""));
 
-                    list_items_barang_jadi[i].qty = qtyBarangVal;
-                    list_items_barang_jadi[i].rasio = rasioBarangVal;
-                    list_items_barang_jadi[i].harga_satuan = hargaSatuanBarangVal;
-                    list_items_barang_jadi[i].harga = hargaBarangVal;
-                    list_items_barang_jadi[i].valas = valasVal;
-                    list_items_barang_jadi[i].kurs = kursVal;
-                });
+                        list_items_barang_jadi_trimming[i].qty = qtyBarangVal;
+                        list_items_barang_jadi_trimming[i].rasio = rasioBarangVal;
+                        list_items_barang_jadi_trimming[i].harga_satuan = hargaSatuanBarangVal;
+                        list_items_barang_jadi_trimming[i].harga = hargaBarangVal;
+                        list_items_barang_jadi_trimming[i].valas = valasVal;
+                        list_items_barang_jadi_trimming[i].kurs = kursVal;
+                    });
+                } else if (list_items_barang_jadi_frozen.length != 0) {
+                    $.each(list_items_barang_jadi_frozen, function(i, v) {
+                        var qtyBarang = $('input[data-index="' + i + '"].jumlah-barang');
+                        var rasioBarang = $('input[data-index="' + i + '"].rasio');
+                        var hargaSatuanBarang = $('input[data-index="' + i + '"].harga-satuan');
+                        var hargaBarang = $('input[data-index="' + i + '"].harga');
+                        var valas = $('select[data-index="' + i + '"].select2-valas');
+                        var kurs = $('input[data-index="' + i + '"].kurs');
+                        var qtyBarangVal = parseFloat(qtyBarang.val());
+                        var rasioBarangVal = parseFloat(rasioBarang.val());
+                        var hargaSatuanBarangVal = parseFloat(hargaSatuanBarang.val().replace(/Rp|\./g, ""));
+                        var hargaBarangVal = parseFloat(hargaBarang.val().replace(/Rp|\./g, ""));
+                        var valasVal = parseFloat(valas.val().replace(/Rp|\./g, ""));
+                        var kursVal = parseFloat(kurs.val().replace(/Rp|\./g, ""));
+
+                        list_items_barang_jadi_frozen[i].qty = qtyBarangVal;
+                        list_items_barang_jadi_frozen[i].rasio = rasioBarangVal;
+                        list_items_barang_jadi_frozen[i].harga_satuan = hargaSatuanBarangVal;
+                        list_items_barang_jadi_frozen[i].harga = hargaBarangVal;
+                        list_items_barang_jadi_frozen[i].valas = valasVal;
+                        list_items_barang_jadi_frozen[i].kurs = kursVal;
+                    });
+                } else if (list_items_barang_jadi_kaleng.length != 0) {
+                    $.each(list_items_barang_jadi_kaleng, function(i, v) {
+                        var qtyBarang = $('input[data-index="' + i + '"].jumlah-barang');
+                        var rasioBarang = $('input[data-index="' + i + '"].rasio');
+                        var hargaSatuanBarang = $('input[data-index="' + i + '"].harga-satuan');
+                        var hargaBarang = $('input[data-index="' + i + '"].harga');
+                        var valas = $('select[data-index="' + i + '"].select2-valas');
+                        var kurs = $('input[data-index="' + i + '"].kurs');
+                        var qtyBarangVal = parseFloat(qtyBarang.val());
+                        var rasioBarangVal = parseFloat(rasioBarang.val());
+                        var hargaSatuanBarangVal = parseFloat(hargaSatuanBarang.val().replace(/Rp|\./g, ""));
+                        var hargaBarangVal = parseFloat(hargaBarang.val().replace(/Rp|\./g, ""));
+                        var valasVal = parseFloat(valas.val().replace(/Rp|\./g, ""));
+                        var kursVal = parseFloat(kurs.val().replace(/Rp|\./g, ""));
+
+                        list_items_barang_jadi_kaleng[i].qty = qtyBarangVal;
+                        list_items_barang_jadi_kaleng[i].rasio = rasioBarangVal;
+                        list_items_barang_jadi_kaleng[i].harga_satuan = hargaSatuanBarangVal;
+                        list_items_barang_jadi_kaleng[i].harga = hargaBarangVal;
+                        list_items_barang_jadi_kaleng[i].valas = valasVal;
+                        list_items_barang_jadi_kaleng[i].kurs = kursVal;
+                    });
+                }
+
 
                 // $.each(list_items_barang_digunakan_material_2, function(i, v) {
                 //     list_items_barang_jadi_material_2.forEach((item2, index2) => {
@@ -3263,8 +3313,14 @@
                             data.append("labor_cost", JSON.stringify(list_items_labor_cost));
                             data.append("overhead_cost", JSON.stringify(list_items_overhead_cost));
                             data.append("fixed_cost", JSON.stringify(list_items_fixed_cost));
-                            data.append("items_jadi", JSON.stringify(list_items_barang_jadi));
-                            data.append("item_jadi_frozen", JSON.stringify(list_items_barang_jadi_frozen));
+                            if (list_items_barang_jadi_trimming.length != 0) {
+                                data.append("items_jadi", JSON.stringify(list_items_barang_jadi_trimming));
+                            } else if (list_items_barang_jadi_frozen.length != 0) {
+                                // data.append("items_jadi", JSON.stringify(list_items_barang_jadi_frozen));
+                                data.append("item_jadi_frozen", JSON.stringify(list_items_barang_jadi_frozen));
+                            } else if (list_items_barang_jadi_kaleng.length != 0) {
+                                data.append("items_jadi", JSON.stringify(list_items_barang_jadi_kaleng));
+                            }
                             data.append("tipe_bahan", tipe_bahan);
 
                             let id = $(".id").val();
@@ -3480,7 +3536,7 @@
                         qty: parseFloat(<?= json_encode($value->qty_barang) ?>),
                         qty2: parseFloat(<?= json_encode($value->qty2) ?>),
                         qty_isi: parseFloat(<?= json_encode($value->qty_isi) ?>),
-                        banyakData: parseFloat(<?= json_encode($value->banyakData) ?>),
+                        banyakData: parseFloat(<?= json_encode($value->banyakData || 0) ?>),
                         hasilWithPersentase: parseFloat(<?= json_encode($value->hasilWithPersentase) ?>),
                     };
                 }
@@ -3509,9 +3565,9 @@
         if (list_items_barang_jadi_trimming.length != 0) {
             drawTableRasioAkhir(list_items_barang_jadi_trimming);
             drawTableRasioTerhadapBahanBaku(list_items_barang_jadi_trimming);
-        }
-        hideShowTab();
-    <?php endif; ?>
+
+            hideShowTab();
+        <?php endif; ?>
 </script>
 
 <?= $this->endSection(); ?>

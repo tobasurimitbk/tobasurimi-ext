@@ -75,7 +75,7 @@
             </tbody>
             <tfoot style="background: #ffffff !important;" class="tfoot-rasio-akhir" id="tfoot-rasio-akhir">
                 <tr>
-                    <td colspan="12" style="text-align: center;">
+                    <td colspan="16" style="text-align: center;">
                         Tidak Ada Barang
                     </td>
                 </tr>

@@ -65,13 +65,17 @@
                         <th style="text-align: center;">Harga Satuan</th>
                         <th style="text-align: center;">Total</th>
                         <th style="text-align: center;">Harga BB</th>
+                        <th style="text-align: center;">Valas</th>
+                        <th style="text-align: center;">Kurs</th>
+                        <th style="text-align: center;">Harga Satuan(Sesuai Kurs)</th>
+                        <th style="text-align: center;">Harga Total(Sesuai Kurs)</th>
                     </tr>
                 </thead>
                 <tbody class="body-table-rasio-akhir">
                 </tbody>
                 <tfoot style="background: #ffffff !important;" class="tfoot-rasio-akhir" id="tfoot-rasio-akhir">
                     <tr>
-                        <td colspan="12" style="text-align: center;">
+                        <td colspan="16" style="text-align: center;">
                             Tidak Ada Barang
                         </td>
                     </tr>

@@ -350,7 +350,6 @@ class RasioController extends BaseController
                         'kode_satuan'                   => $s->kode_satuan,
                         'tipe_bahan'                    => $s->tipe_bahan,
                         'hasilWithPersentase'           => $s->hasilWithPersentase,
-                        'banyakData'                    => $s->banyakData,
                         'valas'                    => $s->valas,
                         'kurs'                    => $s->kurs,
                     ]);
@@ -381,6 +380,8 @@ class RasioController extends BaseController
                             'satuan_id'                     => $i->satuan_id,
                             'hasilWithPersentase'           => $i->hasilWithPersentase,
                             'banyakData'                    => $i->banyakData,
+                            'valas'                    => $s->valas,
+                            'kurs'                    => $s->kurs,
                         ]);
                     }
                 }
@@ -411,68 +412,74 @@ class RasioController extends BaseController
             }
 
             foreach ($labor_cost as $bd) {
-                foreach ($bd->inputData as $bdm) {
-                    $data = [
-                        'rasio_id' => $id,
-                        'production_result_id' => $bdm->id_production,
-                        'production_result_detail_id' => $bdm->id_production_detail,
-                        'setting_costing_id' => $bd->id,
-                        'setting_costing_parent_id' => $bd->parent_id,
-                        'coa_id' => $bd->coa,
-                        'barang1_id_production' => $bdm->barang1_id_production,
-                        'barang2_id_production' => $bdm->barang2_id_production,
-                        'name' => $bd->name,
-                        'type' => "labor",
-                        // 'jumlah_jurnal' => $bd->jmlhJurnal,
-                        'qty_cost' => $bdm->qty_input,
-                        'total_cost' => $bdm->totalHarga_input,
-                        'harga_cost' => $bdm->hargaSatuan_input,
-                    ];
-                    $this->rasioCostModel->insert($data);
+                if (!empty($bd->inputData)) {
+                    foreach ($bd->inputData as $bdm) {
+                        $data = [
+                            'rasio_id' => $id,
+                            'production_result_id' => $bdm->id_production,
+                            'production_result_detail_id' => $bdm->id_production_detail,
+                            'setting_costing_id' => $bd->id,
+                            'setting_costing_parent_id' => $bd->parent_id,
+                            'coa_id' => $bd->coa,
+                            'barang1_id_production' => $bdm->barang1_id_production,
+                            'barang2_id_production' => $bdm->barang2_id_production,
+                            'name' => $bd->name,
+                            'type' => "labor",
+                            // 'jumlah_jurnal' => $bd->jmlhJurnal,
+                            'qty_cost' => $bdm->qty_input,
+                            'total_cost' => $bdm->totalHarga_input,
+                            'harga_cost' => $bdm->hargaSatuan_input,
+                        ];
+                        $this->rasioCostModel->insert($data);
+                    }
                 }
             }
 
             foreach ($overhead_cost as $bd) {
-                foreach ($bd->inputData as $bdm) {
-                    $data = [
-                        'rasio_id' => $id,
-                        'production_result_id' => $bdm->id_production,
-                        'production_result_detail_id' => $bdm->id_production_detail,
-                        'setting_costing_id' => $bd->id,
-                        'setting_costing_parent_id' => $bd->parent_id,
-                        'coa_id' => $bd->coa,
-                        'barang1_id_production' => $bdm->barang1_id_production,
-                        'barang2_id_production' => $bdm->barang2_id_production,
-                        'name' => $bd->name,
-                        'type' => "overhead",
-                        // 'jumlah_jurnal' => $bd->jmlhJurnal,
-                        'qty_cost' => $bdm->qty_input,
-                        'total_cost' => $bdm->totalHarga_input,
-                        'harga_cost' => $bdm->hargaSatuan_input,
-                    ];
-                    $this->rasioCostModel->insert($data);
+                if (!empty($bd->inputData)) {
+                    foreach ($bd->inputData as $bdm) {
+                        $data = [
+                            'rasio_id' => $id,
+                            'production_result_id' => $bdm->id_production,
+                            'production_result_detail_id' => $bdm->id_production_detail,
+                            'setting_costing_id' => $bd->id,
+                            'setting_costing_parent_id' => $bd->parent_id,
+                            'coa_id' => $bd->coa,
+                            'barang1_id_production' => $bdm->barang1_id_production,
+                            'barang2_id_production' => $bdm->barang2_id_production,
+                            'name' => $bd->name,
+                            'type' => "overhead",
+                            // 'jumlah_jurnal' => $bd->jmlhJurnal,
+                            'qty_cost' => $bdm->qty_input,
+                            'total_cost' => $bdm->totalHarga_input,
+                            'harga_cost' => $bdm->hargaSatuan_input,
+                        ];
+                        $this->rasioCostModel->insert($data);
+                    }
                 }
             }
 
             foreach ($fixed_cost as $bd) {
-                foreach ($bd->inputData as $bdm) {
-                    $data = [
-                        'rasio_id' => $id,
-                        'production_result_id' => $bdm->id_production,
-                        'production_result_detail_id' => $bdm->id_production_detail,
-                        'setting_costing_id' => $bd->id,
-                        'setting_costing_parent_id' => $bd->parent_id,
-                        'coa_id' => $bd->coa,
-                        'barang1_id_production' => $bdm->barang1_id_production,
-                        'barang2_id_production' => $bdm->barang2_id_production,
-                        'name' => $bd->name,
-                        'type' => "fixed",
-                        // 'jumlah_jurnal' => $bd->jmlhJurnal,
-                        'qty_cost' => $bdm->qty_input,
-                        'total_cost' => $bdm->totalHarga_input,
-                        'harga_cost' => $bdm->hargaSatuan_input,
-                    ];
-                    $this->rasioCostModel->insert($data);
+                if (!empty($bd->inputData)) {
+                    foreach ($bd->inputData as $bdm) {
+                        $data = [
+                            'rasio_id' => $id,
+                            'production_result_id' => $bdm->id_production,
+                            'production_result_detail_id' => $bdm->id_production_detail,
+                            'setting_costing_id' => $bd->id,
+                            'setting_costing_parent_id' => $bd->parent_id,
+                            'coa_id' => $bd->coa,
+                            'barang1_id_production' => $bdm->barang1_id_production,
+                            'barang2_id_production' => $bdm->barang2_id_production,
+                            'name' => $bd->name,
+                            'type' => "fixed",
+                            // 'jumlah_jurnal' => $bd->jmlhJurnal,
+                            'qty_cost' => $bdm->qty_input,
+                            'total_cost' => $bdm->totalHarga_input,
+                            'harga_cost' => $bdm->hargaSatuan_input,
+                        ];
+                        $this->rasioCostModel->insert($data);
+                    }
                 }
             }
 
@@ -541,6 +548,11 @@ class RasioController extends BaseController
     public function getById($id = null)
     {
         $id = decrypt($id);
+        $values = [
+            "name" => 'Valuta',
+            "company_id"    => $this->this_company_id
+        ];
+        $dataMetadata = $this->metadataModel->search_list($values, "value");
         $subAkunsModel = $this->subAkunModel->asObject()->findAll();
         $rasioModel = $this->rasioModel->asObject()->find($id);
         $rasioBarangDigunakanAlokasiModel = $this->rasioBarangDigunakanAlokasiModel->asObject()->where('rasio_id', $id)->findAll();
@@ -560,6 +572,7 @@ class RasioController extends BaseController
         $data = [
             'dataDivisi' => $this->divisisModel->getDivisiAccess(),
             "subAkuns" => $subAkunsModel,
+            "dataMetadata" => $dataMetadata,
             'kategoriBarangAkun' => $this->metadataModel->asObject()->where('name', 'kategori_barang_akun')->findAll(),
             "rasio" => $rasioModel,
             "rasioBarangDigunakanAlokasi" => $rasioBarangDigunakanAlokasiModel,
@@ -571,6 +584,8 @@ class RasioController extends BaseController
             // "rasioBarangPenolong" => $rasioBarangPenolongModel,
             // "rasioCost" => $rasioCostModel,
         ];
+        // var_dump($data);
+        // exit;
         return view('Accounting/rasio/form', $data);
     }
 
