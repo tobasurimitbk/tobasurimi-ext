@@ -1253,7 +1253,7 @@
                 v.warehouse_id = warehouse_id;
                 v.tipe_barang = $('#type_barang option:selected').val();
 
-                v.qty = parseFloat(mutasiQty.toFixed(2));
+                v.qty = parseFloat(mutasiQty.toFixed(4));
 
                 var barangOrder = {
                     id_barang: dataIdBarangOrder,

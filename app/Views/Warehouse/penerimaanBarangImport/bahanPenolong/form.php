@@ -799,7 +799,7 @@
                     var jml_diterima_total_now = Number(item.jml_diterima_total - jml_diterima_lpb_last);
                     var sisa_total_now = Number(item.sisa_total + jml_diterima_lpb_last);
                     $('.sub_total').val('' +
-                        formatRupiah((Number(jml_diterima_lpb) * Number(item.harga).toFixed(2))));
+                        formatRupiah((Number(jml_diterima_lpb) * Number(item.harga).toFixed(4))));
                     $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(4));
                     $('.sisa_total').val(sisa_total_now.toFixed(4));
 

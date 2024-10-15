@@ -561,7 +561,7 @@
                         if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
                             var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
                             listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                            listStockAsal[i].qty = parseFloat(mutasiQty.toFixed(2));
+                            listStockAsal[i].qty = parseFloat(mutasiQty.toFixed(4));
                             listStockSelected.push(listStockAsal[i]);
                             qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                         }

@@ -1178,7 +1178,7 @@
                             listStockAsal[i].departmentTujuanText = departmentTujuanText;
                             listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                             listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                            listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
+                            listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
                             listStockSelectedBahan.push(listStockAsal[i]);
                             qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                         }
@@ -1269,7 +1269,7 @@
         $.each(listStockSelectedBahan, function(i, v) {
             totalQty += parseFloat(listStockSelectedBahan[i].qty2) || 0;
         });
-        $('.nilai-total-barang-request').text(totalQty.toFixed(2));
+        $('.nilai-total-barang-request').text(totalQty.toFixed(4));
     }
 
     function getIDListDataSelected() {

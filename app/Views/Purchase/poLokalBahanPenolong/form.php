@@ -886,7 +886,7 @@
             newRow.append($('<td>').text(v.nama_barang));
             newRow.append($('<td>').text(v.nama_satuan));
             newRow.append($('<td>').text(formatRupiah(v.harga_satuan)));
-            newRow.append($('<td>').text(parseFloat(v.qty).toFixed(2)));
+            newRow.append($('<td>').text(parseFloat(v.qty).toFixed(4)));
             newRow.append($('<td>').text(v.diskon));
             newRow.append($('<td>').text(formatRupiah(v.biaya_tambahan)));
             newRow.append($('<td>').text(formatRupiah(v.total)));
@@ -922,7 +922,7 @@
         table.find('tfoot').empty();
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="8"><b>Total</b></td>'));
-        newRow.append($('<td style="text-align:center;"><b>' + formatRupiah(totalHarga.toFixed(2)) + '</b></td>'));
+        newRow.append($('<td style="text-align:center;"><b>' + formatRupiah(totalHarga.toFixed(4)) + '</b></td>'));
         newRow.append($('<td></td>'));
         table.find('tfoot').append(newRow);
     }

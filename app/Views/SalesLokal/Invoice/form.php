@@ -941,8 +941,8 @@
                 dataError = list_items[i];
                 isValid = false;
             } else {
-                list_items[i].qty_sekarang = stok_max.toFixed(2);
-                list_items[i].qty_input = input_user.toFixed(2);
+                list_items[i].qty_sekarang = stok_max.toFixed(4);
+                list_items[i].qty_input = input_user.toFixed(4);
 
 
                 // Calculate the amount and format it using .toLocaleString()
