@@ -62,7 +62,6 @@ class RequestStock extends BaseController
         $this->stockDetail2Model = new StockDetail2Model();
         $this->stockModel = new StockModel();
         $this->jurnalUmumController = new JurnalUmum();
-    
     }
 
     public function index()
@@ -80,10 +79,10 @@ class RequestStock extends BaseController
             "sortType" => $this->request->getGet("sortType"),
             "material_type" => $this->request->getGet("material_type")
         ];
-    
+
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-    
+
         // Buat condition berdasarkan material_type
         if ($payload["material_type"] === "material_request") {
             $condition = [
@@ -99,7 +98,7 @@ class RequestStock extends BaseController
         } elseif ($payload["material_type"] === "material_penolong") {
             $condition = [
                 'material_requests_penolong.company_id' => $this->this_company_id,
-                'parent_barang.parent_name' => "",
+                'parent_barang.parent_type' => "bahan_penolong",
                 'material_requests_penolong.is_posted' => 1
             ];
         } else {
@@ -109,13 +108,13 @@ class RequestStock extends BaseController
                 'material_requests.is_posted' => 1
             ];
         }
-    
+
         $addCondition = [
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType")
         ];
-    
+
         // Ambil data sesuai kondisi yang telah dibuat
         if ($payload["material_type"] === "material_request" ||  empty($payload["material_type"])) {
             $type = "Material Request";
@@ -128,10 +127,10 @@ class RequestStock extends BaseController
             $materialRequestData = $this->materialRequestPenolongModel->getMaterialRequestList($condition, $addCondition, $limit, $offset);
         }
 
-        
+
         $dataMaterialRequest = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-    
+
         foreach ($materialRequestData['data'] as $data) {
             array_push($dataMaterialRequest, [
                 "no" => $no++,
@@ -145,7 +144,7 @@ class RequestStock extends BaseController
                 "type" => $type,
             ]);
         }
-    
+
         $data = [
             "draw" => intval($this->request->getGet("draw")),
             "recordsTotal" => $materialRequestData['totalData'],
@@ -153,11 +152,11 @@ class RequestStock extends BaseController
             "data" => $dataMaterialRequest,
             "payload" => $payload
         ];
-    
+
         echo json_encode($data);
         return;
     }
-    
+
 
     public function getById($id = null)
     {
@@ -467,8 +466,6 @@ class RequestStock extends BaseController
                 ];
                 echo json_encode($data);
             }
-           
-        
         } catch (Exception $e) {
             $data = [
                 "status"     => false,
@@ -654,7 +651,6 @@ class RequestStock extends BaseController
                 ];
                 echo json_encode($data);
             }
-
         } catch (Exception $e) {
             $data = [
                 "status"            => false,
@@ -666,5 +662,4 @@ class RequestStock extends BaseController
 
         return;
     }
-
 }
