@@ -119,6 +119,24 @@ class AccountBarangModel extends Model
         ];
     }
 
+    public function checkAccountBarangCOA($company_id, $divisi_id, $barang_id)
+    {
+        $accountBarang = $this->asArray()
+            ->where('company_id', $company_id)
+            ->where('divisi_id', $divisi_id)
+            ->where('barang_master_id', $barang_id)
+            ->where('deleted_at', null)
+            ->where('ap_id', null)
+            ->where('ar_id', null)
+            ->first();
+
+        if ($accountBarang) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function checkAccountBarang($company_id, $divisi_id, $barang_id)
     {
         $accountBarang = $this->asArray()

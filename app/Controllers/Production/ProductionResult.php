@@ -272,7 +272,6 @@ class ProductionResult extends BaseController
             ->where('company_id', $this->this_company_id)
             ->where('work_orders.deletedAt', null)
             ->where('work_orders.id', $productionResData->work_order_id)
-            ->where('work_orders.is_posted', "1")
             ->where('work_order_details.deletedAt', null)
             ->groupBy('work_order_details.work_order_id')
             ->find();
@@ -758,66 +757,7 @@ class ProductionResult extends BaseController
 
                 $materialRequestData = [];
                 foreach ($resultDetailData as $key => $value) {
-                    if ($value['type'] == 'RETURN') {
-                        $materialRequest = $this->materialRequestDetailModel
-                            ->where('material_request_id', $value['material_request_id'])
-                            ->where('id', $value['material_request_detail_id'])
-                            ->findAll();
-                        foreach ($materialRequest as $materialRequestData) {
-                            if ($value['kondisi_barang'] == "ditapak") {
-                                $datas = [
-                                    'qty_now' => $value['qty'],
-                                    'kondisi_barang' => $value['kondisi_barang'],
-                                ];
-                                $this->materialRequestDetailModel->update($materialRequestData['id'], $datas);
-                            } else {
-                                $dataMaterialDetail = [
-                                    'material_request_id' => $materialRequestData['material_request_id'],
-                                    'divisi_id' => $materialRequestData['divisi_id'],
-                                    'warehouse_id' => $materialRequestData['warehouse_id'],
-                                    'divisi_tujuan_id' => $materialRequestData['divisi_tujuan_id'],
-                                    'warehouse_tujuan_id' => $materialRequestData['warehouse_tujuan_id'],
-                                    'stock_tujuan_id' => $materialRequestData['stock_tujuan_id'],
-                                    'barang1_id' => $materialRequestData['barang1_id'],
-                                    'barang2_id' => $materialRequestData['barang2_id'],
-                                    'nama_barang' => $materialRequestData['nama_barang'],
-                                    'satuan' => $materialRequestData['satuan'],
-                                    'stock_id' => $materialRequestData['stock_id'],
-                                    'bc_id' => $materialRequestData['bc_id'],
-                                    'no_aju' => $materialRequestData['no_aju'],
-                                    'ref_no' => $materialRequestData['ref_no'],
-                                    'stock_date' => $materialRequestData['stock_date'],
-                                    'stock_dokumen' => $materialRequestData['stock_dokumen'],
-                                    'barang_type' => $materialRequestData['barang_type'],
-                                    'qty' => $materialRequestData['qty'],
-                                    'qty2' => $materialRequestData['qty2'],
-                                    'qty_isi' => $materialRequestData['qty_isi'],
-                                    'qty_now' => $value['qty'],
-                                    'kondisi_barang' => $value['kondisi_barang'],
-                                ];
-                                $this->materialRequestDetailModel->insert($dataMaterialDetail);
-                            }
-                        }
-                    } else if ($value['type'] == 'DIGUNAKAN') {
-                        $materialRequest = $this->materialRequestDetailModel
-                            ->where('material_request_id', $value['material_request_id'])
-                            ->where('id', $value['material_request_detail_id'])
-                            ->findAll();
-                        foreach ($materialRequest as $materialRequestData) {
-                            $qtyNow = (float) $materialRequestData['qty_now'];
-                            $qtyProduksi = (float) $value['qty'];
-                            $qtyHasil = $qtyNow - $qtyProduksi;
-                            if ($qtyHasil == 0) {
-                                $datas = [
-                                    'qty_now' => $qtyHasil,
-                                ];
-                                $this->materialRequestDetailModel->update($materialRequestData['id'], $datas);
-                            }
-                        }
-                    }
-
-                    $cekAccount = $this->accountBarangModel->checkAccountBarang($this->this_company_id, $value['divisi_id'], $value['barang1_id']);
-
+                    $cekAccount = $this->accountBarangModel->checkAccountBarangCOA($this->this_company_id, $value['divisi_id'], $value['barang1_id']);
                     if ($cekAccount) {
                         $data = [
                             "status"    => false,
@@ -827,6 +767,63 @@ class ProductionResult extends BaseController
                         echo json_encode($data);
                         return;
                     } else {
+                        if ($value['type'] == 'RETURN') {
+                            $materialRequest = $this->materialRequestDetailModel
+                                ->where('material_request_id', $value['material_request_id'])
+                                ->where('id', $value['material_request_detail_id'])
+                                ->findAll();
+                            foreach ($materialRequest as $materialRequestData) {
+                                if ($value['kondisi_barang'] == "ditapak") {
+                                    $datas = [
+                                        'qty_now' => $value['qty'],
+                                        'kondisi_barang' => $value['kondisi_barang'],
+                                    ];
+                                    $this->materialRequestDetailModel->update($materialRequestData['id'], $datas);
+                                } else {
+                                    $dataMaterialDetail = [
+                                        'material_request_id' => $materialRequestData['material_request_id'],
+                                        'divisi_id' => $materialRequestData['divisi_id'],
+                                        'warehouse_id' => $materialRequestData['warehouse_id'],
+                                        'divisi_tujuan_id' => $materialRequestData['divisi_tujuan_id'],
+                                        'warehouse_tujuan_id' => $materialRequestData['warehouse_tujuan_id'],
+                                        'stock_tujuan_id' => $materialRequestData['stock_tujuan_id'],
+                                        'barang1_id' => $materialRequestData['barang1_id'],
+                                        'barang2_id' => $materialRequestData['barang2_id'],
+                                        'nama_barang' => $materialRequestData['nama_barang'],
+                                        'satuan' => $materialRequestData['satuan'],
+                                        'stock_id' => $materialRequestData['stock_id'],
+                                        'bc_id' => $materialRequestData['bc_id'],
+                                        'no_aju' => $materialRequestData['no_aju'],
+                                        'ref_no' => $materialRequestData['ref_no'],
+                                        'stock_date' => $materialRequestData['stock_date'],
+                                        'stock_dokumen' => $materialRequestData['stock_dokumen'],
+                                        'barang_type' => $materialRequestData['barang_type'],
+                                        'qty' => $materialRequestData['qty'],
+                                        'qty2' => $materialRequestData['qty2'],
+                                        'qty_isi' => $materialRequestData['qty_isi'],
+                                        'qty_now' => $value['qty'],
+                                        'kondisi_barang' => $value['kondisi_barang'],
+                                    ];
+                                    $this->materialRequestDetailModel->insert($dataMaterialDetail);
+                                }
+                            }
+                        } else if ($value['type'] == 'DIGUNAKAN') {
+                            $materialRequest = $this->materialRequestDetailModel
+                                ->where('material_request_id', $value['material_request_id'])
+                                ->where('id', $value['material_request_detail_id'])
+                                ->findAll();
+                            foreach ($materialRequest as $materialRequestData) {
+                                $qtyNow = (float) $materialRequestData['qty_now'];
+                                $qtyProduksi = (float) $value['qty'];
+                                $qtyHasil = $qtyNow - $qtyProduksi;
+                                if ($qtyHasil == 0) {
+                                    $datas = [
+                                        'qty_now' => $qtyHasil,
+                                    ];
+                                    $this->materialRequestDetailModel->update($materialRequestData['id'], $datas);
+                                }
+                            }
+                        }
                         if ($value['type'] == 'JADI') {
                             // -----
                             // BARANG IN KE INVENTORI
