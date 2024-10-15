@@ -40,7 +40,7 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -74,7 +74,7 @@
         .children('span')
         .css('margin-left', '-7px');
 
-        const table = $('.dataTable').DataTable({
+    const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
@@ -134,66 +134,66 @@
                 className: "text-center"
             },
             {
-                    data: "id",
-                    className: "text-center actions",
-                    searchable: false,
-                    sortable: false,
-                    render: function(data, type, row) {
-                        let id = row.id;
-                        let status = row.is_approve;
-                        let buttonHtml = '';  // Inisialisasi buttonHtml kosong
-                        
-                        if ($("#material_type").val() === 'material_request' || $("#material_type").val() == null) {
-                            if (status != 1) {
-                                buttonHtml = `
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+                    let status = row.is_approve;
+                    let buttonHtml = ''; // Inisialisasi buttonHtml kosong
+
+                    if ($("#material_type").val() === 'material_request' || $("#material_type").val() == null) {
+                        if (status != 1) {
+                            buttonHtml = `
                                     <button type="button" class="btn btn-primary" onclick="approve('${id}', 1)">
                                         <i class="fa fa-paper-plane"></i> Approve
                                     </button>
                                 `;
-                            } else {
-                                buttonHtml = `
+                        } else {
+                            buttonHtml = `
                                     <button type="button" class="btn btn-success" disabled>
                                         <i class="fa fa-check"></i> Approved
                                     </button>
                                 `;
-                            }
                         }
-                        
-                        if ($("#material_type").val() === 'material_kimia') {
-                            if (status != 1) {
-                                buttonHtml = `
-                                    <button type="button" class="btn btn-primary" onclick="approve_penolong('${id}', 1)">
-                                        <i class="fa fa-paper-plane"></i> Approve
-                                    </button>
-                                `;
-                            } else {
-                                buttonHtml = `
-                                    <button type="button" class="btn btn-success" disabled>
-                                        <i class="fa fa-check"></i> Approved
-                                    </button>
-                                `;
-                            }
-                        }
-
-                        if ($("#material_type").val() === 'material_penolong') {
-                            if (status != 1) {
-                                buttonHtml = `
-                                    <button type="button" class="btn btn-primary" onclick="approve_penolong('${id}', 1)">
-                                        <i class="fa fa-paper-plane"></i> Approve
-                                    </button>
-                                `;
-                            } else {
-                                buttonHtml = `
-                                    <button type="button" class="btn btn-success" disabled>
-                                        <i class="fa fa-check"></i> Approved
-                                    </button>
-                                `;
-                            }
-                        }
-
-                        return buttonHtml;  // Harus return buttonHtml
                     }
+
+                    if ($("#material_type").val() === 'material_kimia') {
+                        if (status != 1) {
+                            buttonHtml = `
+                                    <button type="button" class="btn btn-primary" onclick="approve_penolong('${id}', 1)">
+                                        <i class="fa fa-paper-plane"></i> Approve
+                                    </button>
+                                `;
+                        } else {
+                            buttonHtml = `
+                                    <button type="button" class="btn btn-success" disabled>
+                                        <i class="fa fa-check"></i> Approved
+                                    </button>
+                                `;
+                        }
+                    }
+
+                    if ($("#material_type").val() === 'material_penolong') {
+                        if (status != 1) {
+                            buttonHtml = `
+                                    <button type="button" class="btn btn-primary" onclick="approve_penolong('${id}', 1)">
+                                        <i class="fa fa-paper-plane"></i> Approve
+                                    </button>
+                                `;
+                        } else {
+                            buttonHtml = `
+                                    <button type="button" class="btn btn-success" disabled>
+                                        <i class="fa fa-check"></i> Approved
+                                    </button>
+                                `;
+                        }
+                    }
+
+                    return buttonHtml; // Harus return buttonHtml
                 }
+            }
         ],
         columnDefs: [{
             defaultContent: "-",
@@ -218,15 +218,15 @@
             table.ajax.reload();
         })
 
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            // Get the data associated with the clicked row
-            const data = table.row(this).data();
+        // $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+        //     // Get the data associated with the clicked row
+        //     const data = table.row(this).data();
 
-            // Redirect to the detail page using the data ID
-            if (data) {
-                location.replace(`<?= base_url("request-stock/details"); ?>/${data.id}`);
-            }
-        });
+        //     // Redirect to the detail page using the data ID
+        //     if (data) {
+        //         location.replace(`<?= base_url("request-stock/details"); ?>/${data.id}`);
+        //     }
+        // });
     })
 
     const approve = function(id, status_approve) {

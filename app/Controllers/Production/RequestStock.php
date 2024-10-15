@@ -18,6 +18,7 @@ use App\Models\StockDetailModel;
 use App\Models\StockModel;
 use App\Models\SupplierModel;
 use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
+use App\Models\AccountBarangModel;
 
 class RequestStock extends BaseController
 {
@@ -38,6 +39,7 @@ class RequestStock extends BaseController
     protected $woModel;
     protected $metaDataModel;
     protected $stockModel;
+    protected $accountBarangModel;
 
     protected $jurnalUmumController;
 
@@ -62,7 +64,7 @@ class RequestStock extends BaseController
         $this->stockDetail2Model = new StockDetail2Model();
         $this->stockModel = new StockModel();
         $this->jurnalUmumController = new JurnalUmum();
-    
+        $this->accountBarangModel = new AccountBarangModel();
     }
 
     public function index()
@@ -80,10 +82,10 @@ class RequestStock extends BaseController
             "sortType" => $this->request->getGet("sortType"),
             "material_type" => $this->request->getGet("material_type")
         ];
-    
+
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-    
+
         // Buat condition berdasarkan material_type
         if ($payload["material_type"] === "material_request") {
             $condition = [
@@ -99,7 +101,7 @@ class RequestStock extends BaseController
         } elseif ($payload["material_type"] === "material_penolong") {
             $condition = [
                 'material_requests_penolong.company_id' => $this->this_company_id,
-                'parent_barang.parent_name' => "",
+                'parent_barang.parent_type' => "bahan_penolong",
                 'material_requests_penolong.is_posted' => 1
             ];
         } else {
@@ -109,13 +111,13 @@ class RequestStock extends BaseController
                 'material_requests.is_posted' => 1
             ];
         }
-    
+
         $addCondition = [
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType")
         ];
-    
+
         // Ambil data sesuai kondisi yang telah dibuat
         if ($payload["material_type"] === "material_request" ||  empty($payload["material_type"])) {
             $type = "Material Request";
@@ -128,10 +130,10 @@ class RequestStock extends BaseController
             $materialRequestData = $this->materialRequestPenolongModel->getMaterialRequestList($condition, $addCondition, $limit, $offset);
         }
 
-        
+
         $dataMaterialRequest = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-    
+
         foreach ($materialRequestData['data'] as $data) {
             array_push($dataMaterialRequest, [
                 "no" => $no++,
@@ -145,7 +147,7 @@ class RequestStock extends BaseController
                 "type" => $type,
             ]);
         }
-    
+
         $data = [
             "draw" => intval($this->request->getGet("draw")),
             "recordsTotal" => $materialRequestData['totalData'],
@@ -153,11 +155,11 @@ class RequestStock extends BaseController
             "data" => $dataMaterialRequest,
             "payload" => $payload
         ];
-    
+
         echo json_encode($data);
         return;
     }
-    
+
 
     public function getById($id = null)
     {
@@ -311,16 +313,19 @@ class RequestStock extends BaseController
 
                 foreach ($materialRequestDetailData as $key => $value) {
 
-                    $statusOUT = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'OUT');
-                    $statusIN = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_tujuan_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'IN');
+                    $statusOUT = $this->accountBarangModel->checkAccountBarangCOA($this->this_company_id, $value['divisi_id'], $value['barang1_id']);
+                    $statusIN = $this->accountBarangModel->checkAccountBarangCOA($this->this_company_id, $value['divisi_tujuan_id'], $value['barang1_id']);
+
+
+                    // $statusOUT = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'OUT');
+                    // $statusIN = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_tujuan_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'IN');
                     // var_dump($statusOUT, $statusIN);
                     // exit;
 
                     if ($statusOUT && $statusIN) {
-                        $responseBody = json_decode($statusOUT->getBody(), true);
                         $data = [
                             "status"    => false,
-                            "message"   => $responseBody['message'],
+                            "message"   => "Barang belum memiliki Akun COA",
                             'token'     => csrf_hash()
                         ];
                         echo json_encode($data);
@@ -467,8 +472,6 @@ class RequestStock extends BaseController
                 ];
                 echo json_encode($data);
             }
-           
-        
         } catch (Exception $e) {
             $data = [
                 "status"     => false,
@@ -498,16 +501,19 @@ class RequestStock extends BaseController
 
                 foreach ($materialRequestPenolongDetailData as $key => $value) {
 
-                    $statusOUT = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'OUT');
-                    $statusIN = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_tujuan_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'IN');
+                    $statusOUT = $this->accountBarangModel->checkAccountBarangCOA($this->this_company_id, $value['divisi_id'], $value['barang1_id']);
+                    $statusIN = $this->accountBarangModel->checkAccountBarangCOA($this->this_company_id, $value['divisi_tujuan_id'], $value['barang1_id']);
+
+
+                    // $statusOUT = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'OUT');
+                    // $statusIN = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_tujuan_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'IN');
                     // var_dump($statusOUT, $statusIN);
                     // exit;
 
                     if ($statusOUT && $statusIN) {
-                        $responseBody = json_decode($statusOUT->getBody(), true);
                         $data = [
                             "status"    => false,
-                            "message"   => $responseBody['message'],
+                            "message"   => "Barang belum memiliki Akun COA",
                             'token'     => csrf_hash()
                         ];
                         echo json_encode($data);
@@ -633,7 +639,7 @@ class RequestStock extends BaseController
                             $value['harga_harian'],
                             $value['harga_bulanan'],
                         );
-                        $this->materialRequestPenolongDetailsModel->update($id, $data);
+                        $this->materialRequestPenolongModel->update($id, $data);
 
                         $this->workOrdersModel->update($materialRequestData['work_order_id'], [
                             'is_posted' => 1
@@ -654,7 +660,6 @@ class RequestStock extends BaseController
                 ];
                 echo json_encode($data);
             }
-
         } catch (Exception $e) {
             $data = [
                 "status"            => false,
@@ -666,5 +671,4 @@ class RequestStock extends BaseController
 
         return;
     }
-
 }

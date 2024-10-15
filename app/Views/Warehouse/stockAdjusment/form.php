@@ -835,7 +835,7 @@
                                 var adjusmentQty = Math.min(qtyAdjusmentFifo, parseFloat(listStockInventori[i].stok_total));
 
                                 listStockInventori[i].type_adjusment = "MINUS";
-                                listStockInventori[i].qty_adjusment = adjusmentQty.toFixed(2);
+                                listStockInventori[i].qty_adjusment = adjusmentQty.toFixed(4);
                                 listStockInventori[i].kode_barang = $('#spesifikasi_id option:selected').data('kode_barang');
                                 listStockInventori[i].warehouse_text = $('#warehouse_id option:selected').text();
                                 listStockInventori[i].warehouse_id = $('#warehouse_id option:selected').val();
@@ -859,7 +859,7 @@
                             var adjusmentQty = Math.min(qtyAdjusmentFifo, parseFloat(listStockInventori[i].stok_total));
 
                             listStockInventori[i].type_adjusment = "PLUS";
-                            listStockInventori[i].qty_adjusment = adjusmentQty.toFixed(2);
+                            listStockInventori[i].qty_adjusment = adjusmentQty.toFixed(4);
                             listStockInventori[i].kode_barang = $('#spesifikasi_id option:selected').data('kode_barang');
                             listStockInventori[i].warehouse_text = $('#warehouse_id option:selected').text();
                             listStockInventori[i].warehouse_id = $('#warehouse_id option:selected').val();

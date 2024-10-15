@@ -581,7 +581,7 @@
                         if (!isIDSelected && qtyKeluarFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
                             var keluarQty = Math.min(qtyKeluarFifo, parseFloat(listStockAsal[i].stok_total));
                             listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                            listStockAsal[i].qty = parseFloat(keluarQty.toFixed(2));
+                            listStockAsal[i].qty = parseFloat(keluarQty.toFixed(4));
 
                             listStockSelected.push(listStockAsal[i]);
                             qtyKeluarFifo = qtyKeluarFifo - keluarQty;

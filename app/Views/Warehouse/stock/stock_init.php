@@ -624,7 +624,7 @@
         newRow.append($('<td><b></b></td>'));
         newRow.append($('<td><b></b></td>'));
         newRow.append($('<td><b>TOTAL</b></td>'));
-        newRow.append($('<td><b>' + qtyTotal.toFixed(2) + '</b></td>'));
+        newRow.append($('<td><b>' + qtyTotal.toFixed(4) + '</b></td>'));
         newRow.append($('<td></td>'));
         table.find('tfoot').append(newRow);
     }

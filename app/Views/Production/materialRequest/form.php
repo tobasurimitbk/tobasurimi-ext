@@ -1412,7 +1412,7 @@
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                         listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                        listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
+                        listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
                         listStockSelectedBahanSetengahJadi.push(listStockAsal[i]);
                         qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                     }
@@ -1436,7 +1436,7 @@
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                         listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                        listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
+                        listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
                         listStockSelectedBahan.push(listStockAsal[i]);
                         qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                     }
@@ -1479,7 +1479,7 @@
                 totalStokTotal += parseFloat(v.stok_total);
             });
             // deleteByStockID(stockID);
-            if (qtyMutasiFifo > parseFloat(totalStokTotal.toFixed(2))) {
+            if (qtyMutasiFifo > parseFloat(totalStokTotal.toFixed(4))) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Terjadi Kesalahan : Stok barang tidak cukup !',
@@ -1510,7 +1510,7 @@
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                                 listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
+                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
                                 listStockSelectedBahanBaku.push(listStockAsal[i]);
                                 qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                             }
@@ -1534,7 +1534,7 @@
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                                 listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
+                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
                                 listStockSelectedBahanJadi.push(listStockAsal[i]);
                                 qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                             }
@@ -1558,7 +1558,7 @@
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                                 listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
+                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
                                 listStockSelectedBahanSetengahJadi.push(listStockAsal[i]);
                                 qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                             }
@@ -1582,7 +1582,7 @@
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                                 listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
+                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
                                 listStockSelectedBahan.push(listStockAsal[i]);
                                 qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                             }
@@ -1677,7 +1677,7 @@
         $.each(listStockSelectedBahanBaku, function(i, v) {
             totalQty += parseFloat(listStockSelectedBahanBaku[i].qty2) || 0;
         });
-        $('.nilai-total-bahan-baku-request').text(totalQty.toFixed(2));
+        $('.nilai-total-bahan-baku-request').text(totalQty.toFixed(4));
     }
 
     function drawTableSelectedItemBahanSetengahJadi(data) {
@@ -1763,7 +1763,7 @@
         $.each(listStockSelectedBahanSetengahJadi, function(i, v) {
             totalQty += parseFloat(listStockSelectedBahanSetengahJadi[i].qty2) || 0;
         });
-        $('.nilai-total-barang-setengah-jadi-request').text(totalQty.toFixed(2));
+        $('.nilai-total-barang-setengah-jadi-request').text(totalQty.toFixed(4));
     }
 
     function drawTableSelectedItemBahan(data) {
@@ -1819,6 +1819,7 @@
             },
             display: "stripe",
             searching: false,
+            paging: false,
             language: {
                 emptyTable: "Tidak Ada Data",
                 lengthMenu: "Show _MENU_ entries",
@@ -1848,7 +1849,7 @@
         $.each(listStockSelectedBahan, function(i, v) {
             totalQty += parseFloat(listStockSelectedBahan[i].qty2) || 0;
         });
-        $('.nilai-total-barang-scrap-request').text(totalQty.toFixed(2));
+        $('.nilai-total-barang-scrap-request').text(totalQty.toFixed(4));
     }
 
     function drawTableSelectedItemBahanJadi(data) {
@@ -1909,6 +1910,7 @@
             },
             display: "stripe",
             searching: false,
+            paging: false,
             language: {
                 emptyTable: "Tidak Ada Data",
                 lengthMenu: "Show _MENU_ entries",
@@ -1940,7 +1942,7 @@
         $.each(listStockSelectedBahanJadi, function(i, v) {
             totalQty += parseFloat(listStockSelectedBahanJadi[i].qty2) || 0;
         });
-        $('.nilai-total-barang-jadi-request').text(totalQty.toFixed(2));
+        $('.nilai-total-barang-jadi-request').text(totalQty.toFixed(4));
     }
 
     function getIDListDataSelected() {

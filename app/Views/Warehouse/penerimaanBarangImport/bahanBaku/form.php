@@ -941,7 +941,7 @@
         $('.keterangan').val(item.keterangan);
         $('.jml_diterima_lpb').val(item.jml_diterima_lpb);
         $('.jml_diterima_total').val(item.jml_diterima_total);
-        $('.sisa_total').val(item.sisa_total.toFixed(2));
+        $('.sisa_total').val(item.sisa_total.toFixed(4));
         $('.nama_barang_dokumen').val(item.nama_barang_master);
         $('.harga_satuan').val("" + formatRupiah(Number(item.harga) || 0));
         $('.sub_total').val("" + formatRupiah(Number(item.sub_total) || 0));

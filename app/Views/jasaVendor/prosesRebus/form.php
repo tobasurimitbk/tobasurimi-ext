@@ -1083,9 +1083,9 @@
 
             var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
             newRow.append($('<td style="text-align: right;" colspan="8">').html("<b>GRAND TOTAL</b>"));
-            newRow.append($('<td style="text-align: center;">').text(totalQtyRebus));
+            newRow.append($('<td style="text-align: center;">').text(totalQtyRebus.toFixed(4)));
             newRow.append($('<td colspan ="2">').text(''));
-            newRow.append($('<td style="text-align: center;">').text(totalQtyHasilRebus));
+            newRow.append($('<td style="text-align: center;">').text(totalQtyHasilRebus.toFixed(4)));
             newRow.append($('<td colspan ="2">').text(''));
             table.find('tbody').append(newRow);
         }
