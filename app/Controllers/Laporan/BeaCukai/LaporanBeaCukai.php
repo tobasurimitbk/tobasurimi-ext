@@ -1455,9 +1455,7 @@ class LaporanBeaCukai extends BaseController
                 
                 // Looping dataBCTarif untuk mengisi nilai
                 $dataBCTarif = $this->bcTarifModel->getByBcPurchaseOrder($data->bc_purchase_order_id);
-                $tarifUpdated = false; // Flag untuk cek apakah ada perubahan pada dataBCTarif
-
-                if (!empty($dataBCTarif)) {
+               
                     foreach ($dataBCTarif as $tarif) {
                         $jenisPungutan = '';
                         // Tentukan jenis pungutan berdasarkan string
@@ -1497,12 +1495,7 @@ class LaporanBeaCukai extends BaseController
                             }
                         }
                     }
-                }
-
-                // Hanya tambahkan entry jika ada perubahan di dataBCTarif (artinya ada tarif yang diisi)
-                if ($tarifUpdated) {
-                    $dataBC23Result[] = $entry;
-                }
+                
             }
 
             // Format response untuk DataTables
@@ -1594,10 +1587,8 @@ class LaporanBeaCukai extends BaseController
             
             // Looping dataBCTarif untuk mengisi nilai
             $dataBCTarif = $this->bcTarifModel->getByBcPurchaseOrder($data->bc_purchase_order_id);
-                $tarifUpdated = false; // Flag untuk cek apakah ada perubahan pada dataBCTarif
-        
-                if (!empty($dataBCTarif)) {
-                    foreach ($dataBCTarif as $tarif) {
+               
+            foreach ($dataBCTarif as $tarif) {
                         $jenisPungutan = '';
                         // Tentukan jenis pungutan berdasarkan string
                         switch ($tarif['kode_jenis_pungutan']) {
@@ -1635,13 +1626,10 @@ class LaporanBeaCukai extends BaseController
                                     break;
                             }
                         }
-                    }
-                }
-        
-                // Hanya tambahkan entry jika ada perubahan di dataBCTarif (artinya ada tarif yang diisi)
-                if ($tarifUpdated) {
-                    $dataBC23Result[] = $entry;
-                }
+            }
+                   
+            $dataBC23Result[] = $entry;
+                
         }
     
         // Generate the spreadsheet
@@ -1801,10 +1789,7 @@ class LaporanBeaCukai extends BaseController
             ];
 
             $dataBCTarif = $this->bcTarifModel->getByBcPurchaseOrder($data->bc_purchase_order_id);
-                $tarifUpdated = false; // Flag untuk cek apakah ada perubahan pada dataBCTarif
-        
-                if (!empty($dataBCTarif)) {
-                    foreach ($dataBCTarif as $tarif) {
+            foreach ($dataBCTarif as $tarif) {
                         $jenisPungutan = '';
                         // Tentukan jenis pungutan berdasarkan string
                         switch ($tarif['kode_jenis_pungutan']) {
@@ -1842,13 +1827,10 @@ class LaporanBeaCukai extends BaseController
                                     break;
                             }
                         }
-                    }
-                }
-        
-                // Hanya tambahkan entry jika ada perubahan di dataBCTarif (artinya ada tarif yang diisi)
-                if ($tarifUpdated) {
-                    $dataBC23Result[] = $entry;
-                }
+            }
+                
+            $dataBC23Result[] = $entry;
+                
         }
 
         // Inisialisasi Dompdf
@@ -1924,11 +1906,9 @@ class LaporanBeaCukai extends BaseController
             
                 if (isset($payloadData['barang']) && !empty($payloadData['barang'])) {
                     foreach ($payloadData['barang'] as $barang) {
-                      
                             
                             // Jika id sudah ada, tambahkan tarifnya
-                            if (!isset($dataBC25Result[$data->id])) {
-                                $dataBC25Result[$data->id] = [
+                            $dataBC25Result[$data->id] = [
                                     "no" => $no++,  // Nomor akan selalu bertambah
                                     "id" => encrypt($data->id),
                                     "asal_pengeluaran"      => ($data->sales_order_lain_id != null) ? "PENJUALAN" : "RETUR",
@@ -1956,9 +1936,8 @@ class LaporanBeaCukai extends BaseController
                                             'di_lunasi' => 0
                                         ],
                                     ]
-                                ];
-                            }
-            
+                            ];
+                            
                             // Loop data barangTarif dan tambahkan nilai ke entri yang sudah ada
                             foreach ($barang['barangTarif'] as $tarif) {
                                 $jenisPungutan = '';
@@ -2392,54 +2371,51 @@ class LaporanBeaCukai extends BaseController
         if (!empty($dataBC30['data'])) {
             $dataBC30Result = [];
             $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
             foreach ($dataBC30['data'] as $data) {
                 // Decode payload JSON
                 $payloadData = json_decode($data->payload, true);
-            
-                if (empty($payloadData)) {
-                    continue;
-                }
-            
+
+                // Tetap buat entry, meskipun payloadData kosong
+                $dataBC30Result[$data->id] = [
+                    "no" => $no++,
+                    "id"                    => encrypt($data->id),
+                    "no_aju"                => $data->no_aju . " / " . $data->no_daftar,
+                    "tanggal_bc_30"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
+                    "no_daftar"             => $data->no_daftar,
+                    "no_stuffing"           => $data->no_stuffing,
+                    "dataBCTarif" => [
+                        'PPN' => [
+                            'di_bebaskan' => 0,
+                            'di_bayar' => 0,
+                            'di_tanggung_pemerintah' => 0,
+                            'di_lunasi' => 0
+                        ],
+                        'PPH' => [
+                            'di_bebaskan' => 0,
+                            'di_bayar' => 0,
+                            'di_tanggung_pemerintah' => 0,
+                            'di_lunasi' => 0
+                        ],
+                        'BM' => [
+                            'di_bebaskan' => 0,
+                            'di_bayar' => 0,
+                            'di_tanggung_pemerintah' => 0,
+                            'di_lunasi' => 0
+                        ],
+                    ]
+                ];
+
+                // Lanjutkan jika payloadData memiliki barang
                 if (isset($payloadData['barang']) && !empty($payloadData['barang'])) {
                     foreach ($payloadData['barang'] as $barang) {
-                       
-                            
-                            // Jika id sudah ada, tambahkan tarifnya
-                            if (!isset($dataBC30Result[$data->id])) {
-                                $dataBC30Result[$data->id] = [
-                                    "no" => $no++,
-                                    "id"                    => encrypt($data->id),
-                                    "no_aju"                => $data->no_aju . " / " . $data->no_daftar,
-                                    "tanggal_bc_30"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
-                                    "no_daftar"        => $data->no_daftar,
-                                    "no_stuffing"        => $data->no_stuffing,
-                                    "dataBCTarif" => [
-                                        'PPN' => [
-                                            'di_bebaskan' => 0,
-                                            'di_bayar' => 0,
-                                            'di_tanggung_pemerintah' => 0,
-                                            'di_lunasi' => 0
-                                        ],
-                                        'PPH' => [
-                                            'di_bebaskan' => 0,
-                                            'di_bayar' => 0,
-                                            'di_tanggung_pemerintah' => 0,
-                                            'di_lunasi' => 0
-                                        ],
-                                        'BM' => [
-                                            'di_bebaskan' => 0,
-                                            'di_bayar' => 0,
-                                            'di_tanggung_pemerintah' => 0,
-                                            'di_lunasi' => 0
-                                        ],
-                                    ]
-                                ];
-                            }
-            
+                        // Lanjutkan jika barang memiliki barangTarif
+                        if (isset($barang['barangTarif']) && !empty($barang['barangTarif'])) {
                             // Loop data barangTarif dan tambahkan nilai ke entri yang sudah ada
                             foreach ($barang['barangTarif'] as $tarif) {
                                 $jenisPungutan = '';
-            
+
+                                // Tentukan jenis pungutan
                                 switch ($tarif['kodeJenisPungutan']) {
                                     case 'PPN':
                                         $jenisPungutan = 'PPN';
@@ -2451,30 +2427,35 @@ class LaporanBeaCukai extends BaseController
                                         $jenisPungutan = 'BM';
                                         break;
                                 }
-            
+
                                 if (!empty($jenisPungutan)) {
+                                    // Gunakan ternary untuk nilaiBayar, jika tidak ada, gunakan 0
+                                    $nilaiBayar = isset($tarif['nilaiBayar']) ? (int)$tarif['nilaiBayar'] : 0;
+
                                     switch ($tarif['kodeFasilitasTarif']) {
                                         case '1':
-                                            $dataBC30Result[$data->id]['dataBCTarif'][$jenisPungutan]['di_bayar'] += (int)$tarif['nilaiBayar'];
+                                            $dataBC30Result[$data->id]['dataBCTarif'][$jenisPungutan]['di_bayar'] += $nilaiBayar;
                                             break;
                                         case '5':
-                                            $dataBC30Result[$data->id]['dataBCTarif'][$jenisPungutan]['di_bebaskan'] += (int)$tarif['nilaiBayar'];
+                                            $dataBC30Result[$data->id]['dataBCTarif'][$jenisPungutan]['di_bebaskan'] += $nilaiBayar;
                                             break;
                                         case '2':
-                                            $dataBC30Result[$data->id]['dataBCTarif'][$jenisPungutan]['di_tanggung_pemerintah'] += (int)$tarif['nilaiBayar'];
+                                            $dataBC30Result[$data->id]['dataBCTarif'][$jenisPungutan]['di_tanggung_pemerintah'] += $nilaiBayar;
                                             break;
                                         case '7':
-                                            $dataBC30Result[$data->id]['dataBCTarif'][$jenisPungutan]['di_lunasi'] += (int)$tarif['nilaiBayar'];
+                                            $dataBC30Result[$data->id]['dataBCTarif'][$jenisPungutan]['di_lunasi'] += $nilaiBayar;
                                             break;
                                     }
                                 }
                             }
+                        }
                     }
                 }
             }
 
             // Ubah array asosiatif menjadi array numerik untuk respons DataTables
             $dataBC30Result = array_values($dataBC30Result);
+
 
             // Format response untuk DataTables
             $data = [
@@ -2870,101 +2851,101 @@ class LaporanBeaCukai extends BaseController
         if (!empty($dataBC27['data'])) {
             $dataBC27Result = [];
             $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+            
             foreach ($dataBC27['data'] as $data) {
                 // Decode payload JSON
                 $payloadData = json_decode($data->payload, true);
+                
+                // Tetap buat entry, meskipun payloadData kosong
+                $dataBC27Result[$data->id] = [
+                    "no" => $no++,
+                    "id" => encrypt($data->id),
+                    "no_aju" => $data->no_aju . " / " . $data->no_daftar,
+                    "tanggal_bc_27" => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
+                    "no_daftar" => $data->no_daftar,
+                    "pungutan" => [
+                        'PPN' => [
+                            'di_bebaskan' => 0,
+                            'tidak_dipungunt' => 0,
+                            'di_tunda' => 0,
+                            'di_bayar' => 0,
+                            'di_tanggung_pemerintah' => 0,
+                            'di_lunasi' => 0,
+                            'di_tangguhkan' => 0
+                        ],
+                        'PPH' => [
+                            'di_bebaskan' => 0,
+                            'tidak_dipungunt' => 0,
+                            'di_tunda' => 0,
+                            'di_bayar' => 0,
+                            'di_tanggung_pemerintah' => 0,
+                            'di_lunasi' => 0,
+                            'di_tangguhkan' => 0
+                        ],
+                        'BM' => [
+                            'di_bebaskan' => 0,
+                            'tidak_dipungunt' => 0,
+                            'di_tunda' => 0,
+                            'di_bayar' => 0,
+                            'di_tanggung_pemerintah' => 0,
+                            'di_lunasi' => 0,
+                            'di_tangguhkan' => 0
+                        ],
+                    ]
+                ];
             
-                if (empty($payloadData)) {
-                    continue;
-                }
-               
-                foreach ($payloadData['pungutan'] as $pungutan) {
-    
-                    // If id is not set in the result, initialize the dataBC27Result array with default values
-                    if (!isset($dataBC27Result[$data->id])) {
-                        $dataBC27Result[$data->id] = [
-                            "no" => $no++,
-                            "id" => encrypt($data->id),
-                            "no_aju" => $data->no_aju . " / " . $data->no_daftar,
-                            "tanggal_bc_27" => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
-                            "no_daftar" => $data->no_daftar,
-                            "pungutan" => [
-                                'PPN' => [
-                                    'di_bebaskan' => 0,
-                                    'tidak_dipungunt' => 0,
-                                    'di_tunda' => 0,
-                                    'di_bayar' => 0,
-                                    'di_tanggung_pemerintah' => 0,
-                                    'di_lunasi' => 0,
-                                    'di_tangguhkan' => 0
-                                ],
-                                'PPH' => [
-                                    'di_bebaskan' => 0,
-                                    'tidak_dipungunt' => 0,
-                                    'di_tunda' => 0,
-                                    'di_bayar' => 0,
-                                    'di_tanggung_pemerintah' => 0,
-                                    'di_lunasi' => 0,
-                                    'di_tangguhkan' => 0
-                                ],
-                                'BM' => [
-                                    'di_bebaskan' => 0,
-                                    'tidak_dipungunt' => 0,
-                                    'di_tunda' => 0,
-                                    'di_bayar' => 0,
-                                    'di_tanggung_pemerintah' => 0,
-                                    'di_lunasi' => 0,
-                                    'di_tangguhkan' => 0
-                                ],
-                            ]
-                        ];
-                    }
-                
-                    // Process each pungutan item individually
-                    if (is_array($pungutan) && isset($pungutan['kodeJenisPungutan'])) {
-                        $jenisPungutan = '';
-                        
-                        switch ($pungutan['kodeJenisPungutan']) {
-                            case 'PPN':
-                                $jenisPungutan = 'PPN';
-                                break;
-                            case 'PPH':
-                                $jenisPungutan = 'PPH';
-                                break;
-                            case 'BM':
-                                $jenisPungutan = 'BM';
-                                break;
-                        }
-                
-                        if (!empty($jenisPungutan)) {
-                            switch ($pungutan['kodeFasilitasTarif']) {
-                                case '1':
-                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_bayar'] += (int)$pungutan['nilaiPungutan'];
+                // Lanjutkan hanya jika payloadData tidak kosong dan mengandung pungutan
+                if (!empty($payloadData) && isset($payloadData['pungutan'])) {
+                    foreach ($payloadData['pungutan'] as $pungutan) {
+                        // Process each pungutan item individually
+                        if (is_array($pungutan) && isset($pungutan['kodeJenisPungutan'])) {
+                            $jenisPungutan = '';
+            
+                            switch ($pungutan['kodeJenisPungutan']) {
+                                case 'PPN':
+                                    $jenisPungutan = 'PPN';
                                     break;
-                                case '5':
-                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_bebaskan'] += (int)$pungutan['nilaiPungutan'];
+                                case 'PPH':
+                                    $jenisPungutan = 'PPH';
                                     break;
-                                case '2':
-                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tanggung_pemerintah'] += (int)$pungutan['nilaiPungutan'];
+                                case 'BM':
+                                    $jenisPungutan = 'BM';
                                     break;
-                                case '7':
-                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_lunasi'] += (int)$pungutan['nilaiPungutan'];
-                                    break;
-                                case '6':
-                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tunda'] += (int)$pungutan['nilaiPungutan'];
-                                    break;
-                                case '9':
-                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['tidak_dipungut'] += (int)$pungutan['nilaiPungutan'];
-                                    break;
-                                case '3':
-                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tangguhkan'] += (int)$pungutan['nilaiPungutan'];
-                                    break;
+                            }
+            
+                            if (!empty($jenisPungutan)) {
+                                // Gunakan ternary untuk mengecek apakah 'nilaiPungutan' ada
+                                $nilaiPungutan = isset($pungutan['nilaiPungutan']) ? (int)$pungutan['nilaiPungutan'] : 0;
+            
+                                switch ($pungutan['kodeFasilitasTarif']) {
+                                    case '1':
+                                        $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_bayar'] += $nilaiPungutan;
+                                        break;
+                                    case '5':
+                                        $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_bebaskan'] += $nilaiPungutan;
+                                        break;
+                                    case '2':
+                                        $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tanggung_pemerintah'] += $nilaiPungutan;
+                                        break;
+                                    case '7':
+                                        $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_lunasi'] += $nilaiPungutan;
+                                        break;
+                                    case '6':
+                                        $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tunda'] += $nilaiPungutan;
+                                        break;
+                                    case '9':
+                                        $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['tidak_dipungut'] += $nilaiPungutan;
+                                        break;
+                                    case '3':
+                                        $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tangguhkan'] += $nilaiPungutan;
+                                        break;
+                                }
                             }
                         }
                     }
                 }
-                
             }
+            
 
             // Ubah array asosiatif menjadi array numerik untuk respons DataTables
             $dataBC27Result = array_values($dataBC27Result);
@@ -3024,101 +3005,101 @@ class LaporanBeaCukai extends BaseController
         // Retrieve all data based on the conditions without pagination
         $dataBC27 = $this->bc27Model->getList($condition, $addCondition, 10000000, 0);
         $dataBC27Result = [];
-        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-    
-        foreach ($dataBC27['data'] as $data) {
-            // Decode payload JSON
-            $payloadData = json_decode($data->payload, true);
+            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
             
-            if (empty($payloadData)) {
-                continue;
-            }
-            
-            foreach ($payloadData['pungutan'] as $pungutan) {
-                // If id is not set in the result, initialize the dataBC27Result array with default values
-                if (!isset($dataBC27Result[$data->id])) {
-                    $dataBC27Result[$data->id] = [
-                        "no" => $no++,
-                        "id" => encrypt($data->id),
-                        "no_aju" => $data->no_aju . " / " . $data->no_daftar,
-                        "tanggal_bc_27" => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
-                        "no_daftar" => $data->no_daftar,
-                        "pungutan" => [
-                            'PPN' => [
-                                'di_bebaskan' => 0,
-                                'tidak_dipungut' => 0,
-                                'di_tunda' => 0,
-                                'di_bayar' => 0,
-                                'di_tanggung_pemerintah' => 0,
-                                'di_lunasi' => 0,
-                                'di_tangguhkan' => 0
-                            ],
-                            'PPH' => [
-                                'di_bebaskan' => 0,
-                                'tidak_dipungut' => 0,
-                                'di_tunda' => 0,
-                                'di_bayar' => 0,
-                                'di_tanggung_pemerintah' => 0,
-                                'di_lunasi' => 0,
-                                'di_tangguhkan' => 0
-                            ],
-                            'BM' => [
-                                'di_bebaskan' => 0,
-                                'tidak_dipungut' => 0,
-                                'di_tunda' => 0,
-                                'di_bayar' => 0,
-                                'di_tanggung_pemerintah' => 0,
-                                'di_lunasi' => 0,
-                                'di_tangguhkan' => 0
-                            ],
-                        ]
-                    ];
-                }
+            foreach ($dataBC27['data'] as $data) {
+                // Decode payload JSON
+                $payloadData = json_decode($data->payload, true);
                 
-                // Process each pungutan item individually
-                if (is_array($pungutan) && isset($pungutan['kodeJenisPungutan'])) {
-                    $jenisPungutan = '';
-                    
-                    switch ($pungutan['kodeJenisPungutan']) {
-                        case 'PPN':
-                            $jenisPungutan = 'PPN';
-                            break;
-                        case 'PPH':
-                            $jenisPungutan = 'PPH';
-                            break;
-                        case 'BM':
-                            $jenisPungutan = 'BM';
-                            break;
-                    }
+                // Tetap buat entry, meskipun payloadData kosong
+                $dataBC27Result[$data->id] = [
+                    "no" => $no++,
+                    "id" => encrypt($data->id),
+                    "no_aju" => $data->no_aju . " / " . $data->no_daftar,
+                    "tanggal_bc_27" => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
+                    "no_daftar" => $data->no_daftar,
+                    "pungutan" => [
+                        'PPN' => [
+                            'di_bebaskan' => 0,
+                            'tidak_dipungunt' => 0,
+                            'di_tunda' => 0,
+                            'di_bayar' => 0,
+                            'di_tanggung_pemerintah' => 0,
+                            'di_lunasi' => 0,
+                            'di_tangguhkan' => 0
+                        ],
+                        'PPH' => [
+                            'di_bebaskan' => 0,
+                            'tidak_dipungunt' => 0,
+                            'di_tunda' => 0,
+                            'di_bayar' => 0,
+                            'di_tanggung_pemerintah' => 0,
+                            'di_lunasi' => 0,
+                            'di_tangguhkan' => 0
+                        ],
+                        'BM' => [
+                            'di_bebaskan' => 0,
+                            'tidak_dipungunt' => 0,
+                            'di_tunda' => 0,
+                            'di_bayar' => 0,
+                            'di_tanggung_pemerintah' => 0,
+                            'di_lunasi' => 0,
+                            'di_tangguhkan' => 0
+                        ],
+                    ]
+                ];
             
-                    if (!empty($jenisPungutan)) {
-                        switch ($pungutan['kodeFasilitasTarif']) {
-                            case '1':
-                                $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_bayar'] += (int)$pungutan['nilaiPungutan'];
-                                break;
-                            case '5':
-                                $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_bebaskan'] += (int)$pungutan['nilaiPungutan'];
-                                break;
-                            case '2':
-                                $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tanggung_pemerintah'] += (int)$pungutan['nilaiPungutan'];
-                                break;
-                            case '7':
-                                $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_lunasi'] += (int)$pungutan['nilaiPungutan'];
-                                break;
-                            case '6':
-                                $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tunda'] += (int)$pungutan['nilaiPungutan'];
-                                break;
-                            case '9':
-                                $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['tidak_dipungut'] += (int)$pungutan['nilaiPungutan'];
-                                break;
-                            case '3':
-                                $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tangguhkan'] += (int)$pungutan['nilaiPungutan'];
-                                break;
+                // Lanjutkan hanya jika payloadData tidak kosong dan mengandung pungutan
+                if (!empty($payloadData) && isset($payloadData['pungutan'])) {
+                    foreach ($payloadData['pungutan'] as $pungutan) {
+                        // Process each pungutan item individually
+                        if (is_array($pungutan) && isset($pungutan['kodeJenisPungutan'])) {
+                            $jenisPungutan = '';
+            
+                            switch ($pungutan['kodeJenisPungutan']) {
+                                case 'PPN':
+                                    $jenisPungutan = 'PPN';
+                                    break;
+                                case 'PPH':
+                                    $jenisPungutan = 'PPH';
+                                    break;
+                                case 'BM':
+                                    $jenisPungutan = 'BM';
+                                    break;
+                            }
+            
+                            if (!empty($jenisPungutan)) {
+                                // Gunakan ternary untuk mengecek apakah 'nilaiPungutan' ada
+                                $nilaiPungutan = isset($pungutan['nilaiPungutan']) ? (int)$pungutan['nilaiPungutan'] : 0;
+            
+                                switch ($pungutan['kodeFasilitasTarif']) {
+                                    case '1':
+                                        $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_bayar'] += $nilaiPungutan;
+                                        break;
+                                    case '5':
+                                        $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_bebaskan'] += $nilaiPungutan;
+                                        break;
+                                    case '2':
+                                        $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tanggung_pemerintah'] += $nilaiPungutan;
+                                        break;
+                                    case '7':
+                                        $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_lunasi'] += $nilaiPungutan;
+                                        break;
+                                    case '6':
+                                        $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tunda'] += $nilaiPungutan;
+                                        break;
+                                    case '9':
+                                        $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['tidak_dipungut'] += $nilaiPungutan;
+                                        break;
+                                    case '3':
+                                        $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tangguhkan'] += $nilaiPungutan;
+                                        break;
+                                }
+                            }
                         }
                     }
                 }
             }
-        }
     
         // Generate the spreadsheet
         $spreadsheet = new Spreadsheet();
@@ -3260,63 +3241,58 @@ class LaporanBeaCukai extends BaseController
         $dataBC27 = $this->bc27Model->getList($condition, $addCondition, 10000000, 1);
 
         $no = 1; // Resetting no for Excel export
-
         $dataBC27Result = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        
         foreach ($dataBC27['data'] as $data) {
-                // Decode payload JSON
-                $payloadData = json_decode($data->payload, true);
+            // Decode payload JSON
+            $payloadData = json_decode($data->payload, true);
             
-                if (empty($payloadData)) {
-                    continue;
-                }
-               
+            // Tetap buat entry, meskipun payloadData kosong
+            $dataBC27Result[$data->id] = [
+                "no" => $no++,
+                "id" => encrypt($data->id),
+                "no_aju" => $data->no_aju . " / " . $data->no_daftar,
+                "tanggal_bc_27" => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
+                "no_daftar" => $data->no_daftar,
+                "pungutan" => [
+                    'PPN' => [
+                        'di_bebaskan' => 0,
+                        'tidak_dipungunt' => 0,
+                        'di_tunda' => 0,
+                        'di_bayar' => 0,
+                        'di_tanggung_pemerintah' => 0,
+                        'di_lunasi' => 0,
+                        'di_tangguhkan' => 0
+                    ],
+                    'PPH' => [
+                        'di_bebaskan' => 0,
+                        'tidak_dipungunt' => 0,
+                        'di_tunda' => 0,
+                        'di_bayar' => 0,
+                        'di_tanggung_pemerintah' => 0,
+                        'di_lunasi' => 0,
+                        'di_tangguhkan' => 0
+                    ],
+                    'BM' => [
+                        'di_bebaskan' => 0,
+                        'tidak_dipungunt' => 0,
+                        'di_tunda' => 0,
+                        'di_bayar' => 0,
+                        'di_tanggung_pemerintah' => 0,
+                        'di_lunasi' => 0,
+                        'di_tangguhkan' => 0
+                    ],
+                ]
+            ];
+        
+            // Lanjutkan hanya jika payloadData tidak kosong dan mengandung pungutan
+            if (!empty($payloadData) && isset($payloadData['pungutan'])) {
                 foreach ($payloadData['pungutan'] as $pungutan) {
-    
-                    // If id is not set in the result, initialize the dataBC27Result array with default values
-                    if (!isset($dataBC27Result[$data->id])) {
-                        $dataBC27Result[$data->id] = [
-                            "no" => $no++,
-                            "id" => encrypt($data->id),
-                            "no_aju" => $data->no_aju . " / " . $data->no_daftar,
-                            "tanggal_bc_27" => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
-                            "no_daftar" => $data->no_daftar,
-                            "pungutan" => [
-                                'PPN' => [
-                                    'di_bebaskan' => 0,
-                                    'tidak_dipungunt' => 0,
-                                    'di_tunda' => 0,
-                                    'di_bayar' => 0,
-                                    'di_tanggung_pemerintah' => 0,
-                                    'di_lunasi' => 0,
-                                    'di_tangguhkan' => 0
-                                ],
-                                'PPH' => [
-                                    'di_bebaskan' => 0,
-                                    'tidak_dipungunt' => 0,
-                                    'di_tunda' => 0,
-                                    'di_bayar' => 0,
-                                    'di_tanggung_pemerintah' => 0,
-                                    'di_lunasi' => 0,
-                                    'di_tangguhkan' => 0
-                                ],
-                                'BM' => [
-                                    'di_bebaskan' => 0,
-                                    'tidak_dipungunt' => 0,
-                                    'di_tunda' => 0,
-                                    'di_bayar' => 0,
-                                    'di_tanggung_pemerintah' => 0,
-                                    'di_lunasi' => 0,
-                                    'di_tangguhkan' => 0
-                                ],
-                            ]
-                        ];
-                    }
-                
                     // Process each pungutan item individually
                     if (is_array($pungutan) && isset($pungutan['kodeJenisPungutan'])) {
                         $jenisPungutan = '';
-                        
+        
                         switch ($pungutan['kodeJenisPungutan']) {
                             case 'PPN':
                                 $jenisPungutan = 'PPN';
@@ -3328,38 +3304,39 @@ class LaporanBeaCukai extends BaseController
                                 $jenisPungutan = 'BM';
                                 break;
                         }
-                
+        
                         if (!empty($jenisPungutan)) {
+                            // Gunakan ternary untuk mengecek apakah 'nilaiPungutan' ada
+                            $nilaiPungutan = isset($pungutan['nilaiPungutan']) ? (int)$pungutan['nilaiPungutan'] : 0;
+        
                             switch ($pungutan['kodeFasilitasTarif']) {
                                 case '1':
-                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_bayar'] += (int)$pungutan['nilaiPungutan'];
+                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_bayar'] += $nilaiPungutan;
                                     break;
                                 case '5':
-                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_bebaskan'] += (int)$pungutan['nilaiPungutan'];
+                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_bebaskan'] += $nilaiPungutan;
                                     break;
                                 case '2':
-                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tanggung_pemerintah'] += (int)$pungutan['nilaiPungutan'];
+                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tanggung_pemerintah'] += $nilaiPungutan;
                                     break;
                                 case '7':
-                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_lunasi'] += (int)$pungutan['nilaiPungutan'];
+                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_lunasi'] += $nilaiPungutan;
                                     break;
                                 case '6':
-                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tunda'] += (int)$pungutan['nilaiPungutan'];
+                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tunda'] += $nilaiPungutan;
                                     break;
                                 case '9':
-                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['tidak_dipungut'] += (int)$pungutan['nilaiPungutan'];
+                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['tidak_dipungut'] += $nilaiPungutan;
                                     break;
                                 case '3':
-                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tangguhkan'] += (int)$pungutan['nilaiPungutan'];
+                                    $dataBC27Result[$data->id]['pungutan'][$jenisPungutan]['di_tangguhkan'] += $nilaiPungutan;
                                     break;
                             }
                         }
                     }
                 }
-                
-                
+            }
         }
-
         // Inisialisasi Dompdf
         $domPdf = new Dompdf();
 
@@ -3448,9 +3425,8 @@ class LaporanBeaCukai extends BaseController
                 
                 // Looping dataBCTarif untuk mengisi nilai
                 $dataBCTarif = $this->bcTarifModel->getByBcPurchaseOrder($data->bc_purchase_order_id);
-                $tarifUpdated = false; // Flag untuk cek apakah ada perubahan pada dataBCTarif
 
-                if (!empty($dataBCTarif)) {
+               
                     foreach ($dataBCTarif as $tarif) {
                         $jenisPungutan = '';
                         // Tentukan jenis pungutan berdasarkan string
@@ -3482,12 +3458,12 @@ class LaporanBeaCukai extends BaseController
                             }
                         }
                     }
-                }
+                
 
                 // Hanya tambahkan entry jika ada perubahan di dataBCTarif (artinya ada tarif yang diisi)
-                if ($tarifUpdated) {
+               
                     $dataBC40Result[] = $entry;
-                }
+                
             }
 
             // Format response untuk DataTables
@@ -3571,9 +3547,8 @@ class LaporanBeaCukai extends BaseController
             // Looping dataBCTarif untuk mengisi nilai
             $dataBCTarif = $this->bcTarifModel->getByBcPurchaseOrder($data->bc_purchase_order_id);
                 $tarifUpdated = false; // Flag untuk cek apakah ada perubahan pada dataBCTarif
-        
-                if (!empty($dataBCTarif)) {
-                    foreach ($dataBCTarif as $tarif) {
+    
+                foreach ($dataBCTarif as $tarif) {
                         $jenisPungutan = '';
                         // Tentukan jenis pungutan berdasarkan string
                         switch ($tarif['kode_jenis_pungutan']) {
@@ -3603,13 +3578,12 @@ class LaporanBeaCukai extends BaseController
                                     break;
                             }
                         }
-                    }
                 }
-        
+                
                 // Hanya tambahkan entry jika ada perubahan di dataBCTarif (artinya ada tarif yang diisi)
-                if ($tarifUpdated) {
-                    $dataBC40Result[] = $entry;
-                }
+              
+                $dataBC40Result[] = $entry;
+                
         }
     
         // Generate the spreadsheet
@@ -3745,10 +3719,9 @@ class LaporanBeaCukai extends BaseController
 
             // Looping dataBCTarif untuk mengisi nilai
             $dataBCTarif = $this->bcTarifModel->getByBcPurchaseOrder($data->bc_purchase_order_id);
-            $tarifUpdated = false; // Flag untuk cek apakah ada perubahan pada dataBCTarif
-        
-                if (!empty($dataBCTarif)) {
-                    foreach ($dataBCTarif as $tarif) {
+           
+              
+            foreach ($dataBCTarif as $tarif) {
                         $jenisPungutan = '';
                         // Tentukan jenis pungutan berdasarkan string
                         switch ($tarif['kode_jenis_pungutan']) {
@@ -3778,13 +3751,11 @@ class LaporanBeaCukai extends BaseController
                                     break;
                             }
                         }
-                    }
-                }
+            }
+            
         
-                // Hanya tambahkan entry jika ada perubahan di dataBCTarif (artinya ada tarif yang diisi)
-                if ($tarifUpdated) {
-                    $dataBC40Result[] = $entry;
-                }
+            $dataBC40Result[] = $entry;
+                
         }
 
         // Inisialisasi Dompdf
