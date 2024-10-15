@@ -1819,6 +1819,7 @@
             },
             display: "stripe",
             searching: false,
+            paging: false,
             language: {
                 emptyTable: "Tidak Ada Data",
                 lengthMenu: "Show _MENU_ entries",
@@ -1909,6 +1910,7 @@
             },
             display: "stripe",
             searching: false,
+            paging: false,
             language: {
                 emptyTable: "Tidak Ada Data",
                 lengthMenu: "Show _MENU_ entries",

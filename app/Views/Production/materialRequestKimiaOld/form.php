@@ -1061,6 +1061,7 @@
             processing: false,
             serverSide: false,
             ordering: true,
+            paging: false,
             order: [],
             fixedHeader: true,
             "initComplete": function(settings, json) {
@@ -1185,6 +1186,7 @@
             ordering: true,
             order: [],
             fixedHeader: true,
+            paging: false,
             "initComplete": function(settings, json) {
                 $('.dataTables_length').empty();
                 $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
@@ -1259,6 +1261,7 @@
             processing: false,
             serverSide: false,
             ordering: true,
+            paging: false,
             order: [],
             fixedHeader: true,
             "initComplete": function(settings, json) {
@@ -1337,6 +1340,7 @@
             ordering: true,
             order: [],
             fixedHeader: true,
+            paging: false,
             "initComplete": function(settings, json) {
                 $('.dataTables_length').empty();
                 $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
@@ -1421,6 +1425,7 @@
             processing: false,
             serverSide: false,
             ordering: true,
+            paging: false,
             order: [],
             fixedHeader: true,
             "initComplete": function(settings, json) {

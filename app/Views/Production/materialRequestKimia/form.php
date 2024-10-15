@@ -1069,6 +1069,7 @@
             processing: false,
             serverSide: false,
             ordering: true,
+            paging: false,
             order: [],
             fixedHeader: true,
             "initComplete": function(settings, json) {
@@ -1262,6 +1263,7 @@
             processing: false,
             serverSide: false,
             ordering: true,
+            paging: false,
             order: [],
             fixedHeader: true,
             "initComplete": function(settings, json) {
