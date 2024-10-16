@@ -683,6 +683,7 @@ class StockDetail2Model extends Model
             'nama_barang' => 'barang_master.barang_name',
             'satuan' => '  barang_master_spesifikasi.satuan_1',
             'kategori_barang' =>  'parent_barang.parent_type',
+            'jenis_kategori'    => 'parent_barang.parent_name',
             'divisi' => 'divisis.divisi',
             'warehouse' => 'warehouses.warehouse_name',
         ];
@@ -743,7 +744,8 @@ class StockDetail2Model extends Model
             $dataQry->groupStart()
                 ->like("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
                 ->groupEnd()
-                ->orWhere('barang_master.kode_barang', $addCondition['search']);
+                ->orWhere('barang_master.kode_barang', $addCondition['search'])
+                ->orWhere('parent_name', $addCondition['search']);
         }
 
         if (

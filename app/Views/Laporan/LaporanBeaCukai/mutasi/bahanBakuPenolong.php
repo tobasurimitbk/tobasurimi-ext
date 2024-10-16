@@ -84,8 +84,8 @@
                 </div>
                 <div class="col-md-2">
                     <div class="form-floating mb-3">
-                        <input type="text" name="search" id="search" class="form-control search" placeholder="Kode / Nama Barang">
-                        <label style="z-index: 1;">Kode / Nama Barang</label>
+                        <input type="text" name="search" id="search" class="form-control search" placeholder="Cari Data">
+                        <label style="z-index: 1;">Cari Data</label>
                     </div>
                 </div>
             </div>
@@ -99,7 +99,8 @@
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
                                 <th onclick="changeSort('satuan')">Satuan</th>
-                                <th onclick="changeSort('kategori_barang')">Kategori Barang</th>
+                                <th onclick="changeSort('kategori_barang')">Tipe Barang</th>
+                                <th onclick="changeSort('jenis_kategori')">Kategori</th>
                                 <th onclick="changeSort('divisi')">Departemen</th>
                                 <th onclick="changeSort('warehouse')">Warehouse</th>
                                 <th>Stok Awal</th>
@@ -183,6 +184,10 @@
             },
             {
                 data: "kategori_barang",
+                className: "text-center",
+            },
+            {
+                data: "jenis_kategori",
                 className: "text-center",
             },
             {

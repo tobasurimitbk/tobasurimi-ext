@@ -96,6 +96,7 @@
             <th>Kode Barang</th>
             <th>Nama Barang</th>
             <th>Satuan</th>
+            <th>Tipe</th>
             <th>Kategori</th>
             <th>Jumlah Barang</th>
             <th>Stok Awal</th>
@@ -129,6 +130,7 @@
                     <td><?= $d['nama_barang'] ?></td>
                     <td><?= $d['satuan'] ?></td>
                     <td><?= $d['kategori_barang'] ?></td>
+                    <td><?= $d['jenis_kategori'] ?></td>
                     <td></td>
                     <td><?= $d['stok_awal'] ?></td>
                     <td><?= $d['stok_pemasukan'] ?></td>
@@ -141,7 +143,7 @@
                 </tr>
             <?php endforeach; ?>
             <tr style="font-weight: bold;">
-                <td colspan="5" style="text-align: center;">
+                <td colspan="6" style="text-align: center;">
                     Total
                 </td>
                 <td></td>
