@@ -145,8 +145,9 @@ class StockDetail2Model extends Model
             ->join('warehouses', 'warehouses.id = stock.warehouse_id')
             ->join('divisis', 'divisis.id = stock.divisi_id')
             ->where($condition)
-            ->groupBy('stock_details2.supplier_id')
-            ->groupBy('stock_details2.stock_id')
+            // ->groupBy('stock_details2.supplier_id')
+            ->groupBy('stock_details2.stock_dokumen')
+            ->groupBy('stock_details2.bc_id')
             ->groupBy('stock_details2.no_aju')
             ->orderBy($sort, $sortType);
 
