@@ -45,6 +45,7 @@ class Pembelian extends BaseController
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
     }
+
     public function index()
     {
         $supplierData = $this->supplierModel->asObject()->findAll();
@@ -53,6 +54,7 @@ class Pembelian extends BaseController
         ];
         return view('Laporan/LaporanPembelian/index', $data);
     }
+
     public function allTransaksi()
     {
         $payload = [

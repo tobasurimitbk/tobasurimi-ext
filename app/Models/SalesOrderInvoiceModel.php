@@ -15,10 +15,6 @@ class SalesOrderInvoiceModel extends Model
     protected $returnType     = 'array';
     protected $useSoftDeletes = true;
     protected $protectedField = true;
-
-
-
-
     protected $allowedFields = [
         'id_user',
         'id_po',
@@ -153,6 +149,7 @@ class SalesOrderInvoiceModel extends Model
             'totalFilteredData' => $totalFilteredData
         ];
     }
+
     public function getSalesOrderInvoiceLokalById($id)
     {
         $selectQry = "sales_order_invoice.*,

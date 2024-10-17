@@ -2100,6 +2100,16 @@ $routes->get('/laporan-bea-cukai/laporan-2.7/excel', 'Laporan\BeaCukai\LaporanBe
 $routes->get('/laporan-bea-cukai/laporan-mutasi/print', 'Laporan\BeaCukai\LaporanBeaCukai::exportPDFLaporanMutasi', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-mutasi/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelLaporanMutasi', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/all-mutasi-barang', 'Laporan\BeaCukai\LaporanBeaCukai::allMutasiBarang', ['filter' => 'Auth']);
+
+//Penjualan
+$routes->get('/laporan-sales', 'Laporan\Penjualan\Penjualan::index', ['filter' => 'Auth']);
+
+$routes->get('/laporan-sales/sales-per-pelanggan', 'Laporan\Penjualan\PenjualanPerPelanggan::index', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/sales-per-pelanggan/all', 'Laporan\Penjualan\PenjualanPerPelanggan::allTransaksi', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/sales-per-pelanggan/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\Penjualan::LaporanPenjualanPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/sales-per-pelanggan/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\Penjualan::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
+
+
 // RETUR LOKAL BB
 $routes->get('/retur-po-lokal-bb', 'ReturPembelian\ReturPembelianLokalBB::index', ['filter' => 'Auth']);
 $routes->get('/retur-po-lokal-bb/all', 'ReturPembelian\ReturPembelianLokalBB::all', ['filter' => 'Auth']);
