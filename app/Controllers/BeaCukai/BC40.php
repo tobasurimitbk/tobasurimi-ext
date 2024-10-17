@@ -2046,8 +2046,8 @@ class BC40 extends BaseController
             $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
             $bc40 = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
 
-            $poIdArr = json_decode($bcPo['multiple_po_id']);
-            $lpbIdArr = json_decode($bcPo['multiple_lpb_id']);
+            $poIdArr = array_unique(json_decode($bcPo['multiple_po_id']));
+            $lpbIdArr = array_unique(json_decode($bcPo['multiple_lpb_id']));
             $typeBahan = $bcPo['po_type'] == "LOKAL BAKU" ? "bahan_baku" : "bahan_penolong";
 
             foreach ($lpbIdArr as $lpbId) {

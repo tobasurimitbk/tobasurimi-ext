@@ -438,9 +438,9 @@ class ProductionResult extends BaseController
                     "no_ref" => $bd->ref_no,
                     "qty" => isset($bd->qty2) ? $qty2 : $qty,
                     "kondisi_barang" => $bd->kondisi_barang,
-                    "harga_umum" => (float) $bd->harga_umum,
-                    "harga_harian" => (float) $bd->harga_harian,
-                    "harga_bulanan" => (float) $bd->harga_bulanan,
+                    "harga_umum" => (float) isset($bd->harga_umum) ? $bd->harga_umum :  0,
+                    "harga_harian" => (float) isset($bd->harga_harian) ? $bd->harga_harian : 0,
+                    "harga_bulanan" => (float) isset($bd->harga_bulanan) ? $bd->harga_bulanan : 0,
                 ];
                 $this->productionResultDetailModel->insert($datasbd);
 
@@ -463,9 +463,9 @@ class ProductionResult extends BaseController
                         "no_ref" => $bd->ref_no,
                         "qty" => $qtySisa,
                         "kondisi_barang" => "ditapak",
-                        "harga_umum" => (float) $bd->harga_umum,
-                        "harga_harian" => (float) $bd->harga_harian,
-                        "harga_bulanan" => (float) $bd->harga_bulanan,
+                        "harga_umum" => (float) isset($bd->harga_umum) ? $bd->harga_umum :  0,
+                        "harga_harian" => (float) isset($bd->harga_harian) ? $bd->harga_harian : 0,
+                        "harga_bulanan" => (float) isset($bd->harga_bulanan) ? $bd->harga_bulanan : 0,
                     ];
                     $this->productionResultDetailModel->insert($datasbr);
                 }
@@ -486,9 +486,9 @@ class ProductionResult extends BaseController
                     "type" => "SCRAP",
                     "no_ref" => "NON PABEAN",
                     "qty" => (float) $bs->qty,
-                    "harga_umum" => (float) $bs->harga_umum,
-                    "harga_harian" => (float) $bs->harga_harian,
-                    "harga_bulanan" => (float) $bs->harga_bulanan,
+                    "harga_umum" => (float) isset($bs->harga_umum) ? $bs->harga_umum :  0,
+                    "harga_harian" => (float) isset($bs->harga_harian) ? $bs->harga_harian : 0,
+                    "harga_bulanan" => (float) isset($bs->harga_bulanan) ? $bs->harga_bulanan : 0,
                 ];
                 $this->productionResultDetailModel->insert($datasbs);
             }
@@ -512,9 +512,9 @@ class ProductionResult extends BaseController
                     "no_ref" => $bf->ref_no,
                     "qty" => (float) $bf->qty,
                     "kondisi_barang" => $bf->kondisi_barang,
-                    "harga_umum" => (float) $bf->harga_umum,
-                    "harga_harian" => (float) $bf->harga_harian,
-                    "harga_bulanan" => (float) $bf->harga_bulanan,
+                    "harga_umum" => (float) isset($bf->harga_umum) ? $bf->harga_umum :  0,
+                    "harga_harian" => (float) isset($bf->harga_harian) ? $bf->harga_harian : 0,
+                    "harga_bulanan" => (float) isset($bf->harga_bulanan) ? $bf->harga_bulanan : 0,
                 ];
                 $this->productionResultDetailModel->insert($datasbf);
             }
