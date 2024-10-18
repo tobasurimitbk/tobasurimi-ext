@@ -10,14 +10,8 @@
 
         <div class="col-md-2 text-right">
             <div class="btn-group">
-                <button type="button" class="btn btn-warning">Export</button>
-                <button type="button" class="btn btn-warning dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                    <span class="sr-only">Toggle Dropdown</span>
-                </button>
-                <div class="dropdown-menu" role="menu">
-                    <a class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-accounting/pembelian/printPDF"); ?>')">PDF</a>
-                    <a class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/pembelian/printExcel"); ?>')">Excel</a>
-                </div>
+                <a class="nav-link btn btn-warning" onclick="printPDF('<?= base_url("/laporan-sales/sales-per-pelanggan/printPDF"); ?>')">Export PDF</a>
+                <!-- <a class="btn btn-warning" onclick="printExcel('<?= base_url("/laporan-accounting/pembelian/printExcel"); ?>')">Export Excel</a> -->
             </div>
         </div>
     </div>
@@ -244,7 +238,7 @@
         var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
         var search = $(".search").val() ? $(".search").val() : "all";
-        var filter = $(".list_supplier").val() ? $(".list_supplier").val() : "all";
+        var filter = $(".filter_customer").val() ? $(".filter_customer").val() : "all";
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
         // console.log(url2);
         window.open(url2, "_blank");
@@ -253,7 +247,7 @@
         var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
         var search = $(".search").val() ? $(".search").val() : "all";
-        var filter = $(".list_supplier").val() ? $(".list_supplier").val() : "all";
+        var filter = $(".filter_customer").val() ? $(".filter_customer").val() : "all";
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
         // console.log(url2);
         window.open(url2, "_blank");
