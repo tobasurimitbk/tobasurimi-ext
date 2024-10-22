@@ -6,12 +6,14 @@ use App\Controllers\BaseController;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\BC25Model;
+use App\Models\BC27Model;
 use App\Models\BC30Model;
 use App\Models\BC41Model;
 use App\Models\DivisisModel;
 use App\Models\KemasanModel;
 use App\Models\MetadataModel;
 use App\Models\ParentBarangModel;
+use App\Models\PPBKBModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
@@ -36,6 +38,8 @@ class StokHistori extends BaseController
     protected $bc30Model;
     protected $bc25Model;
     protected $bc41Model;
+    protected $bc27Model;
+    protected $ppbkbModel;
 
     public function __construct()
     {
@@ -55,6 +59,8 @@ class StokHistori extends BaseController
         $this->bc30Model = new BC30Model();
         $this->bc25Model = new BC25Model();
         $this->bc41Model = new BC41Model();
+        $this->bc27Model = new BC27Model();
+        $this->ppbkbModel = new PPBKBModel();
     }
 
     public function index()
@@ -103,7 +109,6 @@ class StokHistori extends BaseController
 
         foreach ($dataQry['data'] as $data) {
             // NO AJU REFERENSI
-            $data->no_aju_referensi = $data->no_aju;
             $in_out = $data->status == "In" ? "(+)" : "(-)";
 
             if ($data->sumber == "LPB" || $data->sumber == "JASA VENDOR") {
@@ -117,7 +122,7 @@ class StokHistori extends BaseController
             }
 
             // TEMPELKAN SAJA NO BC 3.0 JIKA PENJUALAN
-            if ($data->sumber == "PENJUALAN") {
+            if ($data->sumber == "PENJUALAN" || $data->sumber == "MUTASI" || $data->sumber == "RETUR") {
                 $bc30Lokal = $this->bc30Model
                     ->select('bc_30.no_aju, sales_order.bc_type')
                     ->join('sales_order', 'sales_order.id = bc_30.sales_order_id', 'left')
@@ -162,6 +167,20 @@ class StokHistori extends BaseController
                     ->where('bc_41.company_id', $this->this_company_id)
                     ->first();
 
+                $ppbkbMutasi = $this->ppbkbModel
+                    ->select('ppbkb.no_ppbkb')
+                    ->join('mutasi', 'mutasi.id = ppbkb.mutasi_id', 'left')
+                    ->where('mutasi.company_id', $this->this_company_id)
+                    ->where('mutasi.no_mutasi', $data->no_dokumen2)
+                    ->first();
+
+                $bc27MutasiGlobal = $this->bc27Model
+                    ->select('bc_27.no_aju')
+                    ->join('mutasi_global', 'mutasi_global.id = bc_27.mutasi_global_id', 'left')
+                    // ->where('mutasi_global.company_asal_id', $this->this_company_id)
+                    ->where('mutasi_global.no_mutasi', $data->no_dokumen2)
+                    ->first();
+
                 if ($bc30Lokal != null) {
                     // STUFFING LOKAL BC 3.0 SUDAH DIBUAT
                     $dokumenBC = $this->metaDataModel->find($bc30Lokal['bc_type']);
@@ -192,6 +211,15 @@ class StokHistori extends BaseController
                     $dokumenBC = $this->metaDataModel->find($bc41PengeluaranBarang['bc_id']);
                     $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
                     $data->no_aju = $bc41PengeluaranBarang['no_aju'];
+                } elseif ($ppbkbMutasi != null) {
+                    // PPBKB'
+                    $bcName = "PPBKB";
+                    $data->no_aju_referensi = $data->no_aju;
+                    $data->no_aju = $ppbkbMutasi['no_ppbkb'];
+                } elseif ($bc27MutasiGlobal != null) {
+                    $bcName = "BC 2.7";
+                    $data->no_aju_referensi = $data->no_aju;
+                    $data->no_aju = $bc27MutasiGlobal['no_aju'];
                 } else {
                     // BELUM DIBUAT SAMA SEKALI DOKUMEN BC 3.O NYA
                     $dokumenBC = $this->metaDataModel->find($data->bc_id);
@@ -203,8 +231,17 @@ class StokHistori extends BaseController
             }
 
             // REFERENSI
-            $dokumenBCReferensi = $this->metaDataModel->find($data->bc_id);
-            $bcNameReferensi = $dokumenBCReferensi == null ? "NON PABEAN" : $dokumenBCReferensi['value'];
+            if ($data->sumber == "PENJUALAN" || $data->sumber == "MUTASI" || $data->sumber == "RETUR") {
+                $dokumenBCReferensi = $this->metaDataModel->find($data->bc_id);
+                $bcNameReferensi = $dokumenBCReferensi == null ? "NON PABEAN" : $dokumenBCReferensi['value'];
+                if ($data->sumber != "MUTASI") {
+                    $data->no_aju_referensi = $data->no_aju;
+                }
+            } else {
+                $bcNameReferensi = "-";
+                $data->no_aju_referensi = "-";
+            }
+
 
             if ($data->kemasan_id == 0) {
                 // BARANG
