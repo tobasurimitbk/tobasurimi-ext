@@ -87,13 +87,13 @@
                             <tr style="color:whitesmoke;">
                                 <td style="text-align: center;"><?= $i++ ?></td>
                                 <td style="text-align: center;"><?= $d['tanggal_text'] ?></td>
-                                <td style="text-align: center;"><?= $d['jam_kerja']['jenis'] ?></td>
-                                <td style="text-align: center;"><?= $d['jam_kerja']['jam_masuk'] ?></td>
-                                <td style="text-align: center;"><?= $d['jam_kerja']['jam_istirahat_mulai'] ?></td>
-                                <td style="text-align: center;"><?= $d['jam_kerja']['jam_istirahat_selesai'] ?></td>
-                                <td style="text-align: center;"><?= $d['jam_kerja']['jam_pulang'] ?></td>
+                                <td style="text-align: center;"><?= @$d['jam_kerja']['jenis'] ?></td>
+                                <td style="text-align: center;"><?= @$d['jam_kerja']['jam_masuk'] ?></td>
+                                <td style="text-align: center;"><?= @$d['jam_kerja']['jam_istirahat_mulai'] ?></td>
+                                <td style="text-align: center;"><?= @$d['jam_kerja']['jam_istirahat_selesai'] ?></td>
+                                <td style="text-align: center;"><?= @$d['jam_kerja']['jam_pulang'] ?></td>
                                 <td style="text-align: center;">
-                                    <a href="#" data-jam_kerja_id="<?= $d['jam_kerja']['jam_kerja_id'] ?>" data-tanggal_text="<?= $d['tanggal_text'] ?>" data-tanggal="<?= $d['tanggal'] ?>" data-toggle="tooltip" title="Atur Jam Kerja" class="btn btn-primary btn-update-modal">
+                                    <a href="#" data-jam_kerja_id="<?= @$d['jam_kerja']['jam_kerja_id'] ?>" data-tanggal_text="<?= $d['tanggal_text'] ?>" data-tanggal="<?= $d['tanggal'] ?>" data-toggle="tooltip" title="Atur Jam Kerja" class="btn btn-primary btn-update-modal">
                                         <i class="fas fa-pencil-alt"></i>
                                     </a>
                                 </td>
