@@ -1,6 +1,14 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
-
+<style>
+    .sticky-col {
+        position: sticky;
+        right: 0;
+        background-color: white;
+        z-index: 100;
+        border-left: 1px solid #ddd;
+    }
+</style>
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
@@ -38,7 +46,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_customer" name="filter_customer" id="filter_customer">
                             <option value="" data-code=""></option>
@@ -52,7 +60,7 @@
                         <label for="floatingInput">Pilih Customer</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_invoice" name="filter_invoice" id="filter_invoice">
                             <option value="" data-code=""></option>
@@ -62,7 +70,7 @@
                         <label for="floatingInput">Pilih Invoice</label>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-2 mb-2">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Surat Jalan </label>
@@ -85,7 +93,7 @@
                                 <th onclick="changeSort('sales_order_invoice_id')" class="sort">Invoice</th>
                                 <th onclick="changeSort('print')" class="sort">Print</th>
                                 <th onclick="changeSort('total_harga')" class="sort">Total Harga</th>
-                                <th class="sort">Action</th>
+                                <th class="sort sticky-col">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -262,16 +270,29 @@
             className: "text-center"
         }, {
             data: "id",
-            className: "text-center actions",
+            className: "text-center actions sticky-col",
             searchable: false,
             sortable: false,
             render: function(data, type, row) {
                 let id = row.id;
-                return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
+                let btn_delete = ``;
+                let btn_print = ``;
 
-                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("surat-jalan/print/"); ?>${id}')" style="box-shadow: none !important;">
-                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                </button>`
+                <?php if (can('Penjualan Lokal', 'Surat Jalan', 'p')): ?>
+                    btn_print = `
+                          <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("surat-jalan/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                        </button>
+                        `;
+                <?php endif; ?>
+
+                <?php if (can('Penjualan Lokal', 'Surat Jalan', 'd')): ?>
+                    btn_delete = `
+                          <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
+                        `;
+                <?php endif; ?>
+
+                return `${btn_print}${btn_delete}`;
             }
         }],
         columnDefs: [{
