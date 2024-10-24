@@ -1,6 +1,14 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
-
+<style>
+    .sticky-col {
+        position: sticky;
+        right: 0;
+        background-color: white;
+        z-index: 100;
+        border-left: 1px solid #ddd;
+    }
+</style>
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
@@ -11,20 +19,30 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end row-col-spp">
+            <div class="row justify-content-end">
                 <div class="col-md-2">
-                    <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -39,21 +57,24 @@
 
 
                         </select>
-                        <label for="floatingInput">Filter Customer</label>
+                        <label for="floatingInput">Pilih Customer</label>
                     </div>
                 </div>
                 <div class="col-md-2">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_jenis_dokumen" name="filter_jenis_dokumen" id="filter_jenis_dokumen">
                             <option value="" data-code=""></option>
-                            <option value="pengiriman" data-code="">Pengiriman</option>
-                            <option value="pesanan" data-code="">Pesanan</option>
+                            <option value="pengiriman" data-code="">PENGIRIMAN</option>
+                            <option value="pesanan" data-code="">PESANAN</option>
                         </select>
-                        <label for="floatingInput">Filter Jenis Dokumen</label>
+                        <label for="floatingInput">Pilih Jenis Dokumen</label>
                     </div>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari No. Invoice" value="" />
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Invoice </label>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -75,7 +96,7 @@
                                 <th onclick="changeSort('status')" class="sort">Status</th>
                                 <th onclick="changeSort('counter_print')" class="sort">Print</th>
 
-                                <th class="sort">Action</th>
+                                <th class="sort sticky-col">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -99,11 +120,17 @@
     let list_delete = [];
     var row = 0;
 
-    $('.filter_customer, .filter_jenis_dokumen').select2({
-        placeholder: "",
+    $('.filter_customer').select2({
+        placeholder: "Pilih Customer",
         theme: "bootstrap-5",
         allowClear: true,
-    })
+    });
+
+    $('.filter_jenis_dokumen').select2({
+        placeholder: "Pilih Jenis Dokumen",
+        theme: "bootstrap-5",
+        allowClear: true,
+    });
 
     //CSS SELECT2 FLOATING LABEL
     $('.filter_customer, .filter_jenis_dokumen')
@@ -257,24 +284,35 @@
             },
             {
                 data: "id",
-                className: "text-center actions",
+                className: "text-center actions sticky-col",
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row.id;
                     let status = row.status
-                    if (status == "Waiting") {
-                        return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
+                    let btn_print = '';
+                    let btn_delete = '';
 
-                    <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-penjualan-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
-                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                    </button>
-                    `
+                    <?php if (can('Penjualan Lokal', 'Invoice', 'p')): ?>
+                        btn_print = `
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-penjualan-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                        `;
+                    <?php endif; ?>
+
+                    <?php if (can('Penjualan Lokal', 'Invoice', 'd')): ?>
+                        btn_delete = `
+                            <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
+                        `;
+                    <?php endif; ?>
+
+
+                    if (status == "WAITING") {
+                        return `${btn_print}${btn_delete}`;
                     } else {
-                        return `
-                        <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-penjualan-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
-                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                    `
+                        return `${btn_print}`;
+
                     }
 
                 }
@@ -355,6 +393,58 @@
         })
     }
 
+    const posting = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan di posting?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("penerimaan-barang-lokal-bb/posting"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+
+                        }
+                    },
+
+                });
+            }
+        })
+    }
 
     const changeSort = function(val) {
         if (sort !== val) {

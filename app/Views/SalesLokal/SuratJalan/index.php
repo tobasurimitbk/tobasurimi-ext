@@ -11,20 +11,30 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end row-col-spp">
+            <div class="row justify-content-end">
                 <div class="col-md-2">
-                    <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -39,7 +49,7 @@
 
 
                         </select>
-                        <label for="floatingInput">Filter Customer</label>
+                        <label for="floatingInput">Pilih Customer</label>
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -49,11 +59,14 @@
                             <option value="belum" data-code="">Belum Digunakan Invoice</option>
                             <option value="sudah" data-code="">Sudah Digunakan Invoice</option>
                         </select>
-                        <label for="floatingInput">Filter Invoice</label>
+                        <label for="floatingInput">Pilih Invoice</label>
                     </div>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari No. Surat Jalan" value="" />
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Surat Jalan </label>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -96,12 +109,17 @@
     let list_delete = [];
     var row = 0;
 
-    $('.filter_customer, .filter_invoice').select2({
-        placeholder: "",
+    $('.filter_customer').select2({
+        placeholder: "Pilih Customer",
         theme: "bootstrap-5",
         allowClear: true,
-    })
+    });
 
+    $('.filter_invoice').select2({
+        placeholder: "Pilih Invoice",
+        theme: "bootstrap-5",
+        allowClear: true,
+    });
     //CSS SELECT2 FLOATING LABEL
     $('.filter_customer, .filter_invoice')
         .parent('div')
