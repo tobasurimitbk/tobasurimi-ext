@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rincian Penjualan Per Pelanggan</title>
+  <title>Rincian Penjualan Per Barang</title>
   <style>
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -51,7 +51,7 @@
 
 <body>
   <h6>TOBA FISH</h6>
-  <h5>Rincian Penjualan per Pelanggan</h5>
+  <h5>Rincian Penjualan per Barang</h5>
   <h6>Dari <?= ($dateStart != "All") ? $dateStart : "-" ?> s/d <?= ($dateEnd != "Now") ? $dateEnd : "-" ?></h6>
 
   <table width="100%" id="table1">
@@ -60,7 +60,10 @@
         <th>No. Faktur</th>
         <th>Tanggal Faktur</th>
         <th>Keterangan</th>
+        <th>Kuantitas</th>
+        <th>Satuan</th>
         <th>Jumlah</th>
+        <th>Nama Barang</th>
         <th>Nama Pelanggan</th>
         <th>Nama Penjual</th>
       </tr>
@@ -75,7 +78,7 @@
             $currentCustomer = $value['no_faktur'];
       ?>
             <tr>
-              <td colspan="6" style="font-weight: bold;"><?= $value['no_faktur'] ?></td>
+              <td colspan="9" style="font-weight: bold;"><?= $value['no_faktur'] ?></td>
             </tr>
           <?php
           }
@@ -83,9 +86,9 @@
           // Tampilkan total hanya untuk pelanggan yang sama
           ?>
           <tr>
-            <td colspan="3"></td>
+            <td colspan="5"></td>
             <td style="font-weight: bold;"><?= $value['no_faktur'] ?></td>
-            <td colspan="2"></td>
+            <td colspan="3"></td>
           </tr>
         <?php
         } else {
@@ -94,7 +97,10 @@
             <td><?= $value['no_faktur'] ?></td>
             <td><?= $value['tanggal_faktur'] ?></td>
             <td><?= $value['keterangan'] ?></td>
+            <td><?= $value['qty_invoice'] ?></td>
+            <td><?= $value['kode_satuan'] ?></td>
             <td><?= $value['total_invoice'] ?></td>
+            <td><?= $value['barang_name'] ?></td>
             <td><?= $value['nama_pelanggan'] ?></td>
             <td><?= $value['nama_sales'] ?></td>
           </tr>

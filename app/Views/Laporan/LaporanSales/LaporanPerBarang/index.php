@@ -5,7 +5,7 @@
 <section class="section">
     <div class="section-header">
         <div class="col-md-10">
-            <h1>Laporan Penjualan Per Barang</h1>
+            <h1>Laporan Rincian Penjualan Per Barang</h1>
         </div>
 
         <div class="col-md-2 text-right">
@@ -149,7 +149,16 @@
                 data: "keterangan",
                 className: "text-center",
             }, {
+                data: "qty_invoice",
+                className: "text-center",
+            }, {
+                data: "kode_satuan",
+                className: "text-center",
+            }, {
                 data: "total_invoice",
+                className: "text-center",
+            }, {
+                data: "barang_name",
                 className: "text-center",
             }, {
                 data: "nama_pelanggan",
