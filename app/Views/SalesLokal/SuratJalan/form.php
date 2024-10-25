@@ -5,7 +5,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name"><?= !empty($data) ? "Ubah" : "Tambah"; ?></h1>
+        <h1 class="title-name"><?= !empty($data) ? "Update Surat Jalan" : "Tambah Surat Jalan"; ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("surat-jalan"); ?>">
                 Kembali

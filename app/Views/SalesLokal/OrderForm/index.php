@@ -1,6 +1,14 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
-
+<style>
+    .sticky-col {
+        position: sticky;
+        right: 0;
+        background-color: white;
+        z-index: 100;
+        border-left: 1px solid #ddd;
+    }
+</style>
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
@@ -19,20 +27,30 @@
             </div>
         <?php endif; ?>
         <div class="card-body">
-            <div class="row justify-content-end row-col-spp">
+            <div class="row justify-content-end ">
                 <div class="col-md-4">
-                    <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -40,14 +58,11 @@
                     <div class="form-floating mb-3">
                         <select class="form-select filter_customer" name="filter_customer" id="filter_customer">
                             <option value="" data-code=""></option>
-
                             <?php foreach ($getCustomers as $row) : ?>
                                 <option value="<?= $row['id']; ?>" data-code=""><?= $row['name'] ?></option>
                             <?php endforeach; ?>
-
-
                         </select>
-                        <label for="floatingInput">Filter Customer</label>
+                        <label for="floatingInput">Pilih Customer</label>
                     </div>
                 </div>
 
@@ -60,21 +75,24 @@
                             <option value="belum" data-code="">Belum Digunakan Surat Jalan</option>
                             <option value="sudah" data-code="">Sudah Digunakan Surat Jalan</option>
                         </select>
-                        <label for="floatingInput">Filter Surat Jalan</label>
+                        <label for="floatingInput">Pilih Surat Jalan</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_invoice" name="filter_invoice" id="filter_invoice">
                             <option value="" data-code=""></option>
-                            <option value="belum" data-code="">Belum Digunakan Invoice</option>
-                            <option value="sudah" data-code="">Sudah Digunakan Invoice</option>
+                            <option value="belum" data-code="">BELUM DIGUNAKAN INVOICE</option>
+                            <option value="sudah" data-code="">SUDAH DIGUNAKAN INVOICE</option>
                         </select>
-                        <label for="floatingInput">Filter Invoice</label>
+                        <label for="floatingInput">Pilih Invoice</label>
                     </div>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari No. Order" value="" />
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Order </label>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -106,7 +124,7 @@
 
                                 <th onclick="changeSort('counter_print')" class="sort">Print</th>
 
-                                <th class="sort">Action</th>
+                                <th class="sort sticky-col">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -181,11 +199,23 @@
     let list_delete = [];
     var row = 0;
 
-    $('.filter_customer, .filter_surat_jalan, .filter_invoice').select2({
-        placeholder: "",
+    $('.filter_customer').select2({
+        placeholder: "Pilih Customer",
         theme: "bootstrap-5",
         allowClear: true,
-    })
+    });
+
+    $('.filter_surat_jalan').select2({
+        placeholder: "Pilih Surat Jalan",
+        theme: "bootstrap-5",
+        allowClear: true,
+    });
+
+    $('.filter_invoice').select2({
+        placeholder: "Pilih Invoice",
+        theme: "bootstrap-5",
+        allowClear: true,
+    });
 
     //CSS SELECT2 FLOATING LABEL
     $('.filter_customer, .filter_surat_jalan, .filter_invoice')
@@ -346,7 +376,7 @@
                 }
             }, {
                 data: "id",
-                className: "text-center actions",
+                className: "text-center actions sticky-col",
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {

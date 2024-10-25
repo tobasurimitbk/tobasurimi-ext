@@ -163,7 +163,7 @@ class Invoice extends BaseController
                 "id"                => encrypt($data->id),
                 "no_faktur"         => $data->no_faktur,
                 "tanggal_faktur"    => $data->tanggal_faktur,
-                "document_type"     => $data->doc_type,
+                "document_type"     => strtoupper($data->doc_type),
                 "document_no"       => $cleaned_string_document_no,
                 "total_invoice"     => number_format(floatval($data->total_invoice)),
                 "kode_pelanggan"    => $data->kode_pelanggan,
@@ -171,7 +171,7 @@ class Invoice extends BaseController
                 "nama_pelanggan"    => $data->nama_pelanggan,
                 "nama_sales"        => $data->salesName,
                 "tipe_invoice"      => $data->tipe_invoice,
-                "status"            => ($data->status_posting == 0) ? 'Waiting' : 'Posting',
+                "status"            => ($data->status_posting == 0) ? 'WAITING' : 'POSTING',
                 "counter_print"     => $data->counter_print,
                 "status_pembayaran"     => $statusPembayaranInvoice,
             ]);
@@ -1354,7 +1354,7 @@ class Invoice extends BaseController
 
         return response()->setJSON([
             'status' => true,
-            'message' => "Pengeluaran Lokal berhasil diposting",
+            'message' => "Invoice Berhasil Diposting",
             'token' => csrf_hash(),
         ]);
     }
