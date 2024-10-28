@@ -278,7 +278,7 @@ class SuratJalan extends BaseController
             $this->SuratJalanModel->db->transComplete();
 
             $data = [
-                "id"        => $dataSuratJalan,
+                "id"        => encrypt($dataSuratJalan),
                 "status"    => true,
                 "message"   => "Data Berhasil disimpan",
                 "payload"   => $values,

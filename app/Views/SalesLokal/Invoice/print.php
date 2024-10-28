@@ -129,8 +129,9 @@
                         <tr>
                             <td style="width: 1px;vertical-align: top">Penagihan: </td>
                             <td class="rounded-border" style="padding: 5px">
-                                <div><?= $invData->customer_name ?></div>
+                                <div><?= $invData->customer_name ?> - <?= $invData->customer_phone ?></div>
                                 <div><?= $invData->customer_address ?></div>
+                                <div>Termin : <?= $invData->terms ?></div>
                             </td>
                         </tr>
                     </table>
