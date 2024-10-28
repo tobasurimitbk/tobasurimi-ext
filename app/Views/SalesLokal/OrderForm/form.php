@@ -1980,7 +1980,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url('order-form-lokal') ?>"
+                                                window.location.href = `<?= base_url("order-form-lokal/print"); ?>/${response.id}`;
                                             })
                                     } else {
                                         Swal.fire({

@@ -824,7 +824,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = `<?= base_url("invoice-penjualan-lokal"); ?>`;
+                                                window.location.href = `<?= base_url("invoice-penjualan-lokal/print"); ?>/${response.id}`;
                                             })
                                     } else {
                                         Swal.fire({
