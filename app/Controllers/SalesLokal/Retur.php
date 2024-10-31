@@ -345,11 +345,11 @@ class Retur extends BaseController
 
                         // SUB DETAIL
                         $this->stockDetail2Model->insertStokDetail2(
-                            "-",
-                            '-',
+                            $value['bc_id_warehouse'],
+                            $value['stock_id_warehouse'],
                             $stokDetail,
                             $value['qty'],
-                            "-",
+                            $value['no_aju_Warehouse'],
                             $salesOrderReturnData["no_return"],
                             $value['stock_dokumen'],
                             '-',
@@ -381,8 +381,8 @@ class Retur extends BaseController
                             $value['barang1_type'],
                             $value['barang1_id_warehouse'],
                             $value['barang2_id_warehouse'],
-                            '-',
-                            "-",
+                            $value['bc_id_warehouse'],
+                            $value['no_aju_Warehouse'],
                             $stokIn
                         );
 
@@ -394,26 +394,26 @@ class Retur extends BaseController
                                 "In",
                                 date('Y-m-d'),
                                 $this->this_user_id,
-                                "INISIASI",
+                                "RETURN PENJUALAN LOKAL",
                                 "-",
                                 "-"
                             );
-                            // $this->stockDetail2Model->insertStokDetail2(
-                            //     '-',
-                            //     '-',
-                            //     $stokDetailIn,
-                            //     0,
-                            //     '-',
-                            //     "-"
-                            // );
+                            $this->stockDetail2Model->insertStokDetail2(
+                                $value['bc_id_warehouse'],
+                                $value['stock_id_warehouse'],
+                                $stokDetailIn,
+                                0,
+                                $value['no_aju_warehouse'],
+                                "-"
+                            );
                         }
 
-                        // $stockRebusDetailIn = $this->stockDetail2Model->getStockListDetail(
-                        //     $value['bc_id'],
-                        //     $value['stock_id'],
-                        //     $value['no_aju'],
-                        //     $value['stock_dokumen']
-                        // );
+                        $stockRebusDetailIn = $this->stockDetail2Model->getStockListDetail(
+                            $value['bc_id_warehouse'],
+                            $value['stock_id_warehouse'],
+                            $value['no_aju_warehouse'],
+                            $value['stock_dokumen']
+                        );
 
                         // DETAIL
                         $stokDetailIn = $this->stockDetailModel->insertStokDetail(
@@ -429,11 +429,11 @@ class Retur extends BaseController
 
                         // SUB DETAIL
                         $this->stockDetail2Model->insertStokDetail2(
-                            '-',
-                            $stokIn,
-                            $stokDetailIn,
+                            $value['bc_id_warehouse'],
+                            $value['stock_id_warehouse'],
+                            $stokDetail,
                             $value['qty'],
-                            '-',
+                            $value['no_aju_warehouse'],
                             $salesOrderReturnData["no_return"],
                             '-',
                             '-',
