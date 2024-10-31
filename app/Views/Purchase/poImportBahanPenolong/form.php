@@ -342,8 +342,16 @@
                                 <select class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
                                     <option data-barang_id="" data-satuan_id="" data-nama_barang="" data-kode_barang="" data-spesifikasi_id="" value=""></option>
                                     <?php foreach ($barang as $s) : ?>
-                                        <option data-barang_id="<?= $s['id'] ?>" data-satuan_id="<?= $s['satuan_1'] ?>" data-nama_barang="<?= strtoupper($s['barang_name_master']) . ' - ' . strtoupper($s['spesifikasi']) ?>" data-kode_barang="<?= $s['kode_barang'] ?>" data-spesifikasi_id="<?= $s['barang_master_spesifikasi_id'] ?>" value="<?= $s['barang_master_spesifikasi_id'] ?>">
-                                            <?= strtoupper($s['kode_barang']) . " ( " . strtoupper($s['barang_name_master']) . ' - ' . strtoupper($s['spesifikasi']) . " )" ?>
+                                        <option
+                                            data-barang_id="<?= $s['id'] ?>"
+                                            data-satuan_id="<?= $s['satuan_1'] ?>"
+                                            data-satuan_2="<?= $s['satuan_2'] ?>"
+                                            data-satuan_3="<?= $s['satuan_3'] ?>"
+                                            data-nama_barang="<?= $s['barang_name_master'] . ' - ' . $s['spesifikasi'] ?>"
+                                            data-kode_barang="<?= $s['kode_barang'] ?>"
+                                            data-spesifikasi_id="<?= $s['barang_master_spesifikasi_id'] ?>"
+                                            value="<?= $s['barang_master_spesifikasi_id'] ?>">
+                                            <?= $s['kode_barang'] . " ( " . $s['barang_name_master'] . ' - ' . $s['spesifikasi'] . " )" ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -357,17 +365,25 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select disabled class="form-select satuan_id" name="satuan_id" id="satuan_id" aria-label="Floating label select example">
+                        <div class="col-md-6 mb-5">
+                            <div class="form-floating" style="height: 50px;">
+                                <select class="form-select satuan_id" name="satuan_id" id="satuan_id" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($satuan as $s) : ?>
-                                        <option data-nama_satuan="<?= strtoupper($s['nama_satuan']) ?>" value="<?= $s['id'] ?>">
-                                            <?= strtoupper($s['nama_satuan']) ?>
+                                        <option
+                                            data-kode_satuan="<?= $s['kode_satuan'] ?>"
+                                            data-nama_satuan="<?= $s['nama_satuan'] ?>"
+                                            value="<?= $s['id'] ?>">
+                                            <?= $s['kode_satuan'] ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput">Satuan</label>
+                                <label for="floatingInput" style="z-index: 1;">Satuan</label>
+                                <small class="mb-4 mt-1">
+                                    <i>
+                                        Jika ingin menggunakan satuan yang lain, pastikan anda sudah mengatur satuannya di menu master barang
+                                    </i>
+                                </small>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -380,13 +396,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control harga_satuan" name="harga_satuan" id="harga_satuan" placeholder="Harga Satuan" onchange="this.value = formatRupiah(this.value)">
+                                <input autocomplete="one-time-code" type="text" class="form-control harga_satuan" name="harga_satuan" id="harga_satuan" placeholder="Harga Satuan" onchange="this.value = formatRupiah2(this.value)">
                                 <label for="floatingInput">Harga Satuan</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control biaya_tambahan" name="biaya_tambahan" id="biaya_tambahan" placeholder="Biaya Tambahan (Opsional)" onchange="this.value = formatRupiah(this.value)">
+                                <input autocomplete="one-time-code" type="text" class="form-control biaya_tambahan" name="biaya_tambahan" id="biaya_tambahan" placeholder="Biaya Tambahan (Opsional)" onchange="this.value = formatRupiah2(this.value)">
                                 <label for="floatingInput">Biaya Tambahan (Opsional)</label>
                             </div>
                             <!-- <div class="form-floating mb-3" style="height: 50px;">
@@ -398,7 +414,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onchange="this.value = formatRupiah(this.value)">
+                                <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onchange="this.value = formatRupiah2(this.value)">
                                 <label for="floatingInput">Total</label>
                             </div>
                         </div>
@@ -464,6 +480,16 @@
 
     });
 
+    $('#satuan_id').select2({
+        placeholder: "Pilih Satuan",
+        theme: "bootstrap-5",
+        allowClear: true,
+        dropdownParent: $('.detail-modal')
+    }).change(function() {
+
+    });
+
+
     $('#spp_id').select2({
         placeholder: "Pilih Nomor SPP",
         theme: "bootstrap-5",
@@ -473,13 +499,25 @@
     });
 
     $('#barang_id').select2({
-        placeholder: "Pilih Bahan Penolong",
+        placeholder: "Pilih Bahan Baku",
         theme: "bootstrap-5",
         allowClear: true,
         dropdownParent: $('.detail-modal')
     }).change(function() {
-        $('#satuan_id').val(($(this).find("option:selected").data("satuan_id")));
+        var selected = $('#barang_id option:selected');
+        var barang_update_id = $('#barang_update_id').val();
+        if (barang_update_id == '') {
+            // INSERT
+            $('#satuan_id').val(selected.data('satuan_id')).change();
+        }
+
+        activeFieldSatuanId(
+            selected.data('satuan_id'),
+            selected.data('satuan_2'),
+            selected.data('satuan_3')
+        )
     });
+
 
     $("#payment_date,#latest_shipment_date").datepicker({
         todayHighlight: true,
@@ -487,7 +525,7 @@
         orientation: "bottom auto",
         autoclose: true
     });
-    $("#division_id,#supplier_id,#currency,#barang_id,#spp_id,#shipment")
+    $("#division_id,#supplier_id,#currency,#barang_id, #spp_id, #shipment, #satuan_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -543,7 +581,7 @@
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
-        $('#total').val(formatRupiah(total.toFixed(2)));
+        $('#total').val(formatRupiah2(total.toFixed(2)));
     });
 
 
@@ -557,7 +595,7 @@
         var harga_satuan;
         var total = $('#total').val()
         harga_satuan = convertRupiahToNumber(total) / Number(qty);
-        $('#harga_satuan').val(formatRupiah(harga_satuan));
+        $('#harga_satuan').val(formatRupiah2(harga_satuan));
     });
 
     // VALIDATOR DETAIL
@@ -1020,7 +1058,7 @@
             kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
             nama_barang: $('#barang_id').find("option:selected").data("nama_barang"),
             satuan_id: $('#satuan_id').val(),
-            nama_satuan: $('#satuan_id').find("option:selected").data("nama_satuan"),
+            nama_satuan: $('#satuan_id').find("option:selected").data("kode_satuan"),
             qty: $('#qty').val(),
             diskon: $('#diskon').val() || 0,
             harga_satuan: convertRupiahToNumber($('#harga_satuan').val()) || 0,
@@ -1029,6 +1067,7 @@
         });
         $(".detail-form input, .detail-form select").val("");
         $(".barang_id").val("").change();
+        $('#satuan_id').val(null).change();
         $(".diskon").val('0');
         // reset update flag
         $('#barang_update_id').val("")
@@ -1052,9 +1091,9 @@
             newRow.append($('<td>').text(v.kode_barang));
             newRow.append($('<td>').text(v.nama_barang));
             newRow.append($('<td>').text(v.nama_satuan));
-            newRow.append($('<td>').text(formatRupiah(v.harga_satuan)));
+            newRow.append($('<td>').text(formatRupiah2(v.harga_satuan)));
             newRow.append($('<td>').text(v.qty));
-            newRow.append($('<td>').text(formatRupiah(v.biaya_tambahan)));
+            newRow.append($('<td>').text(formatRupiah2(v.biaya_tambahan)));
             newRow.append($('<td>').text(v.total));
             <?php if (!empty($dataPOImport)) : ?>
                 <?php if ($dataPOImport->is_posted) : ?>
@@ -1095,10 +1134,10 @@
         table.find('tfoot').empty();
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="4"><b>TOTAL</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(totalHargaSatuan) + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + formatRupiah2(totalHargaSatuan) + '</b></td>'));
         newRow.append($('<td style="text-align:left;"><b>' + totalQty + '</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(totalTambahan) + '</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(totalHarga) + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + formatRupiah2(totalTambahan) + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + formatRupiah2(totalHarga) + '</b></td>'));
         newRow.append($('<td></td>'));
         table.find('tfoot').append(newRow);
 
@@ -1133,13 +1172,15 @@
             .data("barang_id", item.barang_id)
             .trigger('change');
 
-        $('#harga_satuan').val(formatRupiah(item.harga_satuan));
+        $('#harga_satuan').val(formatRupiah2(item.harga_satuan));
         $('#qty').val(item.qty);
         $('#diskon').val(item.diskon);
         $('#biaya_tambahan').val((item.biaya_tambahan == 0) ? "" : item.biaya_tambahan).val();
         $('#biaya_tambahan').change();
         $('#total').val(item.total);
         $('#barang_id').attr('disabled', true);
+        $('#keterangan').val(item.keterangan);
+        $('#satuan_id').val(item.satuan_id).change();
 
         $('.title-detail-name').text('Update ');
         $('.detail-modal').modal('show');
@@ -1158,7 +1199,7 @@
         return strs.replace(/[^0-9]/g, '');
     }
 
-    function formatRupiah(angka) {
+    function formatRupiah2(angka) {
         var formatter = new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR'
@@ -1168,6 +1209,20 @@
             return "0,00";
         }
         return formatter.format(parsedNumber).replace('Rp', '').trim();
+    }
+
+
+    function activeFieldSatuanId(satuan_1, satuan_2, satuan_3) {
+        const allowedValues = [String(satuan_1), String(satuan_2), String(satuan_3)];
+        $('#satuan_id').on('select2:open', function() {
+            $('#satuan_id option').each(function() {
+                if (!allowedValues.includes(String($(this).val()))) {
+                    $(this).attr('disabled', true).addClass('disabled-option');
+                } else {
+                    $(this).attr('disabled', false).removeClass('disabled-option');
+                }
+            });
+        });
     }
 
     function convertRupiahToNumber(rupiah) {
@@ -1297,7 +1352,7 @@
                 diskon: <?= $d['disc'] ?>,
                 harga_satuan: <?= $d['price'] ?>,
                 biaya_tambahan: <?= $d['additional_cost'] ?>,
-                total: formatRupiah("<?= (($d['price'] * $d['qty']) - (($d['disc'] / 100) * ($d['price'] * $d['qty']))) + $d['additional_cost'] ?>"),
+                total: formatRupiah2("<?= (($d['price'] * $d['qty']) - (($d['disc'] / 100) * ($d['price'] * $d['qty']))) + $d['additional_cost'] ?>"),
             });
         <?php endforeach; ?>
         drawTabel(listBarang);

@@ -493,10 +493,32 @@ class PenerimaanBarangModel extends Model
         $lpbID = $penerimaanBarangModel->insert($payloadPenerimaanBarang);
 
         foreach ($rmBarangDetail as $r) {
-            $barang = $supplierHargaModel->select('supplier_harga.bahan_baku_id, supplier_harga.spesifikasi, barang_master.barang_name')
-                ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id')
+            $selectQry = "
+                supplier_harga.bahan_baku_id, 
+                supplier_harga.spesifikasi, 
+                barang_master.barang_name,
+                barang_master_spesifikasi.satuan_1,
+                barang_master_spesifikasi.satuan_2,
+                barang_master_spesifikasi.satuan_3,
+                barang_master_spesifikasi.konversi_satuan_2,
+                barang_master_spesifikasi.konversi_satuan_3,
+            ";
+
+            $barang = $supplierHargaModel->select($selectQry)
+                ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id', 'left')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = supplier_harga.spesifikasi_id', 'left')
                 ->where('supplier_harga.id', $r['supplier_harga_id'])
                 ->first();
+
+            $nilaiKonversi = 1;
+            $satuanKonversiId = $barang == null ? null : $barang['satuan_1'];
+            if ($r['satuan_id'] == $barang['satuan_1']) {
+                $nilaiKonversi = 1;
+            } elseif ($r['satuan_id'] == $barang['satuan_2']) {
+                $nilaiKonversi = $barang['konversi_satuan_2'];
+            } elseif ($r['satuan_id'] == $barang['satuan_3']) {
+                $nilaiKonversi = $barang['konversi_satuan_3'];
+            }
 
             $penerimaanBarangDetailModel->insert([
                 'purchase_order_id' => $r['rm_purchase_order_id'],
@@ -513,6 +535,8 @@ class PenerimaanBarangModel extends Model
                 'unit' => $r['satuan_id'],
                 'nama_barang_dok' => $barang['barang_name'] . " (" . $barang['spesifikasi'] . ")",
                 'jml_masuk' => $r['qty'],
+                'jml_masuk_konversi' => ($r['qty'] * $nilaiKonversi),
+                'unit_konversi' => $satuanKonversiId,
                 // 'packaging' => "-",
                 // 'packaging_qty' => $r['qty']
             ]);
@@ -540,13 +564,13 @@ class PenerimaanBarangModel extends Model
                     "bahan_baku",
                     $p['barang_id'],
                     $p['spesifikasi_id'],
-                    $p['jml_masuk']
+                    $p['jml_masuk_konversi']
                 );
 
                 // DETAIL
                 $stokDetail = $stockDetailModel->insertStokDetail(
                     $stok,
-                    $p['jml_masuk'],
+                    $p['jml_masuk_konversi'],
                     'In',
                     date('Y-m-d'),
                     $rmDetail['createdBy'],
@@ -562,7 +586,7 @@ class PenerimaanBarangModel extends Model
                     $penerimaanBarang['bc_type'],
                     $stok,
                     $stokDetail,
-                    $p['qty'],
+                    $p['jml_masuk_konversi'],
                     "-",
                     $po['po_no'],
                     $po['po_no'],

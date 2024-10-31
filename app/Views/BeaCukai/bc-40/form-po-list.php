@@ -140,6 +140,7 @@
                                     <th style="text-align: center;">Barang</th>
                                     <th style="text-align: center;">Qty PO</th>
                                     <th style="text-align: center;">Qty Diterima</th>
+                                    <th style="text-align: center;">Qty Diterima (Konversi)</th>
                                     <th style="text-align: center;">Harga</th>
                                     <th style="text-align: center;">Action</th>
                                 </tr>
@@ -236,6 +237,7 @@
             lpb_no: "<?= $d['lpb_no'] ?>",
             purchase_order_id: "<?= $d['purchase_order_id'] ?>",
             qty_lpb: "<?= $d['qty_lpb'] ?>",
+            qty_lpb_konversi: "<?= $d['qty_lpb_konversi'] ?>",
             qty_po: "<?= $d['qty_po'] ?>",
             barang_id: "<?= $d['barang_id'] ?>",
             po_no: "<?= $d['po_no'] ?>",
@@ -626,6 +628,7 @@
                 newRow.append($('<td style="text-align: center;">').text(v.barang_name));
                 newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_po).toFixed(4)));
                 newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_lpb).toFixed(4)));
+                newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_lpb_konversi).toFixed(4)));
                 newRow.append($('<td style="text-align: center;">').text(formatRupiah(v.harga_number)));
 
                 newRow.append($('<td style="text-align: center;">').html(

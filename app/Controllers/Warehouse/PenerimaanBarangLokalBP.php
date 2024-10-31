@@ -405,6 +405,8 @@ class PenerimaanBarangLokalBP extends BaseController
                     'qty' => $b->jml_order,
                     'nama_barang_dok' => $barang == null ? 0 : $barang['barang_name'],
                     'jml_masuk' => $b->jml_diterima_lpb,
+                    'jml_masuk_konversi' => $b->jml_diterima_lpb_konversi,
+                    'unit_konversi' => $b->satuan_konversi_id
                 ]);
                 // update remeaning di detail po
                 $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->where('am_purchase_order_id', $b->am_purchase_order_id)
@@ -515,6 +517,8 @@ class PenerimaanBarangLokalBP extends BaseController
                     'qty' => $b->jml_order,
                     'nama_barang_dok' => $barang == null ? 0 : $barang['barang_name'],
                     'jml_masuk' => $b->jml_diterima_lpb,
+                    'jml_masuk_konversi' => $b->jml_diterima_lpb_konversi,
+                    'unit_konversi' => $b->satuan_konversi_id
                 ]);
                 // update remeaning di detail po
                 $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->where('am_purchase_order_id', $b->am_purchase_order_id)
@@ -664,13 +668,13 @@ class PenerimaanBarangLokalBP extends BaseController
                         "bahan_penolong",
                         $p['barang_id'],
                         $p['spesifikasi_id'],
-                        $p['jml_masuk']
+                        $p['jml_masuk_konversi']
                     );
 
                     // DETAIL
                     $stokDetail = $this->stockDetailModel->insertStokDetail(
                         $stok,
-                        $p['jml_masuk'],
+                        $p['jml_masuk_konversi'],
                         'In',
                         date('Y-m-d'),
                         $this->this_user_id,
@@ -686,7 +690,7 @@ class PenerimaanBarangLokalBP extends BaseController
                         $penerimaanBarang['bc_type'],
                         $stok,
                         $stokDetail,
-                        $p['jml_masuk'],
+                        $p['jml_masuk_konversi'],
                         "-",
                         $po['po_no'],
                         $po['po_no'],

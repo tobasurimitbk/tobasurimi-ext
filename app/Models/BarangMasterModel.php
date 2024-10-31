@@ -179,7 +179,8 @@ class BarangMasterModel extends Model
     public function getBarangByTypeWithSpec($condition)
     {
         $selectQry = "barang_master.id, barang_master.kode_barang, barang_master.barang_name AS barang_name_master, barang_master.parent_type_id, 
-                    satuans.nama_satuan, 
+                    satuans.nama_satuan,
+                    satuans.kode_satuan, 
                     parent_barang.parent_name,
                     barang_master_spesifikasi.id AS barang_master_spesifikasi_id, 
                     barang_master_spesifikasi.spesifikasi,

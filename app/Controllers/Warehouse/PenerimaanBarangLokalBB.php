@@ -401,6 +401,8 @@ class PenerimaanBarangLokalBB extends BaseController
                     'qty' => $b->jml_order,
                     'nama_barang_dok' => $supplierHarga == null ? 0 : $supplierHarga['barang_name'] . ' (' . $supplierHarga['spesifikasi'] . ')',
                     'jml_masuk' => $b->jml_diterima_lpb,
+                    'jml_masuk_konversi' => $b->jml_diterima_lpb_konversi,
+                    'unit_konversi' => $b->satuan_konversi_id
                 ]);
                 // update remeaning di detail po
                 $this->rmPurchaseOrderDetailModel->where('id', $b->rm_purchase_order_details_id)->where('rm_purchase_order_id', $b->rm_purchase_order_id)
@@ -515,6 +517,8 @@ class PenerimaanBarangLokalBB extends BaseController
                         'qty' => $b->jml_order,
                         'nama_barang_dok' => $supplierHarga == null ? 0 : $supplierHarga['barang_name'],
                         'jml_masuk' => $b->jml_diterima_lpb,
+                        'jml_masuk_konversi' => $b->jml_diterima_lpb_konversi,
+                        'unit_konversi' => $b->satuan_konversi_id
                     ]);
                 // update remeaning di detail po
                 $this->rmPurchaseOrderDetailModel->where('id', $b->rm_purchase_order_details_id)->where('rm_purchase_order_id', $b->rm_purchase_order_id)
@@ -663,13 +667,13 @@ class PenerimaanBarangLokalBB extends BaseController
                         "bahan_baku",
                         $p['barang_id'],
                         $p['spesifikasi_id'],
-                        $p['jml_masuk']
+                        $p['jml_masuk_konversi']
                     );
 
                     // DETAIL
                     $stokDetail = $this->stockDetailModel->insertStokDetail(
                         $stok,
-                        $p['jml_masuk'],
+                        $p['jml_masuk_konversi'],
                         'In',
                         date('Y-m-d'),
                         $this->this_user_id,
@@ -685,7 +689,7 @@ class PenerimaanBarangLokalBB extends BaseController
                         $penerimaanBarang['bc_type'],
                         $stok,
                         $stokDetail,
-                        $p['jml_masuk'],
+                        $p['jml_masuk_konversi'],
                         "-",
                         $po['po_no'],
                         $po['po_no'],

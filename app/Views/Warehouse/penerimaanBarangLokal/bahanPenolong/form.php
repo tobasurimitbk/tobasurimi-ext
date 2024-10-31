@@ -219,6 +219,7 @@
                                 <th style="text-align: center;">Satuan</th>
                                 <th style="text-align: center;">Jml. Order</th>
                                 <th style="text-align: center;">Jml. Diterima LPB ini</th>
+                                <th style="text-align: center;">Jml. Diterima LPB ini (Konversi)</th>
                                 <th style="text-align: center;">Jml. Diterima Total</th>
                                 <th style="text-align: center;">Sisa Total</th>
                                 <th class="label-harga" style="text-align: center;">Harga</th>
@@ -235,10 +236,11 @@
                                 <td></td>
                                 <td></td>
                                 <td colspan="3" style="text-align: right;">GRAND TOTAL</td>
-                                <td style="text-align: center;"><b>0.00</b></td>
-                                <td style="text-align: center;"><b>0.00</b></td>
-                                <td style="text-align: center;"><b>0.00</b></td>
-                                <td style="text-align: center;"><b>0.00</b></td>
+                                <td style="text-align: center;"><b>0</b></td>
+                                <td style="text-align: center;"><b>0</b></td>
+                                <td style="text-align: center;"><b>0</b></td>
+                                <td style="text-align: center;"><b>0</b></td>
+                                <td style="text-align: center;"><b>0</b></td>
                                 <td style="text-align: center;"><b>0.00</b></td>
                                 <td style="text-align: center;"><b>0.00</b></td>
                                 <td style="text-align: center;"><b></b></td>
@@ -837,10 +839,14 @@
             var indexToRemove = -1;
             for (var i = 0; i < listData.result.length; i++) {
                 if (Number(listData.result[i].am_purchase_order_details_id) == Number($('.am_purchase_order_details_id').val()) && Number(listData.result[i].am_purchase_order_id) == Number($('.am_purchase_order_id').val())) {
+                    var jml_diterima_lpb = Number($('.jml_diterima_lpb').val());
+                    var nilai_konversi = listData.result[i].nilai_konversi;
+
                     listData.result[i].jml_diterima_lpb = Number($('.jml_diterima_lpb').val());
                     listData.result[i].jml_diterima_total = Number($('.jml_diterima_total').val());
                     listData.result[i].sisa_total = Number($('.sisa_total').val());
                     listData.result[i].sub_total = Number(formatCurrency($('.sub_total').val()));
+                    listData.result[i].jml_diterima_lpb_konversi = Number(jml_diterima_lpb * nilai_konversi);
                     drawTable(listData);
                     $('.detail-modal').modal('hide');
                     break;
@@ -860,7 +866,7 @@
                     var jml_diterima_total_now = Number(item.jml_diterima_total - jml_diterima_lpb_last);
                     var sisa_total_now = Number(item.sisa_total + jml_diterima_lpb_last);
                     $('.sub_total').val('' +
-                        formatRupiah(Number(jml_diterima_lpb) * Number(item.harga)));
+                        formatRupiah2(Number(jml_diterima_lpb) * Number(item.harga)));
                     $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(4));
                     $('.sisa_total').val(sisa_total_now.toFixed(4));
 
@@ -876,7 +882,7 @@
                     var jml_diterima_total_now = (Number(item.jml_diterima_total) + Number(jml_diterima_lpb) - jml_diterima_lpb_last);
                     var sisa_total_now = item.jml_order - jml_diterima_total_now;
                     $('.sub_total').val('' +
-                        formatRupiah(Number(jml_diterima_lpb) * Number(item.harga)));
+                        formatRupiah2(Number(jml_diterima_lpb) * Number(item.harga)));
                     $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(4));
                     $('.sisa_total').val(sisa_total_now.toFixed(4));
                     break;
@@ -911,6 +917,7 @@
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0.0</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0.0</b></td>'));
             newRow.append($('<td></td>'));
@@ -924,6 +931,8 @@
             var subTotal = 0;
             var jmlOrderTotal = 0;
             var hargaTotal = 0;
+            var jmlDiterimaLpbKonversi = 0;
+
             $.each(listData.result, function(i, v) {
                 var newRow = $('<tr>');
                 newRow.append($('<td>').text(no++));
@@ -934,10 +943,13 @@
                 newRow.append($('<td>').text(v.satuan));
                 newRow.append($('<td>').text(parseFloat(v.jml_order).toFixed(4)));
                 newRow.append($('<td>').text(parseFloat(v.jml_diterima_lpb).toFixed(4)));
+                newRow.append(
+                    $('<td>').text(parseFloat(v.jml_diterima_lpb_konversi).toFixed(4) + " (" + v.satuan_konversi + ")")
+                );
                 newRow.append($('<td>').text(parseFloat(v.jml_diterima_total).toFixed(4)));
                 newRow.append($('<td>').text(parseFloat(v.sisa_total).toFixed(4)));
-                newRow.append($('<td>').text(formatRupiah(parseFloat(v.harga) || 0)));
-                newRow.append($('<td>').text(formatRupiah(parseFloat(v.sub_total) || 0)));
+                newRow.append($('<td>').text(formatRupiah2(parseFloat(v.harga) || 0)));
+                newRow.append($('<td>').text(formatRupiah2(parseFloat(v.sub_total) || 0)));
                 newRow.append($('<td>').text(v.keterangan));
                 newRow.append($('<td>').html(
                     <?php if (!empty($dataPenerimaanBarang)) : ?> <?php if ($dataPenerimaanBarang['status_post'] === "FINISH") : ?> `-`
@@ -964,6 +976,7 @@
                 subTotal += Number(v.sub_total) || 0;
                 jmlOrderTotal += Number(v.jml_order) || 0;
                 hargaTotal += Number(v.harga) || 0;
+                jmlDiterimaLpbKonversi += Number(v.jml_diterima_lpb_konversi) || 0;
             });
             table.find('tfoot').empty();
             var newRow = $('<tr>');
@@ -972,10 +985,11 @@
             newRow.append($('<td style="text-align:right;" colspan="3"><b>GRAND TOTAL</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + jmlOrderTotal.toFixed(4) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaLPBTotal.toFixed(4) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;">' + jmlDiterimaLpbKonversi.toFixed(4) + '</td>'));
             newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaTotal.toFixed(4) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + sisaTotal.toFixed(4) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseFloat(hargaTotal) || 0) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(parseFloat(subTotal) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah2(parseFloat(hargaTotal) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah2(parseFloat(subTotal) || 0) + '</b></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
@@ -1006,8 +1020,8 @@
         $('.jml_diterima_total').val(parseFloat(item.jml_diterima_total).toFixed(4));
         $('.sisa_total').val(parseFloat(item.sisa_total).toFixed(4));
         $('.nama_barang_dokumen').val(item.nama_barang_master);
-        $('.harga_satuan').val("" + formatRupiah(Number(item.harga) || 0));
-        $('.sub_total').val("" + formatRupiah(Number(item.sub_total) || 0));
+        $('.harga_satuan').val("" + formatRupiah2(Number(item.harga) || 0));
+        $('.sub_total').val("" + formatRupiah2(Number(item.sub_total) || 0));
         $('.jml_diterima_lpb_last').val(item.jml_diterima_lpb);
     }
 
@@ -1057,7 +1071,7 @@
         }
     }
 
-    function formatRupiah(angka) {
+    function formatRupiah2(angka) {
         var formatter = new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR'

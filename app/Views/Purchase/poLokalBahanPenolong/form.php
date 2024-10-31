@@ -185,8 +185,18 @@
                             <select disabled class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
                                 <option data-barang_id="" data-parent_name="" data-spesifikasi_id="" data-spesifikasi_name="" data-satuan_id="" data-nama_barang="" data-kode_barang="" value=""></option>
                                 <?php foreach ($barang as $s) : ?>
-                                    <option data-barang_id="<?= $s['id'] ?>" data-parent_name="<?= $s['parent_name'] ?>" data-spesifikasi_id="<?= $s['barang_master_spesifikasi_id'] ?>" data-spesifikasi_name="<?= strtoupper($s['spesifikasi'])  ?>" data-satuan_id="<?= $s['satuan_1'] ?>" data-nama_barang="<?= strtoupper($s['barang_name_master']) ?>" data-kode_barang="<?= $s['kode_barang'] ?>" value="<?= $s['barang_master_spesifikasi_id'] ?>">
-                                        <?= strtoupper($s['kode_barang']) . " ( " . strtoupper($s['barang_name_master']) . " - " . strtoupper($s['spesifikasi']) . " )" ?>
+                                    <option
+                                        data-barang_id="<?= $s['id'] ?>"
+                                        data-parent_name="<?= $s['parent_name'] ?>"
+                                        data-spesifikasi_id="<?= $s['barang_master_spesifikasi_id'] ?>"
+                                        data-spesifikasi_name="<?= $s['spesifikasi']  ?>"
+                                        data-satuan_id="<?= $s['satuan_1'] ?>"
+                                        data-satuan_2="<?= $s['satuan_2'] ?>"
+                                        data-satuan_3="<?= $s['satuan_3'] ?>"
+                                        data-nama_barang="<?= $s['barang_name_master'] ?>"
+                                        data-kode_barang="<?= $s['kode_barang'] ?>"
+                                        value="<?= $s['barang_master_spesifikasi_id'] ?>">
+                                        <?= $s['kode_barang'] . " ( " . $s['barang_name_master'] . " - " . $s['spesifikasi'] . " )" ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -210,21 +220,29 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select disabled class="form-select satuan_id" name="satuan_id" id="satuan_id" aria-label="Floating label select example">
+                        <div class="form-floating" style="height: 50px;">
+                            <select class="form-select satuan_id" name="satuan_id" id="satuan_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($satuan as $s) : ?>
-                                    <option data-nama_satuan="<?= strtoupper($s['nama_satuan']) ?>" value="<?= $s['id'] ?>">
-                                        <?= strtoupper($s['nama_satuan']) ?>
+                                    <option
+                                        data-nama_satuan="<?= $s['nama_satuan'] ?>"
+                                        data-kode_satuan="<?= $s['kode_satuan'] ?>"
+                                        value="<?= $s['id'] ?>">
+                                        <?= $s['kode_satuan'] ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput">Satuan</label>
+                            <label for="floatingInput" style="z-index: 1;">Satuan</label>
                         </div>
+                        <small class="mb-4 mt-1">
+                            <i>
+                                Jika ingin menggunakan satuan yang lain, pastikan anda sudah mengatur satuannya di menu master barang
+                            </i>
+                        </small>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control harga_satuan" name="harga_satuan" id="harga_satuan" placeholder="Harga Satuan" onchange="this.value = formatRupiah(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control harga_satuan" name="harga_satuan" id="harga_satuan" placeholder="Harga Satuan" onchange="this.value = formatRupiah2(this.value)">
                             <label for="floatingInput">Harga Satuan</label>
                         </div>
                     </div>
@@ -245,13 +263,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control biaya_tambahan" name="biaya_tambahan" id="biaya_tambahan" placeholder="Biaya Tambahan" onchange="this.value = formatRupiah(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control biaya_tambahan" name="biaya_tambahan" id="biaya_tambahan" placeholder="Biaya Tambahan" onchange="this.value = formatRupiah2(this.value)">
                             <label for="floatingInput">Biaya Tambahan (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onchange="this.value = formatRupiah(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onchange="this.value = formatRupiah2(this.value)">
                             <label for="floatingInput">Total</label>
                         </div>
                     </div>
@@ -359,6 +377,12 @@
     var totalHarga = 0;
     // init select
 
+    $('#satuan_id').select2({
+        placeholder: "Pilih Satuan",
+        theme: "bootstrap-5",
+        allowClear: true
+    })
+
     $('#division_id').select2({
         placeholder: "Pilih Departemen",
         theme: "bootstrap-5",
@@ -405,7 +429,13 @@
     }).change(function() {
         $('#nama_barang').val($(this).find("option:selected").data("nama_barang") + " - " + $(this).find("option:selected").data("spesifikasi_name"));
         $('#nama_kategori').val($(this).find("option:selected").data("parent_name"));
-        $('#satuan_id').val(($(this).find("option:selected").data("satuan_id")));
+        // $('#satuan_id').val(($(this).find("option:selected").data("satuan_id")));
+        var selected = $('#barang_id option:selected');
+        activeFieldSatuanId(
+            selected.data('satuan_id'),
+            selected.data('satuan_2'),
+            selected.data('satuan_3')
+        );
 
         $.ajax({
             url: "<?= base_url("po-lokal-bahan-penolong/histori-harga"); ?>",
@@ -422,9 +452,9 @@
             method: "GET",
             success: function(response) {
                 if (response.hargaTerakhir !== "-") {
-                    $('#harga_satuan').val(formatRupiah(response.res.hargaTerakhirNumber));
+                    $('#harga_satuan').val(formatRupiah2(response.res.hargaTerakhirNumber));
                 } else {
-                    $('#harga_satuan').val(formatRupiah('0'));
+                    $('#harga_satuan').val(formatRupiah2('0'));
                 }
             },
         });
@@ -454,7 +484,7 @@
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
-        $('#total').val(formatRupiah(total));
+        $('#total').val(formatRupiah2(total));
     });
 
     // CHANGE TOTAL
@@ -466,7 +496,7 @@
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var hargaSatuan = (((total / qty)));
-        $('#harga_satuan').val(formatRupiah(hargaSatuan));
+        $('#harga_satuan').val(formatRupiah2(hargaSatuan));
     });
 
     // VALIDATOR DETAIL
@@ -856,7 +886,7 @@
             kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
             nama_barang: $('#nama_barang').val(),
             satuan_id: $('#satuan_id').val(),
-            nama_satuan: $('#satuan_id').find("option:selected").data("nama_satuan"),
+            nama_satuan: $('#satuan_id').find("option:selected").data("kode_satuan"),
             qty: parseFloat($('#qty').val()),
             diskon: parseFloat($('#diskon').val()),
             harga_satuan: convertRupiahToNumber($('#harga_satuan').val() || 0),
@@ -870,7 +900,8 @@
         $(".barang_id").val("").change();
         $(".diskon").val('0');
         // reset update flag
-        $('#barang_update_id').val("")
+        $('#barang_update_id').val("");
+        $('#satuan_id').val(null).change();
         drawTabel(listBarang);
     }
 
@@ -885,11 +916,11 @@
             newRow.append($('<td>').text(v.kode_barang));
             newRow.append($('<td>').text(v.nama_barang));
             newRow.append($('<td>').text(v.nama_satuan));
-            newRow.append($('<td>').text(formatRupiah(v.harga_satuan)));
+            newRow.append($('<td>').text(formatRupiah2(v.harga_satuan)));
             newRow.append($('<td>').text(parseFloat(v.qty).toFixed(4)));
             newRow.append($('<td>').text(v.diskon));
-            newRow.append($('<td>').text(formatRupiah(v.biaya_tambahan)));
-            newRow.append($('<td>').text(formatRupiah(v.total)));
+            newRow.append($('<td>').text(formatRupiah2(v.biaya_tambahan)));
+            newRow.append($('<td>').text(formatRupiah2(v.total)));
             <?php if (!empty($poDetail)) : ?>
                 <?php if (!$poDetail['is_posted']) : ?>
                     newRow.append($('<td>').html(
@@ -922,7 +953,7 @@
         table.find('tfoot').empty();
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="8"><b>Total</b></td>'));
-        newRow.append($('<td style="text-align:center;"><b>' + formatRupiah(totalHarga.toFixed(4)) + '</b></td>'));
+        newRow.append($('<td style="text-align:center;"><b>' + formatRupiah2(totalHarga.toFixed(4)) + '</b></td>'));
         newRow.append($('<td></td>'));
         table.find('tfoot').append(newRow);
     }
@@ -983,15 +1014,16 @@
             }
         }
         $('#barang_id, #barang_update_id').val(item.spesifikasi_id).change();
-        $('#harga_satuan').val(formatRupiah(item.harga_satuan));
+        $('#harga_satuan').val(formatRupiah2(item.harga_satuan));
         $('#qty').val(parseFloat(item.qty));
         $('#diskon').val(parseFloat(item.diskon));
-        $('#biaya_tambahan').val((item.biaya_tambahan == 0) ? formatRupiah(0) : formatRupiah(item.biaya_tambahan));
+        $('#biaya_tambahan').val((item.biaya_tambahan == 0) ? formatRupiah2(0) : formatRupiah2(item.biaya_tambahan));
         $('#keterangan').val(item.keterangan);
         $('#ppn').val(item.ppn);
         $('#pph').val(item.pph);
+        $('#satuan_id').val(item.satuan_id).change();
         // $('#biaya_tambahan').change();
-        $('#total').val(formatRupiah(item.total));
+        $('#total').val(formatRupiah2(item.total));
         // attr barang_id disabled
         $('#barang_id').attr('disabled', true);
         // setTimeout(function() {
@@ -1006,7 +1038,7 @@
         $(".diskon").val('0');
     }
 
-    function formatRupiah(angka) {
+    function formatRupiah2(angka) {
         var formatter = new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR'
@@ -1119,6 +1151,19 @@
             });
         }
 
+    }
+
+    function activeFieldSatuanId(satuan_1, satuan_2, satuan_3) {
+        const allowedValues = [String(satuan_1), String(satuan_2), String(satuan_3)];
+        $('#satuan_id').on('select2:open', function() {
+            $('#satuan_id option').each(function() {
+                if (!allowedValues.includes(String($(this).val()))) {
+                    $(this).attr('disabled', true).addClass('disabled-option');
+                } else {
+                    $(this).attr('disabled', false).removeClass('disabled-option');
+                }
+            });
+        });
     }
 </script>
 <!-- Edit Script -->
