@@ -791,6 +791,7 @@ class OrderForm extends BaseController
             ->select('barang_master_sales.harga_pokok as harga_pokok')
             ->select('barang_master_sales.harga_jual as harga_jual')
             ->select('barang_master_sales.status_ppn as statusppn')
+            ->select('satuans.kode_satuan as kode_satuan')
             ->select('satuans.nama_satuan as nama_satuan')
             ->where('type_barang_sales', 'LOKAL')
             ->where('barang_master_sales.deletedAt', null)

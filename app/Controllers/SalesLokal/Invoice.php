@@ -209,15 +209,9 @@ class Invoice extends BaseController
                 ]
             ],
             "doc_type" => [
-                "rules" => "required|in_list[pesanan,pengiriman]",
+                "rules" => "required|in_list[pesanan,pengiriman,penjualan]",
                 'errors' => [
                     'required' => 'Jenis dokumen tidak boleh kosong',
-                ]
-            ],
-            "doc_id" => [
-                "rules" => "required",
-                'errors' => [
-                    'required' => 'Nomor Dokumen tidak boleh kosong',
                 ]
             ],
             "terms" => [
@@ -246,7 +240,6 @@ class Invoice extends BaseController
         }
 
         try {
-
             $postData = $this->request->getPost();
             $postItemsData = json_decode($this->request->getPost('items'), true);
             $documentData = null;
@@ -261,52 +254,6 @@ class Invoice extends BaseController
                 echo json_encode($data);
                 return;
             }
-
-            // var_dump($postItemsData);
-            // die;
-
-
-
-
-            // if ($postData['doc_type'] === 'pesanan') {
-            //     $documentData = $this->SalesOrderModel->asObject()
-            //         ->find($postData['doc_id']);
-
-            //     // Periksa apakah $postItemsData tidak kosong sebelum melakukan iterasi
-            //     if (!empty($postItemsData)) {
-            //         foreach ($postItemsData as $value) {
-            //             // Pastikan data detail ditemukan sebelum mengurangi qty_sekarang
-            //             $newQtySekarang = (float)$value['qty_sekarang'] - (float)$value['qty_input'];
-
-            //             $data = ['qty_sekarang' => number_format($newQtySekarang, 2, '.', '')];
-            //             $this->SalesOrderDetailModel->update($value['id'], $data);
-            //         }
-            //     }
-            // } else {
-            //     $documentData = $this->SuratJalanModel->asObject()
-            //         ->find($postData['doc_id']);
-
-            //     // Periksa apakah $postItemsData tidak kosong sebelum melakukan iterasi
-            //     if (!empty($postItemsData)) {
-            //         foreach ($postItemsData as $value) {
-            //             // Pastikan data detail ditemukan sebelum mengurangi qty_sekarang
-            //             $newQtySekarang = (float)$value['qty_sekarang'] - (float)$value['qty_input'];
-
-            //             $data = ['qty_sekarang' => number_format($newQtySekarang, 2, '.', '')];
-            //             $this->SalesOrderDetailModel->update($value['id'], $data);
-            //         }
-            //     }
-            // }
-
-            // if (empty($documentData)) {
-            //     $data = [
-            //         "status"    => false,
-            //         "message"   => 'Dokumen tidak ditemukan',
-            //         'token'     => csrf_hash(),
-            //     ];
-            //     echo json_encode($data);
-            //     return;
-            // }
 
             // start transaction
             $this->SalesOrderInvoiceModel->db->transException(true)->transStart();
@@ -359,31 +306,13 @@ class Invoice extends BaseController
             $this->SalesOrderInvoiceModel->db->transComplete();
 
             foreach ($postData['doc_id'] as $id) {
-
-
-
                 if ($postData['doc_type'] === 'pesanan') {
-
                     $this->SalesOrderModel->where('id', $id)->set(['sales_order_invoice_id' => $dataSalesOrderInvoice])->update();
                 } else {
 
                     $this->SuratJalanModel->where('id', $id)->set(['sales_order_invoice_id' => $dataSalesOrderInvoice])->update();
                 }
             }
-
-
-            // $updateData = [$documentData[0]->id, ['sales_order_invoice_id' => $dataSalesOrderInvoice]];
-            // if ($postData['doc_type'] === 'pesanan') {
-            //     $this->SalesOrderModel->update(...$updateData);
-            // } else {
-            //     /* $soIds = json_decode($documentData->multiple_id_so);
-            //     $this->SalesOrderModel->whereIn('id', $soIds)
-            //         ->set(['sales_order_invoice_id' => $dataSalesOrderInvoice])
-            //         ->update(); */
-            //     $this->SuratJalanModel->update(...$updateData);
-            // }
-
-
 
             $data = [
                 "id"        => encrypt($dataSalesOrderInvoice),

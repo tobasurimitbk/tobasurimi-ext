@@ -471,7 +471,7 @@
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" oninput="preventNegativeInput(this)" class="form-control qty_barang_add" name="qty_barang_add" id="qty_barang_add" placeholder="Qty Hasil">
-                                <label for="floatingInput">Qty Hasil</label>
+                                <label for="floatingInput">Qty Saat Ini</label>
                             </div>
                         </div>
                         <div class="col-md-4">
