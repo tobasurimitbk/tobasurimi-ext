@@ -303,7 +303,9 @@ class Retur extends BaseController
                                             ->where('stuffing_lokal_id', $stuffingLokalData["id"])
                                             ->join('barang_master AS barang1', 'barang1.id = stuffing_lokal_detail.barang1_id_Warehouse', 'left')
                                             ->join('barang_master AS barang2', 'barang2.id = stuffing_lokal_detail.barang2_id_Warehouse', 'left')
-                                            ->select('stuffing_lokal_detail.*, barang1.type_barang AS barang1_type, barang2.type_barang AS barang2_type')
+                                            ->join('stock', 'stock.id = stuffing_lokal_detail.stock_id_warehouse', 'left')
+                                            ->join('stock_details2', 'stock_details2.stock_id = stock.id', 'left')
+                                            ->select('stuffing_lokal_detail.*, barang1.type_barang AS barang1_type, barang2.type_barang AS barang2_type, stock_details2.harga_umum, stock_details2.harga_harian, stock_details2.harga_bulanan, stock_details2.supplier_id')
                                             ->findAll();
             
 
@@ -349,13 +351,13 @@ class Retur extends BaseController
                             $value['stock_id_warehouse'],
                             $stokDetail,
                             $value['qty'],
-                            $value['no_aju_Warehouse'],
+                            $value['no_aju_warehouse'],
                             $salesOrderReturnData["no_return"],
                             $value['stock_dokumen'],
-                            '-',
-                            "0",
-                            "0",
-                            "0",
+                            $value['supplier_id'],
+                            $value['harga_umum'],
+                            $value['harga_harian'],
+                            $value['harga_bulanan'],
                         );
 
                         // -----
@@ -382,7 +384,7 @@ class Retur extends BaseController
                             $value['barang1_id_warehouse'],
                             $value['barang2_id_warehouse'],
                             $value['bc_id_warehouse'],
-                            $value['no_aju_Warehouse'],
+                            $value['no_aju_warehouse'],
                             $stokIn
                         );
 
@@ -435,11 +437,11 @@ class Retur extends BaseController
                             $value['qty'],
                             $value['no_aju_warehouse'],
                             $salesOrderReturnData["no_return"],
-                            '-',
-                            '-',
-                            0,
-                            0,
-                            0,
+                            $value['stock_dokumen'],
+                            $value['supplier_id'],
+                            $value['harga_umum'],
+                            $value['harga_harian'],
+                            $value['harga_bulanan'],
                         );
                         // $this->materialRequestModel->update($id, $data);
 
