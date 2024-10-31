@@ -2073,13 +2073,13 @@ class BC23 extends BaseController
                         $typeBahan,
                         $p['barang_id'],
                         $p['spesifikasi_id'],
-                        $p['jml_masuk']
+                        $p['jml_masuk_konversi']
                     );
 
                     // DETAIL
                     $stokDetail = $this->stockDetailModel->insertStokDetail(
                         $stok,
-                        $p['jml_masuk'],
+                        $p['jml_masuk_konversi'],
                         'In',
                         date('Y-m-d'),
                         $this->this_user_id,
@@ -2101,7 +2101,7 @@ class BC23 extends BaseController
                         $penerimaanBarang['bc_type'],
                         $stok,
                         $stokDetail,
-                        $p['jml_masuk'],
+                        $p['jml_masuk_konversi'],
                         $bc23['no_aju'],
                         $po['po_no'],
                         $po['po_no'],

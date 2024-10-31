@@ -926,7 +926,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = `<?= base_url("invoice-penjualan-lokal"); ?>`;
+                                                window.location.href = `<?= base_url("invoice-penjualan-lokal/print"); ?>/${response.id}`;
                                             })
                                     } else {
                                         Swal.fire({
@@ -972,8 +972,6 @@
         const includeTax = $('#include_tax').is(':checked');
         let taxes = parseFloat($('#taxes option:selected').data('tax_value'));
 
-        console.log(taxes);
-
         const itemList = table.rows().data();
 
         let itemSubTotal = 0;
@@ -986,7 +984,6 @@
         list_items.map((obj) => {
             const itemAmt = parseFloat(obj.amount.replaceAll(',', ''));
             let taxAmt = 0;
-
             discTotal += ((+obj.disc) / 100) * itemAmt;
             if (taxStatus) {
                 taxAmt = itemAmt * (taxes / 100);
@@ -998,9 +995,15 @@
                 itemSubTotal += itemAmt;
                 taxTotalHtml += taxAmt;
             } else if (taxStatus && includeTax) {
-                itemSubTotal += itemAmt - taxAmt;
+                if (taxes == 11) {
+                    itemSubTotal += itemAmt / (1 + (taxes / 100));
+                } else if (taxes == 10) {
+                    itemSubTotal += itemAmt / (1 + (taxes / 100));
+                } else {
+                    itemSubTotal += (itemAmt - taxAmt);
+                }
                 dummyGrandTotal += itemAmt;
-                taxTotalHtml += taxAmt;
+                taxTotalHtml += itemAmt - itemSubTotal;
             } else if (!taxStatus && !includeTax) {
                 itemSubTotal += itemAmt;
                 taxTotalHtml += taxAmt;
@@ -1009,9 +1012,11 @@
                 taxTotalHtml += taxAmt;
             }
 
+           
+
 
         });
-
+       
         $('#itemSubTotal').html(itemSubTotal.toLocaleString());
         $('#taxTotal').html(taxTotalHtml.toLocaleString());
         $('#taxValue').html(taxes);

@@ -550,8 +550,8 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            window.location.href = "<?= base_url("surat-jalan"); ?>";
-                                        })
+                                                window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
+                                            })
                                 } else {
                                     Swal.fire({
                                         icon: 'error',

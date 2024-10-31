@@ -315,7 +315,7 @@ class Invoice extends BaseController
             }
 
             $data = [
-                "id"        => $dataSalesOrderInvoice,
+                "id"        => encrypt($dataSalesOrderInvoice),
                 "status"    => true,
                 "message"   => "Data Berhasil disimpan",
                 "payload"   => $values,
@@ -890,18 +890,21 @@ class Invoice extends BaseController
         DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
         users.name AS seller_name,
         customers.name AS customer_name,
+        customers.phone AS customer_phone,
         customers.address AS customer_address,
         sales_order_invoice.status_tax AS status_tax,
         sales_order_invoice.termasuk_pa AS termasuk_pa,
         sales_order.jenis_penjualan,
         sales_order.no_po, 
-        sales_order.nama_ecommerce";
+        sales_order.nama_ecommerce,
+        metadata.value as terms";
         $invData = $this->SalesOrderInvoiceModel->asObject()
             ->select($invSelectQry)
             ->join('users', 'users.id = sales_order_invoice.id_user', 'left')
             ->join('customers', 'customers.id = sales_order_invoice.id_customer', 'left')
             ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id', 'left')
             ->join('employees', 'employees.id = sales_order.sales_id', 'left')
+            ->join('metadata', 'metadata.id = sales_order_invoice.terms', 'left')
             ->find($id);
 
         // if ($invData->document_type == 'pengiriman') {

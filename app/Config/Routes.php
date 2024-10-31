@@ -574,6 +574,7 @@ $routes->get('/return-barang-sales/all', 'SalesLokal\Retur::all', ['filter' => '
 $routes->post('/return-barang-sales/save', 'SalesLokal\Retur::save', ['filter' => 'Auth']);
 $routes->post('/return-barang-sales/update', 'SalesLokal\Retur::update', ['filter' => 'Auth']);
 $routes->post('/return-barang-sales/delete', 'SalesLokal\Retur::delete', ['filter' => 'Auth']);
+$routes->post('/return-barang-sales/approve', 'SalesLokal\Retur::approve', ['filter' => 'Auth']);
 $routes->get('/return-barang-sales/get-detail-invoice/(:segment)', 'SalesLokal\Retur::getInvoiceNumberList/$1', ['filter' => 'Auth']);
 $routes->get('/return-barang-sales/get-nomor-surat-return', 'SalesLokal\Retur::getNomorSuratReturn', ['filter' => 'Auth']);
 

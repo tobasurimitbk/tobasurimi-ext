@@ -1882,6 +1882,7 @@ class BC40 extends BaseController
                     penerimaan_barang.no_penerimaan_barang,
                     penerimaan_barang_detail.purchase_order_id,
                     SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
+                    SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                     SUM(penerimaan_barang_detail.qty) AS qty_po,
                     SUM(penerimaan_barang_detail.sub_total) AS sub_total,
                     penerimaan_barang_detail.barang_id,
@@ -1914,6 +1915,7 @@ class BC40 extends BaseController
                 penerimaan_barang_detail.purchase_order_id,
                 SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
                 SUM(penerimaan_barang_detail.qty) AS qty_po,
+                SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                 SUM(penerimaan_barang_detail.sub_total) AS sub_total,
                 penerimaan_barang_detail.barang_id,
                 am_purchase_orders.po_no,
@@ -1944,6 +1946,7 @@ class BC40 extends BaseController
                     penerimaan_barang.no_penerimaan_barang,
                     penerimaan_barang_detail.purchase_order_id,
                     SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
+                    SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                     SUM(penerimaan_barang_detail.qty) AS qty_po,
                     SUM(penerimaan_barang_detail.sub_total) AS sub_total,
                     penerimaan_barang_detail.barang_id,
@@ -1975,6 +1978,7 @@ class BC40 extends BaseController
                 penerimaan_barang.no_penerimaan_barang,
                 penerimaan_barang_detail.purchase_order_id,
                 SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
+                SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                 SUM(penerimaan_barang_detail.qty) AS qty_po,
                 SUM(penerimaan_barang_detail.sub_total) AS sub_total,
                 penerimaan_barang_detail.barang_id,
@@ -2117,13 +2121,13 @@ class BC40 extends BaseController
                         $typeBahan,
                         $p['barang_id'],
                         $p['spesifikasi_id'],
-                        $p['jml_masuk']
+                        $p['jml_masuk_konversi']
                     );
 
                     // DETAIL
                     $stokDetail = $this->stockDetailModel->insertStokDetail(
                         $stok,
-                        $p['jml_masuk'],
+                        $p['jml_masuk_konversi'],
                         'In',
                         date('Y-m-d'),
                         $this->this_user_id,
@@ -2145,7 +2149,7 @@ class BC40 extends BaseController
                         $penerimaanBarang['bc_type'],
                         $stok,
                         $stokDetail,
-                        $p['jml_masuk'],
+                        $p['jml_masuk_konversi'],
                         $bc40['no_aju'],
                         $po['po_no'],
                         $po['po_no'],

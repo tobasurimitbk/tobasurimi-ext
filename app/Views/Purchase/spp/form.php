@@ -1,6 +1,11 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
-
+<style>
+    .disabled-option {
+        color: gray !important;
+        background-color: #f0f0f0 !important;
+    }
+</style>
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
@@ -172,7 +177,7 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title title-secondary">Tambah Barang</h5>
+                <h5 class="modal-title title-secondary" id="title-detail-name">Tambah Barang</h5>
                 <!-- <button class="btn btn-show-form btn-add-barang float-right">
                     <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Barang
                 </button> -->
@@ -212,13 +217,22 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="hidden" class="satuan_id" name="satuan_id">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" readonly="true" type="text" class="form-control satuan" id="satuan" name="satuan" placeholder="Satuan">
-                                    <label for="floatingInput">Satuan</label>
-                                </div>
+                            <div class="form-floating" style="height: 50px;">
+                                <select class="form-select satuan_id" name="satuan_id" id="satuan_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($satuanBarang as $s) : ?>
+                                        <option data-kode_satuan="<?= $s['kode_satuan'] ?>" value="<?= $s['id'] ?>">
+                                            <?= $s['kode_satuan'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Satuan</label>
                             </div>
+                            <small class="mb-4 mt-1">
+                                <i>
+                                    Jika ingin menggunakan satuan yang lain, pastikan anda sudah mengatur satuannya di menu master barang
+                                </i>
+                            </small>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -265,7 +279,7 @@
                                         <option value="<?= encrypt($kb['id']) ?>"><?= $kb['parent_name'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput">Kategori Barang</label>
+                                <label for="floatingInput" style="z-index: 1;">Kategori Barang</label>
                             </div>
                         </div>
                     </div>
@@ -384,7 +398,7 @@
                     <div class="col-md-12">
                         <div class="row">
                             <div class="table-responsive">
-                                <table class="table table-bordered nowrap table-hover-tobasurimi" id="" width="100%" cellspacing="0">
+                                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" width="100%" cellspacing="0">
                                     <thead class="thead-dark">
                                         <tr>
                                             <th scope="col">No</th>
@@ -424,18 +438,6 @@
         });
     <?php endif; ?>
 
-
-    $("#satuan1_id, #satuan2_id, #satuan3_id")
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
-    $("#satuan1_id, #satuan2_id, #satuan3_id").select2({
-        theme: "bootstrap-5",
-        allowClear: true,
-        placeholder: 'Pilih Satuan',
-        dropdownParent: $(".add-modal .modal-content")
-    });
-
     var validator_detail = $(".detail-form").validate({
         rules: {
             kode_barang: {
@@ -450,7 +452,7 @@
             harga: {
                 required: true
             },
-            satuan: {
+            satuan_id: {
                 required: true
             }
         },
@@ -467,7 +469,7 @@
             harga: {
                 required: "Harga wajib diisi"
             },
-            satuan: {
+            satuan_id: {
                 required: "Satuan wajib diisi"
             }
         },
@@ -557,52 +559,12 @@
         theme: "bootstrap-5"
     });
 
-    //CSS SELECT2 FLOATING LABEL
-    $('.divisi_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $('.divisi_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $('.divisi_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
-
     // PILIH TIPE SPP
     $('.spp_type').select2({
         placeholder: "Pilih SPP",
         theme: "bootstrap-5"
     });
 
-    $('.spp_type')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $('.spp_type')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $('.spp_type')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
 
     // KODE BARANG
     $('.kode_barang').select2({
@@ -611,17 +573,26 @@
         dropdownParent: $(".detail-modal .modal-content"),
         tags: false,
         allowClear: true
+    });
+
+    $('.satuan_id').select2({
+        placeholder: "Pilih Kode Satuan",
+        theme: "bootstrap-5",
+        dropdownParent: $(".detail-modal .modal-content"),
+        tags: false,
+        allowClear: true
     })
 
+
     //CSS SELECT2 FLOATING LABEL
-    $('.kode_barang')
+    $('.divisi_id,.spp_type,.kode_barang,.satuan_id')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.kode_barang')
+    $('.divisi_id,.spp_type,.kode_barang,.satuan_id')
         .parent('div')
         .children('span')
         .children('span')
@@ -629,7 +600,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.kode_barang')
+    $('.divisi_id,.spp_type,.kode_barang,.satuan_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -743,14 +714,12 @@
 
     $(".btn-show-detail").click(function() {
 
-        $(".title-detail-name").text("Tambah");
+        $("#title-detail-name").text("Tambah Barang");
         $(".barang_detail_id").val('');
 
         $(".kode").val('')
         $(".nama_barang").val('')
         $(".qty").val('')
-        $(".satuan").val('')
-        $(".satuan_id").val('')
         $(".harga").val('')
         $(".total").val('')
         $(".keterangan").val('')
@@ -779,9 +748,9 @@
                     $(".kode_barang").empty();
                     $(".kode_barang").append(`<option data-barang_name_master="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
                     res.data.forEach(function(item) {
-                        $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                        $(".kode_barang").append(`<option data-satuan_1="${item.satuan_1}" data-satuan_2="${item.satuan_2}" data-satuan_3="${item.satuan_3}" data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
                     })
-                    $(".kode_barang").val("").change();
+                    $(".kode_barang").val(null).change();
                     $(".detail-modal").modal("show");
                 }
             })
@@ -793,40 +762,50 @@
             })
         }
 
-        $(".btn-hide-detail").click(function() {
-            $(".detail-modal").modal("hide")
-        })
+    })
 
-        $(".kode_barang").change(function() {
-            if ($(".kode_barang option:selected").val()) {
-                let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
-                let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
-                let satuan_id = $(".kode_barang option:selected").data("satuan_id") ? $(".kode_barang option:selected").data("satuan_id") : "";
-                let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
-                let barang_spesifikasi_id = $(".kode_barang option:selected").data("barang_spesifikasi_id") ? $(".kode_barang option:selected").data("barang_spesifikasi_id") : "";
-                let barang_name_master = $(".kode_barang option:selected").data("barang_name_master");
-                let spp_type = $('.spp_type').val().trim();
+    $(".btn-hide-detail").click(function() {
+        $(".detail-modal").modal("hide")
+    })
+
+    $(".kode_barang").change(function() {
+        if ($(".kode_barang option:selected").val()) {
+            let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
+            let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
+            let satuan_1 = $(".kode_barang option:selected").data("satuan_1") ? $(".kode_barang option:selected").data("satuan_1") : "";
+            let satuan_2 = $(".kode_barang option:selected").data("satuan_2") ? $(".kode_barang option:selected").data("satuan_2") : "";
+            let satuan_3 = $(".kode_barang option:selected").data("satuan_3") ? $(".kode_barang option:selected").data("satuan_3") : "";
+            let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
+            let barang_spesifikasi_id = $(".kode_barang option:selected").data("barang_spesifikasi_id") ? $(".kode_barang option:selected").data("barang_spesifikasi_id") : "";
+            let barang_name_master = $(".kode_barang option:selected").data("barang_name_master");
+            let spp_type = $('.spp_type').val().trim();
 
 
-                if (list_items.length === 0 && spp_type === "Lokal BB") {
-                    $('.header_barang_name').val(barang_name_master);
-                }
-
-                $(".kode").val($(".kode_barang option:selected").val());
-                $(".nama_barang").val(nama);
-                $(".barang_id").val(barang_id);
-                $(".barang_spesifikasi_id").val(barang_spesifikasi_id);
-                $(".satuan").val(satuan);
-                $(".satuan_id").val(satuan_id);
-            } else {
-                $(".kode").val("");
-                $(".nama_barang").val("");
-                $(".barang_id").val("");
-                $(".barang_spesifikasi_id").val("");
-                $(".satuan").val("");
-                $(".satuan_id").val("");
+            if (list_items.length === 0 && spp_type === "Lokal BB") {
+                $('.header_barang_name').val(barang_name_master);
             }
-        })
+
+            $(".kode").val($(".kode_barang option:selected").val());
+            $(".nama_barang").val(nama);
+            $(".barang_id").val(barang_id);
+            $(".barang_spesifikasi_id").val(barang_spesifikasi_id);
+
+            // SET ACTIVE FIELD
+            activeFieldSatuanId(
+                satuan_1,
+                satuan_2,
+                satuan_3
+            );
+
+            $(".satuan_id").val(satuan_1).change();
+
+        } else {
+            $(".kode").val("");
+            $(".nama_barang").val("");
+            $(".barang_id").val("");
+            $(".barang_spesifikasi_id").val("");
+            $(".satuan_id").val(null).change();
+        }
     })
 
     // delete
@@ -879,8 +858,7 @@
     })
 
     $(document).on('click', '.edit-table-detail', function(evt) {
-        $(".title-detail-name").text("Update")
-
+        $("#title-detail-name").text("Update Barang")
         validator_detail.resetForm();
         validator_detail.reset();
         let barang_id = "";
@@ -894,8 +872,7 @@
                 $(".barang_spesifikasi_id").val(v.barang_spesifikasi_id);
                 $(".kode_barang").val(v.kode_barang);
                 $(".nama_barang").val(v.nama_barang);
-                $(".nama_satuan").val(v.nama_satuan);
-                $(".satuan_id").val(v.satuan_id);
+                $(".satuan_id").val(v.satuan_id).change();
                 $(".qty").val(v.qty);
                 $(".keterangan").val(v.keterangan);
 
@@ -924,13 +901,18 @@
                 $(".kode_barang").append(`<option data-barang_name_master=""  data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
                 res.data.forEach(function(item) {
                     if (barang_id === item.id && barang_spesifikasi_id === item.barang_master_spesifikasi_id) {
-                        $(".satuan_id").val(item.satuan_1);
-                        $(".satuan").val(item.nama_satuan);
-                        $(".kode_barang").append(`<option selected data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                        $(".kode_barang").append(`<option selected data-satuan_1="${item.satuan_1}" data-satuan_2="${item.satuan_2}" data-satuan_3="${item.satuan_3}" data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
                     } else {
-                        $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                        $(".kode_barang").append(`<option data-satuan_1="${item.satuan_1}" data-satuan_2="${item.satuan_2}" data-satuan_3="${item.satuan_3}" data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
                     }
                 })
+
+                var kode_barang_selected = $(".kode_barang option:selected");
+                activeFieldSatuanId(
+                    kode_barang_selected.data('satuan_1'),
+                    kode_barang_selected.data('satuan_2'),
+                    kode_barang_selected.data('satuan_3')
+                );
 
                 $(".detail-modal").modal("show");
             }
@@ -948,8 +930,8 @@
         let barang_spesifikasi_id = $(".barang_spesifikasi_id").val();
         let kode_barang = $(".kode_barang").val()
         let nama_barang = $(".nama_barang").val()
-        let nama_satuan = $(".satuan").val()
-        let satuan_id = $(".satuan_id").val()
+        let nama_satuan = $(".satuan_id option:selected").data('kode_satuan')
+        let satuan_id = $(".satuan_id option:selected").val()
         let qty = $(".qty").val()
         let keterangan = $(".keterangan").val() ? $(".keterangan").val() : '-'
 
@@ -974,9 +956,6 @@
                 }
             });
         }
-
-        validator_detail.resetForm();
-        validator_detail.reset();
 
         if (validate_bahan_baku) {
             Swal.fire({
@@ -1212,7 +1191,7 @@
     }
 
     const deleteRowDetail = function(id, detail_id) {
-        if (detail_id) {
+        if (detail_id != 'undefined') {
             Swal.fire({
                 icon: 'question',
                 title: 'Hapus Data Detail?',
@@ -1322,6 +1301,7 @@
         $("#konversi_satuan_2").val('');
         $("#satuan3_id").val('').change()
         $("#konversi_satuan_3").val('');
+        $('#satuan_id').val(null).change();
     }
 
     const print = function(id) {
@@ -2104,11 +2084,6 @@
         let spek_id = $("#spek_id").val();
         let spesifikasi_id = $("#spesifikasi_id").val();
 
-        console.log(spek);
-        console.log(satuan1_id);
-        console.log(satuan2_id);
-        console.log(spesifikasi_id);
-
         if ($(".create-form-barang").valid()) {
             if ($(".spek-form").valid()) {
                 if (spek_id) {
@@ -2217,7 +2192,7 @@
                 'barang_spesifikasi_id': "<?= encrypt($d->barang2_id) ?>",
                 'kode_barang': "<?= $d->kode_barang ?>",
                 'nama_barang': "<?= $d->nama_barang ?>",
-                'nama_satuan': "<?= $d->nama_satuan ?>",
+                'nama_satuan': "<?= $d->kode_satuan ?>",
                 'satuan_id': "<?= $d->unit ?>",
                 'qty': "<?= $d->qty ?>",
                 'keterangan': "<?= trim($d->note) ?>"
@@ -2263,19 +2238,51 @@
                     confirmButtonColor: '#4e73df',
                 })
             }
-            console.log('u just pressed f5');
         }
     });
+
+    function activeFieldSatuanId(satuan_1, satuan_2, satuan_3) {
+        const allowedValues = [String(satuan_1), String(satuan_2), String(satuan_3)];
+        $('#satuan_id').on('select2:open', function() {
+            $('#satuan_id option').each(function() {
+                if (!allowedValues.includes(String($(this).val()))) {
+                    $(this).attr('disabled', true).addClass('disabled-option');
+                } else {
+                    $(this).attr('disabled', false).removeClass('disabled-option');
+                }
+            });
+        });
+    }
 </script>
 <script>
-    $("select[name='parent_type_id']")
+    $("select[name='parent_type_id']").select2({
+        placeholder: "Pilih Kategori Barang",
+        theme: "bootstrap-5",
+        allowClear: true,
+        dropdownParent: $(".add-modal .modal-content")
+    });
+
+
+    $("#satuan1_id, #satuan2_id, #satuan3_id").select2({
+        theme: "bootstrap-5",
+        allowClear: true,
+        placeholder: 'Pilih Satuan',
+        dropdownParent: $(".add-modal .modal-content")
+    });
+
+    $("#satuan1_id, #satuan2_id, #satuan3_id")
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+    $("select[name='parent_type_id'],#satuan1_id, #satuan2_id, #satuan3_id")
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $("select[name='parent_type_id']")
+    $("select[name='parent_type_id'],#satuan1_id, #satuan2_id, #satuan3_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -2283,15 +2290,9 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $("select[name='parent_type_id']")
+    $("select[name='parent_type_id'],#satuan1_id, #satuan2_id, #satuan3_id")
         .parent('div')
         .find('label')
         .css('z-index', '1');
-    $("select[name='parent_type_id']").select2({
-        placeholder: "Pilih Kategori Barang",
-        theme: "bootstrap-5",
-        allowClear: true,
-        dropdownParent: $(".add-modal .modal-content")
-    });
 </script>
 <?= $this->endSection(); ?>

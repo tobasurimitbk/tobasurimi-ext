@@ -78,6 +78,20 @@
                     </div> -->
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select id_warehouse" name="id_warehouse" id="id_warehouse" <?= !empty($data) ? 'disabled'  : ''; ?>>
+                                <option value=""></option>
+                                <?php foreach ($dataWarehouse ?? [] as $warehouse) : ?>
+                                    <option value="<?= $warehouse->id; ?>" <?= !empty($data) ? ($data->id_warehouse === $warehouse->id ? "selected" : "") : ""; ?>><?= $warehouse->warehouse_name; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Warehouse Tujuan</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <textarea autocomplete="one-time-code" class="form-control" id="note" name="note" placeholder="Keterangan"><?= $data->note ?? ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
@@ -196,6 +210,14 @@
             theme: "bootstrap-5",
             disabled: true
         })
+
+        // invoice
+        $('.id_warehouse').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            allowClear: true
+        });
+
         // invoice
         $('.id_invoice').select2({
             placeholder: "",
@@ -464,6 +486,9 @@
             id_invoice: {
                 required: true
             },
+            id_warehouse: {
+                required: true
+            },
             no_surat_retur: {
                 required: true
             },
@@ -477,6 +502,9 @@
             },
             id_invoice: {
                 required: "No invoice wajib diisi"
+            },
+            id_warehouse: {
+                required: "Warehouse wajib diisi"
             },
             no_surat_retur: {
                 required: "No surat return wajib diisi"

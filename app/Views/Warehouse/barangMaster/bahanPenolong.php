@@ -415,7 +415,7 @@
                 sortable: false,
             },
             {
-                data: "satua3",
+                data: "satuan3",
                 className: "text-center",
                 sortable: false,
             },

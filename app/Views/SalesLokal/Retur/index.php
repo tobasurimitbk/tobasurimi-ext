@@ -5,6 +5,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Return Barang Sales</h1>
+        <?= csrf_field() ?>
         <a class="btn btn-show-form btn-add float-right" href="<?= base_url("return-barang-sales/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
@@ -21,6 +22,7 @@
                                 <th>Nama Customer</th>
                                 <th>No. Invoice</th>
                                 <th>Tanggal Return</th>
+                                <th>Approved</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -34,6 +36,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+    const csrf = $(`[name="${csrfToken}"]`);
 
     let sort = "";
     let sortType = "desc";
@@ -102,6 +105,32 @@
         }, {
             data: "returnDate",
             className: "text-center"
+        }, {
+                data: "is_approved",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+                    let status = row.is_approved;
+                    let buttonHtml = ''; // Inisialisasi buttonHtml kosong
+
+                    if (status != 1) {
+                            buttonHtml = `
+                                    <button type="button" class="btn btn-primary" onclick="approve('${id}', 1)">
+                                        <i class="fa fa-paper-plane"></i> Approve
+                                    </button>
+                                `;
+                    } else {
+                            buttonHtml = `
+                                    <button type="button" class="btn btn-success" disabled>
+                                        <i class="fa fa-check"></i> Approved
+                                    </button>
+                                `;
+                    }
+                
+                    return buttonHtml; // Harus return buttonHtml
+                }
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -125,5 +154,65 @@
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
+
+    const approve = function(id, status_approve) {
+        Swal.fire({
+            icon: 'question',
+            title: status_approve == "1" ? "Yakin Akan Diapprove ?" : "Yakin Akan di Unapprove ?",
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Approved',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "<?= base_url("return-barang-sales/approve"); ?>",
+                    data: {
+                        id: id,
+                        status_approve: status_approve
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Di Approved, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
+    }
+
 </script>
 <?= $this->endSection(); ?>

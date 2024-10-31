@@ -149,11 +149,17 @@ class AMPurchaseOrderDetailModel extends Model
             barang_master.kode_barang,
             barang_master_spesifikasi.spesifikasi,
             barang_master_spesifikasi.id AS spesifikasi_id,
+            barang_master_spesifikasi.satuan_1,
+            barang_master_spesifikasi.satuan_2,
+            barang_master_spesifikasi.satuan_3,
+            barang_master_spesifikasi.konversi_satuan_2,
+            barang_master_spesifikasi.konversi_satuan_3,
             satuans.kode_satuan
         ";
 
         $amPurchaseOrderModel = new AMPurchaseOrderModel();
         $penerimaanBarangModel = new PenerimaanBarangModel();
+        $satuanModel = new SatuansModel();
 
         $barangs = $amPurchaseOrderModel
             ->select($selectQry)
@@ -175,6 +181,22 @@ class AMPurchaseOrderDetailModel extends Model
         $subTotal = 0;
 
         foreach ($barangs as $b) {
+
+            // GET NILAI KONVERSI
+            $nilaiKonversi = 1;
+            $satuanKonversiId = $b['satuan_1'];
+            $kodeSatuanKonversi = "";
+            if ($b['unit'] == $b['satuan_1']) {
+                $nilaiKonversi = 1;
+            } elseif ($b['unit'] == $b['satuan_2']) {
+                $nilaiKonversi = $b['konversi_satuan_2'];
+            } elseif ($b['unit'] == $b['satuan_3']) {
+                $nilaiKonversi = $b['konversi_satuan_3'];
+            }
+
+            // GET KODE SATUAN KONVERSI
+            $satuanKonversi = $satuanModel->where('id', $satuanKonversiId)->first();
+            $kodeSatuanKonversi = $satuanKonversi == null ? "" : $satuanKonversi['kode_satuan'];
 
             $allLPB = $penerimaanBarangModel
                 ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk')
@@ -236,7 +258,13 @@ class AMPurchaseOrderDetailModel extends Model
                         'sisa_total' => $sisaDiterima,
                         'harga' => $harga,
                         'sub_total' => ($inLPB * $harga),
-                        'keterangan' => $b['note']
+                        'keterangan' => $b['note'],
+                        // TAMBAHAN
+                        'satuan_id' => $b['unit'],
+                        'satuan_konversi_id' => $satuanKonversiId,
+                        'satuan_konversi' => $kodeSatuanKonversi,
+                        'nilai_konversi' => $nilaiKonversi,
+                        'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi)
                     ];
 
                     $jmlOrderTotal += $b['qty'];
@@ -270,7 +298,13 @@ class AMPurchaseOrderDetailModel extends Model
                         'sisa_total' => $sisaDiterima,
                         'harga' => $harga,
                         'sub_total' => ($inLPB * $harga),
-                        'keterangan' => $b['note']
+                        'keterangan' => $b['note'],
+                        // TAMBAHAN
+                        'satuan_id' => $b['unit'],
+                        'satuan_konversi_id' => $satuanKonversiId,
+                        'satuan_konversi' => $kodeSatuanKonversi,
+                        'nilai_konversi' => $nilaiKonversi,
+                        'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi)
                     ];
 
                     $jmlOrderTotal += $b['qty'];

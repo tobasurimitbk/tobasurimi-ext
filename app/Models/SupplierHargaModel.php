@@ -148,7 +148,7 @@ class SupplierHargaModel extends Model
             ->findAll();
 
         for ($i = 0; $i < count($result); $i++) {
-            $spesifikaiDetail = $satuanModel->select('satuans.*')
+            $spesifikaiDetail = $satuanModel->select('satuans.*,satuan_2,satuan_3')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.satuan_1 = satuans.id')
                 ->where('barang_master_spesifikasi.id', $result[0]['spesifikasi_id'])
                 ->first();
@@ -169,6 +169,8 @@ class SupplierHargaModel extends Model
 
             $result[$i]['nama_barang'] = $result[$i]['barang_name'] . " " . $result[$i]['spesifikasi'];
             $result[$i]['satuan_id'] = ($spesifikaiDetail != null) ? $spesifikaiDetail['id'] : '';
+            $result[$i]['satuan_2'] = ($spesifikaiDetail != null) ? $spesifikaiDetail['satuan_2'] : '';
+            $result[$i]['satuan_3'] = ($spesifikaiDetail != null) ? $spesifikaiDetail['satuan_3'] : '';
             $result[$i]['nama_satuan'] = ($spesifikaiDetail != null) ? $spesifikaiDetail['nama_satuan'] : '';
             $result[$i]['kode_satuan'] = ($spesifikaiDetail != null) ? $spesifikaiDetail['kode_satuan'] : '';
         }

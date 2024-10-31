@@ -125,6 +125,7 @@ class POLokalBahanBaku extends BaseController
         $dataBCType = $this->metadataModel->getBCUsed("po_lokal_bb");
         $dataDivisi =  $this->divisiModel->getDivisiAccess();
         $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
+        $dataSatuan = $this->SatuansModel->where('deletedAt', null)->findAll();
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -136,7 +137,8 @@ class POLokalBahanBaku extends BaseController
             "dataWarehouse" => $dataWarehouse,
             "dataBCType"    => $dataBCType,
             "dataDivisi"    => $dataDivisi,
-            "dataKemasan"   => $dataKemasan
+            "dataKemasan"   => $dataKemasan,
+            "dataSatuan"    => $dataSatuan,
         ];
 
 

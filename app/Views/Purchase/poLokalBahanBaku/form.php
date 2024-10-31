@@ -290,7 +290,18 @@
                                 if (!empty($dataSpesifikasi)) {
                                     foreach ($dataSpesifikasi as $spesifikasi) {
                                 ?>
-                                        <option data-spesifikasi_id="<?= $spesifikasi['spesifikasi_id'] ?>" data-nama_satuan="<?= $spesifikasi['nama_satuan'] ?>" data-kode_satuan="<?= $spesifikasi['kode_satuan'] ?>" data-satuan_id="<?= $spesifikasi['satuan_id'] ?>" data-umum="<?= $spesifikasi['harga_umum'] ?>" data-harian="<?= $spesifikasi['harga_harian'] ?>" data-bulanan="<?= $spesifikasi['harga_bulanan'] ?>" value="<?= $spesifikasi["id"]; ?>"><?= $spesifikasi["spesifikasi"]; ?></option>
+                                        <option
+                                            data-spesifikasi_id="<?= $spesifikasi['spesifikasi_id'] ?>"
+                                            data-nama_satuan="<?= $spesifikasi['nama_satuan'] ?>"
+                                            data-kode_satuan="<?= $spesifikasi['kode_satuan'] ?>"
+                                            data-satuan_id="<?= $spesifikasi['satuan_id'] ?>"
+                                            data-satuan_2="<?= $spesifikasi['satuan_2'] ?>"
+                                            data-satuan_3="<?= $spesifikasi['satuan_3'] ?>"
+                                            data-umum="<?= $spesifikasi['harga_umum'] ?>"
+                                            data-harian="<?= $spesifikasi['harga_harian'] ?>"
+                                            data-bulanan="<?= $spesifikasi['harga_bulanan'] ?>"
+                                            value="<?= $spesifikasi["id"]; ?>">
+                                            <?= $spesifikasi["spesifikasi"]; ?></option>
                                 <?php
                                     }
                                 }
@@ -300,10 +311,22 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="satuan" class="form-control satuan" name="satuan" id="satuan" placeholder="Satuan Barang" readonly>
-                            <label for="floatingInput">Satuan Barang</label>
+                        <div class="form-floating" style="height: 50px;">
+                            <select class="form-select satuan_id" name="satuan_id" id="satuan_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataSatuan as $d) : ?>
+                                    <option data-kode_satuan="<?= $d['kode_satuan'] ?>" value="<?= $d['id'] ?>">
+                                        <?= $d['kode_satuan'] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Satuan</label>
                         </div>
+                        <small class="mb-4 mt-1">
+                            <i>
+                                Jika ingin menggunakan satuan yang lain, pastikan anda sudah mengatur satuannya di menu master barang
+                            </i>
+                        </small>
                     </div>
                 </div>
                 <div class="row">
@@ -484,6 +507,9 @@
             },
             monthly_price: {
                 required: true
+            },
+            satuan_id: {
+                required: true
             }
         },
         messages: {
@@ -513,6 +539,9 @@
             },
             monthly_price: {
                 required: "Harga Bulanan wajib diisi"
+            },
+            satuan_id: {
+                required: "Satuan Wajib Diisi"
             }
         },
         errorElement: 'span',
@@ -539,28 +568,28 @@
 
     const changeSpesifikasi = function() {
         if ($(".spesifikasi option:selected").val()) {
-            let nama_satuan = $(".spesifikasi option:selected").data("nama_satuan") ? $(".spesifikasi option:selected").data("nama_satuan") : "";
-            let kode_satuan = $(".spesifikasi option:selected").data("kode_satuan") ? $(".spesifikasi option:selected").data("kode_satuan") : "";
+            let id_detail = $('.id_detail').val();
             let satuan_id = $(".spesifikasi option:selected").data("satuan_id") ? $(".spesifikasi option:selected").data("satuan_id") : "";
+            let satuan_2 = $(".spesifikasi option:selected").data("satuan_2") ? $(".spesifikasi option:selected").data("satuan_2") : "";
+            let satuan_3 = $(".spesifikasi option:selected").data("satuan_3") ? $(".spesifikasi option:selected").data("satuan_3") : "";
             let umum = $(".spesifikasi option:selected").data("umum") ? $(".spesifikasi option:selected").data("umum") : "";
             let harian = $(".spesifikasi option:selected").data("harian") ? $(".spesifikasi option:selected").data("harian") : "";
             let bulanan = $(".spesifikasi option:selected").data("bulanan") ? $(".spesifikasi option:selected").data("bulanan") : "";
             let satuan = $(".spesifikasi option:selected").data("wq") ? $(".spesifikasi option:selected").data("satuan") : "";
 
-            $(".satuan").val(nama_satuan);
-            $(".satuan").attr("satuan_id", satuan_id);
-            $(".satuan").attr("nama_satuan", nama_satuan);
-            $(".satuan").attr("kode_satuan", kode_satuan);
+            if (id_detail == '') {
+                $(".satuan_id").val(satuan_id).change();
+            }
             $(".harga").val(parseInt(umum.toString().replaceAll(",", "")));
             $(".daily_price").val(parseInt(harian.toString().replaceAll(",", "")));
             $(".monthly_price").val(parseInt(bulanan.toString().replaceAll(",", "")));
 
             $(".qty").val("");
             $(".total").val("");
+
+            activeFieldSatuanId(satuan_id, satuan_2, satuan_3);
         } else {
-            $(".satuan").val("");
-            $(".satuan").attr("satuan_id", "");
-            $(".satuan").attr("nama_satuan", "");
+            $(".satuan_id").val(null).change();
             $(".harga").val("");
             $(".daily_price").val("");
             $(".monthly_price").val("");
@@ -568,6 +597,19 @@
             $(".total").val("");
         }
 
+    }
+
+    const activeFieldSatuanId = function(satuan_1, satuan_2, satuan_3) {
+        const allowedValues = [String(satuan_1), String(satuan_2), String(satuan_3)];
+        $('#satuan_id').on('select2:open', function() {
+            $('#satuan_id option').each(function() {
+                if (!allowedValues.includes(String($(this).val()))) {
+                    $(this).attr('disabled', true).addClass('disabled-option');
+                } else {
+                    $(this).attr('disabled', false).removeClass('disabled-option');
+                }
+            });
+        });
     }
 
     $(document).ready(function() {
@@ -664,7 +706,13 @@
         $('.bagian').select2({
             placeholder: "Pilih Bagian",
             theme: "bootstrap-5"
+        });
+
+        $('.satuan_id').select2({
+            placeholder: "Pilih Satuan",
+            theme: "bootstrap-5"
         })
+
 
         //CSS SELECT2 FLOATING LABEL
         $('.form-select')
@@ -804,6 +852,8 @@
                         data-nama_satuan="${item.nama_satuan}" 
                         data-kode_satuan="${item.kode_satuan}" 
                         data-satuan_id="${item.satuan_id}" 
+                        data-satuan_2="${item.satuan_2}"
+                        data-satuan_3="${item.satuan_3}"
                         data-umum="${Number(item.harga_umum).toLocaleString(undefined, {minimumFractionDigits: 2, maximumSignificantDigits: 2})}" 
                         data-harian=" ${Number(item.harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
                         data-bulanan=" ${Number(item.harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
@@ -853,6 +903,7 @@
                     $(".peti").val(list_items[i].peti);
                     $(".quality").val(list_items[i].quality).change();
                     $(".keterangan").val(list_items[i].keterangan);
+                    $('.satuan_id').val(list_items[i].satuan_id).change();
                     break;
                 }
             }
@@ -1206,8 +1257,8 @@
             let supplier_harga_id = $(".spesifikasi option:selected").val();
             let spesifikasi_id = $(".spesifikasi option:selected").data("spesifikasi_id");
             let spesifikasi_name = $(".spesifikasi option:selected").text().trim();
-            let satuan_id = $(".spesifikasi option:selected").data("satuan_id");
-            let kode_satuan = $(".spesifikasi option:selected").data("kode_satuan");
+            let satuan_id = $(".satuan_id option:selected").val();
+            let kode_satuan = $(".satuan_id option:selected").data('kode_satuan');
             let peti = $(".peti").val()
             let quality = $(".quality").val()
             let harga = convertRupiahToNumber($(".harga").val() || 0)
@@ -1350,6 +1401,8 @@
                                 data-nama_satuan="${item.nama_satuan}" 
                                 data-kode_satuan="${item.kode_satuan}" 
                                 data-satuan_id="${item.satuan_id}" 
+                                data-satuan_2="${item.satuan_2}"
+                                data-satuan_3="${item.satuan_3}"
                                 data-umum="${Number(item.harga_umum).toLocaleString(undefined, {minimumFractionDigits: 2, maximumSignificantDigits: 2})}" 
                                 data-harian=" ${Number(item.harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
                                 data-bulanan=" ${Number(item.harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
@@ -1374,7 +1427,7 @@
     const resetDetailForm = function() {
         $(".id_detail").val('');
         $(".spesifikasi").val("").change()
-        $(".satuan").val("").change()
+        $(".satuan_id").val("").change()
         $(".harga").val('')
         $(".daily_price").val('')
         $(".monthly_price").val('')

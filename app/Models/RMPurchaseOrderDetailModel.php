@@ -136,11 +136,18 @@ class RMPurchaseOrderDetailModel extends Model
             barang_master.barang_name AS nama_barang,
             barang_master.kode_barang,
             satuans.kode_satuan,
-            supplier_harga.spesifikasi
+            supplier_harga.spesifikasi,
+            barang_master_spesifikasi.satuan_1,
+            barang_master_spesifikasi.satuan_2,
+            barang_master_spesifikasi.satuan_3,
+            barang_master_spesifikasi.konversi_satuan_2,
+            barang_master_spesifikasi.konversi_satuan_3,
+
         ";
 
         $rmPurchaseOrderModel = new RMPurchaseOrderModel();
         $penerimaanBarangModel = new PenerimaanBarangModel();
+        $satuanModel = new SatuansModel();
 
         $barangs = $rmPurchaseOrderModel
             ->select($selectQry)
@@ -149,6 +156,7 @@ class RMPurchaseOrderDetailModel extends Model
             ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
             ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
             ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = supplier_harga.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
             ->findAll();
 
@@ -164,6 +172,22 @@ class RMPurchaseOrderDetailModel extends Model
         $subTotal = 0;
 
         foreach ($barangs as $b) {
+
+            // GET NILAI KONVERSI
+            $nilaiKonversi = 1;
+            $satuanKonversiId = $b['satuan_1'];
+            $kodeSatuanKonversi = "";
+            if ($b['satuan_id'] == $b['satuan_1']) {
+                $nilaiKonversi = 1;
+            } elseif ($b['satuan_id'] == $b['satuan_2']) {
+                $nilaiKonversi = $b['konversi_satuan_2'];
+            } elseif ($b['satuan_id'] == $b['satuan_3']) {
+                $nilaiKonversi = $b['konversi_satuan_3'];
+            }
+
+            // GET KODE SATUAN KONVERSI
+            $satuanKonversi = $satuanModel->where('id', $satuanKonversiId)->first();
+            $kodeSatuanKonversi = $satuanKonversi == null ? "" : $satuanKonversi['kode_satuan'];
 
             if ($penerimaanBarangID == null) {
                 $allLPB = $penerimaanBarangModel
@@ -222,7 +246,13 @@ class RMPurchaseOrderDetailModel extends Model
                         'harga_bulanan' => $b['monthly_price'],
                         'harga_sum' => ($b['general_price'] + $b['daily_price'] + $b['monthly_price']),
                         'sub_total' => ($inLPB * ($b['general_price'] + $b['daily_price'] + $b['monthly_price'])),
-                        'keterangan' => $b['note']
+                        'keterangan' => $b['note'],
+                        // TAMBAHAN
+                        'satuan_id' => $b['satuan_id'],
+                        'satuan_konversi_id' => $satuanKonversiId,
+                        'satuan_konversi' => $kodeSatuanKonversi,
+                        'nilai_konversi' => $nilaiKonversi,
+                        'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi)
                     ];
 
                     $jmlOrderTotal += $b['qty'];
@@ -267,7 +297,6 @@ class RMPurchaseOrderDetailModel extends Model
                     ->where('penerimaan_barang_detail.deletedAt', null)
                     ->where('pengembalian_barang_detail.deletedAt', null)
                     ->first();
-                // var_dump($firstLPB);
 
                 $inLPB = ($firstLPB == null) ? 0 : $firstLPB['jml_masuk'];
                 $sisaDiterima = $b['qty'] - $jmlMasukAll;
@@ -295,7 +324,13 @@ class RMPurchaseOrderDetailModel extends Model
                         'harga_bulanan' => $b['monthly_price'],
                         'harga_sum' => ($b['general_price'] + $b['daily_price'] + $b['monthly_price']),
                         'sub_total' => ($inLPB * ($b['general_price'] + $b['daily_price'] + $b['monthly_price'])),
-                        'keterangan' => $b['note']
+                        'keterangan' => $b['note'],
+                        // TAMBAHAN
+                        'satuan_id' => $b['satuan_id'],
+                        'satuan_konversi_id' => $satuanKonversiId,
+                        'satuan_konversi' => $kodeSatuanKonversi,
+                        'nilai_konversi' => $nilaiKonversi,
+                        'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi)
                     ];
 
                     $jmlOrderTotal += $b['qty'];
