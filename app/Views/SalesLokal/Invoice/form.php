@@ -65,6 +65,7 @@
                                 <option value=""></option>
                                 <option value="pesanan" <?= !empty($data) ? ($data->document_type == 'pesanan' ? 'selected' : "") : ""; ?>>Pesanan</option>
                                 <option value="pengiriman" <?= !empty($data) ? ($data->document_type == 'pengiriman' ? 'selected' : "") : ""; ?>>Pengiriman</option>
+                                <option value="penjualan" <?= !empty($data) ? ($data->document_type == 'penjualan' ? 'selected' : "") : ""; ?>>Penjualan Kembali</option>
                             </select>
                             <label for="floatingInput">Jenis Dokumen</label>
                         </div>
@@ -246,8 +247,11 @@
                 <!-- list barang -->
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
-                        <div class="col-md-12">
+                        <div class="col-md-10">
                             <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-success float-right btn-show-modal" style="display: none;"><i class="fa fa-plus mr-1"></i>Add Barang</button>
                         </div>
                     </div>
                 </div>
@@ -295,10 +299,63 @@
                 </div>
             </form>
         </div>
-
-    </div>
     </div>
 </section>
+
+<div class="modal" id="add_barang_penjualan" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Barang Penjualan Kembali</h5>
+            </div>
+            <div class="modal-body">
+                <form class="form-excel" method="post">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="hidden" class="id_barang_hasil" name="id_barang_hasil" id="id_barang_hasil" />
+                                <select class="form-select kode_barang_add" name="kode_barang_add" id="kode_barang_add" aria-label="Floating label select example">
+                                    <option data-barang_id="" data-nama="" data-satuan="" value=""></option>
+                                </select>
+                                <label for="floatingInput">Kode Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly class="form-control satuan_barang_add" name="satuan_barang_add" id="satuan_barang_add" placeholder="Satuan">
+                                <label for="floatingInput">Satuan</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" oninput="preventNegativeInput(this)" class="form-control qty_barang_add" name="qty_barang_add" id="qty_barang_add" placeholder="Qty Hasil">
+                                <label for="floatingInput">Qty Hasil</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" oninput="preventNegativeInput(this)" class="form-control kg_barang_add" name="kg_barang_add" id="kg_barang_add" placeholder="Berat Isi">
+                                <label for="floatingInput">Berat Isi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" oninput="preventNegativeInput(this)" readonly class="form-control qty_kg_barang_add" name="qty_kg_barang_add" id="qty_kg_barang_add" placeholder="Qty dalam KG">
+                                <label for="floatingInput">Qty dalam KG</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-add-barang mr-2">Kembali</button>
+                <button type="button" class="btn btn-submit-form btn-add-barang">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <script>
@@ -411,7 +468,20 @@
             <?php endif; ?>
         <?php endif; ?>
 
-        $('.ship_via, .termin').select2({
+        $(".btn-show-modal").click(function() {
+            getBarang();
+            $('#add_barang_penjualan').modal('show');
+        });
+
+        $(".btn-discard-add-barang").click(function() {
+            $(".kode_barang_add").val("").change();
+            $(".qty_barang_add").val();
+            $(".kg_barang_add").val();
+            $(".qty_kg_barang_add").val();
+            $('#add_barang_penjualan').modal('hide');
+        });
+
+        $('.ship_via, .termin, .kode_barang_add').select2({
             placeholder: "",
             theme: "bootstrap-5"
         });
@@ -448,14 +518,14 @@
         });
 
         //CSS SELECT2 FLOATING LABEL
-        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id')
+        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id, .kode_barang_add')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id')
+        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id, .kode_barang_add')
             .parent('div')
             .children('span')
             .children('span')
@@ -463,7 +533,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id, #doc_type, .termin')
+        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id, #doc_type, .termin, .kode_barang_add')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -480,19 +550,31 @@
 
         //nomor faktur
         function getDocumentList(docType, idCustomer) {
-
-            $.ajax({
-                url: `<?= base_url('/invoice-penjualan-lokal/getDocNumber/'); ?>${docType}/${idCustomer}`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $("#doc_id").empty();
-                    res.data.forEach(function(item) {
-                        $("#doc_id").append(`<option value="${item.id}">${item.doc_no}</option>`);
+            if (docType === "penjualan") {
+                $(".btn-show-modal").css('display', '');
+                $("#doc_id").val('').change().attr('disabled', 'true');
+                table.clear();
+                list_items = [];
+                clearField();
+            } else {
+                $(".btn-show-modal").css('display', 'none');
+                $("#doc_id").removeAttr('disabled');
+                if (docType && idCustomer) {
+                    clearField();
+                    $.ajax({
+                        url: `<?= base_url('/invoice-penjualan-lokal/getDocNumber/'); ?>${docType}/${idCustomer}`,
+                        method: "GET",
+                        dataType: "json",
+                        success: function(res) {
+                            $("#doc_id").empty();
+                            res.data.forEach(function(item) {
+                                $("#doc_id").append(`<option value="${item.id}">${item.doc_no}</option>`);
+                            });
+                            $("#doc_id").trigger('change');
+                        }
                     });
-                    $("#doc_id").trigger('change');
                 }
-            });
+            }
         }
 
         function getTerminList() {
@@ -631,15 +713,38 @@
         });
     })
 
+    function clearField() {
+        $('#salesName').val('');
+        $('#customerName').val('');
+        $('#customerAddress').val('');
+        $('#nama_ecommerce').val('');
+        $('#no_po').val('');
+        $('#termin').val('').change();
+        $('#jenis_penjualan').val('').change();
+    }
+
+    function getBarang() {
+        $.ajax({
+            url: `<?= base_url("order-form-lokal/barangAll"); ?>`,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                $(".kode_barang_add").empty();
+                $(".kode_barang_add").append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-statusppn="" data-warehouse_name="" data-id_item="" value=""></option>`);
+                res.dataBarang.forEach(function(item) {
+                    $(".kode_barang_add").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-statusppn="${item.statusppn}" data-satuan="${item.nama_satuan}" data-kode_satuan="${item.kode_satuan}" data-warehouse_id="${item.warehouse_id}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
+                });
+                $(".kode_barang_add").val("").change();
+            }
+        })
+    }
+
     var validator = $(".create-form").validate({
         rules: {
             id_customer: {
                 required: true
             },
             id_po: {
-                required: true
-            },
-            "doc_id[]": {
                 required: true
             },
             no_surat_jalan: {
@@ -655,9 +760,6 @@
             },
             id_po: {
                 required: "PO wajib diisi"
-            },
-            "doc_id[]": {
-                required: "SO wajib diisi"
             },
             no_surat_jalan: {
                 required: "No Surat jalan wajib diisi"
