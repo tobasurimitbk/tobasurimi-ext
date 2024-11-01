@@ -7,6 +7,8 @@ use App\Models\DivisisModel;
 use App\Models\WarehousesModel;
 use App\Models\ProvincesModel;
 use App\Models\EmployeesModel;
+use App\Models\StockModel;
+use App\Models\PenerimaanBarangModel;
 
 class Warehouse extends BaseController
 {
@@ -16,6 +18,8 @@ class Warehouse extends BaseController
     protected $ProvincesModel;
     protected $EmployeesModel;
     protected $DivisisModel;
+    protected $stockModel;
+    protected $penerimaanBarangModel;
 
     public function __construct()
     {
@@ -25,6 +29,8 @@ class Warehouse extends BaseController
         $this->ProvincesModel = new ProvincesModel();
         $this->EmployeesModel = new EmployeesModel();
         $this->DivisisModel = new DivisisModel();
+        $this->stockModel = new StockModel();
+        $this->penerimaanBarangModel  = new PenerimaanBarangModel();
     }
 
     public function warehouse()
@@ -368,6 +374,20 @@ class Warehouse extends BaseController
     {
         try {
             $id = decrypt($this->request->getPost("id"));
+
+            $dataStock = $this->stockModel->where('warehouse_id', $id)->first();
+            $dataLPB = $this->penerimaanBarangModel->where('warehouse_id', $id)->first();
+            
+            // Check if data exists and return error if so
+            if ($dataStock || $dataLPB) {
+                $data = [
+                    "status"  => false,
+                    "message" => "Data Gudang masih di gunakan",
+                    'token'   => csrf_hash()
+                ];
+                echo json_encode($data);
+                return; // Stop further execution
+            }
 
             if (!empty($id)) {
                 $values = [
