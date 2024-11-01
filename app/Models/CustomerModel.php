@@ -78,6 +78,7 @@ class CustomerModel extends Model
 
     public function getList($condition, $companyAccessArr, $addCondition, $limit = 10, $offset = 0)
     {
+
         $availableSort = [
             'companyName'       => 'companies.company',
             'namaSales'         => 'users.name',
@@ -109,7 +110,6 @@ class CustomerModel extends Model
             ->join('country', 'country.id = customers.country_id', 'left')
             ->join('employees', 'employees.id = customers.sales_id', 'LEFT')
             ->join('companies', 'companies.id = customers.company_id', 'LEFT')
-            // ->groupBy(('customers.id'))
             ->orderBy($sort, $sortType);
 
         $totalData = $customerDataQry->countAllResults(false);
@@ -120,12 +120,11 @@ class CustomerModel extends Model
 
         if ($addCondition['search']) {
             $customerDataQry->like('customers.name', $addCondition['search'])
-                ->orLike('users.name', $addCondition['search'])
                 ->orLike('customers.kode', $addCondition['search']);
         }
 
         if ($addCondition['company_id']) {
-            $customerDataQry->where('company_id', $addCondition['company_id']);
+            $customerDataQry->where('customers.company_id', $addCondition['company_id']);
         }
 
         if ($addCondition['search'] || $addCondition['company_id']) {
