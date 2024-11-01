@@ -64,14 +64,25 @@
 <section class="section">
     <div class="section-header">
         <h1>Kode HS</h1>
-        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </button>
+        <?php if (can('Master Data', 'HS Code', 'c')) : ?>
+            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                Import / Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <li><button class="dropdown-item btn-upload-excel">Import Excel</button></li>
+                <li><button class="dropdown-item" onclick="excel('<?= base_url("hs-code/export"); ?>')">Export Excel</button></li>
+            </ul>
+        <?php endif; ?>
+        <?php if (can('Master Data', 'HS Code', 'c')) : ?>
+            <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </button>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end mb-3">
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
@@ -80,7 +91,7 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th onclick="changeSort('komoditi')" class="sort">Komoditi</th>
                                 <th onclick="changeSort('code')" class="sort">HS Code</th>
                                 <th onclick="changeSort('uraian_barang')" class="sort">Uraian Barang</th>
@@ -97,7 +108,29 @@
         </div>
     </div>
 </section>
-
+<div class="modal" id="import_excel_modal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Kode HS</h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary text-black" role="alert">
+                    UNDUH TEMPLEATE EXCEL <a href="<?= base_url('assets/import/IMPORT_EXCEL_HS_CODE.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                </div>
+                <form class="form-excel" method="post">
+                    <div class="form-floating" style="height: 50px;">
+                        <input type="file" name="file" id="file" accept=".xlsx" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-import-excel mr-2">Kembali</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-excel">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "komoditi";
@@ -512,6 +545,84 @@
                 })
             }
         })
+
+        // upload excel
+        $('.btn-upload-excel').click(function() {
+            $('#file').val(null);
+            $('#import_excel_modal').modal('show');
+
+        });
+
+        $('.btn-discard-import-excel').click(function() {
+            $('#import_excel_modal').modal('hide');
+        });
+
+        var validator_excel = $(".form-excel").validate({
+            rules: {
+                file: {
+                    required: true
+                },
+            },
+            messages: {
+                file: {
+                    required: "File wajib diisi"
+                },
+            },
+        });
+
+        $('.btn-submit-excel').click(function() {
+            if ($('.form-excel').valid()) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Import Excel?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Kembali',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let csrf = $(`[name="${csrfToken}"]`);
+                        let formData = new FormData(document.querySelector(".form-excel"));
+                        $.ajax({
+                            url: "<?= base_url("hs-code/import"); ?>",
+                            data: formData,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    });
+                                }
+                            },
+                        });
+
+                    }
+                })
+            }
+        });
     })
 
     const changeSort = function(val) {
@@ -521,6 +632,11 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+    }
+
+    const excel = function(url) {
+        let search = $(".search").val();
+        window.open(url + `?search=${search}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 

@@ -179,6 +179,8 @@ $routes->get('/hs-code/id/(:segment)', 'Master\HSCode::getByIdHSCode/$1', ['filt
 $routes->post('/hs-code/save', 'Master\HSCode::saveHSCode', ['filter' => 'Auth']);
 $routes->post('/hs-code/update', 'Master\HSCode::updateHSCode', ['filter' => 'Auth']);
 $routes->post('/hs-code/delete', 'Master\HSCode::deleteHSCode', ['filter' => 'Auth']);
+$routes->post('/hs-code/import', 'Master\HSCode::import', ['filter' => 'Auth']);
+$routes->get('/hs-code/export', 'Master\HSCode::export', ['filter' => 'Auth']);
 
 // SATUAN
 $routes->get('/satuan', 'Master\Satuan::satuan', ['filter' => 'Auth']);

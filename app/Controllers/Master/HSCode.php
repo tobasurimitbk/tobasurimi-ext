@@ -4,16 +4,23 @@ namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
 use App\Models\HsCodesModel;
+use App\Models\SatuansModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class HSCode extends BaseController
 {
     protected $token;
     protected $HsCodesModel;
+    protected $satuanModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->HsCodesModel = new HsCodesModel();
+        $this->satuanModel = new SatuansModel();
     }
 
     public function hsCode()
@@ -72,59 +79,175 @@ class HSCode extends BaseController
         return;
     }
 
-    // public function allHSCode()
-    // {
-    //     $draw = $this->request->getVar('draw');
-    //     $row = $this->request->getVar('start');
-    //     $rowperpage = $this->request->getVar('length');
-    //     $temp = $this->request->getVar('order');
-    //     $columnIndex = $temp[0]['column']; // Column index
 
-    //     $temp = $this->request->getVar('columns');
-    //     $columnName = $temp[$columnIndex]['data']; // Column index
+    public function import()
+    {
+        $rules = [
+            "file" => [
+                'rules' => 'uploaded[file]|ext_in[file,xlsx]',
+                'errors' => [
+                    'uploaded' => 'Tidak ada file yang di-upload.',
+                    'ext_in' => 'File yang di-upload harus berupa file Excel (.xlsx).',
+                ],
+            ],
+        ];
 
-    //     $temp = $this->request->getVar('order');
-    //     $columnSortOrder = $temp[0]['dir']; // Column index
+        if (!$this->validate($rules)) {
+            return response()->setJSON([
+                'message' => $this->validator->getError('file'),
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
 
-    //     $search = $this->request->getVar('search');
-    //     //$searchValue = $temp['value']; // Column index
+        $file = $this->request->getFile('file');
 
-    //     $values = [
-    //         "search"        => $search
-    //     ];
+        try {
+            $spreadsheet = IOFactory::load($file->getTempName());
+            $worksheet = $spreadsheet->getActiveSheet();
 
-    //     $totalRecords = $this->HsCodesModel->total_list(array());
-    //     $totalRecordwithFilter = $this->HsCodesModel->total_list($values);
+            // Cek apakah ada data selain header
+            if ($worksheet->getHighestRow() <= 1) {
+                return response()->setJSON([
+                    'message' => 'File kosong atau tidak ada data yang dapat diimpor.',
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
 
-    //     $res = $this->HsCodesModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);
+            $data = [];
+            $rowIterator = $worksheet->getRowIterator(2);
+            foreach ($rowIterator as $row) {
+                $cellIterator = $row->getCellIterator();
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+                $data[] = $rowData;
+            }
 
-    //     $number = $row * $rowperpage;
+            $berhasilTotal = 0;
+            $gagalTotal = 0;
+            $totalData = count($data);
 
-    //     $data = [];
+            foreach ($data as $row) {
+                $komoditi = isset($row[0]) ? trim($row[0]) : null;
+                $code = isset($row[1]) ? trim($row[1]) : null;
+                $uraianBarang = isset($row[2]) ? trim($row[2]) : null;
+                $unit = isset($row[3]) ? trim($row[3]) : null;
+                $nilaiTarif = is_numeric($row[4]) ? (float)$row[4] : null;
+                if ($komoditi && $code && $uraianBarang && $unit) {
+                    $satuan = $this->satuanModel->where('kode_satuan', $unit)->first();
+                    $hsCode = $this->HsCodesModel->where('code', $code)->first();
 
-    //     for ($i = 0; $i < count($res); $i++) {
+                    if ($satuan && !$hsCode) {
+                        $this->HsCodesModel->insert([
+                            'komoditi' => $komoditi,
+                            'code' => $code,
+                            'uraian_barang' => $uraianBarang,
+                            'unit' => $satuan['id'],
+                            'nilai_tarif' => $nilaiTarif
+                        ]);
+                        $berhasilTotal++;
+                    } else {
+                        $gagalTotal++;
+                    }
+                } else {
+                    $gagalTotal++;
+                }
+            }
 
-    //         $data[] = array(
-    //             "no" => ($row + $i + 1),
-    //             "id" => $res[$i]["id"],
-    //             "komoditi" => $res[$i]["komoditi"],
-    //             "code" => $res[$i]["code"],
-    //             "uraian_barang" => $res[$i]["uraian_barang"],
-    //             "kode_satuan" => $res[$i]["kode_satuan"],
-    //             "nama_satuan" => $res[$i]["nama_satuan"]
-    //         );
-    //     }
+            return response()->setJSON([
+                'message' => "Berhasil Import: $berhasilTotal Data, Gagal Import: $gagalTotal",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (\Exception $e) {
+            return response()->setJSON([
+                'message' => "Terjadi kesalahan saat memproses file: " . $e->getMessage(),
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
+    }
 
-    //     ## Response
-    //     $response = array(
-    //         "draw" => intval($draw),
-    //         "iTotalRecords" => $totalRecords,
-    //         "iTotalDisplayRecords" => $totalRecordwithFilter,
-    //         "aaData" => $data
-    //     );
 
-    //     return $this->response->setJSON($response);
-    // }
+
+    public function export()
+    {
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType")
+        ];
+
+        $hsData = $this->HsCodesModel->getList([], $addCondition, 10000000, 0);
+
+        $dataHS = [];
+
+        foreach ($hsData['data'] as $data) {
+            array_push($dataHS, [
+                "komoditi"          => $data->komoditi,
+                "code"              => $data->code,
+                "uraian_barang"     => $data->uraian_barang,
+                "kode_satuan"       => $data->kode_satuan,
+                "nilai_tarif"       => $data->nilai_tarif
+            ]);
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->getStyle('A1:E1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+            ],
+        ]);
+
+
+        if (empty($dataHS)) {
+            $sheet->setCellValue('A1', 'Tidak Ada Data HS Code');
+        } else {
+            $filename = "EXPORT_HS_CODE" . date('d/m/Y');
+
+            $sheet->setCellValue('A1', 'KOMODITI');
+            $sheet->setCellValue('B1', 'KODE');
+            $sheet->setCellValue('C1', 'URAIAN BARANG');
+            $sheet->setCellValue('D1', 'KODE SATUAN');
+            $sheet->setCellValue('E1', 'NILAI TARIF');
+            $sheet->getStyle('A1:E1')->applyFromArray([
+                'font' => [
+                    'bold' => true,
+                ],
+            ]);
+
+            $numRow = 2;
+            foreach ($dataHS as $d) {
+                $sheet->setCellValue('A' . $numRow, $d['komoditi']);
+                $sheet->setCellValue('B' . $numRow, $d['code']);
+                $sheet->setCellValue('C' . $numRow, $d['uraian_barang']);
+                $sheet->setCellValue('D' . $numRow, $d['kode_satuan']);
+                $sheet->setCellValue('E' . $numRow, $d['nilai_tarif']);
+                $numRow++;
+            }
+
+            $sheet->getStyle('A1:' . $sheet->getHighestDataColumn() . $sheet->getHighestDataRow())
+                ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+            ob_start();
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+            $excelOutput = ob_get_clean();
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="' . $filename . '.xlsx"');
+            header('Cache-Control: max-age=0');
+            header('Content-Length: ' . strlen($excelOutput));
+
+            echo $excelOutput;
+            exit();
+        }
+    }
 
     public function saveHSCode()
     {

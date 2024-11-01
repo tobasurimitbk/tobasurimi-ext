@@ -4,7 +4,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Bahan Penolong</h1>
-        <?php if (can('Master Barang', 'Bahan Penolong', 'p')) : ?>
+        <?php if (can('Master Barang', 'Bahan Penolong', 'c')) : ?>
             <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
                 Import / Export
             </button>
