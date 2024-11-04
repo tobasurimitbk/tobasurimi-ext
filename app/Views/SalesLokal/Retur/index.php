@@ -183,32 +183,36 @@
                     method: "POST",
                     dataType: "json",
                     success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status == "true") {
-                            Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                })
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            })
-                        }
-                    },
-                    onError: function(response) {
-                        csrf.val(response.token);
+                    // Update CSRF token
+                    csrf.val(response.token);
+
+                    // Check if the status in the response is true
+                    if (response.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        }).then(() => {
+                            table.ajax.reload(); // Reload the table data
+                        });
+                    } else {
+                        // If status is false, display an error message
                         Swal.fire({
                             icon: 'error',
-                            title: 'Data Gagal Di Approved, coba Lagi',
+                            title: response.message,
                             confirmButtonColor: '#4e73df',
-                        })
+                        });
                     }
+                },
+                error: function(xhr) {
+                    // Handle any AJAX error (e.g., network issues, server errors)
+                    csrf.val(xhr.responseJSON.token); // Update CSRF token if available
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Data Gagal Di Approved, coba Lagi',
+                        confirmButtonColor: '#4e73df',
+                    });
+                }
                 });
             }
         })

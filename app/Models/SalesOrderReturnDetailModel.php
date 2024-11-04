@@ -24,7 +24,10 @@ class SalesOrderReturnDetailModel extends Model
         'discount_percentage_return',
         'harga_barang_return',
         'tax_return',
-        'amount_return',
+        'stock_id',
+        'bc_id',
+        'no_aju',
+        'stock_dokumen',
     ];
 
     // Dates
