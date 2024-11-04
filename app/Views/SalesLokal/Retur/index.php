@@ -184,7 +184,7 @@
                     dataType: "json",
                     success: function(response) {
                         csrf.val(response.token);
-                        if (response) {
+                        if (response.status == "true") {
                             Swal.fire({
                                     icon: 'success',
                                     title: response.message,

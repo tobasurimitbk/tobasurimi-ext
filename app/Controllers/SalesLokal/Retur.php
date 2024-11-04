@@ -231,6 +231,7 @@ class Retur extends BaseController
         }
 
         $returnDate = $postData['return_date'];
+        $idWarehouse = decrypt($postData['id_warehouse']);
         $idInvoice = decrypt($postData['id_invoice']);
 
         try {
@@ -238,6 +239,7 @@ class Retur extends BaseController
             $values = [
                 "id_user"             => $this->userId,
                 "id_invoice"             => $idInvoice,
+                "id_warehouse"             => $idWarehouse,
                 "no_return"             => $postData['no_surat_retur'],
                 "note"             => $postData['note'],
                 "id_company"        => $this->this_company_id,
@@ -292,13 +294,24 @@ class Retur extends BaseController
 
             $data = [
                 'is_approve' => $this->request->getVar('status_approve'),
-            ];
+            ];  
 
             if (!empty($id)) {
                 $salesOrderReturnData = $this->soReturnModel->find($id);
                 $invoiceData = $this->soInvModel->where('id_sales_order_return', $id)->first();
                 $salesOrderData = $this->soModel->where('sales_order_invoice_id', $invoiceData['id'])->first(); 
                 $stuffingLokalData = $this->stuffingLokalModel->where('sales_order_id', $salesOrderData["id"])->first();
+
+                if (!$stuffingLokalData) {
+                    $data = [
+                        "status"    => false,
+                        "message"   => "Data Invoice dengan Nomor Faktur" . $invoiceData["no_faktur"] . " belum di Stuffingkan",
+                        'token'     => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
+                
                 $stuffingLokalDetailData = $this->stuffingLokalDetailModel
                                             ->where('stuffing_lokal_id', $stuffingLokalData["id"])
                                             ->join('barang_master AS barang1', 'barang1.id = stuffing_lokal_detail.barang1_id_Warehouse', 'left')
@@ -308,7 +321,7 @@ class Retur extends BaseController
                                             ->select('stuffing_lokal_detail.*, barang1.type_barang AS barang1_type, barang2.type_barang AS barang2_type, stock_details2.harga_umum, stock_details2.harga_harian, stock_details2.harga_bulanan, stock_details2.supplier_id')
                                             ->findAll();
             
-
+               
                 foreach ($stuffingLokalDetailData as $key => $value) {
 
                     $statusOUT = $this->accountBarangModel->checkAccountBarangCOA($this->this_company_id, $value['divisi_id'], $value['barang1_id_warehouse']);
@@ -324,8 +337,8 @@ class Retur extends BaseController
                         return;
                     } else {
                         $stok = $this->stockModel->insertStok(
-                            $salesOrderReturnData['id_company'],
-                            $value['warehouse_id'],
+                            $salesOrderReturnData["id_company"],
+                            $salesOrderReturnData["id_warehouse"],
                             $value['divisi_id'],
                             $value['barang1_type'],
                             $value['barang1_id_warehouse'],
@@ -364,7 +377,7 @@ class Retur extends BaseController
                         // BARANG IN KE INVENTORI
                         $stokIn = $this->stockModel->insertStok(
                             $salesOrderReturnData["id_company"],
-                            $value['warehouse_id'],
+                            $salesOrderReturnData["id_warehouse"],
                             $value['divisi_id'],
                             $value['barang1_type'],
                             $value['barang1_id_warehouse'],
@@ -377,8 +390,8 @@ class Retur extends BaseController
                         // ]);
 
                         $checkStokDetailIn =  $this->stockModel->isDefinedStockSubDetail(
-                            $salesOrderReturnData['id_company'],
-                            $value['warehouse_id'],
+                            $salesOrderReturnData["id_company"],
+                            $salesOrderReturnData["id_warehouse"],
                             $value['divisi_id'],
                             $value['barang1_type'],
                             $value['barang1_id_warehouse'],
@@ -431,7 +444,7 @@ class Retur extends BaseController
 
                         // SUB DETAIL
                         $this->stockDetail2Model->insertStokDetail2(
-                            $value['bc_id_warehouse'],
+                            $salesOrderReturnData["id_warehouse"],
                             $value['stock_id_warehouse'],
                             $stokDetail,
                             $value['qty'],
@@ -445,11 +458,19 @@ class Retur extends BaseController
                         );
                         // $this->materialRequestModel->update($id, $data);
 
-                        $this->soReturnModel->update($id, [
-                            'is_approved' => 1
+                        $this->soReturnDetailModel->update($id, [
+                            'stock_id' =>   $value['bc_id_warehouse'],
+                            'bc_id' => $value['stock_id_warehouse'],
+                            'no_aju' => $value['no_aju_warehouse'],
+                            'stock_dokumen' => $value['stock_dokumen'],
                         ]);
                     }
                 }
+
+                $this->soReturnModel->update($id, [
+                    'is_approved' => 1,
+                ]);
+
                 $data = [
                     "status"    => true,
                     "message"   => "Status Approve Berhasil Diperbaharui",
