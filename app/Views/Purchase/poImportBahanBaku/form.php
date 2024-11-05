@@ -585,7 +585,7 @@
         $('.detail-modal').modal('hide');
     });
     // HARGA SATUAN DAN QTY CHANE
-    $('#harga_satuan,#qty,#biaya_tambahan,#diskon').keyup(function() {
+    $('#harga_satuan,#qty,#biaya_tambahan,#diskon').change(function() {
         var hargaSatuan = convertRupiahToNumber($('#harga_satuan').val()) || 0;
         var qty = parseFloat($('#qty').val()) || 1;
         var biayaTambahan = convertRupiahToNumber($('#biaya_tambahan').val()) || 0;
@@ -596,16 +596,15 @@
         $('#total').val(formatRupiah2(total.toFixed(2)));
     });
 
-    $('#total').keyup(function() {
-        var qty = $('#qty').val();
-        console.log(qty);
+    $('#total').change(function() {
+        var qty = parseFloat($('#qty').val()) || 0;
         if (qty === "" || qty === 0) {
             qty = 1;
             $('#qty').val(qty);
         }
         var harga_satuan;
-        var total = $('#total').val()
-        harga_satuan = convertRupiahToNumber(total) / Number(qty);
+        var total = convertRupiahToNumber($('#total').val()) || 0;
+        harga_satuan = total / qty;
         $('#harga_satuan').val(formatRupiah2(harga_satuan));
     });
 
