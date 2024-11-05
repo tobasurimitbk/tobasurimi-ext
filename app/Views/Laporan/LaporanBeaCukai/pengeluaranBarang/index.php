@@ -52,7 +52,7 @@
                 <div class="col-md-2">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                            <input placeholder="" value="<?= date('d/m/Y') ?>" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
                             <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir Dokumen</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
@@ -136,9 +136,16 @@
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <div class="form-floating mb-3">
-                        <input type="text" name="no_daftar" id="no_daftar" class="form-control no_daftar" placeholder="No Daftar">
-                        <label style="z-index: 1;">No Daftar</label>
+                    <div class="input-group">
+                        <div class="form-floating mb-3">
+                            <input type="text" name="no_daftar" id="no_daftar" class="form-control no_daftar" placeholder="No Daftar">
+                            <label style="z-index: 1;">No Daftar</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button class="btn btn-secondary" onclick="handleFilter()" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -149,19 +156,19 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="changeSort('stock.tipe_barang')" class="sort">Tipe Barang</th>
-                                <th onclick="changeSort('stock_details2.bc_id')" class="sort">Jenis Dokumen</th>
-                                <th onclick="changeSort('stock_details2.no_aju')" class="sort">Nomor Aju</th>
+                                <th>Tipe Barang</th>
+                                <th>Jenis Dokumen</th>
+                                <th>Nomor Aju</th>
                                 <th>No Daftar</th>
                                 <th>Tgl Daftar</th>
                                 <th>No Stuffing / No Pengeluaran</th>
                                 <th>Tgl Pengeluaran</th>
                                 <th>Surat Jalan</th>
-                                <th onclick="changeSort('stock_details.sumber')" class="sort">Jenis Order</th>
-                                <th onclick="changeSort('stock_details2.no_po')" class="sort">No Order</th>
+                                <th>Jenis Order</th>
+                                <th>No Order</th>
                                 <th>No Invoice</th>
-                                <th onclick="changeSort('stock.divisi_id')" class="sort">Departemen</th>
-                                <th onclick="changeSort('stock.warehouse_id')" class="sort">Warehouse</th>
+                                <th>Departemen</th>
+                                <th>Warehouse</th>
                                 <th>Penerima / Customer</th>
                                 <th>Kode Barang</th>
                                 <th>Barang</th>
@@ -173,7 +180,7 @@
                                 <th>Nilai Penyerahan</th>
                                 <th>Jumlah Penerimaan</th>
                                 <th>Selisih</th>
-                                <th onclick="changeSort('stock_details.keterangan')" class="sort">Keterangan</th>
+                                <th>Keterangan</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
@@ -191,162 +198,25 @@
     let sortType = "desc";
     var row = 0;
 
-    var table = $('.dataTable').DataTable({
+    var dataTable = $('#dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        processing: true,
-        serverSide: true,
+        processing: false,
+        serverSide: false,
         ordering: true,
-        order: [
-            [1, 'asc']
-        ],
+        order: [],
         fixedHeader: true,
+        pageLength: 25, // Default jumlah data per halaman
         lengthMenu: [
-            [25],
-            [25],
-        ],
-        pageLength: 25,
-        ajax: {
-            url: "<?= base_url("laporan-bea-cukai/all-keluar"); ?>",
-            dataSrc: "data",
-            data: function(data) {
-                data.status = "Out";
-                data.tipe_barang = $(".tipe_barang").val();
-                data.date_start = $(".dateStart").val();
-                data.date_end = $(".dateEnd").val();
-                data.supplier_id = $('.supplier_id').val();
-                data.bc_id = $('.bc_id').val();
-                data.sumber = $('.sumber').val();
-                data.divisi_id = $('.divisi_id').val();
-                data.warehouse_id = $('.warehouse_id').val();
-                data.nama_barang = $('.nama_barang').val();
-                data.no_aju = $(".no_aju").val();
-                data.no_daftar = $('.no_daftar').val();
-                data.sort = sort;
-                data.sortType = sortType;
-            },
-        },
-        // scrollX: true,
-        "initComplete": function(settings, json) {
+            [10, 25, 50, -1],
+            [10, 25, 50, "All"]
+        ], // Opsi jumlah data per halaman
+        initComplete: function(settings, json) {
             $('.dataTables_length').empty();
             $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
             $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
-        //responsive: true,
         display: "stripe",
-        searching: false,
-        columns: [{
-                data: "no",
-                className: "text-center",
-                sortable: false
-            },
-            {
-                data: "tipeBarang",
-                className: "text-center",
-
-            },
-            {
-                data: "jenisDokumen",
-                className: "text-center",
-
-            },
-            {
-                data: "noAju",
-                className: "text-center",
-            },
-            {
-                data: "noDaftar",
-                className: "text-center",
-            },
-            {
-                data: "tglDaftar",
-                className: "text-center",
-            },
-            {
-                data: "noPengeluaran",
-                className: "text-center",
-            },
-            {
-                data: "tglPengeluaran",
-                className: "text-center",
-            },
-            {
-                data: "suratJalan",
-                className: "text-center",
-            },
-            {
-                data: "jenisSumber",
-                className: "text-center",
-            },
-            {
-                data: "noOrder",
-                className: "text-center",
-            },
-            {
-                data: "noInvoice",
-                className: "text-center",
-            },
-            {
-                data: "divisi",
-                className: "text-center",
-            },
-            {
-                data: "warehouse",
-                className: "text-center",
-            },
-            {
-                data: "penerima",
-                className: "text-center",
-            },
-            {
-                data: "kodeBarang",
-                className: "text-center",
-            },
-            {
-                data: "barang",
-                className: "text-center",
-            },
-            {
-                data: "spesifikasi",
-                className: "text-center",
-            },
-            {
-                data: "jumlahBarang",
-                className: "text-center",
-            },
-
-            {
-                data: "satuanName",
-                className: "text-center",
-            },
-            {
-                data: "valas",
-                className: "text-center",
-            },
-            {
-                data: "hargaBarang",
-                className: "text-center",
-            },
-            {
-                data: "nilaiPenyerahan",
-                className: "text-center",
-            },
-            {
-                data: "jumlahPenerimaan",
-                className: "text-center",
-            },
-            {
-                data: "selisih",
-                className: "text-center",
-            },
-            {
-                data: "keterangan",
-                className: "text-center",
-            },
-        ],
-        columnDefs: [{
-            defaultContent: "-",
-            targets: "_all"
-        }],
+        searching: true,
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -356,6 +226,7 @@
             }
         }
     });
+
 
 
     $(".dateStart").datepicker({
@@ -410,13 +281,9 @@
         $(".dateEnd").focus();
     });
 
-    $('.tipe_barang, .dateStart, .dateEnd, .supplier_id, .bc_id, .sumber, .divisi_id, .warehouse_id').change(function() {
-        table.ajax.reload();
-    });
+    $('.tipe_barang, .dateStart, .dateEnd, .supplier_id, .bc_id, .sumber, .divisi_id, .warehouse_id').change(function() {});
 
-    $('.nama_barang,.no_aju,.no_daftar').change(function() {
-        table.ajax.reload();
-    });
+    $('.nama_barang,.no_aju,.no_daftar').change(function() {});
 
     const changeSort = function(val) {
         if (sort !== val) {
@@ -452,6 +319,143 @@
         window.open(url + `?tipe_barang=${tipe_barang}&date_start=${date_start}&date_end=${date_end}&supplier_id=${supplier_id}&bc_id=${bc_id}&sumber=${sumber}&divisi_id=${divisi_id}&warehouse_id=${warehouse_id}&nama_barang=${nama_barang}&no_aju=${no_aju}&no_daftar=${no_daftar}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 
+    const handleFilter = () => {
+        let date_start = $(".dateStart").val();
+        let date_end = $(".dateEnd").val();
+
+        if (!date_start || !date_end) {
+            Swal.fire({
+                icon: 'error',
+                text: 'Tanggal mulai dan tanggal akhir wajib diisi!',
+            });
+            return;
+        }
+
+        const datePattern = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/([0-9]{4})$/;
+        if (!datePattern.test(date_start) || !datePattern.test(date_end)) {
+            Swal.fire({
+                icon: 'error',
+                text: 'Format tanggal harus DD/MM/YYYY!',
+            });
+            return;
+        }
+
+        const startDateParts = date_start.split('/');
+        const endDateParts = date_end.split('/');
+        const startDate = new Date(`${startDateParts[2]}-${startDateParts[1]}-${startDateParts[0]}`);
+        const endDate = new Date(`${endDateParts[2]}-${endDateParts[1]}-${endDateParts[0]}`);
+
+        const oneYearInMillis = 365 * 24 * 60 * 60 * 1000;
+        if (endDate - startDate > oneYearInMillis) {
+            Swal.fire({
+                icon: 'error',
+                text: 'Rentang tanggal tidak boleh lebih dari satu tahun!',
+            });
+            return;
+        }
+
+        showData();
+    }
+
+    function showData() {
+        $.ajax({
+            url: `<?= base_url("laporan-bea-cukai/all-keluar"); ?>`,
+            method: "GET",
+            data: {
+                status: "Out",
+                tipe_barang: $(".tipe_barang").val(),
+                date_start: $(".dateStart").val(),
+                date_end: $(".dateEnd").val(),
+                supplier_id: $('.supplier_id').val(),
+                bc_id: $('.bc_id').val(),
+                sumber: $('.sumber').val(),
+                divisi_id: $('.divisi_id').val(),
+                warehouse_id: $('.warehouse_id').val(),
+                nama_barang: $('.nama_barang').val(),
+                no_aju: $(".no_aju").val(),
+                no_daftar: $('.no_daftar').val(),
+                sort: "DESC",
+                sortType: "stock_details2.createdAt",
+            },
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            dataType: "json",
+            success: function(res) {
+                if ($.fn.DataTable.isDataTable('#dataTable')) {
+                    $('#dataTable').DataTable().clear().draw();
+                    dataTable.destroy();
+                }
+                const table = $('#dataTable');
+                table.find('tbody').empty();
+                table.find('tfoot').empty();
+
+                $.each(res.data.data, function(i, v) {
+                    var newRow = $('<tr style="color:whitesmoke;">');
+                    newRow.append($('<td>').text(v.no));
+                    newRow.append($('<td>').text(v.tipeBarang));
+                    newRow.append($('<td>').text(v.jenisDokumen));
+                    newRow.append($('<td>').text(v.noAju));
+                    newRow.append($('<td>').text(v.noDaftar));
+                    newRow.append($('<td>').text(v.tglDaftar));
+                    newRow.append($('<td>').text(v.noPengeluaran));
+                    newRow.append($('<td>').text(v.tglPengeluaran));
+                    newRow.append($('<td>').text(v.suratJalan));
+                    newRow.append($('<td>').text(v.jenisSumber));
+                    newRow.append($('<td>').text(v.noOrder));
+                    newRow.append($('<td>').text(v.noInvoice));
+                    newRow.append($('<td>').text(v.divisi));
+                    newRow.append($('<td>').text(v.warehouse));
+                    newRow.append($('<td>').text(v.penerima));
+                    newRow.append($('<td>').text(v.kodeBarang));
+                    newRow.append($('<td>').text(v.barang));
+                    newRow.append($('<td>').text(v.spesifikasi));
+                    newRow.append($('<td>').text(v.jumlahBarang));
+                    newRow.append($('<td>').text(v.satuanName));
+                    newRow.append($('<td>').text(v.valas));
+                    newRow.append($('<td>').text(v.hargaBarang));
+                    newRow.append($('<td>').text(v.nilaiPenyerahan));
+                    newRow.append($('<td>').text(v.jumlahPenerimaan));
+                    newRow.append($('<td>').text(v.selisih));
+                    newRow.append($('<td>').text(v.keterangan));
+                    table.find('tbody').append(newRow);
+                });
+                dataTable = $('#dataTable').DataTable({
+                    dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+                    processing: false,
+                    serverSide: false,
+                    ordering: true,
+                    order: [],
+                    fixedHeader: true,
+                    pageLength: 25, // Default jumlah data per halaman
+                    lengthMenu: [
+                        [10, 25, 50, -1],
+                        [10, 25, 50, "All"]
+                    ], // Opsi jumlah data per halaman
+                    initComplete: function(settings, json) {
+                        $('.dataTables_length').empty();
+                        $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                        $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+                    },
+                    display: "stripe",
+                    searching: true,
+                    language: {
+                        emptyTable: "Tidak Ada Data",
+                        lengthMenu: "Show _MENU_ entries",
+                        paginate: {
+                            previous: '<i class="fa fa-angle-left"></i>',
+                            next: '<i class="fa fa-angle-right"></i>'
+                        }
+                    }
+                });
+
+                dataTable.draw();
+            }
+        })
+    }
 
     function getListWarehouse() {
         // GET WAREHOUSES
