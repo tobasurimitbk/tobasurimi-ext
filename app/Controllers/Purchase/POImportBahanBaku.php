@@ -80,7 +80,7 @@ class POImportBahanBaku extends BaseController
                 'barang_master_spesifikasi.deletedAt' => null
             ]),
             "satuan" => $this->satuanModel->getSatuanAll(),
-            "dataValuta" => $this->metadataModel->get_by_name('Valuta'),
+            "dataValuta" => $this->metadataModel->get_by_name_valuta('Valuta'),
             "dataShipment" => $this->metadataModel->get_by_name('Shipment')
         ];
 
