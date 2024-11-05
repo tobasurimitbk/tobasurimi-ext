@@ -68,6 +68,24 @@ class MetadataModel extends Model
         return $query->getResultArray();
     }
 
+    public function get_by_name_valuta($name)
+    {
+        // Siapkan query untuk ambil data dari kurs dengan LEFT JOIN ke metadata
+        $requete = "
+            SELECT k.*, m.*
+            FROM kurs k
+            LEFT JOIN metadata m ON m.id = k.metadata_id
+            WHERE m.name = '" . $this->db->escapeString($name) . "'
+            AND k.start_date <= NOW() AND k.end_date >= NOW()
+            ORDER BY k.id ASC
+        ";
+
+        // Eksekusi query
+        $query = $this->db->query($requete);
+        return $query->getResultArray();
+    }
+
+
     public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
     {
         $requete = "SELECT * FROM metadata ";
