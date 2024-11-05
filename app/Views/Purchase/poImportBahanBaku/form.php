@@ -157,16 +157,23 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($dataValuta as $valuta) : ?>
-                                    <option <?= !empty($dataPOImport) ? (($dataPOImport->currency ? formatter($dataPOImport->currency, "STR_TO_INT") : 0) == formatter($valuta["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
-                                <?php endforeach ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Valas</label>
+                       <div class="input-group">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($dataValuta as $valuta) : ?>
+                                        <option <?= !empty($dataPOImport) ? (($dataPOImport->currency ? formatter($dataPOImport->currency, "STR_TO_INT") : 0) == formatter($valuta["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Valas</label>
+                            </div>
+                            <div class="input-group-append" style="height:50px;">
+                                <a class="btn btn-success" href="<?= site_url('kurs'); ?>" type="button">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                            </div>
                         </div>
-                    </div>
+                    </div>  
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->payment_term : ""; ?>" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran (Opsional)">
