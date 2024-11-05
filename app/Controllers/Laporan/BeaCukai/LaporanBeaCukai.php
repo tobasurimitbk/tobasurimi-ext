@@ -1472,6 +1472,7 @@ class LaporanBeaCukai extends BaseController
         $offset = $this->request->getVar("start");
 
         $dataBC23 = $this->bc23Model->getList($condition, $addCondition, $limit, $offset);
+
         // Pastikan datanya ada sebelum lanjut
         if (!empty($dataBC23['data'])) {
             $dataBC23Result = [];
@@ -1549,6 +1550,10 @@ class LaporanBeaCukai extends BaseController
                         }
                     }
                 }
+
+                // Tambahkan entry ke dataBC23Result
+                $dataBC23Result[] = $entry;
+
             }
 
             // Format response untuk DataTables
