@@ -991,21 +991,43 @@
         }
     }
 
-    function formatRupiah2(angka) {
-        var formatter = new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR'
-        });
-        var parsedNumber = parseFloat(angka);
-        if (isNaN(parsedNumber)) {
-            return "0,00";
+    function formatRupiah2(x) {
+        let min = false;
+        x = x.toString();
+        if (x.includes("-")) {
+            min = true;
+        } else {
+            min = false;
         }
-        return formatter.format(parsedNumber).replace('Rp', '').trim();
+        x = x.replace(/-/g, '');
+
+        let parts = x.split(".");
+        parts[0] = parts[0].replace(/,/g, '');
+        let bilangan = parts[0];
+
+        let number_string = bilangan.toString(),
+            sisa = number_string.length % 3,
+            rupiah = number_string.substr(0, sisa),
+            ribuan = number_string.substr(sisa).match(/\d{3}/g);
+
+        if (ribuan) {
+            let separator = sisa ? ',' : '';
+            rupiah += separator + ribuan.join(',');
+        }
+        parts[0] = rupiah;
+
+        if (parts[1]) {
+            parts[1] = parts[1].slice(0, 2).padEnd(2, '0');
+        } else {
+            parts[1] = '00';
+        }
+
+        return (min ? '-' : '') + parts.join(".");
     }
 
     function formatCurrency(str) {
-        var strs = str.replace(/,..$/, '');
-        return strs.replace(/[^0-9]/g, '');
+        return str.replace(/,/g, '');
+
     }
 </script>
 

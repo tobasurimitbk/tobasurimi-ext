@@ -332,13 +332,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Umum" onchange="this.value = formatRupiah(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Umum" onchange="this.value = formatRupiah2(this.value)">
                             <label for="floatingInput">Harga Umum</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control daily_price" name="daily_price" id="daily_price" placeholder="Harga Harian" onchange="this.value = formatRupiah(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control daily_price" name="daily_price" id="daily_price" placeholder="Harga Harian" onchange="this.value = formatRupiah2(this.value)">
                             <label for="floatingInput">Harga Harian</label>
                         </div>
                     </div>
@@ -346,7 +346,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control monthly_price" name="monthly_price" id="monthly_price" placeholder="Harga Bulanan" onchange="this.value = formatRupiah(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control monthly_price" name="monthly_price" id="monthly_price" placeholder="Harga Bulanan" onchange="this.value = formatRupiah2(this.value)">
                             <label for="floatingInput">Harga Bulanan</label>
                         </div>
                     </div>
@@ -361,7 +361,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onchange="this.value = formatRupiah(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onchange="this.value = formatRupiah2(this.value)">
                             <label for="floatingInput">Total Harga</label>
                         </div>
                     </div>
@@ -854,9 +854,9 @@
                         data-satuan_id="${item.satuan_id}" 
                         data-satuan_2="${item.satuan_2}"
                         data-satuan_3="${item.satuan_3}"
-                        data-umum="${Number(item.harga_umum).toLocaleString(undefined, {minimumFractionDigits: 2, maximumSignificantDigits: 2})}" 
-                        data-harian=" ${Number(item.harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
-                        data-bulanan=" ${Number(item.harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
+                        data-umum="${Number(item.harga_umum)}" 
+                        data-harian=" ${Number(item.harga_harian)}" 
+                        data-bulanan=" ${Number(item.harga_bulanan)}" 
                         value="${item.id}">
                         ${item.spesifikasi}
                         </option>`);
@@ -870,24 +870,24 @@
         })
 
         $(".qty, .harga, .daily_price, .monthly_price").keyup(function() {
-            var qty = $(".qty").val() ? Number($(".qty").val()) : 0;
-            var harga = convertRupiahToNumber($('.harga').val() || 0);
-            var daily_price = convertRupiahToNumber($('.daily_price').val() || 0);
-            var monthly_price = convertRupiahToNumber($('.monthly_price').val() || 0);
+            var qty = $(".qty").val() ? parseFloat($(".qty").val()) : 0;
+            var harga = parseFloat(convertRupiahToNumber($('.harga').val()) || 0);
+            var daily_price = parseFloat(convertRupiahToNumber($('.daily_price').val()) || 0);
+            var monthly_price = parseFloat(convertRupiahToNumber($('.monthly_price').val()) || 0);
 
             var gabungan_harga = harga + daily_price + monthly_price;
             let total = (gabungan_harga * qty);
-            $(".total").val(formatRupiah(total));
+            $(".total").val(formatRupiah2(total));
         });
 
         $(".total").keyup(function() {
-            var total = convertRupiahToNumber($('.total').val() || 0);
-            var qty = $(".qty").val() ? Number($(".qty").val()) : 1;
+            var total = parseFloat(convertRupiahToNumber($('.total').val()) || 0);
+            var qty = $(".qty").val() ? parseFloat(Number($(".qty").val())) : 1;
 
             var harga = total / qty;
-            $(".daily_price").val(formatRupiah('0'));
-            $(".monthly_price").val(formatRupiah('0'));
-            $(".harga").val(formatRupiah(harga));
+            $(".daily_price").val(formatRupiah2('0'));
+            $(".monthly_price").val(formatRupiah2('0'));
+            $(".harga").val(formatRupiah2(harga));
         });
 
         $(document).on('click', '.edit-table-detail', function(evt) {
@@ -1403,9 +1403,9 @@
                                 data-satuan_id="${item.satuan_id}" 
                                 data-satuan_2="${item.satuan_2}"
                                 data-satuan_3="${item.satuan_3}"
-                                data-umum="${Number(item.harga_umum).toLocaleString(undefined, {minimumFractionDigits: 2, maximumSignificantDigits: 2})}" 
-                                data-harian=" ${Number(item.harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
-                                data-bulanan=" ${Number(item.harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" 
+                                data-umum="${Number(item.harga_umum)}" 
+                                data-harian=" ${Number(item.harga_harian)}" 
+                                data-bulanan=" ${Number(item.harga_bulanan)}" 
                                 value="${item.id}">
                                 ${item.spesifikasi}
                                 </option>`);
@@ -1615,9 +1615,9 @@
             row += '<td>' + no + '</td>';
             row += '<td>' + item.nama_spesifikasi + '</td>';
             row += '<td>' + item.kode_satuan + '</td>';
-            row += '<td>' + formatRupiah(item.harga) + '</td>';
-            row += '<td>' + formatRupiah(item.daily_price) + '</td>';
-            row += '<td>' + formatRupiah(item.monthly_price) + '</td>';
+            row += '<td>' + formatRupiah2(item.harga) + '</td>';
+            row += '<td>' + formatRupiah2(item.daily_price) + '</td>';
+            row += '<td>' + formatRupiah2(item.monthly_price) + '</td>';
             row += '<td>' + item.qty + '</td>';
             row += '<td>' + item.peti + '</td>';
             row += '<td>' + item.quality + '</td>';
@@ -1653,10 +1653,10 @@
                     <tr>
                         <td colspan="2"></td>
                         <td><b>TOTAL</b></td>
-                        <td><b>${formatRupiah(umumTotal)}</b></td>
-                        <td><b>${formatRupiah(harianTotal)}</b></td>
-                        <td><b>${formatRupiah(bulananTotal)}</b></td>
-                        <td><b>${formatRupiah(qtyTotal)}</b></td>
+                        <td><b>${formatRupiah2(umumTotal)}</b></td>
+                        <td><b>${formatRupiah2(harianTotal)}</b></td>
+                        <td><b>${formatRupiah2(bulananTotal)}</b></td>
+                        <td><b>${(qtyTotal.toFixed(4))}</b></td>
                         <td colspan="2"></td>
                         <td style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>"></td>
                     </tr>
@@ -1684,24 +1684,43 @@
         window.open(url, "_blank");
     }
 
-    function formatRupiah(angka) {
-        var formatter = new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR'
-        });
-        var parsedNumber = parseFloat(angka);
-        if (isNaN(parsedNumber)) {
-            return "0,00";
+    function formatRupiah2(x) {
+        let min = false;
+        x = x.toString();
+        if (x.includes("-")) {
+            min = true;
+        } else {
+            min = false;
         }
-        return formatter.format(parsedNumber).replace('Rp', '').trim();
+        x = x.replace(/-/g, '');
+
+        let parts = x.split(".");
+        parts[0] = parts[0].replace(/,/g, '');
+        let bilangan = parts[0];
+
+        let number_string = bilangan.toString(),
+            sisa = number_string.length % 3,
+            rupiah = number_string.substr(0, sisa),
+            ribuan = number_string.substr(sisa).match(/\d{3}/g);
+
+        if (ribuan) {
+            let separator = sisa ? ',' : '';
+            rupiah += separator + ribuan.join(',');
+        }
+        parts[0] = rupiah;
+
+        if (parts[1]) {
+            parts[1] = parts[1].slice(0, 2).padEnd(2, '0');
+        } else {
+            parts[1] = '00';
+        }
+
+        return (min ? '-' : '') + parts.join(".");
     }
 
     function convertRupiahToNumber(rupiah) {
-        var withoutDot = rupiah.replace(/\./g, '');
-        var numberWithDot = withoutDot.replace(',', '.');
-        return parseFloat(numberWithDot);
+        return rupiah.replace(/,/g, '');
     }
-
 
     <?php if (!empty($dataPOLokal)) : ?>
         <?php foreach ($dataPOLokal->rm_purchase_order_details as $detail) : ?>

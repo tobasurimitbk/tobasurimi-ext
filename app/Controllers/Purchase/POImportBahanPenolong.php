@@ -274,7 +274,7 @@ class POImportBahanPenolong extends BaseController
                 'disc' => $b->diskon,
                 'additional_cost' => $b->biaya_tambahan,
                 'remaining_qty' => $b->qty,
-                'total' => repairDouble($b->total),
+                'total' => repairDouble2($b->total),
             ]);
             $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);
         }
@@ -382,7 +382,7 @@ class POImportBahanPenolong extends BaseController
                     'disc' => $b->diskon,
                     'additional_cost' => $b->biaya_tambahan,
                     'remaining_qty' => $b->qty,
-                    'total' => repairDouble($b->total),
+                    'total' => repairDouble2($b->total),
                 ]);
                 array_push($id_detail_all, $check['id']);
                 $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);
@@ -406,7 +406,7 @@ class POImportBahanPenolong extends BaseController
                     'disc' => $b->diskon,
                     'additional_cost' => $b->biaya_tambahan,
                     'remaining_qty' => $b->qty,
-                    'total' => repairDouble($b->total),
+                    'total' => repairDouble2($b->total),
                 ]);
                 array_push($id_detail_all, $id_detail_new);
                 $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);

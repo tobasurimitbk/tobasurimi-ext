@@ -184,7 +184,7 @@ class POImportBahanBaku extends BaseController
                 "po_no"         => $data->po_no,
                 "divisi"        => strtoupper($data->divisi),
                 "supplierName"  => strtoupper($data->supplierName),
-                "total"         => number_format($data->total),
+                "total"         => number_format($data->total, 2),
                 "currencyName"  => $data->currencyName,
                 "itemCount"     => $data->itemCount,
                 "is_posted"     => $data->is_posted,
@@ -273,7 +273,7 @@ class POImportBahanBaku extends BaseController
                 'additional_cost' => $b->biaya_tambahan,
                 'remaining_qty' => $b->qty,
                 'note' => $b->keterangan,
-                'total' => repairDouble($b->total),
+                'total' => repairDouble2($b->total),
             ]);
             $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);
         }
@@ -379,7 +379,7 @@ class POImportBahanBaku extends BaseController
                     'additional_cost' => $b->biaya_tambahan,
                     'remaining_qty' => $b->qty,
                     'note' => trim($b->keterangan),
-                    'total' => repairDouble($b->total),
+                    'total' => repairDouble2($b->total),
                 ]);
                 array_push($id_detail_all, $check['id']);
                 $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);
@@ -404,7 +404,7 @@ class POImportBahanBaku extends BaseController
                     'additional_cost' => $b->biaya_tambahan,
                     'remaining_qty' => $b->qty,
                     'note' => trim($b->keterangan),
-                    'total' => repairDouble($b->total),
+                    'total' => repairDouble2($b->total),
                 ]);
                 array_push($id_detail_all, $id_detail_new);
                 $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);

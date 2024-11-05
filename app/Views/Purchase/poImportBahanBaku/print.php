@@ -204,8 +204,8 @@
             ?>
             <?php foreach ($dataPODetail as $detail) : ?>
                 <?php
-                $totalDisc =  (formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "STR_TO_FLOAT")) * ((float)$detail["disc"] / 100);
-                $totalWithAdditional = (formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "STR_TO_FLOAT") - $totalDisc) +  formatter($detail["additional_cost"], "CURR_TO_INT");
+                $totalDisc =  (formatter($detail["price"], "CURR_TO_FLOAT") * formatter($detail["qty"], "STR_TO_FLOAT")) * ((float)$detail["disc"] / 100);
+                $totalWithAdditional = (formatter($detail["price"], "CURR_TO_FLOAT") * formatter($detail["qty"], "STR_TO_FLOAT") - $totalDisc) +  formatter($detail["additional_cost"], "CURR_TO_INT");
                 $totalPrice += $totalWithAdditional;
                 $diskonTotal += $totalDisc;
                 ?>
