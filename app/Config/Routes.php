@@ -179,6 +179,8 @@ $routes->get('/hs-code/id/(:segment)', 'Master\HSCode::getByIdHSCode/$1', ['filt
 $routes->post('/hs-code/save', 'Master\HSCode::saveHSCode', ['filter' => 'Auth']);
 $routes->post('/hs-code/update', 'Master\HSCode::updateHSCode', ['filter' => 'Auth']);
 $routes->post('/hs-code/delete', 'Master\HSCode::deleteHSCode', ['filter' => 'Auth']);
+$routes->post('/hs-code/import', 'Master\HSCode::import', ['filter' => 'Auth']);
+$routes->get('/hs-code/export', 'Master\HSCode::export', ['filter' => 'Auth']);
 
 // SATUAN
 $routes->get('/satuan', 'Master\Satuan::satuan', ['filter' => 'Auth']);
@@ -2059,11 +2061,11 @@ $routes->get('/laporan-warehouse/stock-kartu/print', 'Laporan\Warehouse\LaporanW
 // LAPORAN 
 $routes->get('/laporan-bea-cukai', 'Laporan\BeaCukai\LaporanBeaCukai::index', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-pemasukan-barang', 'Laporan\BeaCukai\LaporanBeaCukai::laporanPemasukanBarang', ['filter' => 'Auth']);
-$routes->get('/laporan-bea-cukai/all-masuk', 'Laporan\BeaCukai\LaporanBeaCukai::allMasukBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/all-masuk', 'Laporan\BeaCukai\LaporanBeaCukai::ajaxAllMasukBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-pemasukan-barang/print', 'Laporan\BeaCukai\LaporanBeaCukai::exportPDFLaporanMasukBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-pemasukan-barang/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelLaporanMasukBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-pengeluaran-barang', 'Laporan\BeaCukai\LaporanBeaCukai::laporanPengeluaranBarang', ['filter' => 'Auth']);
-$routes->get('/laporan-bea-cukai/all-keluar', 'Laporan\BeaCukai\LaporanBeaCukai::allKeluarBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/all-keluar', 'Laporan\BeaCukai\LaporanBeaCukai::ajaxAllKeluarBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-pengeluaran-barang/print', 'Laporan\BeaCukai\LaporanBeaCukai::exportPDFLaporanKeluarBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-pengeluaran-barang/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelLaporanKeluarBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-wip', 'Laporan\BeaCukai\LaporanBeaCukai::laporanWip', ['filter' => 'Auth']);

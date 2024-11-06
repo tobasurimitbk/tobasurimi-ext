@@ -232,6 +232,7 @@ class Retur extends BaseController
         }
 
         $returnDate = $postData['return_date'];
+        $idWarehouse = decrypt($postData['id_warehouse']);
         $idInvoice = decrypt($postData['id_invoice']);
 
         try {
@@ -239,6 +240,7 @@ class Retur extends BaseController
             $values = [
                 "id_user"             => $this->userId,
                 "id_invoice"             => $idInvoice,
+                "id_warehouse"             => $idWarehouse,
                 "no_return"             => $postData['no_surat_retur'],
                 "note"             => $postData['note'],
                 "id_company"        => $this->this_company_id,
@@ -287,195 +289,126 @@ class Retur extends BaseController
     public function approve()
     {
         try {
-
             $id = $this->request->getVar('id');
             $id = decrypt($id);
 
-            $data = [
-                'is_approve' => $this->request->getVar('status_approve'),
-            ];
-
-            if (!empty($id)) {
-                $salesOrderReturnData = $this->soReturnModel->find($id);
-                $invoiceData = $this->soInvModel->where('id_sales_order_return', $id)->first();
-                $salesOrderData = $this->soModel->where('sales_order_invoice_id', $invoiceData['id'])->first();
-                $stuffingLokalData = $this->stuffingLokalModel->where('sales_order_id', $salesOrderData["id"])->first();
-                $stuffingLokalDetailData = $this->stuffingLokalDetailModel
-                    ->where('stuffing_lokal_id', $stuffingLokalData["id"])
-                    ->join('barang_master AS barang1', 'barang1.id = stuffing_lokal_detail.barang1_id_Warehouse', 'left')
-                    ->join('barang_master AS barang2', 'barang2.id = stuffing_lokal_detail.barang2_id_Warehouse', 'left')
-                    ->join('stock', 'stock.id = stuffing_lokal_detail.stock_id_warehouse', 'left')
-                    ->join('stock_details2', 'stock_details2.stock_id = stock.id', 'left')
-                    ->select('stuffing_lokal_detail.*, barang1.type_barang AS barang1_type, barang2.type_barang AS barang2_type, stock_details2.harga_umum, stock_details2.harga_harian, stock_details2.harga_bulanan, stock_details2.supplier_id')
-                    ->findAll();
-
-
-                foreach ($stuffingLokalDetailData as $key => $value) {
-
-                    $statusOUT = $this->accountBarangModel->checkAccountBarangCOA($this->this_company_id, $value['divisi_id'], $value['barang1_id_warehouse']);
-                    $statusIN = $this->accountBarangModel->checkAccountBarangCOA($this->this_company_id, $value['divisi_id'], $value['barang1_id_warehouse']);
-
-                    if ($statusOUT && $statusIN) {
-                        $data = [
-                            "status"    => false,
-                            "message"   => "Barang belum memiliki Akun COA",
-                            'token'     => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                        return;
-                    } else {
-                        $stok = $this->stockModel->insertStok(
-                            $salesOrderReturnData['id_company'],
-                            $value['warehouse_id'],
-                            $value['divisi_id'],
-                            $value['barang1_type'],
-                            $value['barang1_id_warehouse'],
-                            $value['barang2_id_warehouse'],
-                            ($value['qty'] * -1)
-                        );
-
-                        // DETAIL
-                        $stokDetail = $this->stockDetailModel->insertStokDetail(
-                            $stok,
-                            $value['qty'],
-                            "Out",
-                            date('Y-m-d'),
-                            $this->this_user_id,
-                            "RETURN PENJUALAN LOKAL",
-                            $salesOrderReturnData["no_return"],
-                            $salesOrderReturnData['note'] ? $salesOrderReturnData['note'] : "-"
-                        );
-
-                        // SUB DETAIL
-                        $this->stockDetail2Model->insertStokDetail2(
-                            $value['bc_id_warehouse'],
-                            $value['stock_id_warehouse'],
-                            $stokDetail,
-                            $value['qty'],
-                            $value['no_aju_warehouse'],
-                            $salesOrderReturnData["no_return"],
-                            $value['stock_dokumen'],
-                            $value['supplier_id'],
-                            $value['harga_umum'],
-                            $value['harga_harian'],
-                            $value['harga_bulanan'],
-                        );
-
-                        // -----
-                        // BARANG IN KE INVENTORI
-                        $stokIn = $this->stockModel->insertStok(
-                            $salesOrderReturnData["id_company"],
-                            $value['warehouse_id'],
-                            $value['divisi_id'],
-                            $value['barang1_type'],
-                            $value['barang1_id_warehouse'],
-                            $value['barang2_id_warehouse'],
-                            $value['qty']
-                        );
-
-                        // $this->materialRequestDetailsModel->update($value['id'], [
-                        //     'stock_tujuan_id' => $stokIn
-                        // ]);
-
-                        $checkStokDetailIn =  $this->stockModel->isDefinedStockSubDetail(
-                            $salesOrderReturnData['id_company'],
-                            $value['warehouse_id'],
-                            $value['divisi_id'],
-                            $value['barang1_type'],
-                            $value['barang1_id_warehouse'],
-                            $value['barang2_id_warehouse'],
-                            $value['bc_id_warehouse'],
-                            $value['no_aju_warehouse'],
-                            $stokIn
-                        );
-
-                        if ($checkStokDetailIn == null) {
-                            // INSERT STOK INISIASI
-                            $stokDetailIn = $this->stockDetailModel->insertStokDetail(
-                                $stokIn,
-                                0,
-                                "In",
-                                date('Y-m-d'),
-                                $this->this_user_id,
-                                "RETURN PENJUALAN LOKAL",
-                                "-",
-                                "-"
-                            );
-                            $this->stockDetail2Model->insertStokDetail2(
-                                $value['bc_id_warehouse'],
-                                $value['stock_id_warehouse'],
-                                $stokDetailIn,
-                                0,
-                                $value['no_aju_warehouse'],
-                                "-"
-                            );
-                        }
-
-                        $stockRebusDetailIn = $this->stockDetail2Model->getStockListDetail(
-                            $value['bc_id_warehouse'],
-                            $value['stock_id_warehouse'],
-                            $value['no_aju_warehouse'],
-                            $value['stock_dokumen']
-                        );
-
-                        // DETAIL
-                        $stokDetailIn = $this->stockDetailModel->insertStokDetail(
-                            $stokIn,
-                            $value['qty'],
-                            "In",
-                            date('Y-m-d'),
-                            $this->this_user_id,
-                            "PRODUKSI",
-                            $salesOrderReturnData["no_return"],
-                            $salesOrderReturnData['note'] ? $salesOrderReturnData['note'] : "-"
-                        );
-
-                        // SUB DETAIL
-                        $this->stockDetail2Model->insertStokDetail2(
-                            $value['bc_id_warehouse'],
-                            $value['stock_id_warehouse'],
-                            $stokDetail,
-                            $value['qty'],
-                            $value['no_aju_warehouse'],
-                            $salesOrderReturnData["no_return"],
-                            $value['stock_dokumen'],
-                            $value['supplier_id'],
-                            $value['harga_umum'],
-                            $value['harga_harian'],
-                            $value['harga_bulanan'],
-                        );
-                        // $this->materialRequestModel->update($id, $data);
-
-                        $this->soReturnModel->update($id, [
-                            'is_approved' => 1
-                        ]);
-                    }
-                }
-                $data = [
-                    "status"    => true,
-                    "message"   => "Status Approve Berhasil Diperbaharui",
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $data = [
-                    "status"    => false,
-                    "message"   => "Data Not Found",
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
+            if (empty($id)) {
+                return $this->sendResponse(false, "Data Not Found");
             }
-        } catch (Exception $e) {
-            $data = [
-                "status"     => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
 
+            $salesOrderReturnData = $this->soReturnModel->find($id);
+            $invoiceData = $this->soInvModel->where('id_sales_order_return', $id)->first();
+            $salesOrderData = $this->soModel->where('sales_order_invoice_id', $invoiceData['id'] ?? null)->first();
+
+            $stuffingLokalData = $this->stuffingLokalModel->where('sales_order_id', $salesOrderData["id"] ?? null)->first();
+            if (!$stuffingLokalData) {
+                return $this->sendResponse(false, "Data Invoice dengan Nomor Faktur {$invoiceData["no_faktur"]} belum di Stuffingkan");
+            }
+
+            // Only fetch essential fields from related models
+            $returnDetailData = $this->soReturnDetailModel
+                ->select([
+                    'sales_order_return_detail.id as id_sales_order_return',
+                    'stuffing_lokal_detail.qty',
+                    'stuffing_lokal_detail.divisi_id',
+                    'stuffing_lokal_detail.barang1_id_warehouse',
+                    'stuffing_lokal_detail.barang2_id_warehouse',
+                    'stuffing_lokal_detail.bc_id_warehouse',
+                    'stuffing_lokal_detail.stock_id_warehouse',
+                    'stuffing_lokal_detail.no_aju_warehouse',
+                    'stuffing_lokal_detail.stock_dokumen'
+                ])
+                ->join('sales_order_return', 'sales_order_return.id = sales_order_return_detail.id_sales_order_return', 'left')
+                ->join('sales_order_invoice', 'sales_order_invoice.id_sales_order_return = sales_order_return.id', 'left')
+                ->join('sales_order', 'sales_order.sales_order_invoice_id = sales_order_invoice.id', 'left')
+                ->join('stuffing_lokal', 'stuffing_lokal.sales_order_id = sales_order.id', 'left')
+                ->join('stuffing_lokal_detail', 'stuffing_lokal_detail.stuffing_lokal_id = stuffing_lokal.id', 'left')
+                ->where('sales_order_return_detail.id_sales_order_return', $id)
+                ->findAll();
+
+            foreach ($returnDetailData as $value) {
+                $statusOUT = $this->accountBarangModel->checkAccountBarangCOA($this->this_company_id, $value['divisi_id'], $value['barang1_id_warehouse']);
+                $statusIN = $this->accountBarangModel->checkAccountBarangCOA($this->this_company_id, $value['divisi_id'], $value['barang1_id_warehouse']);
+
+                if ($statusOUT && $statusIN) {
+                    return $this->sendResponse(false, "Barang belum memiliki Akun COA");
+                }
+
+                // Fetch specific stock details as needed
+                $stockDetails = $this->stockDetail2Model
+                    ->where('stock_id', $value['stock_id_warehouse'])
+                    ->where('no_aju', $value['no_aju_warehouse'])
+                    ->where('bc_id', $value['bc_id_warehouse'])
+                    ->first();
+
+                $this->processStok($salesOrderReturnData, $value, $stockDetails);
+            }
+
+            $this->soReturnModel->update($id, ['is_approved' => 1]);
+            return $this->sendResponse(true, "Status Approve Berhasil Diperbaharui");
+        } catch (Exception $e) {
+            return $this->sendResponse(false, $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+        }
+    }
+
+    private function processStok($salesOrderReturnData, $value, $stockDetails)
+    {
+        $stok = $this->stockModel->insertStok(
+            $salesOrderReturnData["id_company"],
+            $salesOrderReturnData["id_warehouse"],
+            $value['divisi_id'],
+            "-",
+            $value['barang1_id_warehouse'],
+            $value['barang2_id_warehouse'],
+            ($value['qty'] * -1)
+        );
+
+        $this->insertStockDetails($stok, $value, $salesOrderReturnData, $stockDetails);
+    }
+
+    private function insertStockDetails($stok, $value, $salesOrderReturnData, $stockDetails, $isInbound = false)
+    {
+        $operationType = $isInbound ? "In" : "Out";
+        $this->stockDetailModel->insertStokDetail(
+            $stok,
+            $value['qty'],
+            $operationType,
+            date('Y-m-d'),
+            $this->this_user_id,
+            $isInbound ? "PRODUKSI" : "RETURN PENJUALAN LOKAL",
+            $salesOrderReturnData["no_return"],
+            $salesOrderReturnData['note'] ?: "-"
+        );
+
+        if ($stockDetails) {
+            $this->stockDetail2Model->insertStokDetail2(
+                $value['bc_id_warehouse'],
+                $value['stock_id_warehouse'],
+                $stok,
+                $value['qty'],
+                $value['no_aju_warehouse'],
+                $salesOrderReturnData["no_return"],
+                $value['stock_dokumen'],
+                $stockDetails['supplier_id'],
+                $stockDetails['harga_umum'],
+                $stockDetails['harga_harian'],
+                $stockDetails['harga_bulanan']
+            );
+        }
+    }
+
+    private function sendResponse($status, $message)
+    {
+        echo json_encode([
+            "status" => $status,
+            "message" => $message,
+            'token' => csrf_hash()
+        ]);
         return;
     }
+
+
+
 
     public function getById($id)
     {

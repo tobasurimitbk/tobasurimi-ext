@@ -34,6 +34,7 @@ use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
 use App\Models\SupplierModel;
 use Dompdf\Dompdf;
+use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -362,12 +363,58 @@ class LaporanBeaCukai extends BaseController
         return response()->setJSON($jsonData);
     }
 
+    public function ajaxAllMasukBarang()
+    {
+        $payload = [
+            "pageSize" => 1,
+            "currentPage" => 1000000000,
+            "search" => $this->request->getVar("search"),
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+            "date_start" => $this->request->getVar("date_start") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("date_start")))) : "",
+            "date_end" => $this->request->getVar("date_end") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("date_end")))) : "",
+        ];
+
+        $addCondition = [
+            "tipe_barang"   => $this->request->getVar('tipe_barang'),
+            "date_start"    => $this->request->getVar("date_start") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_start")))) : "",
+            "date_end"      => $this->request->getVar("date_end") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_end")))) : "",
+            "supplier_id"   => $this->request->getVar("supplier_id"),
+            "bc_id"         => $this->request->getVar("bc_id"),
+            "sumber"        => $this->request->getVar("sumber") ? [$this->request->getVar("sumber")] : ["LPB", "JASA VENDOR", "MUTASI", "REBUS"],
+            "divisi_id"     => $this->request->getVar("divisi_id"),
+            "warehouse_id"  => $this->request->getVar("warehouse_id"),
+            "nama_barang"   => $this->request->getVar("nama_barang"),
+            "no_aju"        => $this->request->getVar("no_aju"),
+            "no_daftar"     => $this->request->getVar("no_daftar"),
+            "status"        => $this->request->getVar("status"),
+            "sort"          => $this->request->getVar("sort"),
+            "sortType"      => $this->request->getVar("sortType")
+        ];
+
+        $condition = [
+            "stock_details2.deletedAt" => null,
+            "stock_details.deletedAt" => null,
+            "stock.deletedAt" => null,
+            "stock.company_id" => $this->this_company_id,
+            "stock_details.status" => "In"
+        ];
+
+
+        $dataBarang = $this->stockDetail2Model->getListStokMasukKeluar($condition, $addCondition, 1000000000, 0);
+        $jsonData = $this->getListMasukBarang($dataBarang, $payload, $addCondition);
+
+        return response()->setJSON([
+            'data' => $jsonData
+        ]);
+    }
 
     private function getListMasukBarang($dataBarang, $payload, $addCondition)
     {
         $dataBarangList = [];
 
-        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $noFormat = 0;
+        $lastNoAju = null;
 
         foreach ($dataBarang['data'] as $data) {
             $jenisDokumen = ($data->bc_id == 0) ? "NON PABEAN" : $this->metadataModel->find($data->bc_id)['value'];
@@ -484,14 +531,21 @@ class LaporanBeaCukai extends BaseController
                 }
             }
 
-
+            $noFormat2 = 0;
             $hargaBarang = ($data->harga_umum + $data->harga_harian + $data->harga_bulanan) * $data->qty;
+            if ($lastNoAju === $data->no_aju) {
+                $noFormat2 = "";
+            } else {
+                $noFormat++;
+                $lastNoAju = $data->no_aju;
+                $noFormat2 = $noFormat;
+            }
 
             // FILTERAN
             if ($addCondition['nama_barang'] != "" || $addCondition['no_daftar'] != "") {
                 if ($addCondition['nama_barang'] == $barangName || $addCondition['nama_barang'] == $kodeBarang) {
                     array_push($dataBarangList, [
-                        "no"            => $no++,
+                        "no"            => $noFormat2,
                         "id"            => encrypt($data->id),
                         "tipeBarang"    => strtoupper(str_replace("_", " ", $data->tipe_barang)),
                         "jenisDokumen"  => $jenisDokumen,
@@ -522,7 +576,7 @@ class LaporanBeaCukai extends BaseController
                 } elseif ($data->bc_id != 0 && $bcDetail != null) {
                     if ($bcDetail['no_daftar'] == $addCondition['no_daftar'] && $bcDetail['no_daftar'] != "") {
                         array_push($dataBarangList, [
-                            "no"            => $no++,
+                            "no"            => $noFormat2,
                             "id"            => encrypt($data->id),
                             "tipeBarang"    => strtoupper(str_replace("_", " ", $data->tipe_barang)),
                             "jenisDokumen"  => $jenisDokumen,
@@ -554,7 +608,7 @@ class LaporanBeaCukai extends BaseController
                 }
             } else {
                 array_push($dataBarangList, [
-                    "no"            => $no++,
+                    "no"            => $noFormat2,
                     "id"            => encrypt($data->id),
                     "tipeBarang"    => strtoupper(str_replace("_", " ", $data->tipe_barang)),
                     "jenisDokumen"  => $jenisDokumen,
@@ -590,7 +644,7 @@ class LaporanBeaCukai extends BaseController
             "recordsTotal"      => $dataBarang['totalData'],
             "recordsFiltered"   => $dataBarang['totalFilteredData'],
             "data"              => $dataBarangList,
-            "payload"           => $payload
+            "payload"           => $payload,
         ];
 
         return $data;
@@ -653,6 +707,53 @@ class LaporanBeaCukai extends BaseController
 
         $jsonData = $this->getListKeluarBarang($dataBarang, $payload, $addCondition);
         return response()->setJSON($jsonData);
+    }
+
+
+    public function ajaxAllKeluarBarang()
+    {
+        $payload = [
+            "pageSize" => 1,
+            "currentPage" => 1000000000,
+            "search" => $this->request->getVar("search"),
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+            "date_start" => $this->request->getVar("date_start") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("date_start")))) : "",
+            "date_end" => $this->request->getVar("date_end") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("date_end")))) : "",
+        ];
+
+        $addCondition = [
+            "tipe_barang"   => $this->request->getVar('tipe_barang'),
+            "date_start"    => $this->request->getVar("date_start") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_start")))) : "",
+            "date_end"      => $this->request->getVar("date_end") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_end")))) : "",
+            "supplier_id"   => $this->request->getVar("supplier_id"),
+            "bc_id"         => $this->request->getVar("bc_id"),
+            "sumber"        => $this->request->getVar("sumber") ? [$this->request->getVar("sumber")] : ["PENJUALAN", "JASA VENDOR", "MUTASI", "REBUS"],
+            "divisi_id"     => $this->request->getVar("divisi_id"),
+            "warehouse_id"  => $this->request->getVar("warehouse_id"),
+            "nama_barang"   => $this->request->getVar("nama_barang"),
+            "no_aju"        => $this->request->getVar("no_aju"),
+            "no_daftar"     => $this->request->getVar("no_daftar"),
+            "status"        => $this->request->getVar("status"),
+            "sort"          => $this->request->getVar("sort"),
+            "sortType"      => $this->request->getVar("sortType")
+        ];
+
+        $condition = [
+            "stock_details2.deletedAt" => null,
+            "stock_details.deletedAt" => null,
+            "stock.deletedAt" => null,
+            "stock.company_id" => $this->this_company_id,
+            "stock_details.status" => "Out"
+        ];
+
+
+        $dataBarang = $this->stockDetail2Model->getListStokMasukKeluar($condition, $addCondition, 1000000000, 0);
+        $jsonData = $this->getListKeluarBarang($dataBarang, $payload, $addCondition);
+
+        return response()->setJSON([
+            'data' => $jsonData
+        ]);
     }
 
     public function exportPDFLaporanKeluarBarang()
@@ -845,7 +946,8 @@ class LaporanBeaCukai extends BaseController
     {
         $dataBarangList = [];
 
-        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $noFormat = 0;
+        $lastNoAju = null;
 
         foreach ($dataBarang['data'] as $data) {
             $jenisDokumen = ($data->bc_id == 0) ? "NON PABEAN" : $this->metadataModel->find($data->bc_id)['value'];
@@ -1025,13 +1127,21 @@ class LaporanBeaCukai extends BaseController
                 $satuanName = $satuan == null ? "-" : $satuan['kode_satuan'];
             }
 
+            $noFormat2 = 0;
             $hargaBarang = ($data->harga_umum + $data->harga_harian + $data->harga_bulanan) * $data->qty;
+            if ($lastNoAju === $data->no_aju) {
+                $noFormat2 = "";
+            } else {
+                $noFormat++;
+                $lastNoAju = $data->no_aju;
+                $noFormat2 = $noFormat;
+            }
 
             // FILTERAN
             if ($addCondition['nama_barang'] != "" || $addCondition['no_daftar'] != "") {
                 if ($addCondition['nama_barang'] == $barangName || $addCondition['nama_barang'] == $kodeBarang) {
                     array_push($dataBarangList, [
-                        "no"            => $no++,
+                        "no"            => $noFormat2,
                         "id"            => encrypt($data->id),
                         "tipeBarang"    => strtoupper(str_replace("_", " ", $data->tipe_barang)),
                         "jenisDokumen"  => $jenisDokumen,
@@ -1062,7 +1172,7 @@ class LaporanBeaCukai extends BaseController
                 } elseif ($addCondition['no_daftar'] != "" || $addCondition['no_aju'] != "" || $addCondition['bc_id'] != "") {
                     if ($noDaftar == $addCondition['no_daftar'] || $data->no_aju == "" && $addCondition['bc_id'] == $data->bc_id) {
                         array_push($dataBarangList, [
-                            "no"            => $no++,
+                            "no"            => $noFormat2,
                             "id"            => encrypt($data->id),
                             "tipeBarang"    => strtoupper(str_replace("_", " ", $data->tipe_barang)),
                             "jenisDokumen"  => $jenisDokumen,
@@ -1094,7 +1204,7 @@ class LaporanBeaCukai extends BaseController
                 }
             } else {
                 array_push($dataBarangList, [
-                    "no"            => $no++,
+                    "no"            => $noFormat2,
                     "id"            => encrypt($data->id),
                     "tipeBarang"    => strtoupper(str_replace("_", " ", $data->tipe_barang)),
                     "jenisDokumen"  => $jenisDokumen,
@@ -1418,6 +1528,7 @@ class LaporanBeaCukai extends BaseController
         $offset = $this->request->getVar("start");
 
         $dataBC23 = $this->bc23Model->getList($condition, $addCondition, $limit, $offset);
+
         // Pastikan datanya ada sebelum lanjut
         if (!empty($dataBC23['data'])) {
             $dataBC23Result = [];
@@ -1495,6 +1606,9 @@ class LaporanBeaCukai extends BaseController
                         }
                     }
                 }
+
+                // Tambahkan entry ke dataBC23Result
+                $dataBC23Result[] = $entry;
             }
 
             // Format response untuk DataTables

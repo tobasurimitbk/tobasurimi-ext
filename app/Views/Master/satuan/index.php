@@ -53,7 +53,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end mb-3">
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
@@ -62,7 +62,7 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th onclick="changeSort('kode_satuan')" class="sort">Kode Satuan</th>
                                 <th onclick="changeSort('nama_satuan')" class="sort">Nama Satuan</th>
                             </tr>

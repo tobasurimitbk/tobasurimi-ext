@@ -687,13 +687,13 @@
                 newRow.append($('<td>').text(item.kemasan));
                 newRow.append($('<td>').text(item.remark));
                 newRow.append($('<td>').text(item.qty));
-                newRow.append($('<td>').text(formatRupiah(item.harga)));
-                newRow.append($('<td>').text(formatRupiah(item.total)));
+                newRow.append($('<td>').text(formatRupiah2(item.harga)));
+                newRow.append($('<td>').text(formatRupiah2(item.total)));
                 newRow.append($('<td>').html(`
                 <input <?= isset($dataSalesExport) && $dataSalesExport->status === "POSTED" ? "readonly" : "" ?> class="form-control qty-barang-order" oninput="preventNegativeInput(this);updateOrder($(this))" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qtyOrder}">
             `));
-                newRow.append($('<td>').text(formatRupiah(item.hargaOrder)));
-                newRow.append($('<td>').text(formatRupiah(item.totalHargaOrder)));
+                newRow.append($('<td>').text(formatRupiah2(item.hargaOrder)));
+                newRow.append($('<td>').text(formatRupiah2(item.totalHargaOrder)));
 
                 totalQty += parseFloat(item.qty);
                 totalHarga += parseFloat(item.harga);
@@ -711,11 +711,11 @@
             newRow.append($('<td colspan="5"></td>'));
             newRow.append($('<td><b>TOTAL</b></td>'));
             newRow.append($('<td><b>' + totalQty + '</b></td>'));
-            newRow.append($('<td><b>' + formatRupiah(totalHarga.toString()) + '</b></td>'));
-            newRow.append($('<td><b>' + formatRupiah(totalTotalHarga.toString()) + '</b></td>'));
+            newRow.append($('<td><b>' + formatRupiah2(totalHarga.toString()) + '</b></td>'));
+            newRow.append($('<td><b>' + formatRupiah2(totalTotalHarga.toString()) + '</b></td>'));
             newRow.append($('<td><b>' + totalQtyOrder + '</b></td>'));
-            newRow.append($('<td><b>' + formatRupiah(totalHargaOrder.toString()) + '</b></td>'));
-            newRow.append($('<td><b>' + formatRupiah(totalTotalHargaOrder.toString()) + '</b></td>'));
+            newRow.append($('<td><b>' + formatRupiah2(totalHargaOrder.toString()) + '</b></td>'));
+            newRow.append($('<td><b>' + formatRupiah2(totalTotalHargaOrder.toString()) + '</b></td>'));
             table.find('tfoot').append(newRow);
 
             totalAmount = totalTotalHarga;
@@ -740,8 +740,8 @@
         input.val(qty);
 
         // Update Harga Order dan Total Harga Order
-        $('.dataTable tbody tr:eq(' + index + ') td:eq(10)').text(formatRupiah(hargaOrder.toString()));
-        $('.dataTable tbody tr:eq(' + index + ') td:eq(11)').text(formatRupiah(totalHargaOrder.toString()));
+        $('.dataTable tbody tr:eq(' + index + ') td:eq(10)').text(formatRupiah2(hargaOrder.toString()));
+        $('.dataTable tbody tr:eq(' + index + ') td:eq(11)').text(formatRupiah2(totalHargaOrder.toString()));
 
         // Recalculate Total
         var totalQty = 0;
@@ -759,8 +759,8 @@
         });
 
         $('.foot-detail-table td:eq(5)').text(totalQty);
-        $('.foot-detail-table td:eq(6)').text(formatRupiah(totalHarga.toString()));
-        $('.foot-detail-table td:eq(7)').text(formatRupiah(totalTotalHarga.toString()));
+        $('.foot-detail-table td:eq(6)').text(formatRupiah2(totalHarga.toString()));
+        $('.foot-detail-table td:eq(7)').text(formatRupiah2(totalTotalHarga.toString()));
     }
 
 
@@ -768,7 +768,7 @@
         window.open(url, "_blank");
     }
 
-    function formatRupiah(angka) {
+    function formatRupiah2(angka) {
         if (angka != "") {
             angka = angka.replace(/\./g, ',');
             angka = angka.replace(/[^\d,]/g, '');

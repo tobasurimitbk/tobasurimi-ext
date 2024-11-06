@@ -241,7 +241,7 @@
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.id_customer, .id_invoice')
+        $('.id_customer, .id_invoice, .id_warehouse')
             .parent('div')
             .children('span')
             .children('span')
@@ -249,7 +249,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.id_customer, .id_invoice')
+        $('.id_customer, .id_invoice, .id_warehouse')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -335,7 +335,7 @@
             const dataTab = table.rows().every(function(rowIdx) {
                 const inputVal = $(this.node()).first().find('input').val();
                 const rowData = table.row(rowIdx).data();
-                if (parseFloat(rowData.qty) < parseFloat(inputVal)) {
+                if (parseFloat(rowData.qty) < parseFloat(inputVal) && rowData.qty == 0) {
                     isValid = false;
                 } else {
                     rowData.qtyReturn = inputVal;

@@ -259,6 +259,19 @@ function repairDouble($nominal)
    return $angkaDesimal;
 }
 
+function repairDouble2($nominal)
+{
+   $angka = preg_replace("/[^0-9.,]/", "", $nominal);
+   if (strpos($angka, ',') !== false && strpos($angka, '.') !== false) {
+      $angka = str_replace(',', '', $angka);
+   } else {
+      $angka = str_replace(',', '.', $angka);
+   }
+   $angkaDesimal = number_format((float) $angka, 2, '.', '');
+   return $angkaDesimal;
+}
+
+
 function toRupiah($nominal)
 {
    return "" . number_format($nominal, 2, ',', '.');
@@ -353,7 +366,8 @@ function convertRupiahToNumber($rupiah)
    return $angkaTanpaKoma;
 }
 
-function formatRupiahPdfExcel($angka) {
+function formatRupiahPdfExcel($angka)
+{
    return 'Rp ' . number_format($angka, 0, ',', '.');
 }
 

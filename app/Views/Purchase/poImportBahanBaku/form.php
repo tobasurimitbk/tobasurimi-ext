@@ -157,14 +157,21 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($dataValuta as $valuta) : ?>
-                                    <option <?= !empty($dataPOImport) ? (($dataPOImport->currency ? formatter($dataPOImport->currency, "STR_TO_INT") : 0) == formatter($valuta["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
-                                <?php endforeach ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Valas</label>
+                        <div class="input-group">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($dataValuta as $valuta) : ?>
+                                        <option <?= !empty($dataPOImport) ? (($dataPOImport->currency ? formatter($dataPOImport->currency, "STR_TO_INT") : 0) == formatter($valuta["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Valas</label>
+                            </div>
+                            <div class="input-group-append" style="height:50px;">
+                                <a class="btn btn-success" href="<?= site_url('kurs'); ?>" type="button">
+                                    <i class="fas fa-plus" style="margin-top: 10px;"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -585,7 +592,7 @@
         $('.detail-modal').modal('hide');
     });
     // HARGA SATUAN DAN QTY CHANE
-    $('#harga_satuan,#qty,#biaya_tambahan,#diskon').keyup(function() {
+    $('#harga_satuan,#qty,#biaya_tambahan,#diskon').change(function() {
         var hargaSatuan = convertRupiahToNumber($('#harga_satuan').val()) || 0;
         var qty = parseFloat($('#qty').val()) || 1;
         var biayaTambahan = convertRupiahToNumber($('#biaya_tambahan').val()) || 0;
@@ -596,16 +603,15 @@
         $('#total').val(formatRupiah2(total.toFixed(2)));
     });
 
-    $('#total').keyup(function() {
-        var qty = $('#qty').val();
-        console.log(qty);
+    $('#total').change(function() {
+        var qty = parseFloat($('#qty').val()) || 0;
         if (qty === "" || qty === 0) {
             qty = 1;
             $('#qty').val(qty);
         }
         var harga_satuan;
-        var total = $('#total').val()
-        harga_satuan = convertRupiahToNumber(total) / Number(qty);
+        var total = convertRupiahToNumber($('#total').val()) || 0;
+        harga_satuan = total / qty;
         $('#harga_satuan').val(formatRupiah2(harga_satuan));
     });
 
@@ -1143,7 +1149,7 @@
             totalQty += parseFloat(v.qty);
             totalDiskon += parseFloat(v.diskon);
             totalTambahan += parseFloat(v.biaya_tambahan);
-            totalHarga += parseFloat(formatCurrency(v.total));
+            totalHarga += parseFloat(convertRupiahToNumber(v.total));
         });
         table.find('tfoot').empty();
         var newRow = $('<tr>');
@@ -1208,22 +1214,40 @@
         $(".diskon").val('0');
     }
 
-    function formatCurrency(str) {
-        var strs = str.replace(/,..$/, '');
-        return strs.replace(/[^0-9]/g, '');
+    function formatRupiah2(x) {
+        let min = false;
+        x = x.toString();
+        if (x.includes("-")) {
+            min = true;
+        } else {
+            min = false;
+        }
+        x = x.replace(/-/g, '');
+
+        let parts = x.split(".");
+        parts[0] = parts[0].replace(/,/g, '');
+        let bilangan = parts[0];
+
+        let number_string = bilangan.toString(),
+            sisa = number_string.length % 3,
+            rupiah = number_string.substr(0, sisa),
+            ribuan = number_string.substr(sisa).match(/\d{3}/g);
+
+        if (ribuan) {
+            let separator = sisa ? ',' : '';
+            rupiah += separator + ribuan.join(',');
+        }
+        parts[0] = rupiah;
+
+        if (parts[1]) {
+            parts[1] = parts[1].slice(0, 2).padEnd(2, '0');
+        } else {
+            parts[1] = '00';
+        }
+
+        return (min ? '-' : '') + parts.join(".");
     }
 
-    function formatRupiah2(angka) {
-        var formatter = new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR'
-        });
-        var parsedNumber = parseFloat(angka);
-        if (isNaN(parsedNumber)) {
-            return "0,00";
-        }
-        return formatter.format(parsedNumber).replace('Rp', '').trim();
-    }
 
     function activeFieldSatuanId(satuan_1, satuan_2, satuan_3) {
         const allowedValues = [String(satuan_1), String(satuan_2), String(satuan_3)];
@@ -1239,9 +1263,7 @@
     }
 
     function convertRupiahToNumber(rupiah) {
-        var withoutDot = rupiah.replace(/\./g, '');
-        var numberWithDot = withoutDot.replace(',', '.');
-        return parseFloat(numberWithDot);
+        return rupiah.replace(/,/g, '');
     }
 
     function getListSPP() {

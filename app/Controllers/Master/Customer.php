@@ -85,6 +85,7 @@ class Customer extends BaseController
             "company_id"    => $this->request->getGet("company_id"),
         ];
 
+
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
         $dataCompanyUserLogin = $this->CompanyModel->getCompaniesUserLogin();

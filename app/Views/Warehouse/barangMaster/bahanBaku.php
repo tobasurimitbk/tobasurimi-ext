@@ -5,7 +5,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Bahan Baku</h1>
-        <?php if (can('Master Barang', 'Bahan Baku', 'p')) : ?>
+        <?php if (can('Master Barang', 'Bahan Baku', 'c')) : ?>
             <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
                 Import / Export
             </button>
@@ -13,7 +13,6 @@
                 <li><button class="dropdown-item btn-upload-excel">Import Excel</button></li>
                 <li><button class="dropdown-item" onclick="excel('<?= base_url("barang-master/export-excel"); ?>')">Export Excel</button></li>
             </ul>
-
         <?php endif; ?>
         <?php if (can('Master Barang', 'Bahan Baku', 'c')) : ?>
             <button class="btn btn-show-form btn-add btn-add-barang float-right">

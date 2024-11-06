@@ -24,6 +24,7 @@ class SalesOrderReturnModel extends Model
         'note',
         'id_company',
         'is_approved',
+        'id_warehouse',
     ];
 
     // Dates
