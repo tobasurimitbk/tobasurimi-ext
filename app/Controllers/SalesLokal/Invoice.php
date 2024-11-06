@@ -13,10 +13,12 @@ use App\Models\SalesOrderDetailModel;
 use App\Models\SuratJalanModel;
 use App\Models\TaxModel;
 use App\Models\AllNoModel;
+use App\Models\BarangMasterSalesModel;
 use App\Models\PembayaranInvoiceModel;
 use App\Models\SalesOrderInvoiceDetailModel;
 use App\Models\SalesOrderPaymentDetailModel;
 use App\Models\SalesOrderPaymentModel;
+use App\Models\StockModel;
 use Config\Services;
 use Dompdf\Dompdf;
 use ErrorException;
@@ -40,6 +42,8 @@ class Invoice extends BaseController
     protected $SalesOrderInvoiceDetailModel;
     protected $taxModel;
     protected $pembayaranInvoiceModel;
+    protected $BarangMasterSalesModel;
+    protected $stockModel;
 
     public function __construct()
     {
@@ -61,6 +65,8 @@ class Invoice extends BaseController
         $this->SalesOrderInvoiceDetailModel = new SalesOrderInvoiceDetailModel();
         $this->taxModel = new TaxModel();
         $this->pembayaranInvoiceModel = new PembayaranInvoiceModel();
+        $this->BarangMasterSalesModel = new BarangMasterSalesModel();
+        $this->stockModel = new StockModel();
     }
 
     public function index()
@@ -262,7 +268,7 @@ class Invoice extends BaseController
             $values = [
                 "id_user"           => $this->userId,
                 "document_type"     => $postData['doc_type'],
-                "document_id"       => str_replace(['\\"', '\\', '"'], '', json_encode($postData['doc_id'])),
+                "document_id"       => isset($postData['doc_id']) ? str_replace(['\\"', '\\', '"'], '', json_encode($postData['doc_id'])) : "",
                 "id_customer"       => $postData['id_customer'],
                 "document_no"       => $postData['noDocument'],
                 // "id_surat_jalan"    => $postData['id_surat_jalan'],
@@ -305,12 +311,14 @@ class Invoice extends BaseController
 
             $this->SalesOrderInvoiceModel->db->transComplete();
 
-            foreach ($postData['doc_id'] as $id) {
-                if ($postData['doc_type'] === 'pesanan') {
-                    $this->SalesOrderModel->where('id', $id)->set(['sales_order_invoice_id' => $dataSalesOrderInvoice])->update();
-                } else {
+            if (isset($postData['doc_id'])) {
+                foreach ($postData['doc_id'] as $id) {
+                    if ($postData['doc_type'] === 'pesanan') {
+                        $this->SalesOrderModel->where('id', $id)->set(['sales_order_invoice_id' => $dataSalesOrderInvoice])->update();
+                    } else {
 
-                    $this->SuratJalanModel->where('id', $id)->set(['sales_order_invoice_id' => $dataSalesOrderInvoice])->update();
+                        $this->SuratJalanModel->where('id', $id)->set(['sales_order_invoice_id' => $dataSalesOrderInvoice])->update();
+                    }
                 }
             }
 
@@ -396,8 +404,14 @@ class Invoice extends BaseController
             ->where('name', 'tipe_shipping_via')
             ->findAll();
 
-        $documentData = $this->getDocDataaaa($dataSalesInvoiceOrder->document_type, json_decode($dataSalesInvoiceOrder->document_id));
+        if ($dataSalesInvoiceOrder->document_type != "penjualan") {
+            $documentData = $this->getDocDataaaa($dataSalesInvoiceOrder->document_type, json_decode($dataSalesInvoiceOrder->document_id));
+        } else {
+            $documentData = $this->getDocDataaaa($dataSalesInvoiceOrder->document_type, $id);
+        }
 
+        // var_dump($documentData);
+        // exit;
 
         foreach ($documentData->itemList as $key => &$value) {
             foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
@@ -1009,7 +1023,7 @@ class Invoice extends BaseController
 
 
 
-    private function getDocDataaaa(string $docType, $docId): object
+    private function  getDocDataaaa(string $docType, $docId): object
     {
 
         $soId = 0;
@@ -1026,7 +1040,6 @@ class Invoice extends BaseController
         $soId = $docId;
 
         if ($docType == 'pesanan') {
-
             $soData = $this->SalesOrderModel->asObject()
                 ->select("sales_order.*,
                 sales_order.no_po, sales_order.nama_ecommerce, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , ' - ', employees.name) AS salesName, metadata.id AS termin")
@@ -1043,14 +1056,15 @@ class Invoice extends BaseController
             $nama_ecommerce = $soData->nama_ecommerce ?? "-";
             $customerName = $soData->customerName ?? "-";
             $customerAddress = $soData->customerAddress ?? "-";
-        } else {
+        } else if ($docType == 'pengiriman') {
             $selectQry = "surat_jalan_so.*, 
                           sales_order.jenis_penjualan,
                           sales_order.no_po,
                           sales_order.nama_ecommerce,
                           customers.name AS customerName, 
                           customers.address AS customerAddress,  
-                          CONCAT(employees.nip , ' - ', employees.name) AS salesName, metadata.id AS termin";
+                          CONCAT(employees.nip , ' - ', employees.name) AS salesName, 
+                          metadata.id AS termin";
             $suratJalanData = $this->SuratJalanModel->asObject()
                 ->select($selectQry)
                 ->join('customers', 'customers.id = surat_jalan_so.id_customer', 'left')
@@ -1060,9 +1074,6 @@ class Invoice extends BaseController
                 ->whereIn('surat_jalan_so.id', $docId)
                 ->first();
 
-            // var_dump($suratJalanData);
-            // die();
-
             $salesName = $suratJalanData->salesName ?? "-";
             $termin = $suratJalanData->termin ?? "-";
             $jenis_penjualan = $suratJalanData->jenis_penjualan ?? "-";
@@ -1071,6 +1082,27 @@ class Invoice extends BaseController
             $soId = $suratJalanData == NULL ? [] : json_decode($suratJalanData->multiple_id_so);
             $customerName = $suratJalanData->customerName ?? "-";
             $customerAddress = $suratJalanData->customerAddress ?? "-";
+        } else {
+            $selectQry = "  sales_order_invoice.*,
+                            sales_order_invoice.no_faktur, 
+                            sales_order_invoice.nama_ecommerce, 
+                            customers.name AS customerName, 
+                            customers.address AS customerAddress, 
+                            metadata.id AS termin";
+            $soData = $this->SalesOrderInvoiceModel->asObject()
+                ->select($selectQry)
+                ->join('customers', 'customers.id = sales_order_invoice.id_customer', 'left')
+                ->join('metadata', 'metadata.id = sales_order_invoice.terms', 'left')
+                ->where('sales_order_invoice.id', $docId)
+                ->first();
+
+            $salesName =  "-";
+            $termin = $soData->termin ?? "-";
+            $jenis_penjualan = "-";
+            $no_po = $soData->no_po ?? "-";
+            $nama_ecommerce = $soData->nama_ecommerce ?? "-";
+            $customerName = $soData->customerName ?? "-";
+            $customerAddress = $soData->customerAddress ?? "-";
         }
         // var_dump($docId);
         // die;
@@ -1323,5 +1355,55 @@ class Invoice extends BaseController
             'token' => csrf_hash(),
             'status' => true
         ]);
+    }
+
+    public function getAllBarang()
+    {
+        $dataBarang = $this->BarangMasterSalesModel
+            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'left')
+            ->join('sales_order_return_detail', 'sales_order_return_detail.id_barang_return = barang_master_sales.id', 'left')
+            ->join('sales_order_return', 'sales_order_return.id = sales_order_return_detail.id_sales_order_return', 'left')
+            ->select('barang_master_sales.*')
+            ->select('barang_master_sales.id as id_barang')
+            ->select('barang_master_sales.kode_barang as kode_barang')
+            ->select('barang_master_sales.barang_name as nama_barang')
+            ->select('barang_master_sales.harga_pokok as harga_pokok')
+            ->select('barang_master_sales.harga_jual as harga_jual')
+            ->select('barang_master_sales.status_ppn as statusppn')
+            ->select('satuans.kode_satuan as kode_satuan')
+            ->select('satuans.nama_satuan as nama_satuan')
+            ->select('sales_order_return_detail.stock_id as stock_id')
+            ->select('sales_order_return_detail.bc_id as bc_id')
+            ->select('sales_order_return_detail.no_aju as no_aju')
+            ->select('sales_order_return_detail.stock_dokumen as stock_dokumen')
+            ->where('type_barang_sales', 'LOKAL')
+            ->where('barang_master_sales.deletedAt', null)
+            ->where('barang_master_sales.company_id', $this->this_company_id)
+            ->where('sales_order_return.is_approved', 1)
+            ->groupBy('id_barang')
+            ->findAll();
+
+        // Map to get stock quantities and filter
+        $dataBarang = array_filter(array_map(function ($value) {
+            $currentStock = 0;
+
+            if ($value['stock_id'] || $value['stock_id'] != "0") {
+                $stockDetail = $this->stockModel->detailStock($value['stock_id']);
+                $currentStock = $stockDetail['barang']['qty'];
+            }
+
+            if ($currentStock > 0) {
+                $value['qty_stock'] = $currentStock;
+                return $value;
+            }
+            return null; // Filter out items with stock <= 0
+        }, $dataBarang));
+
+        $data = [
+            "dataBarang" => array_values($dataBarang), // Reindex the array
+        ];
+
+        echo json_encode($data);
+        return;
     }
 }

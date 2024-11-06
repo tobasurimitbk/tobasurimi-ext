@@ -19,6 +19,7 @@ use App\Models\StockModel;
 use App\Models\StuffingLokalDetailModel;
 use App\Models\StuffingLokalModel;
 use App\Models\AccountBarangModel;
+use Exception;
 
 class Retur extends BaseController
 {
@@ -42,7 +43,7 @@ class Retur extends BaseController
     private $soInvModel;
     private $soInvDetailModel;
     private $userId;
-    
+
 
     public function __construct()
     {
@@ -85,9 +86,9 @@ class Retur extends BaseController
         $noReturn = $this->soReturnModel->generateNoReturn();
 
         $dataWarehouse = $this->WarehousesModel
-                        ->asObject()
-                        ->where('company_id', $this->this_company_id)
-                        ->findAll();
+            ->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->findAll();
 
         foreach ($invoiceList as &$value) {
             $value->id = encrypt($value->id);
@@ -297,17 +298,17 @@ class Retur extends BaseController
             if (!empty($id)) {
                 $salesOrderReturnData = $this->soReturnModel->find($id);
                 $invoiceData = $this->soInvModel->where('id_sales_order_return', $id)->first();
-                $salesOrderData = $this->soModel->where('sales_order_invoice_id', $invoiceData['id'])->first(); 
+                $salesOrderData = $this->soModel->where('sales_order_invoice_id', $invoiceData['id'])->first();
                 $stuffingLokalData = $this->stuffingLokalModel->where('sales_order_id', $salesOrderData["id"])->first();
                 $stuffingLokalDetailData = $this->stuffingLokalDetailModel
-                                            ->where('stuffing_lokal_id', $stuffingLokalData["id"])
-                                            ->join('barang_master AS barang1', 'barang1.id = stuffing_lokal_detail.barang1_id_Warehouse', 'left')
-                                            ->join('barang_master AS barang2', 'barang2.id = stuffing_lokal_detail.barang2_id_Warehouse', 'left')
-                                            ->join('stock', 'stock.id = stuffing_lokal_detail.stock_id_warehouse', 'left')
-                                            ->join('stock_details2', 'stock_details2.stock_id = stock.id', 'left')
-                                            ->select('stuffing_lokal_detail.*, barang1.type_barang AS barang1_type, barang2.type_barang AS barang2_type, stock_details2.harga_umum, stock_details2.harga_harian, stock_details2.harga_bulanan, stock_details2.supplier_id')
-                                            ->findAll();
-            
+                    ->where('stuffing_lokal_id', $stuffingLokalData["id"])
+                    ->join('barang_master AS barang1', 'barang1.id = stuffing_lokal_detail.barang1_id_Warehouse', 'left')
+                    ->join('barang_master AS barang2', 'barang2.id = stuffing_lokal_detail.barang2_id_Warehouse', 'left')
+                    ->join('stock', 'stock.id = stuffing_lokal_detail.stock_id_warehouse', 'left')
+                    ->join('stock_details2', 'stock_details2.stock_id = stock.id', 'left')
+                    ->select('stuffing_lokal_detail.*, barang1.type_barang AS barang1_type, barang2.type_barang AS barang2_type, stock_details2.harga_umum, stock_details2.harga_harian, stock_details2.harga_bulanan, stock_details2.supplier_id')
+                    ->findAll();
+
 
                 foreach ($stuffingLokalDetailData as $key => $value) {
 
