@@ -988,7 +988,7 @@ class BC40 extends BaseController
         }
 
         $data = [
-            'kodeFasilitasTarif' => $this->metaDataModel->where('name', "Kode Fasilitas Tarif BC")->whereIn('description', ['TIDAK DIPUNGUT', 'DIBEBASKAN', 'DITANGGUHKAN'])->findAll(),
+            'kodeFasilitasTarif' => $this->metaDataModel->where('name', "Kode Fasilitas Tarif BC")->whereIn('description', ['TIDAK DIPUNGUT', 'DIBEBASKAN', 'DITANGGUHKAN', 'SUDAH DILUNASI'])->findAll(),
             'kodeJenisTarif' => $this->metaDataModel->where('name', "Kode Jenis Tarif BC")->whereIn('description', ['ADVALORUM'])->findAll(),
             'kodeJenisPungutan' => $this->metaDataModel->where('name', "Kode Jenis Pungutan BC")->whereIn('value', ['PPN'])->findAll(),
             'kodeHS' => $this->hsCodeModel->findAll(),
