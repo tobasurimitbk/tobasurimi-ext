@@ -19,6 +19,7 @@ use App\Models\StockModel;
 use App\Models\StuffingLokalDetailModel;
 use App\Models\StuffingLokalModel;
 use App\Models\AccountBarangModel;
+use Exception;
 
 class Retur extends BaseController
 {
@@ -42,7 +43,7 @@ class Retur extends BaseController
     private $soInvModel;
     private $soInvDetailModel;
     private $userId;
-    
+
 
     public function __construct()
     {
@@ -85,9 +86,9 @@ class Retur extends BaseController
         $noReturn = $this->soReturnModel->generateNoReturn();
 
         $dataWarehouse = $this->WarehousesModel
-                        ->asObject()
-                        ->where('company_id', $this->this_company_id)
-                        ->findAll();
+            ->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->findAll();
 
         foreach ($invoiceList as &$value) {
             $value->id = encrypt($value->id);
@@ -290,20 +291,20 @@ class Retur extends BaseController
         try {
             $id = $this->request->getVar('id');
             $id = decrypt($id);
-    
+
             if (empty($id)) {
                 return $this->sendResponse(false, "Data Not Found");
             }
-    
+
             $salesOrderReturnData = $this->soReturnModel->find($id);
             $invoiceData = $this->soInvModel->where('id_sales_order_return', $id)->first();
             $salesOrderData = $this->soModel->where('sales_order_invoice_id', $invoiceData['id'] ?? null)->first();
-    
+
             $stuffingLokalData = $this->stuffingLokalModel->where('sales_order_id', $salesOrderData["id"] ?? null)->first();
             if (!$stuffingLokalData) {
                 return $this->sendResponse(false, "Data Invoice dengan Nomor Faktur {$invoiceData["no_faktur"]} belum di Stuffingkan");
             }
-    
+
             // Only fetch essential fields from related models
             $returnDetailData = $this->soReturnDetailModel
                 ->select([
@@ -324,33 +325,32 @@ class Retur extends BaseController
                 ->join('stuffing_lokal_detail', 'stuffing_lokal_detail.stuffing_lokal_id = stuffing_lokal.id', 'left')
                 ->where('sales_order_return_detail.id_sales_order_return', $id)
                 ->findAll();
-    
+
             foreach ($returnDetailData as $value) {
                 $statusOUT = $this->accountBarangModel->checkAccountBarangCOA($this->this_company_id, $value['divisi_id'], $value['barang1_id_warehouse']);
                 $statusIN = $this->accountBarangModel->checkAccountBarangCOA($this->this_company_id, $value['divisi_id'], $value['barang1_id_warehouse']);
-    
+
                 if ($statusOUT && $statusIN) {
                     return $this->sendResponse(false, "Barang belum memiliki Akun COA");
                 }
-    
+
                 // Fetch specific stock details as needed
                 $stockDetails = $this->stockDetail2Model
                     ->where('stock_id', $value['stock_id_warehouse'])
                     ->where('no_aju', $value['no_aju_warehouse'])
                     ->where('bc_id', $value['bc_id_warehouse'])
                     ->first();
-    
+
                 $this->processStok($salesOrderReturnData, $value, $stockDetails);
             }
-    
+
             $this->soReturnModel->update($id, ['is_approved' => 1]);
             return $this->sendResponse(true, "Status Approve Berhasil Diperbaharui");
-    
         } catch (Exception $e) {
             return $this->sendResponse(false, $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
         }
     }
-    
+
     private function processStok($salesOrderReturnData, $value, $stockDetails)
     {
         $stok = $this->stockModel->insertStok(
@@ -362,10 +362,10 @@ class Retur extends BaseController
             $value['barang2_id_warehouse'],
             ($value['qty'] * -1)
         );
-    
+
         $this->insertStockDetails($stok, $value, $salesOrderReturnData, $stockDetails);
     }
-    
+
     private function insertStockDetails($stok, $value, $salesOrderReturnData, $stockDetails, $isInbound = false)
     {
         $operationType = $isInbound ? "In" : "Out";
@@ -379,7 +379,7 @@ class Retur extends BaseController
             $salesOrderReturnData["no_return"],
             $salesOrderReturnData['note'] ?: "-"
         );
-    
+
         if ($stockDetails) {
             $this->stockDetail2Model->insertStokDetail2(
                 $value['bc_id_warehouse'],
@@ -396,7 +396,7 @@ class Retur extends BaseController
             );
         }
     }
-    
+
     private function sendResponse($status, $message)
     {
         echo json_encode([
@@ -406,9 +406,9 @@ class Retur extends BaseController
         ]);
         return;
     }
-    
 
-    
+
+
 
     public function getById($id)
     {

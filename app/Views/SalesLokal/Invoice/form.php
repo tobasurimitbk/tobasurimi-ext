@@ -100,20 +100,20 @@
                     ?>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select doc_id" multiple name="doc_id[]" id="doc_id" <?= !empty($documentData) && $data->status_posting != "0" ? 'disabled' : ''; ?>>
+                            <select class="form-select doc_id" multiple name="doc_id[]" id="doc_id" <?= !empty($documentData) && $data->status_posting != "0" ? 'disabled' : ($data->document_type == 'penjualan' ? 'disabled' : ''); ?>>
                                 <option value=""></option>
                                 <?php if (!empty($data)) : ?>
                                     <?php if (!empty($selectedDocIds)) : ?>
                                         <?php foreach ($selectedDocIds as $i => $id) : ?>
                                             <option selected value="<?= $id ?>"><?= $selectedDocNos[$i] ?></option>
                                         <?php endforeach; ?>
-                                    <?php endif; ?>
 
-                                    <?php foreach ($documentList as $row) : ?>
-                                        <?php if (!in_array($row->id, $selectedDocIds)) : ?>
-                                            <option value="<?= $row->id ?>"><?= $row->doc_no ?></option>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
+                                        <?php foreach ($documentList as $row) : ?>
+                                            <?php if (!in_array($row->id, $selectedDocIds)) : ?>
+                                                <option value="<?= $row->id ?>"><?= $row->doc_no ?></option>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
 
 
                                 <?php endif; ?>
@@ -302,56 +302,97 @@
     </div>
 </section>
 
-<div class="modal" id="add_barang_penjualan" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px">
+<!-- modal barang -->
+<div class="modal detail-modal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Tambah Barang Penjualan Kembali</h5>
+                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
             </div>
             <div class="modal-body">
-                <form class="form-excel" method="post">
+                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <!-- <input autocomplete="one-time-code" type="hidden" class="id_barang" name="id_barang" id="id_barang" /> -->
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="hidden" class="id_barang_hasil" name="id_barang_hasil" id="id_barang_hasil" />
-                                <select class="form-select kode_barang_add" name="kode_barang_add" id="kode_barang_add" aria-label="Floating label select example">
-                                    <option data-barang_id="" data-nama="" data-satuan="" value=""></option>
+                                <select class="form-select id_barang" name="id_barang" id="id_barang" aria-label="Floating label select example">
+                                    <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Kode Barang</label>
+                                <label for="floatingInput">Nama Barang</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" readonly class="form-control satuan_barang_add" name="satuan_barang_add" id="satuan_barang_add" placeholder="Satuan">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control satuan" name="satuan" id="satuan" placeholder="Satuan">
                                 <label for="floatingInput">Satuan</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" oninput="preventNegativeInput(this)" class="form-control qty_barang_add" name="qty_barang_add" id="qty_barang_add" placeholder="Qty Hasil">
-                                <label for="floatingInput">Qty Hasil</label>
+                                <input autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, '');" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
+                                <label for="floatingInput">Harga Barang</label>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" oninput="preventNegativeInput(this)" class="form-control kg_barang_add" name="kg_barang_add" id="kg_barang_add" placeholder="Berat Isi">
-                                <label for="floatingInput">Berat Isi</label>
+                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/\.(?=.*\.)/g, '');" class="form-control qty-awal" name="qty_awal" id="qty-awal" placeholder="Qty Awal" readonly>
+                                <label for="floatingInput">Qty Awal</label>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" oninput="preventNegativeInput(this)" readonly class="form-control qty_kg_barang_add" name="qty_kg_barang_add" id="qty_kg_barang_add" placeholder="Qty dalam KG">
-                                <label for="floatingInput">Qty dalam KG</label>
+                                <input autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, '');" type="text" class="form-control qty-sekarang" name="qty_sekarang" id="qty-sekarang" placeholder="Qty Sekarang" readonly>
+                                <label for="floatingInput">Qty Sekarang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/\.(?=.*\.)/g, '');" class="form-control qty-invoice" name="qty_invoice" id="qty-invoice" placeholder="Qty Invoice">
+                                <label for="floatingInput">Qty Invoice</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control amount" name="amount" id="amount" placeholder="Total Harga" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/\.(?=.*\.)/g, '');">
+                                <label for="floatingInput">Total Harga</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control discount_percentage" name="discount_percentage" id="discount_percentage" placeholder="discount">
+                                <label for="floatingInput">disc%</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
+                                <label for="floatingInput">Keterangan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control keteranganppn" name="keteranganppn" id="keteranganppn" placeholder="keteranganppn">
+                                <label for="floatingInput">Status PPN</label>
+                                <input autocomplete="one-time-code" type="hidden" readonly="true" class="form-control statusppn" name="statusppn" id="statusppn" placeholder="statusppn">
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard btn-discard-add-barang mr-2">Kembali</button>
-                <button type="button" class="btn btn-submit-form btn-add-barang">Simpan</button>
+                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Kembali</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
+                <!-- <button type="button" class="btn btn-discard delete-btn delete-detail delete-form">Hapus</button> -->
             </div>
         </div>
     </div>
@@ -469,19 +510,95 @@
         <?php endif; ?>
 
         $(".btn-show-modal").click(function() {
+            $(".title-detail-name").text("Tambah");
+
+            $(".id_detail").val('')
+            $(".id_barang").empty('')
+            $(".id_barang").val('').change()
+            $("#warehouse").val('').change()
+            $("#warehouse").empty()
+            $(".harga").val('')
+            $(".qty").val('')
+            $(".statusppn").val('')
+            $(".amount").val('')
+            $(".keterangan").val('')
+
+            $(".id_barang").val('')
             getBarang();
-            $('#add_barang_penjualan').modal('show');
+            $(".detail-modal").modal("show");
         });
 
-        $(".btn-discard-add-barang").click(function() {
-            $(".kode_barang_add").val("").change();
-            $(".qty_barang_add").val();
-            $(".kg_barang_add").val();
-            $(".qty_kg_barang_add").val();
-            $('#add_barang_penjualan').modal('hide');
+        $(".btn-hide-detail").click(function() {
+            $(".id_detail").val('')
+            $(".id_barang").empty('')
+            $(".id_barang").val('').change()
+            $("#warehouse").val('').change()
+            $("#warehouse").empty()
+            $(".harga").val('')
+            $(".qty").val('')
+            $(".statusppn").val('')
+            $(".amount").val('')
+            $(".keterangan").val('')
+
+            $(".id_barang").val('')
+            $(".detail-modal").modal('hide');
         });
 
-        $('.ship_via, .termin, .kode_barang_add').select2({
+        $(".btn-submit-detail").click(function() {
+
+            let amountBarang = $(".amount").val();
+            let discBarang = $(".discount_percentage").val();
+            let hargaBarang = $(".harga").val();
+            let idBarang = $(".id_barang option:selected").val();
+            let codeBarang = $(".id_barang option:selected").data("code");
+            let namaBarang = $(".id_barang option:selected").data("nama");
+            let qtyBarang = $(".qty-awal").val();
+            let qtyNowBarang = $(".qty-sekarang").val();
+            let qtyinputBarang = $(".qty-invoice").val();
+            let codeSatuan = $(".id_barang option:selected").data("kode_satuan");
+
+            // Menambahkan data ke dalam list_items
+            list_items.push({
+                amount: amountBarang, // Jumlah total
+                disc: discBarang, // Diskon
+                harga_barang: hargaBarang, // Harga barang per unit
+                id: null, // ID item
+                id_barang: idBarang, // ID barang
+                id_sales_order: null, // ID sales order
+                kode_barang: codeBarang, // Kode barang
+                nama_barang: namaBarang, // Nama barang
+                no: 1, // Nomor urutan barang
+                qty: qtyBarang, // Jumlah barang
+                qty_sekarang: qtyNowBarang, // Jumlah barang yang tersedia
+                qty_input: qtyinputBarang, // Jumlah barang yang tersedia
+                satuan: codeSatuan, // Satuan barang
+                tax: null, // Pajak (kosong/null jika tidak ada)
+                taxChecked: "11.00", // Pajak yang dipilih
+                total_harga_barang: amountBarang // Total harga barang
+            });
+
+            // Update DataTable
+            table.rows.add(list_items).draw(false);
+
+            reCountTotal();
+
+
+            $(".id_detail").val('')
+            $(".id_barang").empty('')
+            $(".id_barang").val('').change()
+            $("#warehouse").val('').change()
+            $("#warehouse").empty()
+            $(".harga").val('')
+            $(".qty").val('')
+            $(".statusppn").val('')
+            $(".amount").val('')
+            $(".keterangan").val('')
+
+            $(".id_barang").val('')
+            $(".detail-modal").modal('hide');
+        });
+
+        $('.ship_via, .termin, .id_barang').select2({
             placeholder: "",
             theme: "bootstrap-5"
         });
@@ -517,15 +634,60 @@
             autoclose: true
         });
 
+        $(".harga, .qty-invoice").change(function() {
+            let harga = $(".harga").val() || 0;
+            let qtyInvoice = $(".qty-invoice").val() || 0;
+
+            hasil = parseFloat(harga) * parseFloat(qtyInvoice);
+
+            $(".amount").val(hasil);
+        });
+
+        $(".id_barang").change(function() {
+            if ($(".id_barang").val()) {
+                let nama = $(".id_barang option:selected").data("nama") ? $(".id_barang option:selected").data("nama") : "";
+                let idBarang = $(".id_barang option:selected").data("id_item") ? $(".id_barang option:selected").data("id_item") : "";
+                let satuan = $(".id_barang option:selected").data("satuan") ? $(".id_barang option:selected").data("satuan") : "";
+                let statusppn = $(".id_barang option:selected").data("statusppn");
+                let qtyStock = $(".id_barang option:selected").data("qty") ? $(".id_barang option:selected").data("qty") : "";
+                let harga = $(".id_barang option:selected").data("harga") ? $(".id_barang option:selected").data("harga") : 0;
+
+                $(".nama_barang").attr("readonly", nama ? true : false);
+                if (statusppn == 1) {
+                    $(".keteranganppn").val("Barang PPN");
+
+                } else {
+                    $(".keteranganppn").val("Barang Tidak PPN");
+                }
+
+                $(".statusppn").val(statusppn);
+                $(".nama_barang").val(nama);
+                $(".satuan").val(satuan);
+                $(".harga").val(harga);
+                $(".qty-awal").val(qtyStock);
+                $(".qty-sekarang").val(qtyStock);
+
+            } else {
+                $(".nama_barang").attr("readonly", false)
+                $(".amount").val("0");
+                $(".keterangan").val("").change();
+                $(".statusppn").val("");
+                $(".tax").val("");
+                $(".discount_percentage").val("0");
+                $(".qty-awal").val("");
+                $(".qty-sekarang").val("");
+            }
+        });
+
         //CSS SELECT2 FLOATING LABEL
-        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id, .kode_barang_add')
+        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id, .id_barang')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id, .kode_barang_add')
+        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id, .id_barang')
             .parent('div')
             .children('span')
             .children('span')
@@ -533,7 +695,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id, #doc_type, .termin, .kode_barang_add')
+        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id, #doc_type, .termin, .id_barang')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -613,16 +775,18 @@
             var selectedDocs = $(this).val();
 
             <?php if (!empty($data)) : ?>
+                <?php if (isset($data->document_id)) : ?>
 
-                var array1 = (<?= ($data->document_id) ?>);
-                var difference = selectedDocs.filter(item => !array1.includes(Number(item)));
+                    var array1 = [<?= ($data->document_id) ?>];
+                    var difference = selectedDocs.filter(item => !array1.includes(Number(item)));
 
-                // console.log(array1);
-                // console.log(difference);
-                // Fetch data for newly selected documents
-                if (difference && difference.length > 0) {
-                    difference.forEach(docId => getDocumentData(docId));
-                }
+                    // console.log(array1);
+                    // console.log(difference);
+                    // Fetch data for newly selected documents
+                    if (difference && difference.length > 0) {
+                        difference.forEach(docId => getDocumentData(docId));
+                    }
+                <?php endif; ?>
             <?php else : ?>
 
                 if (selectedDocs && selectedDocs.length > 0) {
@@ -645,34 +809,36 @@
             <?php endif; ?>
 
             const docType = $('#doc_type').val();
-            $.ajax({
-                url: `<?= base_url('/invoice-penjualan-lokal/getDocumentData/'); ?>${docType}/${docId}`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    // Populate the form fields with document data
-                    $('#salesName').val(res.salesName);
-                    $('#customerName').val(res.customerName);
-                    $('#customerAddress').val(res.customerAddress);
-                    $('#nama_ecommerce').val(res.nama_ecommerce);
-                    $('#no_po').val(res.no_po);
-                    $('#termin').val(res.termin).change();
-                    $('#jenis_penjualan').val(res.jenis_penjualan).change();
-                    // Add items to list_items array
-                    res.itemList.forEach(function(item) {
-                        list_items.push(item);
-                    });
+            if (docType && docId) {
+                $.ajax({
+                    url: `<?= base_url('/invoice-penjualan-lokal/getDocumentData/'); ?>${docType}/${docId}`,
+                    method: "GET",
+                    dataType: "json",
+                    success: function(res) {
+                        // Populate the form fields with document data
+                        $('#salesName').val(res.salesName);
+                        $('#customerName').val(res.customerName);
+                        $('#customerAddress').val(res.customerAddress);
+                        $('#nama_ecommerce').val(res.nama_ecommerce);
+                        $('#no_po').val(res.no_po);
+                        $('#termin').val(res.termin).change();
+                        $('#jenis_penjualan').val(res.jenis_penjualan).change();
+                        // Add items to list_items array
+                        res.itemList.forEach(function(item) {
+                            list_items.push(item);
+                        });
 
-                    // Update DataTable
-                    table.rows.add(res.itemList).draw(false);
-                    // Update totals
-                    // Recount totals
-                    reCountTotal();
-                },
-                error: function(xhr, status, error) {
-                    console.error(`Error fetching data for document ID ${docId}:`, error);
-                }
-            });
+                        // Update DataTable
+                        table.rows.add(res.itemList).draw(false);
+                        // Update totals
+                        // Recount totals
+                        reCountTotal();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(`Error fetching data for document ID ${docId}:`, error);
+                    }
+                });
+            }
         }
 
         <?php if (!empty($documentData)) : ?>
@@ -725,16 +891,16 @@
 
     function getBarang() {
         $.ajax({
-            url: `<?= base_url("order-form-lokal/barangAll"); ?>`,
+            url: `<?= base_url("invoice-penjualan-lokal/barangAll"); ?>`,
             method: "GET",
             dataType: "json",
             success: function(res) {
-                $(".kode_barang_add").empty();
-                $(".kode_barang_add").append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-statusppn="" data-warehouse_name="" data-id_item="" value=""></option>`);
+                $(".id_barang").empty();
+                $(".id_barang").append(`<option data-satuan="" data-harga="" data-statusppn="" data-id_item="" value=""></option>`);
                 res.dataBarang.forEach(function(item) {
-                    $(".kode_barang_add").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-statusppn="${item.statusppn}" data-satuan="${item.nama_satuan}" data-kode_satuan="${item.kode_satuan}" data-warehouse_id="${item.warehouse_id}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
+                    $(".id_barang").append(`<option data-code="${item.kode_barang}" data-nama="${item.nama_barang}" data-harga="${item.harga_jual}" data-statusppn="${item.statusppn}" data-satuan="${item.nama_satuan}" data-kode_satuan="${item.kode_satuan}" data-harga="${item.harga_barang}" data-qty="${item.qty_stock}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
                 });
-                $(".kode_barang_add").val("").change();
+                $(".id_barang").val("").change();
             }
         })
     }
@@ -981,6 +1147,9 @@
         let taxTotalHtml = 0;
         let dummyTax = 0;
 
+        console.log(list_items);
+
+
         list_items.map((obj) => {
             const itemAmt = parseFloat(obj.amount.replaceAll(',', ''));
             let taxAmt = 0;
@@ -1012,11 +1181,11 @@
                 taxTotalHtml += taxAmt;
             }
 
-           
+
 
 
         });
-       
+
         $('#itemSubTotal').html(itemSubTotal.toLocaleString());
         $('#taxTotal').html(taxTotalHtml.toLocaleString());
         $('#taxValue').html(taxes);

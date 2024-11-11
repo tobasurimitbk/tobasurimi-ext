@@ -87,42 +87,9 @@ class SalesOrderDetailModel extends Model
 
         foreach ($datas as &$data) {
             $amount = ($data->amount);
-
-
-            // $basePrice = ($amount / $data->qty) / ((100 - $data->disc) / 100);
             $totalPrice = (($amount) * (100 - $data->disc)) / 100;
-            // var_dump($totalPrice);
-            // $data->harga_barang = number_format($basePrice);
             $data->total_harga_barang = $totalPrice;
         }
-
-        // die();
-
-
-
-
-
-        // $totalPrice = 0;
-        // $totalQty = 0;
-        // foreach ($datas as &$data) {
-        //     $amount = floatval($data->amount);
-        //     $basePrice = ($amount / $data->qty) / ((100 - $data->disc) / 100);
-
-        //     $amounts = $data->amount;
-        //     $basePrices = ($amounts / $data->qty) / ((100 - $data->disc) / 100);
-
-        //     $totalQty += floatval($data->qty);
-
-        //     $data->amount = number_format($amount);
-        //     $data->qty = number_format($data->qty);
-        //     $data->harga_barang = number_format($basePrice);
-        //     $totalPrice += $basePrices;
-        // }
-        // $datas['total_qty'] = $totalQty;
-        // $datas['total_amount'] = $totalPrice;
-
-        // var_dump($datas);
-
         return $datas;
     }
 
