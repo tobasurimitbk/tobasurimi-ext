@@ -108,7 +108,8 @@ class PembayaranInvoice extends BaseController
             "divisi" => $divisi,
             "subsAkuns" => $subAkunsModel,
             "dokumenList" => $dokumenList,
-            "detail" => ""
+            "detail" => "",
+            'divisi' => $this->divisiModel->getDivisiAccess()
         ];
         return view('Pembayaran/pembayaranInvoice/formEkspor', $data);
     }
@@ -596,6 +597,7 @@ class PembayaranInvoice extends BaseController
                 $id = $this->pembayaranInvoiceModel->insert([
                     'company_id' => $this->this_company_id,
                     'user_id' => $this->user_id,
+                    'divisi_id' => $this->request->getVar('divisi_id'),
                     'payment_method' => $this->request->getVar('payment_methods'),
                     'invoice_id' => decrypt($this->request->getVar('no_dokumen')),
                     'valas_id' => "-",
@@ -716,6 +718,7 @@ class PembayaranInvoice extends BaseController
             $this->pembayaranInvoiceModel->update($id, [
                 'company_id' => $this->this_company_id,
                 'user_id' => $this->user_id,
+                'divisi_id' => $this->request->getVar('divisi_id'),
 
                 'invoice_id' => decrypt($this->request->getVar('no_dokumen')),
                 'valas_id' => $this->request->getVar('valas'),

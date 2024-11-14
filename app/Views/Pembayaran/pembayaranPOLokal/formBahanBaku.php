@@ -58,7 +58,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" disabled type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? 'disabled value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
+                            <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? 'value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
                             <label for="floatingInput">No. Pembayaran</label>
                         </div>
                     </div>
@@ -70,7 +70,7 @@
                                     <option <?= !empty($detail) ? ($detail['pembayaranDetail']['bank_id'] == $b->id ? 'selected' : '') : '' ?> value="<?= $b->id ?>"><?= strtoupper($b->kode_bank) ?></option>
                                 <?php endforeach ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Kode Bank</label>
+                            <label for="floatingInput" style="z-index: 1;">Kode Bank (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -239,8 +239,8 @@
                                                     <th style="text-align: center;">Total Order</th>
                                                     <th style="text-align: center;">Total Diterima</th>
                                                     <th style="text-align: center;">Total Bayar</th>
-                                                    <th style="text-align: center;">Sisa Bayar</th>
-                                                    <th style="text-align: center;">Input Harga</th>
+                                                    <!-- <th style="text-align: center;">Sisa Bayar</th>
+                                                    <th style="text-align: center;">Input Harga</th> -->
 
                                                 </tr>
                                             </thead>
@@ -364,9 +364,9 @@
             no_bukti_pembayaran: {
                 required: true
             },
-            bank_id: {
-                required: true
-            },
+            // bank_id: {
+            //     required: true
+            // },
             divisi_id: {
                 required: true
             },
@@ -405,9 +405,9 @@
             no_bukti_pembayaran: {
                 required: "No. Pembayaran wajib diisi"
             },
-            bank_id: {
-                required: "Kode bank wajib diisi"
-            },
+            // bank_id: {
+            //     required: "Kode bank wajib diisi"
+            // },
             divisi_id: {
                 required: "Departemen wajib diisi"
             },
@@ -951,10 +951,10 @@
             newRow.append($('<td style="text-align:center;">').text(v.total_order));
             newRow.append($('<td style="text-align:center;">').text(v.total_diterima));
             newRow.append($('<td style="text-align:center;">').text(formatRupiah(v.total_tagihan)));
-            newRow.append($('<td style="text-align:center;">').text(formatRupiah(v.sisa_pembayaran)));
-            newRow.append($('<td>').html(
+            // newRow.append($('<td style="text-align:center;">').text(formatRupiah(v.sisa_pembayaran)));
+            newRow.append($('<td class="hidden" style="display:none;">').html(
                 `
-                        <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> oninput="limitInputBayar(this, ${v.total_number + v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="${formatRupiah (v.total_number)}" name = "pembayaran" style="height:40px">
+                        <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> oninput="limitInputBayar(this, ${v.total_number + v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="${formatRupiah (v.total_tagihan)}" name = "pembayaran" style="height:40px">
                                 `
             ));
             table.find('tbody').append(newRow);
@@ -963,8 +963,8 @@
         newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN  </b></td>'));
         newRow.append(($('<td </td>')));
         newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
+        // newRow.append(($('<td </td>')));
+        // newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:right;" ><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="' + formatRupiah(data.total_pembayaran) + '" name = "total_pembayaran"  readonly>' +
             '</b></td>'));
@@ -974,8 +974,8 @@
         newRow.append($('<td style="text-align:right;" colspan="6"><b>POTONGAN/DISKON</b></td>'));
         newRow.append(($('<td </td>')));
         newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
+        // newRow.append(($('<td </td>')));
+        // newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:center;"><b>' +
             '  <input <?= !empty($detail) ? 'disabled' : '' ?> oninput="preventNegativeInput(this)" name="potongan" id="potongan" autocomplete="one-time-code" value="<?= !empty($detail) ? number_format($detail['pembayaranDetail']['potongan_harga'], 2) : '0' ?>" type="text" class="form-control trigger-input" placeholder="Nominal Pembayaran">' +
             '</b></td>'));
@@ -985,8 +985,8 @@
         newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN PANJAR</b></td>'));
         newRow.append(($('<td </td>')));
         newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
+        // newRow.append(($('<td </td>')));
+        // newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value="' + formatRupiah(data.total_bayar_panjar) + ' " name = "total_pembayaran_panjar" readonly>' +
             '</b></td>'));
@@ -997,8 +997,8 @@
         newRow.append($('<td style="text-align:right;" colspan="6"><b>GRAND TOTAL</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' + data.total_order + '</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' + data.total_diterima + '</b></td>'));
-        newRow.append($('<td style="text-align:center;"><b>' + formatRupiah(data.total_tagihan) + '</b></td>'));
-        newRow.append(($('<td </td>')));
+        // newRow.append($('<td style="text-align:center;"><b>' + formatRupiah(data.total_tagihan) + '</b></td>'));
+        // newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control grand-total" type="text" value="' + formatRupiah(data.total_akhir) + '" name = "grand_total"  readonly>' +
             '</b></td>'));
@@ -1039,10 +1039,10 @@
             newRow.append($('<td style="text-align:center;">').text(v.total_order));
             newRow.append($('<td style="text-align:center;">').text(v.total_diterima));
             newRow.append($('<td style="text-align:center;">').text(v.total_tagihan));
-            newRow.append($('<td style="text-align:center;">').text(formatRupiah(v.sisa_pembayaran)));
-            newRow.append($('<td>').html(
+            // newRow.append($('<td style="text-align:center;">').text(formatRupiah(v.sisa_pembayaran)));
+            newRow.append($('<td class="hidden" style="display:none;">').html(
                 `
-                        <input  onchange="this.value = formatRupiah(this.value)"  oninput="limitInputBayar(this, ${v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="" name = "pembayaran" style="height:40px">
+                        <input  onchange="this.value = formatRupiah(this.value)"  oninput="limitInputBayar(this, ${v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="${v.total_tagihan}" name = "pembayaran" style="height:40px">
                                 `
             ));
             table.find('tbody').append(newRow);
@@ -1056,18 +1056,16 @@
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN  </b></td>'));
         newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
+        // newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:right;" ><b>' +
-            '<input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="" name = "total_pembayaran"  readonly>' +
+            '<input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="'+ TotalHarga +'" name = "total_pembayaran"  readonly>' +
             '</b></td>'));
         table.find('tbody').append(newRow);
 
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>POTONGAN/DISKON</b></td>'));
         newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
+        // newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:center;"><b>' +
             '  <input <?= !empty($detail) ? 'disabled' : '' ?> onchange="this.value = formatRupiah(this.value)" oninput="preventNegativeInput(this)" name="potongan" id="potongan" autocomplete="one-time-code" value="<?= !empty($detail) ? number_format($detail['pembayaranDetail']['potongan_harga'], 2) : '0' ?>" type="text" class="form-control trigger-input" placeholder="Nominal Pembayaran">' +
             '</b></td>'));
@@ -1077,8 +1075,8 @@
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PANJAR</b></td>'));
         newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
+        // newRow.append(($('<td </td>')));
+        // newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value="" name = "total_pembayaran_panjar" readonly>' +
             '</b></td>'));
@@ -1088,13 +1086,14 @@
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>GRAND TOTAL</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' + TotalOrder + '</b></td>'));
-        newRow.append($('<td style="text-align:center;"><b>' + TotalDiterima + '</b></td>'));
-        newRow.append($('<td style="text-align:center;"><b>' + formatRupiah(TotalHarga) + '</b></td>'));
+        // newRow.append($('<td style="text-align:center;"><b>' + TotalDiterima + '</b></td>'));
+        // newRow.append($('<td style="text-align:center;"><b>' + formatRupiah(TotalHarga) + '</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control grand-total" type="text" value="" name = "grand_total"  readonly>' +
             '</b></td>'));
 
         table.find('tbody').append(newRow);
+        updateGrandTotal()
     }
 
     function preventNegativeInput(inputElement) {
@@ -1335,7 +1334,7 @@
         updateGrandTotal();
     });
 
-    function updateGrandTotal(potongan) {
+    function updateGrandTotal() {
         var totalBayarPanjar = 0;
         if ($(".total-bayar-panjar").length) {
             totalBayarPanjar = convertRupiahToNumber($(".total-bayar-panjar").val()) || 0;

@@ -1086,7 +1086,7 @@ class BC23 extends BaseController
 
         $data = [
             'kodeFasilitasTarif' => $this->metaDataModel
-                ->where('name', "Kode Fasilitas Tarif BC")->whereIn('description', ['TIDAK DIPUNGUT', 'DIBEBASKAN', 'DITANGGUHKAN'])
+                ->where('name', "Kode Fasilitas Tarif BC")->whereIn('description', ['TIDAK DIPUNGUT', 'DIBEBASKAN', 'DITANGGUHKAN', 'SUDAH DILUNASI'])
                 ->findAll(),
             'kodeJenisTarif' => $this->metaDataModel
                 ->where('name', "Kode Jenis Tarif BC")
