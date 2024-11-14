@@ -100,7 +100,7 @@
                     ?>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select doc_id" multiple name="doc_id[]" id="doc_id" <?= !empty($documentData) && $data->status_posting != "0" ? 'disabled' : ($data->document_type == 'penjualan' ? 'disabled' : ''); ?>>
+                            <select class="form-select doc_id" multiple name="doc_id[]" id="doc_id" <?= !empty($documentData) && $data->status_posting != "0" ? 'disabled' : (!empty($data) && $data->document_type == 'penjualan' ? 'disabled' : ''); ?>>
                                 <option value=""></option>
                                 <?php if (!empty($data)) : ?>
                                     <?php if (!empty($selectedDocIds)) : ?>
