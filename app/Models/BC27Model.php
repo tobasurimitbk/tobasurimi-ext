@@ -204,7 +204,7 @@ class BC27Model extends Model
         if ($payload == null) {
             $isCompleteForm = false;
         } else {
-            if (count($payload->kontainer) != 0 && count($payload->kemasan) != 0) {
+            if (count($payload->kemasan) != 0) {
                 $isCompleteForm = true;
             } else {
                 $isCompleteForm = false;
