@@ -169,13 +169,40 @@
                         </div>
                     </div>
                 </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-light">
+                            Jika ada Tagihan Diluar Invoice (Tagihan Lain-Lain), Silahkan Diinputkan Pada Form Dibawah
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Deskripsi Tagihan">
+                            <label for="floatingInput">Nama Tagihan / Invoice</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Pembayaran Oleh">
+                                <label for="floatingInput">Total Tagihan</label>
+                            </div>
+                            <div class="input-group-append" style="height:50px;">
+                                <button class="btn btn-success btn-add-barang" data-toggle="modal" type="button">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="table-responsive">
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" id="dataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr style="color: whitesmoke;">
                                     <th style="text-align: center;">Kode Barang</th>
-                                    <th style="text-align: center;">Nama Barang</th>
+                                    <th style="text-align: center;">Nama Barang / Invoice</th>
                                     <th style="text-align: center;">Qty</th>
                                     <th style="text-align: center;">Harga Satuan</th>
                                     <th style="text-align: center;">Amount</th>
