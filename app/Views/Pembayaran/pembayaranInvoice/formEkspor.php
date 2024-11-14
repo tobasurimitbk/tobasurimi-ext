@@ -772,14 +772,14 @@
                 var newRow3 = $('<tr style="color:whitesmoke;">');
                 newRow3.append($('<td colspan="4" style="text-align: right;">').text("Potongan"));
                 newRow3.append($('<td style="text-align:center;"><b>' +
-                    `<input autocomplete="one-time-code" data-id="" <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = formatRupiah2(this.value)" class="form-control potongan trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah2($detail['potongan'])  : '' ?>" name="potongan" oninput="limitInputBayar(this, ${limit_bayar})">` +
+                    `<input autocomplete="one-time-code" data-id="" <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = formatRupiah2(this.value)" class="form-control potongan trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['potongan'])  : '' ?>" name="potongan" oninput="limitInputBayar(this, ${limit_bayar})">` +
                     '</b></td>'));
                 table.find('tbody').append(newRow3);
 
                 var newRow4 = $('<tr style="color:whitesmoke;">');
                 newRow4.append($('<td colspan="4" style="text-align: right;">').text("Pembayaran"));
                 newRow4.append($('<td style="text-align:center;"><b>' +
-                    `<input autocomplete="one-time-code" data-id="" <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = formatRupiah2(this.value)" class="form-control total-bayar trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah2($detail['total_bayar'])  : '' ?>" name = "total_bayar"> ` +
+                    `<input autocomplete="one-time-code" data-id="" <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = formatRupiah2(this.value)" class="form-control total-bayar trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['total_bayar'])  : '' ?>" name = "total_bayar"> ` +
                     '</b></td>'));
                 table.find('tbody').append(newRow4);
 
