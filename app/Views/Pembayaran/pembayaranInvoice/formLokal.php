@@ -93,6 +93,19 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select divisi_id " name="divisi_id" id="divisi_id">
+                                <option value=""></option>
+                                <?php foreach ($divisi as $d): ?>
+                                    <option <?= !empty($detail) ? ($detail['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                        <?= $d['divisi'] ?>
+                                    </option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Departemen</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select no_dokumen" name="no_dokumen" id="no_dokumen">
                                 <option value=""></option>
                                 <?php if (!empty($dokumenList)): ?>
@@ -104,17 +117,12 @@
                             <label for="floatingInput" style="z-index: 1;">No Dokumen</label>
                         </div>
                     </div>
-
-                </div>
-                <div class="row">
-
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input readonly name="customer" id="customer" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['customer_name'] : "" ?>" type="text" class="form-control customer" placeholder="Customer">
                             <label for="floatingInput">Customer</label>
                         </div>
                     </div>
-
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select payment_methods " name="payment_methods" id="payment_methods">
@@ -132,10 +140,6 @@
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
-
-                </div>
-
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?>class="form-select" name="akun_kas" id="akun_kas">
@@ -165,8 +169,6 @@
                         </div>
                     </div>
                 </div>
-
-
                 <div class="row">
                     <div class="table-responsive">
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" id="dataTable" width="100%" cellspacing="0">
@@ -223,6 +225,9 @@
                 customer: {
                     required: true
                 },
+                divisi_id: {
+                    required: true
+                },
                 valas: {
                     required: true
                 },
@@ -257,6 +262,9 @@
                 },
                 customer: {
                     required: "Customer wajib diisi"
+                },
+                divisi_id: {
+                    required: "Departemen Wajib Diisi"
                 },
                 valas: {
                     required: "Valas wajib diisi"
