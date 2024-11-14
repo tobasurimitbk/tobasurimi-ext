@@ -12,17 +12,17 @@
 
             <?php if (!empty($detail)) : ?>
                 <?php if ($detail['status_posting'] == "0") : ?>
-                    <?php if (can('Pembayaran', 'Lokal BP', 'd')) : ?>
+                    <?php if (can('Pembayaran', 'Pembayaran Invoice', 'd')) : ?>
                         <button onclick="remove('<?= encrypt($detail['id']) ?>')" class="btn btn-hapus delete-parent float-right">
                             Hapus
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Pembayaran', 'Lokal BP', 'a')) : ?>
+                    <?php if (can('Pembayaran', 'Pembayaran Invoice', 'a')) : ?>
                         <button onclick="posting('<?= encrypt($detail['id']) ?>')" class="btn btn-success posting-spp float-right posting">
                             Posting
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Pembayaran', 'Lokal BP', 'u')) : ?>
+                    <?php if (can('Pembayaran', 'Pembayaran Invoice', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-form">
                             Update
                         </button>
