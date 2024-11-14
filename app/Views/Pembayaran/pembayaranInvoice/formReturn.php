@@ -29,11 +29,6 @@
                         </button>
                     <?php endif; ?>
                 <?php endif; ?>
-                <?php if (can('Pembayaran', 'Pembayaran Invoice', 'p')) : ?>
-                    <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bp/print/' . encrypt($detail['id']) ?? '') ?>">
-                        <i class="fa-solid fa-print"></i> Print
-                    </a>
-                <?php endif; ?>
 
             <?php else : ?>
                 <?php if (can('Pembayaran', 'Pembayaran Invoice', 'c')) : ?>

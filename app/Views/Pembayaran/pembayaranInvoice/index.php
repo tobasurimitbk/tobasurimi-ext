@@ -169,14 +169,6 @@
                         `;
 
                         form += `
-                            <?php if (can('Pembayaran', 'Pembayaran Invoice', 'p')) : ?>
-                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-import/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
-                            <?php endif; ?>
-                        `;
-
-                        form += `
                             <?php if (can('Pembayaran', 'Pembayaran Invoice', 'a')) : ?>
                                 <button data-toggle="tooltip" title="Posting" onclick="posting('${id}', 1)" class="btn btn-success posting-spp">
                                     <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
@@ -184,13 +176,7 @@
                             <?php endif; ?>
                         `;
                     } else {
-                        form += `
-                            <?php if (can('Pembayaran', 'Pembayaran Invoice', 'p')) : ?>
-                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-import/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
-                            <?php endif; ?>
-                        `;
+
                     }
 
                     form += ` </div>`;

@@ -29,11 +29,6 @@
                         </button>
                     <?php endif; ?>
                 <?php endif; ?>
-                <?php if (can('Pembayaran', 'Lokal BP', 'p')) : ?>
-                    <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bp/print/' . encrypt($detail['id']) ?? '') ?>">
-                        <i class="fa-solid fa-print"></i> Print
-                    </a>
-                <?php endif; ?>
 
             <?php else : ?>
                 <?php if (can('Pembayaran', 'Lokal BP', 'c')) : ?>
@@ -124,8 +119,8 @@
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select payment_methods " name="payment_methods" id="payment_methods">
                                 <option value=""></option>
-                                <option value="BANK">BANK</option>
-                                <option value="CASH">CASH</option>
+                                <option <?= !empty($detail) ? ($detail['payment_method'] == 'bank' ? 'selected' : '') : '' ?> value="BANK">BANK</option>
+                                <option <?= !empty($detail) ? ($detail['payment_method'] == 'cash' ? 'selected' : '') : '' ?> value="CASH">CASH</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Payment Methods</label>
                         </div>
