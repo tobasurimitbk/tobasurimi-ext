@@ -168,7 +168,34 @@
                         </div>
                     </div>
                 </div>
-
+                
+                <hr>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-light">
+                            Jika ada Tagihan Diluar Invoice (Tagihan Lain-Lain), Silahkan Diinputkan Pada Form Dibawah
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="nama_tagihan_lain_lain" id="nama_tagihan_lain_lain" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Deskripsi Tagihan">
+                            <label for="floatingInput">Nama Tagihan / Invoice</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="total_tagihan_lain_lain" id="total_tagihan_lain_lain" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Pembayaran Oleh">
+                                <label for="floatingInput">Total Tagihan</label>
+                            </div>
+                            <div class="input-group-append" style="height:50px;">
+                                <button class="btn btn-success btn-add-barang" data-toggle="modal" type="button">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="table-responsive">
@@ -180,6 +207,7 @@
                                     <th style="text-align: center;">Qty</th>
                                     <th style="text-align: center;">Harga Satuan</th>
                                     <th style="text-align: center;">Amount</th>
+                                    <th style="text-align: center;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -361,6 +389,40 @@
             const csrf = $(`[name="${csrfToken}"]`);
 
 
+            // Ambil data dari tabel
+            let tableData = [];
+            $("#body-detail-table tr").each(function() {
+                let kodeBarang = $(this).find("td:eq(2)").text(); // Pastikan indeks sesuai posisi kolom kode_barang
+                let salesOrderReturnDetailId = $(this).find("td:eq(0)").text(); // Pastikan indeks sesuai posisi kolom
+                let salesOrderReturnId = $(this).find("td:eq(1)").text(); // Pastikan indeks sesuai posisi kolom
+                let namaBarang = $(this).find("td:eq(3)").text(); // Pastikan indeks sesuai posisi kolom nama_barang
+                let qty = $(this).find("td:eq(4)").text();
+                let hargaSatuan = $(this).find("td:eq(5)").text();
+                let amount = $(this).find("td:eq(6)").text();
+
+                // Cek row untuk validasi atau "LAIN LAIN"
+                if (kodeBarang && kodeBarang !== "Total Sudah Dibayar" && kodeBarang !== "Total Amount Invoice" && kodeBarang !== "Potongan" && kodeBarang !== "Pembayaran") {
+                    tableData.push({
+                        sales_order_return_detail_id: kodeBarang === "LAIN LAIN" ? "" : salesOrderReturnDetailId,
+                        sales_order_return_id: kodeBarang === "LAIN LAIN" ? "" : salesOrderReturnId,
+                        kode_barang: kodeBarang,
+                        nama_barang: namaBarang,
+                        qty: qty,
+                        harga_satuan: hargaSatuan,
+                        amount: amount
+                    });
+                }
+            });
+
+
+
+
+              // Ambil total amount, potongan, dan pembayaran dari form/input
+                let totalAmount = parseFloat($('.total_amount_invoice').text().replace(/\./g, '').replace(',', '.'));
+                let potongan = $('.potongan').val() ? convertRupiahToNumber($('.potongan').val()) : 0;
+                let pembayaran = $('.total-bayar').val() ? convertRupiahToNumber($('.total-bayar').val()) : 0;
+
+
 
             if (id) {
                 // UPDATE
@@ -377,7 +439,12 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             let formData = new FormData(document.querySelector(".create-form"));
-                            formData.append('total_amount_invoice', $(".total_amount_invoice").text());
+                            // formData.append('total_amount_invoice', $(".total_amount_invoice").text());
+                            formData.append('total_amount_invoice', totalAmount);
+                            formData.append('potongan', potongan);
+                            formData.append('pembayaran', pembayaran);
+                            formData.append('tableData', JSON.stringify(tableData));
+
                             $.ajax({
 
                                 url: "<?= base_url("/pembayaran-invoice/update"); ?>",
@@ -441,7 +508,11 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             let formData = new FormData(document.querySelector(".create-form"));
-                            formData.append('total_amount_invoice', $(".total_amount_invoice").text());
+                            // formData.append('total_amount_invoice', $(".total_amount_invoice").text());
+                            formData.append('total_amount_invoice', totalAmount);
+                            formData.append('potongan', potongan);
+                            formData.append('pembayaran', pembayaran);
+                            formData.append('tableData', JSON.stringify(tableData));
                             $.ajax({
                                 url: "<?= base_url("pembayaran-invoice/save"); ?>",
                                 data: formData,
@@ -693,7 +764,8 @@
             method: "GET",
             dataSrc: "data",
             data: {
-                id: $("#no_dokumen").val()
+                id: $("#no_dokumen").val(),
+                pembayaran_invoice_id: "<?= !empty($detail) ? encrypt($detail['id']) : '' ?>"
             },
             beforeSend: function(xhr) {
                 // setLoading();
@@ -704,6 +776,7 @@
             },
             dataType: "json",
             success: function(res) {
+                console.log(res);
                 const table = $('#dataTable');
                 table.find('tbody').empty();
                 var total_amount = 0;
@@ -711,16 +784,18 @@
                 var limit_bayar = 0;
                 $.each(res.data, function(index, item) {
                     var newRow = $('<tr style="color:whitesmoke;">');
+                    newRow.append($('<td style="text-align:center; display:none;" >').text(item.sales_order_return_detail_id));
+                    newRow.append($('<td style="text-align:center; display:none;" >').text(item.sales_order_return_id));
                     newRow.append($('<td style="text-align:center;" >').text(item.kode_barang));
                     newRow.append($('<td style="text-align:center;">').text(item.barang_name));
-                    newRow.append($('<td style="text-align:center;">').text(item.qty_konversi));
-                    newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_satuan)));
-                    newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.total_harga)));
+                    newRow.append($('<td style="text-align:center;">').text(item.qty_return));
+                    newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_return)));
+                    newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.amount_return)));
                     table.find('tbody').append(newRow);
-                    total_amount += parseFloat(item.total_harga);
+                    total_amount += parseFloat(item.amount_return);
                 });
                 total_invoice = res.totalPembayaran;
-                var newRow1 = $('<tr style="color:whitesmoke;">');
+                var newRow1 = $('<tr style="color:whitesmoke;" class="total-dibayar-row">');
                 newRow1.append($('<td colspan="4" style="text-align: right;">').text("Total Sudah Dibayar"));
                 newRow1.append($('<td class="total_dibayar" style="text-align:center;">').text(formatRupiah2(total_invoice)));
                 table.find('tbody').append(newRow1);
@@ -747,8 +822,9 @@
                 table.find('tbody').append(newRow4);
 
                 $(document).on("input", ".total-bayar, .potongan", function() {
+                    let totalAmount = parseFloat($('.total_amount_invoice').text().replace(/\./g, '').replace(',', '.'));
                     var potongan = $('.potongan').val() ? convertRupiahToNumber($('.potongan').val()) : 0;
-                    limit_bayar = parseFloat(total_amount) - parseFloat(total_invoice) - parseFloat(potongan);
+                    limit_bayar = totalAmount - parseFloat(total_invoice) - parseFloat(potongan);
 
                     $('input.total-bayar').attr('oninput', `limitInputBayar(this, ${limit_bayar})`);
 
@@ -759,6 +835,98 @@
             }
         })
     }
+
+    function recalculateTable() {
+    let totalAmount = 0;
+    let totalDibayar = parseRupiahToNumber($('.total_dibayar').text());
+    let potongan = parseRupiahToNumber($('.potongan').val());
+
+    // Hitung ulang total amount berdasarkan data di tabel
+    $('#dataTable tbody tr:not(.total-dibayar-row)').each(function () {
+        const rowAmount = parseRupiahToNumber($(this).find('td:eq(6)').text());
+        totalAmount += rowAmount;
+    });
+
+    // Update Total Amount Invoice
+    $('.total_amount_invoice').text(formatRupiah2(totalAmount));
+
+    // Update limit bayar
+    const sanitizedTotalDibayar = Math.max(totalDibayar, 0);
+    const sanitizedPotongan = Math.max(potongan, 0);
+    let limitBayar = totalAmount - sanitizedTotalDibayar - sanitizedPotongan;
+
+    // Prevent negative limit bayar
+    if (limitBayar < 0) {
+        limitBayar = 0;
+    }
+
+    // Update limit bayar di input pembayaran
+    $('input.total-bayar').attr('oninput', `limitInputBayar(this, ${limitBayar})`);
+    console.log("Recalculated Limit Bayar: ", limitBayar);
+}
+
+function parseRupiahToNumber(value) {
+    if (!value) return 0;
+    return parseFloat(value.replace(/\./g, '').replace(',', '.')) || 0;
+}
+
+// Event untuk potongan dan total bayar
+$(document).on("input", ".potongan, .total-bayar", function () {
+    recalculateTable();
+});
+
+// Event hapus row
+$(document).on("click", ".btn-delete-row", function () {
+    $(this).closest('tr').remove();
+    recalculateTable();
+});
+
+// Event tambah row baru
+$(document).on("click", ".btn-add-barang", function () {
+    addRowToTable();
+});
+
+function addRowToTable() {
+    const namaTagihan = $("#nama_tagihan_lain_lain").val();
+    const totalTagihan = $("#total_tagihan_lain_lain").val() ? parseFloat($("#total_tagihan_lain_lain").val()) : 0;
+    const qty = 1;
+
+    if (!namaTagihan || totalTagihan <= 0) {
+        alert("Nama Tagihan / Invoice dan Total Tagihan harus diisi");
+        return;
+    }
+
+    const newRow = $(` 
+        <tr style="color:whitesmoke;" data-kategori="LAIN LAIN">
+            <td style="text-align:center; display:none;"></td>
+            <td style="text-align:center; display:none;"></td>
+            <td style="text-align:center;">LAIN LAIN</td>
+            <td style="text-align:center;">${namaTagihan}</td>
+            <td style="text-align:center;">${qty}</td>
+            <td style="text-align:center;">${formatRupiah2(totalTagihan)}</td>
+            <td style="text-align:center;">${formatRupiah2(totalTagihan * qty)}</td>
+            <td style="text-align:center;">
+                <button class="btn-delete-row"><i class="fa fa-trash"></i></button>
+            </td>
+        </tr>
+    `);
+
+    const totalRow = $("#dataTable").find('tbody tr.total-dibayar-row').first();
+    if (totalRow.length) {
+        totalRow.before(newRow);
+    } else {
+        $("#dataTable").find('tbody').append(newRow);
+    }
+
+    recalculateTable();
+    $("#nama_tagihan_lain_lain").val('');
+    $("#total_tagihan_lain_lain").val('');
+}
+
+$(document).ready(function () {
+    recalculateTable();
+});
+
 
     function getCustomer() {
         let invoice_id = $("#no_dokumen").val();
