@@ -19,6 +19,7 @@ use App\Models\SalesOrderLainDetailModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SalesOrderExportDetailModel;
 use App\Models\MetadataModel;
+use App\Models\PembayaranInvoiceDetailModel;
 use App\Models\SalesOrderReturnDetailModel;
 use App\Models\SalesOrderReturnModel;
 use Exception;
@@ -41,6 +42,7 @@ class PembayaranInvoice extends BaseController
     protected $salesOrderInvoiceDetailModel;
     protected $salesOrderReturnModel;
     protected $salesOrderReturnDetailModel;
+    protected $pembayaranInvoiceDetailModel;
     protected $metaDataModel;
 
 
@@ -54,6 +56,7 @@ class PembayaranInvoice extends BaseController
         $this->supplierList = new SupplierModel();
         $this->Sub_AkunsModel = new Sub_AkunsModel();
         $this->pembayaranInvoiceModel = new PembayaranInvoiceModel();
+        $this->pembayaranInvoiceDetailModel = new PembayaranInvoiceDetailModel();
         $this->customerModel = new CustomerModel();
         $this->salesOrderLainModel = new SalesOrderLainModel();
         $this->salesOrderLainDetailModel = new SalesOrderLainDetailModel();
@@ -314,8 +317,7 @@ class PembayaranInvoice extends BaseController
                     ->join('customers', 'customers.id = sales_order_invoice.id_customer')
                     ->where('sales_order_invoice.id', $p['invoice_id'])
                     ->first();
-                $nomor_invoice = $salesOrderLokalInvoiceData['document_no'];
-                $nomor_invoice = str_replace(['[', ']', '"'], "", $nomor_invoice);
+                $nomor_invoice = $salesOrderLokalInvoiceData['no_faktur'];
                 $customer_name = $salesOrderLokalInvoiceData['name'];
             } elseif ($p['type_invoice'] == "EKSPOR") {
                 $salesOrderExportData = $this->salesOrderExportModel
@@ -399,20 +401,43 @@ class PembayaranInvoice extends BaseController
     public function getBarangSalesLokal()
     {
         $id = decrypt($this->request->getVar('id'));
+        $pembayaranInvoiceId = decrypt($this->request->getVar('pembayaran_invoice_id'));
+
+
         $dataBarang = [];
         $totalPembayaran = 0;
         $totalAmountInvoice = 0;
         $salesOrderInvoiceData = $this->salesOrderInvoiceModel->where('id', $id)->first();
         $salesOrderInvoiceDetailData = $this->salesOrderInvoiceDetailModel
-            ->select('qty_invoice, harga_barang_invoice, qty_invoice, amount_invoice, kode_barang, barang_name')
+            ->select('sales_order_invoice_detail.id as sales_order_invoice_detail_id, sales_order_invoice_detail.id_sales_order_invoice as sales_order_invoice_id, qty_invoice, harga_barang_invoice, qty_invoice, amount_invoice, kode_barang, barang_name')
             ->join('barang_master_sales', 'sales_order_invoice_detail.id_barang_invoice = barang_master_sales.id')
             ->where('id_sales_order_invoice', $id)
             ->where('sales_order_invoice_detail.deletedAt', null)
             ->findAll();
+
+        if ($pembayaranInvoiceId) {
+            $pembayaranInvoiceDatail = $this->pembayaranInvoiceDetailModel->where('pembayaran_invoice_id', $pembayaranInvoiceId)->where('sales_order_invoice_id', null)->findAll();
+        }
+
         foreach ($salesOrderInvoiceDetailData as $s) {
             $totalAmountInvoice += $s['amount_invoice'];
             array_push($dataBarang, $s);
         }
+
+        if (isset($pembayaranInvoiceDatail)) {
+            foreach ($pembayaranInvoiceDatail as $p) {
+                array_push($dataBarang, [
+                    "sales_order_invoice_detail_id" => $p['sales_order_invoice_detail_id'],
+                    "sales_order_invoice_id" => $p['sales_order_invoice_id'],
+                    "qty_invoice" => $p['qty'],
+                    "harga_barang_invoice" => $p['harga_satuan'],
+                    "amount_invoice" => $p['harga_total'],
+                    "kode_barang" => "LAIN-LAIN",
+                    "barang_name" => $p['nama_barang']
+                ]);
+            }
+        }
+
         $pembayaranInvoiceData = $this->pembayaranInvoiceModel
             ->where('pembayaran_invoice.company_id', $this->this_company_id)
             ->where('pembayaran_invoice.invoice_id', $id)
@@ -613,6 +638,19 @@ class PembayaranInvoice extends BaseController
                     'status_posting' => '0'
                 ]);
 
+                foreach (json_decode($_POST['list_barang']) as $l) {
+                    $this->pembayaranInvoiceDetailModel->insert([
+                        'pembayaran_invoice_id' => $id,
+                        'sales_order_invoice_id' => $l->sales_order_invoice_id,
+                        'sales_order_invoice_detail_id' => $l->sales_order_invoice_detail_id,
+                        'type_invoice' => "LOKAL",
+                        'nama_barang' => $l->barang_name,
+                        'qty' => $l->qty_invoice,
+                        'harga_satuan' => $l->harga_barang_invoice,
+                        'harga_total' => $l->amount_invoice
+                    ]);
+                }
+
                 return response()->setJSON([
                     'id' => encrypt($id),
                     'status' => true,
@@ -715,6 +753,7 @@ class PembayaranInvoice extends BaseController
                     'status' => false
                 ]);
             }
+
             $this->pembayaranInvoiceModel->update($id, [
                 'company_id' => $this->this_company_id,
                 'user_id' => $this->user_id,
@@ -732,6 +771,24 @@ class PembayaranInvoice extends BaseController
                 'status_posting' => '0',
                 'payment_method' => $this->request->getVar('payment_methods')
             ]);
+
+            $pembayaranInvoiceFirst = $this->pembayaranInvoiceModel->find($id);
+            // Delete Detail Lalu Insert Again
+            $this->pembayaranInvoiceDetailModel->where('pembayaran_invoice_id', $id)->delete();
+            foreach (json_decode($_POST['list_barang']) as $l) {
+                $this->pembayaranInvoiceDetailModel->insert([
+                    'pembayaran_invoice_id' => $id,
+                    'sales_order_invoice_id' => $l->sales_order_invoice_id,
+                    'sales_order_invoice_detail_id' => $l->sales_order_invoice_detail_id,
+                    'type_invoice' => $pembayaranInvoiceFirst['type_invoice'],
+                    'nama_barang' => $l->barang_name,
+                    'qty' => $l->qty_invoice,
+                    'harga_satuan' => $l->harga_barang_invoice,
+                    'harga_total' => $l->amount_invoice
+                ]);
+            }
+
+
             return response()->setJSON([
                 'id' => encrypt($id),
                 'status' => true,

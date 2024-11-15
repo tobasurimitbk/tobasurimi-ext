@@ -178,18 +178,18 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Deskripsi Tagihan">
+                            <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="nama_tagihan" id="nama_tagihan" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Deskripsi Tagihan">
                             <label for="floatingInput">Nama Tagihan / Invoice</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="input-group">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Pembayaran Oleh">
+                                <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="total_tagihan" id="total_tagihan" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Total Tagihan" onchange="this.value = formatRupiah2(this.value)">
                                 <label for="floatingInput">Total Tagihan</label>
                             </div>
                             <div class="input-group-append" style="height:50px;">
-                                <button class="btn btn-success btn-add-barang" data-toggle="modal" type="button">
+                                <button class="btn btn-success btn-add-barang" onclick="insertBarangLain()" data-toggle="modal" type="button">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
@@ -198,7 +198,7 @@
                 </div>
                 <div class="row">
                     <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" id="dataTable" width="100%" cellspacing="0">
+                        <table class="table table-bordered nowrap " id="dataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr style="color: whitesmoke;">
                                     <th style="text-align: center;">Kode Barang</th>
@@ -206,6 +206,7 @@
                                     <th style="text-align: center;">Qty</th>
                                     <th style="text-align: center;">Harga Satuan</th>
                                     <th style="text-align: center;">Amount</th>
+                                    <th style="text-align: center;">Action</th>
                                 </tr>
                             </thead>
                             <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -226,9 +227,8 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-
-
-
+    var dataList = [];
+    var totalPembayaran = 0;
 
     $(document).ready(function() {
 
@@ -371,7 +371,7 @@
             theme: "bootstrap-5",
             allowClear: true
         }).change(function() {
-            drawTable();
+            getDataSalesLokal();
             getCustomer();
         })
 
@@ -407,6 +407,7 @@
                         if (result.isConfirmed) {
                             let formData = new FormData(document.querySelector(".create-form"));
                             formData.append('total_amount_invoice', $(".total_amount_invoice").text());
+                            formData.append('list_barang', JSON.stringify(dataList));
                             $.ajax({
 
                                 url: "<?= base_url("/pembayaran-invoice/update"); ?>",
@@ -469,11 +470,12 @@
                         cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            const data = new FormData(document.querySelector(".create-form"));
-                            data.append('total_amount_invoice', $(".total_amount_invoice").text());
+                            const formData = new FormData(document.querySelector(".create-form"));
+                            formData.append('total_amount_invoice', $(".total_amount_invoice").text());
+                            formData.append('list_barang', JSON.stringify(dataList));
                             $.ajax({
                                 url: "<?= base_url("pembayaran-invoice/save"); ?>",
-                                data: data,
+                                data: formData,
                                 beforeSend: function(xhr) {
                                     setLoading();
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -494,7 +496,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = `<?= base_url("pembayaran-invoice/id/"); ?>` + response.id;
+                                                window.location.href = `<?= base_url("pembayaran-invoice"); ?>`;
                                             })
                                     } else {
                                         Swal.fire({
@@ -693,79 +695,148 @@
         })
     }
 
-    function drawTable() {
-        // const csrfToken = '<?= csrf_token() ?>';
-        // const csrf = $(`[name="${csrfToken}"]`);
+    function getDataSalesLokal() {
         $.ajax({
             url: "<?= base_url("pembayaran-invoice/get-barang-sales-lokal"); ?>",
             method: "GET",
             dataSrc: "data",
             data: {
-                id: $("#no_dokumen").val()
-            },
-            beforeSend: function() {
-                // setLoading();
-                // xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            complete: function() {
-                //stopLoading();
+                id: $("#no_dokumen").val(),
+                pembayaran_invoice_id: "<?= !empty($detail) ? encrypt($detail['id']) : '' ?>"
             },
             dataType: "json",
             success: function(res) {
-                const table = $('#dataTable');
-                table.find('tbody').empty();
-                var total_amount = 0;
-                var total_invoice = 0;
-                var limit_bayar = 0;
-                $.each(res.data, function(index, item) {
-                    var newRow = $('<tr style="color:whitesmoke;">');
-                    newRow.append($('<td style="text-align:center;" >').text(item.kode_barang));
-                    newRow.append($('<td style="text-align:center;">').text(item.barang_name));
-                    newRow.append($('<td style="text-align:center;">').text(item.qty_invoice));
-                    newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_invoice)));
-                    newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.amount_invoice)));
-                    table.find('tbody').append(newRow);
-                    total_amount += parseFloat(item.amount_invoice);
-                });
-                total_invoice = res.totalPembayaran;
-                var newRow1 = $('<tr style="color:whitesmoke;">');
-                newRow1.append($('<td colspan="4" style="text-align: right;">').text("Total Sudah Dibayar"));
-                newRow1.append($('<td class="total_dibayar" style="text-align:center;">').text(formatRupiah2(total_invoice)));
-                table.find('tbody').append(newRow1);
+                dataList = [];
+                totalPembayaran = res.totalPembayaran;
+                for (let i = 0; i < res.data.length; i++) {
+                    var data = res.data[i];
+                    dataList.push({
+                        id: getID(),
+                        qty_invoice: data.qty_invoice,
+                        harga_barang_invoice: data.harga_barang_invoice,
+                        amount_invoice: data.amount_invoice,
+                        kode_barang: data.kode_barang,
+                        barang_name: data.barang_name,
+                        sales_order_invoice_id: data.sales_order_invoice_id,
+                        sales_order_invoice_detail_id: data.sales_order_invoice_detail_id
 
-                var newRow2 = $('<tr style="color:whitesmoke;">');
-                newRow2.append($('<td colspan="4" style="text-align: right;">').text("Total Amount Invoice"));
-                newRow2.append($('<td class="total_amount_invoice" style="text-align:center;">').text(formatRupiah2(total_amount)));
-                table.find('tbody').append(newRow2);
-
-                limit_bayar = parseFloat(total_amount) - parseFloat(total_invoice);
-
-                var newRow3 = $('<tr style="color:whitesmoke;">');
-                newRow3.append($('<td colspan="4" style="text-align: right;">').text("Potongan"));
-                newRow3.append($('<td style="text-align:center;"><b>' +
-                    `<input autocomplete="one-time-code" data-id="" onchange="this.value = formatRupiah2(this.value)" class="form-control potongan trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['potongan'])  : '' ?>" name="potongan" oninput="limitInputBayar(this, ${limit_bayar})">` +
-                    '</b></td>'));
-                table.find('tbody').append(newRow3);
-
-                var newRow4 = $('<tr style="color:whitesmoke;">');
-                newRow4.append($('<td colspan="4" style="text-align: right;">').text("Pembayaran"));
-                newRow4.append($('<td style="text-align:center;"><b>' +
-                    `<input autocomplete="one-time-code" data-id="" onchange="this.value = formatRupiah2(this.value)" class="form-control total-bayar trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['total_bayar'])  : '' ?>" name = "total_bayar"> ` +
-                    '</b></td>'));
-                table.find('tbody').append(newRow4);
-
-                $(document).on("input", ".total-bayar, .potongan", function() {
-                    var potongan = $('.potongan').val() ? convertRupiahToNumber($('.potongan').val()) : 0;
-                    limit_bayar = parseFloat(total_amount) - parseFloat(total_invoice) - parseFloat(potongan);
-
-                    $('input.total-bayar').attr('oninput', `limitInputBayar(this, ${limit_bayar})`);
-
-                    if ($('.potongan').val() != "" || $('.potongan').val() != 0) {
-                        $('.total-bayar').val(limit_bayar).change()
-                    }
-                });
+                    });
+                }
+                drawTable(dataList);
             }
         })
+    }
+
+    function drawTable(dataList) {
+        const table = $('#dataTable');
+        table.find('tbody').empty();
+        var total_amount = 0;
+        var total_invoice = 0;
+        var limit_bayar = 0;
+        var total_invoice_barang_lain = 0;
+        $.each(dataList, function(index, item) {
+            var newRow = $('<tr style="color:whitesmoke;">');
+            newRow.append($('<td style="text-align:center;" >').text(item.kode_barang));
+            newRow.append($('<td style="text-align:center;">').text(item.barang_name));
+            newRow.append($('<td style="text-align:center;">').text(item.qty_invoice));
+            newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_invoice)));
+            newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.amount_invoice)));
+            if (item.kode_barang == "LAIN-LAIN") {
+                total_invoice_barang_lain += parseFloat(item.amount_invoice) || 0;
+                newRow.append($('<td style="text-align:center;">').html(
+                    `<button type="button" class="btn btn-danger" onclick="deleteBarang('${item.id}')" >
+                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                    </button>`
+                ));
+            } else {
+                newRow.append($('<td style="text-align:center;">').html(
+                    ``
+                ));
+            }
+
+            table.find('tbody').append(newRow);
+            total_amount += parseFloat(item.amount_invoice);
+        });
+        total_invoice = totalPembayaran;
+        var newRow1 = $('<tr style="color:whitesmoke;">');
+        newRow1.append($('<td colspan="4" style="text-align: right;">').text("Total Sudah Dibayar"));
+        newRow1.append($('<td class="total_dibayar" style="text-align:center;">').text(formatRupiah2(total_invoice)));
+        table.find('tbody').append(newRow1);
+
+        var newRow2 = $('<tr style="color:whitesmoke;">');
+        newRow2.append($('<td colspan="4" style="text-align: right;">').text("Total Amount Invoice"));
+        newRow2.append($('<td class="total_amount_invoice" style="text-align:center;">').text(formatRupiah2(total_amount)));
+        table.find('tbody').append(newRow2);
+
+        limit_bayar = parseFloat(total_amount) - parseFloat(total_invoice);
+
+        var newRow3 = $('<tr style="color:whitesmoke;">');
+        newRow3.append($('<td colspan="4" style="text-align: right;">').text("Potongan"));
+        newRow3.append($('<td style="text-align:center;"><b>' +
+            `<input autocomplete="one-time-code" data-id="" onchange="this.value = formatRupiah2(this.value)" class="form-control potongan trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['potongan'])  : '' ?>" name="potongan" oninput="limitInputBayar(this, ${limit_bayar})">` +
+            '</b></td>'));
+        table.find('tbody').append(newRow3);
+
+        var newRow4 = $('<tr style="color:whitesmoke;">');
+        newRow4.append($('<td colspan="4" style="text-align: right;">').text("Pembayaran"));
+        newRow4.append($('<td style="text-align:center;"><b>' +
+            `<input autocomplete="one-time-code" data-id="" onchange="this.value = formatRupiah2(this.value)" class="form-control total-bayar trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['total_bayar'])  : '' ?>" name = "total_bayar"> ` +
+            '</b></td>'));
+        table.find('tbody').append(newRow4);
+
+        $(document).on("input", ".total-bayar, .potongan", function() {
+            var potongan = $('.potongan').val() ? convertRupiahToNumber($('.potongan').val()) : 0;
+            limit_bayar = parseFloat(total_amount) - parseFloat(total_invoice) - parseFloat(potongan);
+            $('input.total-bayar').attr('oninput', `limitInputBayar(this, ${limit_bayar})`);
+
+            if ($('.potongan').val() != "" || $('.potongan').val() != 0) {
+                $('.total-bayar').val(limit_bayar).change()
+            }
+        });
+
+    }
+
+    function insertBarangLain() {
+        var namaTagihan = $('#nama_tagihan').val();
+        var totalTagihan = $('#total_tagihan').val();
+
+        if (namaTagihan == '' || totalTagihan == '') {
+            Swal.fire({
+                icon: 'error',
+                title: "Nama Tagihan dan Total Tagihan Wajib Diisi",
+                confirmButtonColor: '#4e73df',
+            })
+        } else {
+            dataList.push({
+                id: getID(),
+                qty_invoice: 1,
+                harga_barang_invoice: convertRupiahToNumber(totalTagihan),
+                amount_invoice: convertRupiahToNumber(totalTagihan),
+                kode_barang: "LAIN-LAIN",
+                barang_name: namaTagihan,
+                sales_order_invoice_id: null,
+                sales_order_invoice_detail_id: null
+            });
+
+            drawTable(dataList);
+            $('#nama_tagihan').val(null);
+            $('#total_tagihan').val(null);
+        }
+    }
+
+    function deleteBarang(id) {
+        var indexToRemove = -1;
+        for (let i = 0; i < dataList.length; i++) {
+            if (dataList[i].id == id) {
+                indexToRemove = i;
+                break;
+            }
+        }
+
+        if (indexToRemove !== -1) {
+            dataList.splice(indexToRemove, 1);
+            drawTable(dataList)
+        }
     }
 
     function getCustomer() {
@@ -812,11 +883,20 @@
         }
     }
 
+    function getID() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let randomString = '';
 
+        for (let i = 0; i < 10; i++) {
+            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
+        return randomString;
+    };
 
 
     <?php if (!empty($detail)) : ?>
-        drawTable();
+        getDataSalesLokal();
 
     <?php endif; ?>
 </script>
