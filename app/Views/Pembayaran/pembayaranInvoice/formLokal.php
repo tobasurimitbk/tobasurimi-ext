@@ -142,7 +142,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?>class="form-select" name="akun_kas" id="akun_kas">
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select" name="akun_kas" id="akun_kas">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($subsAkuns as $subs) : ?>
                                     <option <?= (!empty($detail)) ?  (($detail['akun_kas']) == $subs->id ? "selected" : "") : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
@@ -743,11 +743,26 @@
             newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.amount_invoice)));
             if (item.kode_barang == "LAIN-LAIN") {
                 total_invoice_barang_lain += parseFloat(item.amount_invoice) || 0;
-                newRow.append($('<td style="text-align:center;">').html(
-                    `<button type="button" class="btn btn-danger" onclick="deleteBarang('${item.id}')" >
+                <?php if (!empty($detail)): ?>
+                    <?php if ($detail['status_posting']): ?>
+                        newRow.append($('<td style="text-align:center;">').html(
+                            ``
+                        ));
+                    <?php else: ?>
+                        newRow.append($('<td style="text-align:center;">').html(
+                            `<button type="button" class="btn btn-danger" onclick="deleteBarang('${item.id}')" >
                         <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                     </button>`
-                ));
+                        ));
+                    <?php endif; ?>
+                <?php else: ?>
+                    newRow.append($('<td style="text-align:center;">').html(
+                        `<button type="button" class="btn btn-danger" onclick="deleteBarang('${item.id}')" >
+                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                    </button>`
+                    ));
+                <?php endif; ?>
+
             } else {
                 newRow.append($('<td style="text-align:center;">').html(
                     ``
