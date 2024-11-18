@@ -554,30 +554,53 @@ class PembayaranInvoice extends BaseController
     public function getBarangSalesReturn()
     {
         $id = decrypt($this->request->getVar('id'));
+        $pembayaranreturnId = decrypt($this->request->getVar('pembayaran_invoice_id'));
+
         $dataBarang = [];
         $totalPembayaran = 0;
-        $totalAmountInvoice = 0;
-        $salesOrderReturnDetailData = $this->salesOrderReturnDetailModel
-            ->select('kode_barang, barang_name, qty_return AS qty_konversi, harga_barang_return AS harga_satuan, amount_return AS total_harga')
-            // ->join('stock', 'stock.id = sales_order_return_detail.stock_id')
-            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_return_detail.id_barang_return')
+        $totalAmountreturn = 0;
+        $salesOrderreturnData = $this->salesOrderReturnModel->where('id', $id)->first();
+        $salesOrderreturnDetailData = $this->salesOrderReturnDetailModel
+            ->select('sales_order_return_detail.id as sales_order_return_detail_id, sales_order_return_detail.id_sales_order_return as sales_order_return_id, qty_return, harga_barang_return, qty_return, amount_return, kode_barang, barang_name')
+            ->join('barang_master_sales', 'sales_order_return_detail.id_barang_return = barang_master_sales.id')
+            ->where('id_sales_order_return', $id)
             ->where('sales_order_return_detail.deletedAt', null)
-            ->where('sales_order_return_detail.id_sales_order_return', $id)
             ->findAll();
-        foreach ($salesOrderReturnDetailData as $s) {
+
+        if ($pembayaranreturnId) {
+            $pembayaranInvoiceDetail = $this->pembayaranInvoiceDetailModel->where('pembayaran_invoice_id', $pembayaranreturnId)->where('sales_order_invoice_id', null)->findAll();
+        }
+
+        foreach ($salesOrderreturnDetailData as $s) {
+            $totalAmountreturn += $s['amount_return'];
             array_push($dataBarang, $s);
         }
-        $pembayaranInvoiceData = $this->pembayaranInvoiceModel
+
+        if (isset($pembayaranInvoiceDetail)) {
+            foreach ($pembayaranInvoiceDetail as $p) {
+                array_push($dataBarang, [
+                    "sales_order_return_detail_id" => $p['sales_order_invoice_detail_id'],
+                    "sales_order_return_id" => $p['sales_order_invoice_id'],
+                    "qty_return" => $p['qty'],
+                    "harga_barang_return" => $p['harga_satuan'],
+                    "amount_return" => $p['harga_total'],
+                    "kode_barang" => "LAIN-LAIN",
+                    "barang_name" => $p['nama_barang']
+                ]);
+            }
+        }
+
+        $pembayaranreturnData = $this->pembayaranInvoiceModel
             ->where('pembayaran_invoice.company_id', $this->this_company_id)
             ->where('pembayaran_invoice.invoice_id', $id)
             ->where('pembayaran_invoice.deletedAt', null)
             ->where('pembayaran_invoice.type_invoice', "RETURN")
             ->findAll();
-        foreach ($pembayaranInvoiceData as $s) {
+        foreach ($pembayaranreturnData as $s) {
             $totalPembayaran += $s['total_bayar'];
         }
 
-        // if ($totalAmountInvoice >= $totalPembayaran) {
+        // if ($totalAmountreturn >= $totalPembayaran) {
         $data = [
             'data' => $dataBarang,
             'totalPembayaran' => $totalPembayaran,
@@ -590,14 +613,11 @@ class PembayaranInvoice extends BaseController
         //         'status' => false
         //     ];
         // }
-
-
         return response()->setJSON($data);
     }
 
     public function saveLokalInvoice()
     {
-
         try {
             $check = $this->pembayaranInvoiceModel->where('company_id', $this->this_company_id)->where('no_pembayaran', $this->request->getVar('no_bukti_pembayaran'))->first();
             if ($check != null) {
@@ -725,6 +745,20 @@ class PembayaranInvoice extends BaseController
                     'akun_selisih' => $this->request->getVar('akun_selisih'),
                     'status_posting' => '0'
                 ]);
+
+
+                foreach (json_decode($_POST['tableData']) as $l) {
+                    $this->pembayaranInvoiceDetailModel->insert([
+                        'pembayaran_invoice_id' => $id,
+                        'sales_order_invoice_id' => (!isset($l->sales_order_return_id) || $l->sales_order_return_id == 0) ? null : $l->sales_order_return_id,
+                        'sales_order_invoice_detail_id' => (!isset($l->sales_order_return_detail_id) || $l->sales_order_return_detail_id == 0) ? null : $l->sales_order_return_detail_id,
+                        'type_invoice' => "RETUR",
+                        'nama_barang' => $l->nama_barang,
+                        'qty' => $l->qty,
+                        'harga_satuan' => $l->harga_satuan,
+                        'harga_total' => $l->amount
+                    ]);
+                }
 
                 return response()->setJSON([
                     'id' => encrypt($id),
