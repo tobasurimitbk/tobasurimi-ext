@@ -758,7 +758,7 @@
 
                 var newRow2 = $('<tr style="color:whitesmoke;">');
                 newRow2.append($('<td colspan="4" style="text-align: right;">').text("Total Amount Invoice"));
-                newRow2.append($('<td class="total_amount_invoice" style="text-align:center;">').text(formatRupiah2(total_amount)));
+                newRow2.append($('<td class="total_amount_invoice" style="text-align:center;">').text(formatRupiah2(total_amount - total_invoice)));
                 table.find('tbody').append(newRow2);
 
                 limit_bayar = parseFloat(total_amount) - parseFloat(total_invoice);
