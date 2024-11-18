@@ -178,7 +178,7 @@
                                     <th style="text-align: center;">Nama Barang</th>
                                     <th style="text-align: center;">Qty</th>
                                     <th style="text-align: center;">Harga Satuan</th>
-                                    <th style="text-align: center;">Amount</th>
+                                    <th style="text-align: center;">Sub Total</th>
                                 </tr>
                             </thead>
                             <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -727,13 +727,18 @@
                     total_amount += parseFloat(item.total_harga);
                 });
                 total_invoice = res.totalPembayaran;
+                var newRow0 = $('<tr style="color:whitesmoke;">');
+                newRow0.append($('<td colspan="4" style="text-align: right;">').text("Total Pembayaran"));
+                newRow0.append($('<td style="text-align:center;">').text(formatRupiah2(total_amount)));
+                table.find('tbody').append(newRow0);
+
                 var newRow1 = $('<tr style="color:whitesmoke;">');
                 newRow1.append($('<td colspan="4" style="text-align: right;">').text("Total Sudah Dibayar"));
                 newRow1.append($('<td class="total_dibayar" style="text-align:center;">').text(formatRupiah2(total_invoice)));
                 table.find('tbody').append(newRow1);
 
                 var newRow2 = $('<tr style="color:whitesmoke;">');
-                newRow2.append($('<td colspan="4" style="text-align: right;">').text("Total Amount Invoice"));
+                newRow2.append($('<td colspan="4" style="text-align: right;">').text("Sisa Pembayaran"));
                 newRow2.append($('<td class="total_amount_invoice" style="text-align:center;">').text(formatRupiah2(total_amount - total_invoice)));
                 table.find('tbody').append(newRow2);
 
@@ -748,7 +753,7 @@
 
 
                 var newRow4 = $('<tr style="color:whitesmoke;">');
-                newRow4.append($('<td colspan="4" style="text-align: right;">').text("Pembayaran"));
+                newRow4.append($('<td colspan="4" style="text-align: right;">').text("Anda Membayar Sebesar"));
                 newRow4.append($('<td style="text-align:center;"><b>' +
                     `<input autocomplete="one-time-code" data-id="" <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = formatRupiah2(this.value)" class="form-control total-bayar trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['total_bayar'])  : '' ?>" name = "total_bayar"> ` +
                     '</b></td>'));
