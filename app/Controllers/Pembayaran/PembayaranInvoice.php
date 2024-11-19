@@ -655,6 +655,8 @@ class PembayaranInvoice extends BaseController
                     'total_bayar' => repairDouble($this->request->getVar('total_bayar')),
                     'akun_kas' => $this->request->getVar('akun_kas'),
                     'akun_selisih' => $this->request->getVar('akun_selisih'),
+                    'akun_kas_lain' => $this->request->getVar('akun_kas_lain'),
+                    'akun_kredit_lain' => $this->request->getVar('akun_kredit_lain'),
                     'status_posting' => '0'
                 ]);
 
@@ -802,6 +804,8 @@ class PembayaranInvoice extends BaseController
                 'total_bayar' => repairDouble($this->request->getVar('total_bayar')),
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
+                'akun_kas_lain' => $this->request->getVar('akun_kas_lain'),
+                'akun_kredit_lain' => $this->request->getVar('akun_kredit_lain'),
                 'status_posting' => '0',
                 'payment_method' => $this->request->getVar('payment_methods')
             ]);

@@ -168,6 +168,28 @@
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select" name="akun_kas_lain" id="akun_kas_lain">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option <?= (!empty($detail)) ?  (($detail['akun_kas_lain']) == $subs->id ? "selected" : "") : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Debit Lain (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select" name="akun_kredit_lain" id="akun_kredit_lain">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option <?= (!empty($detail)) ?  (($detail['akun_kredit_lain']) == $subs->id ? "selected" : "") : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Kredit Lain (Opsional)</label>
+                        </div>
+                    </div>
                 </div>
                 <hr>
                 <div class="row">
@@ -652,18 +674,25 @@
     }
 
     function limitInputBayar(input, maxAmount) {
-
+        console.log(input)
         var inputValue = input.value;
+
+        // Hapus karakter non-numerik kecuali titik desimal
         var numericValue = inputValue.replace(/[^0-9.]/g, '');
+
+        // Pastikan angka gak diawali nol atau hanya titik
         numericValue = numericValue.replace(/^0+/g, '');
         numericValue = numericValue.replace(/^\./g, '0.');
 
+        // Validasi nilai angka: tidak boleh negatif atau NaN
         if (parseFloat(numericValue) < 0 || isNaN(parseFloat(numericValue))) {
             input.value = '0';
         } else {
             input.value = numericValue;
         }
-        if (numericValue > maxAmount) {
+
+        // Batas maksimum
+        if (parseFloat(numericValue) > maxAmount) {
             input.value = maxAmount;
         }
     }
@@ -734,6 +763,7 @@
         var total_invoice = 0;
         var limit_bayar = 0;
         var total_invoice_barang_lain = 0;
+        var total_invoice_non_lain = 0; // Variabel buat total non-LAIN-LAIN
         $.each(dataList, function(index, item) {
             var newRow = $('<tr style="color:whitesmoke;">');
             newRow.append($('<td style="text-align:center;" >').text(item.kode_barang));
@@ -741,8 +771,9 @@
             newRow.append($('<td style="text-align:center;">').text(item.qty_invoice));
             newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_invoice)));
             newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.amount_invoice)));
+
             if (item.kode_barang == "LAIN-LAIN") {
-                total_invoice_barang_lain += parseFloat(item.amount_invoice) || 0;
+                total_invoice_barang_lain += parseFloat(item.amount_invoice) || 0;               
                 <?php if (!empty($detail)): ?>
                     <?php if ($detail['status_posting']): ?>
                         newRow.append($('<td style="text-align:center;">').html(
@@ -762,16 +793,15 @@
                     </button>`
                     ));
                 <?php endif; ?>
-
             } else {
-                newRow.append($('<td style="text-align:center;">').html(
-                    ``
-                ));
+                total_invoice_non_lain += parseFloat(item.amount_invoice) || 0; // Tambahkan total barang non-LAIN-LAIN
+                newRow.append($('<td style="text-align:center;">').html(``));
             }
 
             table.find('tbody').append(newRow);
-            total_amount += parseFloat(item.amount_invoice);
+            
         });
+        total_amount += total_invoice_non_lain - total_invoice_barang_lain;
         total_invoice = totalPembayaran;
         var newRow0 = $('<tr style="color:whitesmoke;">');
         newRow0.append($('<td colspan="4" style="text-align: right;">').text("Total Pembayaran"));
@@ -800,17 +830,21 @@
         var newRow4 = $('<tr style="color:whitesmoke;">');
         newRow4.append($('<td colspan="4" style="text-align: right;">').text("Anda Membayar Sebesar"));
         newRow4.append($('<td style="text-align:center;"><b>' +
-            `<input autocomplete="one-time-code" data-id="" onchange="this.value = formatRupiah2(this.value)" class="form-control total-bayar trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['total_bayar'])  : '' ?>" name = "total_bayar"> ` +
+            `<input autocomplete="one-time-code" data-id="" class="form-control total-bayar trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['total_bayar'])  : '' ?>" name = "total_bayar"> ` +
             '</b></td>'));
         table.find('tbody').append(newRow4);
 
-        $(document).on("input", ".total-bayar, .potongan", function() {
+        $(document).on("input", ".total-bayar, .potongan", function () {
             var potongan = $('.potongan').val() ? convertRupiahToNumber($('.potongan').val()) : 0;
             limit_bayar = parseFloat(total_amount) - parseFloat(total_invoice) - parseFloat(potongan);
+
+            // Set batas input di elemen total-bayar
             $('input.total-bayar').attr('oninput', `limitInputBayar(this, ${limit_bayar})`);
 
+            // Format ulang nilai dengan format Indonesia (titik sebagai ribuan, koma sebagai desimal)
             if ($('.potongan').val() != "" || $('.potongan').val() != 0) {
-                $('.total-bayar').val(limit_bayar).change()
+                var formattedLimit = formatRupiah2(limit_bayar); // Format sesuai
+                $('.total-bayar').val(formattedLimit).change();
             }
         });
 

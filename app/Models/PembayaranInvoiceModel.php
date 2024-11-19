@@ -31,6 +31,8 @@ class PembayaranInvoiceModel extends Model
         'status_posting',
         'akun_kas',
         'akun_selisih',
+        'akun_kas_lain',
+        'akun_kredit_lain',
         'payment_method'
 
     ];
