@@ -885,7 +885,17 @@
                     newRowItem.append($('<td style="text-align:center;">').text(item.qty_invoice));
                     newRowItem.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_invoice)));
                     newRowItem.append($('<td style="text-align:center;">').text(formatRupiah2(item.amount_invoice)));
-                    newRowItem.append($('<td style="text-align:center;">').html(``));
+                    if (item.kode_barang == "LAIN-LAIN") {
+                        total_invoice_barang_lain += parseFloat(item.amount_invoice) || 0;
+                        newRow.append($('<td style="text-align:center;">').html(`
+                            <button type="button" class="btn btn-danger" onclick="deleteBarang('${item.id}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        `));
+                    } else {
+                        total_invoice_non_lain += parseFloat(item.amount_invoice) || 0;
+                        newRow.append($('<td style="text-align:center;">').html(``));
+                    }
                     table.find('tbody').append(newRowItem);
                 }
             });
