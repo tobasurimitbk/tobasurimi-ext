@@ -709,7 +709,7 @@ class PembayaranInvoice extends BaseController
                     'user_id' => $this->user_id,
                     'divisi_id' => $this->request->getVar('divisi_id'),
                     'payment_method' => $this->request->getVar('payment_methods'),
-                    'payment_method' => $this->request->getVar('customer'),
+                    'customer_id' => decrypt($this->request->getVar('customer')),
                     'invoice_id' => $no_dokumen_implode,
                     'valas_id' => "-",
                     'no_pembayaran' => $this->request->getVar('no_bukti_pembayaran'),

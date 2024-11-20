@@ -59,7 +59,6 @@
                                 <th onclick="changeSort('')">No. Pembayaran</th>
                                 <th onclick="changeSort('')">Payment Date</th>
                                 <th onclick="changeSort('')">Tipe Sales</th>
-                                <th onclick="changeSort('')">Nomor Invoice</th>
                                 <th onclick="changeSort('')">Customer</th>
                                 <th onclick="changeSort('')">Amount</th>
                                 <th>Action</th>
@@ -133,10 +132,6 @@
             },
             {
                 data: "tipe_invoice",
-                className: "text-center"
-            },
-            {
-                data: "nomor_invoice",
                 className: "text-center"
             },
             {
