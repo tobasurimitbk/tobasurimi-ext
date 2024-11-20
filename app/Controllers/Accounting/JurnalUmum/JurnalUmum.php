@@ -1177,8 +1177,8 @@ class JurnalUmum extends BaseController
             return false;
         }
         $pembayaranInvoiceDetail = $this->pembayaranInvoiceDetailModel->where('pembayaran_invoice_id', $pembayaranInvoice['id'])->findAll();
-        $metaDataTypeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'PEMBAYARAN')->first();
-        $metaDataValutaIDR = $this->MetadataModel->asObject()->where('name', 'Valuta')->where('value', 'IDR')->first();
+        $metaDataTypeTransaksi = $this->MetadataModel->where('name', 'tipe_transaksi')->where('value', 'PEMBAYARAN')->first();
+        $metaDataValutaIDR = $this->MetadataModel->where('name', 'Valuta')->where('value', 'IDR')->first();
 
         try {
             $db = Database::connect();
@@ -1191,6 +1191,7 @@ class JurnalUmum extends BaseController
                 'total_kredit' =>  $pembayaranInvoice['total_bayar'],
                 'metode_input' => 'system',
                 'type_transaksi' => $metaDataTypeTransaksi['id'],
+                'valas' => "IDR"
             );
 
             $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
@@ -1211,6 +1212,8 @@ class JurnalUmum extends BaseController
             if ($pembayaranInvoice['akun_kas'] != null) {
                 $result[] = array(
                     'id_transaksi' => $id_transaksi_jurnal,
+                    'company_id' => $this->this_company_id,
+                    'divisi_id' => $pembayaranInvoice['divisi_id'],
                     'id_coa' =>  $pembayaranInvoice['akun_kas'],
                     'tanggal_jurnal' => $resultTransaksiJurnal['tanggal_transaksi'],
                     'debit' => 0,
@@ -1223,10 +1226,12 @@ class JurnalUmum extends BaseController
             }
 
 
-            if ($pembayaranInvoice['akun_kas_selisih'] != null) {
+            if ($pembayaranInvoice['akun_kas_lain'] != null) {
                 $result[] = array(
                     'id_transaksi' => $id_transaksi_jurnal,
-                    'id_coa' =>  $pembayaranInvoice['akun_kas_selisih'],
+                    'company_id' => $this->this_company_id,
+                    'divisi_id' => $pembayaranInvoice['divisi_id'],
+                    'id_coa' =>  $pembayaranInvoice['akun_kas_lain'],
                     'tanggal_jurnal' => $resultTransaksiJurnal['tanggal_transaksi'],
                     'debit' => 0,
                     'kredit' => $hargaTotalBarangLain,
@@ -1242,6 +1247,8 @@ class JurnalUmum extends BaseController
             if ($pembayaranInvoice['akun_selisih'] != null) {
                 $result[] = array(
                     'id_transaksi' => $id_transaksi_jurnal,
+                    'company_id' => $this->this_company_id,
+                    'divisi_id' => $pembayaranInvoice['divisi_id'],
                     'id_coa' =>  $pembayaranInvoice['akun_selisih'],
                     'tanggal_jurnal' => $resultTransaksiJurnal['tanggal_transaksi'],
                     'debit' => $hargaTotalBarangInvoice,
@@ -1256,6 +1263,8 @@ class JurnalUmum extends BaseController
             if ($pembayaranInvoice['akun_selisih_lain'] != null) {
                 $result[] = array(
                     'id_transaksi' => $id_transaksi_jurnal,
+                    'company_id' => $this->this_company_id,
+                    'divisi_id' => $pembayaranInvoice['divisi_id'],
                     'id_coa' =>  $pembayaranInvoice['akun_selisih_lain'],
                     'tanggal_jurnal' => $resultTransaksiJurnal['tanggal_transaksi'],
                     'debit' => $hargaTotalBarangInvoice,
@@ -1269,6 +1278,7 @@ class JurnalUmum extends BaseController
 
             if (count($result) > 0) {
                 $this->jurnalUmumModel->insertJurnalBatch($result);
+                $db->transCommit();
                 return true;
             } else {
                 $db->transRollback();

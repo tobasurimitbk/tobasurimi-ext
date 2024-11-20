@@ -201,15 +201,15 @@ class PembayaranInvoice extends BaseController
             ->findAll();
         $dokumenList = [];
         $customers = $this->customerModel
-        ->select('customers.id, customers.name') // Pilih kolom yang diperlukan
-        ->join('sales_order_invoice', 'sales_order_invoice.id_customer = customers.id', 'left') // Perbaiki kondisi join
-        ->where('sales_order_invoice.deletedAt', null)
-        ->where('sales_order_invoice.status_pelunasan', 'UNPAID')
-        ->where('sales_order_invoice.id_company', $this->this_company_id)
-        ->where('customers.company_id', $this->this_company_id)
-        ->where('customers.deletedAt', null)
-        ->groupBy('customers.id')
-        ->findAll();
+            ->select('customers.id, customers.name') // Pilih kolom yang diperlukan
+            ->join('sales_order_invoice', 'sales_order_invoice.id_customer = customers.id', 'left') // Perbaiki kondisi join
+            ->where('sales_order_invoice.deletedAt', null)
+            ->where('sales_order_invoice.status_pelunasan', 'UNPAID')
+            ->where('sales_order_invoice.id_company', $this->this_company_id)
+            ->where('customers.company_id', $this->this_company_id)
+            ->where('customers.deletedAt', null)
+            ->groupBy('customers.id')
+            ->findAll();
         $divisi = $this->divisiModel->getDivisiAccess();
         $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel->where('deletedAt', null)->where('id_company', $this->this_company_id)->findAll();
         foreach ($salesOrderLokalInvoiceData as $s) {
@@ -238,13 +238,13 @@ class PembayaranInvoice extends BaseController
     }
 
     public function getDataDokumenInvoiceLokal($customer_id)
-    {   
+    {
         $customer_id_decrypt = decrypt($customer_id);
         $dokumenList = [];
         $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel->where('deletedAt', null)
-                                                                ->where('id_company', $this->this_company_id)
-                                                                ->where('id_customer', $customer_id_decrypt)
-                                                                ->findAll();
+            ->where('id_company', $this->this_company_id)
+            ->where('id_customer', $customer_id_decrypt)
+            ->findAll();
         foreach ($salesOrderLokalInvoiceData as $s) {
             $totalPembayaran = 0;
             $pembayaranInvoiceData = $this->pembayaranInvoiceModel
@@ -365,14 +365,13 @@ class PembayaranInvoice extends BaseController
                     ->findAll();  // Mengambil semua data yang cocok
 
                 // Ambil nomor faktur dan nama pelanggan dan gabungkan dengan koma
-                $nomor_invoice = implode(', ', array_map(function($item) {
+                $nomor_invoice = implode(', ', array_map(function ($item) {
                     return $item['no_faktur'];  // Mengambil no_faktur dari setiap hasil query
                 }, $salesOrderLokalInvoiceData));
 
-                $customer_name = implode(', ', array_map(function($item) {
+                $customer_name = implode(', ', array_map(function ($item) {
                     return $item['name'];  // Mengambil name dari setiap hasil query
                 }, $salesOrderLokalInvoiceData));
-
             } elseif ($p['type_invoice'] == "EKSPOR") {
                 $salesOrderExportData = $this->salesOrderExportModel
                     ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
@@ -397,7 +396,7 @@ class PembayaranInvoice extends BaseController
                 $nomor_invoice = $salesOrderReturnData['no_return'];
                 $customer_name = $salesOrderReturnData['name'];
             }
-            
+
             array_push($dataPembayaran, [
                 "no" => $no++,
                 "id" => encrypt($p['id']),
@@ -456,11 +455,11 @@ class PembayaranInvoice extends BaseController
     {
         $idArray = json_decode($this->request->getVar('id'), true); // Decode array dari JSON
         $pembayaranInvoiceId = decrypt($this->request->getVar('pembayaran_invoice_id'));
-    
+
         $dataBarang = [];
         $totalPembayaran = 0;
         $totalAmountInvoice = 0;
-    
+
         // Ambil data invoice berdasarkan semua ID
         $salesOrderInvoiceData = $this->salesOrderInvoiceModel->whereIn('id', $idArray)->findAll();
         $salesOrderInvoiceDetailData = $this->salesOrderInvoiceDetailModel
@@ -470,7 +469,7 @@ class PembayaranInvoice extends BaseController
             ->whereIn('id_sales_order_invoice', $idArray)
             ->where('sales_order_invoice_detail.deletedAt', null)
             ->findAll();
-    
+
         // Jika ada ID pembayaran, tambahkan detailnya
         if ($pembayaranInvoiceId) {
             $pembayaranInvoiceDatail = $this->pembayaranInvoiceDetailModel
@@ -478,13 +477,13 @@ class PembayaranInvoice extends BaseController
                 ->where('sales_order_invoice_id', null)
                 ->findAll();
         }
-    
+
         // Proses data dari detail invoice
         foreach ($salesOrderInvoiceDetailData as $s) {
             $totalAmountInvoice += $s['amount_invoice'];
             array_push($dataBarang, $s);
         }
-    
+
         // Tambahkan data lain-lain jika ada
         if (isset($pembayaranInvoiceDatail)) {
             foreach ($pembayaranInvoiceDatail as $p) {
@@ -499,13 +498,13 @@ class PembayaranInvoice extends BaseController
                 ]);
             }
         }
-    
+
         // Hitung total pembayaran
         $pembayaranInvoiceData = $this->pembayaranInvoiceModel
-                                    ->select('total_bayar') // Hanya memilih kolom 'total_bayar'
-                                    ->where('id', $pembayaranInvoiceId) // Filter berdasarkan ID
-                                    ->first(); // Ambil data pertama
-    
+            ->select('total_bayar') // Hanya memilih kolom 'total_bayar'
+            ->where('id', $pembayaranInvoiceId) // Filter berdasarkan ID
+            ->first(); // Ambil data pertama
+
         // Return data
         return $this->response->setJSON([
             'data' => $dataBarang,
@@ -513,7 +512,7 @@ class PembayaranInvoice extends BaseController
             'status' => true
         ]);
     }
-    
+
 
     public function getBarangSalesEkspor()
     {
@@ -668,10 +667,10 @@ class PembayaranInvoice extends BaseController
     }
 
     public function saveLokalInvoice()
-    {   
+    {
 
-    $no_dokumen_req = $this->request->getVar("no_dokumen");
-    $no_dokumen_implode = "[" . implode("','", $no_dokumen_req) . "]";
+        $no_dokumen_req = $this->request->getVar("no_dokumen");
+        $no_dokumen_implode = "[" . implode("','", $no_dokumen_req) . "]";
 
         try {
             $check = $this->pembayaranInvoiceModel->where('company_id', $this->this_company_id)->where('no_pembayaran', $this->request->getVar('no_bukti_pembayaran'))->first();
@@ -1059,12 +1058,15 @@ class PembayaranInvoice extends BaseController
     {
 
         $id = decrypt($this->request->getVar('id'));
-        $this->pembayaranInvoiceModel->update($id, ['status_posting' => '1']);
         $result = $this->jurnalController->insertDataPembayaranInvoice($id);
+
+        if ($result) {
+            $this->pembayaranInvoiceModel->update($id, ['status_posting' => 1]);
+        }
 
         return response()->setJSON([
             'token' => csrf_hash(),
-            'status' => true,
+            'status' => $result,
             'message' => $result ? "Pembayaran berhasil diposting" : "Terjadi Kesalahan Saat Input Data Transaksi Ke Jurnal Umum"
         ]);
     }

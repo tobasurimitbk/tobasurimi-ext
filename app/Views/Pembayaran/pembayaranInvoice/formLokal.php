@@ -119,11 +119,11 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : "" ?> 
-                                    class="form-select no_dokumen" 
-                                    name="no_dokumen[]" 
-                                    id="no_dokumen" 
-                                    multiple>
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : "" ?>
+                                class="form-select no_dokumen"
+                                name="no_dokumen[]"
+                                id="no_dokumen"
+                                multiple>
                             </select>
                             <label for="no_dokumen" style="z-index: 1;">No Dokumen</label>
                         </div>
@@ -186,10 +186,10 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select" name="akun_kredit_lain" id="akun_kredit_lain">
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select" name="akun_selisih_lain" id="akun_selisih_lain">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($subsAkuns as $subs) : ?>
-                                    <option <?= (!empty($detail)) ?  (($detail['akun_kredit_lain']) == $subs->id ? "selected" : "") : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                    <option <?= (!empty($detail)) ?  (($detail['akun_selisih_lain']) == $subs->id ? "selected" : "") : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
                                 <?php endforeach ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Kredit Lain (Opsional)</label>
@@ -391,7 +391,7 @@
             placeholder: "Akun Debit Lain",
             theme: "bootstrap-5"
         });
-        $('#akun_kredit_lain').select2({
+        $('#akun_selisih_lain').select2({
             placeholder: "Akun Kredit Lain (Opsional)",
             theme: "bootstrap-5"
         });
@@ -406,7 +406,7 @@
             getDataDokumenInvoice(customerId);
         });
 
-         // Trigger event change jika sudah ada nilai default
+        // Trigger event change jika sudah ada nilai default
         const selectedCustomerId = "<?= !empty(encrypt($detail['customer_id'])) ? encrypt($detail['customer_id']) : ''; ?>";
         if (selectedCustomerId) {
             $('#customer').val(selectedCustomerId).trigger('change'); // Trigger change secara manual
@@ -752,7 +752,7 @@
         })
     }
 
-    
+
     function getDataDokumenInvoice(customerId) {
         $.ajax({
             url: `<?= base_url("pembayaran-invoice/get-dokumen-invoice-lokal"); ?>/${customerId}`,
@@ -777,7 +777,7 @@
                     .split(','); // Split string menjadi array berdasarkan koma
                 console.log(selectedIds); // Pastikan array sudah benar
                 // Set pilihan yang sudah ada pada dropdown
-                $('#no_dokumen').val(selectedIds).trigger('change');  // `val()` untuk set value, `trigger('change')` untuk trigger perubahan
+                $('#no_dokumen').val(selectedIds).trigger('change'); // `val()` untuk set value, `trigger('change')` untuk trigger perubahan
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error);
@@ -976,7 +976,7 @@
         `);
 
         // Tambahkan event listener untuk validasi input
-        table.find('input.total-bayar').on('input', function () {
+        table.find('input.total-bayar').on('input', function() {
             let rawValue = $(this).val(); // Ambil nilai input
             let cleanValue = rawValue.replace(/[^0-9]/g, ''); // Hapus karakter non-digit
             let numberValue = parseInt(cleanValue) || 0; // Konversi ke angka, default 0
