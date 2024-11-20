@@ -407,7 +407,7 @@
         });
 
         // Trigger event change jika sudah ada nilai default
-        const selectedCustomerId = "<?= !empty(encrypt($detail['customer_id'])) ? encrypt($detail['customer_id']) : ''; ?>";
+        const selectedCustomerId = "<?= !empty($detail) ? encrypt($detail['customer_id']) : ''; ?>";
         if (selectedCustomerId) {
             $('#customer').val(selectedCustomerId).trigger('change'); // Trigger change secara manual
         }
@@ -772,13 +772,19 @@
                     );
                 });
 
-                const selectedIds = "<?= $detail['invoice_id']; ?>"
-                    .replace(/[\[\]\'\s]/g, '') // Hapus tanda kutip, kurung siku, dan spasi
-                    .split(','); // Split string menjadi array berdasarkan koma
-                console.log(selectedIds); // Pastikan array sudah benar
-                // Set pilihan yang sudah ada pada dropdown
-                $('#no_dokumen').val(selectedIds).trigger('change'); // `val()` untuk set value, `trigger('change')` untuk trigger perubahan
-            },
+
+                <?php if (isset($detail) && !empty($detail['invoice_id'])): ?>
+                    const selectedIds = "<?= $detail['invoice_id']; ?>"
+                        .replace(/[\[\]\'\s]/g, '') // Hapus tanda kutip, kurung siku, dan spasi
+                        .split(','); // Split string menjadi array berdasarkan koma
+                    // Set pilihan yang sudah ada pada dropdown
+                    $('#no_dokumen').val(selectedIds).trigger('change'); // `val()` untuk set value, `trigger('change')` untuk trigger perubahan
+                <?php else: ?>
+                    console.log("Invoice ID tidak tersedia");
+                <?php endif; ?>
+
+
+               },
             error: function(xhr, status, error) {
                 console.error("Error:", error);
             }
