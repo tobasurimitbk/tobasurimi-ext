@@ -976,7 +976,7 @@
         `);
 
         // Tambahkan event listener untuk validasi input
-        table.find('input.total-bayar').on('input', function() {
+        table.find('input.total-bayar').on('change', function() {
             let rawValue = $(this).val(); // Ambil nilai input
             let cleanValue = rawValue.replace(/[^0-9]/g, ''); // Hapus karakter non-digit
             let numberValue = parseInt(cleanValue) || 0; // Konversi ke angka, default 0
