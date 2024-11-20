@@ -2,6 +2,7 @@
 
 namespace App\Controllers\Pembayaran;
 
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Controllers\BaseController;
 use App\Models\PayrollsModel;
 use App\Models\EmployeesModel;
@@ -44,6 +45,7 @@ class PembayaranInvoice extends BaseController
     protected $salesOrderReturnDetailModel;
     protected $pembayaranInvoiceDetailModel;
     protected $metaDataModel;
+    protected $jurnalController;
 
 
     public function __construct()
@@ -67,6 +69,7 @@ class PembayaranInvoice extends BaseController
         $this->salesOrderReturnModel = new SalesOrderReturnModel();
         $this->salesOrderReturnDetailModel = new SalesOrderReturnDetailModel();
         $this->metaDataModel = new MetadataModel();
+        $this->jurnalController = new JurnalUmum();
     }
 
     public function index()
@@ -1057,11 +1060,12 @@ class PembayaranInvoice extends BaseController
 
         $id = decrypt($this->request->getVar('id'));
         $this->pembayaranInvoiceModel->update($id, ['status_posting' => '1']);
+        $result = $this->jurnalController->insertDataPembayaranInvoice($id);
 
         return response()->setJSON([
             'token' => csrf_hash(),
             'status' => true,
-            'message' => "Pembayaran berhasil diposting"
+            'message' => $result ? "Pembayaran berhasil diposting" : "Terjadi Kesalahan Saat Input Data Transaksi Ke Jurnal Umum"
         ]);
     }
 }

@@ -4,79 +4,80 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <div class="col-md-10">
-            <h1>Buku Besar</h1>
-        </div>
-        <div class="col-md-2 text-right">
-            <div class="btn-group">
-                <button type="button" class="btn btn-warning">Export</button>
-                <button type="button" class="btn btn-warning dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                    <span class="sr-only">Toggle Dropdown</span>
-                </button>
-                <div class="dropdown-menu" role="menu">
-                    <a class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-accounting/bukubesar/printPDF"); ?>')">PDF</a>
-                    <a class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/bukubesar/printExcel"); ?>')">Excel</a>
-                </div>
-            </div>
-        </div>
+        <h1>Buku Besar</h1>
+        <?php if (can('Laporan', 'Accounting', 'p')) : ?>
+            <button style="right: 10px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <li><button class="dropdown-item" onclick="printPDF('<?= base_url("laporan-accounting/bukubesar/printPDF"); ?>')">PDF</button></li>
+                <!-- <li><button class="dropdown-item" onclick="printExcel('<?= base_url("laporan-accounting/bukubesar/printExcel"); ?>')">Excel</button></li> -->
+            </ul>
+        <?php endif; ?>
     </div>
+
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end row-col-spp">
-                <div class="col-md-12">
-                    <form method="post" action="<?= base_url('/laporan-accounting/bukubesar') ?>" class="create-form" role="form">
-                        <?= csrf_field(); ?>
-                        <div class="row">
-                            <div class="col-md-3 mb-3">
-                                <div class="input-group">
-                                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal" readonly>
-                                    <div class="input-group-prepend group-prepend-password align-items-center">
-                                        <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
-                                    </div>
-                                </div>
+            <form method="post" action="<?= base_url('/laporan-accounting/bukubesar') ?>" class="create-form form-add-spp" role="form">
+                <?= csrf_field(); ?>
+                <div class="row justify-content-end">
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="form-floating" style="height: 50px;">
+                                <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                                <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
                             </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="input-group">
-                                    <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir" value="<?= $dateEnd; ?>">
-                                    <div class="input-group-prepend group-prepend-password align-items-center">
-                                        <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-2 mb-3">
-                                <div class="input-group">
-                                    <button type="submit" name="cariTanggal" class="btn btn-primary" value="cari">Cari</button>
-                                </div>
+                            <div class="input-group-append" style="height:50px;">
+                                <button disabled class="btn btn-secondary" type="button">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </button>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select id_header" name="id_header" id="id_header">
-                                        <option value="">All</option>
-                                        <?php foreach ($dataHeaderAkun ?? [] as $HeaderAkunData) : ?>
-                                            <option value="<?= $HeaderAkunData->hexid; ?>" data-header-id=""><?= $HeaderAkunData->nama_header; ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <label for="floatingInput">Filter Header</label>
-                                </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="form-floating" style="height: 50px;">
+                                <input value="<?= isset($_POST['dateEnd']) ? $_POST['dateEnd']  : '' ?>" placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                                <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select id_sub_akun" name="id_sub_akun" id="id_sub_akun">
-                                        <option value="">All</option>
-                                        <?php foreach ($dataSubAkuns ?? [] as $SubAkunsData) : ?>
-                                            <option value="<?= $SubAkunsData->hexid; ?>" data-header-id=""><?= $SubAkunsData->nama_sub; ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <label for="floatingInput">Filter Sub Akun</label>
-                                </div>
+                            <div class="input-group-append" style="height:50px;">
+                                <button disabled class="btn btn-secondary" type="button">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </button>
                             </div>
                         </div>
-                    </form>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select id_header" name="id_header" id="id_header">
+                                <option value="">All</option>
+                                <?php foreach ($dataHeaderAkun ?? [] as $HeaderAkunData) : ?>
+                                    <option <?= isset($_POST['id_header']) ? (encrypt($HeaderAkunData->id) == $_POST['id_header'] ? 'selected' : '') : '' ?> value="<?= encrypt($HeaderAkunData->id); ?>" data-header-id=""><?= $HeaderAkunData->nama_header; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Pilih Header Akun</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="form-floating" style="height: 50px;">
+                                <select class="form-select id_sub_akun" multiple name="id_sub_akun[]" id="id_sub_akun">
+                                    <option value="">All</option>
+                                    <?php foreach ($dataSubAkuns ?? [] as $SubAkunsData) : ?>
+                                        <option <?= isset($_POST['id_sub_akun']) ? (in_array(encrypt($SubAkunsData->id), $_POST['id_sub_akun']) ? 'selected' : '') : '' ?> value="<?= encrypt($SubAkunsData->id); ?>" data-header-id=""><?= $SubAkunsData->nama_sub; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Pilih Sub Akun (COA)</label>
+                            </div>
+                            <div class="input-group-append" style="height:50px;">
+                                <button class="btn btn-secondary" name="cariTanggal" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
+            </form>
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-hover" id="myTable" width="100%" cellspacing="0">
@@ -84,7 +85,7 @@
                             <tr>
                                 <th>Nama Akun / Tanggal</th>
                                 <th>Transaksi</th>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th>Deskripsi</th>
                                 <th>Debit</th>
                                 <th>Kredit</th>
@@ -92,71 +93,78 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php
-                            function format_ribuan($nilai)
-                            {
-                                $nilais = "";
-                                if ($nilai < 0) {
-                                    $nilaiFloat = floatval($nilai);
-                                    $nilais = '(' . number_format(abs($nilaiFloat), 2, ',', '.') . ')';
-                                } else {
-                                    $nilaiFloat = floatval($nilai);
-                                    $nilais = number_format($nilaiFloat, 2, ',', '.');
+                            <?php if (count($dataJurnalUmumWithGroup)  == 0): ?>
+                                <tr>
+                                    <td colspan="7">Tidak Ada Transaksi</td>
+                                </tr>
+                            <?php else: ?>
+                                <?php
+                                function format_ribuan($nilai)
+                                {
+                                    $nilais = "";
+                                    if ($nilai < 0) {
+                                        $nilaiFloat = floatval($nilai);
+                                        $nilais = '(' . number_format(abs($nilaiFloat), 2, ',', '.') . ')';
+                                    } else {
+                                        $nilaiFloat = floatval($nilai);
+                                        $nilais = number_format($nilaiFloat, 2, ',', '.');
+                                    }
+                                    return $nilais;
                                 }
-                                return $nilais;
-                            }
-                            // kelompok
-                            foreach ($dataHeaderAkun as $HeaderAkunData) :
-                                foreach ($dataJurnalUmumWithGroup as $JurnalUmumDataGroup) :
-                                    if ($JurnalUmumDataGroup->header_id == $HeaderAkunData->id) :
-                            ?>
-                                        <tr class="clickable" data-toggle="collapse" data-target=".collapse_<?= $HeaderAkunData->hexid; ?>" aria-expanded="false" data-header-id="<?= $HeaderAkunData->hexid; ?>">
-                                            <td colspan="7"><i class="fas fa-chevron-down"></i><?= $HeaderAkunData->no_header . "-" . $HeaderAkunData->nama_header; ?></td>
-                                        </tr>
+                                // kelompok
+                                foreach ($dataHeaderAkun as $HeaderAkunData) :
+                                    foreach ($dataJurnalUmumWithGroup as $JurnalUmumDataGroup) :
+                                        if ($JurnalUmumDataGroup->header_id == $HeaderAkunData->id) :
+                                ?>
+                                            <tr class="clickable" data-toggle="collapse" data-target=".collapse_<?= encrypt($HeaderAkunData->id); ?>" aria-expanded="false" data-header-id="<?= encrypt($HeaderAkunData->id); ?>">
+                                                <td colspan="7"><i class="fas fa-chevron-down"></i><?= $HeaderAkunData->no_header . "-" . $HeaderAkunData->nama_header; ?></td>
+                                            </tr>
 
-                                    <?php
-                                    endif;
-                                endforeach;
-                                $saldo = 0;
-                                $totalsaldo = 0;
-                                $totaldebit = 0;
-                                $totalkredit = 0;
-                                foreach ($dataJurnalUmum as $JurnalUmumData) :
-                                    if ($JurnalUmumData->header_id == $HeaderAkunData->id) :
-                                        if ($JurnalUmumData->debit == 0) {
-                                            $saldo = $saldo + $JurnalUmumData->debit - $JurnalUmumData->kredit;
-                                        } else {
-                                            $saldo = $saldo + $JurnalUmumData->debit;
-                                        }
-                                        $totaldebit += $JurnalUmumData->debit;
-                                        $totalkredit += $JurnalUmumData->kredit;
-                                    ?>
-                                        <tr class="collapse_<?= $HeaderAkunData->hexid; ?> collapse out">
-                                            <td><?= date('d-m-Y', strtotime($JurnalUmumData->tanggal_jurnal)); ?></td>
-                                            <td><?= $JurnalUmumData->value; ?></td>
-                                            <td><?= $JurnalUmumData->no_transaksi; ?></td>
-                                            <td><?= $JurnalUmumData->keterangan; ?></td>
-                                            <td><?= format_ribuan($JurnalUmumData->debit); ?></td>
-                                            <td><?= format_ribuan($JurnalUmumData->kredit); ?></td>
-                                            <td><?= format_ribuan($saldo); ?></td>
-                                        </tr>
-                                    <?php
-                                    endif;
-                                endforeach;
-                                foreach ($dataJurnalUmumWithGroup as $JurnalUmumDataGroup) :
-                                    if ($JurnalUmumDataGroup->header_id == $HeaderAkunData->id) :
-                                    ?>
-                                        <tr data-header-id="<?= $HeaderAkunData->hexid; ?>">
-                                            <td colspan="4" style="text-align: right;">Total <?= $HeaderAkunData->no_header . "-" . $HeaderAkunData->nama_header; ?></td>
-                                            <td><?= format_ribuan($totaldebit); ?></td>
-                                            <td><?= format_ribuan($totalkredit); ?></td>
-                                            <td><?= format_ribuan($totaldebit - $totalkredit); ?></td>
-                                        </tr>
-                            <?php
-                                    endif;
+                                        <?php
+                                        endif;
+                                    endforeach;
+                                    $saldo = 0;
+                                    $totalsaldo = 0;
+                                    $totaldebit = 0;
+                                    $totalkredit = 0;
+                                    foreach ($dataJurnalUmum as $JurnalUmumData) :
+                                        if ($JurnalUmumData->header_id == $HeaderAkunData->id) :
+                                            if ($JurnalUmumData->debit == 0) {
+                                                $saldo = $saldo + $JurnalUmumData->debit - $JurnalUmumData->kredit;
+                                            } else {
+                                                $saldo = $saldo + $JurnalUmumData->debit;
+                                            }
+                                            $totaldebit += $JurnalUmumData->debit;
+                                            $totalkredit += $JurnalUmumData->kredit;
+                                        ?>
+                                            <tr class="collapse_<?= encrypt($HeaderAkunData->id); ?> collapse out">
+                                                <td><?= date('d-m-Y', strtotime($JurnalUmumData->tanggal_jurnal)); ?></td>
+                                                <td><?= $JurnalUmumData->value; ?></td>
+                                                <td><?= $JurnalUmumData->no_transaksi; ?></td>
+                                                <td><?= $JurnalUmumData->keterangan; ?></td>
+                                                <td><?= format_ribuan($JurnalUmumData->debit); ?></td>
+                                                <td><?= format_ribuan($JurnalUmumData->kredit); ?></td>
+                                                <td><?= format_ribuan($saldo); ?></td>
+                                            </tr>
+                                        <?php
+                                        endif;
+                                    endforeach;
+                                    foreach ($dataJurnalUmumWithGroup as $JurnalUmumDataGroup) :
+                                        if ($JurnalUmumDataGroup->header_id == $HeaderAkunData->id) :
+                                        ?>
+                                            <tr data-header-id="<?= encrypt($HeaderAkunData->id); ?>">
+                                                <td colspan="4" style="text-align: right;">Total <?= $HeaderAkunData->no_header . "-" . $HeaderAkunData->nama_header; ?></td>
+                                                <td><?= format_ribuan($totaldebit); ?></td>
+                                                <td><?= format_ribuan($totalkredit); ?></td>
+                                                <td><?= format_ribuan($totaldebit - $totalkredit); ?></td>
+                                            </tr>
+                                <?php
+                                        endif;
+                                    endforeach; // akhir kelompok 
                                 endforeach; // akhir kelompok 
-                            endforeach; // akhir kelompok 
-                            ?>
+                                ?>
+                            <?php endif ?>
+
                         </tbody>
                     </table>
                 </div>
@@ -193,11 +201,17 @@
         });
 
         //CSS SELECT2 FLOATING LABEL
-        $('.id_header, .id_sub_akun').select2({
-            placeholder: "Filter",
+        $('.id_header').select2({
+            placeholder: "Pilih Header Account",
             theme: "bootstrap-5",
             allowClear: true
         });
+        $('.id_sub_akun').select2({
+            placeholder: "Pilih Sub Account (COA)",
+            theme: "bootstrap-5",
+            allowClear: false
+        });
+
         $('.id_header, .id_sub_akun')
             .parent('div')
             .children('span')
@@ -286,13 +300,26 @@
         return formattedDate;
     }
     const printPDF = function(url) {
-        var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
-        var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
-        var filter = $(".id_header").val() ? $(".id_header").val() : "all";
-        url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter;
-        // console.log(url2);
-        window.open(url2, "_blank");
-    }
+        const formData = $('.create-form').serializeArray();
+
+        const $form = $('<form>', {
+            action: url,
+            method: 'POST',
+            target: '_blank',
+        });
+
+        $.each(formData, function(index, field) {
+            $('<input>')
+                .attr({
+                    type: 'hidden',
+                    name: field.name,
+                    value: field.value,
+                })
+                .appendTo($form);
+        });
+
+        $form.appendTo('body').submit().remove();
+    };
     const printExcel = function(url) {
         var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";

@@ -24,9 +24,12 @@ use App\Models\LocalPOPaymentModel;
 use App\Models\LocalPOPaymentDetailModel;
 use App\Models\ImportPOPaymentModel;
 use App\Models\KursModel;
+use App\Models\PembayaranInvoiceDetailModel;
+use App\Models\PembayaranInvoiceModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\SalesOrderLainDetailModel;
 use App\Models\SalesOrderLainModel;
+use Config\Database;
 use Exception;
 
 class JurnalUmum extends BaseController
@@ -60,6 +63,8 @@ class JurnalUmum extends BaseController
 
     protected $salesOrderLainModel;
     protected $salesOrderLainDetailModel;
+    protected $pembayaranInvoiceModel;
+    protected $pembayaranInvoiceDetailModel;
 
     public function __construct()
     {
@@ -92,6 +97,8 @@ class JurnalUmum extends BaseController
 
         $this->salesOrderLainModel = new SalesOrderLainModel();
         $this->salesOrderLainDetailModel = new SalesOrderLainDetailModel();
+        $this->pembayaranInvoiceModel = new PembayaranInvoiceModel();
+        $this->pembayaranInvoiceDetailModel = new PembayaranInvoiceDetailModel();
     }
 
     public function index()
@@ -1161,5 +1168,115 @@ class JurnalUmum extends BaseController
         var_dump($piutangDepartment);
         var_dump($gajiDepartment);
         var_dump($hppDepartment);
+    }
+
+    public function insertDataPembayaranInvoice($pembayaranInvoiceId)
+    {
+        $pembayaranInvoice = $this->pembayaranInvoiceModel->where('id', $pembayaranInvoiceId)->first();
+        if ($pembayaranInvoice == null) {
+            return false;
+        }
+        $pembayaranInvoiceDetail = $this->pembayaranInvoiceDetailModel->where('pembayaran_invoice_id', $pembayaranInvoice['id'])->findAll();
+        $metaDataTypeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'PEMBAYARAN')->first();
+        $metaDataValutaIDR = $this->MetadataModel->asObject()->where('name', 'Valuta')->where('value', 'IDR')->first();
+
+        try {
+            $db = Database::connect();
+            $db->transBegin();
+
+            $resultTransaksiJurnal = array(
+                'no_transaksi' => $pembayaranInvoice['no_pembayaran'],
+                'tanggal_transaksi' => $pembayaranInvoice['tanggal'],
+                'total_debit' => $pembayaranInvoice['total_bayar'],
+                'total_kredit' =>  $pembayaranInvoice['total_bayar'],
+                'metode_input' => 'system',
+                'type_transaksi' => $metaDataTypeTransaksi['id'],
+            );
+
+            $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
+            $hargaTotalBarangInvoice = 0;
+            $hargaTotalBarangLain = 0;
+            foreach ($pembayaranInvoiceDetail as $p) {
+                if ($p['sales_order_invoice_id'] == null) {
+                    // PASTI LAIN LAIN
+                    $hargaTotalBarangLain += $p['harga_total'];
+                } else {
+                    // PASTI BARANG
+                    $hargaTotalBarangInvoice += $p['harga_total'];
+                }
+            }
+
+            $result = array();
+            // AKUN KAS
+            if ($pembayaranInvoice['akun_kas'] != null) {
+                $result[] = array(
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' =>  $pembayaranInvoice['akun_kas'],
+                    'tanggal_jurnal' => $resultTransaksiJurnal['tanggal_transaksi'],
+                    'debit' => 0,
+                    'kredit' => $hargaTotalBarangInvoice,
+                    'valas' => $metaDataValutaIDR['id'],
+                    'kurs' => 1,
+                    'keterangan' => "Pembayaran Invoice (Barang Invoice), Nomor : " . $pembayaranInvoice['no_pembayaran'],
+                    'id_inputer' => session()->get("login")->user_id
+                );
+            }
+
+
+            if ($pembayaranInvoice['akun_kas_selisih'] != null) {
+                $result[] = array(
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' =>  $pembayaranInvoice['akun_kas_selisih'],
+                    'tanggal_jurnal' => $resultTransaksiJurnal['tanggal_transaksi'],
+                    'debit' => 0,
+                    'kredit' => $hargaTotalBarangLain,
+                    'valas' => $metaDataValutaIDR['id'],
+                    'kurs' => 1,
+                    'keterangan' => "Pembayaran Invoice (Invoice Lain), Nomor : " . $pembayaranInvoice['no_pembayaran'],
+                    'id_inputer' => session()->get("login")->user_id
+                );
+            }
+
+
+            // AKUN SELISIH
+            if ($pembayaranInvoice['akun_selisih'] != null) {
+                $result[] = array(
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' =>  $pembayaranInvoice['akun_selisih'],
+                    'tanggal_jurnal' => $resultTransaksiJurnal['tanggal_transaksi'],
+                    'debit' => $hargaTotalBarangInvoice,
+                    'kredit' => 0,
+                    'valas' => $metaDataValutaIDR['id'],
+                    'kurs' => 1,
+                    'keterangan' => "Pembayaran Invoice (Barang Invoice), Nomor : " . $pembayaranInvoice['no_pembayaran'],
+                    'id_inputer' => session()->get("login")->user_id
+                );
+            }
+
+            if ($pembayaranInvoice['akun_selisih_lain'] != null) {
+                $result[] = array(
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' =>  $pembayaranInvoice['akun_selisih_lain'],
+                    'tanggal_jurnal' => $resultTransaksiJurnal['tanggal_transaksi'],
+                    'debit' => $hargaTotalBarangInvoice,
+                    'kredit' => 0,
+                    'valas' => $metaDataValutaIDR['id'],
+                    'kurs' => 1,
+                    'keterangan' => "Pembayaran Invoice (Barang Lain), Nomor : " . $pembayaranInvoice['no_pembayaran'],
+                    'id_inputer' => session()->get("login")->user_id
+                );
+            }
+
+            if (count($result) > 0) {
+                $this->jurnalUmumModel->insertJurnalBatch($result);
+                return true;
+            } else {
+                $db->transRollback();
+                return false;
+            }
+        } catch (Exception $e) {
+            $db->transRollback();
+            return false;
+        }
     }
 }

@@ -58,7 +58,7 @@
       <tr>
         <th>Nama Akun / Tanggal</th>
         <th>Transaksi</th>
-        <th>No.</th>
+        <th>No</th>
         <th>Deskripsi</th>
         <th>Debit</th>
         <th>Kredit</th>
@@ -66,71 +66,77 @@
       </tr>
     </thead>
     <tbody>
-      <?php
-      function format_ribuan($nilai)
-      {
-        $nilais = "";
-        if ($nilai < 0) {
-          $nilaiFloat = floatval($nilai);
-          $nilais = '(' . number_format(abs($nilaiFloat), 2, ',', '.') . ')';
-        } else {
-          $nilaiFloat = floatval($nilai);
-          $nilais = number_format($nilaiFloat, 2, ',', '.');
+      <?php if (count($dataJurnalUmumWithGroup)  == 0): ?>
+        <tr>
+          <td colspan="7">Tidak Ada Transaksi</td>
+        </tr>
+      <?php else: ?>
+        <?php
+        function format_ribuan($nilai)
+        {
+          $nilais = "";
+          if ($nilai < 0) {
+            $nilaiFloat = floatval($nilai);
+            $nilais = '(' . number_format(abs($nilaiFloat), 2, ',', '.') . ')';
+          } else {
+            $nilaiFloat = floatval($nilai);
+            $nilais = number_format($nilaiFloat, 2, ',', '.');
+          }
+          return $nilais;
         }
-        return $nilais;
-      }
-      // kelompok
-      foreach ($dataHeaderAkun as $HeaderAkunData) :
-        foreach ($dataJurnalUmumWithGroup as $JurnalUmumDataGroup) :
-          if ($JurnalUmumDataGroup->header_id == $HeaderAkunData->id) :
-      ?>
-            <tr class="clickable" data-toggle="collapse" data-target=".collapse_<?= $HeaderAkunData->hexid; ?>" aria-expanded="false" data-header-id="<?= $HeaderAkunData->hexid; ?>">
-              <td colspan="7"><i class="fas fa-chevron-down"></i><?= $HeaderAkunData->no_header . "-" . $HeaderAkunData->nama_header; ?></td>
-            </tr>
+        // kelompok
+        foreach ($dataHeaderAkun as $HeaderAkunData) :
+          foreach ($dataJurnalUmumWithGroup as $JurnalUmumDataGroup) :
+            if ($JurnalUmumDataGroup->header_id == $HeaderAkunData->id) :
+        ?>
+              <tr class="clickable" data-toggle="collapse" data-target=".collapse_<?= $HeaderAkunData->id; ?>" aria-expanded="false" data-header-id="<?= $HeaderAkunData->id; ?>">
+                <td colspan="7"><i class="fas fa-chevron-down"></i><?= $HeaderAkunData->no_header . "-" . $HeaderAkunData->nama_header; ?></td>
+              </tr>
 
-          <?php
-          endif;
-        endforeach;
-        $saldo = 0;
-        $totalsaldo = 0;
-        $totaldebit = 0;
-        $totalkredit = 0;
-        foreach ($dataJurnalUmum as $JurnalUmumData) :
-          if ($JurnalUmumData->header_id == $HeaderAkunData->id) :
-            if ($JurnalUmumData->debit == 0) {
-              $saldo = $saldo + $JurnalUmumData->debit - $JurnalUmumData->kredit;
-            } else {
-              $saldo = $saldo + $JurnalUmumData->debit;
-            }
-            $totaldebit += $JurnalUmumData->debit;
-            $totalkredit += $JurnalUmumData->kredit;
-          ?>
-            <tr class="collapse_<?= $HeaderAkunData->hexid; ?> collapse out">
-              <td><?= date('d-m-Y', strtotime($JurnalUmumData->tanggal_jurnal)); ?></td>
-              <td><?= $JurnalUmumData->value; ?></td>
-              <td><?= $JurnalUmumData->no_transaksi; ?></td>
-              <td><?= $JurnalUmumData->keterangan; ?></td>
-              <td><?= format_ribuan($JurnalUmumData->debit); ?></td>
-              <td><?= format_ribuan($JurnalUmumData->kredit); ?></td>
-              <td><?= format_ribuan($saldo); ?></td>
-            </tr>
-          <?php
-          endif;
-        endforeach;
-        foreach ($dataJurnalUmumWithGroup as $JurnalUmumDataGroup) :
-          if ($JurnalUmumDataGroup->header_id == $HeaderAkunData->id) :
-          ?>
-            <tr data-header-id="<?= $HeaderAkunData->hexid; ?>">
-              <td colspan="4" style="text-align: right;">Total <?= $HeaderAkunData->no_header . "-" . $HeaderAkunData->nama_header; ?></td>
-              <td><?= format_ribuan($totaldebit); ?></td>
-              <td><?= format_ribuan($totalkredit); ?></td>
-              <td><?= format_ribuan($totaldebit - $totalkredit); ?></td>
-            </tr>
-      <?php
-          endif;
+            <?php
+            endif;
+          endforeach;
+          $saldo = 0;
+          $totalsaldo = 0;
+          $totaldebit = 0;
+          $totalkredit = 0;
+          foreach ($dataJurnalUmum as $JurnalUmumData) :
+            if ($JurnalUmumData->header_id == $HeaderAkunData->id) :
+              if ($JurnalUmumData->debit == 0) {
+                $saldo = $saldo + $JurnalUmumData->debit - $JurnalUmumData->kredit;
+              } else {
+                $saldo = $saldo + $JurnalUmumData->debit;
+              }
+              $totaldebit += $JurnalUmumData->debit;
+              $totalkredit += $JurnalUmumData->kredit;
+            ?>
+              <tr class="collapse_<?= $HeaderAkunData->id; ?> collapse out">
+                <td><?= date('d-m-Y', strtotime($JurnalUmumData->tanggal_jurnal)); ?></td>
+                <td><?= $JurnalUmumData->value; ?></td>
+                <td><?= $JurnalUmumData->no_transaksi; ?></td>
+                <td><?= $JurnalUmumData->keterangan; ?></td>
+                <td><?= format_ribuan($JurnalUmumData->debit); ?></td>
+                <td><?= format_ribuan($JurnalUmumData->kredit); ?></td>
+                <td><?= format_ribuan($saldo); ?></td>
+              </tr>
+            <?php
+            endif;
+          endforeach;
+          foreach ($dataJurnalUmumWithGroup as $JurnalUmumDataGroup) :
+            if ($JurnalUmumDataGroup->header_id == $HeaderAkunData->id) :
+            ?>
+              <tr data-header-id="<?= $HeaderAkunData->id; ?>">
+                <td colspan="4" style="text-align: right;">Total <?= $HeaderAkunData->no_header . "-" . $HeaderAkunData->nama_header; ?></td>
+                <td><?= format_ribuan($totaldebit); ?></td>
+                <td><?= format_ribuan($totalkredit); ?></td>
+                <td><?= format_ribuan($totaldebit - $totalkredit); ?></td>
+              </tr>
+        <?php
+            endif;
+          endforeach; // akhir kelompok 
         endforeach; // akhir kelompok 
-      endforeach; // akhir kelompok 
-      ?>
+        ?>
+      <?php endif ?>
     </tbody>
   </table>
 </body>
