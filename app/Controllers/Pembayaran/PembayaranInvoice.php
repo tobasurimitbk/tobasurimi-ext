@@ -513,7 +513,7 @@ class PembayaranInvoice extends BaseController
         // Return data
         return $this->response->setJSON([
             'data' => $dataBarang,
-            'totalPembayaran' => $pembayaranInvoiceData['total_bayar'],
+            'totalPembayaran' => $pembayaranInvoiceData['total_bayar'] ?? 0,
             'status' => true
         ]);
     }
