@@ -789,11 +789,6 @@
     function getDataSalesLokal() {
         const selectedIds = $("#no_dokumen").val(); // Ambil nilai array dari dropdown
 
-        if (!selectedIds || selectedIds.length === 0) {
-            alert("Silakan pilih dokumen terlebih dahulu.");
-            return;
-        }
-
         $.ajax({
             url: "<?= base_url('pembayaran-invoice/get-barang-sales-lokal'); ?>",
             method: "GET",

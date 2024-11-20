@@ -355,23 +355,28 @@ class PembayaranInvoice extends BaseController
             $nomor_invoice = "";
             $customer_name = "";
             if ($p['type_invoice'] == "LOKAL") {
-                // Ambil array invoice_id
-                $invoiceIds = is_array($p['invoice_id']) ? $p['invoice_id'] : explode(',', $p['invoice_id']);  // Mengonversi ke array jika dalam format string yang dipisah koma
+               // Ambil array invoice_id
+               $invoiceIds = is_array($p['invoice_id']) ? $p['invoice_id'] : explode(',', $p['invoice_id']);  // Mengonversi ke array jika dalam format string yang dipisah koma
+                
+               // Query untuk mengambil data berdasarkan array invoice_id
+               $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel
+                   ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+                   ->whereIn('sales_order_invoice.id', $invoiceIds)  // Menggunakan whereIn untuk memilih beberapa ID
+                   ->findAll();  // Mengambil semua data yang cocok
 
-                // Query untuk mengambil data berdasarkan array invoice_id
-                $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel
-                    ->join('customers', 'customers.id = sales_order_invoice.id_customer')
-                    ->whereIn('sales_order_invoice.id', $invoiceIds)  // Menggunakan whereIn untuk memilih beberapa ID
-                    ->findAll();  // Mengambil semua data yang cocok
+               // Ambil nomor faktur dan nama pelanggan dan gabungkan dengan koma
+               $nomor_invoice = implode(', ', array_map(function($item) {
+                   return $item['no_faktur'];  // Mengambil no_faktur dari setiap hasil query
+               }, $salesOrderLokalInvoiceData));
 
-                // Ambil nomor faktur dan nama pelanggan dan gabungkan dengan koma
-                $nomor_invoice = implode(', ', array_map(function ($item) {
-                    return $item['no_faktur'];  // Mengambil no_faktur dari setiap hasil query
-                }, $salesOrderLokalInvoiceData));
-
-                $customer_name = implode(', ', array_map(function ($item) {
-                    return $item['name'];  // Mengambil name dari setiap hasil query
-                }, $salesOrderLokalInvoiceData));
+               $customerName = $this->customerModel->where('id', $p['customer_id'])->select('name')->first();
+               if (empty($customerName)) {
+                   $customer_name = implode(', ', array_map(function($item) {
+                       return $item['name'];  // Mengambil name dari setiap hasil query
+                   }, $salesOrderLokalInvoiceData));
+               } else {
+                   $customer_name = $customerName['name'];
+               }
             } elseif ($p['type_invoice'] == "EKSPOR") {
                 $salesOrderExportData = $this->salesOrderExportModel
                     ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
