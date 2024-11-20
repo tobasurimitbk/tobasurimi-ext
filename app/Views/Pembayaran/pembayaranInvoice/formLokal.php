@@ -817,7 +817,7 @@
                                 barang_name: data.barang_name,
                                 sales_order_invoice_id: data.sales_order_invoice_id,
                                 sales_order_invoice_detail_id: data.sales_order_invoice_detail_id,
-                                no_faktur: data.no_faktur
+                                no_faktur: data.no_faktur ? data.no_faktur : "LAIN-LAIN"
                             });
                         }
                     });
@@ -846,7 +846,7 @@
 
         // Mengelompokkan data berdasarkan no_faktur
         let groupedData = {};
-        $.each(dataList, function(index, item) {
+        $.each(dataList, function (index, item) {
             if (!groupedData[item.no_faktur]) {
                 groupedData[item.no_faktur] = [];
             }
@@ -854,50 +854,44 @@
         });
 
         // Loop untuk menambahkan baris ke tabel
-        $.each(groupedData, function(noFaktur, group) {
-            let newRow = $('<tr style="color:whitesmoke;">');
-            newRow.append($('<td rowspan="' + group.length + '" style="text-align:center;">').text(noFaktur));
+        $.each(groupedData, function (noFaktur, group) {
+            let isFirstRow = true;
 
-            $.each(group, function(index, item) {
-                if (index === 0) {
-                    newRow.append($('<td style="text-align:center;">').text(item.kode_barang));
-                    newRow.append($('<td style="text-align:center;">').text(item.barang_name));
-                    newRow.append($('<td style="text-align:center;">').text(item.qty_invoice));
-                    newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_invoice)));
-                    newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.amount_invoice)));
+            $.each(group, function (index, item) {
+                let newRow = $('<tr style="color:whitesmoke;">');
 
-                    if (item.kode_barang == "LAIN-LAIN") {
-                        total_invoice_barang_lain += parseFloat(item.amount_invoice) || 0;
-                        newRow.append($('<td style="text-align:center;">').html(`
-                            <button type="button" class="btn btn-danger" onclick="deleteBarang('${item.id}')">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-                        `));
-                    } else {
-                        total_invoice_non_lain += parseFloat(item.amount_invoice) || 0;
-                        newRow.append($('<td style="text-align:center;">').html(``));
-                    }
-                    table.find('tbody').append(newRow);
-                } else {
-                    let newRowItem = $('<tr style="color:whitesmoke;">');
-                    newRowItem.append($('<td style="text-align:center;">').text(item.kode_barang));
-                    newRowItem.append($('<td style="text-align:center;">').text(item.barang_name));
-                    newRowItem.append($('<td style="text-align:center;">').text(item.qty_invoice));
-                    newRowItem.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_invoice)));
-                    newRowItem.append($('<td style="text-align:center;">').text(formatRupiah2(item.amount_invoice)));
-                    if (item.kode_barang == "LAIN-LAIN") {
-                        total_invoice_barang_lain += parseFloat(item.amount_invoice) || 0;
-                        newRow.append($('<td style="text-align:center;">').html(`
-                            <button type="button" class="btn btn-danger" onclick="deleteBarang('${item.id}')">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-                        `));
-                    } else {
-                        total_invoice_non_lain += parseFloat(item.amount_invoice) || 0;
-                        newRow.append($('<td style="text-align:center;">').html(``));
-                    }
-                    table.find('tbody').append(newRowItem);
+                // Tambahkan kolom no_faktur hanya pada baris pertama
+                if (isFirstRow) {
+                    newRow.append(
+                        $('<td rowspan="' + group.length + '" style="text-align:center;">').text(noFaktur)
+                    );
+                    isFirstRow = false;
                 }
+
+                newRow.append($('<td style="text-align:center;">').text(item.kode_barang));
+                newRow.append($('<td style="text-align:center;">').text(item.barang_name));
+                newRow.append($('<td style="text-align:center;">').text(item.qty_invoice));
+                newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_invoice)));
+                newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.amount_invoice)));
+
+                if (item.kode_barang === "LAIN-LAIN") {
+                    total_invoice_barang_lain += parseFloat(item.amount_invoice) || 0;
+
+                    // Tambahkan tombol hapus ke baris item "LAIN-LAIN"
+                    newRow.append(
+                        $('<td style="text-align:center;">').html(`
+                            <button type="button" class="btn btn-danger" onclick="deleteBarang('${item.id}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        `)
+                    );
+                } else {
+                    total_invoice_non_lain += parseFloat(item.amount_invoice) || 0;
+                    newRow.append($('<td style="text-align:center;">').html(``));
+                }
+
+                // Tambahkan baris ke tabel
+                table.find('tbody').append(newRow);
             });
         });
 
@@ -907,6 +901,7 @@
         // Menambahkan baris total pembayaran dan potongan
         addSummaryRows(table, total_amount, totalPembayaran, limit_bayar);
     }
+
 
     function insertBarangLain() {
         const namaTagihan = $('#nama_tagihan').val();
