@@ -838,17 +838,6 @@
         const table = $('#dataTable');
         table.find('tbody').empty();
 
-
-        if (dataList.length === 0) {
-            // Tambahkan baris dengan pesan "Tidak ada data"
-            table.find('tbody').append(`
-                <tr style="color:whitesmoke;">
-                    <td colspan="6" style="text-align: center;">Tidak ada data</td>
-                </tr>
-            `);
-            return; // Tidak perlu melanjutkan, tabel sudah kosong
-        }
-
         let total_amount = 0;
         let total_invoice = 0;
         let limit_bayar = 0;
@@ -943,6 +932,11 @@
     }
 
     function addSummaryRows(table, total_amount, total_invoice, limit_bayar) {
+        // Pastikan semua parameter memiliki nilai default 0 jika undefined, null, atau NaN
+        total_amount = isNaN(total_amount) ? 0 : total_amount;
+        total_invoice = isNaN(total_invoice) ? 0 : total_invoice;
+        limit_bayar = isNaN(limit_bayar) ? 0 : limit_bayar;
+
         // Tambahkan baris untuk Total Pembayaran, Total Sudah Dibayar, dan Sisa Pembayaran
         table.find('tbody').append(`
             <tr style="color:whitesmoke;">

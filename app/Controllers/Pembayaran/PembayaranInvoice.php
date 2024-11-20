@@ -465,50 +465,56 @@ class PembayaranInvoice extends BaseController
         $totalPembayaran = 0;
         $totalAmountInvoice = 0;
 
-        // Ambil data invoice berdasarkan semua ID
-        $salesOrderInvoiceData = $this->salesOrderInvoiceModel->whereIn('id', $idArray)->findAll();
-        $salesOrderInvoiceDetailData = $this->salesOrderInvoiceDetailModel
-            ->select('sales_order_invoice.no_faktur, sales_order_invoice_detail.id as sales_order_invoice_detail_id, sales_order_invoice_detail.id_sales_order_invoice as sales_order_invoice_id, qty_invoice, harga_barang_invoice, qty_invoice, amount_invoice, kode_barang, barang_name')
-            ->join('barang_master_sales', 'sales_order_invoice_detail.id_barang_invoice = barang_master_sales.id')
-            ->join('sales_order_invoice', 'sales_order_invoice_detail.id_sales_order_invoice = sales_order_invoice.id', 'left')
-            ->whereIn('id_sales_order_invoice', $idArray)
-            ->where('sales_order_invoice_detail.deletedAt', null)
-            ->findAll();
-
-        // Jika ada ID pembayaran, tambahkan detailnya
-        if ($pembayaranInvoiceId) {
-            $pembayaranInvoiceDatail = $this->pembayaranInvoiceDetailModel
-                ->where('pembayaran_invoice_id', $pembayaranInvoiceId)
-                ->where('sales_order_invoice_id', null)
-                ->findAll();
-        }
-
-        // Proses data dari detail invoice
-        foreach ($salesOrderInvoiceDetailData as $s) {
-            $totalAmountInvoice += $s['amount_invoice'];
-            array_push($dataBarang, $s);
-        }
-
-        // Tambahkan data lain-lain jika ada
-        if (isset($pembayaranInvoiceDatail)) {
-            foreach ($pembayaranInvoiceDatail as $p) {
-                array_push($dataBarang, [
-                    "sales_order_invoice_detail_id" => $p['sales_order_invoice_detail_id'],
-                    "sales_order_invoice_id" => $p['sales_order_invoice_id'],
-                    "qty_invoice" => $p['qty'],
-                    "harga_barang_invoice" => $p['harga_satuan'],
-                    "amount_invoice" => $p['harga_total'],
-                    "kode_barang" => "LAIN-LAIN",
-                    "barang_name" => $p['nama_barang']
-                ]);
-            }
-        }
-
-        // Hitung total pembayaran
-        $pembayaranInvoiceData = $this->pembayaranInvoiceModel
-            ->select('total_bayar') // Hanya memilih kolom 'total_bayar'
-            ->where('id', $pembayaranInvoiceId) // Filter berdasarkan ID
-            ->first(); // Ambil data pertama
+       if(!empty($idArray)) {
+         // Ambil data invoice berdasarkan semua ID
+         $salesOrderInvoiceData = $this->salesOrderInvoiceModel->whereIn('id', $idArray)->findAll();
+         $salesOrderInvoiceDetailData = $this->salesOrderInvoiceDetailModel
+             ->select('sales_order_invoice.no_faktur, sales_order_invoice_detail.id as sales_order_invoice_detail_id, sales_order_invoice_detail.id_sales_order_invoice as sales_order_invoice_id, qty_invoice, harga_barang_invoice, qty_invoice, amount_invoice, kode_barang, barang_name')
+             ->join('barang_master_sales', 'sales_order_invoice_detail.id_barang_invoice = barang_master_sales.id')
+             ->join('sales_order_invoice', 'sales_order_invoice_detail.id_sales_order_invoice = sales_order_invoice.id', 'left')
+             ->whereIn('id_sales_order_invoice', $idArray)
+             ->where('sales_order_invoice_detail.deletedAt', null)
+             ->findAll();
+ 
+         // Jika ada ID pembayaran, tambahkan detailnya
+         if (!empty($pembayaranInvoiceId)) {
+             $pembayaranInvoiceDatail = $this->pembayaranInvoiceDetailModel
+                 ->where('pembayaran_invoice_id', $pembayaranInvoiceId)
+                 ->where('sales_order_invoice_id', null)
+                 ->findAll();
+         }
+ 
+         // Proses data dari detail invoice
+         foreach ($salesOrderInvoiceDetailData as $s) {
+             $totalAmountInvoice += $s['amount_invoice'];
+             array_push($dataBarang, $s);
+         }
+ 
+         // Tambahkan data lain-lain jika ada
+         if (isset($pembayaranInvoiceDatail)) {
+             foreach ($pembayaranInvoiceDatail as $p) {
+                 array_push($dataBarang, [
+                     "sales_order_invoice_detail_id" => $p['sales_order_invoice_detail_id'],
+                     "sales_order_invoice_id" => $p['sales_order_invoice_id'],
+                     "qty_invoice" => $p['qty'],
+                     "harga_barang_invoice" => $p['harga_satuan'],
+                     "amount_invoice" => $p['harga_total'],
+                     "kode_barang" => "LAIN-LAIN",
+                     "barang_name" => $p['nama_barang']
+                 ]);
+             }
+         }
+ 
+         // Hitung total pembayaran
+         if(!empty($pembayaranInvoiceId)) {
+             $pembayaranInvoiceData = $this->pembayaranInvoiceModel
+             ->select('total_bayar') // Hanya memilih kolom 'total_bayar'
+             ->where('id', $pembayaranInvoiceId) // Filter berdasarkan ID
+             ->first(); // Ambil data pertama
+         } else {
+             $pembayaranInvoiceData = NULL;
+         }
+       }
 
         // Return data
         return $this->response->setJSON([
@@ -716,7 +722,7 @@ class PembayaranInvoice extends BaseController
                     'akun_kas' => $this->request->getVar('akun_kas'),
                     'akun_selisih' => $this->request->getVar('akun_selisih'),
                     'akun_kas_lain' => $this->request->getVar('akun_kas_lain'),
-                    'akun_kredit_lain' => $this->request->getVar('akun_kredit_lain'),
+                    'akun_selisih_lain' => $this->request->getVar('akun_kredit_lain'),
                     'status_posting' => '0'
                 ]);
 
@@ -868,7 +874,7 @@ class PembayaranInvoice extends BaseController
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
                 'akun_kas_lain' => $this->request->getVar('akun_kas_lain'),
-                'akun_kredit_lain' => $this->request->getVar('akun_kredit_lain'),
+                'akun_selisih_lain' => $this->request->getVar('akun_kredit_lain'),
                 'status_posting' => '0',
                 'payment_method' => $this->request->getVar('payment_methods')
             ]);
