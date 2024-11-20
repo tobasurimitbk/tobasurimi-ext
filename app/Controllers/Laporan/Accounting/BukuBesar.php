@@ -37,7 +37,7 @@ class BukuBesar extends BaseController
         $dateStart = $this->request->getPost('dateStart');
         $dateEnd = $this->request->getPost('dateEnd');
 
-        if ($this->request->getPost('cariTanggal') != "" && $dateStart != "" && $dateEnd != "") {
+        if ($dateStart != "" && $dateEnd != "") {
             $condition = [
                 'jurnal_umum.company_id' => $this->this_company_id,
                 'tanggal_jurnal >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
@@ -61,75 +61,77 @@ class BukuBesar extends BaseController
             ->findAll();
         $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR($this->this_company_id);
         $dataHeaderAkun = $this->HeaderAkunsModel->getAPAR($this->this_company_id);
-        foreach ($dataHeaderAkun as $val) {
-            $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
-        }
         $dataSubAkun = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
-        foreach ($dataSubAkun as $val) {
-            $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
-        }
-        // $dataJurnalUmum = $this->jurnalUmumModel->getDataJurnal($condition);
+
         $dataJurnalUmum = $this->jurnalUmumModel
             ->asObject()
             ->select('*, sub_akuns.header_id as id_header')
             ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
-            ->where($condition)
-            ->findAll();
+            ->where($condition);
+
+        if (isset($_POST['id_sub_akun'])) {
+            foreach ($_POST['id_sub_akun'] as $i) {
+                $dataJurnalUmum->where('id_coa', decrypt($i));
+            }
+        }
+
+        if (isset($_POST['id_header']) && @$_POST['id_header'] != "") {
+            $dataJurnalUmum->where('sub_akuns.header_id', decrypt($_POST['id_header']));
+        }
+
+        $dataJurnalUmumResult =  $dataJurnalUmum->findAll();
+
         $dataJurnalUmumWithGroup = $this->jurnalUmumModel
             ->asObject()
             ->select('*, sub_akuns.header_id as id_header')
             ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
-            ->where($condition)
-            ->groupBy('id_header')
-            ->findAll();
-        // var_dump($dataJurnalUmum);
-        // var_dump($dataJurnalUmumWithGroup);
+            ->where($condition);
+
+        if (isset($_POST['id_sub_akun'])) {
+            foreach ($_POST['id_sub_akun'] as $i) {
+                $dataJurnalUmumWithGroup->where('id_coa', decrypt($i));
+            }
+        }
+
+        if (isset($_POST['id_header']) && @$_POST['id_header'] != "") {
+            $dataJurnalUmumWithGroup->where('sub_akuns.header_id', decrypt($_POST['id_header']));
+        }
+
+        $dataJurnalUmumWithGroupResult = $dataJurnalUmumWithGroup->groupBy('id_header')->findAll();
 
         $data = [
             "dataMetadata" => $dataMetadata,
             "dataKategoriAkun" => $dataKategoriAkun,
             "dataHeaderAkun" => $dataHeaderAkun,
             "dataSubAkuns" => $dataSubAkun,
-            "dataJurnalUmum" => $dataJurnalUmum,
-            "dataJurnalUmumWithGroup" => $dataJurnalUmumWithGroup,
+            "dataJurnalUmum" => $dataJurnalUmumResult,
+            "dataJurnalUmumWithGroup" => $dataJurnalUmumWithGroupResult,
             "dateEnd" => $dateEnd ? $dateEnd : date('d/m/Y'),
         ];
         return view('Laporan/LaporanBukuBesar/index', $data);
     }
 
-    public function exportPDF($tglAwal, $tglAkhir, $filter)
+    public function exportPDF()
     {
         $dompdf = new Dompdf();
-        $dateStart = $tglAwal;
-        $dateEnd = $tglAkhir;
-        $Filter = $filter != "all" ? $this->encrypter->decrypt(hex2bin($filter)) : "";
+        $dateStart = $this->request->getPost('dateStart');
+        $dateEnd = $this->request->getPost('dateEnd');
 
         if ($dateStart != "" && $dateEnd != "") {
             $condition = [
+                'jurnal_umum.company_id' => $this->this_company_id,
                 'tanggal_jurnal >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
                 'tanggal_jurnal <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))),
             ];
         } else {
             $condition = [
+                'jurnal_umum.company_id' => $this->this_company_id,
                 'tanggal_jurnal >=' => date('Y-m-01'),
                 'tanggal_jurnal <=' => date('Y-m-d')
-            ];
-        }
-        if ($Filter != "") {
-            $condition = [
-                'header_id' => $Filter,
-            ];
-            $condition2 = [
-                'deletedAt' => null,
-                'id' => $Filter,
-            ];
-        } else {
-            $condition2 = [
-                'deletedAt' => null,
             ];
         }
 
@@ -142,44 +144,56 @@ class BukuBesar extends BaseController
             ->groupEnd()
             ->findAll();
         $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR($this->this_company_id);
-        $dataHeaderAkun = $this->HeaderAkunsModel
-            ->asObject()
-            ->select('*')
-            ->where($condition2)
-            ->findAll();
-        foreach ($dataHeaderAkun as $val) {
-            $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
-        }
+        $dataHeaderAkun = $this->HeaderAkunsModel->getAPAR($this->this_company_id);
         $dataSubAkun = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
-        foreach ($dataSubAkun as $val) {
-            $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
-        }
-        // $dataJurnalUmum = $this->jurnalUmumModel->getDataJurnal($condition);
+
         $dataJurnalUmum = $this->jurnalUmumModel
             ->asObject()
             ->select('*, sub_akuns.header_id as id_header')
             ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
-            ->where($condition)
-            ->findAll();
+            ->where($condition);
+
+        if (isset($_POST['id_sub_akun'])) {
+            foreach ($_POST['id_sub_akun'] as $i) {
+                $dataJurnalUmum->where('id_coa', decrypt($i));
+            }
+        }
+
+        if (isset($_POST['id_header']) && @$_POST['id_header'] != "") {
+            $dataJurnalUmum->where('sub_akuns.header_id', decrypt($_POST['id_header']));
+        }
+
+        $dataJurnalUmumResult =  $dataJurnalUmum->findAll();
+
         $dataJurnalUmumWithGroup = $this->jurnalUmumModel
             ->asObject()
             ->select('*, sub_akuns.header_id as id_header')
             ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
-            ->where($condition)
-            ->groupBy('id_header')
-            ->findAll();
+            ->where($condition);
+
+        if (isset($_POST['id_sub_akun'])) {
+            foreach ($_POST['id_sub_akun'] as $i) {
+                $dataJurnalUmumWithGroup->where('id_coa', decrypt($i));
+            }
+        }
+
+        if (isset($_POST['id_header']) && @$_POST['id_header'] != "") {
+            $dataJurnalUmumWithGroup->where('sub_akuns.header_id', decrypt($_POST['id_header']));
+        }
+
+        $dataJurnalUmumWithGroupResult = $dataJurnalUmumWithGroup->groupBy('id_header')->findAll();
 
         $data = [
             "dataMetadata" => $dataMetadata,
             "dataKategoriAkun" => $dataKategoriAkun,
             "dataHeaderAkun" => $dataHeaderAkun,
             "dataSubAkuns" => $dataSubAkun,
-            "dataJurnalUmum" => $dataJurnalUmum,
-            "dataJurnalUmumWithGroup" => $dataJurnalUmumWithGroup,
+            "dataJurnalUmum" => $dataJurnalUmumResult,
+            "dataJurnalUmumWithGroup" => $dataJurnalUmumWithGroupResult,
             "dateStart" => $dateStart ? date("d/m/Y", strtotime($dateStart)) : date('d/m/Y'),
             "dateEnd" => $dateEnd ? date("d/m/Y", strtotime($dateEnd)) : date('d/m/Y'),
         ];
