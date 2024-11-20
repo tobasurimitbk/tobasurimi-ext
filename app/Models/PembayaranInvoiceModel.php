@@ -153,12 +153,24 @@ class PembayaranInvoiceModel extends Model
             ->first();
 
         if ($detail['type_invoice'] == "LOKAL") {
+            // Pastikan invoice_id adalah array (jika tidak, ubah ke array)
+            $invoiceIds = is_array($detail['invoice_id']) ? $detail['invoice_id'] : explode(',', $detail['invoice_id']);  // Jika string, pisahkan berdasarkan koma
+
+            // Ambil nama pelanggan berdasarkan invoice_id
             $namaCustomer = $salesOrderInvoiceModel
-                ->select("name")
+                ->select("customers.name")
                 ->join('customers', 'customers.id = sales_order_invoice.id_customer')
-                ->where('sales_order_invoice.id', $detail['invoice_id'])
-                ->first();
-            $detail['customer_name'] = $namaCustomer['name'];
+                ->whereIn('sales_order_invoice.id', $invoiceIds)  // Gunakan whereIn untuk beberapa ID invoice
+                ->findAll();  // Ambil semua hasil yang sesuai
+
+            // Gabungkan semua nama pelanggan yang ditemukan (jika ada lebih dari satu)
+            $customerNames = array_map(function($item) {
+                return $item['name'];  // Ambil nama pelanggan dari setiap hasil query
+            }, $namaCustomer);
+
+            // Gabungkan nama pelanggan dengan koma jika ada lebih dari satu
+            $detail['customer_name'] = implode(', ', $customerNames);  // Gabungkan nama-nama pelanggan
+
         } elseif ($detail['type_invoice'] == "EKSPOR") {
             $namaCustomer = $salesOrderExportModel
                 ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
