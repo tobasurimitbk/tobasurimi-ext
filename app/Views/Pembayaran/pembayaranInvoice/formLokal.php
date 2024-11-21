@@ -844,6 +844,7 @@
         let limit_bayar = 0;
         let total_invoice_barang_lain = 0;
         let total_invoice_non_lain = 0;
+        let hasLainLain = false; // Flag untuk mengecek apakah ada "LAIN-LAIN"
 
         // Mengelompokkan data berdasarkan no_faktur
         let groupedData = {};
@@ -852,6 +853,10 @@
                 groupedData[item.no_faktur] = [];
             }
             groupedData[item.no_faktur].push(item);
+
+            if (item.kode_barang === "LAIN-LAIN") {
+                hasLainLain = true;
+            }
         });
 
         // Loop untuk menambahkan baris ke tabel
