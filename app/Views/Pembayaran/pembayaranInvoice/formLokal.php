@@ -824,9 +824,10 @@
                 }
 
                 const totalPembayaran = parseFloat(res.totalPembayaran) || 0;
+                const totalSudahDiBayar = parseFloat(res.totalSudahDiBayar) || 0;
 
                 // Refresh tabel dengan data terbaru
-                drawTable(dataList, totalPembayaran);
+                drawTable(dataList, totalPembayaran, totalSudahDiBayar);
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error);
@@ -834,7 +835,7 @@
         });
     }
 
-    function drawTable(dataList, totalPembayaran) {
+    function drawTable(dataList, totalPembayaran, totalSudahDiBayar) {
         const table = $('#dataTable');
         table.find('tbody').empty();
 
@@ -899,7 +900,26 @@
         total_amount = total_invoice_non_lain - total_invoice_barang_lain;
 
         // Menambahkan baris total pembayaran dan potongan
-        addSummaryRows(table, total_amount, totalPembayaran, limit_bayar);
+        addSummaryRows(table, total_amount, totalPembayaran, limit_bayar, totalSudahDiBayar);
+
+            // Set "required" pada select jika ada "LAIN-LAIN" dalam data
+            if (hasLainLain) {
+                // Set required pada kedua select input
+                $('#akun_kas_lain').prop('required', true);
+                $('#akun_selisih_lain').prop('required', true);
+
+                // Mengubah label untuk menambahkan kata 'Wajib' atau menghapus 'Opsional'
+                $('#akun_kas_lain').siblings('label').text('Debit Lain');
+                $('#akun_selisih_lain').siblings('label').text('Kredit Lain');
+            } else {
+                // Set required menjadi false jika tidak ada "LAIN-LAIN"
+                $('#akun_kas_lain').prop('required', false);
+                $('#akun_selisih_lain').prop('required', false);
+
+                // Mengubah label untuk menambahkan kata 'Opsional' kembali
+                $('#akun_kas_lain').siblings('label').text('Debit Lain (Opsional)');
+                $('#akun_selisih_lain').siblings('label').text('Kredit Lain (Opsional)');
+            }
     }
 
 
@@ -936,11 +956,12 @@
         }
     }
 
-    function addSummaryRows(table, total_amount, total_invoice, limit_bayar) {
+    function addSummaryRows(table, total_amount, total_invoice, limit_bayar, totalSudahDiBayar) {
         // Pastikan semua parameter memiliki nilai default 0 jika undefined, null, atau NaN
         total_amount = isNaN(total_amount) ? 0 : total_amount;
         total_invoice = isNaN(total_invoice) ? 0 : total_invoice;
         limit_bayar = isNaN(limit_bayar) ? 0 : limit_bayar;
+        totalSudahDiBayar = isNaN(totalSudahDiBayar) ? 0 : totalSudahDiBayar;
 
         // Tambahkan baris untuk Total Pembayaran, Total Sudah Dibayar, dan Sisa Pembayaran
         table.find('tbody').append(`
@@ -950,11 +971,11 @@
             </tr>
             <tr style="color:whitesmoke;">
                 <td colspan="5" style="text-align: right;">Total Sudah Dibayar</td>
-                <td class="total_dibayar" style="text-align:center;">${formatRupiah2(total_invoice)}</td>
+                <td class="total_dibayar" style="text-align:center;">${formatRupiah2(totalSudahDiBayar)}</td>
             </tr>
             <tr style="color:whitesmoke;">
                 <td colspan="5" style="text-align: right;">Sisa Pembayaran</td>
-                <td class="total_amount_invoice" style="text-align:center;">${formatRupiah2(total_amount - total_invoice)}</td>
+                <td class="total_amount_invoice" style="text-align:center;">${formatRupiah2(total_amount - totalSudahDiBayar)}</td>
             </tr>
         `);
 
@@ -981,7 +1002,7 @@
             let cleanValue = rawValue.replace(/[^0-9]/g, ''); // Hapus karakter non-digit
             let numberValue = parseInt(cleanValue) || 0; // Konversi ke angka, default 0
 
-            let sisaPembayaran = total_amount - total_invoice; // Hitung sisa pembayaran
+            let sisaPembayaran = total_amount - totalSudahDiBayar; // Hitung sisa pembayaran
 
             // Validasi nilai input
             if (numberValue > sisaPembayaran) {

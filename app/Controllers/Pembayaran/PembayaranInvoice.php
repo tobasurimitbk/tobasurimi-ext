@@ -244,6 +244,7 @@ class PembayaranInvoice extends BaseController
         $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel->where('deletedAt', null)
             ->where('id_company', $this->this_company_id)
             ->where('id_customer', $customer_id_decrypt)
+            ->where('pay_amount < total_invoice') // Menambahkan kondisi pay_amount lebih kecil dari total_invoice
             ->findAll();
         foreach ($salesOrderLokalInvoiceData as $s) {
             $totalPembayaran = 0;
@@ -467,7 +468,11 @@ class PembayaranInvoice extends BaseController
 
        if(!empty($idArray)) {
          // Ambil data invoice berdasarkan semua ID
-         $salesOrderInvoiceData = $this->salesOrderInvoiceModel->whereIn('id', $idArray)->findAll();
+         $salesOrderInvoiceData = $this->salesOrderInvoiceModel->select('pay_amount')->whereIn('id', $idArray)->first();
+        // Gunakan ternary untuk memeriksa apakah pay_amount null, jika ya beri nilai 0
+        $payAmount = $salesOrderInvoiceData['pay_amount'] ?? 0;
+
+
          $salesOrderInvoiceDetailData = $this->salesOrderInvoiceDetailModel
              ->select('sales_order_invoice.no_faktur, sales_order_invoice_detail.id as sales_order_invoice_detail_id, sales_order_invoice_detail.id_sales_order_invoice as sales_order_invoice_id, qty_invoice, harga_barang_invoice, qty_invoice, amount_invoice, kode_barang, barang_name')
              ->join('barang_master_sales', 'sales_order_invoice_detail.id_barang_invoice = barang_master_sales.id')
@@ -520,6 +525,7 @@ class PembayaranInvoice extends BaseController
         return $this->response->setJSON([
             'data' => $dataBarang,
             'totalPembayaran' => $pembayaranInvoiceData['total_bayar'] ?? 0,
+            'totalSudahDiBayar' => $payAmount,
             'status' => true
         ]);
     }
@@ -704,6 +710,13 @@ class PembayaranInvoice extends BaseController
 
             if ($tipe_invoice == "LOKAL") {
 
+                //update py_amount untuk metode partials
+                foreach ($no_dokumen_req as $inv_id) {
+                    $this->salesOrderInvoiceModel->update($inv_id, [
+                        'pay_amount' => repairDouble($this->request->getVar('total_bayar')),
+                    ]);
+                }
+
                 $id = $this->pembayaranInvoiceModel->insert([
                     'company_id' => $this->this_company_id,
                     'user_id' => $this->user_id,
@@ -722,7 +735,7 @@ class PembayaranInvoice extends BaseController
                     'akun_kas' => $this->request->getVar('akun_kas'),
                     'akun_selisih' => $this->request->getVar('akun_selisih'),
                     'akun_kas_lain' => $this->request->getVar('akun_kas_lain'),
-                    'akun_selisih_lain' => $this->request->getVar('akun_kredit_lain'),
+                    'akun_selisih_lain' => $this->request->getVar('akun_selisih_lain'),
                     'status_posting' => '0'
                 ]);
 
@@ -738,7 +751,6 @@ class PembayaranInvoice extends BaseController
                         'harga_total' => $l->amount_invoice
                     ]);
                 }
-
                 return response()->setJSON([
                     'id' => encrypt($id),
                     'status' => true,
@@ -874,7 +886,7 @@ class PembayaranInvoice extends BaseController
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
                 'akun_kas_lain' => $this->request->getVar('akun_kas_lain'),
-                'akun_selisih_lain' => $this->request->getVar('akun_kredit_lain'),
+                'akun_selisih_lain' => $this->request->getVar('akun_selisih_lain'),
                 'status_posting' => '0',
                 'payment_method' => $this->request->getVar('payment_methods')
             ]);

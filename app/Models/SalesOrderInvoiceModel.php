@@ -44,6 +44,7 @@ class SalesOrderInvoiceModel extends Model
         'tax_value',
         'jenis_penjualan',
         'nama_ecommerce',
+        'pay_amount',
     ];
 
     // Dates
