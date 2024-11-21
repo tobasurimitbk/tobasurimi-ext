@@ -499,6 +499,7 @@ $routes->get('/pembayaran-invoice/create', 'Pembayaran\PembayaranInvoice::create
 $routes->get('/pembayaran-invoice/create-ekspor', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceEkspor', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/create-lain', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceLain', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/create-return', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceReturn', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/dropdown-invoice-return', 'Pembayaran\PembayaranInvoice::dropdownInvoiceReturn', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-dokumen-list', 'Pembayaran\PembayaranInvoice::getDokumenList', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-dokumen-invoice-lokal/(:segment)', 'Pembayaran\PembayaranInvoice::getDataDokumenInvoiceLokal/$1', ['filter' => 'Auth']);
 $routes->get('pembayaran-invoice/get-valas-sales-ekspor', 'Pembayaran\PembayaranInvoice::getValas', ['filter' => 'Auth']);

@@ -94,30 +94,44 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select  no_dokumen" name="no_dokumen" id="no_dokumen">
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select divisi_id " name="divisi_id" id="divisi_id">
                                 <option value=""></option>
-                                <?php if (!empty($dokumenList)): ?>
-                                    <?php foreach ($dokumenList as $l): ?>
-                                        <option <?= (!empty($detail)) ?  (($detail['invoice_id']) == $l['id'] ? "selected" : "") : '' ?> value="<?= encrypt($l['id']); ?>"><?= $l['no_return']; ?></option>
-                                    <?php endforeach; ?>
-
-                                <?php endif; ?>
+                                <?php foreach ($divisi as $d): ?>
+                                    <option <?= !empty($detail) ? ($detail['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                        <?= $d['divisi'] ?>
+                                    </option>
+                                <?php endforeach ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">No Dokumen</label>
+                            <label for="floatingInput" style="z-index: 1;">Departemen</label>
                         </div>
                     </div>
 
                 </div>
                 <div class="row">
-
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly name="customer" id="customer" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['customer_name'] : "" ?>" type="text" class="form-control customer" placeholder="Customer">
-                            <label for="floatingInput">Customer</label>
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select customer_id " name="customer_id" id="customer_id" onchange="dropdownInvoice()">
+                                <option value=""></option>
+                                <?php foreach ($customers as $c): ?>
+                                    <option <?= !empty($detail) ? ($detail['customer_id'] == $c['id'] ? 'selected' : '') : '' ?> value="<?= $c['id'] ?>"><?= $c['name'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Pilih Customer</label>
                         </div>
                     </div>
-
-
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select multiple <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select  no_dokumen" name="no_dokumen[]" id="no_dokumen">
+                                <option value=""></option>
+                                <?php if (isset($dokumenList)): ?>
+                                    <?php foreach ($dokumenList as $d): ?>
+                                        <option value="<?= $d['id'] ?>" selected><?= $d['no_return'] ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">No Dokumen</label>
+                        </div>
+                    </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select payment_methods " name="payment_methods" id="payment_methods">
@@ -128,17 +142,15 @@
                             <label for="floatingInput" style="z-index: 1;">Payment Methods</label>
                         </div>
                     </div>
+                </div>
 
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="<?= session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
                             <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
-
-                </div>
-
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select" name="akun_kas" id="akun_kas">
@@ -158,7 +170,7 @@
                                     <option <?= (!empty($detail)) ?  (($detail['akun_selisih']) == $subs->id ? "selected" : "") : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
                                 <?php endforeach ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Kredit (Opsional)</label>
+                            <label for="floatingInput" style="z-index: 1;">Kredit</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -167,8 +179,29 @@
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select" name="akun_kas_lain" id="akun_kas_lain">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option <?= (!empty($detail)) ?  (($detail['akun_kas']) == $subs->id ? "selected" : "") : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Debit</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select" name="akun_selisih_lain" id="akun_selisih_lain">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option <?= (!empty($detail)) ?  (($detail['akun_selisih']) == $subs->id ? "selected" : "") : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Kredit</label>
+                        </div>
+                    </div>
                 </div>
-
                 <hr>
                 <div class="row">
                     <div class="col-md-12">
@@ -185,11 +218,11 @@
                     <div class="col-md-4">
                         <div class="input-group">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="total_tagihan_lain_lain" id="total_tagihan_lain_lain" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Pembayaran Oleh">
+                                <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = formatRupiah2(this.value)" name="total_tagihan_lain_lain" id="total_tagihan_lain_lain" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Pembayaran Oleh">
                                 <label for="floatingInput">Total Tagihan</label>
                             </div>
                             <div class="input-group-append" style="height:50px;">
-                                <button class="btn btn-success btn-add-barang" data-toggle="modal" type="button">
+                                <button class="btn btn-success btn-add-barang" data-toggle="modal" type="button" onclick="insertBarangLain()">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
@@ -199,7 +232,7 @@
 
                 <div class="row">
                     <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" id="dataTable" width="100%" cellspacing="0">
+                        <table class="table table-bordered nowrap " id="dataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr style="color: whitesmoke;">
                                     <th style="text-align: center;">Kode Barang</th>
@@ -211,12 +244,13 @@
                                 </tr>
                             </thead>
                             <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
-                                <?php if (empty($detail)):  ?>
-                                    <tr style="color: whitesmoke;">
-                                        <td colspan="9" style="text-align: center;">Tidak ada data</td>
-                                    </tr>
-                                <?php endif; ?>
+
                             </tbody>
+                            <tfoot>
+                                <tr style="color: whitesmoke;">
+                                    <td colspan="9" style="text-align: center;color:black;">Tidak ada data</td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -228,12 +262,14 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+    const csrf = $(`[name="${csrfToken}"]`);
 
+    var listData = [];
+    var totalPembayaran = 0;
 
     <?php if (!empty($detail)) : ?>
-        drawTable();
+        getBarangSalesReturn();
     <?php endif; ?>
-
 
     $(document).ready(function() {
 
@@ -272,6 +308,9 @@
                 akun_kas: {
                     required: true
                 },
+                akun_selisih: {
+                    required: true
+                },
             },
             messages: {
                 no_bukti_pembayaran: {
@@ -307,7 +346,9 @@
                 akun_kas: {
                     required: "Debit wajib diisi"
                 },
-
+                akun_selisih: {
+                    required: "Kredit wajib diisi"
+                },
 
             },
             errorElement: 'span',
@@ -344,6 +385,12 @@
             autoclose: true
         });
 
+        $('#customer_id').select2({
+            placeholder: "Pilih Customer",
+            theme: "bootstrap-5",
+            allowClear: true
+        });
+
         $('#jenis_dokumen').select2({
             placeholder: "Pilih Jenis Dokumen",
             theme: "bootstrap-5"
@@ -355,9 +402,18 @@
             theme: "bootstrap-5"
         });
 
-
         $('#akun_selisih').select2({
-            placeholder: "Akun Selisih (Opsional)",
+            placeholder: "Akun Selisih",
+            theme: "bootstrap-5"
+        });
+
+        $('#akun_kas_lain').select2({
+            placeholder: "Akun Debit Lain",
+            theme: "bootstrap-5"
+        });
+
+        $('#akun_selisih_lain').select2({
+            placeholder: "Akun Selisih Lain",
             theme: "bootstrap-5"
         });
 
@@ -368,10 +424,9 @@
         $('#no_dokumen').select2({
             placeholder: "Pilih Nomor Dokumen",
             theme: "bootstrap-5",
-            allowClear: true
+            allowClear: false
         }).change(function() {
-            drawTable();
-            getCustomer();
+            getBarangSalesReturn();
         })
 
 
@@ -381,184 +436,161 @@
             allowClear: true
         });
 
-
-
         $(".btn-submit-form").click(function() {
             var id = $('.id').val();
-            const csrfToken = '<?= csrf_token() ?>';
-            const csrf = $(`[name="${csrfToken}"]`);
+            var is_form_valid = true;
+            var akun_kas_lain = $('#akun_kas_lain').val();
+            var akun_selisih_lain = $('#akun_selisih_lain').val();
 
-
-            // Ambil data dari tabel
-            let tableData = [];
-            $("#body-detail-table tr").each(function() {
-                let kodeBarang = $(this).find("td:eq(2)").text(); // Pastikan indeks sesuai posisi kolom kode_barang
-                let salesOrderReturnDetailId = $(this).find("td:eq(0)").text(); // Pastikan indeks sesuai posisi kolom
-                let salesOrderReturnId = $(this).find("td:eq(1)").text(); // Pastikan indeks sesuai posisi kolom
-                let namaBarang = $(this).find("td:eq(3)").text(); // Pastikan indeks sesuai posisi kolom nama_barang
-                let qty = $(this).find("td:eq(4)").text();
-                let hargaSatuan = $(this).find("td:eq(5)").text();
-                let amount = $(this).find("td:eq(6)").text();
-
-                // Cek row untuk validasi atau "LAIN LAIN"
-                if (kodeBarang && kodeBarang !== "Total Sudah Dibayar" && kodeBarang !== "Total Amount Invoice" && kodeBarang !== "Potongan" && kodeBarang !== "Pembayaran") {
-                    tableData.push({
-                        sales_order_return_detail_id: kodeBarang === "LAIN LAIN" ? "" : salesOrderReturnDetailId,
-                        sales_order_return_id: kodeBarang === "LAIN LAIN" ? "" : salesOrderReturnId,
-                        kode_barang: kodeBarang,
-                        nama_barang: namaBarang,
-                        qty: qty,
-                        harga_satuan: hargaSatuan,
-                        amount: amount
-                    });
+            for (let i = 0; i < listData.length; i++) {
+                if (listData[i].kode_barang == "LAIN-LAIN") {
+                    if (akun_kas_lain == "" || akun_selisih_lain == "" || akun_kas_lain == null || akun_selisih_lain == null) {
+                        is_form_valid = false;
+                        break;
+                    }
                 }
-            });
+            }
 
+            console.log(is_form_valid, akun_kas_lain, akun_selisih_lain);
 
-
-
-            // Ambil total amount, potongan, dan pembayaran dari form/input
-            let totalAmount = parseFloat($('.total_amount_invoice').text().replace(/\./g, '').replace(',', '.'));
-            let potongan = $('.potongan').val() ? convertRupiahToNumber($('.potongan').val()) : 0;
-            let pembayaran = $('.total-bayar').val() ? convertRupiahToNumber($('.total-bayar').val()) : 0;
-
-
-
-            if (id) {
-                // UPDATE
-                if ($(".create-form").valid()) {
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Kembali',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            let formData = new FormData(document.querySelector(".create-form"));
-                            // formData.append('total_amount_invoice', $(".total_amount_invoice").text());
-                            formData.append('total_amount_invoice', totalAmount);
-                            formData.append('potongan', potongan);
-                            formData.append('pembayaran', pembayaran);
-                            formData.append('tableData', JSON.stringify(tableData));
-
-                            $.ajax({
-
-                                url: "<?= base_url("/pembayaran-invoice/update"); ?>",
-                                data: formData,
-                                beforeSend: function(xhr) {
-                                    setLoading();
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                complete: function() {
-                                    stopLoading();
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                window.location.href = `<?= base_url("pembayaran-invoice"); ?>`;
-                                            })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        });
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                }
-                            });
-                        }
-
-                    })
-                }
-
+            if (!is_form_valid) {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Akun Debit dan Akun Kredit Untuk Invoice Lain Wajib Diisi",
+                    confirmButtonColor: '#4e73df',
+                })
             } else {
-                // CREATE
-                if ($(".create-form").valid()) {
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Kembali',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            let formData = new FormData(document.querySelector(".create-form"));
-                            // formData.append('total_amount_invoice', $(".total_amount_invoice").text());
-                            formData.append('total_amount_invoice', totalAmount);
-                            formData.append('potongan', potongan);
-                            formData.append('pembayaran', pembayaran);
-                            formData.append('tableData', JSON.stringify(tableData));
-                            $.ajax({
-                                url: "<?= base_url("pembayaran-invoice/save"); ?>",
-                                data: formData,
-                                beforeSend: function(xhr) {
-                                    setLoading();
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                complete: function() {
-                                    stopLoading();
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                                icon: 'success',
+                if (id) {
+                    // UPDATE
+                    if ($(".create-form").valid()) {
+                        Swal.fire({
+                            icon: 'question',
+                            title: 'Simpan Data?',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            showCancelButton: true,
+                            reverseButtons: true,
+                            confirmButtonText: 'Simpan',
+                            cancelButtonText: 'Kembali',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                let formData = new FormData(document.querySelector(".create-form"));
+                                formData.append('total_amount_invoice', $(".total_amount_invoice").text());
+                                formData.append('list_barang', JSON.stringify(listData));
+                                $.ajax({
+
+                                    url: "<?= base_url("/pembayaran-invoice/update"); ?>",
+                                    data: formData,
+                                    beforeSend: function(xhr) {
+                                        setLoading();
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    complete: function() {
+                                        stopLoading();
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    window.location.href = `<?= base_url("pembayaran-invoice"); ?>`;
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
                                                 title: response.message,
                                                 confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                window.location.href = `<?= base_url("pembayaran-invoice/id/"); ?>` + response.id;
-                                            })
-                                    } else {
+                                            });
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
                                         Swal.fire({
                                             icon: 'error',
-                                            title: response.message,
+                                            title: 'Data Gagal Disimpan, coba Lagi',
                                             confirmButtonColor: '#4e73df',
                                         })
                                     }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                }
-                            });
-                        }
-                    })
+                                });
+                            }
+
+                        })
+                    }
+
+                } else {
+                    // CREATE
+                    if ($(".create-form").valid()) {
+                        Swal.fire({
+                            icon: 'question',
+                            title: 'Simpan Data?',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            showCancelButton: true,
+                            reverseButtons: true,
+                            confirmButtonText: 'Simpan',
+                            cancelButtonText: 'Kembali',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                let formData = new FormData(document.querySelector(".create-form"));
+                                formData.append('total_amount_invoice', $(".total_amount_invoice").text());
+                                formData.append('list_barang', JSON.stringify(listData));
+                                $.ajax({
+                                    url: "<?= base_url("pembayaran-invoice/save"); ?>",
+                                    data: formData,
+                                    beforeSend: function(xhr) {
+                                        setLoading();
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    complete: function() {
+                                        stopLoading();
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    window.location.href = `<?= base_url("pembayaran-invoice"); ?>`;
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                    }
+                                });
+                            }
+                        })
+                    }
                 }
             }
+
+
         })
     })
 
@@ -688,30 +720,30 @@
     }
 
     function formatRupiah2(angka) {
-        if (angka === null) {
+        if (angka === null || angka === undefined) {
             angka = 0;
         }
 
-        angka = angka.toString();
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return "" + ribuanFormatted + ',' + desimal;
+        angka = angka.toString().replace(/[^\d,]/g, '');
+        let parts = angka.split(',');
+        let ribuan = parts[0] || '0';
+        let desimal = (parts[1] || '').padEnd(2, '0').substring(0, 2);
+
+        let reverse = ribuan.split('').reverse().join('');
+        let ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
+
+        return ribuanFormatted + (desimal ? ',' + desimal : '');
     }
 
     function convertRupiahToNumber(rupiah) {
-        if (rupiah == "") {
+        if (!rupiah || typeof rupiah !== 'string') {
             return 0;
-        } else {
-            var withoutDot = rupiah.replace(/\./g, '');
-            var numberWithDot = withoutDot.replace(',', '.');
-            return parseFloat(numberWithDot);
         }
+
+        rupiah = rupiah.replace(/\./g, '').replace(',', '.');
+        return parseFloat(rupiah) || 0;
     }
+
 
     function limitInputBayar(input, maxAmount) {
 
@@ -756,204 +788,193 @@
         })
     }
 
-    function drawTable() {
-        // const csrfToken = '<?= csrf_token() ?>';
-        // const csrf = $(`[name="${csrfToken}"]`);
+    function insertBarangLain() {
+        var nama_tagihan_lain_lain = $('#nama_tagihan_lain_lain').val();
+        var total_tagihan_lain_lain = convertRupiahToNumber($('#total_tagihan_lain_lain').val());
+
+        if (nama_tagihan_lain_lain == '' || total_tagihan_lain_lain == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Nama Tagihan dan Total Tagihan Wajib Diisi',
+                confirmButtonColor: '#4e73df',
+            });
+        } else {
+            listData.push({
+                id: getID(),
+                sales_order_return_detail_id: null,
+                sales_order_return_id: null,
+                qty_return: 1,
+                harga_barang_return: (parseFloat(total_tagihan_lain_lain) || 0) * -1,
+                amount_return: (parseFloat(total_tagihan_lain_lain) || 0) * -1,
+                kode_barang: "LAIN-LAIN",
+                barang_name: nama_tagihan_lain_lain
+            });
+
+            drawTable(listData);
+            $('#nama_tagihan_lain_lain').val(null);
+            $('#total_tagihan_lain_lain').val(null);
+        }
+
+    }
+
+    function dropdownInvoice() {
+        let customerId = $('#customer_id option:selected').val();
+        $.ajax({
+            url: `<?= base_url('pembayaran-invoice/dropdown-invoice-return'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                customer_id: $("#customer_id option:selected").val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".no_dokumen").empty()
+                $(".no_dokumen").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".no_dokumen").append(`<option value="${item.id}">${item.no_return}</option>`)
+                })
+                $(".no_dokumen").change();
+            }
+        });
+    }
+
+    function getBarangSalesReturn() {
+        let arr = $('.no_dokumen').val();
         $.ajax({
             url: "<?= base_url("pembayaran-invoice/get-barang-sales-return"); ?>",
             method: "GET",
             dataSrc: "data",
             data: {
-                id: $("#no_dokumen").val(),
+                id: JSON.stringify(arr),
                 pembayaran_invoice_id: "<?= !empty($detail) ? encrypt($detail['id']) : '' ?>"
             },
-            beforeSend: function(xhr) {
-                // setLoading();
-                // xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            complete: function() {
-                //stopLoading();
-            },
             dataType: "json",
             success: function(res) {
-                console.log(res);
-                const table = $('#dataTable');
-                table.find('tbody').empty();
-                var total_amount = 0;
-                var total_invoice = 0;
-                var limit_bayar = 0;
-                $.each(res.data, function(index, item) {
-                    var newRow = $('<tr style="color:whitesmoke;">');
-                    newRow.append($('<td style="text-align:center; display:none;" >').text(item.sales_order_return_detail_id));
-                    newRow.append($('<td style="text-align:center; display:none;" >').text(item.sales_order_return_id));
-                    newRow.append($('<td style="text-align:center;" >').text(item.kode_barang));
-                    newRow.append($('<td style="text-align:center;">').text(item.barang_name));
-                    newRow.append($('<td style="text-align:center;">').text(item.qty_return));
-                    newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_return)));
-                    newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.amount_return)));
-                    table.find('tbody').append(newRow);
-                    total_amount += parseFloat(item.amount_return);
-                });
-                total_invoice = res.totalPembayaran;
-                var newRow0 = $('<tr style="color:whitesmoke;">');
-                newRow0.append($('<td colspan="4" style="text-align: right;">').text("Total Pembayaran"));
-                newRow0.append($('<td style="text-align:center;">').text(formatRupiah2(total_amount)));
-                table.find('tbody').append(newRow0);
-
-                var newRow1 = $('<tr style="color:whitesmoke;" class="total-dibayar-row">');
-                newRow1.append($('<td colspan="4" style="text-align: right;">').text("Total Sudah Dibayar"));
-                newRow1.append($('<td class="total_dibayar" style="text-align:center;">').text(formatRupiah2(total_invoice)));
-                table.find('tbody').append(newRow1);
-
-                var newRow2 = $('<tr style="color:whitesmoke;">');
-                newRow2.append($('<td colspan="4" style="text-align: right;">').text("Sisa Pembayaran"));
-                newRow2.append($('<td class="total_amount_invoice" style="text-align:center;">').text(formatRupiah2(total_amount - total_invoice)));
-                table.find('tbody').append(newRow2);
-
-                limit_bayar = parseFloat(total_amount) - parseFloat(total_invoice);
-
-                var newRow3 = $('<tr style="color:whitesmoke;">');
-                newRow3.append($('<td colspan="4" style="text-align: right;">').text("Potongan"));
-                newRow3.append($('<td style="text-align:center;"><b>' +
-                    `<input autocomplete="one-time-code" data-id=""<?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  onchange="this.value = formatRupiah2(this.value)" class="form-control potongan trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['potongan'])  : '' ?>" name="potongan" oninput="limitInputBayar(this, ${limit_bayar})">` +
-                    '</b></td>'));
-                table.find('tbody').append(newRow3);
-
-                var newRow4 = $('<tr style="color:whitesmoke;">');
-                newRow4.append($('<td colspan="4" style="text-align: right;">').text("Anda Membayar Sebesar"));
-                newRow4.append($('<td style="text-align:center;"><b>' +
-                    `<input autocomplete="one-time-code" data-id="" <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = formatRupiah2(this.value)" class="form-control total-bayar trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['total_bayar'])  : '' ?>" name = "total_bayar"> ` +
-                    '</b></td>'));
-                table.find('tbody').append(newRow4);
-
-                $(document).on("input", ".total-bayar, .potongan", function() {
-                    let totalAmount = parseFloat($('.total_amount_invoice').text().replace(/\./g, '').replace(',', '.'));
-                    var potongan = $('.potongan').val() ? convertRupiahToNumber($('.potongan').val()) : 0;
-                    limit_bayar = totalAmount - parseFloat(total_invoice) - parseFloat(potongan);
-
-                    $('input.total-bayar').attr('oninput', `limitInputBayar(this, ${limit_bayar})`);
-
-                    if ($('.potongan').val() != "" || $('.potongan').val() != 0) {
-                        $('.total-bayar').val(limit_bayar).change()
-                    }
-                });
+                listData = [];
+                listData = res.data;
+                totalPembayaran = res.totalPembayaran;
+                drawTable(listData)
             }
         })
     }
 
-    function recalculateTable() {
-        let totalAmount = 0;
-        let totalDibayar = parseRupiahToNumber($('.total_dibayar').text());
-        let potongan = parseRupiahToNumber($('.potongan').val());
+    function drawTable(listData) {
 
-        // Hitung ulang total amount berdasarkan data di tabel
-        $('#dataTable tbody tr:not(.total-dibayar-row)').each(function() {
-            const rowAmount = parseRupiahToNumber($(this).find('td:eq(6)').text());
-            totalAmount += rowAmount;
-        });
+        const table = $('#dataTable');
+        table.find('tbody').empty();
+        table.find('tfoot').empty();
 
-        // Update Total Amount Invoice
-        $('.total_amount_invoice').text(formatRupiah2(totalAmount));
-
-        // Update limit bayar
-        const sanitizedTotalDibayar = Math.max(totalDibayar, 0);
-        const sanitizedPotongan = Math.max(potongan, 0);
-        let limitBayar = totalAmount - sanitizedTotalDibayar - sanitizedPotongan;
-
-        // Prevent negative limit bayar
-        if (limitBayar < 0) {
-            limitBayar = 0;
-        }
-
-        // Update limit bayar di input pembayaran
-        $('input.total-bayar').attr('oninput', `limitInputBayar(this, ${limitBayar})`);
-        console.log("Recalculated Limit Bayar: ", limitBayar);
-    }
-
-    function parseRupiahToNumber(value) {
-        if (!value) return 0;
-        return parseFloat(value.replace(/\./g, '').replace(',', '.')) || 0;
-    }
-
-    // Event untuk potongan dan total bayar
-    $(document).on("input", ".potongan, .total-bayar", function() {
-        recalculateTable();
-    });
-
-    // Event hapus row
-    $(document).on("click", ".btn-delete-row", function() {
-        $(this).closest('tr').remove();
-        recalculateTable();
-    });
-
-    // Event tambah row baru
-    $(document).on("click", ".btn-add-barang", function() {
-        addRowToTable();
-    });
-
-    function addRowToTable() {
-        const namaTagihan = $("#nama_tagihan_lain_lain").val();
-        const totalTagihan = $("#total_tagihan_lain_lain").val() ? parseFloat($("#total_tagihan_lain_lain").val()) : 0;
-        const qty = 1;
-
-        if (!namaTagihan || totalTagihan <= 0) {
-            alert("Nama Tagihan / Invoice dan Total Tagihan harus diisi");
-            return;
-        }
-
-        const newRow = $(` 
-        <tr style="color:whitesmoke;" data-kategori="LAIN LAIN">
-            <td style="text-align:center; display:none;"></td>
-            <td style="text-align:center; display:none;"></td>
-            <td style="text-align:center;">LAIN LAIN</td>
-            <td style="text-align:center;">${namaTagihan}</td>
-            <td style="text-align:center;">${qty}</td>
-            <td style="text-align:center;">${formatRupiah2(totalTagihan)}</td>
-            <td style="text-align:center;">${formatRupiah2(totalTagihan * qty)}</td>
-            <td style="text-align:center;">
-                <button class="btn-delete-row"><i class="fa fa-trash"></i></button>
-            </td>
-        </tr>
-    `);
-
-        const totalRow = $("#dataTable").find('tbody tr.total-dibayar-row').first();
-        if (totalRow.length) {
-            totalRow.before(newRow);
+        if (listData.length == 0) {
+            table.find('tfoot').empty();
+            var newRow = $('<tr style="color: whitesmoke;">');
+            newRow.append($('<td colspan="9" style="text-align: center;color:black;">Tidak ada data</td>'));
+            table.find('tfoot').append(newRow);
         } else {
-            $("#dataTable").find('tbody').append(newRow);
+            var total_amount = 0;
+            var total_invoice = 0;
+            var limit_bayar = 0;
+
+            $.each(listData, function(index, item) {
+                var newRow = $('<tr style="color:whitesmoke;">');
+                newRow.append($('<td style="text-align:center; display:none;" >').text(item.sales_order_return_detail_id));
+                newRow.append($('<td style="text-align:center; display:none;" >').text(item.sales_order_return_id));
+                newRow.append($('<td style="text-align:center;" >').text(item.kode_barang));
+                newRow.append($('<td style="text-align:center;">').text(item.barang_name));
+                newRow.append($('<td style="text-align:center;">').text(item.qty_return));
+                newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_return * -1)));
+                newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.amount_return * -1)));
+
+                if (item.sales_order_return_detail_id == null) {
+                    newRow.append(
+                        $('<td style="text-align:center;">').html(`
+                            <button type="button" class="btn btn-danger" onclick="deleteBarang('${item.id}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        `)
+                    );
+                } else {
+                    newRow.append($('<td style="text-align:center;">').text(''));
+                }
+
+                table.find('tbody').append(newRow);
+                total_amount += parseFloat(item.amount_return);
+            });
+            total_invoice = totalPembayaran;
+            var newRow0 = $('<tr style="color:whitesmoke;">');
+            newRow0.append($('<td colspan="4" style="text-align: right;">').text("Total Pembayaran"));
+            newRow0.append($('<td style="text-align:center;">').text(formatRupiah2(total_amount)));
+            table.find('tbody').append(newRow0);
+
+            var newRow1 = $('<tr style="color:whitesmoke;" class="total-dibayar-row">');
+            newRow1.append($('<td colspan="4" style="text-align: right;">').text("Total Sudah Dibayar"));
+            newRow1.append($('<td class="total_dibayar" style="text-align:center;">').text(formatRupiah2(total_invoice)));
+            table.find('tbody').append(newRow1);
+
+            var newRow2 = $('<tr style="color:whitesmoke;">');
+            newRow2.append($('<td colspan="4" style="text-align: right;">').text("Sisa Pembayaran"));
+            newRow2.append($('<td class="total_amount_invoice" style="text-align:center;">').text(formatRupiah2(total_amount - total_invoice)));
+            table.find('tbody').append(newRow2);
+
+            limit_bayar = parseFloat(total_amount) - parseFloat(total_invoice);
+
+            var newRow3 = $('<tr style="color:whitesmoke;">');
+            newRow3.append($('<td colspan="4" style="text-align: right;">').text("Potongan"));
+            newRow3.append($('<td style="text-align:center;"><b>' +
+                `<input autocomplete="one-time-code" data-id=""<?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value=formatRupiah2(this.value);validateKeyup();"  class="form-control potongan trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['potongan'])  : '' ?>" name="potongan" onchange="limitInputBayar(this, ${limit_bayar})">` +
+                '</b></td>'));
+            table.find('tbody').append(newRow3);
+
+            var newRow4 = $('<tr style="color:whitesmoke;">');
+            newRow4.append($('<td colspan="4" style="text-align: right;">').text("Anda Membayar Sebesar"));
+            newRow4.append($('<td style="text-align:center;"><b>' +
+                `<input autocomplete="one-time-code" data-id="" <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value=formatRupiah2(this.value);validateKeyup();" class="form-control total-bayar trigger-input" id="total_bayar" type="text" value="<?= !empty($detail) ? formatRupiah($detail['total_bayar'])  : '' ?>" name="total_bayar"> ` +
+                '</b></td>'));
+            table.find('tbody').append(newRow4);
+
+            $(document).on("input", ".total-bayar, .potongan", function() {
+                let totalAmount = parseFloat($('.total_amount_invoice').text().replace(/\./g, '').replace(',', '.'));
+                var potongan = $('.potongan').val() ? convertRupiahToNumber($('.potongan').val()) : 0;
+                limit_bayar = totalAmount - parseFloat(potongan);
+
+                $('input.total-bayar').attr('onchange', `limitInputBayar(this, ${limit_bayar})`);
+
+                if ($('.potongan').val() != "" || $('.potongan').val() != 0) {
+                    $('.total-bayar').val(limit_bayar).change()
+                }
+            });
+        }
+    }
+
+    function deleteBarang(id) {
+        var indexToRemove = -1;
+        for (let i = 0; i < listData.length; i++) {
+            if (listData[i].id == id) {
+                indexToRemove = i;
+                break;
+            }
         }
 
-        recalculateTable();
-        $("#nama_tagihan_lain_lain").val('');
-        $("#total_tagihan_lain_lain").val('');
+        if (indexToRemove !== -1) {
+            listData.splice(indexToRemove, 1);
+            drawTable(listData)
+        }
     }
 
-    $(document).ready(function() {
-        recalculateTable();
-    });
+    function getID() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let randomString = '';
 
+        for (let i = 0; i < 10; i++) {
+            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
 
-    function getCustomer() {
-        let invoice_id = $("#no_dokumen").val();
-        let type_invoice = $("#tipe_invoice").val();
-
-        $.ajax({
-            url: '<?= base_url('pembayaran-invoice/get-customer') ?>',
-            method: "GET",
-            data: {
-                invoice_id: invoice_id,
-                type_invoice: type_invoice
-            },
-            dataType: "json",
-            success: function(res) {
-                $('#customer').val(res);
-            }
-        })
-    }
-    <?php if (!empty($detail)) : ?>
-        drawTable();
-
-    <?php endif; ?>
+        return randomString;
+    };
 </script>
 
 <?= $this->endSection(); ?>

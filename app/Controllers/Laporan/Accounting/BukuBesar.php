@@ -73,7 +73,7 @@ class BukuBesar extends BaseController
 
         if (isset($_POST['id_sub_akun'])) {
             foreach ($_POST['id_sub_akun'] as $i) {
-                $dataJurnalUmum->where('id_coa', decrypt($i));
+                $dataJurnalUmum->orWhere('id_coa', decrypt($i));
             }
         }
 
@@ -157,7 +157,7 @@ class BukuBesar extends BaseController
 
         if (isset($_POST['id_sub_akun'])) {
             foreach ($_POST['id_sub_akun'] as $i) {
-                $dataJurnalUmum->where('id_coa', decrypt($i));
+                $dataJurnalUmum->orWhere('id_coa', decrypt($i));
             }
         }
 
