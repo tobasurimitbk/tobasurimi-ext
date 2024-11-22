@@ -19,6 +19,7 @@ use App\Models\StockModel;
 use App\Models\StuffingLokalDetailModel;
 use App\Models\StuffingLokalModel;
 use App\Models\AccountBarangModel;
+use App\Models\SuratJalanModel;
 use Exception;
 
 class Retur extends BaseController
@@ -39,6 +40,7 @@ class Retur extends BaseController
     protected $stockDetailModel;
     protected $stockDetail2Model;
     protected $accountBarangModel;
+    protected $suratJalanSoModel;
     protected $this_user_id;
     private $soInvModel;
     private $soInvDetailModel;
@@ -66,6 +68,7 @@ class Retur extends BaseController
         $this->stuffingLokalModel = new StuffingLokalModel();
         $this->stuffingLokalDetailModel = new StuffingLokalDetailModel();
         $this->accountBarangModel = new AccountBarangModel();
+        $this->suratJalanSoModel = new SuratJalanModel();
     }
 
     public function index()
@@ -80,7 +83,9 @@ class Retur extends BaseController
         $invoiceList = $this->soInvModel->asObject()
             ->select('sales_order_invoice.*, customers.id as customer_id, customers.name as customer_name, customers.kode as customer_kode, customers.address as customer_address')
             ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+            ->where('company_id', $this->this_company_id)
             ->where('id_sales_order_return', null)
+            ->where('sales_order_invoice.deletedAt', null)
             ->findAll();
 
         $noReturn = $this->soReturnModel->generateNoReturn();
@@ -88,6 +93,7 @@ class Retur extends BaseController
         $dataWarehouse = $this->WarehousesModel
             ->asObject()
             ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
             ->findAll();
 
         foreach ($invoiceList as &$value) {
@@ -296,35 +302,77 @@ class Retur extends BaseController
                 return $this->sendResponse(false, "Data Not Found");
             }
 
-            $salesOrderReturnData = $this->soReturnModel->find($id);
-            $invoiceData = $this->soInvModel->where('id_sales_order_return', $id)->first();
-            $salesOrderData = $this->soModel->where('sales_order_invoice_id', $invoiceData['id'] ?? null)->first();
+            $salesOrderReturnData = $this->soReturnModel->where('deletedAt', null)->find($id);
+            $invoiceData = $this->soInvModel->where('id_sales_order_return', $id)->where('deletedAt', null)->first();
 
-            $stuffingLokalData = $this->stuffingLokalModel->where('sales_order_id', $salesOrderData["id"] ?? null)->first();
+            $stuffingLokalData = [];
+            if ($invoiceData['document_type'] == "pengiriman") {
+                 $SJSODATA  = $this->suratJalanSoModel->where('sales_order_invoice_id', $invoiceData['id'] ?? null)->where('deletedAt', null)->first();
+                 $salesOrderData = $this->soModel->where('surat_jalan_so_id', $SJSODATA['id'] ?? null)->where('deletedAt', null)->first();
+                 $stuffingLokalData = $this->stuffingLokalModel->where('sales_order_id', $salesOrderData["id"] ?? null)->where('deletedAt', null)->first();
+            } else if ($invoiceData['document_type'] == "pesanan") {
+                $salesOrderData = $this->soModel->where('sales_order_invoice_id', $invoiceData['id'] ?? null)->where('deletedAt', null)->first();
+                $stuffingLokalData = $this->stuffingLokalModel->where('sales_order_id', $salesOrderData["id"] ?? null)->where('deletedAt', null)->first();
+            }
+            
             if (!$stuffingLokalData) {
                 return $this->sendResponse(false, "Data Invoice dengan Nomor Faktur {$invoiceData["no_faktur"]} belum di Stuffingkan");
             }
 
             // Only fetch essential fields from related models
-            $returnDetailData = $this->soReturnDetailModel
-                ->select([
-                    'sales_order_return_detail.id as id_sales_order_return',
-                    'stuffing_lokal_detail.qty',
-                    'stuffing_lokal_detail.divisi_id',
-                    'stuffing_lokal_detail.barang1_id_warehouse',
-                    'stuffing_lokal_detail.barang2_id_warehouse',
-                    'stuffing_lokal_detail.bc_id_warehouse',
-                    'stuffing_lokal_detail.stock_id_warehouse',
-                    'stuffing_lokal_detail.no_aju_warehouse',
-                    'stuffing_lokal_detail.stock_dokumen'
-                ])
-                ->join('sales_order_return', 'sales_order_return.id = sales_order_return_detail.id_sales_order_return', 'left')
-                ->join('sales_order_invoice', 'sales_order_invoice.id_sales_order_return = sales_order_return.id', 'left')
-                ->join('sales_order', 'sales_order.sales_order_invoice_id = sales_order_invoice.id', 'left')
-                ->join('stuffing_lokal', 'stuffing_lokal.sales_order_id = sales_order.id', 'left')
-                ->join('stuffing_lokal_detail', 'stuffing_lokal_detail.stuffing_lokal_id = stuffing_lokal.id', 'left')
-                ->where('sales_order_return_detail.id_sales_order_return', $id)
-                ->findAll();
+            $returnDetailData = [];
+            if ($invoiceData['document_type'] == "pengiriman") {
+                $returnDetailData = $this->soReturnDetailModel
+                    ->select([
+                        'sales_order_return_detail.id as id_sales_order_return_detail',
+                        'stuffing_lokal_detail.qty',
+                        'stuffing_lokal_detail.divisi_id', 
+                        'stuffing_lokal_detail.barang1_id_warehouse',
+                        'stuffing_lokal_detail.barang2_id_warehouse',
+                        'stuffing_lokal_detail.bc_id_warehouse',
+                        'stuffing_lokal_detail.stock_id_warehouse',
+                        'stuffing_lokal_detail.no_aju_warehouse',
+                        'stuffing_lokal_detail.stock_dokumen'
+                    ])
+                    ->join('sales_order_return', 'sales_order_return.id = sales_order_return_detail.id_sales_order_return', 'left')
+                    ->join('sales_order_invoice', 'sales_order_invoice.id_sales_order_return = sales_order_return.id', 'left')
+                    ->join('surat_jalan_so', 'surat_jalan_so.sales_order_invoice_id = sales_order_invoice.id', 'left')
+                    ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
+                    ->join('stuffing_lokal', 'stuffing_lokal.sales_order_id = sales_order.id', 'left')
+                    ->join('stuffing_lokal_detail', 'stuffing_lokal_detail.stuffing_lokal_id = stuffing_lokal.id', 'left')
+                    ->where('sales_order_return_detail.id_sales_order_return', $id)
+                    ->findAll();
+
+            } else if ($invoiceData['document_type'] == "pesanan") {
+                $returnDetailData = $this->soReturnDetailModel
+                    ->select([
+                        'sales_order_return_detail.id as id_sales_order_return_detail',
+                        'stuffing_lokal_detail.qty',
+                        'stuffing_lokal_detail.divisi_id', 
+                        'stuffing_lokal_detail.barang1_id_warehouse',
+                        'stuffing_lokal_detail.barang2_id_warehouse',
+                        'stuffing_lokal_detail.bc_id_warehouse',
+                        'stuffing_lokal_detail.stock_id_warehouse',
+                        'stuffing_lokal_detail.no_aju_warehouse',
+                        'stuffing_lokal_detail.stock_dokumen'
+                    ])
+                    ->join('sales_order_return', 'sales_order_return.id = sales_order_return_detail.id_sales_order_return', 'left')
+                    ->join('sales_order_invoice', 'sales_order_invoice.id_sales_order_return = sales_order_return.id', 'left')
+                    ->join('sales_order', 'sales_order.sales_order_invoice_id = sales_order_invoice.id', 'left')
+                    ->join('stuffing_lokal', 'stuffing_lokal.sales_order_id = sales_order.id', 'left')
+                    ->join('stuffing_lokal_detail', 'stuffing_lokal_detail.stuffing_lokal_id = stuffing_lokal.id', 'left')
+                    ->where('sales_order_return_detail.id_sales_order_return', $id)
+                    ->findAll();
+
+                    var_dump($returnDetailData, 'ini pesanan');
+                    die;
+
+            }
+
+            if (!$returnDetailData) {
+                return $this->sendResponse(false, "Barang Tidak Memliliki Data Di Stuffing");
+            }
+
 
             foreach ($returnDetailData as $value) {
                 $statusOUT = $this->accountBarangModel->checkAccountBarangCOA($this->this_company_id, $value['divisi_id'], $value['barang1_id_warehouse']);
