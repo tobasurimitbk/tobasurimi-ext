@@ -777,7 +777,7 @@ class PembayaranInvoice extends BaseController
                     'akun_kas' => $this->request->getVar('akun_kas'),
                     'akun_selisih' => $this->request->getVar('akun_selisih'),
                     'akun_kas_lain' => $this->request->getVar('akun_kas_lain'),
-                    'akun_selisih_lain' => $this->request->getVar('akun_kredit_lain'),
+                    'akun_selisih_lain' => $this->request->getVar('akun_selisih_lain'),
                     'status_posting' => '0'
                 ]);
 
@@ -934,7 +934,7 @@ class PembayaranInvoice extends BaseController
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
                 'akun_kas_lain' => $this->request->getVar('akun_kas_lain'),
-                'akun_selisih_lain' => $this->request->getVar('akun_kredit_lain'),
+                'akun_selisih_lain' => $this->request->getVar('akun_selisih_lain'),
                 'status_posting' => '0',
                 'payment_method' => $this->request->getVar('payment_methods')
             ]);
