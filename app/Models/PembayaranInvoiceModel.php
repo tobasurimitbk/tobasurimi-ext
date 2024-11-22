@@ -164,7 +164,7 @@ class PembayaranInvoiceModel extends Model
                 ->findAll();  // Ambil semua hasil yang sesuai
 
             // Gabungkan semua nama pelanggan yang ditemukan (jika ada lebih dari satu)
-            $customerNames = array_map(function($item) {
+            $customerNames = array_map(function ($item) {
                 return $item['name'];  // Ambil nama pelanggan dari setiap hasil query
             }, $namaCustomer);
 
@@ -186,13 +186,21 @@ class PembayaranInvoiceModel extends Model
                 ->first();
             $detail['customer_name'] = $namaCustomer['name'];
         } elseif ($detail['type_invoice'] == "RETURN") {
+            // Pastikan invoice_id adalah array (jika tidak, ubah ke array)
+            $invoiceIds = is_array($detail['invoice_id']) ? $detail['invoice_id'] : explode(',', $detail['invoice_id']);  // Jika string, pisahkan berdasarkan koma
+
+            // Ambil nama pelanggan berdasarkan invoice_id
             $namaCustomer = $salesOrderReturnModel
-                ->select("name")
+                ->select("customers.name")
                 ->join('sales_order_invoice', 'sales_order_invoice.id = sales_order_return.id_invoice')
                 ->join('customers', 'customers.id = sales_order_invoice.id_customer')
-                ->where('sales_order_return.id', $detail['invoice_id'])
-                ->first();
-            $detail['customer_name'] = $namaCustomer['name'];
+                ->whereIn('sales_order_invoice.id', $invoiceIds)
+                ->findAll();
+
+            $customerNames = array_map(function ($item) {
+                return $item['name'];
+            }, $namaCustomer);
+            $detail['customer_name'] = implode(', ', $customerNames);
         }
         return $detail;
     }
