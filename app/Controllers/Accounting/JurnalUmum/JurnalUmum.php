@@ -101,6 +101,19 @@ class JurnalUmum extends BaseController
         $this->pembayaranInvoiceDetailModel = new PembayaranInvoiceDetailModel();
     }
 
+    // public function index()
+    // {
+    //     $tipeTransaksi = $this->MetadataModel
+    //         ->where('name', 'tipe_transaksi')
+    //         ->findAll();
+
+    //     $data = [
+    //         'tipeTransaksi' => $tipeTransaksi
+    //     ];
+
+    //     return view('Accounting/jurnalUmum/index', $data);
+    // }
+
     public function index()
     {
         $accountModuleModel = new AccountModuleModel();
@@ -1196,6 +1209,10 @@ class JurnalUmum extends BaseController
 
             $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
             $hargaTotalBarangInvoice = 0;
+            $result = array();
+            $totalDebit = 0;
+            $totalKredit = 0;
+
             foreach ($pembayaranInvoiceDetail as $p) {
                 if ($p['sales_order_invoice_id'] == null) {
                     // PASTI LAIN LAIN
@@ -1207,29 +1224,31 @@ class JurnalUmum extends BaseController
                             'divisi_id' => $pembayaranInvoice['divisi_id'],
                             'id_coa' =>  $p['akun_kas_lain'],
                             'tanggal_jurnal' => $resultTransaksiJurnal['tanggal_transaksi'],
-                            'debit' => 0,
-                            'kredit' => $p['harga_total'],
+                            'debit' =>  $p['harga_total'],
+                            'kredit' => 0,
                             'valas' => $metaDataValuta['id'],
                             'kurs' => $pembayaranInvoice['kurs_sekarang'],
                             'keterangan' => "Pembayaran Invoice (Invoice Lain), Nomor : " . $p['nama_barang'],
                             'id_inputer' => session()->get("login")->user_id
                         );
+                        $totalDebit += $p['harga_total'];
                     }
 
-                    if ($pembayaranInvoice['akun_selisih_lain'] != null) {
+                    if ($p['akun_selisih_lain'] != null) {
                         $result[] = array(
                             'id_transaksi' => $id_transaksi_jurnal,
                             'company_id' => $this->this_company_id,
                             'divisi_id' => $pembayaranInvoice['divisi_id'],
-                            'id_coa' =>  $pembayaranInvoice['akun_selisih_lain'],
+                            'id_coa' =>  $p['akun_selisih_lain'],
                             'tanggal_jurnal' => $resultTransaksiJurnal['tanggal_transaksi'],
-                            'debit' => $p['harga_total'],
-                            'kredit' => 0,
+                            'debit' => 0,
+                            'kredit' =>  $p['harga_total'],
                             'valas' => $metaDataValuta['id'],
                             'kurs' => $pembayaranInvoice['kurs_sekarang'],
-                            'keterangan' => "Pembayaran Invoice (Barang Lain), Nomor : " . $pembayaranInvoice['no_pembayaran'],
+                            'keterangan' => "Pembayaran Invoice (Barang Lain), Nomor : " . $p['nama_barang'],
                             'id_inputer' => session()->get("login")->user_id
                         );
+                        $totalKredit += $p['harga_total'];
                     }
                 } else {
                     // PASTI BARANG
@@ -1237,7 +1256,6 @@ class JurnalUmum extends BaseController
                 }
             }
 
-            $result = array();
             // AKUN KAS
             if ($pembayaranInvoice['akun_kas'] != null) {
                 $result[] = array(
@@ -1246,8 +1264,8 @@ class JurnalUmum extends BaseController
                     'divisi_id' => $pembayaranInvoice['divisi_id'],
                     'id_coa' =>  $pembayaranInvoice['akun_kas'],
                     'tanggal_jurnal' => $resultTransaksiJurnal['tanggal_transaksi'],
-                    'debit' => 0,
-                    'kredit' => $pembayaranInvoice['total_bayar'],
+                    'debit' => $pembayaranInvoice['total_bayar'],
+                    'kredit' => 0,
                     'valas' => $metaDataValuta['id'],
                     'kurs' => 1,
                     'keterangan' => "Pembayaran Invoice (Barang Invoice), Nomor : " . $pembayaranInvoice['no_pembayaran'],
@@ -1263,14 +1281,20 @@ class JurnalUmum extends BaseController
                     'divisi_id' => $pembayaranInvoice['divisi_id'],
                     'id_coa' =>  $pembayaranInvoice['akun_selisih'],
                     'tanggal_jurnal' => $resultTransaksiJurnal['tanggal_transaksi'],
-                    'debit' => $pembayaranInvoice['total_bayar'],
-                    'kredit' => 0,
+                    'debit' => 0,
+                    'kredit' => $pembayaranInvoice['total_bayar'],
                     'valas' => $metaDataValuta['id'],
                     'kurs' => 1,
                     'keterangan' => "Pembayaran Invoice (Barang Invoice), Nomor : " . $pembayaranInvoice['no_pembayaran'],
                     'id_inputer' => session()->get("login")->user_id
                 );
             }
+
+            // Update di Jurnal
+            $this->transaksiJurnalModel->update($id_transaksi_jurnal, [
+                'total_debit' => $pembayaranInvoice['total_bayar'] + $totalDebit,
+                'total_kredit' =>  $pembayaranInvoice['total_bayar'] + $totalKredit,
+            ]);
 
             if (count($result) > 0) {
                 $this->jurnalUmumModel->insertJurnalBatch($result);
