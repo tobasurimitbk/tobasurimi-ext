@@ -173,28 +173,6 @@
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select" name="akun_kas_lain" id="akun_kas_lain">
-                                <option disabled selected value=""></option>
-                                <?php foreach ($subsAkuns as $subs) : ?>
-                                    <option <?= (!empty($detail)) ?  (($detail['akun_kas_lain']) == $subs->id ? "selected" : "") : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
-                                <?php endforeach ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Debit Lain (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select" name="akun_selisih_lain" id="akun_selisih_lain">
-                                <option disabled selected value=""></option>
-                                <?php foreach ($subsAkuns as $subs) : ?>
-                                    <option <?= (!empty($detail)) ?  (($detail['akun_selisih_lain']) == $subs->id ? "selected" : "") : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
-                                <?php endforeach ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Kredit Lain (Opsional)</label>
-                        </div>
-                    </div>
                 </div>
                 <hr>
                 <div class="row">
@@ -203,13 +181,35 @@
                             Jika ada Tagihan Diluar Invoice (Tagihan Lain-Lain), Silahkan Diinputkan Pada Form Dibawah
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="nama_tagihan" id="nama_tagihan" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Deskripsi Tagihan">
                             <label for="floatingInput">Nama Tagihan / Invoice</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" name="akun_kas_lain" id="akun_kas_lain" data-name="akun_kas_lain_name">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option value="<?= $subs->id ?>" data-name="<?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Debit Lain (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" name="akun_selisih_lain" id="akun_selisih_lain" data-name="akun_selisih_lain_name">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option value="<?= $subs->id ?>" data-name="<?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Kredit Lain (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <div class="input-group">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="total_tagihan" id="total_tagihan" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Total Tagihan" onchange="this.value = formatRupiah2(this.value)">
@@ -231,6 +231,8 @@
                                     <th style="text-align: center;">No Invoice</th>
                                     <th style="text-align: center;">Kode Barang</th>
                                     <th style="text-align: center;">Nama Barang / Invoice</th>
+                                    <th style="text-align: center;">Akun Debit Lain</th>
+                                    <th style="text-align: center;">Akun Kredit Lain</th>
                                     <th style="text-align: center;">Qty</th>
                                     <th style="text-align: center;">Harga Satuan</th>
                                     <th style="text-align: center;">Sub Total</th>
@@ -817,7 +819,11 @@
                                 barang_name: data.barang_name,
                                 sales_order_invoice_id: data.sales_order_invoice_id,
                                 sales_order_invoice_detail_id: data.sales_order_invoice_detail_id,
-                                no_faktur: data.no_faktur ? data.no_faktur : "LAIN-LAIN"
+                                no_faktur: data.no_faktur ? data.no_faktur : "LAIN-LAIN",
+                                akun_kas_lain: data.id_akun_kas_lain ? data.id_akun_kas_lain : null,
+                                akun_selisih_lain: data.id_akun_selisih_lain ? data.id_akun_selisih_lain : null,
+                                nama_akun_kas_lain: data.akun_kas_lain ? data.akun_kas_lain : "-",
+                                nama_akun_selisih_lain: data.akun_selisih_lain ? data.akun_selisih_lain : "-",
                             });
                         }
                     });
@@ -876,10 +882,11 @@
 
                 newRow.append($('<td style="text-align:center;">').text(item.kode_barang));
                 newRow.append($('<td style="text-align:center;">').text(item.barang_name));
+                newRow.append($('<td style="text-align:center;">').text(item.nama_akun_kas_lain || '-'));
+                newRow.append($('<td style="text-align:center;">').text(item.nama_akun_selisih_lain || '-'));
                 newRow.append($('<td style="text-align:center;">').text(item.qty_invoice));
                 newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_invoice)));
                 newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.amount_invoice)));
-
                 if (item.kode_barang === "LAIN-LAIN") {
                     total_invoice_barang_lain += parseFloat(item.amount_invoice) || 0;
 
@@ -906,36 +913,29 @@
 
         // Menambahkan baris total pembayaran dan potongan
         addSummaryRows(table, total_amount, totalPembayaran, limit_bayar, totalSudahDiBayar);
-
-            // Set "required" pada select jika ada "LAIN-LAIN" dalam data
-            if (hasLainLain) {
-                // Set required pada kedua select input
-                $('#akun_kas_lain').prop('required', true);
-                $('#akun_selisih_lain').prop('required', true);
-
-                // Mengubah label untuk menambahkan kata 'Wajib' atau menghapus 'Opsional'
-                $('#akun_kas_lain').siblings('label').text('Debit Lain');
-                $('#akun_selisih_lain').siblings('label').text('Kredit Lain');
-            } else {
-                // Set required menjadi false jika tidak ada "LAIN-LAIN"
-                $('#akun_kas_lain').prop('required', false);
-                $('#akun_selisih_lain').prop('required', false);
-
-                // Mengubah label untuk menambahkan kata 'Opsional' kembali
-                $('#akun_kas_lain').siblings('label').text('Debit Lain (Opsional)');
-                $('#akun_selisih_lain').siblings('label').text('Kredit Lain (Opsional)');
-            }
     }
 
 
     function insertBarangLain() {
         const namaTagihan = $('#nama_tagihan').val();
         const totalTagihan = $('#total_tagihan').val();
+        const akunKasLain = $('#akun_kas_lain').val();
+        const akunSelisihLain = $('#akun_selisih_lain').val();
+        
+        // Ambil nama akun dari atribut data-name
+        const namaAkunKasLain = $('#akun_kas_lain option:selected').data('name');
+        const namaAkunSelisihLain = $('#akun_selisih_lain option:selected').data('name');
 
         if (namaTagihan === '' || totalTagihan === '') {
             Swal.fire({
                 icon: 'error',
                 title: "Nama Tagihan dan Total Tagihan Wajib Diisi",
+                confirmButtonColor: '#4e73df',
+            });
+        } else if(akunKasLain === '' || akunSelisihLain === '') {
+            Swal.fire({
+                icon: 'error',
+                title: "Akun Kas Lain dan Akun Selisih Lain Wajib Di isi",
                 confirmButtonColor: '#4e73df',
             });
         } else {
@@ -949,7 +949,11 @@
                 kode_barang: "LAIN-LAIN",
                 barang_name: namaTagihan,
                 sales_order_invoice_id: null,
-                sales_order_invoice_detail_id: null
+                sales_order_invoice_detail_id: null,
+                akun_kas_lain: akunKasLain,
+                akun_selisih_lain: akunSelisihLain,
+                nama_akun_kas_lain: namaAkunKasLain, // Menyimpan nama akun kas lain
+                nama_akun_selisih_lain: namaAkunSelisihLain // Menyimpan nama akun selisih lain
             });
 
             // Refresh tabel dengan data terbaru
@@ -971,23 +975,23 @@
         // Tambahkan baris untuk Total Pembayaran, Total Sudah Dibayar, dan Sisa Pembayaran
         table.find('tbody').append(`
             <tr style="color:whitesmoke;">
-                <td colspan="5" style="text-align: right;">Total Pembayaran</td>
+                <td colspan="7" style="text-align: right;">Total Pembayaran</td>
                 <td style="text-align:center;">${formatRupiah2(total_amount)}</td>
             </tr>
             <tr style="color:whitesmoke;">
-                <td colspan="5" style="text-align: right;">Total Sudah Dibayar</td>
-                <td class="total_dibayar" style="text-align:center;">${formatRupiah2(totalSudahDiBayar)}</td>
+                <td colspan="7" style="text-align: right;">Total Sudah Dibayar</td>
+                <td class="total_dibayar" style="text-align:center;">${formatRupiah2(total_invoice)}</td>
             </tr>
             <tr style="color:whitesmoke;">
-                <td colspan="5" style="text-align: right;">Sisa Pembayaran</td>
-                <td class="total_amount_invoice" style="text-align:center;">${formatRupiah2(total_amount - totalSudahDiBayar)}</td>
+                <td colspan="7" style="text-align: right;">Sisa Pembayaran</td>
+                <td class="total_amount_invoice" style="text-align:center;">${formatRupiah2(total_amount - total_invoice)}</td>
             </tr>
         `);
 
         // Tambahkan baris untuk input Total Bayar
         table.find('tbody').append(`
             <tr style="color:whitesmoke;">
-                <td colspan="5" style="text-align: right;">Anda Membayar Sebesar</td>
+                <td colspan="7" style="text-align: right;">Anda Membayar Sebesar</td>
                 <td style="text-align:center;">
                     <input 
                         autocomplete="one-time-code" 
@@ -1007,7 +1011,7 @@
             let cleanValue = rawValue.replace(/[^0-9]/g, ''); // Hapus karakter non-digit
             let numberValue = parseInt(cleanValue) || 0; // Konversi ke angka, default 0
 
-            let sisaPembayaran = total_amount - totalSudahDiBayar; // Hitung sisa pembayaran
+            let sisaPembayaran = total_amount - total_invoice; // Hitung sisa pembayaran
 
             // Validasi nilai input
             if (numberValue > sisaPembayaran) {

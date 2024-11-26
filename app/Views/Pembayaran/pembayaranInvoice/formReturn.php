@@ -110,26 +110,26 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select customer_id " name="customer_id" id="customer_id" onchange="dropdownInvoice()">
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select customer_id " name="customer_id" id="customer_id">
                                 <option value=""></option>
-                                <?php foreach ($customers as $c): ?>
-                                    <option <?= !empty($detail) ? ($detail['customer_id'] == $c['id'] ? 'selected' : '') : '' ?> value="<?= $c['id'] ?>"><?= $c['name'] ?></option>
-                                <?php endforeach; ?>
+                                <?php if (!empty($customers)): ?>
+                                    <?php foreach ($customers as $cus): ?>
+                                        <option <?= (!empty($detail)) ?  (($detail['customer_id']) == $cus['id'] ? "selected" : "") : '' ?> value="<?= encrypt($cus['id']); ?>"><?= $cus['name']; ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Pilih Customer</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select multiple <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select  no_dokumen" name="no_dokumen[]" id="no_dokumen">
-                                <option value=""></option>
-                                <?php if (isset($dokumenList)): ?>
-                                    <?php foreach ($dokumenList as $d): ?>
-                                        <option value="<?= $d['id'] ?>" selected><?= $d['no_return'] ?></option>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : "" ?>
+                                class="form-select no_dokumen"
+                                name="no_dokumen[]"
+                                id="no_dokumen"
+                                multiple>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">No Dokumen</label>
+                            <label for="no_dokumen" style="z-index: 1;">No Dokumen</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -179,28 +179,6 @@
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select" name="akun_kas_lain" id="akun_kas_lain">
-                                <option disabled selected value=""></option>
-                                <?php foreach ($subsAkuns as $subs) : ?>
-                                    <option <?= (!empty($detail)) ?  (($detail['akun_kas']) == $subs->id ? "selected" : "") : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
-                                <?php endforeach ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Debit</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select" name="akun_selisih_lain" id="akun_selisih_lain">
-                                <option disabled selected value=""></option>
-                                <?php foreach ($subsAkuns as $subs) : ?>
-                                    <option <?= (!empty($detail)) ?  (($detail['akun_selisih']) == $subs->id ? "selected" : "") : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
-                                <?php endforeach ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Kredit</label>
-                        </div>
-                    </div>
                 </div>
                 <hr>
                 <div class="row">
@@ -209,13 +187,35 @@
                             Jika ada Tagihan Diluar Invoice (Tagihan Lain-Lain), Silahkan Diinputkan Pada Form Dibawah
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="nama_tagihan_lain_lain" id="nama_tagihan_lain_lain" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Deskripsi Tagihan">
                             <label for="floatingInput">Nama Tagihan / Invoice</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" name="akun_kas_lain" id="akun_kas_lain">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option data-name="<?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?>" value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Debit</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" name="akun_selisih_lain" id="akun_selisih_lain">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option data-name="<?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?>" value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Kredit</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <div class="input-group">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = formatRupiah2(this.value)" name="total_tagihan_lain_lain" id="total_tagihan_lain_lain" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Pembayaran Oleh">
@@ -235,8 +235,11 @@
                         <table class="table table-bordered nowrap " id="dataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr style="color: whitesmoke;">
+                                    <th style="text-align: center;">No Return</th>
                                     <th style="text-align: center;">Kode Barang</th>
                                     <th style="text-align: center;">Nama Barang</th>
+                                    <th style="text-align: center;">Akun Debit Lain</th>
+                                    <th style="text-align: center;">Akun Kredit Lain</th>
                                     <th style="text-align: center;">Qty</th>
                                     <th style="text-align: center;">Harga Satuan</th>
                                     <th style="text-align: center;">Sub Total</th>
@@ -247,9 +250,9 @@
 
                             </tbody>
                             <tfoot>
-                                <tr style="color: whitesmoke;">
+                                <!-- <tr style="color: whitesmoke;">
                                     <td colspan="9" style="text-align: center;color:black;">Tidak ada data</td>
-                                </tr>
+                                </tr> -->
                             </tfoot>
                         </table>
                     </div>
@@ -264,7 +267,7 @@
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
 
-    var listData = [];
+    var dataList = [];
     var totalPembayaran = 0;
 
     <?php if (!empty($detail)) : ?>
@@ -385,12 +388,6 @@
             autoclose: true
         });
 
-        $('#customer_id').select2({
-            placeholder: "Pilih Customer",
-            theme: "bootstrap-5",
-            allowClear: true
-        });
-
         $('#jenis_dokumen').select2({
             placeholder: "Pilih Jenis Dokumen",
             theme: "bootstrap-5"
@@ -436,30 +433,25 @@
             allowClear: true
         });
 
+        $('#customer_id').select2({
+            placeholder: "Pilih Customer",
+            theme: "bootstrap-5"
+        }).change(function() {
+            const table = $('#dataTable');
+            table.find('tbody').empty();
+            let customerId = $(this).val();
+            getDataDokumenInvoice(customerId);
+        });
+
+        // Trigger event change jika sudah ada nilai default
+        const selectedCustomerId = "<?= !empty($detail) ? encrypt($detail['customer_id']) : ''; ?>";
+        if (selectedCustomerId) {
+            $('#customer_id').val(selectedCustomerId).trigger('change'); // Trigger change secara manual
+        }
+
         $(".btn-submit-form").click(function() {
             var id = $('.id').val();
-            var is_form_valid = true;
-            var akun_kas_lain = $('#akun_kas_lain').val();
-            var akun_selisih_lain = $('#akun_selisih_lain').val();
-
-            for (let i = 0; i < listData.length; i++) {
-                if (listData[i].kode_barang == "LAIN-LAIN") {
-                    if (akun_kas_lain == "" || akun_selisih_lain == "" || akun_kas_lain == null || akun_selisih_lain == null) {
-                        is_form_valid = false;
-                        break;
-                    }
-                }
-            }
-
-            console.log(is_form_valid, akun_kas_lain, akun_selisih_lain);
-
-            if (!is_form_valid) {
-                Swal.fire({
-                    icon: 'error',
-                    title: "Akun Debit dan Akun Kredit Untuk Invoice Lain Wajib Diisi",
-                    confirmButtonColor: '#4e73df',
-                })
-            } else {
+           
                 if (id) {
                     // UPDATE
                     if ($(".create-form").valid()) {
@@ -476,7 +468,7 @@
                             if (result.isConfirmed) {
                                 let formData = new FormData(document.querySelector(".create-form"));
                                 formData.append('total_amount_invoice', $(".total_amount_invoice").text());
-                                formData.append('list_barang', JSON.stringify(listData));
+                                formData.append('list_barang', JSON.stringify(dataList));
                                 $.ajax({
 
                                     url: "<?= base_url("/pembayaran-invoice/update"); ?>",
@@ -541,7 +533,7 @@
                             if (result.isConfirmed) {
                                 let formData = new FormData(document.querySelector(".create-form"));
                                 formData.append('total_amount_invoice', $(".total_amount_invoice").text());
-                                formData.append('list_barang', JSON.stringify(listData));
+                                formData.append('list_barang', JSON.stringify(dataList));
                                 $.ajax({
                                     url: "<?= base_url("pembayaran-invoice/save"); ?>",
                                     data: formData,
@@ -588,9 +580,6 @@
                         })
                     }
                 }
-            }
-
-
         })
     })
 
@@ -788,57 +777,40 @@
         })
     }
 
-    function insertBarangLain() {
-        var nama_tagihan_lain_lain = $('#nama_tagihan_lain_lain').val();
-        var total_tagihan_lain_lain = convertRupiahToNumber($('#total_tagihan_lain_lain').val());
-
-        if (nama_tagihan_lain_lain == '' || total_tagihan_lain_lain == '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Nama Tagihan dan Total Tagihan Wajib Diisi',
-                confirmButtonColor: '#4e73df',
-            });
-        } else {
-            listData.push({
-                id: getID(),
-                sales_order_return_detail_id: null,
-                sales_order_return_id: null,
-                qty_return: 1,
-                harga_barang_return: (parseFloat(total_tagihan_lain_lain) || 0) * -1,
-                amount_return: (parseFloat(total_tagihan_lain_lain) || 0) * -1,
-                kode_barang: "LAIN-LAIN",
-                barang_name: nama_tagihan_lain_lain
-            });
-
-            drawTable(listData);
-            $('#nama_tagihan_lain_lain').val(null);
-            $('#total_tagihan_lain_lain').val(null);
-        }
-
-    }
-
-    function dropdownInvoice() {
-        let customerId = $('#customer_id option:selected').val();
+    function getDataDokumenInvoice(customerId) {
         $.ajax({
-            url: `<?= base_url('pembayaran-invoice/dropdown-invoice-return'); ?>`,
+            url: `<?= base_url("pembayaran-invoice/get-dokumen-invoice-return"); ?>/${customerId}`,
             method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                customer_id: $("#customer_id option:selected").val(),
-            },
             dataType: "json",
             success: function(res) {
-                $(".no_dokumen").empty()
-                $(".no_dokumen").append(`<option value=""></option>`)
+                // Clear existing options
+                $('#no_dokumen').empty();
+
+                // Tambahkan opsi kosong jika diperlukan
+                $('#no_dokumen').append('<option value=""></option>');
+
+                // Iterasi hasil data dan tambahkan ke dropdown
                 res.data.forEach(function(item) {
-                    $(".no_dokumen").append(`<option value="${item.id}">${item.no_return}</option>`)
-                })
-                $(".no_dokumen").change();
+                    $('#no_dokumen').append(
+                        `<option value="${item.id}">${item.no_return}</option>`
+                    );
+                });
+
+
+                <?php if (isset($detail) && !empty($detail['invoice_id'])): ?>
+                    const selectedIds = "<?= $detail['invoice_id']; ?>"
+                        .replace(/[\[\]\'\s]/g, '') // Hapus tanda kutip, kurung siku, dan spasi
+                        .split(','); // Split string menjadi array berdasarkan koma
+                    // Set pilihan yang sudah ada pada dropdown
+                    $('#no_dokumen').val(selectedIds).trigger('change'); // `val()` untuk set value, `trigger('change')` untuk trigger perubahan
+                <?php else: ?>
+                    console.log("Invoice ID tidak tersedia");
+                <?php endif; ?>
+
+
+               },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
             }
         });
     }
@@ -855,41 +827,89 @@
             },
             dataType: "json",
             success: function(res) {
-                listData = [];
-                listData = res.data;
-                totalPembayaran = res.totalPembayaran;
-                drawTable(listData)
+                console.log(res)
+                if (res.status && res.data.length > 0) {
+                    res.data.forEach((data) => {
+                        // Periksa apakah data sudah ada di dataList sebelum menambahkannya
+                        if (!dataList.some(item => item.sales_order_return_id === data.sales_order_return_id)) {
+                            dataList.push({
+                                id: getID(),
+                                qty_return: data.qty_return,
+                                harga_barang_return: data.harga_barang_return,
+                                amount_return: data.amount_return,
+                                kode_barang: data.kode_barang,
+                                barang_name: data.barang_name,
+                                sales_order_invoice_id: data.sales_order_return_id,
+                                sales_order_invoice_detail_id: data.sales_order_return_detail_id,
+                                no_faktur: data.no_faktur ? data.no_faktur : "LAIN-LAIN",
+                                akun_kas_lain: data.id_akun_kas_lain ? data.id_akun_kas_lain : null,
+                                akun_selisih_lain: data.id_akun_selisih_lain ? data.id_akun_selisih_lain : null,
+                                nama_akun_kas_lain: data.akun_kas_lain ? data.akun_kas_lain : "-",
+                                nama_akun_selisih_lain: data.akun_selisih_lain ? data.akun_selisih_lain : "-",
+                            });
+                        }
+                    });
+                }
+
+                const totalPembayaran = parseFloat(res.totalPembayaran) || 0;
+                const totalSudahDiBayar = parseFloat(res.totalSudahDiBayar) || 0;
+
+                // Refresh tabel dengan data terbaru
+                drawTable(dataList, totalPembayaran, totalSudahDiBayar);
             }
         })
     }
 
-    function drawTable(listData) {
-
+    function drawTable(dataList, totalPembayaran, totalSudahDiBayar) {
         const table = $('#dataTable');
         table.find('tbody').empty();
-        table.find('tfoot').empty();
 
-        if (listData.length == 0) {
-            table.find('tfoot').empty();
-            var newRow = $('<tr style="color: whitesmoke;">');
-            newRow.append($('<td colspan="9" style="text-align: center;color:black;">Tidak ada data</td>'));
-            table.find('tfoot').append(newRow);
-        } else {
-            var total_amount = 0;
-            var total_invoice = 0;
-            var limit_bayar = 0;
+        let total_amount = 0;
+        let total_invoice = 0;
+        let limit_bayar = 0;
+        let total_invoice_barang_lain = 0;
+        let total_invoice_non_lain = 0;
+        let hasLainLain = false; // Flag untuk mengecek apakah ada "LAIN-LAIN"
 
-            $.each(listData, function(index, item) {
-                var newRow = $('<tr style="color:whitesmoke;">');
-                newRow.append($('<td style="text-align:center; display:none;" >').text(item.sales_order_return_detail_id));
-                newRow.append($('<td style="text-align:center; display:none;" >').text(item.sales_order_return_id));
-                newRow.append($('<td style="text-align:center;" >').text(item.kode_barang));
+        // Mengelompokkan data berdasarkan no_faktur
+        let groupedData = {};
+        $.each(dataList, function (index, item) {
+            if (!groupedData[item.no_faktur]) {
+                groupedData[item.no_faktur] = [];
+            }
+            groupedData[item.no_faktur].push(item);
+
+            if (item.kode_barang === "LAIN-LAIN") {
+                hasLainLain = true;
+            }
+        });
+
+        // Loop untuk menambahkan baris ke tabel
+        $.each(groupedData, function (noFaktur, group) {
+            let isFirstRow = true;
+
+            $.each(group, function (index, item) {
+                let newRow = $('<tr style="color:whitesmoke;">');
+
+                // Tambahkan kolom no_faktur hanya pada baris pertama
+                if (isFirstRow) {
+                    newRow.append(
+                        $('<td rowspan="' + group.length + '" style="text-align:center;">').text(noFaktur)
+                    );
+                    isFirstRow = false;
+                }
+
+                newRow.append($('<td style="text-align:center;">').text(item.kode_barang));
                 newRow.append($('<td style="text-align:center;">').text(item.barang_name));
+                newRow.append($('<td style="text-align:center;">').text(item.nama_akun_kas_lain || '-'));
+                newRow.append($('<td style="text-align:center;">').text(item.nama_akun_selisih_lain || '-'));
                 newRow.append($('<td style="text-align:center;">').text(item.qty_return));
-                newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_return * -1)));
-                newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.amount_return * -1)));
+                newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_return)));
+                newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_return * item.qty_return)));
+                if (item.kode_barang === "LAIN-LAIN") {
+                    total_invoice_barang_lain += parseFloat(item.harga_barang_return * item.qty_return) || 0;
 
-                if (item.sales_order_return_detail_id == null) {
+                    // Tambahkan tombol hapus ke baris item "LAIN-LAIN"
                     newRow.append(
                         $('<td style="text-align:center;">').html(`
                             <button type="button" class="btn btn-danger" onclick="deleteBarang('${item.id}')">
@@ -898,70 +918,144 @@
                         `)
                     );
                 } else {
-                    newRow.append($('<td style="text-align:center;">').text(''));
+                    total_invoice_non_lain += parseFloat(item.harga_barang_return * item.qty_return) || 0;
+                    newRow.append($('<td style="text-align:center;">').html(``));
                 }
 
+                // Tambahkan baris ke tabel
                 table.find('tbody').append(newRow);
-                total_amount += parseFloat(item.amount_return);
             });
-            total_invoice = totalPembayaran;
-            var newRow0 = $('<tr style="color:whitesmoke;">');
-            newRow0.append($('<td colspan="4" style="text-align: right;">').text("Total Pembayaran"));
-            newRow0.append($('<td style="text-align:center;">').text(formatRupiah2(total_amount)));
-            table.find('tbody').append(newRow0);
+        });
 
-            var newRow1 = $('<tr style="color:whitesmoke;" class="total-dibayar-row">');
-            newRow1.append($('<td colspan="4" style="text-align: right;">').text("Total Sudah Dibayar"));
-            newRow1.append($('<td class="total_dibayar" style="text-align:center;">').text(formatRupiah2(total_invoice)));
-            table.find('tbody').append(newRow1);
+        // Total amount calculation
+        total_amount = total_invoice_non_lain - total_invoice_barang_lain;
 
-            var newRow2 = $('<tr style="color:whitesmoke;">');
-            newRow2.append($('<td colspan="4" style="text-align: right;">').text("Sisa Pembayaran"));
-            newRow2.append($('<td class="total_amount_invoice" style="text-align:center;">').text(formatRupiah2(total_amount - total_invoice)));
-            table.find('tbody').append(newRow2);
+        // Menambahkan baris total pembayaran dan potongan
+        addSummaryRows(table, total_amount, totalPembayaran, limit_bayar, totalSudahDiBayar);
+    }
 
-            limit_bayar = parseFloat(total_amount) - parseFloat(total_invoice);
 
-            var newRow3 = $('<tr style="color:whitesmoke;">');
-            newRow3.append($('<td colspan="4" style="text-align: right;">').text("Potongan"));
-            newRow3.append($('<td style="text-align:center;"><b>' +
-                `<input autocomplete="one-time-code" data-id=""<?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value=formatRupiah2(this.value);validateKeyup();"  class="form-control potongan trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['potongan'])  : '' ?>" name="potongan" onchange="limitInputBayar(this, ${limit_bayar})">` +
-                '</b></td>'));
-            table.find('tbody').append(newRow3);
+    function insertBarangLain() {
+        const namaTagihan = $('#nama_tagihan_lain_lain').val();
+        const totalTagihan = $('#total_tagihan_lain_lain').val();
+        const akunKasLain = $('#akun_kas_lain').val();
+        const akunSelisihLain = $('#akun_selisih_lain').val();
+        
+        // Ambil nama akun dari atribut data-name
+        const namaAkunKasLain = $('#akun_kas_lain option:selected').data('name');
+        const namaAkunSelisihLain = $('#akun_selisih_lain option:selected').data('name');
 
-            var newRow4 = $('<tr style="color:whitesmoke;">');
-            newRow4.append($('<td colspan="4" style="text-align: right;">').text("Anda Membayar Sebesar"));
-            newRow4.append($('<td style="text-align:center;"><b>' +
-                `<input autocomplete="one-time-code" data-id="" <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value=formatRupiah2(this.value);validateKeyup();" class="form-control total-bayar trigger-input" id="total_bayar" type="text" value="<?= !empty($detail) ? formatRupiah($detail['total_bayar'])  : '' ?>" name="total_bayar"> ` +
-                '</b></td>'));
-            table.find('tbody').append(newRow4);
-
-            $(document).on("input", ".total-bayar, .potongan", function() {
-                let totalAmount = parseFloat($('.total_amount_invoice').text().replace(/\./g, '').replace(',', '.'));
-                var potongan = $('.potongan').val() ? convertRupiahToNumber($('.potongan').val()) : 0;
-                limit_bayar = totalAmount - parseFloat(potongan);
-
-                $('input.total-bayar').attr('onchange', `limitInputBayar(this, ${limit_bayar})`);
-
-                if ($('.potongan').val() != "" || $('.potongan').val() != 0) {
-                    $('.total-bayar').val(limit_bayar).change()
-                }
+        if (namaTagihan === '' || totalTagihan === '') {
+            Swal.fire({
+                icon: 'error',
+                title: "Nama Tagihan dan Total Tagihan Wajib Diisi",
+                confirmButtonColor: '#4e73df',
             });
+        } else if(akunKasLain === '' || akunSelisihLain === '') {
+            Swal.fire({
+                icon: 'error',
+                title: "Akun Kas Lain dan Akun Selisih Lain Wajib Di isi",
+                confirmButtonColor: '#4e73df',
+            });
+        } else {
+            // Tambahkan item baru ke dataList
+            dataList.push({
+                id: getID(),
+                no_faktur: "LAIN-LAIN", // Jika tidak ada `no_faktur`, gunakan default
+                qty_return: 1,
+                harga_barang_return: convertRupiahToNumber(totalTagihan),
+                amount_return: convertRupiahToNumber(totalTagihan),
+                kode_barang: "LAIN-LAIN",
+                barang_name: namaTagihan,
+                sales_order_invoice_id: null,
+                sales_order_invoice_detail_id: null,
+                akun_kas_lain: akunKasLain,
+                akun_selisih_lain: akunSelisihLain,
+                nama_akun_kas_lain: namaAkunKasLain, // Menyimpan nama akun kas lain
+                nama_akun_selisih_lain: namaAkunSelisihLain // Menyimpan nama akun selisih lain
+            });
+
+            // Refresh tabel dengan data terbaru
+            drawTable(dataList);
+
+            // Reset input
+            $('#nama_tagihan_lain_lain').val(null);
+            $('#total_tagihan_lain_lain').val(null);
         }
+    }
+
+    function addSummaryRows(table, total_amount, total_invoice, limit_bayar, totalSudahDiBayar) {
+        // Pastikan semua parameter memiliki nilai default 0 jika undefined, null, atau NaN
+        total_amount = isNaN(total_amount) ? 0 : total_amount;
+        total_invoice = isNaN(total_invoice) ? 0 : total_invoice;
+        limit_bayar = isNaN(limit_bayar) ? 0 : limit_bayar;
+        totalSudahDiBayar = isNaN(totalSudahDiBayar) ? 0 : totalSudahDiBayar;
+
+        // Tambahkan baris untuk Total Pembayaran, Total Sudah Dibayar, dan Sisa Pembayaran
+        table.find('tbody').append(`
+            <tr style="color:whitesmoke;">
+                <td colspan="7" style="text-align: right;">Total Pembayaran</td>
+                <td style="text-align:center;">${formatRupiah2(total_amount)}</td>
+            </tr>
+            <tr style="color:whitesmoke;">
+                <td colspan="7" style="text-align: right;">Total Sudah Dibayar</td>
+                <td class="total_dibayar" style="text-align:center;">${formatRupiah2(total_invoice)}</td>
+            </tr>
+            <tr style="color:whitesmoke;">
+                <td colspan="7" style="text-align: right;">Sisa Pembayaran</td>
+                <td class="total_amount_invoice" style="text-align:center;">${formatRupiah2(total_amount - total_invoice)}</td>
+            </tr>
+        `);
+
+        // Tambahkan baris untuk input Total Bayar
+        table.find('tbody').append(`
+            <tr style="color:whitesmoke;">
+                <td colspan="7" style="text-align: right;">Anda Membayar Sebesar</td>
+                <td style="text-align:center;">
+                    <input 
+                        autocomplete="one-time-code" 
+                        data-id="" 
+                        class="form-control total-bayar trigger-input" 
+                        type="text" 
+                        value="" 
+                        name="total_bayar"
+                        placeholder="Masukkan jumlah pembayaran">
+                </td>
+            </tr>
+        `);
+
+        // Tambahkan event listener untuk validasi input
+        table.find('input.total-bayar').on('change', function() {
+            let rawValue = $(this).val(); // Ambil nilai input
+            let cleanValue = rawValue.replace(/[^0-9]/g, ''); // Hapus karakter non-digit
+            let numberValue = parseInt(cleanValue) || 0; // Konversi ke angka, default 0
+
+            let sisaPembayaran = total_amount - total_invoice; // Hitung sisa pembayaran
+
+            // Validasi nilai input
+            if (numberValue > sisaPembayaran) {
+                numberValue = sisaPembayaran; // Tidak boleh lebih besar dari sisa pembayaran
+            } else if (numberValue < 0) {
+                numberValue = 0; // Tidak boleh kurang dari 0
+            }
+
+            // Tampilkan nilai yang sudah divalidasi dalam format Rupiah
+            $(this).val(formatRupiah2(numberValue));
+        });
     }
 
     function deleteBarang(id) {
         var indexToRemove = -1;
-        for (let i = 0; i < listData.length; i++) {
-            if (listData[i].id == id) {
+        for (let i = 0; i < dataList.length; i++) {
+            if (dataList[i].id == id) {
                 indexToRemove = i;
                 break;
             }
         }
 
         if (indexToRemove !== -1) {
-            listData.splice(indexToRemove, 1);
-            drawTable(listData)
+            dataList.splice(indexToRemove, 1);
+            drawTable(dataList)
         }
     }
 
