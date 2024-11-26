@@ -946,8 +946,8 @@ class PembayaranInvoice extends BaseController
                         'type_invoice' => "RETURN",
                         'nama_barang' => $l->barang_name,
                         'qty' => $l->qty_return,
-                        'harga_satuan' => $l->sales_order_return_id == null ? -1 * $l->harga_barang_return : $l->harga_barang_return,
-                        'harga_total' => $l->sales_order_return_id == null ? -1 *    $l->amount_return : $l->amount_return,
+                        'harga_satuan' =>  $l->harga_barang_return ,
+                        'harga_total' =>  $l->amount_return,
                         'akun_kas_lain' => $l->akun_kas_lain,
                         'akun_selisih_lain' => $l->akun_selisih_lain
                     ]);
