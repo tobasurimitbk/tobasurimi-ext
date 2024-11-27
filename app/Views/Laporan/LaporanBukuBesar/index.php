@@ -24,7 +24,15 @@
                     <div class="col-md-3">
                         <div class="input-group mb-3">
                             <div class="form-floating" style="height: 50px;">
-                                <input placeholder="" value="<?= isset($_POST['dateStart']) ? ($_POST['dateStart']) : date('d/m/y') ?>" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                                <input
+                                    placeholder=""
+                                    value="<?= isset($_POST['dateStart']) && !empty($_POST['dateStart'])
+                                                ? $_POST['dateStart']
+                                                : date('01/m/Y') ?>"
+                                    class="form-control dateStart"
+                                    id="dateStart"
+                                    name="dateStart"
+                                    aria-label="Floating label select example" />
                                 <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
                             </div>
                             <div class="input-group-append" style="height:50px;">
