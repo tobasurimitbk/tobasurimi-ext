@@ -94,6 +94,7 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select supplier_id" name="supplier_id" id="supplier_id">
                                         <option value=""></option>
+                                        <option value="all">All</option>
                                         <?php foreach ($dataSupplier as $supplier) : ?>
                                             <option value="<?= $supplier['id'] ?>"><?= $supplier['name'] ?></option>
                                         <?php endforeach; ?>
@@ -126,6 +127,7 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select <?= !empty($dataTandaTerimaFaktur) ? 'disabled' : '' ?> class="form-select divisi_id" name="divisi_id" id="divisi_id">
                                         <option value=""></option>
+                                        <option value="all">All</option>
                                         <?php foreach ($divisi as $d) : ?>
                                             <option <?= !empty($dataTandaTerimaFaktur) ? ($dataTandaTerimaFaktur['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
                                         <?php endforeach; ?>
@@ -148,6 +150,7 @@
                                                 <th style="text-align: center;" class="sort">No PO</th>
                                                 <th style="text-align: center;" class="sort">Tgl LPB</th>
                                                 <th style="text-align: center;" class="sort">No LPB</th>
+                                                <th style="text-align: center;" class="sort">Supplier</th>
                                                 <th style="text-align: center;" class="sort">Nama Barang</th>
                                                 <th style="text-align: center;" class="sort">Qty LPB</th>
                                                 <th style="text-align: center;" class="sort">Qty Retur</th>
@@ -460,14 +463,32 @@
             return $(this).data("id");
         }).get();
 
-        if (dataIds.length == 0) {
+        if (dataIds.length === 0) {
             Swal.fire({
                 icon: 'error',
-                title: 'Cheklist minimal satu data penerimaan!',
+                title: 'Checklist minimal satu data penerimaan!',
                 confirmButtonColor: '#4e73df',
                 confirmButtonText: 'Ok'
             });
         } else {
+            // Collect all supplier names from selected rows
+            var supplierNames = checkedCheckboxes.map(function() {
+                return $(this).closest('tr').find('td:nth-child(5)').text().trim(); // Assuming supplier_name is the 5th column
+            }).get();
+
+            // Check for unique supplier names
+            var uniqueSuppliers = [...new Set(supplierNames)];
+            if (uniqueSuppliers.length > 1) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Semua data penerimaan harus dari supplier yang sama!',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+                return; // Stop further execution
+            }
+
+            // Proceed with data processing
             $.each(list_penerimaan_barang, function(i, v) {
                 if ($.inArray(Number(v.penerimaan_barang_detail_id), dataIds) !== -1) {
                     var targetInputElement = $('input[data-id_input_diterima="' + v.penerimaan_barang_detail_id + '"]');
@@ -490,10 +511,9 @@
                 }
             });
             drawTableSelected(list_penerimaan_selected);
-
         }
-
     });
+
 
     // VALIDATION PAJAK
     var validatorPajak = $(".pajak-form").validate({
@@ -975,6 +995,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.po_no));
             newRow.append($('<td style="text-align: center;">').text(v.tanggal));
             newRow.append($('<td style="text-align: center;">').text(v.no_penerimaan_barang));
+            newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
             newRow.append($('<td style="text-align: center;">').text(v.nama_barang_dok));
             newRow.append($('<td style="text-align: center;">').text(v.qty_lpb));
             newRow.append($('<td style="text-align: center;">').text(v.qty_retur));

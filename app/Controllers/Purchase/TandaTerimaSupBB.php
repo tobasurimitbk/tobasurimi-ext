@@ -398,7 +398,7 @@ class TandaTerimaSupBB extends BaseController
         // $total = ($itemTotal + $dataInv->tambahan + $taxTotal - $dataInv->potongan) - $taxPph23;
         $total = ($itemTotal + $dataInv->tambahan + $taxReturnTotal) - $taxPph23;
         $taxTotal += $dataInv->potongan;
-
+        
         $data["data"] = $dataInv;
         $data['invNo'] = $dataInv->faktur_no;
         $data["lpbNo"] = implode(', ', $noList);
@@ -417,6 +417,8 @@ class TandaTerimaSupBB extends BaseController
         $data['taxData'] = $taxData;
 
         // dd($data['taxData']);
+        // var_dump($data);
+        // die;
 
         $this->dompdf->loadHtml(view('Purchase/terimaSupplierLokal/bp/print', $data));
         $this->dompdf->setPaper('A5', 'landscape');

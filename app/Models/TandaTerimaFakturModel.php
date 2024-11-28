@@ -154,45 +154,6 @@ class TandaTerimaFakturModel extends Model
         return $res;
     }
 
-    public function getListTandaTerimaFakturNotProcessed($supplierID, $divisiID)
-    {
-        $localPOPaymentBPModel = new LocalPOPaymentBPModel();
-        $condition = [
-            'tanda_terima_faktur.supplier_id' => $supplierID,
-            'tanda_terima_faktur.divisi_id' => $divisiID,
-            'tanda_terima_faktur.deletedAt' => null
-        ];
-        $tandaTerimaFakturModel = new TandaTerimaFakturModel();
-        $res = $tandaTerimaFakturModel
-            ->select('tanda_terima_faktur.id, tanda_terima_faktur.faktur_no, tanda_terima_faktur.nominal_faktur')
-            ->where($condition)
-            ->orderBy('tanda_terima_faktur.id', 'ASC')
-            ->findAll();
-
-        $list = [];
-
-        foreach ($res as $r) {
-            $selectQry = "sum(amount) as amount, tanda_terima_faktur_id";
-            $totalPembayaran = $localPOPaymentBPModel
-                ->select($selectQry)
-                ->where('local_po_payment_bp.tanda_terima_faktur_id', $r['id'])
-                ->groupBy('local_po_payment_bp.tanda_terima_faktur_id')
-                ->first();
-            if ($totalPembayaran === null || intval($r['nominal_faktur']) > intval($totalPembayaran['amount'])) {
-                array_push($list, $r);
-            }
-        }
-        // SELECT tanda_terima_faktur.id, tanda_terima_faktur.faktur_no, tanda_terima_faktur.nominal_faktur, sum(local_po_payment_bp.amount) as total_amount FROM `tanda_terima_faktur`
-        // LEFT JOIN local_po_payment_bp ON local_po_payment_bp.tanda_terima_faktur_id = tanda_terima_faktur.id
-        // WHERE tanda_terima_faktur.supplier_id = 4 AND tanda_terima_faktur.divisi_id = 41 AND tanda_terima_faktur.deletedAt is NULL
-        // GROUP BY local_po_payment_bp.tanda_terima_faktur_id
-        // HAVING 
-        // tanda_terima_faktur.nominal_faktur > total_amount
-
-
-        return $list;
-    }
-
     public function getListPenerimaanBarangLokalBPNotProcessed($supplierID, $divisiID)
     {
         $condition = [
@@ -200,45 +161,55 @@ class TandaTerimaFakturModel extends Model
             'penerimaan_barang.deletedAt' => null,
             'penerimaan_barang_detail.deletedAt' => null,
             'penerimaan_barang_detail.jml_masuk !=' => 0,
-            'penerimaan_barang.supplier_id' => $supplierID,
-            'penerimaan_barang.divisi_id' => $divisiID
         ];
-
+    
+        // Tambahkan filter jika $supplierID bukan "all"
+        if ($supplierID !== 'all') {
+            $condition['penerimaan_barang.supplier_id'] = $supplierID;
+        }
+    
+        // Tambahkan filter jika $divisiID bukan "all"
+        if ($divisiID !== 'all') {
+            $condition['penerimaan_barang.divisi_id'] = $divisiID;
+        }
+    
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $tandaTerimaFakturDetailModel = new TandaTerimaFakturDetailModel();
-
+    
         $selectQry = "am_purchase_orders.po_no, penerimaan_barang.tanggal, 
             penerimaan_barang.no_penerimaan_barang, penerimaan_barang_detail.nama_barang_dok,
             penerimaan_barang_detail.jml_masuk AS qty_lpb, 
             penerimaan_barang_detail.id AS penerimaan_barang_detail_id, 
             penerimaan_barang_detail.harga,
+            suppliers.id as supplier_id, suppliers.name as supplier_name,
             satuans.kode_satuan,
             CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS barang
-            ";
-
+        ";
+    
         $penerimaanList = $penerimaanBarangModel->select($selectQry)
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id')
             ->join('am_purchase_orders', 'am_purchase_orders.id = penerimaan_barang_detail.purchase_order_id')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
             ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->where($condition)
             ->orderBy('penerimaan_barang.tanggal', "ASC")
             ->findAll();
-
+    
         $filteredResults = array_map(function ($penerimaan) use ($tandaTerimaFakturDetailModel) {
             $selectQry = "SUM(qty) AS qty_diterima";
-
+    
             $tandaTerimaFaktur = $tandaTerimaFakturDetailModel->select($selectQry)
                 ->where('penerimaan_barang_detail_id', $penerimaan['penerimaan_barang_detail_id'])
                 ->where('deletedAt', null)
                 ->findAll();
-
+    
             $qtyLpb = $penerimaan['qty_lpb'];
             $qtyRetur = 0;
             $qtyTelahDiterima = empty($tandaTerimaFaktur) ? 0 : $tandaTerimaFaktur[0]['qty_diterima'];
             $qtyAkanDiterima = $qtyLpb - $qtyTelahDiterima;
-
+    
             if ($qtyAkanDiterima != 0) {
                 return [
                     'penerimaan_barang_detail_id' => $penerimaan['penerimaan_barang_detail_id'],
@@ -251,15 +222,18 @@ class TandaTerimaFakturModel extends Model
                     'qty_telah_diterima' => $qtyTelahDiterima == null ? 0 : $qtyTelahDiterima,
                     'qty_akan_diterima' => $qtyAkanDiterima,
                     'kode_satuan' => $penerimaan['kode_satuan'],
-                    'harga' => $penerimaan['harga']
+                    'harga' => $penerimaan['harga'],
+                    'supplier_id' => $penerimaan['supplier_id'],
+                    'supplier_name' => $penerimaan['supplier_name']
                 ];
             }
         }, $penerimaanList);
-
+    
         $filteredResults = array_filter($filteredResults);
-
+    
         return $filteredResults;
     }
+    
 
 
     public function getByID($tandaTerimaFakturID)
