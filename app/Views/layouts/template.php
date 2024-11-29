@@ -173,45 +173,42 @@
         });
 
 
-        function greatFormatRupiah(angka) {
-            // Pastikan angka diubah ke tipe data Number
-            const number = Number(angka);
-            
-            // Format angka ke string dengan 4 digit desimal
-            const formatted = number.toFixed(4);
-            
-            // Pisahkan bagian desimal
-            const [integerPart, decimalPart] = formatted.split(".");
+        function greatFormatRupiah(x) {
+            var min = false;
+            x = x.toString();
+            if (x.includes("-")) {
+                min = true;
+            } else {
+                min = false;
+            }
+            x = x.replace(/-/g, "");
+            var parts = x.toString().split(".");
+            parts[0] = parts[0].replace(/,/g, "");
+            var bilangan = parts[0];
 
-            // Tambahkan pemisah ribuan dengan tanda titik
-            const integerWithDots = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            var number_string = bilangan.toString(),
+                sisa = number_string.length % 3,
+                rupiah = number_string.substr(0, sisa),
+                ribuan = number_string.substr(sisa).match(/\d{3}/g);
 
-            // Gabungkan kembali dengan desimal yang dipisahkan koma
-            return `${integerWithDots},${decimalPart}`;
+            if (ribuan) {
+                var separator = sisa ? "," : "";
+                rupiah += separator + ribuan.join(",");
+            }
+            parts[0] = rupiah;
+            if (min) {
+                return "-" + parts.join(".");
+            } else {
+                return parts.join(".");
+            }
+
         }
 
-        function destroyFormatRupiah(formattedString) {
-            const withoutDots = formattedString.replace(/\./g, "");
-            const normalized = withoutDots.replace(",", ".");
-            return parseFloat(normalized);
+        function destroyFormatRupiah(x) {
+            if (!x) return 0;
+            const cleaned = x.replace(/,/g, "");
+            return parseFloat(cleaned);
         }
-
-        $(document).ready(function() {
-            $('.greatFormatRupiah').on('keyup', function() {
-                let value = $(this).val();
-                
-                // Hapus karakter selain angka dan koma/titik
-                value = value.replace(/[^\d,\.]/g, '');
-
-                // Cek apakah ada koma, jika ada format ke Rupiah
-                if (value.includes(",")) {
-                    $(this).val(greatFormatRupiah(value));
-                } else {
-                    $(this).val(value);
-                }
-            });
-        });
-
     </script>
     <!-- General JS Scripts -->
     <script src="<?= base_url(); ?>assets/js/popper.min.js?v=<?= time(); ?>"></script>
