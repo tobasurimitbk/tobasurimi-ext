@@ -197,7 +197,7 @@
         }
 
         $(document).ready(function() {
-            $('.formatRupiah').on('keyup', function() {
+            $('.greatFormatRupiah').on('keyup', function() {
                 let value = $(this).val();
                 
                 // Hapus karakter selain angka dan koma/titik
