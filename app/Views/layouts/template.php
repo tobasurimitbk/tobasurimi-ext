@@ -171,6 +171,47 @@
         $(document).on('select2:open', () => {
             document.querySelector('.select2-search__field').focus();
         });
+
+
+        function greatFormatRupiah(angka) {
+            // Pastikan angka diubah ke tipe data Number
+            const number = Number(angka);
+            
+            // Format angka ke string dengan 4 digit desimal
+            const formatted = number.toFixed(4);
+            
+            // Pisahkan bagian desimal
+            const [integerPart, decimalPart] = formatted.split(".");
+
+            // Tambahkan pemisah ribuan dengan tanda titik
+            const integerWithDots = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+            // Gabungkan kembali dengan desimal yang dipisahkan koma
+            return `${integerWithDots},${decimalPart}`;
+        }
+
+        function destroyFormatRupiah(formattedString) {
+            const withoutDots = formattedString.replace(/\./g, "");
+            const normalized = withoutDots.replace(",", ".");
+            return parseFloat(normalized);
+        }
+
+        $(document).ready(function() {
+            $('.formatRupiah').on('keyup', function() {
+                let value = $(this).val();
+                
+                // Hapus karakter selain angka dan koma/titik
+                value = value.replace(/[^\d,\.]/g, '');
+
+                // Cek apakah ada koma, jika ada format ke Rupiah
+                if (value.includes(",")) {
+                    $(this).val(greatFormatRupiah(value));
+                } else {
+                    $(this).val(value);
+                }
+            });
+        });
+
     </script>
     <!-- General JS Scripts -->
     <script src="<?= base_url(); ?>assets/js/popper.min.js?v=<?= time(); ?>"></script>
