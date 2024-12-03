@@ -42,6 +42,47 @@
 </head>
 <?php $session = session(); ?>
 
+
+    <script>
+        function greatFormatRupiah(x) {
+            var min = false;
+            x = x.toString();
+            if (x.includes("-")) {
+                min = true;
+            } else {
+                min = false;
+            }
+            x = x.replace(/-/g, "");
+            var parts = x.toString().split(".");
+            parts[0] = parts[0].replace(/,/g, "");
+            var bilangan = parts[0];
+
+            var number_string = bilangan.toString(),
+                sisa = number_string.length % 3,
+                rupiah = number_string.substr(0, sisa),
+                ribuan = number_string.substr(sisa).match(/\d{3}/g);
+
+            if (ribuan) {
+                var separator = sisa ? "," : "";
+                rupiah += separator + ribuan.join(",");
+            }
+            parts[0] = rupiah;
+            if (min) {
+                return "-" + parts.join(".");
+            } else {
+                return parts.join(".");
+            }
+
+        }
+
+        function destroyFormatRupiah(x) {
+            if (!x) return 0;
+            const cleaned = x.replace(/,/g, "");
+            return parseFloat(cleaned);
+        }
+    </script>
+
+
 <body class="<?= $session->get('toggle');  ?>">
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/js-polyfills/0.1.43/polyfill.min.js" integrity="sha512-lvWiOP+aMKHllm4THsjzNleVuGOh0WGniJ3lgu/nvCbex1LlaQSxySUjAu/LTJw9FhnSL/PVYoQcckg1Q03+fQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> Bootstrap core JavaScript -->
     <script src="<?= base_url(); ?>assets/_vendor/jquery/jquery.min.js?v=<?= time(); ?>"></script>
@@ -173,42 +214,6 @@
         });
 
 
-        function greatFormatRupiah(x) {
-            var min = false;
-            x = x.toString();
-            if (x.includes("-")) {
-                min = true;
-            } else {
-                min = false;
-            }
-            x = x.replace(/-/g, "");
-            var parts = x.toString().split(".");
-            parts[0] = parts[0].replace(/,/g, "");
-            var bilangan = parts[0];
-
-            var number_string = bilangan.toString(),
-                sisa = number_string.length % 3,
-                rupiah = number_string.substr(0, sisa),
-                ribuan = number_string.substr(sisa).match(/\d{3}/g);
-
-            if (ribuan) {
-                var separator = sisa ? "," : "";
-                rupiah += separator + ribuan.join(",");
-            }
-            parts[0] = rupiah;
-            if (min) {
-                return "-" + parts.join(".");
-            } else {
-                return parts.join(".");
-            }
-
-        }
-
-        function destroyFormatRupiah(x) {
-            if (!x) return 0;
-            const cleaned = x.replace(/,/g, "");
-            return parseFloat(cleaned);
-        }
     </script>
     <!-- General JS Scripts -->
     <script src="<?= base_url(); ?>assets/js/popper.min.js?v=<?= time(); ?>"></script>
