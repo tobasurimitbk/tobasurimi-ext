@@ -28,6 +28,7 @@ class TransaksiJurnalModel extends Model
         'no_bukti',
         'valas',
         'exchange_rate',
+        'uraian_transaksi'
     ];
 
     // Dates
@@ -113,5 +114,69 @@ class TransaksiJurnalModel extends Model
     public function searchNoBukti($query)
     {
         return $this->like('no_bukti', $query)->where('deleted_at', null)->findAll();
+    }
+
+
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'transaksi_jurnal.id' => 'transaksi_jurnal.id',
+            'transaksi_jurnal.type_transaksi' => 'transaksi_jurnal.type_transaksi',
+            'transaksi_jurnal.no_transaksi' => 'transaksi_jurnal.no_transaksi',
+            'transaksi_jurnal.tanggal_transaksi' => 'transaksi_jurnal.tanggal_transaksi',
+            'transaksi_jurnal.uraian_transaksi' => 'transaksi_jurnal.uraian_transaksi',
+            'transaksi_jurnal.metode_input' => 'transaksi_jurnal.metode_input',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'created_at';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "transaksi_jurnal.*,
+        metadata.value as transaksi_type_name
+        ";
+
+        $dataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('metadata', 'metadata.id = transaksi_jurnal.type_transaksi', 'left')
+            ->join('jurnal_umum', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType)
+            ->groupBy('jurnal_umum.id_transaksi');
+
+        $totalData = $dataQry->countAllResults(false);
+
+        if ($addCondition['start_date'] || $addCondition['end_date'] || $addCondition['type_transaksi'] || $addCondition['search']) {
+            $dataQry->groupStart();
+        }
+
+        if ($addCondition['start_date']) {
+            $dataQry->where('transaksi_jurnal.tanggal_transaksi >=', $addCondition['start_date']);
+        }
+
+        if ($addCondition['end_date']) {
+            $dataQry->where('transaksi_jurnal.tanggal_transaksi <=', $addCondition['end_date']);
+        }
+
+        if ($addCondition['type_transaksi']) {
+            $dataQry->where('transaksi_jurnal.type_transaksi', $addCondition['type_transaksi']);
+        }
+
+        if ($addCondition['search']) {
+            $dataQry->like('no_transaksi', $addCondition['search']);
+        }
+
+        if ($addCondition['start_date'] || $addCondition['end_date'] || $addCondition['type_transaksi'] || $addCondition['search']) {
+            $dataQry->groupEnd();
+        }
+
+        $totalFilteredData = $dataQry->countAllResults(false);
+        $data = $dataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
     }
 }

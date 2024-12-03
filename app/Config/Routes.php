@@ -1854,9 +1854,19 @@ $routes->get('/api/sync-attendances', 'API\Attendances::sync_attendance', ['filt
 //Jurnal
 $routes->get('/jurnal', 'Accounting\JurnalUmum\JurnalUmum::index', ['filter' => 'Auth']);
 $routes->post('/jurnal/generate-no-bukti', 'Accounting\JurnalUmum\JurnalUmum::generateNoBukti', ['filter' => 'Auth']);
-$routes->post('/jurnal/addJurnal', 'Accounting\JurnalUmum\JurnalUmum::save', ['filter' => 'Auth']);
+// $routes->post('/jurnal/addJurnal', 'Accounting\JurnalUmum\JurnalUmum::save', ['filter' => 'Auth']);
 $routes->post('/jurnal/getSubAkuns', 'Accounting\JurnalUmum\JurnalUmum::searchSubAkun', ['filter' => 'Auth']);
 $routes->post('/jurnal/getSubAkunsExact', 'Accounting\JurnalUmum\JurnalUmum::searchSubAkunExact', ['filter' => 'Auth']);
+$routes->get('/jurnal/all', 'Accounting\JurnalUmum\JurnalUmum::all', ['filter' => 'Auth']);
+$routes->get('/jurnal/create', 'Accounting\JurnalUmum\JurnalUmum::create', ['filter' => 'Auth']);
+$routes->post('/jurnal/save', 'Accounting\JurnalUmum\JurnalUmum::store', ['filter' => 'Auth']);
+$routes->post('/jurnal/update', 'Accounting\JurnalUmum\JurnalUmum::update', ['filter' => 'Auth']);
+$routes->get('/jurnal/id/(:segment)', 'Accounting\JurnalUmum\JurnalUmum::detail/$1', ['filter' => 'Auth']);
+$routes->post('/jurnal/delete', 'Accounting\JurnalUmum\JurnalUmum::delete', ['filter' => 'Auth']);
+$routes->get('/jurnal/print/(:segment)', 'Accounting\JurnalUmum\JurnalUmum::print/$1', ['filter' => 'Auth']);
+$routes->get('/jurnal/print-excel', 'Accounting\JurnalUmum\JurnalUmum::exportExcel', ['filter' => 'Auth']);
+$routes->get('/jurnal/print-pdf', 'Accounting\JurnalUmum\JurnalUmum::exportPdf', ['filter' => 'Auth']);
+
 // set no bukti
 $routes->get('/no-bukti', 'Accounting\NoBuktiAccounting\NoBukti::index', ['filter' => 'Auth']);
 $routes->get('/no-bukti/all', 'Accounting\NoBuktiAccounting\NoBukti::allNoBukti', ['filter' => 'Auth']);

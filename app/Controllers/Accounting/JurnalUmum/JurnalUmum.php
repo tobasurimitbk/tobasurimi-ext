@@ -18,6 +18,7 @@ use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\AccountSupplierModel;
 use App\Models\AccountBarangModel;
 use App\Models\AccountDivisisModel;
+use App\Models\CompaniesModel;
 use App\Models\RMImportPOModel;
 use App\Models\RMImportPODetailModel;
 use App\Models\LocalPOPaymentModel;
@@ -29,13 +30,19 @@ use App\Models\PembayaranInvoiceModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\SalesOrderLainDetailModel;
 use App\Models\SalesOrderLainModel;
+use App\Models\TutupBukuModel;
 use Config\Database;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Exception;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class JurnalUmum extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $this_user_id;
     protected $Sub_AkunsModel;
     protected $jurnalUmumModel;
     protected $transaksiJurnalModel;
@@ -60,16 +67,19 @@ class JurnalUmum extends BaseController
     protected $penerimaanBarangModel;
     protected $metadataModel;
     protected $kursModel;
+    protected $tutupBukuModel;
 
     protected $salesOrderLainModel;
     protected $salesOrderLainDetailModel;
     protected $pembayaranInvoiceModel;
     protected $pembayaranInvoiceDetailModel;
+    protected $companiesModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_user_id = session()->get("login")->user_id;
         $this->Sub_AkunsModel = new Sub_AkunsModel();
         $this->jurnalUmumModel = new JurnalUmumModel();
         $this->transaksiJurnalModel = new TransaksiJurnalModel();
@@ -94,27 +104,556 @@ class JurnalUmum extends BaseController
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->metadataModel = new MetadataModel();
         $this->kursModel = new KursModel();
+        $this->tutupBukuModel = new TutupBukuModel();
 
         $this->salesOrderLainModel = new SalesOrderLainModel();
         $this->salesOrderLainDetailModel = new SalesOrderLainDetailModel();
         $this->pembayaranInvoiceModel = new PembayaranInvoiceModel();
         $this->pembayaranInvoiceDetailModel = new PembayaranInvoiceDetailModel();
+        $this->companiesModel = new CompaniesModel();
     }
 
-    // public function index()
-    // {
-    //     $tipeTransaksi = $this->MetadataModel
-    //         ->where('name', 'tipe_transaksi')
-    //         ->findAll();
-
-    //     $data = [
-    //         'tipeTransaksi' => $tipeTransaksi
-    //     ];
-
-    //     return view('Accounting/jurnalUmum/index', $data);
-    // }
-
     public function index()
+    {
+        $tipeTransaksi = $this->MetadataModel
+            ->where('name', 'tipe_transaksi')
+            ->findAll();
+
+        $data = [
+            'tipeTransaksi' => $tipeTransaksi
+        ];
+
+        return view('Accounting/jurnalUmum/index', $data);
+    }
+
+    public function all()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getVar("length"),
+            "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
+            "sort" => $this->request->getVar("sort"),
+            "sorttype" => $this->request->getVar("sortType"),
+        ];
+
+        $addCondition = [
+            "sort"   => $this->request->getVar("sort"),
+            "sortType"  => $this->request->getVar("sortType"),
+            "start_date" => $this->request->getVar('start_date'),
+            "end_date" => $this->request->getVar("end_date"),
+            "type_transaksi" => $this->request->getVar('type_transaksi'),
+            "search" => $this->request->getVar("search"),
+        ];
+
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
+
+        $condition = [
+            'jurnal_umum.company_id' => $this->this_company_id,
+            'transaksi_jurnal.deleted_at' => null,
+        ];
+
+        $dataQry = $this->transaksiJurnalModel->getList($condition, $addCondition, $limit, $offset);
+        $dataJurnal = $this->getData($dataQry['data'], $payload);
+
+        $data = [
+            "draw"              => intval($this->request->getVar("draw")),
+            "recordsTotal"      => $dataQry['totalData'],
+            "recordsFiltered"   => $dataQry['totalFilteredData'],
+            "data"              => $dataJurnal,
+            "payload"           => $payload
+        ];
+
+        return response()->setJSON($data);
+    }
+
+    private function getData($dataJurnal, $payload)
+    {
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $dataResult = [];
+        foreach ($dataJurnal as $data) {
+            if ($data->po_id != null) {
+                // Transaksi Pembelian
+                $transaksiPembelian = $this->transaksiPembelianModel
+                    ->select('suppliers.name as supplier')
+                    ->join('suppliers', 'suppliers.id = transaksi_pembelian.id_supplier', 'left')
+                    ->where('id_transaksi_jurnal', $data->id)
+                    ->first();
+
+                $supplierName = $transaksiPembelian != null ? "0 : " . $transaksiPembelian['supplier'] : "0 : ";
+            }
+
+            // Cek Tutup Buku Per Transaksi
+            $tutupBuku = $this->tutupBukuModel
+                ->where('company_id', $this->this_company_id)
+                ->where('bulan', date('Y-m', strtotime($data->tanggal_transaksi)))
+                ->first();
+
+            array_push($dataResult, [
+                "no"                    => $no++,
+                "id"                    => encrypt($data->id),
+                "transaksi_type_name"   => $data->transaksi_type_name,
+                "no_transaksi"          => $data->no_transaksi,
+                "tanggal_transaksi"     => date('d/m/Y', strtotime($data->tanggal_transaksi)),
+                "uraian_transaksi"      => $data->uraian_transaksi,
+                "invoice"               => isset($supplierName) ? $supplierName : "0 : ",
+                "metode_input"          => strtoupper($data->metode_input),
+                "valas"                 => $data->valas,
+                "nilai"                 => $data->total_debit,
+                "nilai_idr"             => ($data->total_debit * $data->exchange_rate),
+                "tutup_buku"            => $tutupBuku == null ? 0 : 1,
+            ]);
+        }
+
+        return $dataResult;
+    }
+
+    public function create()
+    {
+        $tipeTransaksi = $this->MetadataModel
+            ->where('name', 'tipe_transaksi')
+            ->findAll();
+
+
+        $data = [
+            'tipeTransaksi' => $tipeTransaksi,
+            'subAkun' =>  $this->Sub_AkunsModel->getAPAR($this->this_company_id),
+            'valuta' => $this->metadataModel->get_by_name('Valuta'),
+            'divisi' => $this->divisionModel->getDivisiAccess()
+        ];
+
+        return view('Accounting/jurnalUmum/form', $data);
+    }
+
+    public function store()
+    {
+        // $check = $this->transaksiJurnalModel->where('no_bukti', $this->request->getVar('no_bukti'))->first();
+        // if ($check == null) {
+        //     return response()->setJSON([
+        //         'status' => false,
+        //         'message' => "Nomor bukti sudah ada",
+        //         'token' => csrf_hash()
+        //     ]);
+        // }
+
+        $valas = null;
+        $valasId = null;
+        $exchangeRate = null;
+
+        foreach (json_decode($this->request->getVar('listJurnal')) as $l) {
+            $valas = $l->valas;
+            $valasId = $l->valas_id;
+            $exchangeRate = $l->kurs;
+        }
+        $db = Database::connect();
+
+        try {
+            $db->transBegin();
+
+            $id = $this->transaksiJurnalModel->insert([
+                'no_transaksi' => $this->request->getVar('no_bukti'),
+                'tanggal_transaksi' =>  $this->request->getVar("tanggal_transaksi") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_transaksi")))) : "",
+                'type_transaksi' => $this->request->getVar('type_transaksi'),
+                'uraian_transaksi' => $this->request->getVar('uraian_transaksi'),
+                'total_debit' => $this->request->getVar('total_debit'),
+                'total_kredit' => $this->request->getVar('total_kredit'),
+                'metode_input' => "manual",
+                'no_bukti' => $this->request->getVar('no_bukti'),
+                'uraian_transaksi' => $this->request->getVar('uraian_transaksi'),
+                'valas' => $valas,
+                'valas_id' => $valasId,
+                'exchange_rate' => $exchangeRate,
+                'total_debit' => $this->request->getVar('totalDebit'),
+                'total_kredit' => $this->request->getVar('totalKredit'),
+            ]);
+
+            foreach (json_decode($this->request->getVar('listJurnal')) as $l) {
+                $this->jurnalUmumModel->insert([
+                    'id_transaksi' => $id,
+                    'id_coa' => $l->id_coa,
+                    'company_id' => $this->this_company_id,
+                    'divisi_id' => $this->request->getVar('divisi_id') == "ALL" ? null : $this->request->getVar('divisi_id'),
+                    'tanggal_jurnal' => $this->request->getVar("tanggal_transaksi") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_transaksi")))) : "",
+                    'debit' => $l->jenis_transaksi == "debit" ? $l->jumlah : 0,
+                    'kredit' => $l->jenis_transaksi == "kredit" ? $l->jumlah : 0,
+                    'valas' => $l->valas_id,
+                    'kurs' => $l->kurs,
+                    'keterangan' => $l->keterangan,
+                    'id_inputer' => $this->this_user_id
+                ]);
+            }
+            $db->transCommit();
+
+            return response()->setJSON([
+                'status' => true,
+                'message' => "Jurnal Berhasil Disimpan",
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            var_dump($e->getMessage(), $e->getLine());
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Terjadi Kesalahan",
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function update()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        // $check = $this->transaksiJurnalModel->where('no_bukti', $this->request->getVar('no_bukti'))->where('id !=', $id)->first();
+        // if ($check == null) {
+        //     return response()->setJSON([
+        //         'status' => false,
+        //         'message' => "Nomor bukti sudah ada",
+        //         'token' => csrf_hash()
+        //     ]);
+        // }
+
+        $valas = null;
+        $valasId = null;
+        $exchangeRate = null;
+
+        foreach (json_decode($this->request->getVar('listJurnal')) as $l) {
+            $valas = $l->valas;
+            $valasId = $l->valas_id;
+            $exchangeRate = $l->kurs;
+        }
+        $db = Database::connect();
+
+        try {
+            $db->transBegin();
+
+            $this->transaksiJurnalModel->update($id, [
+                'no_transaksi' => $this->request->getVar('no_bukti'),
+                'tanggal_transaksi' =>  $this->request->getVar("tanggal_transaksi") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_transaksi")))) : "",
+                'type_transaksi' => $this->request->getVar('type_transaksi'),
+                'uraian_transaksi' => $this->request->getVar('uraian_transaksi'),
+                'total_debit' => $this->request->getVar('total_debit'),
+                'total_kredit' => $this->request->getVar('total_kredit'),
+                'metode_input' => "manual",
+                'no_bukti' => $this->request->getVar('no_bukti'),
+                'uraian_transaksi' => $this->request->getVar('uraian_transaksi'),
+                'valas' => $valas,
+                'valas_id' => $valasId,
+                'exchange_rate' => $exchangeRate,
+                'total_debit' => $this->request->getVar('totalDebit'),
+                'total_kredit' => $this->request->getVar('totalKredit'),
+            ]);
+
+            // Delete All
+            $this->jurnalUmumModel->where('id_transaksi', $id)->delete();
+            foreach (json_decode($this->request->getVar('listJurnal')) as $l) {
+                $this->jurnalUmumModel->insert([
+                    'id_transaksi' => $id,
+                    'id_coa' => $l->id_coa,
+                    'company_id' => $this->this_company_id,
+                    'divisi_id' => $this->request->getVar('divisi_id') == "ALL" ? null : $this->request->getVar('divisi_id'),
+                    'tanggal_jurnal' => $this->request->getVar("tanggal_transaksi") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_transaksi")))) : "",
+                    'debit' => $l->jenis_transaksi == "debit" ? $l->jumlah : 0,
+                    'kredit' => $l->jenis_transaksi == "kredit" ? $l->jumlah : 0,
+                    'valas' => $l->valas_id,
+                    'kurs' => $l->kurs,
+                    'keterangan' => $l->keterangan,
+                    'id_inputer' => $this->this_user_id
+                ]);
+            }
+            $db->transCommit();
+
+            return response()->setJSON([
+                'status' => true,
+                'message' => "Jurnal Berhasil Diupdate",
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+
+            var_dump($e->getMessage(), $e->getLine());
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Terjadi Kesalahan",
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function detail($id)
+    {
+
+        $id = decrypt($id);
+        $transaksiJurnal = $this->transaksiJurnalModel->where('id', $id)->first();
+
+        if ($transaksiJurnal == null) {
+            return redirect()->to('jurnal');
+        }
+
+        $jurnalUmum = $this->jurnalUmumModel->select('
+            jurnal_umum.*,
+            sub_akuns.no_sub,
+            sub_akuns.nama_sub,
+            metadata.value as valas_name,    
+        ')
+            ->join('sub_akuns', 'sub_akuns.id = jurnal_umum.id_coa', 'left')
+            ->join('metadata', 'metadata.id = jurnal_umum.valas', 'left')
+            ->where('id_transaksi', $id)
+            ->where('jurnal_umum.deletedAt', null)
+            ->findAll();
+
+        $divisiId = "ALL";
+
+        $jurnalUmumList = [];
+        foreach ($jurnalUmum as $j) {
+            $divisiId = $j['divisi_id'];
+
+            $jumlah =  $j['debit'] == 0.00 ? $j['kredit'] : $j['debit'];
+            array_push($jurnalUmumList, [
+                'id' => $j['id'],
+                'jenis_transaksi' => $j['debit'] == 0.00 ? "kredit" : "debit",
+                'keterangan' => $j['keterangan'],
+                'id_coa' => $j['id_coa'],
+                'valas_id' => $j['valas'],
+                'valas' => $j['valas_name'],
+                'jumlah' => floatval($jumlah),
+                'kurs' => floatval($j['kurs']),
+                'jumlah_idr' => ($jumlah * $j['kurs']),
+                'nama_sub' => $j['nama_sub'],
+                'no_sub' => $j['no_sub'],
+            ]);
+        }
+
+        $tipeTransaksi = $this->MetadataModel
+            ->where('name', 'tipe_transaksi')
+            ->findAll();
+
+        $tutupBuku = $this->tutupBukuModel
+            ->where('company_id', $this->this_company_id)
+            ->where('bulan', date('Y-m', \strtotime($transaksiJurnal['tanggal_transaksi'])))
+            ->first();
+
+        $data = [
+            'transaksiJurnal' => $transaksiJurnal,
+            'jurnalUmumList' => $jurnalUmumList,
+            'tipeTransaksi' => $tipeTransaksi,
+            'tutupBuku' => $tutupBuku == null ? 0 : 1,
+            'divisiId' => $divisiId,
+            'divisi' => $this->divisionModel->getDivisiAccess(),
+            'subAkun' =>  $this->Sub_AkunsModel->getAPAR($this->this_company_id),
+            'valuta' => $this->metadataModel->get_by_name('Valuta'),
+
+        ];
+
+        return view('Accounting/jurnalUmum/form', $data);
+    }
+
+    public function delete($id)
+    {
+        $id = decrypt($id);
+        $this->transaksiJurnalModel->where('id', $id)->delete();
+        $this->jurnalUmumModel->where('id_transaksi', $id)->delete();
+
+        return response()->setJSON([
+            'status' => true,
+            'message' => "Jurnal Berhasil Dihapus",
+            'token' => csrf_hash()
+        ]);
+    }
+
+    public function print($id)
+    {
+        $id = decrypt($id);
+        $transaksiJurnal = $this->transaksiJurnalModel->where('id', $id)->first();
+
+        if ($transaksiJurnal == null) {
+            return redirect()->to('jurnal');
+        }
+
+        $jurnalUmum = $this->jurnalUmumModel->select('
+            jurnal_umum.*,
+            sub_akuns.no_sub,
+            sub_akuns.nama_sub,
+            metadata.value as valas,    
+        ')
+            ->join('sub_akuns', 'sub_akuns.id = jurnal_umum.id_coa', 'left')
+            ->join('metadata', 'metadata.id = jurnal_umum.valas', 'left')
+            ->where('id_transaksi', $id)
+            ->where('jurnal_umum.deletedAt', null)
+            ->findAll();
+
+        $jurnalUmumList = [];
+        foreach ($jurnalUmum as $j) {
+            $jumlah = $j['debit'] == 0.00 ? $j['kredit'] : $j['debit'];
+            array_push($jurnalUmumList, [
+                'id' => $j['id'],
+                'jenis_transaksi' => $j['debit'] == 0.00 ? "kredit" : "debit",
+                'id_coa' => $j['id_coa'],
+                'valas_id' => $j['valas'],
+                'valas' => $j['valas'],
+                'jumlah' => $jumlah,
+                'jumlah_idr' => ($jumlah * $j['kurs']),
+                'nama_sub' => $j['nama_sub'],
+                'no_sub' => $j['no_sub'],
+                'kurs' => $j['kurs']
+            ]);
+        }
+
+        $data = [
+            'transaksiJurnal' => $transaksiJurnal,
+            'jurnalUmumList' => $jurnalUmumList,
+            'company' => $this->companiesModel->where('id', $this->this_company_id)->first()
+        ];
+
+        $html = view('Accounting/jurnalUmum/print', $data);
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $dompdf = new Dompdf($options);
+
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $dompdf->stream('voucher-accounting.pdf', ["Attachment" => false]);
+    }
+
+    public function exportExcel()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getVar("length"),
+            "sort" => $this->request->getVar("sort"),
+            "sorttype" => $this->request->getVar("sortType"),
+            "currentPage"   => 1,
+
+        ];
+
+        $addCondition = [
+            "sort"   => $this->request->getVar("sort"),
+            "sortType"  => $this->request->getVar("sortType"),
+            "start_date" => $this->request->getVar('start_date'),
+            "end_date" => $this->request->getVar("end_date"),
+            "type_transaksi" => $this->request->getVar('type_transaksi'),
+            "search" => $this->request->getVar("search"),
+        ];
+
+        $condition = [
+            'jurnal_umum.company_id' => $this->this_company_id,
+            'transaksi_jurnal.deleted_at' => null,
+        ];
+
+        $dataQry = $this->transaksiJurnalModel->getList($condition, $addCondition, 10000000, 0);
+        $dataJurnal = $this->getData($dataQry['data'], $payload);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $headerStyleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+
+        $dataStyleArray = [
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+        $column = 2;
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('B1', 'Transaksi')
+            ->setCellValue('C1', 'Nomor')
+            ->setCellValue('D1', 'Tanggal')
+            ->setCellValue('E1', 'Invoice')
+            ->setCellValue('F1', 'Keterangan')
+            ->setCellValue('G1', 'Nilai')
+            ->setCellValue('H1', 'Valas')
+            ->setCellValue('I1', 'Nilai (IDR)');
+
+
+        $sheet->getStyle('A1:I1')->applyFromArray($headerStyleArray);
+
+        foreach ($dataJurnal as $row) {
+            $sheet->setCellValue('A' . $column, $row['no'])
+                ->setCellValue('B' . $column, $row['transaksi_type_name'])
+                ->setCellValue('C' . $column, $row['no_transaksi'])
+                ->setCellValue('D' . $column, $row['tanggal_transaksi'])
+                ->setCellValue('E' . $column, $row['invoice'])
+                ->setCellValue('F' . $column, $row['uraian_transaksi'])
+                ->setCellValue('G' . $column, $row['nilai'])
+                ->setCellValue('H' . $column, $row['valas'])
+                ->setCellValue('I' . $column, $row['nilai_idr']);
+
+            $sheet->getStyle('A' . $column . ':I' . $column)->applyFromArray($dataStyleArray);
+            $column++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        foreach (range('A', 'I') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Laporan_Transaksi_Jurnal';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
+    }
+
+    public function exportPdf()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getVar("length"),
+            "sort" => $this->request->getVar("sort"),
+            "sorttype" => $this->request->getVar("sortType"),
+            "currentPage"   => 1,
+
+        ];
+
+        $addCondition = [
+            "sort"   => $this->request->getVar("sort"),
+            "sortType"  => $this->request->getVar("sortType"),
+            "start_date" => $this->request->getVar('start_date'),
+            "end_date" => $this->request->getVar("end_date"),
+            "type_transaksi" => $this->request->getVar('type_transaksi'),
+            "search" => $this->request->getVar("search"),
+        ];
+
+        $condition = [
+            'jurnal_umum.company_id' => $this->this_company_id,
+            'transaksi_jurnal.deleted_at' => null,
+        ];
+
+        $dataQry = $this->transaksiJurnalModel->getList($condition, $addCondition, 10000000, 0);
+        $dataJurnal = $this->getData($dataQry['data'], $payload);
+
+        $data = [
+            'dataJurnal' => $dataJurnal,
+            'company' => $this->companiesModel->where('id', $this->this_company_id)->first(),
+            'startDate' => $addCondition['start_date'],
+            'endDate' => $addCondition['end_date']
+        ];
+
+        $html = view('Accounting/jurnalUmum/printRange', $data);
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $dompdf = new Dompdf($options);
+
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $dompdf->stream('Laporan_Transaksi_Jurnal.pdf', ["Attachment" => false]);
+    }
+
+    public function indexBackup()
     {
         $accountModuleModel = new AccountModuleModel();
         $Sub_AkunsModel = new Sub_AkunsModel();
@@ -273,7 +812,7 @@ class JurnalUmum extends BaseController
         try {
             $dataMetadataTipeTransaksi = $this->MetadataModel
                 ->asObject()
-                ->where('id', $this->encrypter->decrypt(hex2bin($this->request->getPost('transaksi'))))
+                ->where('id', $this->request->getPost('transaksi'))
                 ->findAll();
             foreach ($dataMetadataTipeTransaksi as $val) {
                 $kodeTransaksi = $val->description;
