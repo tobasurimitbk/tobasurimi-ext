@@ -305,7 +305,7 @@
 
     });
 
-    function printPDFn(url) {
+    function printPDF(url) {
         const formData = $('.create-form').serializeArray();
 
         const $form = $('<form>', {
