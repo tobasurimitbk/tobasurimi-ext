@@ -180,7 +180,11 @@
             },
             {
                 data: "total",
-                className: "text-center"
+                className: "text-center",
+                render: function (param) {
+                    // Pastikan nilai param valid
+                    return greatFormatRupiah(param);
+                }
             },
             {
                 data: "itemCount",

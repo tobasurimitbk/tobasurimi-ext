@@ -764,8 +764,8 @@
             harga += (Number(v.qty_akan_diterima) * Number(v.harga));
         });
         var total = harga - potongan + tambahan;
-        $('.nominal_faktur').val(formatRupiah(harga));
-        $('.total_tambahan_potongan').val(formatRupiah(total));
+        $('.nominal_faktur').val(greatFormatRupiah(harga));
+        $('.total_tambahan_potongan').val(greatFormatRupiah(total));
 
     }
 
@@ -865,7 +865,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.tax_inv_date));
             newRow.append($('<td style="text-align: center;">').text(v.tax_inv_no));
             newRow.append($('<td style="text-align: center;">').text(v.tax_type));
-            newRow.append($('<td style="text-align: center;">').text(formatRupiah(v.tax_amt)));
+            newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.tax_amt)));
             newRow.append($('<td style="text-align: center;">').text(v.tax_status));
             newRow.append($('<td style="text-align: center;">').text(v.tax_note));
             <?php if ($isUsed) : ?>
@@ -931,7 +931,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.nama_barang_dok));
             newRow.append($('<td style="text-align: center;">').text(v.qty_akan_diterima));
             newRow.append($('<td style="text-align: center;">').text(v.kode_satuan));
-            newRow.append($('<td style="text-align: center;">').text(formatRupiah(harga)));
+            newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(harga)));
             <?php if ($isUsed) : ?>
                 newRow.append($('<td style="text-align: center;">').html(
                     `
@@ -1087,22 +1087,6 @@
             $(".no_tanda_terima_faktur").attr("readonly", false);
             $(".no_tanda_terima_faktur").val("");
         }
-    }
-
-    function formatRupiah(angka) {
-        if (angka === null) {
-            angka = 0;
-        }
-
-        angka = angka.toString();
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return ribuanFormatted + ',' + desimal;
     }
 
     function preventNegativeInput(inputElement) {

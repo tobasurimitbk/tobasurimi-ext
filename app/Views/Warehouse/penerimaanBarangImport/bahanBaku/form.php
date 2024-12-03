@@ -785,7 +785,7 @@
                     listData.result[i].jml_diterima_lpb = Number($('.jml_diterima_lpb').val());
                     listData.result[i].jml_diterima_total = Number($('.jml_diterima_total').val());
                     listData.result[i].sisa_total = Number($('.sisa_total').val());
-                    listData.result[i].sub_total = Number(formatCurrency($('.sub_total').val()));
+                    listData.result[i].sub_total = Number(destroyFormatRupiah($('.sub_total').val()));
                     listData.result[i].jml_diterima_lpb_konversi = Number(jml_diterima_lpb * nilai_konversi);
                     drawTable(listData);
                     $('.detail-modal').modal('hide');
@@ -806,7 +806,7 @@
                     var jml_diterima_total_now = Number(item.jml_diterima_total - jml_diterima_lpb_last);
                     var sisa_total_now = Number(item.sisa_total + jml_diterima_lpb_last);
                     $('.sub_total').val('' +
-                        formatRupiah2(Number(jml_diterima_lpb) * Number(item.harga)));
+                        greatFormatRupiah(Number(jml_diterima_lpb) * Number(item.harga)));
                     $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(4));
                     $('.sisa_total').val(sisa_total_now.toFixed(4));
 
@@ -822,7 +822,7 @@
                     var jml_diterima_total_now = (Number(item.jml_diterima_total) + Number(jml_diterima_lpb) - jml_diterima_lpb_last);
                     var sisa_total_now = item.jml_order - jml_diterima_total_now;
                     $('.sub_total').val('' +
-                        formatRupiah2(Number(jml_diterima_lpb) * Number(item.harga)));
+                        greatFormatRupiah(Number(jml_diterima_lpb) * Number(item.harga)));
                     $('.jml_diterima_total').val(jml_diterima_total_now.toFixed(4));
                     $('.sisa_total').val(sisa_total_now.toFixed(4));
                     break;
@@ -888,8 +888,8 @@
                 );
                 newRow.append($('<td>').text(parseFloat(v.jml_diterima_total).toFixed(4)));
                 newRow.append($('<td>').text(parseFloat(v.sisa_total).toFixed(4)));
-                newRow.append($('<td>').text(formatRupiah2(parseFloat(v.harga) || 0)));
-                newRow.append($('<td>').text(formatRupiah2(parseFloat(v.sub_total) || 0)));
+                newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.harga) || 0)));
+                newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.sub_total) || 0)));
                 newRow.append($('<td>').text(v.keterangan));
                 newRow.append($('<td>').html(
                     <?php if (!empty($dataPenerimaanBarang)) : ?> <?php if ($dataPenerimaanBarang['status_post'] === "FINISH") : ?> `-`
@@ -924,8 +924,8 @@
             newRow.append($('<td style="text-align:left;">' + jmlDiterimaLpbKonversi.toFixed(4) + '</td>'));
             newRow.append($('<td style="text-align:left;"><b>' + jmlDiterimaTotal.toFixed(4) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + sisaTotal.toFixed(4) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah2(parseFloat(hargaTotal) || 0) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah2(parseFloat(subTotal) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(hargaTotal) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(subTotal) || 0) + '</b></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
@@ -957,8 +957,8 @@
         $('.jml_diterima_total').val(item.jml_diterima_total);
         $('.sisa_total').val(item.sisa_total.toFixed(4));
         $('.nama_barang_dokumen').val(item.nama_barang_master);
-        $('.harga_satuan').val("" + formatRupiah2(Number(item.harga) || 0));
-        $('.sub_total').val("" + formatRupiah2(Number(item.sub_total) || 0));
+        $('.harga_satuan').val("" + greatFormatRupiah(Number(item.harga) || 0));
+        $('.sub_total').val("" + greatFormatRupiah(Number(item.sub_total) || 0));
         $('.jml_diterima_lpb_last').val(item.jml_diterima_lpb);
     }
 
@@ -992,45 +992,6 @@
             $(".no_penerimaan_barang").attr("readonly", false);
             $(".no_penerimaan_barang").val("");
         }
-    }
-
-    function formatRupiah2(x) {
-        let min = false;
-        x = x.toString();
-        if (x.includes("-")) {
-            min = true;
-        } else {
-            min = false;
-        }
-        x = x.replace(/-/g, '');
-
-        let parts = x.split(".");
-        parts[0] = parts[0].replace(/,/g, '');
-        let bilangan = parts[0];
-
-        let number_string = bilangan.toString(),
-            sisa = number_string.length % 3,
-            rupiah = number_string.substr(0, sisa),
-            ribuan = number_string.substr(sisa).match(/\d{3}/g);
-
-        if (ribuan) {
-            let separator = sisa ? ',' : '';
-            rupiah += separator + ribuan.join(',');
-        }
-        parts[0] = rupiah;
-
-        if (parts[1]) {
-            parts[1] = parts[1].slice(0, 2).padEnd(2, '0');
-        } else {
-            parts[1] = '00';
-        }
-
-        return (min ? '-' : '') + parts.join(".");
-    }
-
-    function formatCurrency(str) {
-        return str.replace(/,/g, '');
-
     }
 </script>
 

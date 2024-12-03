@@ -581,8 +581,8 @@
                 newRow.append($('<td>').text(v.no_spp));
                 newRow.append($('<td>').text(v.jml_diterima));
                 newRow.append($('<td>').text(v.kode_satuan));
-                newRow.append($('<td>').text(formatRupiah(v.harga)));
-                newRow.append($('<td>').text(formatRupiah(v.sub_total)));
+                newRow.append($('<td>').text(greatFormatRupiah(v.harga)));
+                newRow.append($('<td>').text(greatFormatRupiah(v.sub_total)));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                         <input <?= isset($dataPengembalianBarang) ? ($dataPengembalianBarang['status_post'] == "FINISH" ? 'disabled' : '') : ""  ?> data-id="${v.id}" oninput="preventNegativeInput(this);sumTotalRetur();" style="height: 39px;" class="form-control jumlah_retur" type="text" value="${v.jml_retur}">
@@ -611,9 +611,9 @@
             newRow.append($('<td style="text-align:right;" colspan="8"><b>GRAND TOTAL</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + totalJmlDiterima + '</b></td>'));
             newRow.append($('<td style="text-align:left;"></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(totalHarga) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(totalSubTotal) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;" id="txt_total_retur"><b>' + formatRupiah(totalJmlRetur) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalHarga) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalSubTotal) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;" id="txt_total_retur"><b>' + greatFormatRupiah(totalJmlRetur) + '</b></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
@@ -645,22 +645,6 @@
             listBarang.splice(indexToRemove, 1);
         }
         drawTable(listBarang);
-    }
-
-    function formatRupiah(angka) {
-        if (angka === null) {
-            angka = 0;
-        }
-
-        angka = angka.toString();
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return ribuanFormatted;
     }
 
     function preventNegativeInput(inputElement) {
