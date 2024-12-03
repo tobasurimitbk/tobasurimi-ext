@@ -1767,7 +1767,7 @@ class JurnalUmum extends BaseController
                             'kredit' => 0,
                             'valas' => $metaDataValuta['id'],
                             'kurs' => $pembayaranInvoice['kurs_sekarang'],
-                            'keterangan' => "Pembayaran Invoice (Invoice Lain), Nomor : " . $p['nama_barang'],
+                            'keterangan' =>  $p['nama_barang'],
                             'id_inputer' => session()->get("login")->user_id
                         );
                         $totalDebit += $p['harga_total'];
@@ -1784,7 +1784,7 @@ class JurnalUmum extends BaseController
                             'kredit' =>  $p['harga_total'],
                             'valas' => $metaDataValuta['id'],
                             'kurs' => $pembayaranInvoice['kurs_sekarang'],
-                            'keterangan' => "Pembayaran Invoice (Barang Lain), Nomor : " . $p['nama_barang'],
+                            'keterangan' =>  $p['nama_barang'],
                             'id_inputer' => session()->get("login")->user_id
                         );
                         $totalKredit += $p['harga_total'];
@@ -1807,7 +1807,7 @@ class JurnalUmum extends BaseController
                     'kredit' => 0,
                     'valas' => $metaDataValuta['id'],
                     'kurs' => 1,
-                    'keterangan' => "Pembayaran Invoice (Barang Invoice), Nomor : " . $pembayaranInvoice['no_pembayaran'],
+                    'keterangan' => $pembayaranInvoice['keterangan'],
                     'id_inputer' => session()->get("login")->user_id
                 );
             }
@@ -1824,7 +1824,7 @@ class JurnalUmum extends BaseController
                     'kredit' => $pembayaranInvoice['total_bayar'],
                     'valas' => $metaDataValuta['id'],
                     'kurs' => 1,
-                    'keterangan' => "Pembayaran Invoice (Barang Invoice), Nomor : " . $pembayaranInvoice['no_pembayaran'],
+                    'keterangan' => $pembayaranInvoice['keterangan'],
                     'id_inputer' => session()->get("login")->user_id
                 );
             }

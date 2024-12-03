@@ -101,9 +101,11 @@ class BukuBesar extends BaseController
       ')
                 ->join('transaksi_jurnal', 'transaksi_jurnal.id = jurnal_umum.id_transaksi', 'left')
                 ->join('metadata AS m_valas', 'm_valas.id = jurnal_umum.valas', 'left')
-                ->join('metadata AS m_jenis_transaksi', 'm_jenis_transaksi.id = jurnal_umum.id_transaksi', 'left')
+                ->join('metadata AS m_jenis_transaksi', 'm_jenis_transaksi.id = transaksi_jurnal.type_transaksi', 'left')
                 ->where('transaksi_jurnal.deleted_at', null)
-                ->where('jurnal_umum.deletedAt', null);
+                ->where('jurnal_umum.deletedAt', null)
+                ->orderBy('jurnal_umum.tanggal_jurnal', "ASC")
+                ->orderBy('jurnal_umum.debit', "DESC");
 
 
             // Filter berdasarkan tanggal
