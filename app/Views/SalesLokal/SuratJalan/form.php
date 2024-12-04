@@ -74,7 +74,6 @@
                                 }
                                 ?>
                             </select>
-                            <label for="floatingInput">No Order</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -550,8 +549,8 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                                window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
-                                            })
+                                            window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
+                                        })
                                 } else {
                                     Swal.fire({
                                         icon: 'error',

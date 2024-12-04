@@ -112,7 +112,6 @@
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">No. Mutasi</label>
                         </div>
                     </div>
 

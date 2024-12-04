@@ -101,7 +101,6 @@
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
-                            <label for="floatingInput">No. PO</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -990,7 +989,6 @@
             $(".no_penerimaan_barang").val("");
         }
     }
-
 </script>
 
 <?php if (!empty($dataPenerimaanBarang)) : ?>

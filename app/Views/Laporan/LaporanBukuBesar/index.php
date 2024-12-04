@@ -79,7 +79,7 @@
                             <label for="floatingInput">Pilih Jenis Akun</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-5">
                         <div class="form-floating" style="height: 50px;">
                             <select class="form-select account_id" multiple name="account_id[]" id="account_id" onchange="changeAccount()">
                                 <?php foreach ($account as $a) : ?>
@@ -232,6 +232,10 @@
 </section>
 
 <script>
+
+</script>
+
+<script>
     $(document).ready(function() {
         // Mendapatkan tanggal saat ini
         var currentDate = new Date();
@@ -282,14 +286,14 @@
             allowClear: true
         });
 
-        $(' .account_id, .divisi_id,.jenis_account,.range_account_start_id,.range_account_finish_id')
+        $('.divisi_id,.jenis_account,.range_account_start_id,.range_account_finish_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $(' .account_id, .divisi_id,.jenis_account,.range_account_start_id,.range_account_finish_id')
+        $('.divisi_id,.jenis_account,.range_account_start_id,.range_account_finish_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -297,7 +301,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px').css('z-index', '1');
 
-        $(' .account_id, .divisi_id,.jenis_account,.range_account_start_id,.range_account_finish_id')
+        $('.divisi_id,.jenis_account,.range_account_start_id,.range_account_finish_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
