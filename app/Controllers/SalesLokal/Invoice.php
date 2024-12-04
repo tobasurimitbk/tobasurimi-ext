@@ -287,7 +287,7 @@ class Invoice extends BaseController
                 "status_pelunasan"  => 'UNPAID',
                 "id_company"        => $this->this_company_id,
                 "tax_id"            => $this->request->getPost('taxes'),
-                "tax_value"         => $this->taxModel->find($this->request->getPost('taxes'))['tax_value'],
+                "tax_value"         => ($tax = $this->taxModel->find($this->request->getPost('taxes'))) ? $tax['tax_value'] : null,
             ];
 
             $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->insert($values);

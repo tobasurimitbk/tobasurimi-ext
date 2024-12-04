@@ -426,6 +426,7 @@
             allowClear: true
         }).change(function() {
             getDataSalesLokal();
+            updateKeterangan();
         });
 
 
@@ -793,41 +794,22 @@
         });
     }
 
-
     function getDataSalesLokal() {
-    const selectedIds = $("#no_dokumen").val(); // Ambil nilai array dari dropdown
+        const selectedIds = $("#no_dokumen").val(); // Ambil nilai array dari dropdown
 
-    $.ajax({
-        url: "<?= base_url('pembayaran-invoice/get-barang-sales-lokal'); ?>",
-        method: "GET",
-        data: {
-            id: JSON.stringify(selectedIds), // Kirim sebagai string JSON
-            pembayaran_invoice_id: "<?= !empty($detail) ? encrypt($detail['id']) : '' ?>"
-        },
-        dataType: "json",
-        success: function(res) {
-            if (res.status && res.data.length > 0) {
-                res.data.forEach((data) => {
-                    // Logika khusus untuk "LAIN-LAIN"
-                    if (data.kode_barang === "LAIN-LAIN") {
-                        dataList.push({
-                            id: getID(),
-                            qty_invoice: data.qty_invoice,
-                            harga_barang_invoice: data.harga_barang_invoice,
-                            amount_invoice: data.amount_invoice,
-                            kode_barang: data.kode_barang,
-                            barang_name: data.barang_name,
-                            sales_order_invoice_id: null, // Tidak ada ID invoice untuk "LAIN-LAIN"
-                            sales_order_invoice_detail_id: null,
-                            no_faktur: data.no_faktur || "LAIN-LAIN",
-                            akun_kas_lain: data.id_akun_kas_lain || null,
-                            akun_selisih_lain: data.id_akun_selisih_lain || null,
-                            nama_akun_kas_lain: data.akun_kas_lain || "-",
-                            nama_akun_selisih_lain: data.akun_selisih_lain || "-"
-                        });
-                    } else {
-                        // Logika untuk selain "LAIN-LAIN"
-                        if (!dataList.some(item => item.sales_order_invoice_id === data.sales_order_invoice_id)) {
+        $.ajax({
+            url: "<?= base_url('pembayaran-invoice/get-barang-sales-lokal'); ?>",
+            method: "GET",
+            data: {
+                id: JSON.stringify(selectedIds), // Kirim sebagai string JSON
+                pembayaran_invoice_id: "<?= !empty($detail) ? encrypt($detail['id']) : '' ?>"
+            },
+            dataType: "json",
+            success: function(res) {
+                if (res.status && res.data.length > 0) {
+                    res.data.forEach((data) => {
+                        // Logika khusus untuk "LAIN-LAIN"
+                        if (data.kode_barang === "LAIN-LAIN") {
                             dataList.push({
                                 id: getID(),
                                 qty_invoice: data.qty_invoice,
@@ -835,100 +817,118 @@
                                 amount_invoice: data.amount_invoice,
                                 kode_barang: data.kode_barang,
                                 barang_name: data.barang_name,
-                                sales_order_invoice_id: data.sales_order_invoice_id,
-                                sales_order_invoice_detail_id: data.sales_order_invoice_detail_id,
-                                no_faktur: data.no_faktur || "-",
+                                sales_order_invoice_id: null, // Tidak ada ID invoice untuk "LAIN-LAIN"
+                                sales_order_invoice_detail_id: null,
+                                no_faktur: data.no_faktur || "LAIN-LAIN",
                                 akun_kas_lain: data.id_akun_kas_lain || null,
                                 akun_selisih_lain: data.id_akun_selisih_lain || null,
                                 nama_akun_kas_lain: data.akun_kas_lain || "-",
                                 nama_akun_selisih_lain: data.akun_selisih_lain || "-"
                             });
+                        } else {
+                            // Logika untuk selain "LAIN-LAIN"
+                            if (!dataList.some(item => item.sales_order_invoice_id === data.sales_order_invoice_id)) {
+                                dataList.push({
+                                    id: getID(),
+                                    qty_invoice: data.qty_invoice,
+                                    harga_barang_invoice: data.harga_barang_invoice,
+                                    amount_invoice: data.amount_invoice,
+                                    kode_barang: data.kode_barang,
+                                    barang_name: data.barang_name,
+                                    sales_order_invoice_id: data.sales_order_invoice_id,
+                                    sales_order_invoice_detail_id: data.sales_order_invoice_detail_id,
+                                    no_faktur: data.no_faktur || "-",
+                                    akun_kas_lain: data.id_akun_kas_lain || null,
+                                    akun_selisih_lain: data.id_akun_selisih_lain || null,
+                                    nama_akun_kas_lain: data.akun_kas_lain || "-",
+                                    nama_akun_selisih_lain: data.akun_selisih_lain || "-"
+                                });
+                            }
                         }
-                    }
-                });
+                    });
+                }
+
+                const totalPembayaran = parseFloat(res.totalPembayaran) || 0;
+                const totalSudahDiBayar = parseFloat(res.totalSudahDiBayar) || 0;
+
+                // Refresh tabel dengan data terbaru
+                drawTable(dataList, totalPembayaran, totalSudahDiBayar);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
             }
-
-            const totalPembayaran = parseFloat(res.totalPembayaran) || 0;
-            const totalSudahDiBayar = parseFloat(res.totalSudahDiBayar) || 0;
-
-            // Refresh tabel dengan data terbaru
-            drawTable(dataList, totalPembayaran, totalSudahDiBayar);
-        },
-        error: function(xhr, status, error) {
-            console.error("Error:", error);
-        }
-    });
-}
-
-function drawTable(dataList, totalPembayaran, totalSudahDiBayar) {
-    const table = $('#dataTable');
-    table.find('tbody').empty();
-
-    let total_amount = 0;
-    let total_invoice_non_lain = 0;
-    let total_invoice_barang_lain = 0;
-
-    // Mengelompokkan data berdasarkan kombinasi no_faktur dan barang_name untuk memastikan semua data "LAIN-LAIN" unik
-    let groupedData = {};
-    dataList.forEach(item => {
-        let key = item.no_faktur + (item.kode_barang === "LAIN-LAIN" ? item.barang_name : "");
-        if (!groupedData[key]) {
-            groupedData[key] = [];
-        }
-        groupedData[key].push(item);
-    });
-
-    // Loop untuk menambahkan baris ke tabel
-    Object.keys(groupedData).forEach(key => {
-        let group = groupedData[key];
-        let isFirstRow = true;
-
-        group.forEach(item => {
-            let newRow = $('<tr style="color:whitesmoke;">');
-
-            // Tambahkan kolom no_faktur hanya pada baris pertama
-            if (isFirstRow) {
-                newRow.append(
-                    $('<td rowspan="' + group.length + '" style="text-align:center;">').text(item.no_faktur)
-                );
-                isFirstRow = false;
-            }
-
-            newRow.append($('<td style="text-align:center;">').text(item.kode_barang));
-            newRow.append($('<td style="text-align:center;">').text(item.barang_name));
-            newRow.append($('<td style="text-align:center;">').text(item.nama_akun_kas_lain || '-'));
-            newRow.append($('<td style="text-align:center;">').text(item.nama_akun_selisih_lain || '-'));
-            newRow.append($('<td style="text-align:center;">').text(item.qty_invoice));
-            newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_invoice)));
-            newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.amount_invoice)));
-
-            if (item.kode_barang === "LAIN-LAIN") {
-                total_invoice_barang_lain += parseFloat(item.amount_invoice) || 0;
-
-                // Tambahkan tombol hapus ke baris item "LAIN-LAIN"
-                newRow.append(
-                    $('<td style="text-align:center;">').html(`
-                        <button type="button" class="btn btn-danger" onclick="deleteBarang('${item.id}')">
-                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                        </button>
-                    `)
-                );
-            } else {
-                total_invoice_non_lain += parseFloat(item.amount_invoice) || 0;
-                newRow.append($('<td style="text-align:center;">').html(``));
-            }
-
-            // Tambahkan baris ke tabel
-            table.find('tbody').append(newRow);
         });
-    });
+    }
 
-    // Total amount calculation
-    total_amount = total_invoice_non_lain - total_invoice_barang_lain;
+    function drawTable(dataList, totalPembayaran, totalSudahDiBayar) {
+        const table = $('#dataTable');
+        table.find('tbody').empty();
 
-    // Menambahkan baris total pembayaran dan potongan
-    addSummaryRows(table, total_amount, totalPembayaran, totalSudahDiBayar);
-}
+        let total_amount = 0;
+        let total_invoice_non_lain = 0;
+        let total_invoice_barang_lain = 0;
+
+        // Mengelompokkan data berdasarkan kombinasi no_faktur dan barang_name untuk memastikan semua data "LAIN-LAIN" unik
+        let groupedData = {};
+        dataList.forEach(item => {
+            let key = item.no_faktur + (item.kode_barang === "LAIN-LAIN" ? item.barang_name : "");
+            if (!groupedData[key]) {
+                groupedData[key] = [];
+            }
+            groupedData[key].push(item);
+        });
+
+        // Loop untuk menambahkan baris ke tabel
+        Object.keys(groupedData).forEach(key => {
+            let group = groupedData[key];
+            let isFirstRow = true;
+
+            group.forEach(item => {
+                let newRow = $('<tr style="color:whitesmoke;">');
+
+                // Tambahkan kolom no_faktur hanya pada baris pertama
+                if (isFirstRow) {
+                    newRow.append(
+                        $('<td rowspan="' + group.length + '" style="text-align:center;">').text(item.no_faktur)
+                    );
+                    isFirstRow = false;
+                }
+
+                newRow.append($('<td style="text-align:center;">').text(item.kode_barang));
+                newRow.append($('<td style="text-align:center;">').text(item.barang_name));
+                newRow.append($('<td style="text-align:center;">').text(item.nama_akun_kas_lain || '-'));
+                newRow.append($('<td style="text-align:center;">').text(item.nama_akun_selisih_lain || '-'));
+                newRow.append($('<td style="text-align:center;">').text(item.qty_invoice));
+                newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_invoice)));
+                newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.amount_invoice)));
+
+                if (item.kode_barang === "LAIN-LAIN") {
+                    total_invoice_barang_lain += parseFloat(item.amount_invoice) || 0;
+
+                    // Tambahkan tombol hapus ke baris item "LAIN-LAIN"
+                    newRow.append(
+                        $('<td style="text-align:center;">').html(`
+                            <button type="button" class="btn btn-danger" onclick="deleteBarang('${item.id}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        `)
+                    );
+                } else {
+                    total_invoice_non_lain += parseFloat(item.amount_invoice) || 0;
+                    newRow.append($('<td style="text-align:center;">').html(``));
+                }
+
+                // Tambahkan baris ke tabel
+                table.find('tbody').append(newRow);
+            });
+        });
+
+        // Total amount calculation
+        total_amount = total_invoice_non_lain - total_invoice_barang_lain;
+
+        // Menambahkan baris total pembayaran dan potongan
+        addSummaryRows(table, total_amount, totalPembayaran, totalSudahDiBayar);
+    }
 
 
 
@@ -1041,9 +1041,6 @@ function drawTable(dataList, totalPembayaran, totalSudahDiBayar) {
         });
     }
 
-
-
-
     function deleteBarang(id) {
         var indexToRemove = -1;
         for (let i = 0; i < dataList.length; i++) {
@@ -1114,6 +1111,17 @@ function drawTable(dataList, totalPembayaran, totalSudahDiBayar) {
         return randomString;
     };
 
+    function updateKeterangan() {
+        // Ambil elemen <select> dan <textarea>
+        const selectElement = document.getElementById('no_dokumen');
+        const textareaElement = document.getElementById('keterangan');
+
+        // Ambil semua opsi yang dipilih (karena select adalah multiple)
+        const selectedOptions = Array.from(selectElement.selectedOptions).map(option => option.text);
+
+        // Gabungkan nilai opsi yang dipilih ke dalam textarea
+        textareaElement.value = selectedOptions.join(', ');
+    }
 
     <?php if (!empty($detail)) : ?>
         getDataSalesLokal();
