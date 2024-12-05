@@ -220,7 +220,10 @@
                 },
                 {
                     data: "harga_barang",
-                    className: "text-center"
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        return greatFormatRupiah(destroyFormatRupiah(data));
+                    }
                 },
                 {
                     data: "disc",
@@ -228,7 +231,10 @@
                 },
                 {
                     data: "amount",
-                    className: "text-center"
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        return greatFormatRupiah(destroyFormatRupiah(data));
+                    }
                 }
             ],
             columnDefs: [{

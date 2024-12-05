@@ -115,13 +115,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Harga Jual">
+                                <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Harga Jual">
                                 <label for="floatingInput">Harga Jual</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control harga_pokok" name="harga_pokok" id="harga_pokok" placeholder="Harga Pokok">
+                                <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control harga_pokok" name="harga_pokok" id="harga_pokok" placeholder="Harga Pokok">
                                 <label for="floatingInput">Harga Pokok</label>
                             </div>
                         </div>
@@ -313,6 +313,11 @@
         if ($('.create-form').valid()) {
             let id = $('.id').val();
             let data = new FormData(document.querySelector('.create-form'));
+            let hargaPokok = destroyFormatRupiah($('#harga_pokok').val());
+            let hargaJual = destroyFormatRupiah($('#harga_jual').val());
+            data.set('harga_pokok', hargaPokok);
+            data.set('harga_jual', hargaJual);
+
             if (id) {
                 <?php if (can('Penjualan Lokal', 'Master Barang', 'u')) : ?>
                     Swal.fire({
@@ -463,8 +468,8 @@
                 $('.barang_name').val(res.data.barang_name);
                 $('.type_barang').val(res.data.type_barang).change();
                 $('.satuan_id').val(res.data.satuan_id).change();
-                $('.harga_pokok').val(res.data.harga_pokok);
-                $('.harga_jual').val(res.data.harga_jual);
+                $('.harga_pokok').val(greatFormatRupiah(res.data.harga_pokok));
+                $('.harga_jual').val(greatFormatRupiah(res.data.harga_jual));
                 if (res.data.status_ppn != 0) {
                     $("#status_ppn").prop('checked', true);
                 } else {

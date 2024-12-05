@@ -190,7 +190,7 @@ class OrderForm extends BaseController
                 "nama_customer" => $customerName,
                 "destination" => $data->destination,
                 "qty_barang" => count($this->SalesOrderDetailModel->where('id_sales_order', $data->id)->where('deletedAt', null)->where('tipe_input', "order_form")->findAll()),
-                "total_harga" => formatRupiah($data->estimated_freight + $data->total_harga),
+                "total_harga" => ($data->estimated_freight + $data->total_harga),
                 "keterangan" => $data->keterangan,
                 "surat_jalan_so_id" => $data->surat_jalan_so_id,
                 "sales_order_invoice_id" => $data->sales_order_invoice_id,
@@ -619,6 +619,8 @@ class OrderForm extends BaseController
                         "tax"                   => $row->statusppn,
                         "discount_percentage"   => $row->disc,
                         "tipe_input"            => "order_form",
+                        "status_ppn"            => $row->statusppn,
+
                         // "dept"                  => $row->dept,
                         // "id_warehouse"          => $row->warehouse_id,
                     ];
@@ -635,6 +637,8 @@ class OrderForm extends BaseController
                         "tax"                   => $row->statusppn,
                         "discount_percentage"   => $row->disc,
                         "tipe_input"            => "order_form",
+                        "status_ppn"            => $row->statusppn,
+
                         // "dept"                  => $row->dept,
                         // "id_warehouse"          => $row->warehouse_id,
                     ];

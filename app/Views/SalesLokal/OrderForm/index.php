@@ -13,9 +13,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Penjualan Lokal</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("order-form-lokal/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        <?php if (can('Penjualan Lokal', 'Order Form', 'c')) : ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("order-form-lokal/create"); ?>">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </a>
+        <?php endif; ?>
     </div>
     <div class="card">
         <?php if (session()->getFlashdata('error') != null) : ?>
@@ -339,7 +341,10 @@
                 className: "text-center"
             }, {
                 data: "total_harga",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(destroyFormatRupiah(data));
+                }
             }, {
                 data: "keterangan",
                 className: "text-center"
@@ -498,8 +503,8 @@
                     newRow.append($('<td style="text-align:center;">').text(no++));
                     newRow.append($('<td style="text-align:center;">').text(v.kode_barang));
                     newRow.append($('<td style="text-align:center;">').text(v.nama_barang));
-                    newRow.append($('<td style="text-align:center;">').text(v.qty));
-                    newRow.append($('<td style="text-align:center;">').text(v.harga_barang));
+                    newRow.append($('<td style="text-align:center;">').text(destroyFormatRupiah(v.qty)));
+                    newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(destroyFormatRupiah(v.harga_barang))));
                     table.find('tbody').append(newRow);
                 });
                 $('#historiModal').modal('show');

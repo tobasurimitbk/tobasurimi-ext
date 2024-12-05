@@ -78,6 +78,7 @@
     }
 
     function destroyFormatRupiah(x) {
+        if (typeof x === "number") return x;
         if (!x) return 0;
         const cleaned = x.replace(/,/g, "");
         return parseFloat(cleaned);

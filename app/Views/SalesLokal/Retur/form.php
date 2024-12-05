@@ -179,15 +179,21 @@
                 },
                 {
                     data: "harga_barang",
-                    className: "text-center"
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        return greatFormatRupiah(destroyFormatRupiah(data));
+                    }
                 },
                 {
                     data: "disc",
-                    className: "text-center"
+                    className: "text-center",
                 },
                 {
                     data: "amount",
-                    className: "text-center"
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        return greatFormatRupiah(destroyFormatRupiah(data));
+                    }
                 }
             ],
             columnDefs: [{

@@ -171,7 +171,6 @@ class Customer extends BaseController
             if ($this->validate($rules)) {
                 $last_year = date("Y-m-t", strtotime(date('Y') . "-12-31"));
                 $kode = $this->CustomerModel->get_kode(date('m'), date('Y'), date('y'), $last_year);
-                $piutangValue = $this->request->getPost("piutang") ? (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $this->request->getPost("piutang"))) : 0;
                 $values = [
                     "company_id" => $this->this_company_id,
                     "user_id" => $this->this_user_id,
@@ -189,7 +188,7 @@ class Customer extends BaseController
                     "tipe_pelanggan" => $this->request->getPost("tipe_pelanggan"),
                     "nik" => $this->request->getPost("nik"),
                     "termin" => $this->request->getPost("termin"),
-                    "piutang" => number_format($piutangValue, 2, '.', ''),
+                    "piutang" =>  $this->request->getPost("piutang"),
                     "currency" => $this->request->getPost("currency"),
                     "country_id" => $this->request->getPost('country_id'),
                     "tipe_customer" => $this->request->getPost("tipe_customer"),
@@ -296,6 +295,7 @@ class Customer extends BaseController
                     "termin" => $this->request->getPost("termin"),
                     "currency" => $this->request->getPost("currency"),
                     "country_id" => $this->request->getPost('country_id'),
+                    "piutang" =>  $this->request->getPost("piutang"),
                     "tipe_customer" => $this->request->getPost("tipe_customer"),
                     "jenis_penjualan" => $this->request->getPost("jenis_penjualan"),
                     "sales_id" => $this->request->getPost("sales_id") ?? null,

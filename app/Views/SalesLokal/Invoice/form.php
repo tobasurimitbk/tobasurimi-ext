@@ -36,7 +36,7 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <form class="create-form form-add-pinjaman-karyawan" role="form" method="POST" enctype="multipart/form-data">
+            <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
                 <input autocomplete="one-time-code" type="hidden" class="tipe_invoice" name="tipe_invoice" id="tipe_invoice" value="LOKAL" />
                 <?= csrf_field() ?>
@@ -48,7 +48,7 @@
                                 <label for="floatingInput">No Faktur</label>
                             </div>
                             <div style="<?= !empty($data) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 20px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                             </div>
                         </div>
                     </div>
@@ -118,7 +118,6 @@
 
                                 <?php endif; ?>
                             </select>
-                            <label for="floatingInput">Nomor Dokumen</label>
                         </div>
                     </div>
 
@@ -444,13 +443,13 @@
                     var qtyValue = row.qty_input !== undefined ? row.qty_input : row.qty_sekarang;
                     <?php if (!empty($documentData) && ($data->status_posting != "0")) : ?>
                         if (type === 'display') {
-                            return '<input onchange="definisiQtyInput()" type="text" data-id="' + row.id + '" class="form-control input-qty" readonly value="' + qtyValue + '">';
+                            return '<input style="height: 40px; padding-bottom: 10px;" onchange="definisiQtyInput()" type="text" data-id="' + row.id + '" class="form-control input-qty" readonly value="' + qtyValue + '">';
                         } else {
                             return qtyValue;
                         }
                     <?php else : ?>
                         if (type === 'display') {
-                            return '<input onchange="definisiQtyInput()" type="text" data-id="' + row.id + '" class="form-control input-qty" value="' + qtyValue + '">';
+                            return '<input style="height: 40px; padding-bottom: 10px;" onchange="definisiQtyInput()" type="text" data-id="' + row.id + '" class="form-control input-qty" value="' + qtyValue + '">';
                         } else {
                             return qtyValue;
                         }
@@ -680,14 +679,14 @@
         });
 
         //CSS SELECT2 FLOATING LABEL
-        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id, .id_barang')
+        $('.ship_via, .id_customer, .id_surat_jalan, .id_barang')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id, .id_barang')
+        $('.ship_via, .id_customer, .id_surat_jalan, .id_barang')
             .parent('div')
             .children('span')
             .children('span')
@@ -695,7 +694,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.ship_via, .id_customer, .id_surat_jalan, .doc_id, #doc_type, .termin, .id_barang')
+        $('.ship_via, .id_customer, .id_surat_jalan, #doc_type, .termin, .id_barang')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -767,8 +766,8 @@
 
         // doc
         $('.doc_id').select2({
-            placeholder: "",
-            // theme: "bootstrap-5",
+            placeholder: "Pilih Dokumen",
+            theme: "bootstrap-5",
             allowClear: false,
         }).change(function() {
 

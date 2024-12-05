@@ -11,7 +11,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name"><?= !empty($data) ? "Ubah" : "Tambah"; ?> Penjualan Lokal</h1>
+        <h1 class="title-name"><?= !empty($data) ? "Update" : "Tambah"; ?> Penjualan Lokal</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("order-form-lokal"); ?>">
                 Kembali
@@ -480,7 +480,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" value="0" type="text" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onkeyup="this.value = greatFormatRupiah(this.value);" class="form-control piutang" id="piutang" name="piutang" placeholder="Limit Piutang">
+                                <input autocomplete="one-time-code" value="0" type="text" onkeyup="this.value = greatFormatRupiah(this.value);" class="form-control piutang" id="piutang" name="piutang" placeholder="Limit Piutang">
                                 <label for="floatingInput">Limit Piutang</label>
                             </div>
                         </div>
@@ -558,7 +558,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onkeyup="this.value = greatFormatRupiah(this.value);" autocomplete="one-time-code" type="text" class="form-control harga_pokok" name="harga_pokok" id="harga_pokok" placeholder="Harga Pokok">
+                                <input onkeyup="this.value = greatFormatRupiah(this.value);" autocomplete="one-time-code" type="text" class="form-control harga_pokok" name="harga_pokok" id="harga_pokok" placeholder="Harga Pokok">
                                 <label for="floatingInput">Harga Pokok</label>
                             </div>
                         </div>
@@ -566,7 +566,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onkeyup="this.value = greatFormatRupiah(this.value);" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Harga Jual">
+                                <input onkeyup="this.value = greatFormatRupiah(this.value);" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Harga Jual">
                                 <label for="floatingInput">Harga Jual</label>
                             </div>
                         </div>
@@ -628,7 +628,7 @@
             },
             {
                 data: "qty",
-                className: "text-center"
+                className: "text-center",
             },
             {
                 data: "satuan",
@@ -637,13 +637,13 @@
             {
                 data: "harga_barang",
                 className: "text-center",
-                render: function (data, type, row) {
-                    return greatFormatRupiah(data);
+                render: function(data, type, row) {
+                    return greatFormatRupiah(destroyFormatRupiah(data));
                 }
             },
             {
                 data: "disc",
-                className: "text-center"
+                className: "text-center",
             },
             {
                 data: "statusppn",
@@ -658,7 +658,10 @@
             },
             {
                 data: "amount",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(destroyFormatRupiah(data));
+                }
             },
             {
                 data: "status",
@@ -703,7 +706,7 @@
                     qty: "<?= $payload['qty'] ?>",
                     amount: "<?= $payload['amount'] ?>",
                     keterangan: "<?= $payload['keterangan'] ?>",
-                    statusppn: "<?= $payload['tax'] ?>",
+                    statusppn: "<?= $payload['status_ppn'] ?>",
                     tax: null,
                     discount_percentage: <?= $payload['discount_percentage'] ?? 0 ?>,
                     isDeleted: false,
@@ -725,7 +728,7 @@
                     qty: "<?= $payload['qty'] ?>",
                     amount: "<?= $payload['amount'] ?>",
                     keterangan: "<?= $payload['keterangan'] ?>",
-                    statusppn: "<?= $payload['tax'] ?>",
+                    statusppn: "<?= $payload['status_ppn'] ?>",
                     tax: null,
                     discount_percentage: <?= $payload['discount_percentage'] ?? 0 ?>,
                     isDeleted: false,
@@ -1375,8 +1378,11 @@
 
         $('.btn-submit-customer').click(function() {
             if ($('.create-form-customer').valid()) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                const data = new FormData(document.querySelector(".create-form-customer"));
+                let csrf = $(`[name="${csrfToken}"]`);
+                let data = new FormData(document.querySelector(".create-form-customer"));
+                let piutang = destroyFormatRupiah($('#piutang').val());
+                data.set('piutang', piutang);
+
                 Swal.fire({
                     icon: 'question',
                     title: 'Simpan Customer?',
@@ -1527,7 +1533,12 @@
         $('.btn-submit-form-master-barang').click(function() {
             if ($('.create-form-master-barang').valid()) {
                 const csrf = $(`[name="${csrfToken}"]`);
-                const data = new FormData(document.querySelector(".create-form-master-barang"));
+                let data = new FormData(document.querySelector(".create-form-master-barang"));
+                let hargaPokok = destroyFormatRupiah($('#harga_pokok').val());
+                let hargaJual = destroyFormatRupiah($('#harga_jual').val());
+                data.set('harga_pokok', hargaPokok);
+                data.set('harga_jual', hargaJual);
+
                 Swal.fire({
                     icon: 'question',
                     title: 'Simpan Master Barang ?',
@@ -1751,7 +1762,7 @@
                     })
                 });
                 $(".satuan").val(satuan);
-                $(".harga").val(harga);
+                $(".harga").val(greatFormatRupiah(harga));
 
             } else {
                 $(".nama_barang").attr("readonly", false)
@@ -2088,106 +2099,95 @@
                 // update detail
                 if (row_detail) {} else {
                     if ($(".detail-form").valid()) {
-                        Swal.fire({
-                            icon: 'question',
-                            title: 'Simpan Data?',
-                            confirmButtonColor: '#4e73df',
-                            cancelButtonColor: '#d33',
-                            showCancelButton: true,
-                            reverseButtons: true,
-                            confirmButtonText: 'Simpan',
-                            cancelButtonText: 'Kembali',
-                        }).then(result => {
-                            if (result.isConfirmed) {
-                                no = no + 1;
-                                list_items.push({
-                                    id: "",
-                                    no: no,
-                                    row: row + 1,
-                                    id_barang: id_barang,
-                                    nama_barang: nama_barang,
-                                    harga_barang: harga,
-                                    qty: qty,
-                                    amount: amount,
-                                    discountedAmt: discountedAmt,
-                                    keterangan: keterangan,
-                                    statusppn: statusppn,
-                                    tax: tax,
-                                    taxAmt: amount * (tax / 100),
-                                    discount_percentage: discountPercentage,
-                                    dept: dept,
-                                    warehouse_id: warehouseId,
-                                    warhouse_name: warhouseName,
 
-                                    kode_barang: selectedData.code,
-                                    satuan: selectedData.satuan,
-                                    disc: discountPercentage,
-                                    discAmt: discAmt,
-                                    isDeleted: false,
+                        no = no + 1;
+                        list_items.push({
+                            id: "",
+                            no: no,
+                            row: row + 1,
+                            id_barang: id_barang,
+                            nama_barang: nama_barang,
+                            harga_barang: harga,
+                            qty: qty,
+                            amount: amount,
+                            discountedAmt: discountedAmt,
+                            keterangan: keterangan,
+                            statusppn: statusppn,
+                            tax: tax,
+                            taxAmt: amount * (tax / 100),
+                            discount_percentage: discountPercentage,
+                            dept: dept,
+                            warehouse_id: warehouseId,
+                            warhouse_name: warhouseName,
 
-                                    barangTotal: amount,
-                                });
+                            kode_barang: selectedData.code,
+                            satuan: selectedData.satuan,
+                            disc: discountPercentage,
+                            discAmt: discAmt,
+                            isDeleted: false,
 
-                                table.row.add({
-                                    id: "",
-                                    no: no,
-                                    id_barang: id_barang,
-                                    kode_barang: selectedData.code,
-                                    nama_barang: nama_barang,
-                                    qty: qty,
-                                    satuan: selectedData.satuan,
-                                    harga_barang: harga,
-                                    barangTotal: amount,
-                                    disc: discountPercentage,
-                                    statusppn: statusppn,
-                                    tax: tax,
-                                    taxAmt: amount * (tax / 100),
-                                    keterangan: keterangan,
-                                    discAmt: discAmt,
-                                    amount: discountedAmt,
-                                    dept: dept,
-                                    warehouse_id: warehouseId,
-                                    warehouse_name: warhouseName,
-                                    isDeleted: false
-                                }).draw(false);
+                            barangTotal: amount,
+                        });
 
-                                reCountTotal();
+                        table.row.add({
+                            id: "",
+                            no: no,
+                            id_barang: id_barang,
+                            kode_barang: selectedData.code,
+                            nama_barang: nama_barang,
+                            qty: qty,
+                            satuan: selectedData.satuan,
+                            harga_barang: harga,
+                            barangTotal: amount,
+                            disc: discountPercentage,
+                            statusppn: statusppn,
+                            tax: tax,
+                            taxAmt: amount * (tax / 100),
+                            keterangan: keterangan,
+                            discAmt: discAmt,
+                            amount: discountedAmt,
+                            dept: dept,
+                            warehouse_id: warehouseId,
+                            warehouse_name: warhouseName,
+                            isDeleted: false
+                        }).draw(false);
 
-                                total_harga_barang = total_harga_barang + Number(harga.replaceAll(",", ""));
-                                total_qty = total_qty + Number(qty);
-                                total_harga = total_harga + Number(amount.replaceAll(",", ""));
+                        reCountTotal();
 
-                                let tag_html = "";
-                                let tag_total = "";
+                        total_harga_barang = total_harga_barang + Number(harga.replaceAll(",", ""));
+                        total_qty = total_qty + Number(qty);
+                        total_harga = total_harga + Number(amount.replaceAll(",", ""));
 
-                                $(".foot-detail-table").empty()
+                        let tag_html = "";
+                        let tag_total = "";
 
-                                tag_total += `<tr>`;
-                                tag_total += "<td colspan='1'>";
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += "<b>TOTAL</b>";
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${total_qty}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${total_harga.toLocaleString()}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td colspan='3'>";
-                                tag_total += "</td>";
-                                tag_total += "</tr>";
+                        $(".foot-detail-table").empty()
 
-                                $(".foot-detail-table").append(tag_total);
+                        tag_total += `<tr>`;
+                        tag_total += "<td colspan='1'>";
+                        tag_total += "</td>";
+                        tag_total += "<td>";
+                        tag_total += "<b>TOTAL</b>";
+                        tag_total += "</td>";
+                        tag_total += "<td>";
+                        tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
+                        tag_total += "</td>";
+                        tag_total += "<td>";
+                        tag_total += `<b>${total_qty}</b>`;
+                        tag_total += "</td>";
+                        tag_total += "<td>";
+                        tag_total += `<b>${total_harga.toLocaleString()}</b>`;
+                        tag_total += "</td>";
+                        tag_total += "<td colspan='3'>";
+                        tag_total += "</td>";
+                        tag_total += "</tr>";
 
-                                $(".detail-modal").modal("hide")
-                                row = row + 1;
-                            }
-                        })
+                        $(".foot-detail-table").append(tag_total);
+
+                        $(".detail-modal").modal("hide")
+                        row = row + 1;
                     }
+
                 }
             }
         });

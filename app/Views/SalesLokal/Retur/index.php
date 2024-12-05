@@ -6,9 +6,11 @@
     <div class="section-header">
         <h1>Return Barang Sales</h1>
         <?= csrf_field() ?>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("return-barang-sales/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        <?php if (can('Penjualan Lokal', 'Return Barang', 'c')) : ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("return-barang-sales/create"); ?>">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </a>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -106,31 +108,31 @@
             data: "returnDate",
             className: "text-center"
         }, {
-                data: "is_approved",
-                className: "text-center actions",
-                searchable: false,
-                sortable: false,
-                render: function(data, type, row) {
-                    let id = row.id;
-                    let status = row.is_approved;
-                    let buttonHtml = ''; // Inisialisasi buttonHtml kosong
+            data: "is_approved",
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                let id = row.id;
+                let status = row.is_approved;
+                let buttonHtml = ''; // Inisialisasi buttonHtml kosong
 
-                    if (status != 1) {
-                            buttonHtml = `
+                if (status != 1) {
+                    buttonHtml = `
                                     <button type="button" class="btn btn-primary" onclick="approve('${id}', 1)">
                                         <i class="fa fa-paper-plane"></i> Approve
                                     </button>
                                 `;
-                    } else {
-                            buttonHtml = `
+                } else {
+                    buttonHtml = `
                                     <button type="button" class="btn btn-success" disabled>
                                         <i class="fa fa-check"></i> Approved
                                     </button>
                                 `;
-                    }
-                
-                    return buttonHtml; // Harus return buttonHtml
                 }
+
+                return buttonHtml; // Harus return buttonHtml
+            }
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -183,40 +185,39 @@
                     method: "POST",
                     dataType: "json",
                     success: function(response) {
-                    // Update CSRF token
-                    csrf.val(response.token);
+                        // Update CSRF token
+                        csrf.val(response.token);
 
-                    // Check if the status in the response is true
-                    if (response.status) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                        }).then(() => {
-                            table.ajax.reload(); // Reload the table data
-                        });
-                    } else {
-                        // If status is false, display an error message
+                        // Check if the status in the response is true
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then(() => {
+                                table.ajax.reload(); // Reload the table data
+                            });
+                        } else {
+                            // If status is false, display an error message
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        // Handle any AJAX error (e.g., network issues, server errors)
+                        csrf.val(xhr.responseJSON.token); // Update CSRF token if available
                         Swal.fire({
                             icon: 'error',
-                            title: response.message,
+                            title: 'Data Gagal Di Approved, coba Lagi',
                             confirmButtonColor: '#4e73df',
                         });
                     }
-                },
-                error: function(xhr) {
-                    // Handle any AJAX error (e.g., network issues, server errors)
-                    csrf.val(xhr.responseJSON.token); // Update CSRF token if available
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Data Gagal Di Approved, coba Lagi',
-                        confirmButtonColor: '#4e73df',
-                    });
-                }
                 });
             }
         })
     }
-
 </script>
 <?= $this->endSection(); ?>
