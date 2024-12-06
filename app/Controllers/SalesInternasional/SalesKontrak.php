@@ -405,7 +405,7 @@ class SalesKontrak extends BaseController
 
     public function dropdownMasterBarang()
     {
-        $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->orderBy('createdAt', "DESC")->findAll();
+        $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->where('type_barang_sales', 'EKSPOR')->orderBy('createdAt', "DESC")->findAll();
         return response()->setJSON([
             'data' => $dataBarang,
             'token' => csrf_hash(),

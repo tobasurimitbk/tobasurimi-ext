@@ -24,6 +24,7 @@ class SalesOrderExportModel extends Model
         'keterangan_unpost',
         'jumlah_unpost',
         'used',
+        'user_id',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -112,11 +113,12 @@ class SalesOrderExportModel extends Model
 
     public function getById($id)
     {
-        $selectQry = "sales_order_export.*, customers.name as customer_name";
+        $selectQry = "sales_order_export.*, customers.name as customer_name,sales_contract.customer_po_no,sales_contract.*";
 
         $salesData = $this->asObject()
             ->select($selectQry)
-            ->join('customers', 'customers.id = sales_order_export.customer_id', 'LEFT')
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'LEFT')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'LEFT')
             ->where('sales_order_export.deletedAt', NULL)
             ->find($id);
 

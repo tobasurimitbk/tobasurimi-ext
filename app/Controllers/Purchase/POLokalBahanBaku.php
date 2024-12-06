@@ -308,6 +308,16 @@ class POLokalBahanBaku extends BaseController
             ]);
         }
 
+        $detailPurchase = $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->where('deletedAt', null)->findAll();
+        $totalHarga = 0;
+        foreach ($detailPurchase as $d) {
+            $totalHarga += ($d['general_price'] + $d['daily_price'] + $d['monthly_price']) * $d['qty'];
+        }
+
+        $this->RMPurchaseOrderModel->update($id, [
+            'total' => $totalHarga  + $this->request->getVar("subsidi_langsung")
+        ]);
+
         $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"));
 
         return response()->setJSON([
@@ -342,6 +352,12 @@ class POLokalBahanBaku extends BaseController
             'request_status' => 'waiting'
         ]);
 
+        $detailPurchase = $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->where('deletedAt', null)->findAll();
+        $totalHarga = 0;
+        foreach ($detailPurchase as $d) {
+            $totalHarga += ($d['general_price'] + $d['daily_price'] + $d['monthly_price']) * $d['qty'];
+        }
+
         $this->RMPurchaseOrderModel->update($id, [
             'company_id' => $this->this_company_id,
             "warehouse_id" => $this->request->getVar("warehouse_id"),
@@ -359,7 +375,7 @@ class POLokalBahanBaku extends BaseController
             "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
             "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
             "subsidi_langsung" => $this->request->getVar("subsidi_langsung") ? formatter($this->request->getVar("subsidi_langsung"), "STR_TO_INT") : 0,
-            "total" => $this->request->getVar("total") ? formatter($this->request->getVar("total"), "STR_TO_INT") : 0,
+            "total" => $totalHarga  + $this->request->getVar("subsidi_langsung"),
             "createdBy" => session()->get("login")->user_id,
         ]);
 

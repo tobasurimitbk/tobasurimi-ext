@@ -183,13 +183,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_sebenarnya : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_sebenarnya" name="cong_sebenarnya" id="cong_sebenarnya" placeholder="Cong Sebenarnya (Opsional)">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_sebenarnya : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control cong_sebenarnya" name="cong_sebenarnya" id="cong_sebenarnya" placeholder="Cong Sebenarnya (Opsional)">
                             <label for="floatingInput">Cong Sebenarnya (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_batasan : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_batasan" name="cong_batasan" id="cong_batasan" placeholder="Cong Batasan (Opsional)">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_batasan : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control cong_batasan" name="cong_batasan" id="cong_batasan" placeholder="Cong Batasan (Opsional)">
                             <label for="floatingInput">Cong Batasan (Opsional)</label>
                         </div>
                     </div>
@@ -197,7 +197,7 @@
                 <div class="row">
                     <div class="col md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->subsidi_langsung : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control subsidi_langsung" name="subsidi_langsung" id="subsidi_langsung" placeholder="Subsidi Langsung (Opsional)">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->subsidi_langsung : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control subsidi_langsung" name="subsidi_langsung" id="subsidi_langsung" placeholder="Subsidi Langsung (Opsional)">
                             <label for="floatingInput">Tambahan Langsung (Opsional)</label>
                         </div>
                     </div>
@@ -346,7 +346,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control monthly_price" name="monthly_price" id="monthly_price" placeholder="Harga Bulanan"  onkeyup="this.value = greatFormatRupiah(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control monthly_price" name="monthly_price" id="monthly_price" placeholder="Harga Bulanan" onkeyup="this.value = greatFormatRupiah(this.value)">
                             <label for="floatingInput">Harga Bulanan</label>
                         </div>
                     </div>
@@ -361,7 +361,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total"  onkeyup="this.value = greatFormatRupiah(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onkeyup="this.value = greatFormatRupiah(this.value)">
                             <label for="floatingInput">Total Harga</label>
                         </div>
                     </div>
@@ -429,10 +429,10 @@
                             <tr>
                                 <td colspan="2"></td>
                                 <td><b>TOTAL</b></td>
-                                <td><b>0.00</b></td>
-                                <td><b>0.00</b></td>
-                                <td><b>0.00</b></td>
-                                <td><b>0.00</b></td>
+                                <td><b>0,00</b></td>
+                                <td><b>0,00</b></td>
+                                <td><b>0,00</b></td>
+                                <td><b>0,00</b></td>
                                 <td colspan="2"></td>
                                 <td style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>"></td>
                             </tr>
@@ -463,6 +463,11 @@
             $('#lpb_otomatis').attr('disabled', true);
         </script>
     <?php endif; ?>
+    <script>
+        $('#cong_sebenarnya').keyup();
+        $('#cong_batasan').keyup();
+        $('#subsidi_langsung').keyup();
+    </script>
 
 <?php else : ?>
     <script>
@@ -580,9 +585,9 @@
             if (id_detail == '') {
                 $(".satuan_id").val(satuan_id).change();
             }
-            $(".harga").val(parseInt(umum.toString().replaceAll(",", "")));
-            $(".daily_price").val(parseInt(harian.toString().replaceAll(",", "")));
-            $(".monthly_price").val(parseInt(bulanan.toString().replaceAll(",", "")));
+            $(".harga").val(greatFormatRupiah(destroyFormatRupiah(umum)));
+            $(".daily_price").val(greatFormatRupiah(destroyFormatRupiah(harian)));
+            $(".monthly_price").val(greatFormatRupiah(destroyFormatRupiah(bulanan)));
 
             $(".qty").val("");
             $(".total").val("");
@@ -981,9 +986,17 @@
                             if (result.isConfirmed) {
                                 const csrf = $(`[name="${csrfToken}"]`);
                                 let data = new FormData(document.querySelector(".create-form"));
+                                let congSebenarnya = destroyFormatRupiah($('#cong_sebenarnya').val());
+                                let congBatasan = destroyFormatRupiah($('#cong_batasan').val());
+                                let subsidiLangsung = destroyFormatRupiah($('#subsidi_langsung').val());
+
+                                data.set('cong_sebenarnya', congSebenarnya);
+                                data.set('cong_batasan', congBatasan);
+                                data.set('subsidi_langsung', subsidiLangsung);
                                 data.append("items", JSON.stringify(list_items))
                                 data.append("barang_id", $('.barang_id').val());
                                 data.append("total", total);
+
                                 let id = $(".id").val();
 
                                 // UPDATE
@@ -1315,7 +1328,7 @@
                             peti: peti,
                             quality: quality,
                             harga: destroyFormatRupiah(harga),
-                            daily_price: destoryFormatRupiah(daily_price),
+                            daily_price: destroyFormatRupiah(daily_price),
                             qty: qty,
                             total: destroyFormatRupiah(total),
                             monthly_price: destroyFormatRupiah(monthly_price),
