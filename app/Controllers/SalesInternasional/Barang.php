@@ -171,8 +171,8 @@ class Barang extends BaseController
                 "type_barang_sales" => $data['type_barang_sales'],
                 'kode_satuan'       => $data['kode_satuan'],
                 "type_barang"       => strtoupper(str_replace('_', ' ', $data['type_barang'])),
-                "harga_pokok"       => number_format($data['harga_pokok']),
-                "harga_jual"        => number_format($data['harga_jual']),
+                "harga_pokok"       => floatval($data['harga_pokok']),
+                "harga_jual"        => floatval($data['harga_jual']),
             ]);
         }
 

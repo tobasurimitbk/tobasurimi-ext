@@ -198,7 +198,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['potongan_harga'] : ""; ?>" type="text" class="form-control potongan_harga" id="potongan_harga" name="potongan_harga" placeholder="Potongan Harga (Opsional)">
+                            <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="preventNegativeInput(this)" autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['potongan_harga'] : ""; ?>" type="text" class="form-control potongan_harga" id="potongan_harga" name="potongan_harga" placeholder="Potongan Harga (Opsional)">
                             <label for="floatingInput">Potongan Harga (Opsional)</label>
                         </div>
                     </div>
@@ -223,7 +223,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['komisi'] : ""; ?>" type="text" class="form-control komisi" id="komisi" name="komisi" placeholder="Komisi Broker (Opsional)">
+                            <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['komisi'] : ""; ?>" type="text" class="form-control komisi" id="komisi" name="komisi" placeholder="Komisi Broker (Opsional)">
                             <label for="floatingInput">Komisi Broker (Opsional)</label>
                         </div>
                     </div>
@@ -304,9 +304,9 @@
                             <tr>
                                 <td colspan="5"></td>
                                 <td><b>TOTAL</b></td>
-                                <td><b>0.00</b></td>
-                                <td><b>0.00</b></td>
-                                <td><b>0.00</b></td>
+                                <td><b>0,00</b></td>
+                                <td><b>0,00</b></td>
+                                <td><b>0,00</b></td>
                                 <td></td>
                             </tr>
                         </tfoot>
@@ -386,7 +386,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
+                                <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
                                 <label for="floatingInput">Harga</label>
                             </div>
                         </div>
@@ -504,8 +504,17 @@
                                 <label for="floatingInput">Nama Barang</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select type_barang" name="type_barang" id="type_barang">
+                                    <option value="">Pilih Tipe Barang</option>
+                                    <option value="bahan_jadi">BARANG JADI</option>
+                                    <option value="kemasan">KEMASAN</option>
+
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
+                            </div>
+                        </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
@@ -519,20 +528,17 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" class="form-control harga_pokok" name="harga_pokok" id="harga_pokok" placeholder="Harga Pokok">
+                                <input onkeyup="this.value=greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_pokok" name="harga_pokok" id="harga_pokok" placeholder="Harga Pokok">
                                 <label for="floatingInput">Harga Pokok</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Harga Jual">
+                                <input onkeyup="this.value=greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Harga Jual">
                                 <label for="floatingInput">Harga Jual</label>
                             </div>
                         </div>
                     </div>
-
                 </form>
             </div>
             <div class="modal-footer">
@@ -551,6 +557,8 @@
     var totalAmount = 0;
 
     <?php if (!empty($dataSalesKontrakDetail)) : ?>
+        $('#potongan_harga').keyup();
+        $('#komisi').keyup();
         <?php foreach ($dataSalesKontrakDetail as $s) : ?>
             listBarang.push({
                 id_detail: "<?= $s['id_detail'] ?>",
@@ -605,6 +613,20 @@
         allowClear: true
     });
 
+    // TYPE BARANG
+    $("#type_barang").select2({
+        theme: "bootstrap-5",
+        placeholder: 'Pilih Tipe Barang',
+        allowClear: true,
+        dropdownParent: $(".add-modal .modal-content")
+    }).change(function() {
+        let value = document.getElementById('generate_new_code').checked ? true : false;
+        if (value) {
+            generateCodeMasterBarang();
+        }
+    });
+
+
     // COUNTRY
     $('.country_id').select2({
         placeholder: "Pilih Negara",
@@ -642,8 +664,10 @@
         theme: "bootstrap-5",
     }).change(function() {
         var selected = $('.barang_master_sales_id option:selected');
-        $('.satuan_order_id').val(selected.data('satuan_id')).change();
-        $('.harga').val(selected.data('harga_jual'));
+        if (selected.val() != "") {
+            $('.satuan_order_id').val(selected.data('satuan_id')).change();
+            $('.harga').val(greatFormatRupiah(selected.data('harga_jual'))).keyup();
+        }
     });
 
     // BROKER
@@ -653,14 +677,14 @@
     })
 
     //CSS SELECT2 FLOATING LABEL
-    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id')
+    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id')
+    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang')
         .parent('div')
         .children('span')
         .children('span')
@@ -684,9 +708,9 @@
     // QTY KEYUP
     $('.qty,.harga').keyup(function() {
         var qty = parseFloat($('.qty').val()) || 0;
-        var harga = parseFloat($('.harga').val()) || 0;
+        var harga = destroyFormatRupiah($('.harga').val()) || 0;
         var total = qty * harga;
-        $('.total').val(formatRupiah(total.toString()));
+        $('.total').val(greatFormatRupiah(total));
     });
 
     // CUSTOMER 
@@ -1038,7 +1062,12 @@
     $('.btn-submit-form-master-barang').click(function() {
         if ($('.create-form-master-barang').valid()) {
             const csrf = $(`[name="${csrfToken}"]`);
-            const data = new FormData(document.querySelector(".create-form-master-barang"));
+            let data = new FormData(document.querySelector(".create-form-master-barang"));
+            let hargaPokok = destroyFormatRupiah($('#harga_pokok').val());
+            let hargaJual = destroyFormatRupiah($('#harga_jual').val());
+            data.set('harga_jual', hargaJual);
+            data.set('harga_pokok', hargaPokok);
+
             Swal.fire({
                 icon: 'question',
                 title: 'Simpan Master Barang ?',
@@ -1107,9 +1136,9 @@
             var satuan_order_name = $('.satuan_order_id option:selected').text();
             var kemasan = $('.kemasan').val();
             var qty = $('.qty').val();
-            var harga = $('.harga').val();
+            var harga = destroyFormatRupiah($('.harga').val());
             var remark = $('.remark').val();
-            var total = (qty * harga).toString();
+            var total = (qty * harga);
 
             if (id_detail) {
                 // UPDATE
@@ -1186,7 +1215,11 @@
                 let id = $('.id').val();
                 const csrf = $(`[name="${csrfToken}"]`);
                 const listDataBarang = JSON.stringify(listBarang);
-                const data = new FormData(document.querySelector(".create-form"));
+                let data = new FormData(document.querySelector(".create-form"));
+                let potonganHarga = destroyFormatRupiah($('#potongan_harga').val());
+                let komisi = destroyFormatRupiah($('#komisi').val());
+                data.set('potongan_harga', potonganHarga);
+                data.set('komisi', komisi);
                 data.append("total_amount", totalAmount);
                 data.append("listBarang", listDataBarang);
 
@@ -1225,7 +1258,7 @@
                                         confirmButtonText: 'Ok'
                                     }).then((result) => {
                                         if (result.isConfirmed) {
-                                            location.reload();
+                                            window.location.href = "<?= base_url('sales-kontrak') ?>"
                                         }
                                     });
                                 },
@@ -1267,7 +1300,7 @@
                                         confirmButtonText: 'Ok'
                                     }).then((result) => {
                                         if (result.isConfirmed) {
-                                            window.location.href = "<?= base_url('sales-kontrak/id/') ?>" + response.id
+                                            window.location.href = "<?= base_url('sales-kontrak') ?>"
                                         }
                                     });
                                 },
@@ -1333,9 +1366,9 @@
         $('.satuan_order_id').val(item.satuan_order_id).change();
         $('.kemasan').val(item.kemasan);
         $('.qty').val(item.qty);
-        $('.harga').val(item.harga);
+        $('.harga').val(greatFormatRupiah(item.harga));
         $('.remark').val(item.remark);
-        $('.total').val(item.total);
+        $('.total').val(greatFormatRupiah(item.total));
         $(".detail-modal").modal("show")
     }
 
@@ -1385,8 +1418,8 @@
                 newRow.append($('<td>').text(item.kemasan));
                 newRow.append($('<td>').text(item.remark));
                 newRow.append($('<td>').text(item.qty));
-                newRow.append($('<td>').text(formatRupiah(item.harga)));
-                newRow.append($('<td>').text(formatRupiah(item.total)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.harga)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.total)));
                 newRow.append($('<td>').html(
                     <?php if (!empty($dataSalesKontrak)) : ?> <?php if ($dataSalesKontrak['status_posting']) : ?> `-`
                         <?php else : ?> `
@@ -1409,8 +1442,8 @@
                 ));
 
                 totalQty += parseFloat(item.qty);
-                totalHarga += parseFloat(item.harga);
-                totalTotalHarga += parseFloat(item.total);
+                totalHarga += destroyFormatRupiah(item.harga);
+                totalTotalHarga += destroyFormatRupiah(item.total);
 
                 table.find('tbody').append(newRow);
             });
@@ -1420,8 +1453,8 @@
             newRow.append($('<td colspan="5"></td>'));
             newRow.append($('<td><b>TOTAL</b></td>'));
             newRow.append($('<td><b>' + totalQty + '</b></td>'));
-            newRow.append($('<td><b>' + formatRupiah(totalHarga.toString()) + '</b></td>'));
-            newRow.append($('<td><b>' + formatRupiah(totalTotalHarga.toString()) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalHarga) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalTotalHarga) + '</b></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
 
@@ -1511,7 +1544,7 @@
         let csrfToken = '<?= csrf_token() ?>';
         let value = document.getElementById('generate_new_code').checked ? true : false;
         let csrf = $(`[name="${csrfToken}"]`);
-        let type_barang = "bahan_jadi"
+        let type_barang = $('#type_barang option:selected').val();
         if (value) {
             $("input[name='kode_barang']").attr("readonly", true);
             $.ajax({
@@ -1537,19 +1570,6 @@
         }
     }
 
-    function formatRupiah(angka) {
-        if (angka != "") {
-            angka = angka.replace(/\./g, ',');
-            angka = angka.replace(/[^\d,]/g, '');
-            var parts = angka.split(',');
-            var ribuan = parts[0];
-            var desimal = parts[1] || '00';
-            var reverse = ribuan.toString().split('').reverse().join('');
-            var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-            return '' + ribuanFormatted + ',' + desimal;
-        }
-
-    }
 
     function resetFormDetail() {
         $('.id_detail').val(null);
@@ -1558,6 +1578,7 @@
         $('.qty').val(null);
         $('.remark').val(null);
         $('.total').val(null);
+        $('#satuan_order_id').val(null).change();
     }
 
     function capitalize() {
@@ -1575,11 +1596,6 @@
         } else {
             inputElement.value = numericValue;
         }
-    }
-
-    function formatCurrency(str) {
-        var strs = str.replace(/,..$/, '');
-        return strs.replace(/[^0-9]/g, '');
     }
 
     function getID() {
