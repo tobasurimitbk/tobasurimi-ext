@@ -78,10 +78,10 @@
     }
 
     function destroyFormatRupiah(x) {
-        if (typeof x === "number") return x;
-        if (!x) return 0;
-        const cleaned = x.replace(/,/g, "");
-        return parseFloat(cleaned);
+        if (typeof x === "number") return x; // Jika input sudah berupa angka, langsung kembalikan
+        if (!x) return 0; // Jika input null, undefined, atau kosong, kembalikan 0
+        const cleaned = x.replace(/[ ,Rp.]/g, ""); // Hapus karakter ",", "Rp", dan "."
+        return parseFloat(cleaned); // Konversi string menjadi angka
     }
 </script>
 

@@ -318,7 +318,9 @@ class MaterialRequestsPenolongModel extends Model
         material_request_penolong_details.satuan as satuan_request,
         stock_details2.stock_dokumen,
         stock_details.no_dokumen,
-        parent_barang.parent_name
+        parent_barang.parent_name,
+        sub_akuns.nama_sub as account_name,
+        sub_akuns.id as account_id,
         ';
 
         $dataQry = $this->asArray()
@@ -331,20 +333,18 @@ class MaterialRequestsPenolongModel extends Model
             ->join('barang_master', 'barang_master.id = material_request_penolong_details.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_penolong_details.barang2_id', 'left')
             ->join('account_barang', 'account_barang.barang_master_id = material_request_penolong_details.barang1_id', 'left')
+            ->join('sub_akuns', 'sub_akuns.id = account_barang.pemakaian_id', 'left')
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->where('material_requests_penolong.request_date >=', $where['tanggal_awal'])
             ->where('material_requests_penolong.request_date <=', $where['tanggal_akhir'])
-            ->where('account_barang.pemakaian_id', $where['akun_pemakaian'])
+            ->whereIn('account_barang.pemakaian_id', $where['akun_pemakaian'])
             ->where('material_request_penolong_details.divisi_tujuan_id', $where['divisi_id'])
-            ->where('material_request_penolong_details.barang_type', 'bahan_penolong')
+            ->whereIn('material_request_penolong_details.barang_type', ['bahan_penolong', 'bahan_kimia'])
             ->where('material_request_penolong_details.deletedAt', $where['deletedAt'])
             ->where('material_requests_penolong.deletedAt', $where['deletedAt'])
             ->groupBy('barang_master.parent_type_id, material_request_penolong_details.barang1_id, material_request_penolong_details.barang2_id')
             ->findAll();
-
-        // var_dump($dataQry);
-        // exit;
 
         return $dataQry;
     }

@@ -179,7 +179,7 @@ class RasioController extends BaseController
 
     public function createRasio()
     {
-        $subAkunsModel = $this->subAkunModel->asObject()->findAll();
+        $subAkunsModel = $this->subAkunModel->where('company_id', $this->this_company_id)->asObject()->findAll();
         $values = [
             "name" => 'Valuta',
             "company_id"    => $this->this_company_id
@@ -196,7 +196,6 @@ class RasioController extends BaseController
 
     public function saveRasio()
     {
-
         try {
             $tanggal_awal_input = $this->request->getVar("tanggal_awal") ? $this->request->getVar("tanggal_awal") : "";
             $tanggal_awal_parts = explode("/", $tanggal_awal_input); // Memisahkan bulan dan tahun
@@ -221,6 +220,21 @@ class RasioController extends BaseController
                 return;
             }
 
+            $dataAccountId = $this->request->getVar("items_digunakan_material_2");
+
+            // Decode JSON menjadi array
+            $dataAccountIdArray = json_decode($dataAccountId, true);
+            $accountIds = [];
+
+            // Iterasi data untuk mengambil account_id
+            foreach ($dataAccountIdArray as $item) {
+                if (isset($item['account_id'])) { // Pastikan key 'account_id' ada
+                    $accountIds[] = $item['account_id'];
+                }
+            }
+
+            $accountIdsString = implode(',', $accountIds);
+
             $data = [
                 "company_id" => $this->this_company_id,
                 "divisi_id" => $this->request->getVar("divisi_id"),
@@ -243,6 +257,7 @@ class RasioController extends BaseController
                 'harga_total_po_bp' => $this->request->getVar("hargaTotalPembelian_material_2") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("hargaTotalPembelian_material_2")), 2, '.', '') : 0,
                 "harga_average_po_bp" => $this->request->getVar("hargaSatuanPembelian_material_2") ? number_format((float) str_replace(["Rp", "."], "", $this->request->getVar("hargaSatuanPembelian_material_2")), 2, '.', '') : 0,
                 "tipe_bahan" => $this->request->getVar('tipe_bahan'),
+                "akun_pemakaian" => $accountIdsString,
             ];
 
 
@@ -584,8 +599,6 @@ class RasioController extends BaseController
             // "rasioBarangPenolong" => $rasioBarangPenolongModel,
             // "rasioCost" => $rasioCostModel,
         ];
-        // var_dump($data);
-        // exit;
         return view('Accounting/rasio/form', $data);
     }
 
