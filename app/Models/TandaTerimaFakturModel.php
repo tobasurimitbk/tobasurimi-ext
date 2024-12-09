@@ -154,10 +154,13 @@ class TandaTerimaFakturModel extends Model
         return $res;
     }
 
-    public function getListPenerimaanBarangLokalBPNotProcessed($supplierID, $divisiID)
+    public function getListPenerimaanBarangLokalBPNotProcessed($supplierID, $divisiID, $companyID)
     {
         $condition = [
             'penerimaan_barang.status_post' => 'FINISH',
+            'penerimaan_barang.company_id' => $companyID,
+            'penerimaan_barang.tipe_bahan' => 'PENOLONG',
+            'penerimaan_barang.status_penerimaan' => 'LOKAL',
             'penerimaan_barang.deletedAt' => null,
             'penerimaan_barang_detail.deletedAt' => null,
             'penerimaan_barang_detail.jml_masuk !=' => 0,

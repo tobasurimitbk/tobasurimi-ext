@@ -179,7 +179,7 @@ class TandaTerimaSupBB extends BaseController
             'dataTandaTerimaFaktur' => $this->tandaTerimaFakturModel->find($id),
             'dataDetailTandaTerimaFaktur' => $this->tandaTerimaFakturDetailModel->getDetail($id),
             'dataPajak' => $this->pajakTandaTerimaFakturModel->where('tanda_terima_faktur_id', $id)->where('deletedAt', null)->findAll(),
-            'dataPenerimaanBarang' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed($tandaTerimaFakturDetail['supplier_id'], $tandaTerimaFakturDetail['divisi_id']),
+            'dataPenerimaanBarang' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed($tandaTerimaFakturDetail['supplier_id'], $tandaTerimaFakturDetail['divisi_id'], $this->this_company_id),
             'isUsed' => $this->tandaTerimaFakturModel->getTandaTerimaFakturInPembayaran($id) == null ? false : true,
             'divisi' => $this->divisiModel->getDivisiAccess(),
         ];
@@ -444,10 +444,11 @@ class TandaTerimaSupBB extends BaseController
     {
         $supplierID = $this->request->getVar('supplierID');
         $divisiID = $this->request->getVar('divisiID');
+        $companyID = $this->this_company_id;
 
         return response()->setJSON([
             'status' => true,
-            'data' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed($supplierID, $divisiID)
+            'data' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed($supplierID, $divisiID, $companyID)
         ]);
     }
 
