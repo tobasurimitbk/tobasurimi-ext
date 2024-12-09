@@ -275,7 +275,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="number" class="form-control" id="tax_amt" name="tax_amt" placeholder="Jumlah">
+                                        <input onkeyup="this.value = greatFormatRupiah(this.value);" autocomplete="one-time-code" type="text" class="form-control" id="tax_amt" name="tax_amt" placeholder="Jumlah">
                                         <label for="floatingInput">Jumlah</label>
                                     </div>
                                 </div>
