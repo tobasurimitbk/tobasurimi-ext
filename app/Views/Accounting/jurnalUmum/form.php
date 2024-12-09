@@ -52,7 +52,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= isset($tutupBuku) ? ($tutupBuku ? 'readonly' : '') : '' ?> <?= isset($transaksiJurnal) ?: 'readonly' ?> autocomplete="one-time-code" value="<?= !empty($transaksiJurnal) ? $transaksiJurnal['no_bukti'] : "" ?>" type="text" class="form-control no_bukti" id="no_bukti" name="no_bukti" placeholder="No Bukti">
+                                    <input <?= isset($tutupBuku) ? ($tutupBuku ? 'readonly' : '') : '' ?> <?= isset($transaksiJurnal) ?: 'readonly' ?> autocomplete="one-time-code" value="<?= !empty($transaksiJurnal) ? ($transaksiJurnal['metode_input'] == "system" ? $transaksiJurnal['no_transaksi'] : $transaksiJurnal['no_bukti']) : "" ?>" type="text" class="form-control no_bukti" id="no_bukti" name="no_bukti" placeholder="No Bukti">
                                     <label for="floatingInput">No Bukti</label>
                                 </div>
                                 <div class="input-generate input-group-prepend group-prepend-password align-items-center" style="<?= isset($transaksiJurnal) ? "display:none;" : '' ?>">

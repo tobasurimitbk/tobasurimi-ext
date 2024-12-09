@@ -51,7 +51,7 @@
     </div>
     <table>
         <tr>
-            <td>No Bukti: <?= $transaksiJurnal['no_bukti']; ?></td>
+            <td>No Bukti:<?= !empty($transaksiJurnal) ? ($transaksiJurnal['metode_input'] == "system" ? $transaksiJurnal['no_transaksi'] : $transaksiJurnal['no_bukti']) : "" ?></td>
             <td>Tanggal: <?= date('d/m/Y', strtotime($transaksiJurnal['tanggal_transaksi'])); ?></td>
         </tr>
     </table>

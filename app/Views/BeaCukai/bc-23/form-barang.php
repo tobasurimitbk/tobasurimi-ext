@@ -70,9 +70,9 @@
                                     <td style="text-align: center;"><?= $l['po_no'] ?></td>
                                     <td style="text-align: center;"><?= $l['kode_barang'] ?></td>
                                     <td style="text-align: center;"><?= $l['barang_name'] ?></td>
-                                    <td style="text-align: center;"><?= number_format($l['qty_po'], 4) ?></td>
-                                    <td style="text-align: center;"><?= number_format($l['qty_lpb'], 4) ?></td>
-                                    <td style="text-align: center;"><?= str_replace('Rp', '', toRupiah($l['harga'])) ?></td>
+                                    <td style="text-align: center;"><?= number_format($l['qty_po']) ?></td>
+                                    <td style="text-align: center;"><?= number_format($l['qty_lpb']) ?></td>
+                                    <td style="text-align: center;"><?= number_format($l['harga'], 2) ?></td>
                                     <td style="text-align: center;" class="body-table-info-status-barang-root-view" data-id="<?= encrypt($l['penerimaan_barang_id']) ?>">
                                         <?php if ($bcDokumenBarang == null) : ?>
                                             <span class="badge badge-danger">

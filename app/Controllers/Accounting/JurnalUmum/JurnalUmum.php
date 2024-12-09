@@ -172,17 +172,14 @@ class JurnalUmum extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         $dataResult = [];
         foreach ($dataJurnal as $data) {
-            if ($data->po_id != null) {
-                // Transaksi Pembelian
-                $transaksiPembelian = $this->transaksiPembelianModel
-                    ->select('suppliers.name as supplier')
-                    ->join('suppliers', 'suppliers.id = transaksi_pembelian.id_supplier', 'left')
-                    ->where('id_transaksi_jurnal', $data->id)
-                    ->first();
-
+            $transaksiPembelian = $this->transaksiPembelianModel
+                ->select('suppliers.name as supplier')
+                ->join('suppliers', 'suppliers.id = transaksi_pembelian.id_supplier', 'left')
+                ->where('id_transaksi_jurnal', $data->id)
+                ->first();
+            if ($transaksiPembelian != null) {
                 $supplierName = $transaksiPembelian != null ? "0 : " . $transaksiPembelian['supplier'] : "0 : ";
             }
-
             // Cek Tutup Buku Per Transaksi
             $tutupBuku = $this->tutupBukuModel
                 ->where('company_id', $this->this_company_id)
