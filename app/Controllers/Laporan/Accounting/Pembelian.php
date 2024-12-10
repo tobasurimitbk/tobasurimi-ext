@@ -12,6 +12,7 @@ use App\Models\KursModel;
 use App\Models\RMImportPODetailModel;
 use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\AMPurchaseOrderDetailModel;
+use App\Models\BCPurchaseOrderModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\PenerimaanBarangDetailModel;
 use Dompdf\Dompdf;
@@ -31,6 +32,7 @@ class Pembelian extends BaseController
     protected $aMPurchaseOrderDetailModel;
     protected $penerimaanBarangModel;
     protected $penerimaanBarangDetailModel;
+    protected $bcPurchaseOrderModel;
 
     public function __construct()
     {
@@ -44,11 +46,12 @@ class Pembelian extends BaseController
         $this->aMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $this->bcPurchaseOrderModel = new BCPurchaseOrderModel();
     }
 
     public function index()
     {
-        $supplierData = $this->supplierModel->asObject()->findAll();
+        $supplierData = $this->supplierModel->asObject()->where('company_id', $this->this_company_id)->findAll();
         $data = [
             'suppliers' => $supplierData
         ];
@@ -69,7 +72,7 @@ class Pembelian extends BaseController
         ];
 
         $condition = [
-            // "company_id"  => $this->this_company_id,
+            "penerimaan_barang.company_id"  => $this->this_company_id,
             "penerimaan_barang.deletedAt" => NULL
         ];
 
@@ -94,8 +97,35 @@ class Pembelian extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($res['data'] as $data) {
+
+            // CARI BC NYA DI BC_PURCHASE ORDER
+            $bc23PurchaseOrder = $this->bcPurchaseOrderModel->select('
+                        bc_purchase_order.no_daftar,
+                        bc_23.no_aju
+                    ')
+                ->join('bc_23', 'bc_23.bc_purchase_order_id = bc_purchase_order.id')
+                ->like('multiple_lpb_id', $data->id)
+                ->where('bc_purchase_order.company_id', $this->this_company_id)
+                ->first();
+
+            $bc40PurchaseOrder = $this->bcPurchaseOrderModel->select('
+                        bc_purchase_order.no_daftar,
+                        bc_40.no_aju
+                    ')
+                ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_purchase_order.id')
+                ->like('multiple_lpb_id', $data->id)
+                ->where('bc_purchase_order.company_id', $this->this_company_id)
+                ->first();
+
+            if ($bc23PurchaseOrder != null) {
+                $dokumenTransaksi = "BC 2.3 / " . $bc23PurchaseOrder['no_aju'] . " / " . $bc23PurchaseOrder['no_daftar'];
+            } elseif ($bc40PurchaseOrder != null) {
+                $dokumenTransaksi = "BC 4.0 / " . $bc40PurchaseOrder['no_aju'] . " / " . $bc40PurchaseOrder['no_daftar'];
+            } else {
+                $dokumenTransaksi = "-";
+            }
+
             $tglTransaksi = $data->tanggal_penerimaan;
-            $dokumenTransaksi = $data->BC23_AJU ? "BC 2.3/" . $data->BC23_AJU : ($data->BC40_AJU ? "BC 4.0/" . $data->BC40_AJU : "-");
             $buktiTransaksi = $data->no_penerimaan_barang;
             $invoiceTransaksi = $data->no_invoice;
             $tglInvoiceTransaksi = $data->tanggal_penerimaan;
@@ -169,10 +199,10 @@ class Pembelian extends BaseController
                 "po_num"                => $poNumberTransaksi,
                 "supplier_name"         => $supplierTransaksi,
                 "valas"                 => $valasTransaksi,
-                "exchange"              => number_format(floatval($exchangeTransaksi), 2, ',', '.'),
-                "nominal"               => number_format(floatval($nominalTransaksi), 2, ',', '.'),
-                "nominal_idr"           => number_format(floatval($nominalIdrTransaksi), 2, ',', '.'),
-                "paid_idr"              => $paidIdrTransaksi,
+                "exchange"              => floatval($exchangeTransaksi),
+                "nominal"               => floatval($nominalTransaksi),
+                "nominal_idr"           => floatval($nominalIdrTransaksi),
+                "paid_idr"              => floatval($paidIdrTransaksi),
             ]);
 
             // var_dump($rdata);
@@ -193,7 +223,7 @@ class Pembelian extends BaseController
     {
         $dompdf = new Dompdf();
         $condition = [
-            // "company_id"  => $this->this_company_id,
+            "penerimaan_barang.company_id"  => $this->this_company_id,
             "penerimaan_barang.deletedAt" => NULL
         ];
 
@@ -221,8 +251,34 @@ class Pembelian extends BaseController
 
         $no = 1;
         foreach ($res['data'] as $data) {
+            // CARI BC NYA DI BC_PURCHASE ORDER
+            $bc23PurchaseOrder = $this->bcPurchaseOrderModel->select('
+                bc_purchase_order.no_daftar,
+                bc_23.no_aju
+            ')
+                ->join('bc_23', 'bc_23.bc_purchase_order_id = bc_purchase_order.id')
+                ->like('multiple_lpb_id', $data->id)
+                ->where('bc_purchase_order.company_id', $this->this_company_id)
+                ->first();
+
+            $bc40PurchaseOrder = $this->bcPurchaseOrderModel->select('
+                bc_purchase_order.no_daftar,
+                bc_40.no_aju
+            ')
+                ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_purchase_order.id')
+                ->like('multiple_lpb_id', $data->id)
+                ->where('bc_purchase_order.company_id', $this->this_company_id)
+                ->first();
+
+            if ($bc23PurchaseOrder != null) {
+                $dokumenTransaksi = "BC 2.3 / " . $bc23PurchaseOrder['no_aju'] . " / " . $bc23PurchaseOrder['no_daftar'];
+            } elseif ($bc40PurchaseOrder != null) {
+                $dokumenTransaksi = "BC 4.0 / " . $bc40PurchaseOrder['no_aju'] . " / " . $bc40PurchaseOrder['no_daftar'];
+            } else {
+                $dokumenTransaksi = "-";
+            }
+
             $tglTransaksi = $data->tanggal_penerimaan;
-            $dokumenTransaksi = $data->BC23_AJU ? "BC 2.3/" . $data->BC23_AJU : ($data->BC40_AJU ? "BC 4.0/" . $data->BC40_AJU : "-");
             $buktiTransaksi = $data->no_penerimaan_barang;
             $invoiceTransaksi = $data->no_invoice;
             $tglInvoiceTransaksi = $data->tanggal_penerimaan;
@@ -299,10 +355,10 @@ class Pembelian extends BaseController
                 "po_num"                => $poNumberTransaksi,
                 "supplier_name"         => $supplierTransaksi,
                 "valas"                 => $valasTransaksi,
-                "exchange"              => number_format(floatval($exchangeTransaksi), 2, ',', '.'),
-                "nominal"               => number_format(floatval($nominalTransaksi), 2, ',', '.'),
-                "nominal_idr"           => number_format(floatval($nominalIdrTransaksi), 2, ',', '.'),
-                "paid_idr"              => $paidIdrTransaksi,
+                "exchange"              => number_format(floatval($exchangeTransaksi)),
+                "nominal"               => number_format(floatval($nominalTransaksi)),
+                "nominal_idr"           => number_format(floatval($nominalIdrTransaksi)),
+                "paid_idr"              => number_format(floatval($paidIdrTransaksi)),
             ]);
         }
 
@@ -331,6 +387,7 @@ class Pembelian extends BaseController
 
 
         $condition = [
+            "penerimaan_barang.company_id"  => $this->this_company_id,
             "penerimaan_barang.deletedAt" => NULL
         ];
 
@@ -369,8 +426,34 @@ class Pembelian extends BaseController
         $no = 1;
         $column = 2;
         foreach ($res['data'] as $data) {
+            // CARI BC NYA DI BC_PURCHASE ORDER
+            $bc23PurchaseOrder = $this->bcPurchaseOrderModel->select('
+                bc_purchase_order.no_daftar,
+                bc_23.no_aju
+            ')
+                ->join('bc_23', 'bc_23.bc_purchase_order_id = bc_purchase_order.id')
+                ->like('multiple_lpb_id', $data->id)
+                ->where('bc_purchase_order.company_id', $this->this_company_id)
+                ->first();
+
+            $bc40PurchaseOrder = $this->bcPurchaseOrderModel->select('
+                bc_purchase_order.no_daftar,
+                bc_40.no_aju
+            ')
+                ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_purchase_order.id')
+                ->like('multiple_lpb_id', $data->id)
+                ->where('bc_purchase_order.company_id', $this->this_company_id)
+                ->first();
+
+            if ($bc23PurchaseOrder != null) {
+                $dokumenTransaksi = "BC 2.3 / " . $bc23PurchaseOrder['no_aju'] . " / " . $bc23PurchaseOrder['no_daftar'];
+            } elseif ($bc40PurchaseOrder != null) {
+                $dokumenTransaksi = "BC 4.0 / " . $bc40PurchaseOrder['no_aju'] . " / " . $bc40PurchaseOrder['no_daftar'];
+            } else {
+                $dokumenTransaksi = "-";
+            }
+
             $tglTransaksi = $data->tanggal_penerimaan;
-            $dokumenTransaksi = $data->BC23_AJU ? "BC 2.3/" . $data->BC23_AJU : ($data->BC40_AJU ? "BC 4.0/" . $data->BC40_AJU : "-");
             $buktiTransaksi = $data->no_penerimaan_barang;
             $invoiceTransaksi = $data->no_invoice;
             $tglInvoiceTransaksi = $data->tanggal_penerimaan;
@@ -438,10 +521,10 @@ class Pembelian extends BaseController
                 ->setCellValue('H' . $column, $poNumberTransaksi)
                 ->setCellValue('I' . $column, $supplierTransaksi)
                 ->setCellValue('J' . $column, $valasTransaksi)
-                ->setCellValue('K' . $column, number_format(floatval($exchangeTransaksi), 2, ',', '.'))
-                ->setCellValue('L' . $column, number_format(floatval($nominalTransaksi), 2, ',', '.'))
-                ->setCellValue('M' . $column, number_format(floatval($nominalIdrTransaksi), 2, ',', '.'))
-                ->setCellValue('N' . $column, $paidIdrTransaksi);
+                ->setCellValue('K' . $column, number_format(floatval($exchangeTransaksi)))
+                ->setCellValue('L' . $column, number_format(floatval($nominalTransaksi)))
+                ->setCellValue('M' . $column, number_format(floatval($nominalIdrTransaksi)))
+                ->setCellValue('N' . $column, number_format(floatval($paidIdrTransaksi)));
 
             $column++;
         }

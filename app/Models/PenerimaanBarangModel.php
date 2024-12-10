@@ -157,8 +157,10 @@ class PenerimaanBarangModel extends Model
             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
             ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'right')
-            ->join('bc_23', 'bc_23.penerimaan_barang_id = penerimaan_barang.id', 'left')
-            ->join('bc_40', 'bc_40.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('bc_purchase_order bc_23_po', 'bc_23_po.id = penerimaan_barang.id', 'left')
+            ->join('bc_purchase_order bc_40_po', 'bc_40_po.id = penerimaan_barang.id', 'left')
+            ->join('bc_23', 'bc_23.bc_purchase_order_id = bc_23_po.id', 'left')
+            ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_40_po.id', 'left')
             ->groupBy(('penerimaan_barang.id'))
             ->where($condition)
             ->orderBy($sort, $sortType);
@@ -221,16 +223,12 @@ class PenerimaanBarangModel extends Model
                     warehouses.warehouse_name, 
                     suppliers.name as supplier_name, 
                     COUNT(penerimaan_barang_detail.id) AS itemCount, 
-                    penerimaan_barang_detail.harga,
-                    bc_23.no_aju AS BC23_AJU,
-                    bc_40.no_aju AS BC40_AJU,";
+                    penerimaan_barang_detail.harga";
         $penerimaanBarangDataQry = $this->asObject()
             ->select($selectQry)
             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
             ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'right')
-            ->join('bc_23', 'bc_23.penerimaan_barang_id = penerimaan_barang.id', 'left')
-            ->join('bc_40', 'bc_40.penerimaan_barang_id = penerimaan_barang.id', 'left')
             ->groupBy(('penerimaan_barang.id'))
             ->where($condition)
             ->orderBy($sort, $sortType);
