@@ -323,6 +323,8 @@ class MaterialRequestsPenolongModel extends Model
         sub_akuns.id as account_id,
         ';
 
+        $akunPemakaian = array_map('intval', $where['akun_pemakaian']);
+
         $dataQry = $this->asArray()
             ->select($selectQryJadi)
             ->join('material_request_penolong_details', 'material_request_penolong_details.material_request_id = material_requests_penolong.id', 'left')
@@ -338,7 +340,7 @@ class MaterialRequestsPenolongModel extends Model
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->where('material_requests_penolong.request_date >=', $where['tanggal_awal'])
             ->where('material_requests_penolong.request_date <=', $where['tanggal_akhir'])
-            ->whereIn('account_barang.pemakaian_id', $where['akun_pemakaian'])
+            ->whereIn('account_barang.pemakaian_id', $akunPemakaian)
             ->where('material_request_penolong_details.divisi_tujuan_id', $where['divisi_id'])
             ->whereIn('material_request_penolong_details.barang_type', ['bahan_penolong', 'bahan_kimia'])
             ->where('material_request_penolong_details.deletedAt', $where['deletedAt'])

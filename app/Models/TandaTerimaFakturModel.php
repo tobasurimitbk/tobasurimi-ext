@@ -84,10 +84,10 @@ class TandaTerimaFakturModel extends Model
         $tandaTerimaQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id')
-            ->join('users', 'users.id = tanda_terima_faktur.user_id')
-            ->join('divisis', 'divisis.id = tanda_terima_faktur.divisi_id');
-
+            ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id', 'left')
+            ->join('users', 'users.id = tanda_terima_faktur.user_id', 'left')
+            ->join('divisis', 'divisis.id = tanda_terima_faktur.divisi_id', 'left');
+    
         if ($addCondition['search']) {
             $tandaTerimaQry->groupStart();
             $tandaTerimaQry->like('faktur_no', $addCondition['search'])
@@ -184,7 +184,10 @@ class TandaTerimaFakturModel extends Model
             penerimaan_barang_detail.jml_masuk AS qty_lpb, 
             penerimaan_barang_detail.id AS penerimaan_barang_detail_id, 
             penerimaan_barang_detail.harga,
-            suppliers.id as supplier_id, suppliers.name as supplier_name,
+            suppliers.id as supplier_id, 
+            suppliers.name as supplier_name,
+            divisis.id as divisi_id, 
+            divisis.divisi as divisi_name,
             satuans.kode_satuan,
             CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS barang
         ";
@@ -195,6 +198,7 @@ class TandaTerimaFakturModel extends Model
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
             ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->where($condition)
             ->orderBy('penerimaan_barang.tanggal', "ASC")
@@ -227,7 +231,9 @@ class TandaTerimaFakturModel extends Model
                     'kode_satuan' => $penerimaan['kode_satuan'],
                     'harga' => $penerimaan['harga'],
                     'supplier_id' => $penerimaan['supplier_id'],
-                    'supplier_name' => $penerimaan['supplier_name']
+                    'supplier_name' => $penerimaan['supplier_name'],
+                    'divisi_id' => $penerimaan['divisi_id'],
+                    'divisi_name' => $penerimaan['divisi_name']
                 ];
             }
         }, $penerimaanList);

@@ -369,7 +369,10 @@ class RasioController extends BaseController
                         'kurs'                    => $s->kurs,
                     ]);
                 }
-            } else {
+            } 
+                
+
+            if (!empty($barang_frozen_jadi)) {
                 foreach ($barang_frozen_jadi as $f) {
                     foreach ($f as $i) {
                         $this->rasioBarangJadiModel->insert([
@@ -401,6 +404,7 @@ class RasioController extends BaseController
                     }
                 }
             }
+            
 
 
             foreach ($barang_digunakan_material_2 as $bd) {

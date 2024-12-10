@@ -351,20 +351,32 @@
                 className: "text-center"
             },
             {
-                data: "upahBersih",
-                className: "text-center"
+            data: "upahBersih",
+            className: "text-center",
+            render: function(data, type, row) {
+                return greatFormatRupiah(data); // Format kolom upahBersih
+            }
             },
             {
                 data: "totalGajiLembur",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(data); // Format kolom totalGajiLembur
+                }
             },
             {
                 data: "totalPenguranganGaji",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(data); // Format kolom totalPenguranganGaji
+                }
             },
             {
                 data: "sisaGaji",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(data); // Format kolom sisaGaji
+                }
             },
             {
                 data: "id",

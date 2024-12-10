@@ -191,7 +191,7 @@ class TandaTerimaSupBB extends BaseController
     {
         $fakturNo = $this->request->getVar('no_tanda_terima_faktur');
         $check = $this->tandaTerimaFakturModel->where('faktur_no', $fakturNo)->first();
-
+        $dataListPenerimaanBarang = json_decode($_POST['listPenerimaanBarang']);
         if ($check != null) {
             return response()->setJSON([
                 'token' => csrf_hash(),
@@ -202,8 +202,8 @@ class TandaTerimaSupBB extends BaseController
 
         $id = $this->tandaTerimaFakturModel->insert([
             'company_id' => $this->this_company_id,
-            'supplier_id' => $this->request->getVar('supplier_id'),
-            'divisi_id' => $this->request->getVar('divisi_id'),
+            'supplier_id' => $dataListPenerimaanBarang[0]->supplier_id,
+            'divisi_id' => $dataListPenerimaanBarang[0]->divisi_id,
             'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : date('Y-m-d'),
             'faktur_no' => $this->request->getVar('no_tanda_terima_faktur'),
             'nominal_faktur' => repairDouble($this->request->getVar('total_tambahan_potongan')),
@@ -220,7 +220,7 @@ class TandaTerimaSupBB extends BaseController
         ]);
 
         // detail faktur
-        foreach (json_decode($_POST['listPenerimaanBarang']) as $l) {
+        foreach ($dataListPenerimaanBarang as $l) {
             $this->tandaTerimaFakturDetailModel->insert([
                 'tanda_terima_faktur_id' => $id,
                 'penerimaan_barang_detail_id' => $l->penerimaan_barang_detail_id,
@@ -260,6 +260,7 @@ class TandaTerimaSupBB extends BaseController
     public function updateAction()
     {
         $id = decrypt($this->request->getVar('id'));
+        $dataListPenerimaanBarang = json_decode($_POST['listPenerimaanBarang']);
 
         $this->tandaTerimaFakturModel->update($id, [
             'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : "",
@@ -278,7 +279,7 @@ class TandaTerimaSupBB extends BaseController
 
         // delete detail first and insert again
         $this->tandaTerimaFakturDetailModel->where('tanda_terima_faktur_id', $id)->delete();
-        foreach (json_decode($_POST['listPenerimaanBarang']) as $l) {
+        foreach ($dataListPenerimaanBarang as $l) {
             $this->tandaTerimaFakturDetailModel->insert([
                 'tanda_terima_faktur_id' => $id,
                 'penerimaan_barang_detail_id' => $l->penerimaan_barang_detail_id,
@@ -352,7 +353,7 @@ class TandaTerimaSupBB extends BaseController
 
         $dataInv = $tandaTerimaFakturModel->asObject()
             ->select("tanda_terima_faktur.*, DATE_FORMAT(tanda_terima_faktur.invoice_date, '%d/%m/%Y') AS invoice_date, suppliers.name AS supplier_name")
-            ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id')
+            ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id', 'left')
             ->find($id);
 
         $dataDet = $tandaTerimaFakturDetModel->asObject()
@@ -362,13 +363,13 @@ class TandaTerimaSupBB extends BaseController
 
         $taxData = $pajakTandaTerimaFakturModel->asObject()
             ->where('tanda_terima_faktur_id', $id)
-            ->where('tax_status', 'Pajak dipungut oleh negara')
+            ->whereNotIn('tax_type', ['PPN Masukan'])
             ->where('deletedAt', null)
             ->findAll();
 
         $taxReturnData = $pajakTandaTerimaFakturModel->asObject()
             ->where('tanda_terima_faktur_id', $id)
-            ->where('tax_status', 'Pajak dikembalikan lagi')
+            ->whereIn('tax_type', ['PPN Masukan 11%', 'PPN Masukan'])
             ->where('deletedAt', null)
             ->findAll();
 

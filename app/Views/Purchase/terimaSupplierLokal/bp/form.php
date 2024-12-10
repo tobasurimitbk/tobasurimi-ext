@@ -506,7 +506,9 @@
                         qty_telah_diterima: v.qty_telah_diterima,
                         qty_akan_diterima: sisaDiterima,
                         kode_satuan: v.kode_satuan,
-                        harga: v.harga
+                        harga: v.harga,
+                        divisi_id: v.divisi_id,
+                        supplier_id: v.supplier_id,
                     });
                 }
             });
@@ -913,7 +915,7 @@
     }
 
     function drawTableSelected(data) {
-
+        console.log(data);
         if ($.fn.DataTable.isDataTable('#selectedItemTable')) {
             $('#selectedItemTable').DataTable().clear().draw();
             selectedItemTable.destroy();

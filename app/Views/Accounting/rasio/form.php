@@ -904,7 +904,6 @@
                     } else {
                         stopLoading()
                         list_items_barang_jadi_material_2 = [];
-                        list_items_barang_digunakan_material_2 = [];
                         list_items_labor_cost = [];
                         list_items_title_cost = [];
                         list_items_overhead_cost = [];
@@ -967,8 +966,10 @@
     }
 
     const drawTableDigunakanMaterialII = function () {
-        $('.body-detail-table-digunakan-material-2').empty(); // Kosongkan isi tabel
-        $('.tfoot-detail-table-digunakan-material-2').empty(); // Kosongkan footer
+        // Kosongkan isi tabel dan footer
+        console.log(list_items_barang_digunakan_material_2.length);
+        $('.body-detail-table-digunakan-material-2').empty();
+        $('.tfoot-detail-table-digunakan-material-2').empty();
 
         if (list_items_barang_digunakan_material_2.length === 0) {
             // Jika data kosong, tampilkan pesan
@@ -978,10 +979,14 @@
             // Kelompokkan data berdasarkan `account_id`
             const groupedData = list_items_barang_digunakan_material_2.reduce((acc, item) => {
                 if (!acc[item.account_id]) {
-                    acc[item.account_id] = { account_name: item.account_name, totalQtyPO: 0, totalHargaPO: 0 };
+                    acc[item.account_id] = { 
+                        account_name: item.account_name, 
+                        totalQtyPO: 0, 
+                        totalHargaPO: 0 
+                    };
                 }
-                acc[item.account_id].totalQtyPO += item.totalQtyPO || 0;
-                acc[item.account_id].totalHargaPO += item.totalHargaPO || 0;
+                acc[item.account_id].totalQtyPO += parseFloat(item.totalQtyPO) || 0;
+                acc[item.account_id].totalHargaPO += parseFloat(item.totalHargaPO) || 0;
                 return acc;
             }, {});
 
@@ -1013,7 +1018,7 @@
             // Hitung grand total harga satuan rata-rata
             const grandHargaSatuanRataRata = grandTotalQtyPO > 0 ? grandTotalHargaPO / grandTotalQtyPO : 0;
 
-            // Tambahkan grand total di bawah semua grup
+            // Tambahkan grand total di footer
             const grandFooter = `
                 <tr style="font-weight: bold; text-align: center; background: #f3f3f3;">
                     <td colspan="2">Grand Total</td>
@@ -1022,7 +1027,7 @@
                     <td>${greatFormatRupiah(grandHargaSatuanRataRata)}</td>
                 </tr>
             `;
-            $('.body-detail-table-digunakan-material-2').append(grandFooter);
+            $('.tfoot-detail-table-digunakan-material-2').append(grandFooter);
 
             // Update input fields untuk grand total
             $('.qtyTotalPembelian_material_2').val(grandTotalQtyPO.toLocaleString());
@@ -1030,9 +1035,6 @@
             $('.hargaSatuanPembelian_material_2').val(greatFormatRupiah(grandHargaSatuanRataRata));
         }
     };
-
-
-
 
 
 
