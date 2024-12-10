@@ -668,6 +668,12 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         let data = new FormData(document.querySelector(".create-form"));
+                        let totalTambahanPotongan = destroyFormatRupiah($('.total_tambahan_potongan').val());
+                        let tambahanForm = destroyFormatRupiah($('.tambahan').val());
+                        let potonganForm = destroyFormatRupiah($('.potongan').val());
+                        data.set('total_tambahan_potongan', totalTambahanPotongan)
+                        data.set('potongan', potonganForm)
+                        data.set('tambahan', tambahanForm)
                         data.append("listPajak", JSON.stringify(list_pajak));
                         data.append("listPenerimaanBarang", JSON.stringify(list_penerimaan_selected));
                         if (id) {
