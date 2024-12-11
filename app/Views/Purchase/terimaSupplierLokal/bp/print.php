@@ -165,6 +165,7 @@
         </div>
 
         <table class="w-100 bank-table border-collapse">
+        <?php $totalTaxAmt = 0; ?>
             <tr>
                 <th class="txt-left" style="width: 150px;">NO. LPB</th>
                 <th class="txt-left" style="width: 300px;">KETERANGAN</th>
@@ -174,33 +175,36 @@
             <tr>
                 <td><?= $lpbNo ?></td>
                 <td><?= $itemName ?></td>
-                <td class="txt-right"><?= toRupiah($itemTotal) ?></td>
+                <td class="txt-right"><?= number_format($itemTotal, 2) ?></td>
                 <td></td>
             </tr>
             <!-- <tr>
                 <td></td>
                 <td><?= $taxList ?></td>
-                <td class="txt-right"><?= toRupiah($taxTotal) ?></td>
+                <td class="txt-right"><?= number_format($taxTotal, 2) ?></td>
                 <td></td>
             </tr> -->
+        
             <?php foreach ($taxReturnData as $t) : ?>
+                <?php $totalTaxAmt += $t->tax_amt; ?>
                 <tr>
                     <td></td>
                     <td><?= $t->tax_type . " - " . $t->tax_inv_no ?></td>
-                    <td class="txt-right"><?= str_replace('Rp', '', toRupiah($t->tax_amt)) ?></td>
+                    <td class="txt-right"><?= number_format($t->tax_amt, 2) ?></td>
                     <td></td>
                 </tr>
             <?php endforeach; ?>
+            <?php $totalPengeluaran = $totalTaxAmt + $tambahan + $itemTotal; ?>
             <tr>
                 <td></td>
                 <td>TAMBAHAN <?= $data->information_tambahan != "" ?  ", " . $data->information_tambahan : "" ?></td>
-                <td class="txt-right"><?= toRupiah($tambahan) ?></td>
+                <td class="txt-right"><?= number_format($tambahan, 2) ?></td>
                 <td></td>
             </tr>
             <tr>
                 <th></th>
                 <th class="txt-right">TOTAL</th>
-                <th class="txt-right"><?= toRupiah($total) ?></th>
+                <th class="txt-right"><?= number_format($totalPengeluaran, 2) ?></th>
                 <th></th>
             </tr>
         </table>
@@ -311,25 +315,28 @@
             <!-- <?php if (!empty($taxReturnList)) : ?>
                 <tr>
                     <td><?= $taxReturnList ?></td>
-                    <td class="txt-right"><?= str_replace('Rp', '', toRupiah($taxReturnTotal)) ?></td>
+                    <td class="txt-right"><?=  number_format($taxReturnTotal, 2) ?></td>
                     <td></td>
                 </tr>
             <?php endif; ?> -->
+            <?php $totalPenerimaan = 0; ?>
             <?php foreach ($taxData as $t) : ?>
+            <?php $totalPenerimaan += $t->tax_amt; ?>
                 <tr>
                     <td><?= $t->tax_type . " - " . $t->tax_inv_no ?></td>
-                    <td class="txt-right"><?= toRupiah($t->tax_amt) ?></td>
+                    <td class="txt-right"><?= number_format($t->tax_amt, 2) ?></td>
                     <td></td>
                 </tr>
             <?php endforeach; ?>
+            <?php $totalPenerimaan += $potongan ?>
             <tr>
                 <td>POTONGAN <?= $data->information_potongan != "" ?  ", " . $data->information_potongan : "" ?></td>
-                <td class="txt-right"><?= toRupiah($potongan) ?></td>
+                <td class="txt-right"><?= number_format($potongan, 2) ?></td>
                 <td></td>
             </tr>
             <tr>
                 <th class="txt-right">TOTAL</th>
-                <th class="txt-right"><?= str_replace('Rp', '', toRupiah($taxTotal))  ?></th>
+                <th class="txt-right"><?= number_format($totalPenerimaan, 2)  ?></th>
                 <th></th>
             </tr>
         </table>

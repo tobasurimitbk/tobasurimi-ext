@@ -1169,6 +1169,7 @@
                 no_penerimaan_barang: "<?= $d['no_penerimaan_barang'] ?>",
                 nama_barang_dok: "<?= str_replace('"', '\"', $d['nama_barang_dok']) ?>",
                 qty_lpb: "<?= $d['qty_lpb'] ?>",
+                supplier_name: "<?= $d['supplier_name'] ?>",
                 qty_retur: "<?= $d['qty_retur'] ?>",
                 qty_telah_diterima: "<?= $d['qty_telah_diterima'] ?>",
                 qty_akan_diterima: "<?= $d['qty_akan_diterima'] ?>",

@@ -99,7 +99,7 @@ class TandaTerimaSupBB extends BaseController
                     "faktur_no"      => $data->faktur_no,
                     "divisi"         => $data->divisi,
                     "supplier_name"  => strtoupper($data->supplierName),
-                    "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur, 0, ',', '.')),
+                    "nominal_faktur" => $data->nominal_faktur,
                     "jumlah_item"    => count($jumlahItem),
                     "invoice_date"   => $data->invoice_date,
                     "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
@@ -363,7 +363,7 @@ class TandaTerimaSupBB extends BaseController
 
         $taxData = $pajakTandaTerimaFakturModel->asObject()
             ->where('tanda_terima_faktur_id', $id)
-            ->whereNotIn('tax_type', ['PPN Masukan'])
+            ->whereNotIn('tax_type', ['PPN Masukan 11%'])
             ->where('deletedAt', null)
             ->findAll();
 
