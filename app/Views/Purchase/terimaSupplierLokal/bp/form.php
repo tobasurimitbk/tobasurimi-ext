@@ -674,8 +674,13 @@
                         data.set('total_tambahan_potongan', totalTambahanPotongan)
                         data.set('potongan', potonganForm)
                         data.set('tambahan', tambahanForm)
-                        data.append("listPajak", JSON.stringify(list_pajak));
+                        const cleanListPajak = list_pajak.map(item => ({
+                                ...item,
+                                tax_amt: destroyFormatRupiah(item.tax_amt),
+                            }));
+                        data.append("listPajak", JSON.stringify(cleanListPajak));
                         data.append("listPenerimaanBarang", JSON.stringify(list_penerimaan_selected));
+                        
                         if (id) {
                             // UPDATE
                             $.ajax({
