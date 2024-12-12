@@ -218,7 +218,7 @@
                     <div class="col-md-3">
                         <div class="input-group">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = formatRupiah2(this.value)" name="total_tagihan_lain_lain" id="total_tagihan_lain_lain" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Pembayaran Oleh">
+                                <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = greatFormatRupiah(this.value)" name="total_tagihan_lain_lain" id="total_tagihan_lain_lain" autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="Pembayaran Oleh">
                                 <label for="floatingInput">Total Tagihan</label>
                             </div>
                             <div class="input-group-append" style="height:50px;">
@@ -466,9 +466,16 @@
                             cancelButtonText: 'Kembali',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                let formData = new FormData(document.querySelector(".create-form"));
-                                formData.append('total_amount_invoice', $(".total_amount_invoice").text());
-                                formData.append('list_barang', JSON.stringify(dataList));
+                                const formData = new FormData(document.querySelector(".create-form"));
+                                formData.append('total_amount_invoice', destroyFormatRupiah($(".total_amount_invoice").text()));
+                                formData.append('total_bayar', destroyFormatRupiah($(".total-bayar").val()));
+                                const cleanListBarang = dataList.map(item => ({
+                                    ...item,
+                                    harga_barang_invoice: destroyFormatRupiah(item.harga_barang_invoice),
+                                    amount_invoice: destroyFormatRupiah(item.amount_invoice),
+                                    qty_invoice: destroyFormatRupiah(item.qty_invoice),
+                                }));
+                                formData.append('list_barang', JSON.stringify(cleanListBarang));
                                 $.ajax({
 
                                     url: "<?= base_url("/pembayaran-invoice/update"); ?>",
@@ -531,9 +538,16 @@
                             cancelButtonText: 'Kembali',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                let formData = new FormData(document.querySelector(".create-form"));
-                                formData.append('total_amount_invoice', $(".total_amount_invoice").text());
-                                formData.append('list_barang', JSON.stringify(dataList));
+                                const formData = new FormData(document.querySelector(".create-form"));
+                                formData.append('total_amount_invoice', destroyFormatRupiah($(".total_amount_invoice").text()));
+                                formData.append('total_bayar', destroyFormatRupiah($(".total-bayar").val()));
+                                const cleanListBarang = dataList.map(item => ({
+                                    ...item,
+                                    harga_barang_invoice: destroyFormatRupiah(item.harga_barang_invoice),
+                                    amount_invoice: destroyFormatRupiah(item.amount_invoice),
+                                    qty_invoice: destroyFormatRupiah(item.qty_invoice),
+                                }));
+                                formData.append('list_barang', JSON.stringify(cleanListBarang));
                                 $.ajax({
                                     url: "<?= base_url("pembayaran-invoice/save"); ?>",
                                     data: formData,
@@ -708,31 +722,6 @@
         }
     }
 
-    function formatRupiah2(angka) {
-        if (angka === null || angka === undefined) {
-            angka = 0;
-        }
-
-        angka = angka.toString().replace(/[^\d,]/g, '');
-        let parts = angka.split(',');
-        let ribuan = parts[0] || '0';
-        let desimal = (parts[1] || '').padEnd(2, '0').substring(0, 2);
-
-        let reverse = ribuan.split('').reverse().join('');
-        let ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-
-        return ribuanFormatted + (desimal ? ',' + desimal : '');
-    }
-
-    function convertRupiahToNumber(rupiah) {
-        if (!rupiah || typeof rupiah !== 'string') {
-            return 0;
-        }
-
-        rupiah = rupiah.replace(/\./g, '').replace(',', '.');
-        return parseFloat(rupiah) || 0;
-    }
-
 
     function limitInputBayar(input, maxAmount) {
 
@@ -904,8 +893,8 @@
                 newRow.append($('<td style="text-align:center;">').text(item.nama_akun_kas_lain || '-'));
                 newRow.append($('<td style="text-align:center;">').text(item.nama_akun_selisih_lain || '-'));
                 newRow.append($('<td style="text-align:center;">').text(item.qty_return));
-                newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_return)));
-                newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang_return * item.qty_return)));
+                newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.harga_barang_return)));
+                newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.harga_barang_return * item.qty_return)));
                 if (item.kode_barang === "LAIN-LAIN") {
                     total_invoice_barang_lain += parseFloat(item.harga_barang_return * item.qty_return) || 0;
 
@@ -963,8 +952,8 @@
                 id: getID(),
                 no_faktur: "LAIN-LAIN", // Jika tidak ada `no_faktur`, gunakan default
                 qty_return: 1,
-                harga_barang_return: convertRupiahToNumber(totalTagihan),
-                amount_return: convertRupiahToNumber(totalTagihan),
+                harga_barang_return: destroyFormatRupiah(totalTagihan),
+                amount_return: destroyFormatRupiah(totalTagihan),
                 kode_barang: "LAIN-LAIN",
                 barang_name: namaTagihan,
                 sales_order_invoice_id: null,
@@ -995,15 +984,15 @@
         table.find('tbody').append(`
             <tr style="color:whitesmoke;">
                 <td colspan="7" style="text-align: right;">Total Pembayaran</td>
-                <td style="text-align:center;">${formatRupiah2(total_amount)}</td>
+                <td style="text-align:center;">${greatFormatRupiah(total_amount)}</td>
             </tr>
             <tr style="color:whitesmoke;">
                 <td colspan="7" style="text-align: right;">Total Sudah Dibayar</td>
-                <td class="total_dibayar" style="text-align:center;">${formatRupiah2(total_invoice)}</td>
+                <td class="total_dibayar" style="text-align:center;">${greatFormatRupiah(total_invoice)}</td>
             </tr>
             <tr style="color:whitesmoke;">
                 <td colspan="7" style="text-align: right;">Sisa Pembayaran</td>
-                <td class="total_amount_invoice" style="text-align:center;">${formatRupiah2(total_amount - total_invoice)}</td>
+                <td class="total_amount_invoice" style="text-align:center;">${greatFormatRupiah(total_amount - total_invoice)}</td>
             </tr>
         `);
 
@@ -1040,7 +1029,7 @@
             }
 
             // Tampilkan nilai yang sudah divalidasi dalam format Rupiah
-            $(this).val(formatRupiah2(numberValue));
+            $(this).val(greatFormatRupiah(numberValue));
         });
     }
 

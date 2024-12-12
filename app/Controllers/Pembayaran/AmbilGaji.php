@@ -117,10 +117,10 @@ class AmbilGaji extends BaseController
                 "hariKerja" => $p->hadir_final . " Hari",
                 "startDate" => date('d/m/Y', strtotime($p->start_date)),
                 "endDate" => date('d/m/Y', strtotime($p->end_date)),
-                "upahBersih" => "Rp " . number_format($p->nominal_uang_gaji, 2, ',', '.'),
-                "totalGajiLembur" => "Rp " . number_format($p->nominal_uang_gaji + $p->nominal_uang_lembur, 2, ',', '.'),
-                "totalPenguranganGaji" => "Rp " . number_format($p->nominal_pengurangan_gaji, 2, ',', '.'),
-                "sisaGaji" => "Rp " . number_format($p->nominal_gaji_diterima, 2, ',', '.'),
+                "upahBersih" => $p->nominal_uang_gaji,
+                "totalGajiLembur" => $p->nominal_uang_gaji + $p->nominal_uang_lembur,
+                "totalPenguranganGaji" => $p->nominal_pengurangan_gaji,
+                "sisaGaji" => $p->nominal_gaji_diterima,
                 "isAmbil" => $p->isAmbil,
                 "status"  => $p->isAmbil == '1' ? 'sudah' : 'belum'
             ]);

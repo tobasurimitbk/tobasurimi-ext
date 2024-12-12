@@ -226,7 +226,7 @@ class PembayaranPOLokal extends BaseController
                 'status_posting' => '0'
             ]);
 
-            $localPOPaymentPanjarModel->where('import_po_payment_id', $id)->where('type', 'BP')->delete();
+            $localPOPaymentPanjarModel->where('local_po_payment_id', $id)->where('type', 'BP')->delete();
 
             foreach ($panjarList as $p) {
                 if ($p->bayar_panjar != '') {
@@ -672,7 +672,7 @@ class PembayaranPOLokal extends BaseController
                 "supplier"          => $p->supplierName,
                 "payment_date"      => $p->payment_date,
                 "payment_method"    => strtoupper($p->payment_method),
-                "amount"            => number_format($p->amount ?? 0, 0, ',', '.'),
+                "amount"            => $p->amount,
                 'status_posting'    => $p->status_posting
             ]);
         }

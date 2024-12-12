@@ -823,7 +823,19 @@ class PembayaranInvoice extends BaseController
 
             if ($tipe_invoice == "LOKAL") {
                 $no_dokumen_req = $this->request->getVar("no_dokumen");
-                $no_dokumen_implode = "[" . implode("','", $no_dokumen_req) . "]";
+
+                // Validasi bahwa data adalah array
+                if (!is_array($no_dokumen_req)) {
+                    // Konversi ke array jika data bukan array
+                    $no_dokumen_req = $no_dokumen_req ? [$no_dokumen_req] : [];
+                }
+                
+                // Gunakan implode jika array tidak kosong
+                if (!empty($no_dokumen_req)) {
+                    $no_dokumen_implode = "[" . implode("','", $no_dokumen_req) . "]";
+                } else {
+                    $no_dokumen_implode = "[]"; // Default jika array kosong
+                }
 
                 $id = $this->pembayaranInvoiceModel->insert([
                     'company_id' => $this->this_company_id,
@@ -972,7 +984,19 @@ class PembayaranInvoice extends BaseController
     public function updateInvoice()
     {
         $no_dokumen_req = $this->request->getVar("no_dokumen");
-        $no_dokumen_implode = "['" . implode("','", $no_dokumen_req) . "']";
+
+                // Validasi bahwa data adalah array
+                if (!is_array($no_dokumen_req)) {
+                    // Konversi ke array jika data bukan array
+                    $no_dokumen_req = $no_dokumen_req ? [$no_dokumen_req] : [];
+                }
+                
+                // Gunakan implode jika array tidak kosong
+                if (!empty($no_dokumen_req)) {
+                    $no_dokumen_implode = "[" . implode("','", $no_dokumen_req) . "]";
+                } else {
+                    $no_dokumen_implode = "[]"; // Default jika array kosong
+                }
 
         try {
             $id = decrypt($this->request->getVar('id'));
@@ -1009,7 +1033,6 @@ class PembayaranInvoice extends BaseController
                 'valas_id' => $this->request->getVar('valas'),
                 'keterangan' =>  $this->request->getVar('keterangan'),
                 'tanggal' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
-                'total_invoice' => repairDouble($this->request->getVar('total_amount_invoice')),
                 'potongan' => $this->request->getVar('potongan') ? repairDouble($this->request->getVar('potongan')) : 0,
                 'total_bayar' =>  $updatedTotalBayar,
                 'akun_kas' => $this->request->getVar('akun_kas'),

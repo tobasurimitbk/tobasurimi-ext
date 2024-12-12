@@ -236,19 +236,31 @@
             },
             {
                 data: "upahBersih",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(data);
+                }
             },
             {
                 data: "totalGajiLembur",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(data);
+                }
             },
             {
                 data: "totalPenguranganGaji",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(data);
+                }
             },
             {
                 data: "sisaGaji",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(data);
+                }
             },
             {
                 data: "status",

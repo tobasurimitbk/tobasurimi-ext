@@ -742,8 +742,8 @@ class PembayaranPOImport extends BaseController
                 "detail_id"         => encrypt($data->id),
                 "kode_barang"       => $data->kode_barang,
                 "nama_barang"       => $data->barang_name . ' - ' . $data->spesifikasi,
-                "qty_order"         => number_format($data->qty),
-                "total_harga"       => number_format($data->total),
+                "qty_order"         => $data->qty,
+                "total_harga"       => $data->total,
                 "total_harga_number" => intval($data->total),
             ];
             $addCondition['po_type'] == "BAKU" ? $entry["id"] = encrypt($data->rm_import_po_id) : $entry["id"] = encrypt($data->am_purchase_order_id);

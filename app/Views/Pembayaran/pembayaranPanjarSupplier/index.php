@@ -66,7 +66,7 @@
 
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control name" id="total_panjar" name="total_panjar" placeholder="Nama" oninput="preventNegativeInput(this)" onkeyup="this.value = formatRupiah(this.value)">
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="total_panjar" name="total_panjar" placeholder="Nama" oninput="preventNegativeInput(this)" onkeyup="this.value = greatFormatRupiah(this.value)">
                                 <label for="floatingInput">Total Panjar</label>
                             </div>
                         </div>
@@ -692,6 +692,8 @@
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     let data = new FormData(document.querySelector(".create-form"));
+                    let totalPanjar = destroyFormatRupiah($('#total_panjar').val());
+                    data.set('total_panjar', totalPanjar);
                     let id = $(".id").val();
 
                     $.ajax({

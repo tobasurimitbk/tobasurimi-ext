@@ -124,6 +124,19 @@ class TandaTerimaFakturModel extends Model
         ];
     }
 
+    public function getListTandaTerimaFakturNotProcessed($supplierID, $divisiID)
+    {
+        $tandaTerimaFakturModel = new TandaTerimaFakturModel();
+        $res = $tandaTerimaFakturModel
+            ->where('supplier_id', $supplierID)
+            ->where('divisi_id', $divisiID)
+            ->select('id, faktur_no')
+            ->findAll();
+
+
+        return $res;
+    }
+
     public function getTandaTerimaFakturInPembayaran($tandaTerimaFakturID)
     {
         $condition = [

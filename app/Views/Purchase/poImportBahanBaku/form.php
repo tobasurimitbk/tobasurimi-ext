@@ -865,6 +865,12 @@
                             formData.append("note", note);
                             formData.append("total", totalHarga);
                             formData.append("direktur", direktur);
+                            listBarang = listBarang.map(item => {
+                                return {
+                                    ...item,
+                                    total: destroyFormatRupiah(item.total)
+                                };
+                            });
                             formData.append("listBarang", JSON.stringify(listBarang));
 
                             $.ajax({
@@ -963,6 +969,12 @@
                             formData.append("note", note);
                             formData.append("total", totalHarga);
                             formData.append("direktur", direktur);
+                            listBarang = listBarang.map(item => {
+                                return {
+                                    ...item,
+                                    total: destroyFormatRupiah(item.total)
+                                };
+                            });
                             formData.append("listBarang", JSON.stringify(listBarang));
 
                             $.ajax({
