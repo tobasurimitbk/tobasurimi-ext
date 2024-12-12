@@ -1658,7 +1658,7 @@
         $.each(listStockSelectedBahanBaku, function(i, v) {
             totalQty += parseFloat(listStockSelectedBahanBaku[i].qty2) || 0;
         });
-        $('.nilai-total-bahan-baku-request').text(totalQty.toFixed(4));
+        $('.nilai-total-bahan-baku-request').text(greatFormatRupiah(totalQty));
     }
 
     function drawTableSelectedItemBahanSetengahJadi(data) {
@@ -1830,7 +1830,7 @@
         $.each(listStockSelectedBahan, function(i, v) {
             totalQty += parseFloat(listStockSelectedBahan[i].qty2) || 0;
         });
-        $('.nilai-total-barang-scrap-request').text(totalQty.toFixed(4));
+        $('.nilai-total-barang-scrap-request').text(greatFormatRupiah(totalQty));
     }
 
     function drawTableSelectedItemBahanJadi(data) {
@@ -1923,7 +1923,7 @@
         $.each(listStockSelectedBahanJadi, function(i, v) {
             totalQty += parseFloat(listStockSelectedBahanJadi[i].qty2) || 0;
         });
-        $('.nilai-total-barang-jadi-request').text(totalQty.toFixed(4));
+        $('.nilai-total-barang-jadi-request').text(greatFormatRupiah(totalQty));
     }
 
     function getIDListDataSelected() {
