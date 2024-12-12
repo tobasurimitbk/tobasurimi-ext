@@ -195,13 +195,13 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-floating mb-3">
-                                    <input <?= $isUsed ? 'disabled' : '' ?> onkeyup="this.value = greatFormatRupiah(this.value); hitungPotonganTambahan(); preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control potongan" name="potongan" id="potongan" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['potongan'] : '' ?> " placeholder="Keterangan">
+                                    <input <?= $isUsed ? 'disabled' : '' ?> onkeyup="this.value = greatFormatRupiah(this.value); hitungPotonganTambahan()" autocomplete="one-time-code" type="text" class="form-control potongan" name="potongan" id="potongan" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['potongan'] : '' ?> " placeholder="Keterangan">
                                     <label for="floatingInput">Potongan (Opsional)</label>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-floating mb-3">
-                                    <input <?= $isUsed ? 'disabled' : '' ?> onkeyup="this.value = greatFormatRupiah(this.value); hitungPotonganTambahan(); preventNegativeInput(this)"autocomplete="one-time-code" type="text" class="form-control tambahan" name="tambahan" id="tambahan" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['tambahan'] : '' ?> " placeholder="Keterangan">
+                                    <input <?= $isUsed ? 'disabled' : '' ?> onkeyup="this.value = greatFormatRupiah(this.value); hitungPotonganTambahan()"autocomplete="one-time-code" type="text" class="form-control tambahan" name="tambahan" id="tambahan" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['tambahan'] : '' ?> " placeholder="Keterangan">
                                     <label for="floatingInput">Penambahan (Opsional)</label>
                                 </div>
                             </div>
