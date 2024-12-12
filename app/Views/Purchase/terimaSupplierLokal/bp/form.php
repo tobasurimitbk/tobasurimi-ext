@@ -195,13 +195,13 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-floating mb-3">
-                                    <input <?= $isUsed ? 'disabled' : '' ?> oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control potongan" onkeyup="hitungPotonganTambahan()" name="potongan" id="potongan" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['potongan'] : '' ?> " placeholder="Keterangan">
+                                    <input <?= $isUsed ? 'disabled' : '' ?> onkeyup="this.value = greatFormatRupiah(this.value);" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control potongan" onkeyup="hitungPotonganTambahan()" name="potongan" id="potongan" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['potongan'] : '' ?> " placeholder="Keterangan">
                                     <label for="floatingInput">Potongan (Opsional)</label>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-floating mb-3">
-                                    <input <?= $isUsed ? 'disabled' : '' ?> oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control tambahan" name="tambahan" onkeyup="hitungPotonganTambahan()" id="tambahan" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['tambahan'] : '' ?> " placeholder="Keterangan">
+                                    <input <?= $isUsed ? 'disabled' : '' ?> onkeyup="this.value = greatFormatRupiah(this.value);" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control tambahan" name="tambahan" onkeyup="hitungPotonganTambahan()" id="tambahan" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['tambahan'] : '' ?> " placeholder="Keterangan">
                                     <label for="floatingInput">Penambahan (Opsional)</label>
                                 </div>
                             </div>
@@ -765,8 +765,8 @@
     });
 
     function hitungPotonganTambahan() {
-        var potongan = Number($('.potongan').val() || 0);
-        var tambahan = Number($('.tambahan').val() || 0);
+        var potongan = Number(destroyFormatRupiah($('.potongan').val()) || 0);
+        var tambahan = Number(destroyFormatRupiah($('.tambahan').val()) || 0);
         var harga = 0;
         $.each(list_penerimaan_selected, function(i, v) {
             harga += (Number(v.qty_akan_diterima) * Number(v.harga));
