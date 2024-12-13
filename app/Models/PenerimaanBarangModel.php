@@ -150,6 +150,7 @@ class PenerimaanBarangModel extends Model
                     suppliers.name as supplier_name, 
                     COUNT(penerimaan_barang_detail.id) AS itemCount, 
                     penerimaan_barang_detail.harga,
+                    SUM(penerimaan_barang_detail.sub_total) as harga_sub_total,
                     bc_23.no_aju AS BC23_AJU,
                     bc_40.no_aju AS BC40_AJU,";
         $penerimaanBarangDataQry = $this->asObject()

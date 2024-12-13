@@ -1744,7 +1744,7 @@
         $.each(listStockSelectedBahanSetengahJadi, function(i, v) {
             totalQty += parseFloat(listStockSelectedBahanSetengahJadi[i].qty2) || 0;
         });
-        $('.nilai-total-barang-setengah-jadi-request').text(totalQty.toFixed(4));
+        $('.nilai-total-barang-setengah-jadi-request').text(greatFormatRupiah(totalQty));
     }
 
     function drawTableSelectedItemBahan(data) {

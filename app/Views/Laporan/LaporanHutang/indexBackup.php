@@ -22,7 +22,7 @@
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <div class="input-group" style="height: 50px;">
-                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Transaksi">
+                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal">
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                                 </div>
@@ -30,7 +30,7 @@
                         </div>
                         <div class="col-md-3 mb-3">
                             <div class="input-group" style="height: 50px;">
-                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal Transaksi">
+                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal">
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                                 </div>
@@ -156,15 +156,9 @@
             }, {
                 data: "nominal_idr",
                 className: "text-center",
-                render: function(data) {
-                    return greatFormatRupiah(data);
-                }
             }, {
                 data: "remaining_idr",
                 className: "text-center",
-                render: function(data) {
-                    return greatFormatRupiah(data);
-                }
             }, ],
             columnDefs: [{
                 defaultContent: "-",
