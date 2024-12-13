@@ -211,7 +211,7 @@
 
         <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
             <span>TERBILANG:</span>
-            <span style="text-transform: uppercase;"><?= $terbilang . ' RUPIAH' ?></span>
+            <span style="text-transform: uppercase;"><?= penyebut($totalPengeluaran) . ' RUPIAH' ?></span>
         </div>
 
         <table class="w-100 sign-table border-collapse">
@@ -343,7 +343,7 @@
 
         <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
             <span>TERBILANG:</span>
-            <span style="text-transform: uppercase;"><?= $taxReturnTerbilang . ' RUPIAH' ?></span>
+            <span style="text-transform: uppercase;"><?= penyebut($totalPenerimaan) . ' RUPIAH' ?></span>
         </div>
 
         <table class="w-100 sign-table border-collapse">
