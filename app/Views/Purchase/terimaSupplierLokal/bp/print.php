@@ -189,7 +189,7 @@
                 <?php $totalTaxAmt += $t->tax_amt; ?>
                 <tr>
                     <td></td>
-                    <td><?= $t->tax_type . " - " . $t->tax_inv_no ?></td>
+                    <td><?= $t->tax_type . " - " . $t->tax_inv_no . (!empty($t->tax_note) ? " - " . $t->tax_note : "")?></td>
                     <td class="txt-right"><?= number_format($t->tax_amt, 2) ?></td>
                     <td></td>
                 </tr>
@@ -323,7 +323,7 @@
             <?php foreach ($taxData as $t) : ?>
             <?php $totalPenerimaan += $t->tax_amt; ?>
                 <tr>
-                    <td><?= $t->tax_type . " - " . $t->tax_inv_no ?></td>
+                    <td><?= $t->tax_type . " - " . $t->tax_inv_no . (!empty($t->tax_note) ? " - " . $t->tax_note : "") ?></td>
                     <td class="txt-right"><?= number_format($t->tax_amt, 2) ?></td>
                     <td></td>
                 </tr>
