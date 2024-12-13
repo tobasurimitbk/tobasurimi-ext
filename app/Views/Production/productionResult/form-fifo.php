@@ -1586,7 +1586,7 @@
                             listStockAsal[i].warehouseText = warehouseText;
                             listStockAsal[i].barang1_id = barangID;
                             listStockAsal[i].barang2_id = spekID;
-                            listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
+                            listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
                             list_items_barang_digunakan.push(listStockAsal[i]);
                             qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                         }

@@ -99,9 +99,9 @@ class Hutang extends BaseController
         // exit;
         foreach ($res['data'] as $data) {
             $journal_num = '-';
-            $description = 'description';
+            $description = '-';
             $invoice = $data->no_invoice;
-            $date = 'date';
+            $date = '-';
             $tax_report = '-';
             $supplier = $data->supplier_name;
             $nominal_idr = 0.0;
@@ -216,8 +216,8 @@ class Hutang extends BaseController
                 "date"                  => $date,
                 "tax_report"            => $tax_report,
                 "supplier"              => $supplier,
-                "nominal_idr"           => number_format(floatval($nominal_idr), 2, ',', '.'),
-                "remaining_idr"         => number_format(floatval($remaining_idr), 2, ',', '.'),
+                "nominal_idr"           => floatval($nominal_idr),
+                "remaining_idr"         => floatval($remaining_idr),
             ]);
         }
 

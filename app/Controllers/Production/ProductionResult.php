@@ -99,11 +99,15 @@ class ProductionResult extends BaseController
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
+        $currentCompanyId =  session()->get('login')->this_company_id;
         foreach ($productionResultData['data'] as &$data) {
-            $qtyHasilProduksi = 0;
+            $qtyHasilProduksi = 0; // Dalam Kg
+            $qtyHasilProduksiKaleng = 0; // Dalam Kaleng
+
             $productionResDetailData = $this->productionResultDetailModel->where('production_result_id', $data->id)->where('type', 'JADI')->findAll();
             foreach ($productionResDetailData as $value) {
-                $qtyHasilProduksi += (float) $value['qty_isi'];
+                $qtyHasilProduksi += (float) $value['qty_isi']; // Dalam Kg
+                $qtyHasilProduksiKaleng += (float) $value['qty']; // Dalam Kaleng
             }
             $data->qtyHasilProduksi = $qtyHasilProduksi;
             array_push($dataSupplier, [
@@ -115,7 +119,7 @@ class ProductionResult extends BaseController
                 "barangName"    => $data->barangName,
                 "is_posted"    => $data->is_posted,
                 "receive_date"  => $data->receives_date,
-                "qty_hasil"  => $data->qtyHasilProduksi,
+                "qty_hasil"  => (in_array($currentCompanyId, [2, 16])) ?  number_format($qtyHasilProduksiKaleng) . " KALENG" : number_format($data->qtyHasilProduksi) . " KG",
             ]);
         }
 

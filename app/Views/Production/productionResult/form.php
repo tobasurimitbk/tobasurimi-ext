@@ -1643,7 +1643,7 @@
             // Simpan nilai baru
             list_items_barang_jadi[index].qty_jadi = valueQtyBarangJadi;
             list_items_barang_jadi[index].berat_isi_jadi = valueBeratBarangJadi;
-            list_items_barang_jadi[index].qty_isi_jadi = jumlahQtyBeratJadi.toFixed(4);
+            list_items_barang_jadi[index].qty_isi_jadi = jumlahQtyBeratJadi.toFixed(2);
 
             // Render ulang untuk memperbarui footer
             drawTableBarangJadi();

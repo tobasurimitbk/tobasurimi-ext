@@ -190,7 +190,7 @@ class JurnalUmum extends BaseController
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
                 "transaksi_type_name"   => $data->transaksi_type_name,
-                "no_transaksi"          => $data->no_transaksi,
+                "no_transaksi"          => $data->metode_input == 'system' ? $data->no_transaksi : $data->no_bukti,
                 "tanggal_transaksi"     => date('d/m/Y', strtotime($data->tanggal_transaksi)),
                 "uraian_transaksi"      => $data->uraian_transaksi,
                 "invoice"               => isset($supplierName) ? $supplierName : "0 : ",
