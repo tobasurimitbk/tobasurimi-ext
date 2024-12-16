@@ -1,5 +1,11 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
+<style>
+    .form-switch-lg .form-check-input {
+        width: 4rem;
+        height: 1.5rem;
+    }
+</style>
 <section class="section section-form">
 
     <div class="section-header">
@@ -128,6 +134,49 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label class="form-label font-weight-bold modal-sub-title" style="font-size: 14px;">Buatkan Penerimaan Barang Otomatis</label>
+                        <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input <?= !empty($bc27) ? ($bc27['penerimaan_otomatis'] == 1 ? 'checked' : '') : '' ?> class="form-check-input" value="1" type="checkbox" name="penerimaan_otomatis" id="penerimaan_otomatis">
+                                <label class="form-check-label" for="penerimaan_otomatis"></label>
+                            </div>
+                        </div>
+                        <small>
+                            <i class="text-dark">
+                                Ketika dichecklist, Barang yang akan dipindahkan akan secara otomatis diterima oleh company tujuan
+                            </i>
+                        </small>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3 form-penerimaan-mutasi" style="height: 50px;">
+                            <select class="form-select divisi_tujuan_id" id="divisi_tujuan_id" name="divisi_tujuan_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php if (isset($divisi)): ?>
+                                    <?php foreach ($divisi as $d) : ?>
+                                        <option <?= !empty($bc27) ? ($bc27['divisi_tujuan_id'] == $d['id'] ? 'checked' : "") : '' ?> value="<?= $d["id"]; ?>" <?= !empty($bc27) ? ($bc27['divisi_tujuan_id'] === $d["id"] ? "selected" : "") : ""; ?>><?= $d["divisi"]; ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3 form-penerimaan-mutasi" style="height: 50px;">
+                            <select class="form-select warehouse_tujuan_id" id="warehouse_tujuan_id" name="warehouse_tujuan_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php if (isset($warehouse)): ?>
+                                    <?php foreach ($warehouse as $w) : ?>
+                                        <option <?= !empty($bc27) ? ($bc27['warehouse_tujuan_id'] == $w['id'] ? 'checked' : "") : '' ?> value="<?= $w["id"]; ?>" <?= !empty($bc27) ? ($bc27['warehouse_tujuan_id'] === $w["id"] ? "selected" : "") : ""; ?>><?= $w["warehouse_name"]; ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
+                        </div>
+                    </div>
+                </div>
+
             </form>
 
             <div class="row mt-2">
@@ -151,13 +200,14 @@
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Qty Mutasi</th>
                                     <th style="text-align: center;">Satuan</th>
+                                    <th style="text-align: center;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table">
                             </tbody>
                             <tfoot class="foot-detail-table" id="foot-detail-table">
                                 <tr>
-                                    <td colspan="10" style="text-align: center;">
+                                    <td colspan="11" style="text-align: center;">
                                         Tidak Ada Barang
                                     </td>
                                 </tr>
@@ -228,10 +278,105 @@
         </div>
     </div>
 </div>
+
+<div class="modal add-modal" id="update_barang_masuk" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detail Barang Masuk (BC 2.7 Incoming)</h5>
+            </div>
+            <div class="modal-body">
+                <form class="create-form-barang-masuk" role="form" method="POST" enctype="multipart/form-data">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="tipe_barang" id="tipe_barang" class="tipe_barang">
+                    <input type="hidden" name="mutasi_global_detail_id" id="mutasi_global_detail_id" class="mutasi_global_detail_id">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" readonly type="text" class="form-control company_tujuan_name" id="company_tujuan_name" name="company_tujuan_name" placeholder="Company Tujuan">
+                                <label for="floatingInput">Company Tujuan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" readonly type="text" class="form-control divisi_penerima_name" id="divisi_penerima_name" name="divisi_penerima_name" placeholder="Departemen Penerima">
+                                <label for="floatingInput">Departemen Penerima</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" readonly type="text" class="form-control warehouse_penerima_name" id="warehouse_penerima_name" name="warehouse_penerima_name" placeholder="Warehouse Penerima">
+                                <label for="floatingInput">Warehouse Penerima</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" readonly type="text" class="form-control barang_keluar_name" id="barang_keluar_name" name="barang_keluar_name" placeholder="Barang Keluar">
+                                <label for="floatingInput">Barang Dikirim</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" readonly type="text" class="form-control dokumen_mutasi_name" id="dokumen_mutasi_name" name="dokumen_mutasi_name" placeholder="Dokumen Mutasi">
+                                <label for="floatingInput">Dokumen Mutasi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" readonly type="text" class="form-control dokumen_asal_name" id="dokumen_asal_name" name="dokumen_asal_name" placeholder="Dokumen Asal">
+                                <label for="floatingInput">Dokumen Asal</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" readonly type="text" class="form-control tipe_barang_name" id="tipe_barang_name" name="tipe_barang_name" placeholder="Tipe Barang">
+                                <label for="floatingInput">Tipe Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating" style="height: 50px;">
+                                <select <?= !empty($bc27) ? ($bc27['status_posting'] == '1' ? 'disabled' : '') : '' ?> class="form-select stock_mutasi_id" name="stock_mutasi_id" id="stock_mutasi_id">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Pilih Barang Masuk</label>
+                            </div>
+                            <small class=" mb-3">
+                                <i>
+                                    Hanya muncul barang yang ada di inventori sesuai dengan departemen dan warehouse penerima
+                                </i>
+                            </small>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input <?= !empty($bc27) ? ($bc27['status_posting'] == '1' ? 'disabled' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control qty_diterima_current" id="qty_diterima_current" name="qty_diterima_current" placeholder="Qty Diterima Sekarang" oninput="preventNegativeInput(this)">
+                                <label for="floatingInput">Qty Barang Masuk</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-barang-masuk mr-2">Kembali</button>
+                <?php if (!empty($bc27)) : ?>
+                    <?php if ($bc27['status_posting'] != '1') : ?>
+                        <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
+                    <?php else : ?>
+
+                    <?php endif; ?>
+                <?php else : ?>
+                    <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
     var listData = [];
+    $('.form-penerimaan-mutasi').hide();
 
     // INIT PAS EDIT
     <?php if (!empty($bc27)) : ?>
@@ -248,6 +393,12 @@
                 drawTable(listData);
             }
         });
+
+        <?php if ($bc27['penerimaan_otomatis'] == 1): ?>
+            $('.form-penerimaan-mutasi').show();
+        <?php else: ?>
+            $('.form-penerimaan-mutasi').hide();
+        <?php endif; ?>
     <?php endif; ?>
 
     $('#company_tujuan_id').select2({
@@ -256,6 +407,31 @@
         allowClear: true
     }).change(function() {
         getListMutasiGobal();
+        dropdownDivisi();
+    });
+
+    $('#divisi_tujuan_id').select2({
+        placeholder: "Pilih Departemen Tujuan",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        dropdownWarehouse();
+    });
+
+    $('#warehouse_tujuan_id').select2({
+        placeholder: "Pilih Warehouse Tujuan",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+
+    });
+
+    $('#stock_mutasi_id').select2({
+        placeholder: "Pilih Barang Masuk",
+        theme: "bootstrap-5",
+        allowClear: true,
+        dropdownParent: $('#update_barang_masuk')
+    }).change(function() {
 
     });
 
@@ -273,13 +449,26 @@
         getListMutasiDetail();
     });
 
-    $("#company_tujuan_id,#mutasi_global_id")
+    $("#company_tujuan_id,#mutasi_global_id,#divisi_tujuan_id,#warehouse_tujuan_id,#mutasi_global_id,#stock_mutasi_id")
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('#penerimaan_otomatis').on('change', function() {
+        var checked = $(this).is(':checked');
+        if (checked) {
+            $('.form-penerimaan-mutasi').show();
+        } else {
+            $('#divisi_tujuan_id').val(null).change();
+            $('#warehouse_tujuan_id').val(null).change();
+            $('.form-penerimaan-mutasi').hide();
+        }
+        drawTable(listData);
+    });
+
 
     // NO AJU ACTION
     $('#no_urut_dokumen').keyup(function() {
@@ -378,85 +567,98 @@
     $('.btn-submit-parent').click(function(e) {
         e.preventDefault();
         if ($('.create-form').valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Data ?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var formData = new FormData(document.querySelector(".create-form"));
-                    var id = $('#id').val();
-                    if (id) {
-                        // UPDATE
-                        $.ajax({
-                            url: `<?= base_url("bea-cukai-bc-27/update"); ?>`,
-                            method: "POST",
-                            data: formData,
-                            beforeSend: function(xhr) {
-                                setLoading();
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            complete: function() {
-                                stopLoading();
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(res) {
-                                if (res.status) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: res.message,
-                                        confirmButtonColor: '#4e73df',
-                                        confirmButtonText: 'Ok'
-                                    }).then((result) => {
-                                        location.href = "<?= base_url('bea-cukai-bc-27') ?>"
-                                    });
+            var divisiTujuanId = $('#divisi_tujuan_id option:selected').val();
+            var warehouseTujuanId = $('#warehouse_tujuan_id option:selected').val();
+            var checked = $('#penerimaan_otomatis').is(':checked');
 
-                                }
-                            }
-                        })
-                    } else {
-                        // CREATE
-                        $.ajax({
-                            url: `<?= base_url("bea-cukai-bc-27/save"); ?>`,
-                            method: "POST",
-                            data: formData,
-                            beforeSend: function(xhr) {
-                                setLoading();
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            complete: function() {
-                                stopLoading();
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(res) {
-                                if (res.status) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: res.message,
-                                        confirmButtonColor: '#4e73df',
-                                        confirmButtonText: 'Ok'
-                                    }).then((result) => {
-                                        location.href = "<?= base_url('bea-cukai-bc-27') ?>"
-                                    });
+            if ((divisiTujuanId == '' || divisiTujuanId == undefined || warehouseTujuanId == '' || warehouseTujuanId == '') && checked) {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Departemen & Warehouse Penerimaan Barang Mutasi Wajib Diisi",
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                })
+            } else {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data ?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Ya',
+                    cancelButtonText: 'Kembali',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var formData = new FormData(document.querySelector(".create-form"));
+                        var id = $('#id').val();
+                        if (id) {
+                            // UPDATE
+                            $.ajax({
+                                url: `<?= base_url("bea-cukai-bc-27/update"); ?>`,
+                                method: "POST",
+                                data: formData,
+                                beforeSend: function(xhr) {
+                                    setLoading();
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                complete: function() {
+                                    stopLoading();
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(res) {
+                                    if (res.status) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: res.message,
+                                            confirmButtonColor: '#4e73df',
+                                            confirmButtonText: 'Ok'
+                                        }).then((result) => {
+                                            location.href = "<?= base_url('bea-cukai-bc-27') ?>"
+                                        });
 
+                                    }
                                 }
-                            }
-                        })
+                            })
+                        } else {
+                            // CREATE
+                            $.ajax({
+                                url: `<?= base_url("bea-cukai-bc-27/save"); ?>`,
+                                method: "POST",
+                                data: formData,
+                                beforeSend: function(xhr) {
+                                    setLoading();
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                complete: function() {
+                                    stopLoading();
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(res) {
+                                    if (res.status) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: res.message,
+                                            confirmButtonColor: '#4e73df',
+                                            confirmButtonText: 'Ok'
+                                        }).then((result) => {
+                                            location.href = "<?= base_url('bea-cukai-bc-27') ?>"
+                                        });
+
+                                    }
+                                }
+                            })
+                        }
                     }
-                }
-            })
+                })
 
+            }
         }
     });
 
@@ -464,6 +666,117 @@
         e.preventDefault();
         $('#modalUpdateNoAju').modal('hide');
     })
+
+    $('.btn-discard-barang-masuk ').click(function(e) {
+        e.preventDefault();
+        $('#update_barang_masuk').modal('hide');
+    })
+
+    var validatorBarangMasuk = $(".create-form-barang-masuk").validate({
+        rules: {
+            stock_mutasi_id: {
+                required: true
+            },
+            qty_diterima_current: {
+                required: true
+            },
+        },
+        messages: {
+            stock_mutasi_id: {
+                required: "Barang masuk wajib diisi"
+            },
+            qty_diterima_current: {
+                required: "Qty diterima masuk wajib diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    function displayDetailModal(id) {
+        // RESET VALIDATOR
+
+        validatorBarangMasuk.resetForm();
+        validatorBarangMasuk.reset();
+
+        var barangFirst = null;
+        $.each(listData, function(i, v) {
+            if (v.mutasi_global_detail_id == id) {
+                barangFirst = v;
+            }
+        });
+
+        var companyAsalName = $('#company_tujuan_id option:selected').text();
+        var barangDikirim = barangFirst.kode_barang + ' / ' + barangFirst.barang;
+        var dokumenMutasi = barangFirst.bc_mutasi_name + ' / ' + barangFirst.no_aju_mutasi;
+        var dokumenAsal = barangFirst.bc_type + ' / ' + barangFirst.no_aju;
+        var divisiPenerima = $('#divisi_tujuan_id option:selected').text();
+        var warehousePenerima = $('#warehouse_tujuan_id option:selected').text();
+        var tipeBarangText = barangFirst.type_barang_text;
+        var tipeBarang = barangFirst.tipe_barang;
+        var qtyDiterimaCurrent = barangFirst.qty;
+
+        $('#company_tujuan_name').val(companyAsalName.trim());
+        $('#barang_keluar_name').val(barangDikirim);
+        $('#dokumen_mutasi_name').val(dokumenMutasi);
+        $('#dokumen_asal_name').val(dokumenAsal);
+        $('#divisi_penerima_name').val(divisiPenerima.trim());
+        $('#warehouse_penerima_name').val(warehousePenerima.trim());
+        $('#tipe_barang_name').val(tipeBarangText);
+        $('#qty_diterima_current').val(qtyDiterimaCurrent);
+        // APPEND TO HIDDEN ELEMENT
+        $('#mutasi_global_detail_id').val(id);
+        $('#tipe_barang').val(tipeBarang);
+        // AJAX DROPDOWN BARANG
+        $.ajax({
+            url: `<?= base_url('penerimaan-mutasi/list-barang-masuk'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                tipe_barang: tipeBarang,
+                divisi_id: $("#divisi_tujuan_id option:selected").val(),
+                warehouse_id: $("#warehouse_tujuan_id option:selected").val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                $('#update_detail_barang').modal('show')
+
+                $("#stock_mutasi_id").empty()
+                $("#stock_mutasi_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $("#stock_mutasi_id").append(`<option data-stock_mutasi_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.stock_id}">(${item.kode_barang}) ${item.barang}</option>`)
+                })
+                $("#stock_mutasi_id").val(barangFirst.stock_mutasi_id).change();
+
+                $('#update_barang_masuk').modal('show');
+            }
+        });
+
+    }
+
 
     function noAjuShowModal() {
         var noAju = $('#no_pengajuan').val();
@@ -541,6 +854,56 @@
         });
     }
 
+    function dropdownDivisi() {
+        $.ajax({
+            url: `<?= base_url('bea-cukai-bc-27/divisi'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                company_tujuan_id: $("#company_tujuan_id option:selected").val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                $("#divisi_tujuan_id").empty()
+                $("#divisi_tujuan_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $("#divisi_tujuan_id").append(`<option value="${item.id}">${item.divisi}</option>`)
+                })
+                $("#divisi_tujuan_id").val();
+            }
+        });
+    }
+
+    function dropdownWarehouse() {
+        $.ajax({
+            url: `<?= base_url('jasa-vendor-out/warehouse'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                divisi_id: $("#divisi_tujuan_id option:selected").val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                $("#warehouse_tujuan_id").empty()
+                $("#warehouse_tujuan_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $("#warehouse_tujuan_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
+                })
+                $("#warehouse_tujuan_id").val();
+            }
+        });
+    }
+
     function drawTable(listData) {
         var no = 1;
         const table = $('#dataTable');
@@ -549,9 +912,11 @@
 
         if (listData.length === 0) {
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="10" style="text-align:center">Tidak Ada Barang</td>'));
+            newRow.append($('<td colspan="11" style="text-align:center">Tidak Ada Barang</td>'));
             table.find('tfoot').append(newRow);
         } else {
+            var checked = $('#penerimaan_otomatis').is(':checked');
+
             $.each(listData, function(i, v) {
                 var newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append($('<td style="text-align: center;">').html(
@@ -568,6 +933,14 @@
                 newRow.append($('<td style="text-align: center;">').text(v.barang));
                 newRow.append($('<td style="text-align: center;">').text(v.qty));
                 newRow.append($('<td style="text-align: center;">').text(v.satuan));
+                if (checked) {
+                    newRow.append($('<td style="text-align: center;">').html(`
+                    <button type="button" class="btn btn-primary" onclick="displayDetailModal(${v.mutasi_global_detail_id})" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
+                `));
+                } else {
+                    newRow.append($('<td style="text-align: center;">').text(''));
+                }
+
                 table.find('tbody').append(newRow);
             });
         }
