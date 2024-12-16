@@ -63,7 +63,6 @@ class Auth extends BaseController
                     $arr_companies = json_decode($res_user[0]["company_role"], true);
                     $in_company_id = implode(', ', array_column($arr_companies, 'company_id'));
                     $in_roles_id = implode(', ', array_column($arr_companies, 'role_id'));
-                    $arr_divisi_access_id = array_column($arr_companies, 'divisi_access_id');
 
                     $res_company = $this->CompaniesModel->get_by_in_id($in_company_id);
                     $res_roles = $this->RolesModel->get_by_in_id($in_roles_id);
@@ -75,7 +74,14 @@ class Auth extends BaseController
                                 if ($res_company[$i]["id"] == $arr_companies[$k]["company_id"] && $res_roles[$j]["id"] == $arr_companies[$k]["role_id"]) {
                                     $res_company[$i]["role_id"] = $res_roles[$j]["id"];
                                     $res_company[$i]["role_name"] = $res_roles[$j]["name"];
-                                    $res_company[$i]["divisi_access_id"] = $arr_divisi_access_id[$i];
+                                    // Access Divisi Id
+                                    $company_id = $res_company[$i]["id"];
+                                    $filtered_data_company_role = array_filter($arr_companies, function ($item) use ($company_id) {
+                                        return $item['company_id'] == $company_id;
+                                    });
+                                    $filtered_data_company_role = reset($filtered_data_company_role);
+                                    $this_access_divisi_id = $filtered_data_company_role ? $filtered_data_company_role['divisi_access_id'] : null;
+                                    $res_company[$i]["divisi_access_id"] = $this_access_divisi_id;
                                     break;
                                 }
                             }
@@ -130,7 +136,11 @@ class Auth extends BaseController
                         }
 
                         $this_company_id = $res_company[0]["id"];
-                        $this_access_divisi_id = $res_company[0]["divisi_access_id"];
+                        $filtered_data_company_role = array_filter($arr_companies, function ($item) use ($this_company_id) {
+                            return $item['company_id'] == $this_company_id;
+                        });
+                        $filtered_data_company_role = reset($filtered_data_company_role);
+                        $this_access_divisi_id = $filtered_data_company_role ? $filtered_data_company_role['divisi_access_id'] : null;
                         $this_company = $res_company[0]["company"];
                         $this_access = $arr;
                         $this_role_id = $res_roles[0]["id"];
