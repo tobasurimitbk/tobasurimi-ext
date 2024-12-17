@@ -107,7 +107,12 @@ class MutasiGlobalDetailModel extends Model
             // ------------
             $stockList['bc_mutasi_id'] = $bcMutasiId['id'];
             $stockList['bc_mutasi_name'] = $bcMutasiId['value'];
-            $stockList['no_aju_mutasi'] = $bc27['no_aju'];
+            $stockList['no_aju_mutasi'] = $bc27 == null ? "-" : $bc27['no_aju'];
+            $stockList['company_tujuan_id'] = $m['company_tujuan_id'];
+            $stockList['divisi_tujuan_id'] = $m['divisi_tujuan_id'];
+            $stockList['warehouse_tujuan_id'] = $m['warehouse_tujuan_id'];
+            $stockList['stock_mutasi_id'] = $m['stock_mutasi_id'];
+            $stockList['qty_diterima'] = $m['qty_diterima'];
 
             array_push($result, $stockList);
         }

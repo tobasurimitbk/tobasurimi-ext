@@ -225,7 +225,10 @@ class BC27 extends BaseController
 
     public function createAction()
     {
-        $this->bc27Model->insert([
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        $id = $this->bc27Model->insert([
             'company_asal_id' => $this->this_company_id,
             'company_tujuan_id' => $this->request->getVar('company_tujuan_id'),
             'mutasi_global_id' => $this->request->getVar('mutasi_global_id'),
@@ -238,6 +241,40 @@ class BC27 extends BaseController
             'createdAt' => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))))
         ]);
 
+        $bc27 = $this->bc27Model->where('id', $id)->first();
+        $barang = json_decode($_POST['barang']);
+        if ($bc27['penerimaan_otomatis'] == 1) {
+            // Penerimaan Otomatis
+            foreach ($barang as $b) {
+                $this->mutasiGlobalDetailModel->update($b->mutasi_global_detail_id, [
+                    'company_tujuan_id' => $bc27['company_tujuan_id'],
+                    'divisi_tujuan_id' => $bc27['divisi_tujuan_id'],
+                    'warehouse_tujuan_id' => $bc27['warehouse_tujuan_id'],
+                    'stock_mutasi_id' => $b->stock_mutasi_id,
+                    'qty_diterima' => $b->qty_diterima
+                ]);
+            }
+        } else {
+            // Bukan Penrimaan Otomatis
+            foreach ($barang as $b) {
+                $this->mutasiGlobalDetailModel->update($b->mutasi_global_detail_id, [
+                    'company_tujuan_id' => null,
+                    'divisi_tujuan_id' => null,
+                    'warehouse_tujuan_id' => null,
+                    'stock_mutasi_id' => null,
+                    'qty_diterima' => null,
+                ]);
+            }
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() == false) {
+            $db->transRollback();
+        }
+
+        $db->transCommit();
+
         return response()->setJSON([
             'status' => true,
             'message' => "Dokumen BC 27 Berhasil Disimpan"
@@ -247,6 +284,9 @@ class BC27 extends BaseController
     public function updateAction()
     {
         $id = decrypt($this->request->getVar('id'));
+
+        $db = \Config\Database::connect();
+        $db->transStart();
 
         $this->bc27Model->update($id, [
             'company_asal_id' => $this->this_company_id,
@@ -259,6 +299,40 @@ class BC27 extends BaseController
             'warehouse_tujuan_id' => empty($this->request->getVar('penerimaan_otomatis')) ? null : $this->request->getVar('warehouse_tujuan_id'),
             'createdAt' => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))))
         ]);
+
+        $barang = json_decode($_POST['barang']);
+        $bc27 = $this->bc27Model->where('id', $id)->first();
+        if ($bc27['penerimaan_otomatis'] == 1) {
+            // Penerimaan Otomatis
+            foreach ($barang as $b) {
+                $this->mutasiGlobalDetailModel->update($b->mutasi_global_detail_id, [
+                    'company_tujuan_id' => $bc27['company_tujuan_id'],
+                    'divisi_tujuan_id' => $bc27['divisi_tujuan_id'],
+                    'warehouse_tujuan_id' => $bc27['warehouse_tujuan_id'],
+                    'stock_mutasi_id' => $b->stock_mutasi_id,
+                    'qty_diterima' => $b->qty_diterima
+                ]);
+            }
+        } else {
+            // Bukan Penrimaan Otomatis
+            foreach ($barang as $b) {
+                $this->mutasiGlobalDetailModel->update($b->mutasi_global_detail_id, [
+                    'company_tujuan_id' => null,
+                    'divisi_tujuan_id' => null,
+                    'warehouse_tujuan_id' => null,
+                    'stock_mutasi_id' => null,
+                    'qty_diterima' => null,
+                ]);
+            }
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() == false) {
+            $db->transRollback();
+        }
+
+        $db->transCommit();
 
         return response()->setJSON([
             'status' => true,
@@ -350,6 +424,10 @@ class BC27 extends BaseController
     public function posting()
     {
         $id = decrypt($this->request->getVar('id'));
+
+        $db = \Config\Database::connect();
+        $db->transStart();
+
         // BC 27 FIRST
         $bc27 = $this->bc27Model->find($id);
         // KURANGI STOK NYA
@@ -414,9 +492,17 @@ class BC27 extends BaseController
         }
 
         $this->bc27Model->update($id, ['status_posting' => '1']);
-        // if ($bc27['penerimaan_otomatis'] == 1) {
-        //     $this->automaticInsertPenerimaanMutasi($mutasiGlobal['id']);
-        // }
+        if ($bc27['penerimaan_otomatis'] == 1) {
+            $this->automaticInsertPenerimaanMutasi($mutasiGlobal['id']);
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() == false) {
+            $db->transRollback();
+        }
+
+        $db->transCommit();
 
         return response()->setJSON([
             'status' => true,
@@ -426,20 +512,21 @@ class BC27 extends BaseController
 
     private function automaticInsertPenerimaanMutasi($mutasiGlobalId)
     {
+
         $mutasiGlobal = $this->mutasiGlobalModel->where('id', $mutasiGlobalId)->first();
-        $barang = $this->penerimaanMutasiGlobalModel->getListBarangMutasi(
-            [$mutasiGlobalId],
-            null
+        $bc27 = $this->bc27Model->where('mutasi_global_id', $mutasiGlobalId)->first();
+        $barang = $this->mutasiGlobalDetailModel->getMutasiDetail(
+            $mutasiGlobalId
         );
-        $no = $this->getNomorPenerimaanMutasiGlobal($mutasiGlobal['divisi_penerima_id']);
+        $no = $this->getNomorPenerimaanMutasiGlobal($bc27['divisi_tujuan_id']);
         $id = $this->penerimaanMutasiGlobalModel->insert([
-            'company_penerima_id' => $mutasiGlobal['company_tujuan_id'],
+            'company_penerima_id' => $bc27['company_tujuan_id'],
             'company_pengirim_id' => $this->this_company_id,
-            'divisi_penerima_id' => $mutasiGlobal['divisi_penerima_id'],
-            'warehouse_penerima_id' => $mutasiGlobal['warehouse_penerima_id'],
+            'divisi_penerima_id' => $bc27['divisi_tujuan_id'],
+            'warehouse_penerima_id' => $bc27['warehouse_tujuan_id'],
             'penerimaan_mutasi_no' => $no,
             'multiple_mutasi_id' => "[" . $mutasiGlobal['id'] . "]",
-            'multiple_no_mutasi' => "[" . $mutasiGlobal['id'] . "]",
+            'multiple_no_mutasi' => "[" . $mutasiGlobal['no_mutasi'] . "]",
             'tanggal' => $mutasiGlobal['tanggal'],
             'keterangan' => null,
             'status_posting' => '1',
@@ -454,10 +541,7 @@ class BC27 extends BaseController
                 'stock_mutasi_id' => $b['stock_mutasi_id'],
                 'bc_mutasi_id' => $b['bc_mutasi_id'],
                 'no_aju_mutasi' => $b['no_aju_mutasi'],
-                'stock_dokumen_asal' => $b['stock_dokumen_asal'],
-                'bc_mutasi_id' => $b['bc_mutasi_id'],
-                'no_aju_mutasi' => $b['no_aju_mutasi'],
-                'stock_dokumen_asal' => $b['stock_dokumen_asal'],
+                'stock_dokumen_asal' => $b['stock_dokumen'],
                 'qty' => $b['qty']
             ]);
         }
@@ -496,7 +580,7 @@ class BC27 extends BaseController
 
             // INIT STOK NYA (KARENA BARANG NYA BISA AJA TIDAK ADA DI INVENTORI)
             $stok = $this->stockModel->getStokMaster(
-                $this->this_company_id,
+                $penerimaanMutasiGlobal['company_penerima_id'],
                 $penerimaanMutasiGlobal['warehouse_penerima_id'],
                 $penerimaanMutasiGlobal['divisi_penerima_id'],
                 $stockMutasi['tipe_barang'],
@@ -506,7 +590,7 @@ class BC27 extends BaseController
 
             if ($stok == null) {
                 $stok = $this->stockModel->insertStok(
-                    $this->this_company_id,
+                    $penerimaanMutasiGlobal['company_penerima_id'],
                     $penerimaanMutasiGlobal['warehouse_penerima_id'],
                     $penerimaanMutasiGlobal['divisi_penerima_id'],
                     $stockMutasi['tipe_barang'],
@@ -518,7 +602,7 @@ class BC27 extends BaseController
 
             // INSERT LEVEL 1
             $stok = $this->stockModel->insertStok(
-                $this->this_company_id,
+                $penerimaanMutasiGlobal['company_penerima_id'],
                 $penerimaanMutasiGlobal['warehouse_penerima_id'],
                 $penerimaanMutasiGlobal['divisi_penerima_id'],
                 $stockMutasi['tipe_barang'],

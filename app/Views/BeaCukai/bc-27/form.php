@@ -228,7 +228,7 @@
             <form id="form-update">
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-sm-6 mt-1">
+                        <div class="col-sm-4 mt-1">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input id="tanggal_pengajuan" value="" name="tanggal_pengajuan" type="text" class="tanggal_pengajuan form-control" placeholder="">
@@ -239,15 +239,13 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6 mt-1">
+                        <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input id="no_urut_dokumen" name="no_urut_dokumen" type="number" class="no_urut_dokumen form-control" placeholder="" oninput="event.target.value = /^\d{0,6}$/.test(event.target.value) ? event.target.value : ''">
                                 <label>Nomor Urut</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6 mt-1">
+                        <div class="col-sm-4 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input id="kode_kantor" name="kode_kantor" type="number" class="kode_kantor form-control" placeholder="" oninput="event.target.value = /^\d{0,6}$/.test(event.target.value) ? event.target.value : ''">
                                 <label>Kode Kantor</label>
@@ -349,7 +347,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <input <?= !empty($bc27) ? ($bc27['status_posting'] == '1' ? 'disabled' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control qty_diterima_current" id="qty_diterima_current" name="qty_diterima_current" placeholder="Qty Diterima Sekarang" oninput="preventNegativeInput(this)">
+                                <input readonly <?= !empty($bc27) ? ($bc27['status_posting'] == '1' ? 'disabled' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control qty_diterima_current" id="qty_diterima_current" name="qty_diterima_current" placeholder="Qty Diterima Sekarang" oninput="preventNegativeInput(this)">
                                 <label for="floatingInput">Qty Barang Masuk</label>
                             </div>
                         </div>
@@ -361,12 +359,12 @@
                 <button type="button" class="btn btn-hide-form btn-discard btn-discard-barang-masuk mr-2">Kembali</button>
                 <?php if (!empty($bc27)) : ?>
                     <?php if ($bc27['status_posting'] != '1') : ?>
-                        <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
+                        <button type="submit" class="btn btn-submit-form btn-submit-form-barang-masuk">Simpan</button>
                     <?php else : ?>
 
                     <?php endif; ?>
                 <?php else : ?>
-                    <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
+                    <button type="submit" class="btn btn-submit-form btn-submit-form-barang-masuk">Simpan</button>
                 <?php endif; ?>
             </div>
         </div>
@@ -460,6 +458,7 @@
     $('#penerimaan_otomatis').on('change', function() {
         var checked = $(this).is(':checked');
         if (checked) {
+            dropdownDivisi();
             $('.form-penerimaan-mutasi').show();
         } else {
             $('#divisi_tujuan_id').val(null).change();
@@ -579,85 +578,112 @@
                     confirmButtonText: 'Ok'
                 })
             } else {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data ?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Ya',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        var formData = new FormData(document.querySelector(".create-form"));
-                        var id = $('#id').val();
-                        if (id) {
-                            // UPDATE
-                            $.ajax({
-                                url: `<?= base_url("bea-cukai-bc-27/update"); ?>`,
-                                method: "POST",
-                                data: formData,
-                                beforeSend: function(xhr) {
-                                    setLoading();
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                complete: function() {
-                                    stopLoading();
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(res) {
-                                    if (res.status) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: res.message,
-                                            confirmButtonColor: '#4e73df',
-                                            confirmButtonText: 'Ok'
-                                        }).then((result) => {
-                                            location.href = "<?= base_url('bea-cukai-bc-27') ?>"
-                                        });
 
-                                    }
-                                }
-                            })
-                        } else {
-                            // CREATE
-                            $.ajax({
-                                url: `<?= base_url("bea-cukai-bc-27/save"); ?>`,
-                                method: "POST",
-                                data: formData,
-                                beforeSend: function(xhr) {
-                                    setLoading();
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                complete: function() {
-                                    stopLoading();
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(res) {
-                                    if (res.status) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: res.message,
-                                            confirmButtonColor: '#4e73df',
-                                            confirmButtonText: 'Ok'
-                                        }).then((result) => {
-                                            location.href = "<?= base_url('bea-cukai-bc-27') ?>"
-                                        });
-
-                                    }
-                                }
-                            })
+                // Validasi Apakah stock_mutasi_id sudah diterapkan jikalau checked true
+                var error = false;
+                var noAju = '';
+                var bcType = '';
+                var namaBarang = '';
+                if (checked) {
+                    for (let i = 0; i < listData.length; i++) {
+                        if (listData[i].stock_mutasi_id == '' || listData[i].stock_mutasi_id == null) {
+                            noAju = listData[i].no_aju;
+                            bcType = listData[i].bc_type;
+                            namaBarang = listData[i].barang;
+                            error = true;
                         }
                     }
-                })
+                }
 
+                if (error == true) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Barang " + namaBarang + ", Dengan Asal Barang " + bcType + " / " + noAju + ", Belum Dibuatkan Hasil Mutasi Output Barang Di company Tujuan",
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    })
+                } else {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data ?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Ya',
+                        cancelButtonText: 'Kembali',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            var formData = new FormData(document.querySelector(".create-form"));
+                            formData.append('barang', JSON.stringify(listData))
+                            var id = $('#id').val();
+                            if (id) {
+                                // UPDATE
+                                $.ajax({
+                                    url: `<?= base_url("bea-cukai-bc-27/update"); ?>`,
+                                    method: "POST",
+                                    data: formData,
+                                    beforeSend: function(xhr) {
+                                        setLoading();
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    complete: function() {
+                                        stopLoading();
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(res) {
+                                        if (res.status) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: res.message,
+                                                confirmButtonColor: '#4e73df',
+                                                confirmButtonText: 'Ok'
+                                            }).then((result) => {
+                                                location.href = "<?= base_url('bea-cukai-bc-27') ?>"
+                                            });
+
+                                        }
+                                    }
+                                })
+                            } else {
+                                // CREATE
+                                $.ajax({
+                                    url: `<?= base_url("bea-cukai-bc-27/save"); ?>`,
+                                    method: "POST",
+                                    data: formData,
+                                    beforeSend: function(xhr) {
+                                        setLoading();
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    complete: function() {
+                                        stopLoading();
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(res) {
+                                        if (res.status) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: res.message,
+                                                confirmButtonColor: '#4e73df',
+                                                confirmButtonText: 'Ok'
+                                            }).then((result) => {
+                                                location.href = "<?= base_url('bea-cukai-bc-27') ?>"
+                                            });
+
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                    })
+
+                }
             }
         }
     });
@@ -711,70 +737,109 @@
         },
     });
 
+    $('.btn-submit-form-barang-masuk').click(function(e) {
+        e.preventDefault();
+        if ($('.create-form-barang-masuk').valid()) {
+            var id = $('#mutasi_global_detail_id').val();
+            var stockMutasiId = $('#stock_mutasi_id option:selected').val();
+            var divisiTujuanId = $('#divisi_tujuan_id option:selected').val();
+            var warehouseTujuanId = $('#warehouse_tujuan_id option:selected').val();
+            var companyTujuanId = $('#company_tujuan_id option:selected').val();
+
+            var index = 0;
+            var qtyBarangDiterima = parseFloat($('#qty_diterima_current').val());
+            $.each(listData, function(i, v) {
+                if (v.mutasi_global_detail_id == id) {
+                    index = i;
+                }
+            });
+
+            listData[index].stock_mutasi_id = stockMutasiId;
+            listData[index].qty_diterima = qtyBarangDiterima;
+            listData[index].divisi_tujuan_id = divisiTujuanId;
+            listData[index].warehouse_tujuan_id = warehouseTujuanId;
+            listData[index].company_tujuan_id = companyTujuanId;
+
+            $('#update_barang_masuk').modal('hide');
+            drawTable(listData);
+        }
+    })
+
     function displayDetailModal(id) {
         // RESET VALIDATOR
+        var divisiTujuanId = $('#divisi_tujuan_id option:selected').val();
+        var warehouseTujuanId = $('#warehouse_tujuan_id option:selected').val();
 
-        validatorBarangMasuk.resetForm();
-        validatorBarangMasuk.reset();
+        if (divisiTujuanId == '' || warehouseTujuanId == '') {
+            Swal.fire({
+                icon: 'error',
+                title: "Departemen & Warehouse Penerimaan Barang Mutasi Wajib Diisi",
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            })
+        } else {
+            validatorBarangMasuk.resetForm();
+            validatorBarangMasuk.reset();
 
-        var barangFirst = null;
-        $.each(listData, function(i, v) {
-            if (v.mutasi_global_detail_id == id) {
-                barangFirst = v;
-            }
-        });
+            var barangFirst = null;
+            $.each(listData, function(i, v) {
+                if (v.mutasi_global_detail_id == id) {
+                    barangFirst = v;
+                }
+            });
 
-        var companyAsalName = $('#company_tujuan_id option:selected').text();
-        var barangDikirim = barangFirst.kode_barang + ' / ' + barangFirst.barang;
-        var dokumenMutasi = barangFirst.bc_mutasi_name + ' / ' + barangFirst.no_aju_mutasi;
-        var dokumenAsal = barangFirst.bc_type + ' / ' + barangFirst.no_aju;
-        var divisiPenerima = $('#divisi_tujuan_id option:selected').text();
-        var warehousePenerima = $('#warehouse_tujuan_id option:selected').text();
-        var tipeBarangText = barangFirst.type_barang_text;
-        var tipeBarang = barangFirst.tipe_barang;
-        var qtyDiterimaCurrent = barangFirst.qty;
+            var nomorAju = $('#no_aju').val();
+            var companyAsalName = $('#company_tujuan_id option:selected').text();
+            var barangDikirim = barangFirst.kode_barang + ' / ' + barangFirst.barang;
+            var dokumenMutasi = barangFirst.bc_mutasi_name + ' / ' + nomorAju;
+            var dokumenAsal = barangFirst.bc_type + ' / ' + barangFirst.no_aju;
+            var divisiTujuan = $('#divisi_tujuan_id option:selected').text();
+            var warehouseTujuan = $('#warehouse_tujuan_id option:selected').text();
+            var tipeBarangText = barangFirst.type_barang_text;
+            var tipeBarang = barangFirst.type_barang;
+            var qtyDiterimaCurrent = barangFirst.qty;
 
-        $('#company_tujuan_name').val(companyAsalName.trim());
-        $('#barang_keluar_name').val(barangDikirim);
-        $('#dokumen_mutasi_name').val(dokumenMutasi);
-        $('#dokumen_asal_name').val(dokumenAsal);
-        $('#divisi_penerima_name').val(divisiPenerima.trim());
-        $('#warehouse_penerima_name').val(warehousePenerima.trim());
-        $('#tipe_barang_name').val(tipeBarangText);
-        $('#qty_diterima_current').val(qtyDiterimaCurrent);
-        // APPEND TO HIDDEN ELEMENT
-        $('#mutasi_global_detail_id').val(id);
-        $('#tipe_barang').val(tipeBarang);
-        // AJAX DROPDOWN BARANG
-        $.ajax({
-            url: `<?= base_url('penerimaan-mutasi/list-barang-masuk'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                tipe_barang: tipeBarang,
-                divisi_id: $("#divisi_tujuan_id option:selected").val(),
-                warehouse_id: $("#warehouse_tujuan_id option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $('#update_detail_barang').modal('show')
+            $('#company_tujuan_name').val(companyAsalName.trim());
+            $('#barang_keluar_name').val(barangDikirim);
+            $('#dokumen_mutasi_name').val(dokumenMutasi);
+            $('#dokumen_asal_name').val(dokumenAsal);
+            $('#divisi_penerima_name').val(divisiTujuan.trim());
+            $('#warehouse_penerima_name').val(warehouseTujuan.trim());
+            $('#tipe_barang_name').val(tipeBarangText);
+            $('#qty_diterima_current').val(qtyDiterimaCurrent);
+            // APPEND TO HIDDEN ELEMENT
+            $('#mutasi_global_detail_id').val(id);
+            $('#tipe_barang').val(tipeBarang);
+            // AJAX DROPDOWN BARANG
+            $.ajax({
+                url: `<?= base_url('penerimaan-mutasi/list-barang-masuk'); ?>`,
+                method: "GET",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                data: {
+                    tipe_barang: tipeBarang,
+                    divisi_id: $("#divisi_tujuan_id option:selected").val(),
+                    warehouse_id: $("#warehouse_tujuan_id option:selected").val(),
+                },
+                dataType: "json",
+                success: function(res) {
+                    $('#update_detail_barang').modal('show')
 
-                $("#stock_mutasi_id").empty()
-                $("#stock_mutasi_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $("#stock_mutasi_id").append(`<option data-stock_mutasi_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.stock_id}">(${item.kode_barang}) ${item.barang}</option>`)
-                })
-                $("#stock_mutasi_id").val(barangFirst.stock_mutasi_id).change();
+                    $("#stock_mutasi_id").empty()
+                    $("#stock_mutasi_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $("#stock_mutasi_id").append(`<option data-stock_mutasi_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.stock_id}">(${item.kode_barang}) ${item.barang}</option>`)
+                    })
+                    $("#stock_mutasi_id").val(barangFirst.stock_mutasi_id).change();
 
-                $('#update_barang_masuk').modal('show');
-            }
-        });
-
+                    $('#update_barang_masuk').modal('show');
+                }
+            });
+        }
     }
 
 
