@@ -26,6 +26,8 @@ class PembayaranInvoiceDetailModel extends Model
         'harga_total',
         'akun_kas_lain',
         'akun_selisih_lain',
+        'keterangan_pajak',
+        'nominal_pajak',
     ];
 
     // Dates

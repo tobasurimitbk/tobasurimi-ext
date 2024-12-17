@@ -571,10 +571,11 @@ class PembayaranInvoice extends BaseController
             // Ambil data invoice berdasarkan semua ID
             $salesOrderInvoiceData = $this->salesOrderInvoiceModel->whereIn('id', $idArray)->findAll();
             $salesOrderInvoiceDetailData = $this->salesOrderInvoiceDetailModel
-                ->select('sales_order_invoice.no_faktur, sales_order_invoice_detail.id as sales_order_invoice_detail_id, sales_order_invoice_detail.id_sales_order_invoice as sales_order_invoice_id, qty_invoice, harga_barang_invoice, qty_invoice, amount_invoice, kode_barang, barang_name')
-                ->join('barang_master_sales', 'sales_order_invoice_detail.id_barang_invoice = barang_master_sales.id')
+                ->select('sales_order_invoice.no_faktur, sales_order_invoice_detail.id as sales_order_invoice_detail_id, sales_order_invoice_detail.id_sales_order_invoice as sales_order_invoice_id, qty_invoice, harga_barang_invoice, qty_invoice, amount_invoice, kode_barang, barang_name, pembayaran_invoice_detail.keterangan_pajak, pembayaran_invoice_detail.nominal_pajak')
+                ->join('barang_master_sales', 'sales_order_invoice_detail.id_barang_invoice = barang_master_sales.id', 'left')
+                ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_detail_id = sales_order_invoice_detail.id', 'left')
                 ->join('sales_order_invoice', 'sales_order_invoice_detail.id_sales_order_invoice = sales_order_invoice.id', 'left')
-                ->whereIn('id_sales_order_invoice', $idArray)
+                ->where('sales_order_invoice_detail.id_sales_order_invoice', $idArray)
                 ->where('sales_order_invoice_detail.deletedAt', null)
                 ->findAll();
 
@@ -609,11 +610,16 @@ class PembayaranInvoice extends BaseController
                         "kas" => $p['nama_barang'],
                         "id_akun_kas_lain" => $p['id_akun_kas'],
                         "id_akun_selisih_lain" => $p['id_akun_selisih'],
+                        "keterangan_pajak" => $p['keterangan_pajak'],
+                        "nominal_pajak" => $p['nominal_pajak'],
                         "akun_kas_lain" => $p['no_sub_kas'] . ' - ' . $p['nama_sub_kas'], // Gabungkan no_sub_kas dan nama_sub_kas
                         "akun_selisih_lain" => $p['no_sub_selisih'] . ' - ' . $p['nama_sub_selisih'], // Gabungkan no_sub_selisih dan nama_sub_selisih
                     ]);
                 }
             }
+
+            // var_dump($dataBarang);
+            // die;
 
             // Hitung total pembayaran
             if (!empty($pembayaranInvoiceId)) {
@@ -735,7 +741,8 @@ class PembayaranInvoice extends BaseController
             // Ambil data return berdasarkan semua ID
             $salesOrderreturnData = $this->salesOrderReturnModel->whereIn('id', $idArray)->findAll();
             $salesOrderReturnDetailData = $this->salesOrderReturnDetailModel
-                ->select('sales_order_return.no_return as no_faktur, sales_order_return_detail.id as sales_order_return_detail_id, sales_order_return_detail.id_sales_order_return as sales_order_return_id, qty_return, harga_barang_return, qty_return, amount_return, kode_barang, barang_name')
+                ->select('sales_order_return.no_return as no_faktur, sales_order_return_detail.id as sales_order_return_detail_id, sales_order_return_detail.id_sales_order_return as sales_order_return_id, qty_return, harga_barang_return, qty_return, amount_return, kode_barang, barang_name, pembayaran_invoice_detail.keterangan_pajak, pembayaran_invoice_detail.nominal_pajak')
+                ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_detail_id = sales_order_return_detail.id', 'left')
                 ->join('barang_master_sales', 'sales_order_return_detail.id_barang_return = barang_master_sales.id')
                 ->join('sales_order_return', 'sales_order_return_detail.id_sales_order_return = sales_order_return.id', 'left')
                 ->whereIn('id_sales_order_return', $idArray)
@@ -867,7 +874,9 @@ class PembayaranInvoice extends BaseController
                         'harga_satuan' => $l->harga_barang_invoice,
                         'harga_total' => $l->amount_invoice,
                         'akun_kas_lain' => $l->akun_kas_lain,
-                        'akun_selisih_lain' => $l->akun_selisih_lain
+                        'akun_selisih_lain' => $l->akun_selisih_lain,
+                        'keterangan_pajak' => $l->keterangan_pajak,
+                        'nominal_pajak' => $l->nominal_pajak
                     ]);
                 }
 
@@ -953,15 +962,18 @@ class PembayaranInvoice extends BaseController
                 foreach (json_decode($_POST['list_barang']) as $l) {
                     $this->pembayaranInvoiceDetailModel->insert([
                         'pembayaran_invoice_id' => $id,
-                        'sales_order_invoice_id' => $l->sales_order_return_id,
-                        'sales_order_invoice_detail_id' => $l->sales_order_return_detail_id,
+                        'sales_order_invoice_id' => $l->sales_order_invoice_id,
+                        'sales_order_invoice_detail_id' => $l->sales_order_invoice_detail_id,
                         'type_invoice' => "RETURN",
                         'nama_barang' => $l->barang_name,
                         'qty' => $l->qty_return,
                         'harga_satuan' =>  $l->harga_barang_return ,
                         'harga_total' =>  $l->amount_return,
                         'akun_kas_lain' => $l->akun_kas_lain,
-                        'akun_selisih_lain' => $l->akun_selisih_lain
+                        'akun_selisih_lain' => $l->akun_selisih_lain,
+                        'akun_selisih_lain' => $l->akun_selisih_lain,
+                        'keterangan_pajak' => $l->keterangan_pajak,
+                        'nominal_pajak' => $l->nominal_pajak
                     ]);
                 }
 
@@ -1042,7 +1054,6 @@ class PembayaranInvoice extends BaseController
             ]);
 
             $pembayaranInvoiceFirst = $this->pembayaranInvoiceModel->find($id);
-            // Delete Detail Lalu Insert Again
             $this->pembayaranInvoiceDetailModel->where('pembayaran_invoice_id', $id)->delete();
             foreach (json_decode($_POST['list_barang']) as $l) {
                 $this->pembayaranInvoiceDetailModel->insert([
@@ -1055,7 +1066,9 @@ class PembayaranInvoice extends BaseController
                     'harga_satuan' => $l->harga_barang_invoice,
                     'harga_total' => $l->amount_invoice,
                     'akun_kas_lain' => $l->akun_kas_lain,
-                    'akun_selisih_lain' => $l->akun_selisih_lain
+                    'akun_selisih_lain' => $l->akun_selisih_lain,
+                    'keterangan_pajak' => $l->keterangan_pajak,
+                    'nominal_pajak' => $l->nominal_pajak
                 ]);
             }
 

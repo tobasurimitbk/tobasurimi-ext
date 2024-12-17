@@ -110,7 +110,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select customer_id " name="customer_id" id="customer_id">
+                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select customer " name="customer" id="customer">
                                 <option value=""></option>
                                 <?php if (!empty($customers)): ?>
                                     <?php foreach ($customers as $cus): ?>
@@ -238,6 +238,8 @@
                                     <th style="text-align: center;">No Return</th>
                                     <th style="text-align: center;">Kode Barang</th>
                                     <th style="text-align: center;">Nama Barang</th>
+                                    <th style="text-align: center;">Ket. Pajak</th>
+                                    <th style="text-align: center;">Nominal Pajak</th>
                                     <th style="text-align: center;">Akun Debit Lain</th>
                                     <th style="text-align: center;">Akun Kredit Lain</th>
                                     <th style="text-align: center;">Qty</th>
@@ -423,6 +425,7 @@
             theme: "bootstrap-5",
             allowClear: false
         }).change(function() {
+            updateKeterangan();
             getBarangSalesReturn();
         })
 
@@ -433,20 +436,21 @@
             allowClear: true
         });
 
-        $('#customer_id').select2({
+        $('#customer').select2({
             placeholder: "Pilih Customer",
             theme: "bootstrap-5"
         }).change(function() {
             const table = $('#dataTable');
             table.find('tbody').empty();
             let customerId = $(this).val();
+            updateKeterangan();
             getDataDokumenInvoice(customerId);
         });
 
         // Trigger event change jika sudah ada nilai default
         const selectedCustomerId = "<?= !empty($detail) ? encrypt($detail['customer_id']) : ''; ?>";
         if (selectedCustomerId) {
-            $('#customer_id').val(selectedCustomerId).trigger('change'); // Trigger change secara manual
+            $('#customer').val(selectedCustomerId).trigger('change'); // Trigger change secara manual
         }
 
         $(".btn-submit-form").click(function() {
@@ -469,11 +473,13 @@
                                 const formData = new FormData(document.querySelector(".create-form"));
                                 formData.append('total_amount_invoice', destroyFormatRupiah($(".total_amount_invoice").text()));
                                 formData.append('total_bayar', destroyFormatRupiah($(".total-bayar").val()));
-                                const cleanListBarang = dataList.map(item => ({
+                                const cleanListBarang = dataList.map((item, index) => ({
                                     ...item,
                                     harga_barang_invoice: destroyFormatRupiah(item.harga_barang_invoice),
                                     amount_invoice: destroyFormatRupiah(item.amount_invoice),
                                     qty_invoice: destroyFormatRupiah(item.qty_invoice),
+                                    keterangan_pajak: $(`#keterangan_pajak_${index}`).val(), // Ambil dari input
+                                    nominal_pajak: $(`#nominal_pajak_${index}`).val() // Ambil dari input
                                 }));
                                 formData.append('list_barang', JSON.stringify(cleanListBarang));
                                 $.ajax({
@@ -541,11 +547,13 @@
                                 const formData = new FormData(document.querySelector(".create-form"));
                                 formData.append('total_amount_invoice', destroyFormatRupiah($(".total_amount_invoice").text()));
                                 formData.append('total_bayar', destroyFormatRupiah($(".total-bayar").val()));
-                                const cleanListBarang = dataList.map(item => ({
+                                const cleanListBarang = dataList.map((item, index) => ({
                                     ...item,
                                     harga_barang_invoice: destroyFormatRupiah(item.harga_barang_invoice),
                                     amount_invoice: destroyFormatRupiah(item.amount_invoice),
                                     qty_invoice: destroyFormatRupiah(item.qty_invoice),
+                                    keterangan_pajak: $(`#keterangan_pajak_${index}`).val(), // Ambil dari input
+                                    nominal_pajak: $(`#nominal_pajak_${index}`).val() // Ambil dari input
                                 }));
                                 formData.append('list_barang', JSON.stringify(cleanListBarang));
                                 $.ajax({
@@ -804,6 +812,17 @@
         });
     }
 
+    $(document).on('input', '#dataTable input[id^="keterangan_pajak"], #dataTable input[id^="nominal_pajak"]', function () {
+        const row = $(this).closest('tr'); // Ambil baris tempat input berada
+        const index = row.index(); // Dapatkan index baris
+        const key = $(this).attr('id').split('_')[0]; // Ambil key berdasarkan nama input sebelum '_'
+        const value = $(this).val(); // Ambil nilai input
+
+        if (dataList[index]) {
+            dataList[index][key] = value; // Perbarui dataList hanya untuk keterangan_pajak atau nominal_pajak
+        }
+    });
+
     function getBarangSalesReturn() {
         let arr = $('.no_dokumen').val();
         $.ajax({
@@ -828,6 +847,8 @@
                                 amount_return: data.amount_return,
                                 kode_barang: data.kode_barang,
                                 barang_name: data.barang_name,
+                                keterangan_pajak: data.keterangan_pajak,
+                                nominal_pajak: data.nominal_pajak,
                                 sales_order_invoice_id: data.sales_order_return_id,
                                 sales_order_invoice_detail_id: data.sales_order_return_detail_id,
                                 no_faktur: data.no_faktur ? data.no_faktur : "LAIN-LAIN",
@@ -890,6 +911,30 @@
 
                 newRow.append($('<td style="text-align:center;">').text(item.kode_barang));
                 newRow.append($('<td style="text-align:center;">').text(item.barang_name));
+                newRow.append(
+                    $('<td style="text-align:center;">').append(
+                        $('<input>', {
+                            type: 'text', 
+                            class: 'form-control', 
+                            name: `keterangan_pajak`, 
+                            id: `keterangan_pajak_${index}`, // ID unik
+                            value: item.keterangan_pajak || '',
+                            placeholder: 'Ket. Pajak (opsional)' 
+                        })
+                    )
+                );
+                newRow.append(
+                    $('<td style="text-align:center;">').append(
+                        $('<input>', {
+                            type: 'number', 
+                            class: 'form-control', 
+                            name: `nominal_pajak`, 
+                            id: `nominal_pajak_${index}`, // ID unik
+                            value: item.nominal_pajak || '',
+                            placeholder: 'Nominal Pajak (opsional)' 
+                        })
+                    )
+                );
                 newRow.append($('<td style="text-align:center;">').text(item.nama_akun_kas_lain || '-'));
                 newRow.append($('<td style="text-align:center;">').text(item.nama_akun_selisih_lain || '-'));
                 newRow.append($('<td style="text-align:center;">').text(item.qty_return));
@@ -983,15 +1028,15 @@
         // Tambahkan baris untuk Total Pembayaran, Total Sudah Dibayar, dan Sisa Pembayaran
         table.find('tbody').append(`
             <tr style="color:whitesmoke;">
-                <td colspan="7" style="text-align: right;">Total Pembayaran</td>
+                <td colspan="9" style="text-align: right;">Total Pembayaran</td>
                 <td style="text-align:center;">${greatFormatRupiah(total_amount)}</td>
             </tr>
             <tr style="color:whitesmoke;">
-                <td colspan="7" style="text-align: right;">Total Sudah Dibayar</td>
+                <td colspan="9" style="text-align: right;">Total Sudah Dibayar</td>
                 <td class="total_dibayar" style="text-align:center;">${greatFormatRupiah(total_invoice)}</td>
             </tr>
             <tr style="color:whitesmoke;">
-                <td colspan="7" style="text-align: right;">Sisa Pembayaran</td>
+                <td colspan="9" style="text-align: right;">Sisa Pembayaran</td>
                 <td class="total_amount_invoice" style="text-align:center;">${greatFormatRupiah(total_amount - total_invoice)}</td>
             </tr>
         `);
@@ -999,7 +1044,7 @@
         // Tambahkan baris untuk input Total Bayar
         table.find('tbody').append(`
             <tr style="color:whitesmoke;">
-                <td colspan="7" style="text-align: right;">Anda Membayar Sebesar</td>
+                <td colspan="9" style="text-align: right;">Anda Membayar Sebesar</td>
                 <td style="text-align:center;">
                     <input 
                         autocomplete="one-time-code" 
@@ -1058,6 +1103,21 @@
 
         return randomString;
     };
+
+    function updateKeterangan() {
+        // Ambil elemen <select> dan <textarea>
+        const noDokumenElement = document.getElementById('no_dokumen');
+        const customerElement = document.getElementById('customer');
+        const textareaElement = document.getElementById('keterangan');
+
+        // Ambil semua opsi yang dipilih dari kedua elemen <select>
+        const selectedNoDokumen = Array.from(noDokumenElement.selectedOptions).map(option => option.text);
+        const selectedCustomer = Array.from(customerElement.selectedOptions).map(option => option.text);
+
+        // Gabungkan nilai opsi yang dipilih ke dalam textarea
+        const combinedText = [...selectedNoDokumen, ...selectedCustomer].join(', ');
+        textareaElement.value = combinedText;
+    }
 </script>
 
 <?= $this->endSection(); ?>
