@@ -1402,6 +1402,7 @@ $routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
     $routes->post('delete', 'BeaCukai\BC27::delete');
     $routes->post('posting', 'BeaCukai\BC27::posting');
     $routes->get('check-no-aju', 'BeaCukai\BC27::checkNoAju');
+    $routes->get('divisi', 'BeaCukai\BC27::dropdownDivisiByCompany');
 
     $routes->get('list-mutasi-global', 'BeaCukai\BC27::dropdownMutasiGlobal');
     $routes->get('list-barang-mutasi', 'BeaCukai\BC27::getListMutasiDetail');

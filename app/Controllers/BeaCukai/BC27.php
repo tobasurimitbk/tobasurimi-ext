@@ -18,6 +18,10 @@ use App\Models\PengusahaTPBModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\HsCodesModel;
 use App\Models\BCPurchaseOrderModel;
+use App\Models\DivisisModel;
+use App\Models\PenerimaanMutasiGlobalDetailModel;
+use App\Models\PenerimaanMutasiGlobalModel;
+use App\Models\WarehousesModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PDO;
@@ -49,6 +53,10 @@ class BC27 extends BaseController
     protected $barangMasterSpesifikasiModel;
     protected $hsCodeModel;
     protected $bcPurchaseOrderModel;
+    protected $penerimaanMutasiGlobalModel;
+    protected $penerimaanMutasiGlobalDetailModel;
+    protected $divisiModel;
+    protected $warehouseModel;
 
     public function __construct()
     {
@@ -66,6 +74,10 @@ class BC27 extends BaseController
         $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->hsCodeModel = new HsCodesModel();
         $this->bcPurchaseOrderModel = new BCPurchaseOrderModel();
+        $this->penerimaanMutasiGlobalModel = new PenerimaanMutasiGlobalModel();
+        $this->penerimaanMutasiGlobalDetailModel = new PenerimaanMutasiGlobalDetailModel();
+        $this->divisiModel = new DivisisModel();
+        $this->warehouseModel = new WarehousesModel();
 
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
@@ -203,7 +215,9 @@ class BC27 extends BaseController
             'dropdownCompanyExcept' => $this->companyModel->getCompaniesExcepct($this->this_company_id),
             'companyAsalName' => session()->get('login')->this_company,
             'noAju' => $this->generateNomorAju(),
-            'bc27' => $bc27
+            'bc27' => $bc27,
+            'divisi' => $bc27['penerimaan_otomatis'] == 1 ? $this->divisiModel->where('company_id', $bc27['company_tujuan_id'])->where('deletedAt', null)->findAll() : [],
+            'warehouse' => $bc27['penerimaan_otomatis'] == 1 ? $this->warehouseModel->where('divisi_id', $bc27['divisi_tujuan_id'])->where('deletedAt', null)->findAll() : [],
         ];
 
         return view('BeaCukai/bc-27/form', $data);
@@ -211,15 +225,55 @@ class BC27 extends BaseController
 
     public function createAction()
     {
-        $this->bc27Model->insert([
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        $id = $this->bc27Model->insert([
             'company_asal_id' => $this->this_company_id,
             'company_tujuan_id' => $this->request->getVar('company_tujuan_id'),
             'mutasi_global_id' => $this->request->getVar('mutasi_global_id'),
             'no_aju' => $this->request->getVar('no_aju'),
             'status_posting' => '0',
             'no_daftar' => $this->request->getVar('no_daftar'),
+            'penerimaan_otomatis' => empty($this->request->getVar('penerimaan_otomatis')) ? 0 : $this->request->getVar('penerimaan_otomatis'),
+            'divisi_tujuan_id' => empty($this->request->getVar('penerimaan_otomatis')) ? null : $this->request->getVar('divisi_tujuan_id'),
+            'warehouse_tujuan_id' => empty($this->request->getVar('penerimaan_otomatis')) ? null : $this->request->getVar('warehouse_tujuan_id'),
             'createdAt' => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))))
         ]);
+
+        $bc27 = $this->bc27Model->where('id', $id)->first();
+        $barang = json_decode($_POST['barang']);
+        if ($bc27['penerimaan_otomatis'] == 1) {
+            // Penerimaan Otomatis
+            foreach ($barang as $b) {
+                $this->mutasiGlobalDetailModel->update($b->mutasi_global_detail_id, [
+                    'company_tujuan_id' => $bc27['company_tujuan_id'],
+                    'divisi_tujuan_id' => $bc27['divisi_tujuan_id'],
+                    'warehouse_tujuan_id' => $bc27['warehouse_tujuan_id'],
+                    'stock_mutasi_id' => $b->stock_mutasi_id,
+                    'qty_diterima' => $b->qty_diterima
+                ]);
+            }
+        } else {
+            // Bukan Penrimaan Otomatis
+            foreach ($barang as $b) {
+                $this->mutasiGlobalDetailModel->update($b->mutasi_global_detail_id, [
+                    'company_tujuan_id' => null,
+                    'divisi_tujuan_id' => null,
+                    'warehouse_tujuan_id' => null,
+                    'stock_mutasi_id' => null,
+                    'qty_diterima' => null,
+                ]);
+            }
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() == false) {
+            $db->transRollback();
+        }
+
+        $db->transCommit();
 
         return response()->setJSON([
             'status' => true,
@@ -231,14 +285,54 @@ class BC27 extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
 
+        $db = \Config\Database::connect();
+        $db->transStart();
+
         $this->bc27Model->update($id, [
             'company_asal_id' => $this->this_company_id,
             'company_tujuan_id' => $this->request->getVar('company_tujuan_id'),
             'mutasi_global_id' => $this->request->getVar('mutasi_global_id'),
             'no_aju' => $this->request->getVar('no_aju'),
             'no_daftar' => $this->request->getVar('no_daftar'),
+            'penerimaan_otomatis' => empty($this->request->getVar('penerimaan_otomatis')) ? 0 : $this->request->getVar('penerimaan_otomatis'),
+            'divisi_tujuan_id' => empty($this->request->getVar('penerimaan_otomatis')) ? null : $this->request->getVar('divisi_tujuan_id'),
+            'warehouse_tujuan_id' => empty($this->request->getVar('penerimaan_otomatis')) ? null : $this->request->getVar('warehouse_tujuan_id'),
             'createdAt' => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))))
         ]);
+
+        $barang = json_decode($_POST['barang']);
+        $bc27 = $this->bc27Model->where('id', $id)->first();
+        if ($bc27['penerimaan_otomatis'] == 1) {
+            // Penerimaan Otomatis
+            foreach ($barang as $b) {
+                $this->mutasiGlobalDetailModel->update($b->mutasi_global_detail_id, [
+                    'company_tujuan_id' => $bc27['company_tujuan_id'],
+                    'divisi_tujuan_id' => $bc27['divisi_tujuan_id'],
+                    'warehouse_tujuan_id' => $bc27['warehouse_tujuan_id'],
+                    'stock_mutasi_id' => $b->stock_mutasi_id,
+                    'qty_diterima' => $b->qty_diterima
+                ]);
+            }
+        } else {
+            // Bukan Penrimaan Otomatis
+            foreach ($barang as $b) {
+                $this->mutasiGlobalDetailModel->update($b->mutasi_global_detail_id, [
+                    'company_tujuan_id' => null,
+                    'divisi_tujuan_id' => null,
+                    'warehouse_tujuan_id' => null,
+                    'stock_mutasi_id' => null,
+                    'qty_diterima' => null,
+                ]);
+            }
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() == false) {
+            $db->transRollback();
+        }
+
+        $db->transCommit();
 
         return response()->setJSON([
             'status' => true,
@@ -330,6 +424,10 @@ class BC27 extends BaseController
     public function posting()
     {
         $id = decrypt($this->request->getVar('id'));
+
+        $db = \Config\Database::connect();
+        $db->transStart();
+
         // BC 27 FIRST
         $bc27 = $this->bc27Model->find($id);
         // KURANGI STOK NYA
@@ -394,10 +492,178 @@ class BC27 extends BaseController
         }
 
         $this->bc27Model->update($id, ['status_posting' => '1']);
+        if ($bc27['penerimaan_otomatis'] == 1) {
+            $this->automaticInsertPenerimaanMutasi($mutasiGlobal['id']);
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() == false) {
+            $db->transRollback();
+        }
+
+        $db->transCommit();
 
         return response()->setJSON([
             'status' => true,
             'message' => "Dokumen BC 2.7 Berhasil Diposting"
+        ]);
+    }
+
+    private function automaticInsertPenerimaanMutasi($mutasiGlobalId)
+    {
+
+        $mutasiGlobal = $this->mutasiGlobalModel->where('id', $mutasiGlobalId)->first();
+        $bc27 = $this->bc27Model->where('mutasi_global_id', $mutasiGlobalId)->first();
+        $barang = $this->mutasiGlobalDetailModel->getMutasiDetail(
+            $mutasiGlobalId
+        );
+        $no = $this->getNomorPenerimaanMutasiGlobal($bc27['divisi_tujuan_id']);
+        $id = $this->penerimaanMutasiGlobalModel->insert([
+            'company_penerima_id' => $bc27['company_tujuan_id'],
+            'company_pengirim_id' => $this->this_company_id,
+            'divisi_penerima_id' => $bc27['divisi_tujuan_id'],
+            'warehouse_penerima_id' => $bc27['warehouse_tujuan_id'],
+            'penerimaan_mutasi_no' => $no,
+            'multiple_mutasi_id' => "[" . $mutasiGlobal['id'] . "]",
+            'multiple_no_mutasi' => "[" . $mutasiGlobal['no_mutasi'] . "]",
+            'tanggal' => $mutasiGlobal['tanggal'],
+            'keterangan' => null,
+            'status_posting' => '1',
+            'createdBy' => $this->this_user_id
+        ]);
+
+        foreach ($barang as $b) {
+            $this->penerimaanMutasiGlobalDetailModel->insert([
+                'penerimaan_mutasi_global_id' => $id,
+                'mutasi_global_id' => $b['mutasi_global_id'],
+                'mutasi_global_detail_id' => $b['mutasi_global_detail_id'],
+                'stock_mutasi_id' => $b['stock_mutasi_id'],
+                'bc_mutasi_id' => $b['bc_mutasi_id'],
+                'no_aju_mutasi' => $b['no_aju_mutasi'],
+                'stock_dokumen_asal' => $b['stock_dokumen'],
+                'qty' => $b['qty']
+            ]);
+        }
+
+        $this->postingPenerimaanMutasiGlobal($id);
+    }
+
+    private function getNomorPenerimaanMutasiGlobal($divisiPenerimaId)
+    {
+        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+        $divisi = $this->divisiModel->where('id', $divisiPenerimaId)->first();
+        if ($divisi != null) {
+            $no = $this->penerimaanMutasiGlobalModel->get_no(date('m'), date('Y'), $last_day, strtoupper($divisi['divisi']), $divisiPenerimaId);
+        } else {
+            $no = "-";
+        }
+        return $no;
+    }
+
+    private function postingPenerimaanMutasiGlobal($penerimaanMutasiId)
+    {
+        $id = $penerimaanMutasiId;
+        // Insert To Inventori (-)
+        $penerimaanMutasiGlobal = $this->penerimaanMutasiGlobalModel->find($id);
+        $penerimaanMutasiGlobalList = $this->penerimaanMutasiGlobalDetailModel->where('penerimaan_mutasi_global_id', $penerimaanMutasiGlobal['id'])->where('deletedAt', null)->findAll();
+        // Inventori Stok Minus
+        foreach ($penerimaanMutasiGlobalList as $p) {
+            $mutasiGlobal = $this->mutasiGlobalModel->where('id', $p['mutasi_global_id'])->first();
+            $stockMutasi = $this->stockModel->find($p['stock_mutasi_id']);
+
+            if ($stockMutasi['tipe_barang'] == "kemasan") {
+                $barang2Id = $stockMutasi['kemasan_id'];
+            } else {
+                $barang2Id = $stockMutasi['barang2_id'];
+            }
+
+            // INIT STOK NYA (KARENA BARANG NYA BISA AJA TIDAK ADA DI INVENTORI)
+            $stok = $this->stockModel->getStokMaster(
+                $penerimaanMutasiGlobal['company_penerima_id'],
+                $penerimaanMutasiGlobal['warehouse_penerima_id'],
+                $penerimaanMutasiGlobal['divisi_penerima_id'],
+                $stockMutasi['tipe_barang'],
+                $stockMutasi['barang1_id'],
+                $barang2Id
+            );
+
+            if ($stok == null) {
+                $stok = $this->stockModel->insertStok(
+                    $penerimaanMutasiGlobal['company_penerima_id'],
+                    $penerimaanMutasiGlobal['warehouse_penerima_id'],
+                    $penerimaanMutasiGlobal['divisi_penerima_id'],
+                    $stockMutasi['tipe_barang'],
+                    $stockMutasi['barang1_id'],
+                    $barang2Id,
+                    0
+                );
+            }
+
+            // INSERT LEVEL 1
+            $stok = $this->stockModel->insertStok(
+                $penerimaanMutasiGlobal['company_penerima_id'],
+                $penerimaanMutasiGlobal['warehouse_penerima_id'],
+                $penerimaanMutasiGlobal['divisi_penerima_id'],
+                $stockMutasi['tipe_barang'],
+                $stockMutasi['barang1_id'],
+                $barang2Id,
+                $p['qty']
+            );
+
+            // INSERT LEVEL 2
+            $stokDetail = $this->stockDetailModel->insertStokDetail(
+                $stok,
+                $p['qty'],
+                'In',
+                date('Y-m-d'),
+                $this->this_user_id,
+                "MUTASI",
+                $penerimaanMutasiGlobal['penerimaan_mutasi_no'],
+                "-",
+            );
+
+            // STOK OLD 
+            $mutasiGlobalDetail =  $this->mutasiGlobalDetailModel
+                ->where('mutasi_global_id', $p['mutasi_global_id'])
+                ->where('id', $p['mutasi_global_detail_id'])
+                ->first();
+
+            $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
+                $mutasiGlobalDetail['stock_id'],
+                $mutasiGlobalDetail['bc_id'],
+                $mutasiGlobalDetail['no_aju'],
+                $mutasiGlobalDetail['stock_dokumen']
+            );
+
+            // INSERT LEVEL 3 
+            $this->stockDetail2Model->insertStokDetail2(
+                $p['bc_mutasi_id'],
+                $stok,
+                $stokDetail,
+                $p['qty'],
+                $p['no_aju_mutasi'],
+                $mutasiGlobal['no_mutasi'],
+                $mutasiGlobal['no_mutasi'] . " (" . $stockOldDetail['no_po'] . ") ",
+                $stockOldDetail['supplier_id'],
+                $stockOldDetail['harga_umum'],
+                $stockOldDetail['harga_harian'],
+                $stockOldDetail['harga_bulanan'],
+                $stockOldDetail['no_po']
+            );
+        }
+
+        $this->penerimaanMutasiGlobalModel->update($id, ['status_posting' => '1']);
+    }
+
+    public function dropdownDivisiByCompany()
+    {
+        $companyTujuanId = $this->request->getVar('company_tujuan_id');
+        $divisi = $this->divisiModel->where('company_id', $companyTujuanId)->where('deletedAt', null)->findAll();
+
+        return response()->setJSON([
+            'data' => $divisi,
+            'status' => true
         ]);
     }
 
