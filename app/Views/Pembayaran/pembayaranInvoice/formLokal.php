@@ -908,7 +908,7 @@
             let group = groupedData[key];
             let isFirstRow = true;
 
-            group.forEach(item => {
+            group.forEach((item, index) => { // Tambahkan `index` sebagai parameter
                 let newRow = $('<tr style="color:whitesmoke;">');
                 if (isFirstRow) {
                     newRow.append(
@@ -921,24 +921,24 @@
                 newRow.append(
                     $('<td style="text-align:center;">').append(
                         $('<input>', {
-                            type: 'text', 
-                            class: 'form-control', 
-                            name: `keterangan_pajak`, 
-                            id: `keterangan_pajak_${index}`, // ID unik
+                            type: 'text',
+                            class: 'form-control',
+                            name: `keterangan_pajak`,
+                            id: `keterangan_pajak_${key}_${index}`, // ID unik
                             value: item.keterangan_pajak || '',
-                            placeholder: 'Ket. Pajak (opsional)' 
+                            placeholder: 'Ket. Pajak (opsional)'
                         })
                     )
                 );
                 newRow.append(
                     $('<td style="text-align:center;">').append(
                         $('<input>', {
-                            type: 'number', 
-                            class: 'form-control', 
-                            name: `nominal_pajak`, 
-                            id: `nominal_pajak_${index}`, // ID unik
+                            type: 'number',
+                            class: 'form-control',
+                            name: `nominal_pajak`,
+                            id: `nominal_pajak_${key}_${index}`, // ID unik
                             value: item.nominal_pajak || '',
-                            placeholder: 'Nominal Pajak (opsional)' 
+                            placeholder: 'Nominal Pajak (opsional)'
                         })
                     )
                 );
@@ -975,6 +975,7 @@
         // Menambahkan baris total pembayaran dan potongan
         addSummaryRows(table, total_amount, totalPembayaran, totalSudahDiBayar);
     }
+
 
 
 
