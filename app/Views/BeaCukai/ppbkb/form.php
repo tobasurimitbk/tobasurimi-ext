@@ -1,5 +1,11 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
+<style>
+    .form-switch-lg .form-check-input {
+        width: 4rem;
+        height: 1.5rem;
+    }
+</style>
 <section class="section section-form">
 
     <div class="section-header">
@@ -222,6 +228,25 @@
                                 </tfoot>
                             </table>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label class="form-label font-weight-bold modal-sub-title" style="font-size: 14px; color:black;">Buatkan Penerimaan Barang Otomatis</label>
+                        <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input <?= !empty($ppbkb) ? ($ppbkb['penerimaan_otomatis'] == 1 ? 'checked' : '') : '' ?> class="form-check-input" value="1" type="checkbox" name="penerimaan_otomatis" id="penerimaan_otomatis">
+                                <label class="form-check-label" for="penerimaan_otomatis"></label>
+                            </div>
+                        </div>
+                        <small>
+                            <i class="text-dark">
+                                Ketika dichecklist, Barang yang akan dipindahkan akan secara otomatis diterima oleh departemen dan warehouse tujuan
+                            </i>
+                        </small>
                     </div>
                 </div>
             </div>

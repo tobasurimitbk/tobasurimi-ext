@@ -67,7 +67,7 @@
                                 <option value="1">AKTIF</option>
                                 <option value="0">TIDAK AKTIF</option>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Tutup No Surat Jalan</label>
+                            <label for="floatingInput" style="z-index: 1;">Status Nomor Izin TPB</label>
                         </div>
                     </div>
                     <div class="col-md-6">

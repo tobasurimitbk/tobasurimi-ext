@@ -526,7 +526,7 @@ class BC27 extends BaseController
             'warehouse_penerima_id' => $bc27['warehouse_tujuan_id'],
             'penerimaan_mutasi_no' => $no,
             'multiple_mutasi_id' => "[" . $mutasiGlobal['id'] . "]",
-            'multiple_no_mutasi' => "[" . $mutasiGlobal['no_mutasi'] . "]",
+            'multiple_no_mutasi' => json_encode([$mutasiGlobal['no_mutasi']], JSON_UNESCAPED_SLASHES),
             'tanggal' => $mutasiGlobal['tanggal'],
             'keterangan' => null,
             'status_posting' => '1',
