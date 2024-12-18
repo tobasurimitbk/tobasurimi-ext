@@ -315,7 +315,7 @@
         // TERMIN
         //CSS SELECT2 FLOATING LABEL
         $('.sales_id').select2({
-            placeholder: "Pilih Sales",
+            placeholder: "Pilih Sales (Opsional)",
             theme: "bootstrap-5",
             allowClear: true,
             dropdownParent: $(".add-modal .modal-content")

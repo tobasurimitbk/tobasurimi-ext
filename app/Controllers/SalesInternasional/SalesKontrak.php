@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\CustomerModel;
 use App\Models\BarangMasterSalesModel;
 use App\Models\CountryModel;
+use App\Models\EmployeesModel;
 use App\Models\MetadataModel;
 use App\Models\SalesKontrakModel;
 use App\Models\SalesKontrakDetailModel;
@@ -31,6 +32,7 @@ class SalesKontrak extends BaseController
     protected $barangMasterSalesModel;
     protected $salesOrderExportModel;
     protected $dompdf;
+    protected $employessModel;
 
     public function __construct()
     {
@@ -47,6 +49,7 @@ class SalesKontrak extends BaseController
         $this->satuanModel = new SatuansModel();
         $this->barangMasterSalesModel = new BarangMasterSalesModel();
         $this->salesOrderExportModel = new SalesOrderExportModel();
+        $this->employessModel = new EmployeesModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -63,6 +66,10 @@ class SalesKontrak extends BaseController
         $dataTipeHarga = $this->metaDataModel->get_by_name('Tipe Harga Sales Ekspor');
         $dataSatuan = $this->satuanModel->findAll();
         $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->where('type_barang_sales', 'EKSPOR')->orderBy('createdAt', "DESC")->findAll();
+        $condition = [
+            'jabatan_name' => "SALES"
+        ];
+        $sales = $this->employessModel->getEmployeesComplete($this->this_company_id, $condition);
 
         $data = [
             "dataCustomer" => $dataCustomer,
@@ -70,7 +77,8 @@ class SalesKontrak extends BaseController
             "dataValuta" => $dataValuta,
             "dataTipeHarga" => $dataTipeHarga,
             'dataSatuan' => $dataSatuan,
-            'dataBarang' => $dataBarang
+            'dataBarang' => $dataBarang,
+            "dataSales" => $sales,
         ];
 
         return view('SalesInternasional/SalesKontrak/form', $data);
@@ -89,6 +97,10 @@ class SalesKontrak extends BaseController
         $dataSatuan = $this->satuanModel->findAll();
         $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->orderBy('createdAt', "DESC")->findAll();
         $isClosed = $this->salesOrderExportModel->where('sales_contract_id', $id)->findAll();
+        $condition = [
+            'jabatan_name' => "SALES"
+        ];
+        $sales = $this->employessModel->getEmployeesComplete($this->this_company_id, $condition);
 
         if ($dataSalesKontrak == null) {
             return redirect()->to('sales-kontrak');
@@ -104,6 +116,7 @@ class SalesKontrak extends BaseController
             'dataSalesKontrak' => $dataSalesKontrak,
             'dataSalesKontrakDetail' => $dataSalesKontrakDetail,
             'isClosed' => count($isClosed) == 0 ? '0' : '1',
+            "dataSales" => $sales,
         ];
 
         return view('SalesInternasional/SalesKontrak/form', $data);

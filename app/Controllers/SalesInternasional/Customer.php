@@ -5,6 +5,7 @@ namespace App\Controllers\SalesInternasional;
 use App\Controllers\BaseController;
 use App\Models\CountryModel;
 use App\Models\CustomerModel;
+use App\Models\EmployeesModel;
 
 class Customer extends BaseController
 {
@@ -15,6 +16,7 @@ class Customer extends BaseController
     protected $ProvincesModel;
     protected $countryModel;
     protected $CustomerModel;
+    protected $employessModel;
 
     public function __construct()
     {
@@ -24,14 +26,20 @@ class Customer extends BaseController
         $this->is_admin = session()->get("login")->is_admin;
         $this->countryModel = new CountryModel();
         $this->CustomerModel = new CustomerModel();
+        $this->employessModel = new EmployeesModel();
     }
 
     public function index()
     {
         $dataCountry = $this->countryModel->findAll();
+        $condition = [
+            'jabatan_name' => "SALES"
+        ];
+        $sales = $this->employessModel->getEmployeesComplete($this->this_company_id, $condition);
 
         $data = [
-            "dataCountry" => $dataCountry
+            "dataCountry" => $dataCountry,
+            "dataSales" => $sales,
         ];
 
         return view('SalesInternasional/Customer/index', $data);

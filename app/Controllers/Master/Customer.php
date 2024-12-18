@@ -48,15 +48,21 @@ class Customer extends BaseController
     public function customer()
     {
         //Get Provinces
+        $condition = [
+            'jabatan_name' => "SALES"
+        ];
+
         $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
         $dataBanks = $this->BanksModel->search_list(array(), 'name');
         $dataCountry = $this->countryModel->findAll();
         $dataCompanyUserLogin = $this->CompanyModel->getCompaniesUserLogin();
+        $sales = $this->employessModel->getEmployeesComplete($this->this_company_id, $condition);
 
         $data = [
             "dataProvinces" => $dataProvinces,
             "dataBanks" => $dataBanks,
             "dataCountry" => $dataCountry,
+            "dataSales" => $sales,
             "dataCompany" => $this->CompanyModel->whereIn('id', $dataCompanyUserLogin)->where('deletedAt', null)->orderBy('company', "ASC")->findAll()
         ];
 

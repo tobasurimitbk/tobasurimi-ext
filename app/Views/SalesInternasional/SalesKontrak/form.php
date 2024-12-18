@@ -459,7 +459,18 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales">
+                                <select class="form-select sales_id" name="sales_id" id="sales_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataSales)) {
+                                        foreach ($dataSales as $sales) {
+                                    ?>
+                                            <option value="<?= $sales["id"]; ?>"><?= strtoupper($sales["name"]); ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
                                 <label for="floatingInput">Nama Sales</label>
                             </div>
                         </div>
@@ -605,6 +616,12 @@
         theme: "bootstrap-5"
     })
 
+    $('#sales_id').select2({
+        placeholder: "Pilih Sales (Optional)",
+        theme: "bootstrap-5",
+        dropdownParent: $('#addCustomerModal')
+    })
+
     // BARANG 
     $('.barang_master_sales_id').select2({
         placeholder: "Pilih Barang",
@@ -677,14 +694,14 @@
     })
 
     //CSS SELECT2 FLOATING LABEL
-    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang')
+    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang')
+    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id')
         .parent('div')
         .children('span')
         .children('span')
@@ -700,7 +717,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id')
+    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,#sales_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');

@@ -47,7 +47,18 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales">
+                                <select class="form-select sales_id" name="sales_id" id="sales_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataSales)) {
+                                        foreach ($dataSales as $sales) {
+                                    ?>
+                                            <option value="<?= $sales["id"]; ?>"><?= strtoupper($sales["name"]); ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
                                 <label for="floatingInput">Nama Sales</label>
                             </div>
                         </div>
@@ -182,17 +193,12 @@
 
         // COUNTRY
         //CSS SELECT2 FLOATING LABEL
-        $(".country_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".country_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+        $('#sales_id').select2({
+            placeholder: "Pilih Sales (Opsional)",
+            theme: "bootstrap-5",
+            allowClear: true,
+            dropdownParent: $("#add_modal_internasional")
+        });
 
         $('.country_id').select2({
             placeholder: "Pilih Negara",
@@ -200,7 +206,21 @@
             dropdownParent: $(".add-modal-internasional .modal-content")
         })
 
-        $(".country_id")
+
+        $(".country_id,#sales_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".country_id,#sales_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+
+        $(".country_id,#sales_id")
             .parent('div')
             .children('span')
             .children('span')
@@ -282,6 +302,7 @@
                         $(".name").val(res.data.name);
                         $(".address").val(res.data.address);
                         $(".country_id").val(res.data.country_id).change();
+                        $(".sales_id").val(res.data.sales_id).change();
                         validatorInternasional.resetForm();
                         validatorInternasional.reset();
 
@@ -364,6 +385,7 @@
         $('.name').val(null);
         $('.country_id').val(null).change();
         $('.address').val(null);
+        $('.sales_id').val(null).change();
         $('.delete-form-internasional').hide();
     });
 
@@ -373,6 +395,7 @@
         $('.name').val(null);
         $('.country_id').val(null).change();
         $('.address').val(null);
+        $('.sales_id').val(null).change();
     });
 
     $(".btn-submit-parent-internasional").click(function() {
