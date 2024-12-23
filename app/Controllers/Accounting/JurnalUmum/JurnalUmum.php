@@ -37,6 +37,8 @@ use Dompdf\Options;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 
 class JurnalUmum extends BaseController
 {
@@ -111,6 +113,7 @@ class JurnalUmum extends BaseController
         $this->pembayaranInvoiceModel = new PembayaranInvoiceModel();
         $this->pembayaranInvoiceDetailModel = new PembayaranInvoiceDetailModel();
         $this->companiesModel = new CompaniesModel();
+        $this->db = \Config\Database::connect();
     }
 
     public function index()
@@ -649,6 +652,249 @@ class JurnalUmum extends BaseController
         $dompdf->render();
         $dompdf->stream('Laporan_Transaksi_Jurnal.pdf', ["Attachment" => false]);
     }
+
+    public function templateImport()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+    
+        // =====================
+        // Keterangan di atas Tabel
+        // =====================
+        $sheet->setCellValue('A1', 'Keterangan:');
+        $sheet->setCellValue('A2', 'Kategori Barang: LOKAL, IMPORT');
+        $sheet->setCellValue('A3', 'Tipe Barang: BAHAN BAKU, BAHAN PENOLONG');
+        $sheet->setCellValue('A4', 'Type Transaksi: BAHAN BAKU, SALDO AWAL, PENJUALAN, PEMBELIAN, PENERIMAAN, BIAYA, PEMBAYARAN, PENYESUAIAN, MUTASI');
+        $sheet->setCellValue('A5', 'Catatan: Untuk input Kategori Barang, pilih antara "LOKAL" atau "IMPORT".');
+        $sheet->setCellValue('A6', 'Untuk Tipe Barang, pilih antara "BAHAN BAKU" atau "BAHAN PENOLONG".');
+        $sheet->setCellValue('A7', 'Untuk Type Transaksi, pilih sesuai jenis transaksi yang relevan seperti "PEMBELIAN" atau "PENJUALAN".');
+    
+        // Apply styling to Keterangan
+        $sheet->getStyle('A1:A7')->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FFFF00']], // Yellow background
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT],
+        ]);
+    
+        // =====================
+        // Tabel 1: transaksi_jurnal
+        // =====================
+        $sheet->setCellValue('A8', 'Tabel 1: Transaksi Jurnal');
+        $sheet->setCellValue('A9', 'No Transaksi');
+        $sheet->setCellValue('B9', 'Tanggal Transaksi');
+        $sheet->setCellValue('C9', 'Total Debit');
+        $sheet->setCellValue('D9', 'Total Kredit');
+        $sheet->setCellValue('E9', 'Exchange Rate');
+        $sheet->setCellValue('F9', 'Uraian Transaksi');
+        $sheet->setCellValue('G9', 'No Bukti');
+        $sheet->setCellValue('H9', 'Kategori Barang');
+        $sheet->setCellValue('I9', 'Tipe Barang');
+        $sheet->setCellValue('J9', 'Type Transaksi');
+    
+        // Contoh data (opsional)
+        $sheet->setCellValue('A10', 'TRX001');
+        $sheet->setCellValue('B10', '2024-12-19');
+        $sheet->setCellValue('C10', '100000');
+        $sheet->setCellValue('D10', '100000');
+        $sheet->setCellValue('E10', '14500');
+        $sheet->setCellValue('F10', 'Transaksi Contoh');
+        $sheet->setCellValue('G10', 'INV001');
+        $sheet->setCellValue('H10', 'LOKAL');
+        $sheet->setCellValue('I10', 'BAHAN BAKU');
+        $sheet->setCellValue('J10', 'PEMBELIAN');
+    
+        // Format header Tabel 1
+        $sheet->getStyle('A9:J9')->applyFromArray([
+            'font' => ['bold' => true],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+            'borders' => ['bottom' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]],
+        ]);
+    
+        // =====================
+        // Tabel 2: jurnal_umum
+        // =====================
+        $sheet->setCellValue('L8', 'Tabel 2: Jurnal Umum');
+        $sheet->setCellValue('L9', 'No Transaksi');
+        $sheet->setCellValue('M9', 'Tanggal Jurnal');
+        $sheet->setCellValue('N9', 'Debit');
+        $sheet->setCellValue('O9', 'Kredit');
+        $sheet->setCellValue('P9', 'Valas');
+        $sheet->setCellValue('Q9', 'Kurs');
+        $sheet->setCellValue('R9', 'Keterangan');
+        $sheet->setCellValue('S9', 'COA');
+        $sheet->setCellValue('T9', 'Divisi');
+    
+        // Contoh data (opsional)
+        $sheet->setCellValue('L10', 'TRX001');
+        $sheet->setCellValue('M10', '2024-12-19');
+        $sheet->setCellValue('N10', '50000');
+        $sheet->setCellValue('O10', '50000');
+        $sheet->setCellValue('P10', 'USD');
+        $sheet->setCellValue('Q10', '15000');
+        $sheet->setCellValue('R10', 'Pembayaran Invoice');
+        $sheet->setCellValue('S10', '100501.C');
+        $sheet->setCellValue('T10', 'CANNING');
+    
+        // Format header Tabel 2
+        $sheet->getStyle('L9:T9')->applyFromArray([
+            'font' => ['bold' => true],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+            'borders' => ['bottom' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]],
+        ]);
+    
+        // =====================
+        // Auto-size kolom
+        // =====================
+        foreach (range('A', 'T') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+    
+        // =====================
+        // Ekspor ke file Excel
+        // =====================
+        $fileName = 'TemplateJurnalUmumHorizontal.xlsx';
+    
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+    
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+    
+
+    public function import()
+    {
+        // Get the uploaded file
+        $file = $this->request->getFile('file');
+    
+        // Validate file type
+        if (!$file->isValid() || $file->getMimeType() != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+            return $this->response->setJSON(['success' => false, 'message' => 'Invalid file type. Please upload an Excel file.']);
+        }
+    
+        try {
+            // Load the spreadsheet
+            $spreadsheet = IOFactory::load($file->getTempName());
+            $sheet = $spreadsheet->getActiveSheet();
+    
+            // Start a database transaction
+            $this->db->transBegin();
+    
+            // =====================
+            // Fetch all metadata and lookup tables
+            // =====================
+            $metadata = $this->MetadataModel->where('name', 'Valuta')->findAll();
+            $metadataLookup = [];
+            foreach ($metadata as $meta) {
+                $metadataLookup[$meta['value']] = $meta['id'];
+            }
+
+            $metadataTypePayment = $this->MetadataModel->where('name', 'tipe_transaksi')->findAll();
+            $metadataLookupTypePayment = [];
+            foreach ($metadataTypePayment as $meta) {
+                $metadataLookupTypePayment[$meta['value']] = $meta['id'];
+            }
+    
+            $coaList = $this->Sub_AkunsModel->findAll();
+            $coaLookup = [];
+            foreach ($coaList as $coa) {
+                $coaLookup[$coa['no_sub']] = $coa['id'];
+            }
+
+            $divisiList = $this->divisionModel->findAll();
+            $divisiLookup = [];
+            foreach ($divisiList as $divisi) {
+                $divisiLookup[$divisi['divisi']] = $divisi['id'];
+            }
+    
+            // =====================
+            // Parse "transaksi_jurnal" data
+            // =====================
+            $transaksi_jurnal_data = [];
+            $row = 10; // Start reading from row 10
+            while (trim($sheet->getCell("A" . $row)->getValue()) != '') {
+                $typeTransaksiValue = $sheet->getCell('J' . $row)->getValue();
+                $valasValue = $sheet->getCell('P' . $row)->getValue();
+    
+                $type_transaksi = $metadataLookupTypePayment[$typeTransaksiValue] ?? null;
+                $valas_id = $metadataLookup[$valasValue] ?? null;
+    
+                $transaksi_jurnal_data[] = [
+                    'no_transaksi' => $sheet->getCell('A' . $row)->getValue(),
+                    'tanggal_transaksi' => $sheet->getCell('B' . $row)->getValue(),
+                    'total_debit' => $sheet->getCell('C' . $row)->getValue(),
+                    'total_kredit' => $sheet->getCell('D' . $row)->getValue(),
+                    'exchange_rate' => $sheet->getCell('E' . $row)->getValue(),
+                    'uraian_transaksi' => $sheet->getCell('F' . $row)->getValue(),
+                    'no_bukti' => $sheet->getCell('G' . $row)->getValue(),
+                    'kategori_barang' => $sheet->getCell('H' . $row)->getValue(),
+                    'tipe_barang' => $sheet->getCell('I' . $row)->getValue(),
+                    'type_transaksi' => $type_transaksi,
+                    'valas' => $sheet->getCell('P' . $row)->getValue(),
+                    'valas_id' => $valas_id,
+                    'metode_input' => "system",
+                ];
+                $row++;
+            }
+    
+            // Insert "transaksi_jurnal" data into database
+            $this->transaksiJurnalModel->insertBatch($transaksi_jurnal_data);
+    
+            // =====================
+            // Parse "jurnal_umum" data
+            // =====================
+            $jurnal_umum_data = [];
+            $row = 10; // Start reading from row 10 for jurnal_umum data
+            while (trim($sheet->getCell("L" . $row)->getValue()) != '') {
+
+                $noTransaksiValue = $sheet->getCell('L' . $row)->getValue();
+                $coaValue = $sheet->getCell('s' . $row)->getValue();
+                $divisiValue = $sheet->getCell('T' . $row)->getValue();
+    
+                $transaksi_id = $this->transaksiJurnalModel->where('no_transaksi', $noTransaksiValue)->select('id')->first()['id'] ?? null;
+                $coa_id = $coaLookup[$coaValue] ?? null;
+                $divisi_id = $divisiLookup[$divisiValue] ?? null;
+
+                $jurnal_umum_data[] = [
+                    'id_transaksi' => $transaksi_id,
+                    'tanggal_jurnal' => $sheet->getCell('M' . $row)->getValue(),
+                    'debit' => $sheet->getCell('N' . $row)->getValue(),
+                    'kredit' => $sheet->getCell('O' . $row)->getValue(),
+                    'id_coa' => $coa_id,
+                    'company_id' => $this->this_company_id,
+                    'divisi_id' => $divisi_id,
+                    'id_inputer' => $this->this_user_id,
+                    'valas' => $sheet->getCell('P' . $row)->getValue(),
+                    'kurs' => $sheet->getCell('Q' . $row)->getValue(),
+                    'keterangan' => $sheet->getCell('R' . $row)->getValue(),
+                ];
+                $row++;
+            }
+    
+            // Insert "jurnal_umum" data into database
+            $this->jurnalUmumModel->insertBatch($jurnal_umum_data);
+    
+            // Commit the database transaction if everything is fine
+            $this->db->transCommit();
+    
+            // Return a success response
+            return $this->response->setJSON(['success' => true, 'message' => 'Import berhasil']);
+    
+        } catch (\Exception $e) {
+            // Rollback the transaction if there is an error
+            $this->db->transRollback();
+    
+            // Return a detailed error response for debugging
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Import gagal: ' . $e->getMessage(),
+                'error' => $e->getTraceAsString(),
+            ]);
+        }
+    }    
+
 
     public function indexBackup()
     {
@@ -1712,11 +1958,6 @@ class JurnalUmum extends BaseController
         } elseif ($typePenjualan == "INTERNASIONAL") {
             # code...
         }
-
-        var_dump($kasDepartment);
-        var_dump($piutangDepartment);
-        var_dump($gajiDepartment);
-        var_dump($hppDepartment);
     }
 
     public function insertDataPembayaranInvoice($pembayaranInvoiceId)

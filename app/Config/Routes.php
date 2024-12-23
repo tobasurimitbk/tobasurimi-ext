@@ -1856,6 +1856,8 @@ $routes->get('/api/sync-attendances', 'API\Attendances::sync_attendance', ['filt
 $routes->get('/jurnal', 'Accounting\JurnalUmum\JurnalUmum::index', ['filter' => 'Auth']);
 $routes->post('/jurnal/generate-no-bukti', 'Accounting\JurnalUmum\JurnalUmum::generateNoBukti', ['filter' => 'Auth']);
 // $routes->post('/jurnal/addJurnal', 'Accounting\JurnalUmum\JurnalUmum::save', ['filter' => 'Auth']);
+$routes->post('/jurnal/import', 'Accounting\JurnalUmum\JurnalUmum::import', ['filter' => 'Auth']);
+$routes->get('/jurnal/import/template', 'Accounting\JurnalUmum\JurnalUmum::templateImport', ['filter' => 'Auth']);
 $routes->post('/jurnal/getSubAkuns', 'Accounting\JurnalUmum\JurnalUmum::searchSubAkun', ['filter' => 'Auth']);
 $routes->post('/jurnal/getSubAkunsExact', 'Accounting\JurnalUmum\JurnalUmum::searchSubAkunExact', ['filter' => 'Auth']);
 $routes->get('/jurnal/all', 'Accounting\JurnalUmum\JurnalUmum::all', ['filter' => 'Auth']);
@@ -1995,7 +1997,9 @@ $routes->get('/laporan-accounting/bukubesar/printExcel/(:segment)/(:segment)/(:s
 $routes->get('/laporan-accounting/bukubesar/dropdown-account', 'Laporan\Accounting\BukuBesar::dropdownAccount', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/jurnalumum', 'Laporan\Accounting\JurnalUmum::index', ['filter' => 'Auth']);
-$routes->post('/laporan-accounting/jurnalumum', 'Laporan\Accounting\JurnalUmum::index', ['filter' => 'Auth']);
+$routes->post('/laporan-accounting/jurnalumum/getAll', 'Laporan\Accounting\JurnalUmum::getAll', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/jurnalumum/import', 'Laporan\Accounting\JurnalUmum::import', ['filter' => 'Auth']);
+$routes->post('/laporan-accounting/jurnalumum/import', 'Laporan\Accounting\JurnalUmum::import', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/jurnalumum/printPDF/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\JurnalUmum::exportPDF/$1/$2/$3', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/jurnalumum/printExcel/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\JurnalUmum::exportExcel/$1/$2/$3', ['filter' => 'Auth']);
 
