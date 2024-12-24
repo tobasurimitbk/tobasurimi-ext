@@ -873,10 +873,6 @@ class PembayaranInvoice extends BaseController
                         'qty' => $l->qty_invoice,
                         'harga_satuan' => $l->harga_barang_invoice,
                         'harga_total' => $l->amount_invoice,
-                        'akun_kas_lain' => $l->akun_kas_lain,
-                        'akun_selisih_lain' => $l->akun_selisih_lain,
-                        'keterangan_pajak' => $l->keterangan_pajak,
-                        'nominal_pajak' => $l->nominal_pajak
                     ]);
                 }
 
@@ -945,7 +941,7 @@ class PembayaranInvoice extends BaseController
                     'user_id' => $this->user_id,
                     'divisi_id' => $this->request->getVar('divisi_id'),
                     'payment_method' => $this->request->getVar('payment_methods'),
-                    'customer_id' => $this->request->getVar('customer_id'),
+                    'customer_id' => decrypt($this->request->getVar('customer')),
                     'invoice_id' => $no_dokumen_implode,
                     'no_pembayaran' => $this->request->getVar('no_bukti_pembayaran'),
                     'keterangan' =>  $this->request->getVar('keterangan'),
