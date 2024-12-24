@@ -935,9 +935,11 @@
                     $(this).val(greatFormatRupiah(pajakValue));
                 }
 
-                const newSubtotal = subtotalValue - pajakValue;
+                // Perbaikan perhitungan subtotal dengan pembulatan
+                const newSubtotal = Math.round((subtotalValue - pajakValue) * 100) / 100;
                 subtotalCell.text(greatFormatRupiah(newSubtotal));
             });
+
 
             let pajakCell = $('<td class="text-center">');
             pajakCell.append(pajakInput);
@@ -969,7 +971,6 @@
             totalSudahDiBayar
         );
     }
-
 
     function addSummaryRows(table, total_amount, total_invoice, limit_bayar, totalSudahDiBayar) {
         // Pastikan semua parameter memiliki nilai default 0 jika undefined, null, atau NaN
