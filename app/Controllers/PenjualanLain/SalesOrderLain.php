@@ -347,7 +347,7 @@ class SalesOrderLain extends BaseController
         $salesOrderLain = $this->salesOrderLainModel->find($id);
         $salesOrderLainList = $this->salesOrderLainDetailModel->where('sales_order_lain_id', $id)->findAll();
 
-        $this->jurnalUmumController->insertDataPenjualan($id, "LAIN");
+        // $this->jurnalUmumController->insertDataPenjualan($id, "LAIN");
         if ($salesOrderLain['bc_id'] === "0") {
             foreach ($salesOrderLainList as $s) {
                 $stock = $this->stockModel->find($s['stock_id']);
@@ -464,7 +464,7 @@ class SalesOrderLain extends BaseController
 
         if (!empty($this->request->getVar('stock_id'))) {
             $condition = [
-                'stock_details2.bc_id' => $bcIdSearch,
+                // 'stock_details2.bc_id' => $bcIdSearch,
                 // 'stock_details.sumber' => "LPB"
             ];
 

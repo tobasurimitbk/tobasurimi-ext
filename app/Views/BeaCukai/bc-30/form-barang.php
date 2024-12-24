@@ -39,6 +39,7 @@
                             $bc30Model = new App\Models\BC30Model();
                             ?>
                             <?php foreach ($barang as $b) : ?>
+                                <?php $totalHarga += $b['harga_number'] ?>
                                 <?php $detailBarang = $bc30Model->detailBarang($bc30['id'], $b['kode_barang_internal']); ?>
                                 <tr style="text-align: center; cursor:pointer;" data-kode_barang="<?= encrypt($b['kode_barang_internal']) ?>" data-id="<?= encrypt($bc30['id']) ?>">
                                     <td><?= $i++; ?></td>
@@ -67,15 +68,10 @@
                                                 BELUM DIISI
                                             </span>
                                         <?php else : ?>
-                                            <?php if (count($detailBarang['bcDetail']->barangPemilik) == 0) : ?>
-                                                <span class="badge badge-danger">
-                                                    BELUM DIISI
-                                                </span>
-                                            <?php else : ?>
-                                                <span class="badge badge-success">
-                                                    SUDAH DIISI
-                                                </span>
-                                            <?php endif; ?>
+
+                                            <span class="badge badge-success">
+                                                SUDAH DIISI
+                                            </span>
                                         <?php endif; ?>
                                     </td>
                                 </tr>

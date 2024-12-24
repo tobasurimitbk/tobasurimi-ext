@@ -347,10 +347,20 @@ class PengembalianBarangModel extends Model
                 $po = $rmPurchaseOrderModel->where('id', $q['purchase_order_id'])->first();
             } elseif ($penerimanBarang['status_penerimaan'] == "IMPORT" && $penerimanBarang['tipe_bahan'] == "BAKU") {
                 // IMPORT BB
-                $po = $rmImportPoModel->where('id', $q['purchase_order_id'])->first();
+                $po = $rmImportPoModel->select('rm_import_pos.*,metadata.value as valas_name')
+                    ->join('metadata', 'metadata.id = rm_import_pos.currency', 'left')
+                    ->where('rm_import_pos.id', $q['purchase_order_id'])
+                    ->first();
+
+                $valasName = $po['valas_name'];
             } else {
                 // LOKAL BP DAN IMPORT BP
-                $po = $amPurchaseOrderModel->where('id', $q['purchase_order_id'])->first();
+                $po = $amPurchaseOrderModel->select('am_purchase_orders.*,metadata.value as valas_name')
+                    ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
+                    ->where('am_purchase_orders.id', $q['purchase_order_id'])
+                    ->first();
+
+                $valasName = $po['valas_name'];
             }
 
             if ($pengembalianBarangDetail != null) {
@@ -393,6 +403,8 @@ class PengembalianBarangModel extends Model
                     'stock_id' => $dataStock == null ? null : $dataStock['stock_id'],
                     'bc_id' => $dataStock == null ? null : $dataStock['bc_id'],
                     'stock_dokumen' => $dataStock == null ? null : $dataStock['stock_dokumen'],
+                    'tipe_barang' => $dataStock == null ? null : strtoupper(str_replace('_', ' ', $dataStock['tipe_barang'])),
+                    'valas_name' => isset($valasName) ? $valasName : ''
                 ];
             }
         }

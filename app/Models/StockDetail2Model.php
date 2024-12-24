@@ -276,6 +276,10 @@ class StockDetail2Model extends Model
             $dataQry->groupStart();
         }
 
+        if (isset($addCondition['where_in_sumber'])) {
+            $dataQry->whereIn('sumber', $addCondition['where_in_sumber']);
+        }
+
         if ($addCondition['bc_id'] || $addCondition['bc_id'] != "") {
             $dataQry->where('stock_details2.bc_id', $addCondition['bc_id']);
         }
@@ -912,6 +916,7 @@ class StockDetail2Model extends Model
             stock.barang1_id,
             stock.barang2_id,
             stock.kemasan_id,
+            stock.tipe_barang,
             stock_details2.id,
             stock_details2.bc_id,
             stock_details2.stock_detail_id,

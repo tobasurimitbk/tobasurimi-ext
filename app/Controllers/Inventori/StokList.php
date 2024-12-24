@@ -1801,6 +1801,7 @@ class StokList extends BaseController
             "bc_id" => "",
             "divisi_id" => "",
             "warehouse_id" => "",
+            "where_in_sumber" => explode(",", $this->request->getVar('sumber')),
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
@@ -1815,7 +1816,6 @@ class StokList extends BaseController
             "stock_details2.stock_id" => $stok_id,
             "stock_details2.deletedAt" => null,
             "stock.deletedAt" => null,
-            "stock_details.sumber" => trim($this->request->getVar('sumber')),
             "stock_details.deletedAt" => null,
         ];
 
@@ -1837,16 +1837,8 @@ class StokList extends BaseController
 
             // NO AJU REFERENSI
             $data->no_aju_referensi = $data->no_aju;
-            // TEMPELKAN SAJA NO BC 3.0 JIKA PENJUALAN
-            if ($data->sumber == "PENJUALAN") {
-                $bc30Lokal = $this->bc30Model
-                    ->select('bc_30.no_aju, bc_30.tipe_sales_order, sales_order.bc_type, customers.name AS customer_name')
-                    ->join('sales_order', 'sales_order.id = bc_30.sales_order_id', 'left')
-                    ->join('stuffing_lokal', 'stuffing_lokal.sales_order_id = sales_order.id', 'left')
-                    ->join('customers', 'customers.id = sales_order.id_customer', 'left')
-                    ->where('stuffing_lokal.no_stuffing', $data->no_dokumen2)
-                    ->first();
-
+            // TEMPELKAN SAJA NO BC 3.0 JIKA PENJUALAN DAN RETUR
+            if ($data->sumber == "PENJUALAN" || $data->sumber == "RETUR") {
                 $bc30Internasional = $this->bc30Model
                     ->select('bc_30.no_aju, bc_30.tipe_sales_order, sales_order_export.bc_type, customers.name AS customer_name')
                     ->join('sales_order_export', 'sales_order_export.sales_order_export_id = bc_30.sales_order_id', 'left')
@@ -1854,6 +1846,23 @@ class StokList extends BaseController
                     ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
                     ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
                     ->where('stuffing_internasional.no_stuffing', $data->no_dokumen2)
+                    ->first();
+
+                $bc30PengembalianBarang = $this->bc30Model
+                    ->select('bc_30.no_aju, pengembalian_barang.bc_pengeluaran_id as bc_type, suppliers.name as customer_name')
+                    ->join('pengembalian_barang', 'pengembalian_barang.id = bc_30.pengembalian_barang_id', 'left')
+                    ->join('penerimaan_barang', 'penerimaan_barang.id = pengembalian_barang.penerimaan_barang_id', 'left')
+                    ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+                    ->where('pengembalian_barang.no_surat_jalan', $data->no_dokumen2)
+                    ->where('bc_30.company_id', $this->this_company_id)
+                    ->first();
+
+                $bc30SalesOrderLain = $this->bc30Model
+                    ->select('bc_30.no_aju, sales_order_lain.bc_id AS bc_type, customers.name AS customer_name')
+                    ->join('sales_order_lain', 'sales_order_lain.id = bc_30.sales_order_lain_id', 'left')
+                    ->join('customers', 'customers.id = sales_order_lain.customer_id', 'left')
+                    ->where('sales_order_lain.no_sales_order', $data->no_dokumen2)
+                    ->where('bc_30.company_id', $this->this_company_id)
                     ->first();
 
                 $bc25 = $this->bc25Model
@@ -1872,27 +1881,36 @@ class StokList extends BaseController
                     ->where('bc_41.company_id', $this->this_company_id)
                     ->first();
 
-                if ($bc30Lokal != null) {
-                    // STUFFING LOKAL BC 3.0 SUDAH DIBUAT
-                    $dokumenBC = $this->metaDataModel->find($bc30Lokal['bc_type']);
-                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
-                    $data->no_aju = $bc30Lokal['no_aju'];
-                    $data->customer_name = $bc30Lokal['customer_name'];
-                    $data->tipe_sales_order = $bc30Lokal['tipe_sales_order'];
-                } elseif ($bc30Internasional != null) {
+                if ($bc30Internasional != null) {
                     // STUFFING INTERNASIONAL BC 3.0 SUDAH DIBUAT
                     $dokumenBC = $this->metaDataModel->find($bc30Internasional['bc_type']);
                     $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
                     $data->no_aju = $bc30Internasional['no_aju'];
                     $data->customer_name = $bc30Internasional['customer_name'];
                     $data->tipe_sales_order = $bc30Internasional['tipe_sales_order'];
+                } elseif ($bc30PengembalianBarang != null) {
+                    // RETUR PEMBELIAN BC 3.0
+                    $dokumenBC = $this->metaDataModel->find($bc30PengembalianBarang['bc_type']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc30PengembalianBarang['no_aju'];
+                    $data->customer_name = $bc30PengembalianBarang['customer_name'];
+                    $data->tipe_sales_order = "RETUR PEMBELIAN";
+                    $data->no_dokumen2 = "-"; // STUFFING NO GA ADA
+                } elseif ($bc30SalesOrderLain != null) {
+                    // SALES ORDER LAIN BC 3.0
+                    $dokumenBC = $this->metaDataModel->find($bc30SalesOrderLain['bc_type']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc30SalesOrderLain['no_aju'];
+                    $data->customer_name = $bc30SalesOrderLain['customer_name'];
+                    $data->tipe_sales_order = "PENJUALAN LAIN";
+                    $data->no_dokumen2 = "-"; // STUFFING NO GA ADA
                 } elseif ($bc25 != null) {
                     // BEA CUKAI 2.5
                     $dokumenBC = $this->metaDataModel->find($bc25['bc_id']);
                     $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
                     $data->no_aju = $bc25['no_aju'];
                     $data->customer_name = $bc25['customer_name'];
-                    $data->tipe_sales_order = "-";
+                    $data->tipe_sales_order = "PENJUALAN LAIN";
                     $data->no_dokumen2 = "-"; // STUFFING NO GA ADA
                 } elseif ($bc41 != null) {
                     // BEA CUKAI 4.1
@@ -1900,7 +1918,7 @@ class StokList extends BaseController
                     $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
                     $data->no_aju = $bc41['no_aju'];
                     $data->customer_name = $bc41['customer_name'];
-                    $data->tipe_sales_order = "-";
+                    $data->tipe_sales_order = "PENJUALAN LAIN";
                     $data->no_dokumen2 = "-"; // STUFFING NO GA ADA
                 } else {
                     // BELUM DIBUAT SAMA SEKALI DOKUMEN BC 3.O NYA
@@ -1908,12 +1926,14 @@ class StokList extends BaseController
                     $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
                     $data->customer_name = "-";
                     $data->tipe_sales_order = "-";
+                    $data->no_dokumen2 = "-"; // STUFFING NO GA ADA
                 }
             } else {
                 $dokumenBC = $this->metaDataModel->find($data->bc_id);
                 $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
                 $data->customer_name = "-";
                 $data->tipe_sales_order = "-";
+                $data->no_dokumen2 = "-"; // STUFFING NO GA ADA
             }
 
             // REFERENSI

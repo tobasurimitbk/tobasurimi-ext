@@ -10,6 +10,9 @@
             </a>
         <?php endif; ?>
     </div>
+    <div class="alert alert-light" role="alert">
+        Form ini Digunakan untuk menjual / mengeluarkan <b><u>Barang Scrap, Kemasan, Bahan Baku dan Bahan Penolong</u> </b> Langsung Dari Inventori
+    </div>
     <div class="card">
         <?= csrf_field() ?>
         <div class="card-body">

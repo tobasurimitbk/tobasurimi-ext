@@ -121,21 +121,42 @@ class StokHistori extends BaseController
                 $no_dokumen = $data->no_dokumen1;
             }
 
+            // REFERENSI
+            if ($data->sumber == "PENJUALAN" || $data->sumber == "MUTASI" || $data->sumber == "RETUR") {
+                $dokumenBCReferensi = $this->metaDataModel->find($data->bc_id);
+                $bcNameReferensi = $dokumenBCReferensi == null ? "NON PABEAN" : $dokumenBCReferensi['value'];
+                if ($data->sumber != "MUTASI") {
+                    $data->no_aju_referensi = $data->no_aju;
+                } else {
+                    $data->no_aju_referensi = "-";
+                }
+            } else {
+                $bcNameReferensi = "-";
+                $data->no_aju_referensi = "-";
+            }
+
+
             // TEMPELKAN SAJA NO BC 3.0 JIKA PENJUALAN
             if ($data->sumber == "PENJUALAN" || $data->sumber == "MUTASI" || $data->sumber == "RETUR") {
-                $bc30Lokal = $this->bc30Model
-                    ->select('bc_30.no_aju, sales_order.bc_type')
-                    ->join('sales_order', 'sales_order.id = bc_30.sales_order_id', 'left')
-                    ->join('stuffing_lokal', 'stuffing_lokal.sales_order_id = sales_order.id', 'left')
-                    ->where('stuffing_lokal.no_stuffing', $data->no_dokumen2)
-                    ->where('bc_30.company_id', $this->this_company_id)
-                    ->first();
-
                 $bc30Internasional = $this->bc30Model
                     ->select('bc_30.no_aju, sales_order_export.bc_type')
                     ->join('sales_order_export', 'sales_order_export.sales_order_export_id = bc_30.sales_order_id', 'left')
                     ->join('stuffing_internasional', 'stuffing_internasional.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
                     ->where('stuffing_internasional.no_stuffing', $data->no_dokumen2)
+                    ->where('bc_30.company_id', $this->this_company_id)
+                    ->first();
+
+                $bc30PengembalianBarang = $this->bc30Model
+                    ->select('bc_30.no_aju, pengembalian_barang.bc_pengeluaran_id')
+                    ->join('pengembalian_barang', 'pengembalian_barang.id = bc_30.pengembalian_barang_id', 'left')
+                    ->where('pengembalian_barang.no_surat_jalan', $data->no_dokumen2)
+                    ->where('bc_30.company_id', $this->this_company_id)
+                    ->first();
+
+                $bc30SalesOrderLain = $this->bc30Model
+                    ->select('bc_30.no_aju, sales_order_lain.bc_id')
+                    ->join('sales_order_lain', 'sales_order_lain.id = bc_30.sales_order_lain_id', 'left')
+                    ->where('sales_order_lain.no_sales_order', $data->no_dokumen2)
                     ->where('bc_30.company_id', $this->this_company_id)
                     ->first();
 
@@ -181,15 +202,21 @@ class StokHistori extends BaseController
                     ->where('mutasi_global.no_mutasi', $data->no_dokumen2)
                     ->first();
 
-                if ($bc30Lokal != null) {
-                    // STUFFING LOKAL BC 3.0 SUDAH DIBUAT
-                    $dokumenBC = $this->metaDataModel->find($bc30Lokal['bc_type']);
+                if ($bc30SalesOrderLain != null) {
+                    // SALES ORDER LAIN
+                    $dokumenBC = $this->metaDataModel->find($bc30SalesOrderLain['bc_id']);
                     $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
-                    $data->no_aju = $bc30Lokal['no_aju'];
+                    $data->no_aju = $bc30SalesOrderLain['no_aju'];
+                } elseif ($bc30PengembalianBarang != null) {
+                    // RETUR
+                    $dokumenBC = $this->metaDataModel->find($bc30PengembalianBarang['bc_pengeluaran_id']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc30PengembalianBarang['no_aju'];
                 } elseif ($bc30Internasional != null) {
                     // STUFFING INTERNASIONAL BC 3.0 SUDAH DIBUAT
                     $dokumenBC = $this->metaDataModel->find($bc30Internasional['bc_type']);
                     $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju_referensi = $data->no_aju;
                     $data->no_aju = $bc30Internasional['no_aju'];
                 } elseif ($bc25SalesOrderLain != null) {
                     // BEA CUKAI 2.5 SALES ORDER
@@ -230,17 +257,6 @@ class StokHistori extends BaseController
                 $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
             }
 
-            // REFERENSI
-            if ($data->sumber == "PENJUALAN" || $data->sumber == "MUTASI" || $data->sumber == "RETUR") {
-                $dokumenBCReferensi = $this->metaDataModel->find($data->bc_id);
-                $bcNameReferensi = $dokumenBCReferensi == null ? "NON PABEAN" : $dokumenBCReferensi['value'];
-                if ($data->sumber != "MUTASI") {
-                    $data->no_aju_referensi = $data->no_aju;
-                }
-            } else {
-                $bcNameReferensi = "-";
-                $data->no_aju_referensi = "-";
-            }
 
 
             if ($data->kemasan_id == 0) {

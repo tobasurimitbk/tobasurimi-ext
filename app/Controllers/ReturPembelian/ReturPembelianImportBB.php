@@ -4,6 +4,7 @@ namespace App\Controllers\ReturPembelian;
 
 use App\Controllers\BaseController;
 use App\Models\BC25Model;
+use App\Models\BC30Model;
 use App\Models\BC41Model;
 use App\Models\DivisisModel;
 use App\Models\MetadataModel;
@@ -26,6 +27,7 @@ class ReturPembelianImportBB extends BaseController
     protected $metaDataModel;
     protected $bc41Model;
     protected $bc25Model;
+    protected $bc30Model;
     protected $dompdf;
 
     public function __construct()
@@ -41,6 +43,7 @@ class ReturPembelianImportBB extends BaseController
         $this->metaDataModel = new MetadataModel();
         $this->bc41Model = new BC41Model();
         $this->bc25Model = new BC25Model();
+        $this->bc30Model = new BC30Model();
         $this->dompdf = new Dompdf();
     }
 
@@ -96,7 +99,7 @@ class ReturPembelianImportBB extends BaseController
             $status_bc = 0;
             $dokumen_pengeluaran = $this->metaDataModel->where('id', $data->bc_pengeluaran_id)->first();
 
-            if ($data->bc_pengeluaran_id == 0) {
+            if ($data->bc_pengeluaran_id == '0') {
                 // TIDAK ADA
                 if ($data->status_post == "FINISH") {
                     $status_bc = 1;
@@ -109,8 +112,9 @@ class ReturPembelianImportBB extends BaseController
                 // 49 -> 2.5
                 $bc25 = $this->bc25Model->where('pengembalian_barang_id', $data->id)->first();
                 $bc41 = $this->bc41Model->where('pengembalian_barang_id', $data->id)->first();
+                $bc30 = $this->bc30Model->where('pengembalian_barang_id', $data->id)->first();
 
-                if ($bc25 != null || $bc41 != null) {
+                if ($bc25 != null || $bc41 != null || $bc30 != null) {
                     $status_bc = 1;
                 } else {
                     $status_bc = 0;
@@ -128,7 +132,12 @@ class ReturPembelianImportBB extends BaseController
                 "warehouse_name"        => $data->warehouse_name,
                 "status_post"           => $data->status_post,
                 "status_bc"             => $status_bc,
-                "dokumen_pengeluaran"   => $dokumen_pengeluaran == null ? "NON PABEAN" : $dokumen_pengeluaran['value'],
+                "dokumen_pengeluaran" =>
+                $data->bc_pengeluaran_id == '0'
+                    ? "NON PABEAN"
+                    : ($data->bc_pengeluaran_id == null
+                        ? "-"
+                        : $dokumen_pengeluaran['value']),
             ]);
         }
 
@@ -148,7 +157,6 @@ class ReturPembelianImportBB extends BaseController
     {
         $data = [
             'dataDivisi' => $this->divisiModel->getDivisiAccess(),
-            'dataDokumenPabean' => $this->metaDataModel->where('name', "jenis_dok_aju")->where('value', "BC 2.5")->findAll()
         ];
 
         return view('Warehouse/returnBarang/formImportBB', $data);
@@ -183,7 +191,6 @@ class ReturPembelianImportBB extends BaseController
 
         $data = [
             'dataDivisi' => $this->divisiModel->getDivisiAccess(),
-            'dataDokumenPabean' => $this->metaDataModel->where('name', "jenis_dok_aju")->where('value', "BC 2.5")->findAll(),
             'dataPengembalianBarang' => $dataPengembalianBarang,
             'dataPengembalianBarangDetail' => $resultPengembalianDetail,
             'dataPenerimaanBarang' => $dataPenerimaanBarang

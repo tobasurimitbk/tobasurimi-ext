@@ -54,21 +54,23 @@
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="form-floating mb-3 mt-1" style="height: 50px;">
-                            <select <?= !empty($bc30) ? ($bc30['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select tipe_sales_order" id="tipe_sales_order" name="tipe_sales_order" aria-label="Floating label select example">
+                            <select <?= !empty($bc30) ? ($bc30['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select type_reference" id="type_reference" name="type_reference" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <option <?= !empty($bc30) ? ($bc30['tipe_sales_order'] == "INTERNASIONAL" ? "selected" : "") : '' ?> value="INTERNASIONAL">SALES ORDER EKSPOR</option>
-                                <option <?= !empty($bc30) ? ($bc30['tipe_sales_order'] == "LOKAL" ? "selected" : "") : '' ?> value="LOKAL">SALES ORDER LOKAL</option>
+                                <option <?= !empty($bc30) ? ($bc30['sales_order_id'] != null ? "selected" : "") : '' ?> value="ORDER FORM EKSPOR">ORDER FORM EKSPOR</option>
+                                <option <?= !empty($bc30) ? ($bc30['pengembalian_barang_id'] != null ? "selected" : "") : '' ?> value="RETUR PEMBELIAN">RETUR PEMBELIAN EKSPOR</option>
+                                <option <?= !empty($bc30) ? ($bc30['sales_order_lain_id'] != null ? "selected" : "") : '' ?> value="ORDER FORM LAIN">ORDER FORM LAIN (SCRAP, KEMASAN, BARANG BEKAS)</option>
                             </select>
                             </select>
-                            <label style="z-index: 1;">Pilih Tipe Sales Order</label>
+                            <label style="z-index: 1;">Pilih Tujuan Pengeluaran</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3 mt-1" style="height: 50px;">
-                            <select <?= !empty($bc30) ? ($bc30['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select sales_order_id" id="sales_order_id" name="sales_order_id" aria-label="Floating label select example">
+                            <select <?= !empty($bc30) ? ($bc30['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select reference_id" id="reference_id" name="reference_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php if (!empty($bc30)) : ?>
-                                    <option selected data-sales_order_id="<?= $bc30['sales_order_id'] ?>" data-nama_customer="<?= $bc30['nama_customer'] ?>" data-country_name="<?= $bc30['country_name'] ?>" data-alamat_customer="<?= $bc30['alamat'] ?>" value="<?= $bc30['sales_order_id'] ?>">
+
+                                    <option selected data-reference_id="<?= $bc30['reference_id'] ?>" data-nama_customer="<?= $bc30['nama_customer'] ?>" data-country_name="<?= $bc30['country_name'] ?>" data-alamat_customer="<?= $bc30['alamat'] ?>" value="<?= $bc30['reference_id'] ?>">
                                         <?= $bc30['no_sales_order'] ?>
                                     </option>
                                 <?php endif; ?>
@@ -80,7 +82,7 @@
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input disabled placeholder="Company Asal" value="<?= !empty($bc30) ? $bc30['nama_customer'] : '' ?>" class="form-control nama_customer" id="nama_customer" aria-label="Floating label select example" />
-                            <label for="floatingInput" style="z-index: 1;">Nama Customer</label>
+                            <label for="floatingInput" style="z-index: 1;">Nama Penerima</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
@@ -140,18 +142,14 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="text-align: center;">No</th>
-                                    <th style="text-align: center;">Tanggal Keluar</th>
-                                    <th style="text-align: center;">Tipe Barang (Internal)</th>
+                                    <th style="text-align: center;">Tipe Barang</th>
                                     <th style="text-align: center;">Dokumen Asal</th>
-                                    <th style="text-align: center;">Kode Barang (Internal)</th>
-                                    <th style="text-align: center;">Barang - Spesifikasi (Internal)</th>
-                                    <th style="text-align: center;">Kode Barang (Sales)</th>
-                                    <th style="text-align: center;">Barang - Spesifikasi (Sales)</th>
-                                    <th style="text-align: center;">No Stuffing / Pengeluaran Barang</th>
+                                    <th style="text-align: center;">Kode Barang</th>
+                                    <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Departemen / Warehouse Pengeluaran</th>
                                     <th style="text-align: center;">Qty Keluar</th>
-                                    <th style="text-align: center;">Satuan (Sales)</th>
-                                    <th style="text-align: center;">Satuan (Internal)</th>
+                                    <th style="text-align: center;">Satuan</th>
+                                    <th style="text-align: center;">Valas</th>
                                     <th style="text-align: center;">Harga</th>
                                 </tr>
                             </thead>
@@ -159,7 +157,7 @@
                             </tbody>
                             <tfoot class="foot-detail-table" id="foot-detail-table">
                                 <tr>
-                                    <td colspan="14" style="text-align: center;">
+                                    <td colspan="11" style="text-align: center;">
                                         Tidak Ada Barang
                                     </td>
                                 </tr>
@@ -205,15 +203,14 @@
                                 <label>Kode Kantor</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12 mt-1">
+                        <div class="col-sm-6 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input id="no_pengajuan" value="<?= !empty($bc30) ? $bc30['no_aju'] : $noAju ?>" name="no_pengajuan" type="text" readonly class="no_pengajuan form-control" placeholder="">
                                 <label>Preview Nomor Pengajuan</label>
                             </div>
                         </div>
                     </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form btn-discard mr-3 btn-discard-modal" data-bs-dismiss="modal">Kembali</button>
@@ -242,8 +239,8 @@
             url: `<?= base_url('bea-cukai-bc-30/list-barang'); ?>`,
             method: "GET",
             data: {
-                tipe_sales_order: "<?= $bc30['tipe_sales_order'] ?>",
-                sales_order_id: "<?= $bc30['sales_order_id'] ?>"
+                type_reference: "<?= $bc30['type_reference'] ?>",
+                reference_id: "<?= $bc30['reference_id'] ?>"
             },
             dataType: "json",
             success: function(res) {
@@ -254,24 +251,24 @@
         });
     <?php endif; ?>
 
-    $('#tipe_sales_order').select2({
-        placeholder: "Pilih Tipe Sales Order",
+    $('#type_reference').select2({
+        placeholder: "Pilih Tujuan Pengeluaran",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        getListSalesOrder();
+        getListReference();
         // RESET FORM
         $('#nama_customer').val('');
         $('#country_name').val('');
         $('#alamat_customer').val('');
     });
 
-    $('#sales_order_id').select2({
+    $('#reference_id').select2({
         placeholder: "Pilih Order Form",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        var selected = $('#sales_order_id option:selected');
+        var selected = $('#reference_id option:selected');
         $('#nama_customer').val(selected.data('nama_customer'));
         $('#country_name').val(selected.data('country_name'));
         $('#alamat_customer').val(selected.data('alamat_customer'));
@@ -282,10 +279,10 @@
     // VALIDATOR
     var validator = $(".create-form").validate({
         rules: {
-            tipe_sales_order: {
+            type_reference: {
                 required: true
             },
-            sales_order_id: {
+            reference_id: {
                 required: true
             },
             no_aju: {
@@ -299,10 +296,10 @@
             }
         },
         messages: {
-            tipe_sales_order: {
+            type_reference: {
                 required: "Pilih tipe sales order"
             },
-            sales_order_id: {
+            reference_id: {
                 required: "Pilih order form"
             },
             no_daftar: {
@@ -337,7 +334,7 @@
         },
     });
 
-    $("#sales_order_id,#tipe_sales_order")
+    $("#reference_id,#type_reference")
         .parent('div')
         .children('span')
         .children('span')
@@ -530,7 +527,7 @@
         });
     }
 
-    function getListSalesOrder() {
+    function getListReference() {
         $.ajax({
             url: `<?= base_url('bea-cukai-bc-30/list-sales-order'); ?>`,
             method: "GET",
@@ -541,22 +538,22 @@
                 stopLoading();
             },
             data: {
-                tipe_sales_order: $(".tipe_sales_order option:selected").val(),
+                type_reference: $(".type_reference option:selected").val(),
             },
             dataType: "json",
             success: function(res) {
-                $(".sales_order_id").empty()
-                $(".sales_order_id").append(`<option value=""></option>`)
+                $(".reference_id").empty()
+                $(".reference_id").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
-                    $(".sales_order_id").append(`<option
-                        data-sales_order_id="${item.sales_order_id}"
+                    $(".reference_id").append(`<option
+                        data-reference_id="${item.reference_id}"
                         data-nama_customer="${item.nama_customer}"
                         data-country_name="${item.country_name}" 
                         data-alamat_customer="${item.alamat_customer}"
-                        value="${item.sales_order_id}">${item.no_sales_order}
+                        value="${item.reference_id}">${item.no_reference}
                     </option>`)
                 })
-                $(".sales_order_id").val();
+                $(".reference_id").val();
             }
         });
     }
@@ -572,8 +569,8 @@
                 stopLoading();
             },
             data: {
-                tipe_sales_order: $(".tipe_sales_order option:selected").val(),
-                sales_order_id: $(".sales_order_id option:selected").val()
+                type_reference: $(".type_reference option:selected").val(),
+                reference_id: $(".reference_id option:selected").val()
             },
             dataType: "json",
             success: function(res) {
@@ -592,7 +589,7 @@
 
         if (listData.length === 0) {
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="14" style="text-align:center">Tidak Ada Barang</td>'));
+            newRow.append($('<td colspan="11" style="text-align:center">Tidak Ada Barang</td>'));
             table.find('tfoot').append(newRow);
         } else {
             $.each(listData, function(i, v) {
@@ -602,18 +599,14 @@
                             ${no++} 
                         `
                 ));
-                newRow.append($('<td style="text-align: center;">').text(v.tanggal_keluar));
                 newRow.append($('<td style="text-align: center;">').text(v.tipe_barang));
-                newRow.append($('<td style="text-align: center;">').text(v.dokumen_asal));
+                newRow.append($('<td style="text-align: center;">').text(v.dokumen_asal + '/' + v.no_aju_warehouse));
                 newRow.append($('<td style="text-align: center;">').text(v.kode_barang_internal));
                 newRow.append($('<td style="text-align: center;">').text(v.nama_barang_internal));
-                newRow.append($('<td style="text-align: center;">').text(v.kode_barang_sales));
-                newRow.append($('<td style="text-align: center;">').text(v.nama_barang_sales));
-                newRow.append($('<td style="text-align: center;">').text(v.no_stuffing));
                 newRow.append($('<td style="text-align: center;">').text(v.divisi + ' / ' + v.warehouse_name));
                 newRow.append($('<td style="text-align: center;">').text(v.qty_keluar));
-                newRow.append($('<td style="text-align: center;">').text(v.kode_satuan_sales));
                 newRow.append($('<td style="text-align: center;">').text(v.kode_satuan_internal));
+                newRow.append($('<td style="text-align: center;">').text(v.mata_uang));
                 newRow.append($('<td style="text-align: center;">').text(v.harga));
                 table.find('tbody').append(newRow);
             });
