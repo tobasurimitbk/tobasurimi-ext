@@ -927,7 +927,6 @@
             pajakInput.on('keyup', function () {
                 let pajakValue = destroyFormatRupiah($(this).val()) || 0;
                 let subtotalValue = destroyFormatRupiah(item.harga_barang_return) * destroyFormatRupiah(item.qty_return);
-
                 if (pajakValue > subtotalValue) {
                     $(this).val(greatFormatRupiah(subtotalValue));
                     pajakValue = subtotalValue;

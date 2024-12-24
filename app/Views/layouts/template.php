@@ -59,6 +59,10 @@
         parts[0] = parts[0].replace(/,/g, "");
         var bilangan = parts[0];
 
+        if (parts[1] && parts[1] === "00") {
+            parts.pop();
+        }
+
         var number_string = bilangan.toString(),
             sisa = number_string.length % 3,
             rupiah = number_string.substr(0, sisa),
@@ -80,9 +84,19 @@
     function destroyFormatRupiah(x) {
         if (typeof x === "number") return x; // Jika input sudah berupa angka, langsung kembalikan
         if (!x) return 0; // Jika input null, undefined, atau kosong, kembalikan 0
-        const cleaned = x.replace(/[ ,Rp.]/g, ""); // Hapus karakter ",", "Rp", dan "."
-        return parseFloat(cleaned); // Konversi string menjadi angka
+        
+        // Hapus "Rp" dan karakter selain angka dan titik
+        const cleaned = x.replace(/[^\d.]/g, "");
+        
+        // Hapus ".00" di akhir string jika ada
+        const withoutDecimal = cleaned.replace(/\.00$/, "");
+        
+        // Konversi string menjadi angka
+        return parseFloat(withoutDecimal) || 0; // Default ke 0 jika hasilnya NaN
     }
+
+
+
 </script>
 
 
