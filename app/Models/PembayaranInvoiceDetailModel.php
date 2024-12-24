@@ -24,8 +24,8 @@ class PembayaranInvoiceDetailModel extends Model
         'qty',
         'harga_satuan',
         'harga_total',
-        'akun_kas_lain',
-        'akun_selisih_lain',
+        'akun_debit',
+        'akun_kredit',
         'keterangan_pajak',
         'nominal_pajak',
     ];

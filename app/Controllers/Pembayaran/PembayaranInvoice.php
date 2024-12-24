@@ -966,12 +966,11 @@ class PembayaranInvoice extends BaseController
                         'sales_order_invoice_detail_id' => $l->sales_order_invoice_detail_id,
                         'type_invoice' => "RETURN",
                         'nama_barang' => $l->barang_name,
-                        'qty' => $l->qty_return,
-                        'harga_satuan' =>  $l->harga_barang_return ,
-                        'harga_total' =>  $l->amount_return,
-                        'akun_kas_lain' => $l->akun_kas_lain,
-                        'akun_selisih_lain' => $l->akun_selisih_lain,
-                        'akun_selisih_lain' => $l->akun_selisih_lain,
+                        'qty' => $l->qty_invoice,
+                        'harga_satuan' =>  $l->harga_barang_invoice,
+                        'harga_total' =>  $l->harga_barang_invoice * $l->qty_invoice,
+                        'akun_kredit' => $l->akun_kredit,
+                        'akun_debit' => $l->akun_debit,
                         'keterangan_pajak' => $l->keterangan_pajak,
                         'nominal_pajak' => $l->nominal_pajak
                     ]);
