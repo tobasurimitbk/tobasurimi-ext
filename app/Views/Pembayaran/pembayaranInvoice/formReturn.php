@@ -1072,23 +1072,23 @@
     };
 
     function updateKeterangan() {
-    // Ambil elemen <select> dan <textarea>
-    const noDokumenElement = document.getElementById('no_dokumen');
-    const noBuktiPembayaranElement = document.getElementById('no_bukti_pembayaran');
-    const customerElement = document.getElementById('customer');
-    const textareaElement = document.getElementById('keterangan');
+        // Ambil elemen <select> dan <textarea>
+        const noDokumenElement = document.getElementById('no_dokumen');
+        const noBuktiPembayaranElement = document.getElementById('no_bukti_pembayaran');
+        const customerElement = document.getElementById('customer');
+        const textareaElement = document.getElementById('keterangan');
 
-    // Ambil teks dari elemen no_bukti_pembayaran
-    const noBuktiPembayaranText = noBuktiPembayaranElement.value.trim();
+        // Ambil teks dari elemen no_bukti_pembayaran
+        const noBuktiPembayaranText = noBuktiPembayaranElement.value.trim();
 
-    // Ambil semua opsi yang dipilih dari elemen <select>
-    const selectedNoDokumen = Array.from(noDokumenElement.selectedOptions).map(option => `TERIMA A/ ${option.text}`);
-    const selectedCustomer = Array.from(customerElement.selectedOptions).map(option => option.text);
+        // Ambil semua opsi yang dipilih dari elemen <select>
+        const selectedNoDokumen = Array.from(noDokumenElement.selectedOptions).map(option => `TERIMA A/ ${option.text}`);
+        const selectedCustomer = Array.from(customerElement.selectedOptions).map(option => option.text);
 
-    // Gabungkan nilai opsi yang dipilih ke dalam textarea
-    const combinedText = [...selectedCustomer, noBuktiPembayaranText, ...selectedNoDokumen].join('; ');
-    textareaElement.value = combinedText;
-}
+        // Gabungkan nilai opsi yang dipilih ke dalam textarea
+        const combinedText = [...selectedCustomer, ...selectedNoDokumen].join('; ');
+        textareaElement.value = combinedText;
+    }
 
 </script>
 

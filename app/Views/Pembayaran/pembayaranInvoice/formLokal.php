@@ -977,7 +977,7 @@ function addSummaryRows(table, total_amount, total_invoice, limit_bayar, totalSu
         const selectedCustomer = Array.from(customerElement.selectedOptions).map(option => option.text);
 
         // Gabungkan nilai opsi yang dipilih ke dalam textarea
-        const combinedText = [...selectedCustomer, noBuktiPembayaranText, ...selectedNoDokumen].join('; ');
+        const combinedText = [...selectedCustomer, ...selectedNoDokumen].join('; ');
         textareaElement.value = combinedText;
     }
 
