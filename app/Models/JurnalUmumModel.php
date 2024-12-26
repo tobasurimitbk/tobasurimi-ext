@@ -121,4 +121,23 @@ class JurnalUmumModel extends Model
 
         return $saldolama;
     }
+
+    public function getTotalSaldoLama($where)
+    {
+        $totalDebit = 0;
+        $totalKredit = 0;
+        $dataJurnalUmum = $this
+            ->select('jurnal_umum.*')
+            ->where('tanggal_jurnal <=', $where['tanggal_awal'])
+            ->whereIn('id_coa', $where['id_coa'])
+            ->where('jurnal_umum.deletedAt', null)
+            ->findAll();
+
+        foreach ($dataJurnalUmum as $d) {
+            $totalDebit += ($d['debit'] ?? 0) * ($d['kurs'] ?? 1);
+            $totalKredit += ($d['kredit'] ?? 0) * ($d['kurs'] ?? 1);
+        }
+        $saldoLama = $totalDebit - $totalKredit;
+        return $saldoLama;
+    }
 }

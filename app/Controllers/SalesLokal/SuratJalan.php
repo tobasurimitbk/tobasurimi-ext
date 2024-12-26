@@ -147,7 +147,7 @@ class SuratJalan extends BaseController
                 "shipping_date"         => date("d-m-Y", strtotime($data->shipping_date)),
                 "sales_order_invoice_id" => $data->sales_order_invoice_id,
                 "print" => $data->counter_print,
-                "total_harga" => formatRupiah($data->estimated_freight + $data->total_harga),
+                "total_harga" => ($data->estimated_freight + $data->total_harga),
             ]);
         }
         //dd($dataAllSuratJalan);
@@ -324,8 +324,8 @@ class SuratJalan extends BaseController
 
         // var_dump($dataSuratJalan);
         foreach ($dataSuratJalan->itemList as $value) {
-            $value->harga_barang = toRupiah(floatval(str_replace('Rp', '', $value->harga_barang)));
-            $value->amount = toRupiah(floatval(str_replace('Rp', '', $value->total_harga_barang)));
+            $value->harga_barang = $value->harga_barang;
+            $value->amount = $value->total_harga_barang;
         }
 
         if ($dataSuratJalan->jenis_penjualan == 1) {

@@ -94,6 +94,7 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select supplier_id" name="supplier_id" id="supplier_id">
                                         <option value=""></option>
+                                        <option value="all">All</option>
                                         <?php foreach ($dataSupplier as $supplier) : ?>
                                             <option value="<?= $supplier['id'] ?>"><?= $supplier['name'] ?></option>
                                         <?php endforeach; ?>
@@ -126,6 +127,7 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select <?= !empty($dataTandaTerimaFaktur) ? 'disabled' : '' ?> class="form-select divisi_id" name="divisi_id" id="divisi_id">
                                         <option value=""></option>
+                                        <option value="all">All</option>
                                         <?php foreach ($divisi as $d) : ?>
                                             <option <?= !empty($dataTandaTerimaFaktur) ? ($dataTandaTerimaFaktur['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
                                         <?php endforeach; ?>
@@ -148,6 +150,7 @@
                                                 <th style="text-align: center;" class="sort">No PO</th>
                                                 <th style="text-align: center;" class="sort">Tgl LPB</th>
                                                 <th style="text-align: center;" class="sort">No LPB</th>
+                                                <th style="text-align: center;" class="sort">Supplier</th>
                                                 <th style="text-align: center;" class="sort">Nama Barang</th>
                                                 <th style="text-align: center;" class="sort">Qty LPB</th>
                                                 <th style="text-align: center;" class="sort">Qty Retur</th>
@@ -192,13 +195,13 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-floating mb-3">
-                                    <input <?= $isUsed ? 'disabled' : '' ?> oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control potongan" onkeyup="hitungPotonganTambahan()" name="potongan" id="potongan" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['potongan'] : '' ?> " placeholder="Keterangan">
+                                    <input <?= $isUsed ? 'disabled' : '' ?> onkeyup="this.value = greatFormatRupiah(this.value); hitungPotonganTambahan();" autocomplete="one-time-code" type="text" class="form-control potongan" name="potongan" id="potongan" value="<?= !empty($dataTandaTerimaFaktur) ? number_format($dataTandaTerimaFaktur['potongan']) : '' ?> " placeholder="Keterangan">
                                     <label for="floatingInput">Potongan (Opsional)</label>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-floating mb-3">
-                                    <input <?= $isUsed ? 'disabled' : '' ?> oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control tambahan" name="tambahan" onkeyup="hitungPotonganTambahan()" id="tambahan" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['tambahan'] : '' ?> " placeholder="Keterangan">
+                                    <input <?= $isUsed ? 'disabled' : '' ?> onkeyup="this.value = greatFormatRupiah(this.value); hitungPotonganTambahan();"autocomplete="one-time-code" type="text" class="form-control tambahan" name="tambahan" id="tambahan" value="<?= !empty($dataTandaTerimaFaktur) ? number_format($dataTandaTerimaFaktur['tambahan']) : '' ?> " placeholder="Keterangan">
                                     <label for="floatingInput">Penambahan (Opsional)</label>
                                 </div>
                             </div>
@@ -272,7 +275,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="number" class="form-control" id="tax_amt" name="tax_amt" placeholder="Jumlah">
+                                        <input onkeyup="this.value = greatFormatRupiah(this.value);" autocomplete="one-time-code" type="text" class="form-control" id="tax_amt" name="tax_amt" placeholder="Jumlah">
                                         <label for="floatingInput">Jumlah</label>
                                     </div>
                                 </div>
@@ -460,14 +463,32 @@
             return $(this).data("id");
         }).get();
 
-        if (dataIds.length == 0) {
+        if (dataIds.length === 0) {
             Swal.fire({
                 icon: 'error',
-                title: 'Cheklist minimal satu data penerimaan!',
+                title: 'Checklist minimal satu data penerimaan!',
                 confirmButtonColor: '#4e73df',
                 confirmButtonText: 'Ok'
             });
         } else {
+            // Collect all supplier names from selected rows
+            var supplierNames = checkedCheckboxes.map(function() {
+                return $(this).closest('tr').find('td:nth-child(5)').text().trim(); // Assuming supplier_name is the 5th column
+            }).get();
+
+            // Check for unique supplier names
+            var uniqueSuppliers = [...new Set(supplierNames)];
+            if (uniqueSuppliers.length > 1) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Semua data penerimaan harus dari supplier yang sama!',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+                return; // Stop further execution
+            }
+
+            // Proceed with data processing
             $.each(list_penerimaan_barang, function(i, v) {
                 if ($.inArray(Number(v.penerimaan_barang_detail_id), dataIds) !== -1) {
                     var targetInputElement = $('input[data-id_input_diterima="' + v.penerimaan_barang_detail_id + '"]');
@@ -485,15 +506,16 @@
                         qty_telah_diterima: v.qty_telah_diterima,
                         qty_akan_diterima: sisaDiterima,
                         kode_satuan: v.kode_satuan,
-                        harga: v.harga
+                        harga: v.harga,
+                        divisi_id: v.divisi_id,
+                        supplier_id: v.supplier_id,
                     });
                 }
             });
             drawTableSelected(list_penerimaan_selected);
-
         }
-
     });
+
 
     // VALIDATION PAJAK
     var validatorPajak = $(".pajak-form").validate({
@@ -646,8 +668,19 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         let data = new FormData(document.querySelector(".create-form"));
-                        data.append("listPajak", JSON.stringify(list_pajak));
+                        let totalTambahanPotongan = destroyFormatRupiah($('.total_tambahan_potongan').val());
+                        let tambahanForm = destroyFormatRupiah($('.tambahan').val());
+                        let potonganForm = destroyFormatRupiah($('.potongan').val());
+                        data.set('total_tambahan_potongan', totalTambahanPotongan)
+                        data.set('potongan', potonganForm)
+                        data.set('tambahan', tambahanForm)
+                        const cleanListPajak = list_pajak.map(item => ({
+                                ...item,
+                                tax_amt: destroyFormatRupiah(item.tax_amt),
+                            }));
+                        data.append("listPajak", JSON.stringify(cleanListPajak));
                         data.append("listPenerimaanBarang", JSON.stringify(list_penerimaan_selected));
+                        
                         if (id) {
                             // UPDATE
                             $.ajax({
@@ -737,15 +770,16 @@
     });
 
     function hitungPotonganTambahan() {
-        var potongan = Number($('.potongan').val() || 0);
-        var tambahan = Number($('.tambahan').val() || 0);
+        console.log(potongan, tambahan)
+        var potongan = Number(destroyFormatRupiah($('.potongan').val()) || 0);
+        var tambahan = Number(destroyFormatRupiah($('.tambahan').val()) || 0);
         var harga = 0;
         $.each(list_penerimaan_selected, function(i, v) {
-            harga += (Number(v.qty_akan_diterima) * Number(v.harga));
+            harga += (Number(v.qty_akan_diterima) * Number(destroyFormatRupiah(v.harga)));
         });
         var total = harga - potongan + tambahan;
-        $('.nominal_faktur').val(formatRupiah(harga));
-        $('.total_tambahan_potongan').val(formatRupiah(total));
+        $('.nominal_faktur').val(greatFormatRupiah(harga));
+        $('.total_tambahan_potongan').val(greatFormatRupiah(total));
 
     }
 
@@ -845,7 +879,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.tax_inv_date));
             newRow.append($('<td style="text-align: center;">').text(v.tax_inv_no));
             newRow.append($('<td style="text-align: center;">').text(v.tax_type));
-            newRow.append($('<td style="text-align: center;">').text(formatRupiah(v.tax_amt)));
+            newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.tax_amt)));
             newRow.append($('<td style="text-align: center;">').text(v.tax_status));
             newRow.append($('<td style="text-align: center;">').text(v.tax_note));
             <?php if ($isUsed) : ?>
@@ -893,7 +927,7 @@
     }
 
     function drawTableSelected(data) {
-
+        console.log(data);
         if ($.fn.DataTable.isDataTable('#selectedItemTable')) {
             $('#selectedItemTable').DataTable().clear().draw();
             selectedItemTable.destroy();
@@ -911,7 +945,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.nama_barang_dok));
             newRow.append($('<td style="text-align: center;">').text(v.qty_akan_diterima));
             newRow.append($('<td style="text-align: center;">').text(v.kode_satuan));
-            newRow.append($('<td style="text-align: center;">').text(formatRupiah(harga)));
+            newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(harga)));
             <?php if ($isUsed) : ?>
                 newRow.append($('<td style="text-align: center;">').html(
                     `
@@ -975,6 +1009,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.po_no));
             newRow.append($('<td style="text-align: center;">').text(v.tanggal));
             newRow.append($('<td style="text-align: center;">').text(v.no_penerimaan_barang));
+            newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
             newRow.append($('<td style="text-align: center;">').text(v.nama_barang_dok));
             newRow.append($('<td style="text-align: center;">').text(v.qty_lpb));
             newRow.append($('<td style="text-align: center;">').text(v.qty_retur));
@@ -1068,22 +1103,6 @@
         }
     }
 
-    function formatRupiah(angka) {
-        if (angka === null) {
-            angka = 0;
-        }
-
-        angka = angka.toString();
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return ribuanFormatted + ',' + desimal;
-    }
-
     function preventNegativeInput(inputElement) {
         var inputValue = inputElement.value;
         var numericValue = inputValue.replace(/[^0-9.]/g, '');
@@ -1156,6 +1175,7 @@
                 no_penerimaan_barang: "<?= $d['no_penerimaan_barang'] ?>",
                 nama_barang_dok: "<?= str_replace('"', '\"', $d['nama_barang_dok']) ?>",
                 qty_lpb: "<?= $d['qty_lpb'] ?>",
+                supplier_name: "<?= $d['supplier_name'] ?>",
                 qty_retur: "<?= $d['qty_retur'] ?>",
                 qty_telah_diterima: "<?= $d['qty_telah_diterima'] ?>",
                 qty_akan_diterima: "<?= $d['qty_akan_diterima'] ?>",

@@ -56,8 +56,9 @@
                 <div class="col-md-3 mb-3">
                     <select name="tipeSalesOrder" class="form-select tipeSalesOrder" id="tipeSalesOrder">
                         <option value="ALL" selected>TIPE PENGELUARAN : SEMUA</option>
-                        <option value="LOKAL">LOKAL</option>
-                        <option value="INTERNASIONAL">INTERNASIONAL</option>
+                        <option value="ORDER FORM EKSPOR">ORDER FORM EKSPOR</option>
+                        <option value="RETUR PEMBELIAN">RETUR PEMBELIAN EKSPOR</option>
+                        <option value="ORDER FORM LAIN">ORDER FORM LAIN (SCRAP, KEMASAN, BARANG BEKAS)</option>
                     </select>
                 </div>
                 <div class="col-md-2 mb-3">
@@ -83,8 +84,7 @@
                                 <th style="text-align: center;">No</th>
                                 <th onclick="changeSort('bc_30.tipe_pengeluaran')" style="text-align: center;">Tipe Pengeluaran</th>
                                 <th onclick="changeSort('bc_30.sales_order_id')" class="sort" style="text-align: center;">No Order Form</th>
-                                <th style="text-align: center;">No Stuffing / Pengeluaran</th>
-                                <th style="text-align: center;">Customer</th>
+                                <th style="text-align: center;">Penerima</th>
                                 <th onclick="changeSort('bc_30.no_aju')" class="sort" style="text-align: center;">No Aju / Daftar</th>
                                 <th onclick="changeSort('bc_30.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
                                 <th onclick="changeSort('bc_30.status_posting')" style="text-align: center;">Status Posting</th>
@@ -153,12 +153,6 @@
             },
             {
                 data: "no_order_form",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "no_stuffing",
                 className: "text-center",
                 searchable: false,
                 sortable: false

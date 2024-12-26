@@ -4,22 +4,16 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <div class="col-md-10">
-            <h1>Laporan Penjualan</h1>
-        </div>
-
-        <div class="col-md-2 text-right">
-            <div class="btn-group">
-                <button type="button" class="btn btn-warning">Export</button>
-                <button type="button" class="btn btn-warning dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                    <span class="sr-only">Toggle Dropdown</span>
-                </button>
-                <div class="dropdown-menu" role="menu">
-                    <a class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-accounting/penjualan/printPDF"); ?>')">PDF</a>
-                    <a class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/penjualan/printExcel"); ?>')">Excel</a>
-                </div>
-            </div>
-        </div>
+        <h1>Laporan Penjualan</h1>
+        <?php if (can('Laporan', 'Accounting', 'p')) : ?>
+            <button style="right: 10px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <li><button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-accounting/penjualan/printPDF"); ?>')">PDF</button></li>
+                <li><button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/penjualan/printExcel"); ?>')">EXCEL</button></li>
+            </ul>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -28,7 +22,7 @@
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <div class="input-group" style="height: 50px;">
-                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Transaksi">
+                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal">
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                                 </div>
@@ -36,7 +30,7 @@
                         </div>
                         <div class="col-md-3 mb-3">
                             <div class="input-group" style="height: 50px;">
-                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal Transaksi">
+                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal">
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                                 </div>
@@ -65,19 +59,12 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="row">
-                <div class="col-md-4"></div>
-                <div class="col-md-4"></div>
-                <div class="col-md-4 mb-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
-                </div>
-            </div> -->
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th>Transaction Date</th>
                                 <th>Document</th>
                                 <th>Evidance Num</th>
@@ -163,6 +150,9 @@
             }, {
                 data: "tax_invoice",
                 className: "text-center",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
             }, {
                 data: "po_num",
                 className: "text-center",
@@ -175,12 +165,21 @@
             }, {
                 data: "exchange",
                 className: "text-center",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
             }, {
                 data: "nominal",
                 className: "text-center",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
             }, {
                 data: "nominal_idr",
                 className: "text-center",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
             }, ],
             columnDefs: [{
                 defaultContent: "-",

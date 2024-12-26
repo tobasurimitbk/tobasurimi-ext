@@ -110,8 +110,8 @@ class OrderForm extends BaseController
                 "customer_po_no"            => $data->customer_po_no,
                 "customer_name"             => $data->customer_name,
                 "dicharge_port"             => $data->dicharge_port,
-                "shipment_date"             => $data->shipment_date,
-                "createdAt"                 => date('Y-m-d', strtotime($data->createdAt)),
+                "shipment_date"             => date('d/m/Y', strtotime($data->shipment_date)),
+                "createdAt"                 => date('d/m/Y', strtotime($data->createdAt)),
                 "status"                    => $data->status,
                 "used"                      => $data->used,
                 "keterangan_unpost"         => $data->keterangan_unpost,
@@ -291,6 +291,10 @@ class OrderForm extends BaseController
             }
         }
 
+        for ($i = 0; $i < count($temp_array); $i++) {
+            $temp_array[$i]['due_date'] = date('d/m/Y', strtotime($temp_array[$i]['due_date']));
+            $temp_array[$i]['shipment_date'] = date('d/m/Y', strtotime($temp_array[$i]['shipment_date']));
+        }
         return response()->setJSON([
             'data' => $temp_array,
             'token' => csrf_hash(),
@@ -526,41 +530,42 @@ class OrderForm extends BaseController
         return;
     }
 
-    // public function print($id = null)
-    // {
-    //     if ($id) {
-    //         $filename = "ORDER FORM";
+    public function print($id = null)
+    {
+        $id = decrypt($id);
+        if ($id) {
+            $filename = "ORDER FORM";
 
-    //         $data = [];
-    //         $dataSO = $this->salesOrderExportModel->getById($id);
+            $data = [];
+            $dataSO = $this->salesOrderExportModel->getById($id);
 
-    //         if ($dataSO) {
-    //             $dataSODetail = $this->salesOrderExportDetailModel->getSalesOrderExportDetailBySalesOrderExportId($id);
+            if ($dataSO) {
+                $dataSODetail = $this->salesOrderExportDetailModel->getSalesOrderExportDetailBySalesOrderExportId($id);
 
-    //             // var_dump($dataSO);
-    //             // die;
+                // var_dump($dataSO);
+                // die;
 
-    //             if ($dataSODetail) {
-    //                 $data["dataSO"] = $dataSO;
-    //                 $data["dataSODetail"] = $dataSODetail;
-    //             }
-    //         }
+                if ($dataSODetail) {
+                    $data["dataSO"] = $dataSO;
+                    $data["dataSODetail"] = $dataSODetail;
+                }
+            }
 
-    //         // load HTML content
-    //         $this->dompdf->loadHtml(view('SalesInternasional/OrderForm/print', $data));
+            // load HTML content
+            $this->dompdf->loadHtml(view('SalesInternasional/OrderForm/print', $data));
 
-    //         // (optional) setup the paper size and orientation
-    //         $this->dompdf->setPaper('A4', 'portrait');
+            // (optional) setup the paper size and orientation
+            $this->dompdf->setPaper('A4', 'portrait');
 
-    //         // render html as PDF
-    //         $this->dompdf->render();
+            // render html as PDF
+            $this->dompdf->render();
 
-    //         // output the generated pdf
-    //         $this->dompdf->stream($filename, array("Attachment" => false));
+            // output the generated pdf
+            $this->dompdf->stream($filename, array("Attachment" => false));
 
-    //         exit(0);
+            exit(0);
 
-    //         // return view('Purchase/poImportBahanPenolong/print', $data);
-    //     }
-    // }
+            // return view('Purchase/poImportBahanPenolong/print', $data);
+        }
+    }
 }

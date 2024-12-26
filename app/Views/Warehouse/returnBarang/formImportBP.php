@@ -51,6 +51,7 @@
                     </div>
                 </div>
                 <div class="row">
+                    <input type="hidden" name="bc_pengeluaran_id" value="<?= !empty($dataPenerimaanBarang) ? $dataPengembalianBarang['bc_pengeluaran_id'] : '' ?>" id="bc_pengeluaran_id">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
@@ -101,18 +102,7 @@
                             <label for="floatingInput" style="z-index: 1;">No Penerimaan Barang</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select disabled <?= isset($dataPengembalianBarang) ? ($dataPengembalianBarang['status_post'] == "FINISH" ? 'disabled' : '') : ""  ?> class="form-select bc_pengeluaran_id" id="bc_pengeluaran_id" name="bc_pengeluaran_id">
-                                <option value=""></option>
-                                <option <?= isset($dataPengembalianBarang) ? ($dataPengembalianBarang['bc_pengeluaran_id'] == 0 ? 'selected' : '') : '' ?> value="0">NON PABEAN</option>
-                                <?php foreach ($dataDokumenPabean as $d): ?>
-                                    <option <?= isset($dataPengembalianBarang) ? ($dataPengembalianBarang['bc_pengeluaran_id'] != 0 ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['value'] ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Dokumen Pengeluaran</label>
-                        </div>
-                    </div>
+
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input value="<?= isset($dataPenerimaanBarang) ? $dataPenerimaanBarang[0]['warehouse_name'] : "" ?>" readonly type="text" class="form-control warehouse" id="warehouse" name="warehouse" placeholder="Warehouse">
@@ -147,18 +137,9 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th colspan="4"></th>
-                                <th colspan="3" style="text-align: center;">Dokumen Pemasukan</th>
-                                <th colspan="8"></th>
-                            </tr>
-                            <tr>
                                 <th style="text-align: center;">No</th>
-                                <th style="text-align: center;">Asal Barang</th>
                                 <th style="text-align: center;">Kode Barang</th>
                                 <th style="text-align: center;">Nama Barang</th>
-                                <th style="text-align: center;">No Aju</th>
-                                <th style="text-align: center;">No Daftar</th>
-                                <th style="text-align: center;">Tgl Daftar</th>
                                 <th style="text-align: center;">No PO</th>
                                 <th style="text-align: center;">Jml Diterima</th>
                                 <th style="text-align: center;">Satuan</th>
@@ -174,12 +155,12 @@
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td colspan="8" style="text-align: right;"><b>GRAND TOTAL</b></td>
+                                <td colspan="4" style="text-align: right;"><b>GRAND TOTAL</b></td>
                                 <td style="text-align: center;"><b>0</td>
+                                <td style="text-align: center;"><b>0</td>
+                                <td style="text-align: center;"><b>0</b></td>
+                                <td style="text-align: center;"><b>0</b></td>
                                 <td style="text-align: center;"></td>
-                                <td style="text-align: center;"><b>0</td>
-                                <td style="text-align: center;"><b>0</b></td>
-                                <td style="text-align: center;"><b>0</b></td>
                                 <td style="text-align: center;"></td>
                                 <td style="text-align: center;"></td>
                             </tr>
@@ -237,13 +218,7 @@
         allowClear: true
     }).change(function() {});
 
-    $('#bc_pengeluaran_id').select2({
-        placeholder: "Pilih Dokumen Pengeluaran",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {});
-
-    $("#divisi_id,#penerimaan_barang_id,#bc_pengeluaran_id")
+    $("#divisi_id,#penerimaan_barang_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -265,9 +240,6 @@
             penerimaan_barang_id: {
                 required: true
             },
-            bc_pengeluaran_id: {
-                required: true,
-            },
         },
         messages: {
             no_surat_jalan: {
@@ -281,9 +253,6 @@
             },
             penerimaan_barang_id: {
                 required: "Pilih No Penerimaan Barang"
-            },
-            bc_pengeluaran_id: {
-                required: "Pilih Dokumen Pengeluaran",
             },
         },
         errorElement: 'span',
@@ -467,7 +436,13 @@
 
     function getPenerimaanBarangDetail() {
         var bc_pengeluaran_id = $("#penerimaan_barang_id option:selected").data('bc_pengeluaran_id');
-        $('#bc_pengeluaran_id').val(bc_pengeluaran_id).change();
+        if (bc_pengeluaran_id == 0) {
+            // Jika Non Pabean Pasangkan Dokumen Pengeluaran Non Pabean
+            $('#bc_pengeluaran_id').val(bc_pengeluaran_id).change();
+        } else {
+            // Perlu Diproses Di Bea Cukai
+            $('#bc_pengeluaran_id').val(null).change();
+        }
         $.ajax({
             url: `<?= base_url('retur-po-import-bp/retur-detail'); ?>`,
             method: "GET",
@@ -552,9 +527,8 @@
         if (listBarang.length == 0) {
             table.find('tfoot').empty();
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align:right;" colspan="8"><b>GRAND TOTAL</b></td>'));
+            newRow.append($('<td style="text-align:right;" colspan="4"><b>GRAND TOTAL</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
-            newRow.append($('<td style="text-align:left;"></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
@@ -573,17 +547,13 @@
             $.each(listBarang, function(i, v) {
                 var newRow = $('<tr style="border:0;border-color:whitesmoke;">');
                 newRow.append($('<td>').text(no++));
-                newRow.append($('<td>').text(v.sumber));
                 newRow.append($('<td>').text(v.kode_barang));
                 newRow.append($('<td>').text(v.nama_barang));
-                newRow.append($('<td>').text(v.no_aju));
-                newRow.append($('<td>').text(v.no_daftar));
-                newRow.append($('<td>').text(v.stock_date));
                 newRow.append($('<td>').text(v.no_po));
                 newRow.append($('<td>').text(v.jml_diterima));
                 newRow.append($('<td>').text(v.kode_satuan));
-                newRow.append($('<td>').text(formatRupiah(v.harga)));
-                newRow.append($('<td>').text(formatRupiah(v.sub_total)));
+                newRow.append($('<td>').text(greatFormatRupiah(v.harga)));
+                newRow.append($('<td>').text(greatFormatRupiah(v.sub_total)));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                         <input <?= isset($dataPengembalianBarang) ? ($dataPengembalianBarang['status_post'] == "FINISH" ? 'disabled' : '') : ""  ?> data-id="${v.id}" oninput="preventNegativeInput(this);sumTotalRetur();" style="height: 39px;" class="form-control jumlah_retur" type="text" value="${v.jml_retur}">
@@ -609,12 +579,12 @@
             });
             table.find('tfoot').empty();
             var newRow = $('<tr style="border:0;border-color:whitesmoke;">');
-            newRow.append($('<td style="text-align:right;" colspan="8"><b>GRAND TOTAL</b></td>'));
+            newRow.append($('<td style="text-align:right;" colspan="4"><b>GRAND TOTAL</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + totalJmlDiterima + '</b></td>'));
             newRow.append($('<td style="text-align:left;"></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(totalHarga) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + formatRupiah(totalSubTotal) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;" id="txt_total_retur"><b>' + formatRupiah(totalJmlRetur) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalHarga) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalSubTotal) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;" id="txt_total_retur"><b>' + greatFormatRupiah(totalJmlRetur) + '</b></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
@@ -646,22 +616,6 @@
             listBarang.splice(indexToRemove, 1);
         }
         drawTable(listBarang);
-    }
-
-    function formatRupiah(angka) {
-        if (angka === null) {
-            angka = 0;
-        }
-
-        angka = angka.toString();
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return ribuanFormatted;
     }
 
     function preventNegativeInput(inputElement) {

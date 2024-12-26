@@ -49,7 +49,7 @@
 
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="harga_ndpbm" value="<?= $bc23 != null ? ($bc23['ndpbm'] != null ? $bc23['ndpbm'] : "0,00") : "0,00" ?>" name="harga_ndpbm" type="text" class="form-control harga_ndpbm" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="harga_ndpbm" value="<?= $bc23 != null ? ($bc23['ndpbm'] != null ? number_format($bc23['ndpbm']) : "0,00") : "0,00" ?>" name="harga_ndpbm" type="text" class="form-control harga_ndpbm" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                 <label>NDPBM</label>
                             </div>
                         </div>
@@ -68,19 +68,19 @@
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input readonly id="harga_nilai_barang" value="<?= $bc23 != null ? ($bc23['nilai_barang'] != null ? $bc23['nilai_barang'] : "0,00") : '0,00' ?>" name="harga_nilai_barang" type="text" class="harga_nilai_barang form-control" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input readonly id="harga_nilai_barang" value="<?= $bc23 != null ? ($bc23['nilai_barang'] != null ? number_format($bc23['nilai_barang']) : "0,00") : '0,00' ?>" name="harga_nilai_barang" type="text" class="harga_nilai_barang form-control" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                 <label>Harga Barang</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input id="harga_cif" name="harga_cif" value="<?= $bc23 != null ? ($bc23['cif'] != null ? $bc23['cif'] : '0,00') : '0,00' ?>" type="text" class="harga_cif form-control" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="harga_cif" name="harga_cif" value="<?= $bc23 != null ? ($bc23['cif'] != null ? number_format($bc23['cif']) : '0,00') : '0,00' ?>" type="text" class="harga_cif form-control" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                 <label>Harga Cif</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="harga_nilai_pabean" value="<?= $bc23 != null ? ($bc23['harga_penyerahan'] != null ? $bc23['harga_penyerahan'] : '0,00') : '0,00' ?>" name="harga_nilai_pabean" type="text" class="form-control harga_nilai_pabean" placeholder="">
+                                <input id="harga_nilai_pabean" value="<?= $bc23 != null ? ($bc23['harga_penyerahan'] != null ? number_format($bc23['harga_penyerahan']) : '0,00') : '0,00' ?>" name="harga_nilai_pabean" type="text" class="form-control harga_nilai_pabean" placeholder="">
                                 <label>Harga Barang Pabean</label>
                             </div>
                         </div>
@@ -91,25 +91,25 @@
                         </label>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="harga_lainnya_biaya_penambah" value="<?= $bc23 != null ? ($bc23['biaya_tambahan'] != null ? $bc23['biaya_tambahan'] : '0,00') : '0,00' ?>" maxlength="24" name="harga_lainnya_biaya_penambah" type="text" class="form-control harga_lainnya_biaya_penambah" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="harga_lainnya_biaya_penambah" value="<?= $bc23 != null ? ($bc23['biaya_tambahan'] != null ? number_format($bc23['biaya_tambahan']) : '0,00') : '0,00' ?>" maxlength="24" name="harga_lainnya_biaya_penambah" type="text" class="form-control harga_lainnya_biaya_penambah" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                 <label>Biaya Penambah</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="harga_lainnya_biaya_pengurang" value="<?= $bc23 != null ? ($bc23['biaya_pengurang'] != null ? $bc23['biaya_pengurang'] : '0,00') : '0,00' ?>" maxlength="24" name="harga_lainnya_biaya_pengurang" type="text" class="form-control harga_lainnya_biaya_pengurang" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="harga_lainnya_biaya_pengurang" value="<?= $bc23 != null ? ($bc23['biaya_pengurang'] != null ? number_format($bc23['biaya_pengurang']) : '0,00') : '0,00' ?>" maxlength="24" name="harga_lainnya_biaya_pengurang" type="text" class="form-control harga_lainnya_biaya_pengurang" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                 <label>Biaya Pengurang</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="harga_lainnya_free_on_board" value="<?= $bc23 ? ($bc23['fob'] != null ? $bc23['fob'] : '0,00') : '0,00' ?>" maxlength="24" name="harga_lainnya_free_on_board" type="text" class="form-control harga_lainnya_free_on_board" placeholder="">
+                                <input id="harga_lainnya_free_on_board" value="<?= $bc23 ? ($bc23['fob'] != null ? number_format($bc23['fob']) : '0,00') : '0,00' ?>" maxlength="24" name="harga_lainnya_free_on_board" type="text" class="form-control harga_lainnya_free_on_board" placeholder="">
                                 <label>FOB (Free on Board)</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="harga_lainnya_freight" maxlength="24" value="<?= $bc23 != null ? ($bc23['freight'] != null ? $bc23['freight'] : '0,00') : '0,00' ?>" name="harga_lainnya_freight" type="text" class="form-control harga_lainnya_freight" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="harga_lainnya_freight" maxlength="24" value="<?= $bc23 != null ? ($bc23['freight'] != null ? number_format($bc23['freight']) : '0,00') : '0,00' ?>" name="harga_lainnya_freight" type="text" class="form-control harga_lainnya_freight" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                 <label>Freight</label>
                             </div>
                         </div>
@@ -128,7 +128,7 @@
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="harga_lainnya_nilai_asuransi" value="<?= $bc23 != null ? ($bc23['asuransi'] != null ? $bc23['asuransi'] : '0,00') : '0,00' ?>" name="harga_lainnya_nilai_asuransi" type="text" class="form-control harga_lainnya_nilai_asuransi" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="harga_lainnya_nilai_asuransi" value="<?= $bc23 != null ? ($bc23['asuransi'] != null ? number_format($bc23['asuransi']) : '0,00') : '0,00' ?>" name="harga_lainnya_nilai_asuransi" type="text" class="form-control harga_lainnya_nilai_asuransi" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                 <label>Nilai Asuransi</label>
                             </div>
                         </div>
@@ -139,13 +139,13 @@
                         </label>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="berat_bruto" name="berat_bruto" value="<?= $bc23 != null ? ($bc23['bruto'] != null ? $bc23['bruto'] : '0,00') : '0,00' ?>" type="text" class="form-control berat_bruto" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="berat_bruto" name="berat_bruto" value="<?= $bc23 != null ? ($bc23['bruto'] != null ? number_format($bc23['bruto']) : '0,00') : '0,00' ?>" type="text" class="form-control berat_bruto" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                 <label>Berat Bersih/Bruto (KGM)</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="berat_netto" value="<?= $bc23 != null ? ($bc23['netto'] != null ? $bc23['netto'] : '0,00') : '0,00' ?>" name="berat_netto" type="text" class="form-control berat_netto" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                <input id="berat_netto" value="<?= $bc23 != null ? ($bc23['netto'] != null ? number_format($bc23['netto']) : '0,00') : '0,00' ?>" name="berat_netto" type="text" class="form-control berat_netto" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                 <label>Berat Kotor/Netto (KGM)</label>
                             </div>
                         </div>
@@ -214,14 +214,14 @@
                     if (res.status) {
                         csrf.val(res.token);
                         if (res.data.status) {
-                            $("#harga_ndpbm").val((formatRupiah(res.data.data)));
-                            $("#harga_cif").val((formatRupiah(res.data.data)));
+                            $("#harga_ndpbm").val((greatFormatRupiah(res.data.data)));
+                            $("#harga_cif").val((greatFormatRupiah(res.data.data)));
 
-                            var ndpbm = convertRupiahToNumber($("#harga_ndpbm").val()) || 0;
-                            var hargaBarang = convertRupiahToNumber($("#harga_nilai_barang").val()) || 0;
+                            var ndpbm = destroyFormatRupiah($("#harga_ndpbm").val()) || 0;
+                            var hargaBarang = destroyFormatRupiah($("#harga_nilai_barang").val()) || 0;
                             var hargaPabean = (Number(ndpbm) * Number(hargaBarang));
 
-                            $('#harga_nilai_pabean').val(formatRupiah(hargaPabean))
+                            $('#harga_nilai_pabean').val(greatFormatRupiah(hargaPabean))
                         }
                     }
 
@@ -246,22 +246,22 @@
     });
 
     $('#harga_ndpbm').keyup(function() {
-        var ndpbm = convertRupiahToNumber($(this).val()) || 0;
-        var hargaBarang = convertRupiahToNumber($("#harga_nilai_barang").val()) || 0;
+        var ndpbm = destroyFormatRupiah($(this).val()) || 0;
+        var hargaBarang = destroyFormatRupiah($("#harga_nilai_barang").val()) || 0;
         var hargaPabean = (Number(ndpbm) * Number(hargaBarang));
 
-        $('#harga_cif').val(formatRupiah(ndpbm));
-        $('#harga_nilai_pabean').val(formatRupiah(hargaPabean))
+        $('#harga_cif').val(greatFormatRupiah(ndpbm));
+        $('#harga_nilai_pabean').val(greatFormatRupiah(hargaPabean))
     });
 
     $('#harga_nilai_barang').keyup(function() {
-        $('#harga_lainnya_free_on_board').val(formatRupiah($(this).val()));
+        $('#harga_lainnya_free_on_board').val(greatFormatRupiah($(this).val()));
 
-        var ndpbm = convertRupiahToNumber($("#harga_ndpbm").val()) || 0;
-        var hargaBarang = convertRupiahToNumber($(this).val()) || 0;
+        var ndpbm = destroyFormatRupiah($("#harga_ndpbm").val()) || 0;
+        var hargaBarang = destroyFormatRupiah($(this).val()) || 0;
         var hargaPabean = (Number(ndpbm) * Number(hargaBarang));
 
-        $('#harga_nilai_pabean').val(formatRupiah(hargaPabean))
+        $('#harga_nilai_pabean').val(greatFormatRupiah(hargaPabean))
     });
 
     $('#pajak_jasa_kena_pajak').select2({
@@ -431,6 +431,30 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-transaksi"));
+                    var hargaNdpbm = destroyFormatRupiah($('#harga_ndpbm').val());
+                    var hargaNilaiBarang = destroyFormatRupiah($('#harga_nilai_barang').val());
+                    var hargaCif = destroyFormatRupiah($('#harga_cif').val());
+                    var hargaNilaiPabean = destroyFormatRupiah($('#harga_nilai_pabean').val());
+                    var hargaLainnyaBiayaPenambah = destroyFormatRupiah($('#harga_lainnya_biaya_penambah').val());
+                    var hargaLainnyaBiayaPengurang = destroyFormatRupiah($('#harga_lainnya_biaya_pengurang').val());
+                    var hargaLainnyaFreeOnBoard = destroyFormatRupiah($('#harga_lainnya_free_on_board').val());
+                    var hargaLainnyaFreight = destroyFormatRupiah($('#harga_lainnya_freight').val());
+                    var hargaLainnyaNilaiAsuransi = destroyFormatRupiah($('#harga_lainnya_nilai_asuransi').val());
+                    var beratBruto = destroyFormatRupiah($('#berat_bruto').val());
+                    var beratNetto = destroyFormatRupiah($('#berat_netto').val());
+
+                    formData.set('harga_ndpbm', hargaNdpbm);
+                    formData.set('harga_nilai_barang', hargaNilaiBarang);
+                    formData.set('harga_cif', hargaCif);
+                    formData.set('harga_nilai_pabean', hargaNilaiPabean);
+                    formData.set('harga_lainnya_biaya_penambah', hargaLainnyaBiayaPenambah);
+                    formData.set('harga_lainnya_biaya_pengurang', hargaLainnyaBiayaPengurang);
+                    formData.set('harga_lainnya_free_on_board', hargaLainnyaFreeOnBoard);
+                    formData.set('harga_lainnya_freight', hargaLainnyaFreight);
+                    formData.set('harga_lainnya_nilai_asuransi', hargaLainnyaNilaiAsuransi);
+                    formData.set('berat_bruto', beratBruto);
+                    formData.set('berat_netto', beratNetto);
+
                     formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
                     $.ajax({
                         url: "<?= base_url("bea-cukai-bc-23/id/transaksi"); ?>",

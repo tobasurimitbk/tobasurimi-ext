@@ -268,7 +268,7 @@ class LocalPOPaymentModel extends Model
                 'totalDiterima' => $rm['qty_diterima'],
                 'akun_kas' => "-",
                 'akun_selisih' => "-",
-                'totalHarga' => toRupiah($harga),
+                'totalHarga' => $harga,
                 'totalHargaNumber' => $harga
             ];
         }
@@ -277,7 +277,7 @@ class LocalPOPaymentModel extends Model
             'detail' => $res,
             'totalOrder' => $totalOrder,
             'totalDiterima' => $totalDiterima,
-            'totalHarga' => toRupiah($hargaTotal),
+            'totalHarga' => $hargaTotal,
             'totalHargaNumber' => $hargaTotal
         ];
 
@@ -561,7 +561,7 @@ class LocalPOPaymentModel extends Model
                 'barang' => $supplierHarga != null ?  $supplierHarga['barang_name'] . " - " . $supplierHarga['spesifikasi'] . "" : "-",
                 'totalOrder' => $rm['qty'],
                 'totalDiterima' => $rm['qty_diterima'],
-                'totalHarga' => toRupiah($harga),
+                'totalHarga' => $harga,
                 'totalHargaNumber' => $harga,
             ];
         }
@@ -570,7 +570,7 @@ class LocalPOPaymentModel extends Model
             'detail' => $res,
             'totalOrder' => $totalOrder,
             'totalDiterima' => $totalDiterima,
-            'totalHarga' => toRupiah($hargaTotal),
+            'totalHarga' => $hargaTotal,
             'lpb' => $penerimaanBarangModel->where($conditionLpb)->findAll(),
             'totalHargaNumber' => $hargaTotal,
             'totalSudahDibayarNumber' => $totalSudahDibayar,
@@ -633,7 +633,7 @@ class LocalPOPaymentModel extends Model
                     $penerimaanBulanAll[$i]['sisa_pembayaran'] = $p['total_tagihan'] - $totalPoPayment['total_dibayar'];
                     if ($penerimaanBulanAll[$i]['sisa_pembayaran'] > 0) {
 
-                        $penerimaanBulanAll[$i]['total_tagihan'] = toRupiah($p['total_tagihan']);
+                        $penerimaanBulanAll[$i]['total_tagihan'] = $p['total_tagihan'];
                         $penerimaanBulanAll[$i]['total_tagihan_number'] = $p['total_tagihan'];
 
                         array_push($result, $penerimaanBulanAll[$i]);
@@ -642,7 +642,7 @@ class LocalPOPaymentModel extends Model
             } else {
                 $penerimaanBulanAll[$i]['sisa_pembayaran'] = $totalTagihan;
                 $penerimaanBulanAll[$i]['tanggal_LPB'] = date('d/m/Y', \strtotime($p['tanggal_LPB']));
-                $penerimaanBulanAll[$i]['total_tagihan'] = toRupiah($p['total_tagihan']);
+                $penerimaanBulanAll[$i]['total_tagihan'] = $p['total_tagihan'];
                 $penerimaanBulanAll[$i]['total_tagihan_number'] = $p['total_tagihan'];
                 $penerimaanBulanAll[$i]['tanggal_PO'] = date('d/m/Y', \strtotime($p['tanggal_PO']));
                 array_push($result, $penerimaanBulanAll[$i]);
@@ -832,10 +832,10 @@ class LocalPOPaymentModel extends Model
                     $penerimaanAll[$i]['sisa_pembayaran'] = $p['total_tagihan'] - $totalPoPayment['total_dibayar'];
                     if ($penerimaanAll[$i]['sisa_pembayaran'] > 0) {
                         $penerimaanAll[$i]['tanggal_LPB'] = date('d/m/Y', \strtotime($p['tanggal_LPB']));
-                        $penerimaanAll[$i]['total_tagihan'] = toRupiah($p['total_tagihan']);
+                        $penerimaanAll[$i]['total_tagihan'] =$p['total_tagihan'];
                         $penerimaanAll[$i]['total_tagihan_number'] = $p['total_tagihan'];
                         $penerimaanAll[$i]['tanggal_PO'] = date('d/m/Y', \strtotime($p['tanggal_PO']));
-                        $penerimaanAll[$i]['total_tagihan'] = toRupiah($p['total_tagihan']);
+                        $penerimaanAll[$i]['total_tagihan'] =$p['total_tagihan'];
                         $penerimaanAll[$i]['total_tagihan_number'] = $p['total_tagihan'];
 
                         array_push($result, $penerimaanAll[$i]);
@@ -845,7 +845,7 @@ class LocalPOPaymentModel extends Model
 
                 $penerimaanAll[$i]['sisa_pembayaran'] = $totalTagihan;
                 $penerimaanAll[$i]['tanggal_LPB'] = date('d/m/Y', \strtotime($p['tanggal_LPB']));
-                $penerimaanAll[$i]['total_tagihan'] = toRupiah($p['total_tagihan']);
+                $penerimaanAll[$i]['total_tagihan'] = $p['total_tagihan'];
                 $penerimaanAll[$i]['total_tagihan_number'] = $p['total_tagihan'];
                 $penerimaanAll[$i]['tanggal_PO'] = date('d/m/Y', \strtotime($p['tanggal_PO']));
                 array_push($result, $penerimaanAll[$i]);

@@ -292,7 +292,7 @@ class POImportBahanBaku extends BaseController
     }
 
     public function updatePOImportBahanBaku()
-    {
+    {   
         $id = decrypt($this->request->getPost("id"));
 
         if ($this->request->getVar('poNo') != "AUTO GENERATE") {
@@ -379,7 +379,7 @@ class POImportBahanBaku extends BaseController
                     'additional_cost' => $b->biaya_tambahan,
                     'remaining_qty' => $b->qty,
                     'note' => trim($b->keterangan),
-                    'total' => repairDouble2($b->total),
+                    'total' => $b->total,
                 ]);
                 array_push($id_detail_all, $check['id']);
                 $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);

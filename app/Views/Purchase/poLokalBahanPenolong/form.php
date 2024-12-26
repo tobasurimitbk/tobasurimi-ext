@@ -242,7 +242,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control harga_satuan" name="harga_satuan" id="harga_satuan" placeholder="Harga Satuan" onchange="this.value = formatRupiah2(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control harga_satuan" name="harga_satuan" id="harga_satuan" placeholder="Harga Satuan" onchange="this.value = greatFormatRupiah(this.value)">
                             <label for="floatingInput">Harga Satuan</label>
                         </div>
                     </div>
@@ -263,13 +263,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control biaya_tambahan" name="biaya_tambahan" id="biaya_tambahan" placeholder="Biaya Tambahan" onchange="this.value = formatRupiah2(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control biaya_tambahan" name="biaya_tambahan" id="biaya_tambahan" placeholder="Biaya Tambahan" onchange="this.value = greatFormatRupiah(this.value)">
                             <label for="floatingInput">Biaya Tambahan (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onchange="this.value = formatRupiah2(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onchange="this.value = greatFormatRupiah(this.value)">
                             <label for="floatingInput">Total</label>
                         </div>
                     </div>
@@ -452,9 +452,9 @@
             method: "GET",
             success: function(response) {
                 if (response.hargaTerakhir !== "-") {
-                    $('#harga_satuan').val(formatRupiah2(response.res.hargaTerakhirNumber));
+                    $('#harga_satuan').val(greatFormatRupiah(response.res.hargaTerakhirNumber));
                 } else {
-                    $('#harga_satuan').val(formatRupiah2('0'));
+                    $('#harga_satuan').val(greatFormatRupiah('0'));
                 }
             },
         });
@@ -477,26 +477,26 @@
 
     // HARGA SATUAN DAN QTY CHANE
     $('#harga_satuan,#qty,#biaya_tambahan,#diskon').change(function() {
-        var hargaSatuan = parseFloat(convertRupiahToNumber($('#harga_satuan').val())) || 0;
+        var hargaSatuan = parseFloat(destroyFormatRupiah($('#harga_satuan').val())) || 0;
         var qty = parseFloat($('#qty').val()) || 1;
-        var biayaTambahan = parseFloat(convertRupiahToNumber($('#biaya_tambahan').val())) || 0;
+        var biayaTambahan = parseFloat(destroyFormatRupiah($('#biaya_tambahan').val())) || 0;
         var diskon = parseFloat($('#diskon').val()) || 0;
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
-        $('#total').val(formatRupiah2(total));
+        $('#total').val(greatFormatRupiah(total));
     });
 
     // CHANGE TOTAL
     $('#total').change(function() {
-        var total = parseFloat(convertRupiahToNumber($('#total').val())) || 0;
+        var total = parseFloat(destroyFormatRupiah($('#total').val())) || 0;
         var qty = parseFloat($('#qty').val()) || 1;
-        var biayaTambahan = parseFloat(convertRupiahToNumber($('#biaya_tambahan').val())) || 0;
+        var biayaTambahan = parseFloat(destroyFormatRupiah($('#biaya_tambahan').val())) || 0;
         var diskon = parseFloat($('#diskon').val()) || 0;
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var hargaSatuan = (((total / qty)));
-        $('#harga_satuan').val(formatRupiah2(hargaSatuan));
+        $('#harga_satuan').val(greatFormatRupiah(hargaSatuan));
     });
 
     // VALIDATOR DETAIL
@@ -889,9 +889,9 @@
             nama_satuan: $('#satuan_id').find("option:selected").data("kode_satuan"),
             qty: parseFloat($('#qty').val()),
             diskon: parseFloat($('#diskon').val()),
-            harga_satuan: convertRupiahToNumber($('#harga_satuan').val() || 0),
-            biaya_tambahan: convertRupiahToNumber($('#biaya_tambahan').val() || 0),
-            total: convertRupiahToNumber($('#total').val()),
+            harga_satuan: destroyFormatRupiah($('#harga_satuan').val() || 0),
+            biaya_tambahan: destroyFormatRupiah($('#biaya_tambahan').val() || 0),
+            total: destroyFormatRupiah($('#total').val()),
             keterangan: $('#keterangan').val(),
             ppn: $('#ppn').val(),
             pph: $('#pph').val()
@@ -916,11 +916,11 @@
             newRow.append($('<td>').text(v.kode_barang));
             newRow.append($('<td>').text(v.nama_barang));
             newRow.append($('<td>').text(v.nama_satuan));
-            newRow.append($('<td>').text(formatRupiah2(v.harga_satuan)));
-            newRow.append($('<td>').text(parseFloat(v.qty).toFixed(4)));
+            newRow.append($('<td>').text(greatFormatRupiah(v.harga_satuan)));
+            newRow.append($('<td>').text(parseFloat(v.qty)));
             newRow.append($('<td>').text(v.diskon));
-            newRow.append($('<td>').text(formatRupiah2(v.biaya_tambahan)));
-            newRow.append($('<td>').text(formatRupiah2(v.total)));
+            newRow.append($('<td>').text(greatFormatRupiah(v.biaya_tambahan)));
+            newRow.append($('<td>').text(greatFormatRupiah(v.total)));
             <?php if (!empty($poDetail)) : ?>
                 <?php if (!$poDetail['is_posted']) : ?>
                     newRow.append($('<td>').html(
@@ -953,7 +953,7 @@
         table.find('tfoot').empty();
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="8"><b>Total</b></td>'));
-        newRow.append($('<td style="text-align:center;"><b>' + formatRupiah2(totalHarga.toFixed(4)) + '</b></td>'));
+        newRow.append($('<td style="text-align:center;"><b>' + greatFormatRupiah(totalHarga) + '</b></td>'));
         newRow.append($('<td></td>'));
         table.find('tfoot').append(newRow);
     }
@@ -1014,16 +1014,16 @@
             }
         }
         $('#barang_id, #barang_update_id').val(item.spesifikasi_id).change();
-        $('#harga_satuan').val(formatRupiah2(item.harga_satuan));
+        $('#harga_satuan').val(greatFormatRupiah(item.harga_satuan));
         $('#qty').val(parseFloat(item.qty));
         $('#diskon').val(parseFloat(item.diskon));
-        $('#biaya_tambahan').val((item.biaya_tambahan == 0) ? formatRupiah2(0) : formatRupiah2(item.biaya_tambahan));
+        $('#biaya_tambahan').val((item.biaya_tambahan == 0) ? greatFormatRupiah(0) : greatFormatRupiah(item.biaya_tambahan));
         $('#keterangan').val(item.keterangan);
         $('#ppn').val(item.ppn);
         $('#pph').val(item.pph);
         $('#satuan_id').val(item.satuan_id).change();
         // $('#biaya_tambahan').change();
-        $('#total').val(formatRupiah2(item.total));
+        $('#total').val(greatFormatRupiah(item.total));
         // attr barang_id disabled
         $('#barang_id').attr('disabled', true);
         // setTimeout(function() {
@@ -1036,44 +1036,6 @@
         $(".detail-form input, .detail-form select").val("");
         $(".barang_id").val("").change();
         $(".diskon").val('0');
-    }
-
-    function formatRupiah2(x) {
-        let min = false;
-        x = x.toString();
-        if (x.includes("-")) {
-            min = true;
-        } else {
-            min = false;
-        }
-        x = x.replace(/-/g, '');
-
-        let parts = x.split(".");
-        parts[0] = parts[0].replace(/,/g, '');
-        let bilangan = parts[0];
-
-        let number_string = bilangan.toString(),
-            sisa = number_string.length % 3,
-            rupiah = number_string.substr(0, sisa),
-            ribuan = number_string.substr(sisa).match(/\d{3}/g);
-
-        if (ribuan) {
-            let separator = sisa ? ',' : '';
-            rupiah += separator + ribuan.join(',');
-        }
-        parts[0] = rupiah;
-
-        if (parts[1]) {
-            parts[1] = parts[1].slice(0, 2).padEnd(2, '0');
-        } else {
-            parts[1] = '00';
-        }
-
-        return (min ? '-' : '') + parts.join(".");
-    }
-
-    function convertRupiahToNumber(rupiah) {
-        return rupiah.replace(/,/g, '');
     }
 
     function getListSPP() {

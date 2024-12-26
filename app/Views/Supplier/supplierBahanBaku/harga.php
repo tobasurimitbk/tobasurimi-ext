@@ -62,13 +62,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="0" autocomplete="one-time-code" type="number" class="form-control harga_umum" id="harga_umum" name="harga_umum" placeholder="Harga Umum">
+                            <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_umum" id="harga_umum" name="harga_umum" placeholder="Harga Umum">
                             <label for="floatingInput">Harga Umum</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="0" autocomplete="one-time-code" type="number" class="form-control harga_harian" id="harga_harian" name="harga_harian" placeholder="Harga Harian">
+                            <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_harian" id="harga_harian" name="harga_harian" placeholder="Harga Harian">
                             <label for="floatingInput">Harga Harian</label>
                         </div>
                     </div>
@@ -76,7 +76,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="0" autocomplete="one-time-code" type="number" class="form-control harga_bulanan" id="harga_bulanan" name="harga_bulanan" placeholder="Harga Bulanan">
+                            <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_bulanan" id="harga_bulanan" name="harga_bulanan" placeholder="Harga Bulanan">
                             <label for="floatingInput">Harga Bulanan</label>
                         </div>
                     </div>
@@ -176,15 +176,24 @@
                 className: "text-center"
             }, {
                 data: "harga_umum",
-                className: "text-center"
+                className: "text-center",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
             },
             {
                 data: "harga_harian",
-                className: "text-center"
+                className: "text-center",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
             },
             {
                 data: "harga_bulanan",
-                className: "text-center"
+                className: "text-center",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
             },
             {
                 data: "id",
@@ -234,9 +243,9 @@
         $(document).on('click', '.edit-table-detail', function() {
             var id = $(this).data('id');
             var bahan_baku = $(this).data('bahan_baku');
-            var harga_umum = $(this).data('harga_umum');
-            var harga_bulanan = $(this).data('harga_bulanan');
-            var harga_harian = $(this).data('harga_harian');
+            var harga_umum = greatFormatRupiah($(this).data('harga_umum'));
+            var harga_bulanan = greatFormatRupiah($(this).data('harga_bulanan'));
+            var harga_harian = greatFormatRupiah($(this).data('harga_harian'));
             var spesifikasi_id = $(this).data('spesifikasi_id');
 
             $('.id').val(id);
@@ -351,7 +360,14 @@
             const csrf = $(`[name="${csrfToken}"]`);
             let data = new FormData(document.querySelector(".harga-form"));
             let id = $('.id').val();
+            let hargaUmum = destroyFormatRupiah($('#harga_umum').val());
+            let hargaHarian = destroyFormatRupiah($('#harga_harian').val());
+            let hargaBulanan = destroyFormatRupiah($('#harga_bulanan').val());
+
             data.append("supplier_id", $(".id_supplier").val())
+            data.set('harga_umum', hargaUmum);
+            data.set('harga_harian', hargaHarian);
+            data.set('harga_bulanan', hargaBulanan);
 
             if (id) {
                 // UPDATE
@@ -494,9 +510,9 @@
         $('.divisi_id').val(null).change();
         $('.bahan_baku').val(null).change();
         $('.spesifikasi_id').val(null).change();
-        $('.harga_umum').val('0');
-        $('.harga_harian').val('0');
-        $('.harga_bulanan').val('0');
+        $('.harga_umum').val(null);
+        $('.harga_harian').val(null);
+        $('.harga_bulanan').val(null);
         $('.spesifikasi_id_hidden').val(null);
     }
 </script>

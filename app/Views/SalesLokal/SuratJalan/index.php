@@ -64,8 +64,8 @@
                     <div class="form-floating mb-3">
                         <select class="form-select filter_invoice" name="filter_invoice" id="filter_invoice">
                             <option value="" data-code=""></option>
-                            <option value="belum" data-code="">Belum Digunakan Invoice</option>
-                            <option value="sudah" data-code="">Sudah Digunakan Invoice</option>
+                            <option value="belum" data-code="">BELUM DIGUNAKAN INVOICE</option>
+                            <option value="sudah" data-code="">SUDAH DIGUNAKAN INVOICE</option>
                         </select>
                         <label for="floatingInput">Pilih Invoice</label>
                     </div>
@@ -267,7 +267,10 @@
             }
         }, {
             data: "total_harga",
-            className: "text-center"
+            className: "text-center",
+            render: function(data, type, row) {
+                return greatFormatRupiah(destroyFormatRupiah(data));
+            }
         }, {
             data: "id",
             className: "text-center actions sticky-col",

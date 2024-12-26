@@ -11,17 +11,19 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name"><?= !empty($data) ? "Ubah" : "Tambah"; ?> Penjualan Lokal</h1>
+        <h1 class="title-name"><?= !empty($data) ? "Update" : "Tambah"; ?> Penjualan Lokal</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("order-form-lokal"); ?>">
                 Kembali
             </a>
 
-            <?php if (!empty($data)) : ?>
-                <!-- <a class="btn btn-save float-right" href="#"> -->
-                <a class="btn btn-warning btn-print float-right" href="<?= base_url("order-form-lokal/print/{$data->id}"); ?>" target="_blank">
-                    Print
-                </a>
+            <?php if (can('Penjualan Lokal', 'Order Form', 'p')): ?>
+                <?php if (!empty($data)) : ?>
+                    <!-- <a class="btn btn-save float-right" href="#"> -->
+                    <a class="btn btn-warning btn-print float-right" href="<?= base_url("order-form-lokal/print/{$data->id}"); ?>" target="_blank">
+                        Print
+                    </a>
+                <?php endif; ?>
             <?php endif; ?>
 
             <button class="btn btn-show-form btn-save float-right btn-submit <?= !empty($data) ? ((($data->used == "USED") or ($data->surat_jalan_so_id != NULL) or ($data->sales_order_invoice_id != NULL)) ? 'disabled' : '') : '' ?>">
@@ -140,7 +142,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select termin" name="termin" id="termin" <?= !empty($data) ? 'disabled' : ''; ?>>
+                            <select class="form-select termin " name="termin" id="termin_order_form" <?= !empty($data) ? 'disabled' : ''; ?>>
                                 <option value=""></option>
                                 <?php foreach ($dataTermin ?? [] as $termin) : ?>
                                     <option value="<?= $termin['id']; ?>" <?= !empty($data) ? ($data->payment_terms == $termin['id'] ? "selected" : "") : ""; ?>><?= $termin['value']; ?></option>
@@ -163,7 +165,7 @@
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" name="shipping_date" type="text" value="<?= !empty($data) ? $data->shipping_date : '' ?>" class="form-control shipping_date" id="shipping_date">
+                                <input placeholder="Tanggal Pengiriman" <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" name="shipping_date" type="text" value="<?= !empty($data) ? $data->shipping_date : '' ?>" class="form-control shipping_date" id="shipping_date">
                                 <label>Tanggal Pengiriman</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
@@ -180,26 +182,16 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="form-floating" style="height: 50px;">
-                            <select <?= !empty($data) ? 'disabled' : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
-
-                                <option value="1445" selected>BC 3.0</option>
-                            </select>
-                            <label for="floatingInput">Dokumen Pabean</label>
-                        </div>
-                        <small class="mb-3"><i>Kosongkan jika non pabean</i></small>
-                    </div>
-                    <div class="col-md-4">
                         <div class="form-floating ff-ket mb-3" style="height: 80px;">
                             <textarea autocomplete="one-time-code" <?= !empty($data) ? 'disabled=true' : ''; ?> class="form-control parent_keterangan text-area-all" style="height: 100%" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
-                            <label for="floatingInput">Keterangan</label>
+                            <label for="floatingInput">Keterangan (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" type="text" class="form-control 
                             no_po" id="no_po" name="no_po" value="<?= !empty($data) ? $data->no_po : ""; ?>">
-                            <label for="floatingInput">No PO</label>
+                            <label for="floatingInput">No PO (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -314,7 +306,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, '');" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
+                                <input autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
                                 <label for="floatingInput">Harga Barang</label>
                             </div>
                         </div>
@@ -464,8 +456,11 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select currency" id="currency" name="currency">
+                                <select disabled class="form-select currency" id="currency" name="currency">
                                     <option value=""></option>
+                                    <?php foreach ($dataValuta as $d): ?>
+                                        <option selected value="<?= $d['id'] ?>"><?= $d['value'] ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                                 <label for="floatingInput">Mata Uang (Opsional)</label>
                             </div>
@@ -474,32 +469,44 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select termin" id="termin" name="termin">
                                     <option value=""></option>
+                                    <?php foreach ($dataTermin as $d): ?>
+                                        <option value="<?= $d['id'] ?>"><?= $d['value'] ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                                 <label for="floatingInput">Termin (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" value="0" type="text" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" class="form-control piutang" id="piutang" name="piutang" placeholder="Limit Piutang">
+                                <input autocomplete="one-time-code" value="0" type="text" onkeyup="this.value = greatFormatRupiah(this.value);" class="form-control piutang" id="piutang" name="piutang" placeholder="Limit Piutang">
                                 <label for="floatingInput">Limit Piutang</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select tipe_pelanggan" name="tipe_pelanggan" id="tipe_pelanggan">
+                                <select class="form-select tipe_pelanggan" name="tipe_pelanggan" id="tipe_pelanggan_customer">
                                     <option value=""></option>
+                                    <?php foreach ($dataTipePelanggan as $d): ?>
+                                        <option value="<?= $d['id'] ?>"><?= $d['value'] ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                                 <label for="floatingInput">Tipe Pelanggan (Opsional)</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales">
-                                <label for="floatingInput">Nama Sales</label>
+                                <select class="form-select jenis_penjualan_customer" name="jenis_penjualan" id="jenis_penjualan_customer">
+                                    <option value=""></option>
+                                    <option value="1">By Sales</option>
+                                    <option value="2">By Office</option>
+                                    <option value="3">By Ecommerce</option>
+                                </select>
+                                <label for="floatingInput">Jenis Penjualan (Opsional)</label>
                             </div>
                         </div>
+
                     </div>
                 </form>
             </div>
@@ -558,7 +565,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" class="form-control harga_pokok" name="harga_pokok" id="harga_pokok" placeholder="Harga Pokok">
+                                <input onkeyup="this.value = greatFormatRupiah(this.value);" autocomplete="one-time-code" type="text" class="form-control harga_pokok" name="harga_pokok" id="harga_pokok" placeholder="Harga Pokok">
                                 <label for="floatingInput">Harga Pokok</label>
                             </div>
                         </div>
@@ -566,7 +573,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Harga Jual">
+                                <input onkeyup="this.value = greatFormatRupiah(this.value);" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Harga Jual">
                                 <label for="floatingInput">Harga Jual</label>
                             </div>
                         </div>
@@ -628,7 +635,7 @@
             },
             {
                 data: "qty",
-                className: "text-center"
+                className: "text-center",
             },
             {
                 data: "satuan",
@@ -636,11 +643,14 @@
             },
             {
                 data: "harga_barang",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(destroyFormatRupiah(data));
+                }
             },
             {
                 data: "disc",
-                className: "text-center"
+                className: "text-center",
             },
             {
                 data: "statusppn",
@@ -655,7 +665,10 @@
             },
             {
                 data: "amount",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(destroyFormatRupiah(data));
+                }
             },
             {
                 data: "status",
@@ -700,7 +713,7 @@
                     qty: "<?= $payload['qty'] ?>",
                     amount: "<?= $payload['amount'] ?>",
                     keterangan: "<?= $payload['keterangan'] ?>",
-                    statusppn: "<?= $payload['tax'] ?>",
+                    statusppn: "<?= $payload['status_ppn'] ?>",
                     tax: null,
                     discount_percentage: <?= $payload['discount_percentage'] ?? 0 ?>,
                     isDeleted: false,
@@ -722,7 +735,7 @@
                     qty: "<?= $payload['qty'] ?>",
                     amount: "<?= $payload['amount'] ?>",
                     keterangan: "<?= $payload['keterangan'] ?>",
-                    statusppn: "<?= $payload['tax'] ?>",
+                    statusppn: "<?= $payload['status_ppn'] ?>",
                     tax: null,
                     discount_percentage: <?= $payload['discount_percentage'] ?? 0 ?>,
                     isDeleted: false,
@@ -840,35 +853,6 @@
             theme: "bootstrap-5",
         });
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.satuan_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.satuan_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.satuan_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.satuan_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
         // Customer
         $('.id_customer').select2({
             placeholder: "Pilih Nama Customer",
@@ -883,11 +867,10 @@
             const tipePelanggan = $(this).find(':selected').data('tipepelanggan') ? $(this).find(':selected').data('tipepelanggan') : "";
             const jenis_penjualan = $(this).find(':selected').data('jenis_penjualan') ? $(this).find(':selected').data('jenis_penjualan') : "";
 
-            console.log(decodeURIComponent(salesName));
 
             $('#customerphone').val(decodeURIComponent(customerPhone));
             $('#tagihan_ke').val(decodeURIComponent(customerAddress));
-            $('#termin').val(decodeURIComponent(termin)).change();
+            $('#termin_order_form').val(decodeURIComponent(termin)).change();
 
             $('#id_sales').val(decodeURIComponent(salesName)).trigger('change');
             $('#hidden_tipe_pelanggan').val(decodeURIComponent(tipePelanggan)).change();
@@ -912,114 +895,25 @@
             // }
         });
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.id_customer')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.id_customer')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.id_customer')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // Sales
         $('.termin').select2({
             placeholder: "Pilih Termin",
             allowClear: true,
-            theme: "bootstrap-5"
+            theme: "bootstrap-5",
+            dropdownParent: $('.addCustomerModal')
         }).change(function() {});
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.termin')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
+        $('#termin_order_form').select2({
+            placeholder: "Pilih Termin",
+            allowClear: true,
+            theme: "bootstrap-5",
+        }).change(function() {});
 
-        $('.termin')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.termin')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // Sales
         $('.id_sales').select2({
             placeholder: "Pilih Nama Sales",
             allowClear: true,
             theme: "bootstrap-5"
         }).change(function() {});
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.id_sales')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.id_sales')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.id_sales')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // warehouse
-        $('.warehouse').select2({
-            placeholder: "Pilih warehouse",
-            theme: "bootstrap-5",
-            dropdownParent: $(".detail-modal .modal-content"),
-            // tags: true,
-            allowClear: true
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.warehouse')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.warehouse')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.warehouse')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // BARANG
         $('.jenis_penjualan').select2({
             placeholder: "Pilih Jenis Penjualan",
             theme: "bootstrap-5",
@@ -1047,28 +941,6 @@
             }
         });
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.jenis_penjualan')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.jenis_penjualan')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.jenis_penjualan')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // BARANG
         $('.id_barang').select2({
             placeholder: "Pilih Barang",
             theme: "bootstrap-5",
@@ -1076,15 +948,50 @@
             allowClear: true
         })
 
+        $('#province_parent_id').select2({
+            placeholder: "Pilih Provinsi",
+            theme: "bootstrap-5",
+            dropdownParent: $(".addCustomerModal"),
+            allowClear: true
+        })
+
+        $('#city_parent_id').select2({
+            placeholder: "Pilih Kabupaten",
+            theme: "bootstrap-5",
+            dropdownParent: $(".addCustomerModal"),
+            allowClear: true
+        })
+
+        $('#tipe_pelanggan_customer').select2({
+            placeholder: "Pilih Tipe Pelanggan",
+            theme: "bootstrap-5",
+            dropdownParent: $(".addCustomerModal"),
+            allowClear: true
+        })
+
+        $('#currency').select2({
+            placeholder: "Pilih Mata Uang",
+            theme: "bootstrap-5",
+            dropdownParent: $(".addCustomerModal"),
+            allowClear: true
+        })
+
+        $('#jenis_penjualan_customer').select2({
+            placeholder: "Pilih Jenis Penjualan",
+            theme: "bootstrap-5",
+            dropdownParent: $(".addCustomerModal"),
+            allowClear: true
+        })
+
         //CSS SELECT2 FLOATING LABEL
-        $('.id_barang')
+        $('.id_customer, .satuan_id, .termin, .id_sales, .jenis_penjualan, .id_barang, .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.id_barang')
+        $('.id_customer, .satuan_id, .termin, .id_sales, .jenis_penjualan, .id_barang,  .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer')
             .parent('div')
             .children('span')
             .children('span')
@@ -1092,10 +999,11 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.id_barang')
+        $('.id_customer, .satuan_id, .termin, .id_sales, .jenis_penjualan, .id_barang,  .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer')
             .parent('div')
             .find('label')
             .css('z-index', '1');
+
 
         $(".nik").mask("AAAAAAAAAAAAAAAA", {
             translation: {
@@ -1112,178 +1020,6 @@
                 }
             }
         })
-
-        // TERMIN
-        //CSS SELECT2 FLOATING LABEL
-        $('.termin').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            allowClear: true,
-            dropdownParent: $(".add-modal .modal-content")
-        });
-        $(".termin")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".termin")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".termin")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // MATA UANG
-        //CSS SELECT2 FLOATING LABEL
-        $('.currency').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            allowClear: false,
-            dropdownParent: $(".add-modal .modal-content")
-        });
-
-        $(".currency")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".currency")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".currency")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // COUNTRY
-        //CSS SELECT2 FLOATING LABEL
-        $(".country_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".country_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        $('.country_id').select2({
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal-internasional .modal-content")
-        })
-
-        $(".country_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-8px');
-
-        // TIPE PELANGGAN
-        //CSS SELECT2 FLOATING LABEL
-        $('.tipe_pelanggan').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            allowClear: true,
-            dropdownParent: $(".add-modal .modal-content")
-        });
-
-        $(".tipe_pelanggan")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".tipe_pelanggan")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".tipe_pelanggan")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // PROVINCE PARENT
-        //CSS SELECT2 FLOATING LABEL
-        $('.province_parent_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            allowClear: true,
-            dropdownParent: $(".add-modal .modal-content")
-        });
-
-        $(".province_parent_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".province_parent_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".province_parent_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // CITY PARENT
-        //CSS SELECT2 FLOATING LABEL
-        $('.city_parent_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            allowClear: true,
-            dropdownParent: $(".add-modal .modal-content")
-        });
-
-        $('.city_parent_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.city_parent_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.city_parent_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
 
         $(".phone").mask("0000000000000")
 
@@ -1372,8 +1108,11 @@
 
         $('.btn-submit-customer').click(function() {
             if ($('.create-form-customer').valid()) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                const data = new FormData(document.querySelector(".create-form-customer"));
+                let csrf = $(`[name="${csrfToken}"]`);
+                let data = new FormData(document.querySelector(".create-form-customer"));
+                let piutang = destroyFormatRupiah($('#piutang').val());
+                data.set('piutang', piutang);
+
                 Swal.fire({
                     icon: 'question',
                     title: 'Simpan Customer?',
@@ -1524,7 +1263,12 @@
         $('.btn-submit-form-master-barang').click(function() {
             if ($('.create-form-master-barang').valid()) {
                 const csrf = $(`[name="${csrfToken}"]`);
-                const data = new FormData(document.querySelector(".create-form-master-barang"));
+                let data = new FormData(document.querySelector(".create-form-master-barang"));
+                let hargaPokok = destroyFormatRupiah($('#harga_pokok').val());
+                let hargaJual = destroyFormatRupiah($('#harga_jual').val());
+                data.set('harga_pokok', hargaPokok);
+                data.set('harga_jual', hargaJual);
+
                 Swal.fire({
                     icon: 'question',
                     title: 'Simpan Master Barang ?',
@@ -1705,20 +1449,6 @@
                 // let stok = $(".id_barang option:selected").data("stok") ? $(".id_barang option:selected").data("stok") : "";
 
                 $(".nama_barang").attr("readonly", nama ? true : false);
-                $.ajax({
-                    url: "<?= base_url('/order-form-lokal/warehouseAll'); ?>" + "/" + idBarang,
-                    method: "GET",
-                    dataType: "json",
-                    success: function(res) {
-                        $(".warehouse").empty();
-                        //bug di penjualan lokal
-                        // $(".warehouse").append(`<option value=""></option>`);
-                        res.dataWarehouse.forEach(function(item) {
-                            $(".warehouse").append(`<option  value="${item.warehouse_id}" ${warehouseId==item.id?"selected":""}>${item.warehouse_name}</option>`).change();
-                            // $(".stok").val(item.qty);
-                        })
-                    }
-                })
                 if (statusppn == 1) {
                     $(".keteranganppn").val("Barang PPN");
 
@@ -1748,7 +1478,7 @@
                     })
                 });
                 $(".satuan").val(satuan);
-                $(".harga").val(harga);
+                $(".harga").val(greatFormatRupiah(harga));
 
             } else {
                 $(".nama_barang").attr("readonly", false)
@@ -2085,106 +1815,95 @@
                 // update detail
                 if (row_detail) {} else {
                     if ($(".detail-form").valid()) {
-                        Swal.fire({
-                            icon: 'question',
-                            title: 'Simpan Data?',
-                            confirmButtonColor: '#4e73df',
-                            cancelButtonColor: '#d33',
-                            showCancelButton: true,
-                            reverseButtons: true,
-                            confirmButtonText: 'Simpan',
-                            cancelButtonText: 'Kembali',
-                        }).then(result => {
-                            if (result.isConfirmed) {
-                                no = no + 1;
-                                list_items.push({
-                                    id: "",
-                                    no: no,
-                                    row: row + 1,
-                                    id_barang: id_barang,
-                                    nama_barang: nama_barang,
-                                    harga_barang: harga,
-                                    qty: qty,
-                                    amount: amount,
-                                    discountedAmt: discountedAmt,
-                                    keterangan: keterangan,
-                                    statusppn: statusppn,
-                                    tax: tax,
-                                    taxAmt: amount * (tax / 100),
-                                    discount_percentage: discountPercentage,
-                                    dept: dept,
-                                    warehouse_id: warehouseId,
-                                    warhouse_name: warhouseName,
 
-                                    kode_barang: selectedData.code,
-                                    satuan: selectedData.satuan,
-                                    disc: discountPercentage,
-                                    discAmt: discAmt,
-                                    isDeleted: false,
+                        no = no + 1;
+                        list_items.push({
+                            id: "",
+                            no: no,
+                            row: row + 1,
+                            id_barang: id_barang,
+                            nama_barang: nama_barang,
+                            harga_barang: harga,
+                            qty: qty,
+                            amount: amount,
+                            discountedAmt: discountedAmt,
+                            keterangan: keterangan,
+                            statusppn: statusppn,
+                            tax: tax,
+                            taxAmt: amount * (tax / 100),
+                            discount_percentage: discountPercentage,
+                            dept: dept,
+                            warehouse_id: warehouseId,
+                            warhouse_name: warhouseName,
 
-                                    barangTotal: amount,
-                                });
+                            kode_barang: selectedData.code,
+                            satuan: selectedData.satuan,
+                            disc: discountPercentage,
+                            discAmt: discAmt,
+                            isDeleted: false,
 
-                                table.row.add({
-                                    id: "",
-                                    no: no,
-                                    id_barang: id_barang,
-                                    kode_barang: selectedData.code,
-                                    nama_barang: nama_barang,
-                                    qty: qty,
-                                    satuan: selectedData.satuan,
-                                    harga_barang: harga,
-                                    barangTotal: amount,
-                                    disc: discountPercentage,
-                                    statusppn: statusppn,
-                                    tax: tax,
-                                    taxAmt: amount * (tax / 100),
-                                    keterangan: keterangan,
-                                    discAmt: discAmt,
-                                    amount: discountedAmt,
-                                    dept: dept,
-                                    warehouse_id: warehouseId,
-                                    warehouse_name: warhouseName,
-                                    isDeleted: false
-                                }).draw(false);
+                            barangTotal: amount,
+                        });
 
-                                reCountTotal();
+                        table.row.add({
+                            id: "",
+                            no: no,
+                            id_barang: id_barang,
+                            kode_barang: selectedData.code,
+                            nama_barang: nama_barang,
+                            qty: qty,
+                            satuan: selectedData.satuan,
+                            harga_barang: harga,
+                            barangTotal: amount,
+                            disc: discountPercentage,
+                            statusppn: statusppn,
+                            tax: tax,
+                            taxAmt: amount * (tax / 100),
+                            keterangan: keterangan,
+                            discAmt: discAmt,
+                            amount: discountedAmt,
+                            dept: dept,
+                            warehouse_id: warehouseId,
+                            warehouse_name: warhouseName,
+                            isDeleted: false
+                        }).draw(false);
 
-                                total_harga_barang = total_harga_barang + Number(harga.replaceAll(",", ""));
-                                total_qty = total_qty + Number(qty);
-                                total_harga = total_harga + Number(amount.replaceAll(",", ""));
+                        reCountTotal();
 
-                                let tag_html = "";
-                                let tag_total = "";
+                        total_harga_barang = total_harga_barang + Number(harga.replaceAll(",", ""));
+                        total_qty = total_qty + Number(qty);
+                        total_harga = total_harga + Number(amount.replaceAll(",", ""));
 
-                                $(".foot-detail-table").empty()
+                        let tag_html = "";
+                        let tag_total = "";
 
-                                tag_total += `<tr>`;
-                                tag_total += "<td colspan='1'>";
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += "<b>TOTAL</b>";
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${total_qty}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>${total_harga.toLocaleString()}</b>`;
-                                tag_total += "</td>";
-                                tag_total += "<td colspan='3'>";
-                                tag_total += "</td>";
-                                tag_total += "</tr>";
+                        $(".foot-detail-table").empty()
 
-                                $(".foot-detail-table").append(tag_total);
+                        tag_total += `<tr>`;
+                        tag_total += "<td colspan='1'>";
+                        tag_total += "</td>";
+                        tag_total += "<td>";
+                        tag_total += "<b>TOTAL</b>";
+                        tag_total += "</td>";
+                        tag_total += "<td>";
+                        tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
+                        tag_total += "</td>";
+                        tag_total += "<td>";
+                        tag_total += `<b>${total_qty}</b>`;
+                        tag_total += "</td>";
+                        tag_total += "<td>";
+                        tag_total += `<b>${total_harga.toLocaleString()}</b>`;
+                        tag_total += "</td>";
+                        tag_total += "<td colspan='3'>";
+                        tag_total += "</td>";
+                        tag_total += "</tr>";
 
-                                $(".detail-modal").modal("hide")
-                                row = row + 1;
-                            }
-                        })
+                        $(".foot-detail-table").append(tag_total);
+
+                        $(".detail-modal").modal("hide")
+                        row = row + 1;
                     }
+
                 }
             }
         });
@@ -2307,7 +2026,7 @@
                 $(".id_customer").empty()
                 $(".id_customer").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
-                    $(".id_customer").append(`<option value="${item.id}" data-jenis_penjualan="${item.jenis_penjualan}" data-tipepelanggan="${item.tipe_pelanggan}" data-customerphone="${item.customerPhone}" data-address="${item.address}" data-termin="${item.termin}" data-salesname="${item.salesName}">${item.kode} - ${item.name}</option>`)
+                    $(".id_customer").append(`<option value="${item.id}" data-jenis_penjualan="${item.jenis_penjualan}" data-tipepelanggan="${item.tipe_pelanggan}" data-customerphone="${item.phone}" data-address="${item.address}" data-termin="${item.termin}" data-salesname="${item.salesName}">${item.kode} - ${item.name}</option>`)
                 })
                 $(".id_customer").val();
             }
@@ -2365,6 +2084,33 @@
             $("input[name='kode_barang']").val("");
         }
     }
+
+    function getCityParent() {
+        const id = $(".province_parent_id option:selected").val()
+
+        if (id) {
+            $.ajax({
+                url: `<?= base_url("city"); ?>/${id}`,
+                method: "GET",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                dataType: "json",
+                success: function(res) {
+                    $(".city_parent_id").empty()
+                    $(".city_parent_id").val("").change()
+                    $(".city_parent_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                    })
+                }
+            })
+        }
+    }
+
 
     // Company
     $('.company').select2({

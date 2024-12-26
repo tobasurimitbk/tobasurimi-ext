@@ -735,12 +735,12 @@
 
         $.each(listPanjar, function(i, v) {
             var element = $('input[data-id="' + v.id + '"].bayar_panjar');
-            var input_user = convertRupiahToNumber(element.val());
+            var input_user = destroyFormatRupiah(element.val());
             listPanjar[i].bayar_panjar = input_user;
         });
         $.each(listPembayaran, function(i, v) {
             var element = $('input[data-id="' + v.detail_id + '"].input_user');
-            var input_user = convertRupiahToNumber(element.val());
+            var input_user = destroyFormatRupiah(element.val());
             listPembayaran[i].pembayaran_user_input = input_user;
         });
 
@@ -1032,7 +1032,7 @@
 
                     newRow.append($('<td>').html(
                         `
-                        <input  class="form-control bayar_panjar" onchange="this.value = formatRupiah(this.value)" oninput="limitInputBayar(this, ${v.sisa_panjar_number})" autocomplete="one-time-code" data-id="${v.id}"  type="text" value="" name = "bayar_panjar" style="height:40px">
+                        <input  class="form-control bayar_panjar" onchange="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this, ${v.sisa_panjar_number})" autocomplete="one-time-code" data-id="${v.id}"  type="text" value="" name = "bayar_panjar" style="height:40px">
                             `
                     ));
                     tablePanjar.find('tbody').append(newRow);
@@ -1092,12 +1092,12 @@
                 newRow.append($('<td style="width: 10px;">').text(no++));
                 newRow.append($('<td>').text(v.no_panjar));
                 newRow.append($('<td>').text((v.payment_date)));
-                newRow.append($('<td>').text(formatRupiah(v.total_panjar)));
-                newRow.append($('<td>').text(formatRupiah(v.sisa_panjar)));
+                newRow.append($('<td>').text(greatFormatRupiah(v.total_panjar)));
+                newRow.append($('<td>').text(greatFormatRupiah(v.sisa_panjar)));
 
                 newRow.append($('<td>').html(
                     `
-                        <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == 1 ? 'disabled' : '') : '' ?> onchange="this.value = formatRupiah(this.value)"  class="form-control bayar_panjar" oninput="limitInputBayar(this, ${Number(v.sisa_panjar)})" autocomplete="one-time-code" data-id="${v.id}"  class="form-control" type="text" value="${formatRupiah(v.bayar_panjar)}" name = "bayar_panjar" style="height:40px">
+                        <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == 1 ? 'disabled' : '') : '' ?> onchange="this.value = greatFormatRupiah(this.value)"  class="form-control bayar_panjar" oninput="limitInputBayar(this, ${Number(v.sisa_panjar)})" autocomplete="one-time-code" data-id="${v.id}"  class="form-control" type="text" value="${greatFormatRupiah(v.bayar_panjar)}" name = "bayar_panjar" style="height:40px">
                             `
                 ));
                 tablePanjar.find('tbody').append(newRow);
@@ -1129,11 +1129,11 @@
             newRow.append($('<td>').text(v.nama_barang));
             newRow.append($('<td>').text(v.qty_order));
             newRow.append($('<td>').text(v.total_harga));
-            newRow.append($('<td>').text(formatRupiah(v.sisa_pembayaran)));
+            newRow.append($('<td>').text(greatFormatRupiah(v.sisa_pembayaran)));
             newRow.append($('<td>').html(
                 `
                 <div class="input-group d-flex align-items-center">
-                    <input onchange="this.value = formatRupiah(this.value)" class="form-control input_user" oninput="limitInputBayar(this, ${v.input_user + v.sisa_pembayaran})" <?= !empty($paymentData) ? ($paymentData['status_posting'] == 1 ? 'disabled' : '') : '' ?> autocomplete="one-time-code" data-id="${v.detail_id}" type="text" value="${formatRupiah( v.input_user)}" name="input_user" style="height:40px">
+                    <input onchange="this.value = greatFormatRupiah(this.value)" class="form-control input_user" oninput="limitInputBayar(this, ${v.input_user + v.sisa_pembayaran})" <?= !empty($paymentData) ? ($paymentData['status_posting'] == 1 ? 'disabled' : '') : '' ?> autocomplete="one-time-code" data-id="${v.detail_id}" type="text" value="${greatFormatRupiah( v.input_user)}" name="input_user" style="height:40px">
                     <span class="input-group-text"  style="height:40px;">${res.currency}</span>
                 </div>
                 `
@@ -1148,12 +1148,12 @@
 
         var newRow1 = $('<tr style="color: white">');
         newRow1.append($('<td style="text-align:right;" colspan="3">').text('Total'));
-        newRow1.append($('<td>').text(formatRupiah(total_harga_semua)));
-        newRow1.append($('<td>').text(formatRupiah(total_sisa_pembayaran)));
+        newRow1.append($('<td>').text(greatFormatRupiah(total_harga_semua)));
+        newRow1.append($('<td>').text(greatFormatRupiah(total_sisa_pembayaran)));
         newRow1.append($('<td>').html(
             `
                 <div class="input-group d-flex align-items-center">
-                    <input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="  ${formatRupiah(total_input_user)}"  name = "total_pembayaran"  readonly>
+                    <input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="  ${greatFormatRupiah(total_input_user)}"  name = "total_pembayaran"  readonly>
                     <span class="input-group-text">${res.currency}</span>
                 </div>
                 `
@@ -1162,13 +1162,13 @@
 
         var pph_result = 0;
         if (statusPph == 1) {
-            pph_result = convertRupiahToNumber($(".total-pembayaran").val()) * 2.5 / 100;
+            pph_result = destroyFormatRupiah($(".total-pembayaran").val()) * 2.5 / 100;
         }
 
         var newRow2 = $('<tr>');
         newRow2.append($('<td style="text-align:right;" colspan="5"><b>PAJAK PENGHASILAN (2.5 %) (+)</b></td>'));
 
-        newRow2.append($('<td class="pph_amount" style="text-align: left"> ').text(formatRupiah(pph_result)));
+        newRow2.append($('<td class="pph_amount" style="text-align: left"> ').text(greatFormatRupiah(pph_result)));
         table.find('tbody').append(newRow2);
 
         var newRow3 = $('<tr>');
@@ -1177,7 +1177,7 @@
         newRow3.append($('<td>').html(
             `
                 <div class="input-group d-flex align-items-center">
-                    <input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value=" ${formatRupiah(total_bayar_panjar)}" name = "total_pembayaran_panjar" readonly>
+                    <input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value=" ${greatFormatRupiah(total_bayar_panjar)}" name = "total_pembayaran_panjar" readonly>
                     <span class="input-group-text">${res.currency}</span>
                 </div>
                 `
@@ -1202,7 +1202,7 @@
         newRow4.append($('<td>').html(
             `
                 <div class="input-group d-flex align-items-center">
-                    <input autocomplete="one-time-code" data-id=""   class="form-control grand-total" type="text" value="${formatRupiah(grand_total)}" name = "grand_total"  readonly>
+                    <input autocomplete="one-time-code" data-id=""   class="form-control grand-total" type="text" value="${greatFormatRupiah(grand_total)}" name = "grand_total"  readonly>
                     <span class="input-group-text">${res.currency}</span>
                 </div>
                 `
@@ -1248,11 +1248,11 @@
                     newRow.append($('<td>').text(v.nama_barang));
                     newRow.append($('<td>').text(v.qty_order));
                     newRow.append($('<td>').text(v.total_harga));
-                    newRow.append($('<td>').text(formatRupiah(v.sisa_pembayaran)));
+                    newRow.append($('<td>').text(greatFormatRupiah(v.sisa_pembayaran)));
                     newRow.append($('<td>').html(
                         `
                         <div class="input-group d-flex align-items-center">
-                             <input onchange="this.value = formatRupiah(this.value)"  class="form-control input_user" oninput="limitInputBayar(this, ${v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.detail_id}"  class="form-control" type="text" value="" name = "input_user" style="height:40px">
+                             <input onchange="this.value = greatFormatRupiah(this.value)"  class="form-control input_user" oninput="limitInputBayar(this, ${v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.detail_id}"  class="form-control" type="text" value="" name = "input_user" style="height:40px">
                             <span class="input-group-text" style="height:40px;">${valas}</span>
                         </div>
                         `
@@ -1263,8 +1263,8 @@
                 });
                 var newRow1 = $('<tr>');
                 newRow1.append($('<td style="text-align:right;" colspan="3">').text('Total'));
-                newRow1.append($('<td>').text(formatRupiah(total_harga_semua)));
-                newRow1.append($('<td>').text(formatRupiah(total_sisa_pembayaran)));
+                newRow1.append($('<td>').text(greatFormatRupiah(total_harga_semua)));
+                newRow1.append($('<td>').text(greatFormatRupiah(total_sisa_pembayaran)));
                 newRow1.append($('<td>').html(
                     `
                         <div class="input-group d-flex align-items-center">
@@ -1308,35 +1308,13 @@
         })
     }
 
-    function formatRupiah(angka) {
-        var formatter = new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR'
-        });
-        var parsedNumber = parseFloat(angka);
-        if (isNaN(parsedNumber)) {
-            return "0,00";
-        }
-        return formatter.format(parsedNumber).replace('Rp', '').trim();
-    }
-
-    function convertRupiahToNumber(rupiah) {
-        if (rupiah == "") {
-            return 0;
-        } else {
-            var withoutDot = rupiah.replace(/\./g, '');
-            var numberWithDot = withoutDot.replace(',', '.');
-            return parseFloat(numberWithDot);
-        }
-    }
-
 
     $(document).on("input", ".bayar_panjar", function() {
         var sum = 0;
         $(".bayar_panjar").each(function() {
-            sum += convertRupiahToNumber($(this).val());
+            sum += destroyFormatRupiah($(this).val());
         });
-        $(".total-bayar-panjar").val(formatRupiah(sum));
+        $(".total-bayar-panjar").val(greatFormatRupiah(sum));
         updateGrandTotal()
 
     });
@@ -1344,20 +1322,20 @@
     $(document).on("input", ".input_user", function() {
         var sum = 0;
         $(".input_user").each(function() {
-            sum += convertRupiahToNumber($(this).val());
+            sum += destroyFormatRupiah($(this).val());
         });
-        $(".total-pembayaran").val(formatRupiah(sum));
+        $(".total-pembayaran").val(greatFormatRupiah(sum));
         updateGrandTotal()
     });
 
 
     $('#status_pph').on('change', function() {
         var status_pph = $(this).val();
-        var total_pembayaran = convertRupiahToNumber($(".total-pembayaran").val());
+        var total_pembayaran = destroyFormatRupiah($(".total-pembayaran").val());
         var result = total_pembayaran * 2.5 / 100;
 
         if (status_pph == 1) {
-            $(".pph_amount").text(formatRupiah(result));
+            $(".pph_amount").text(greatFormatRupiah(result));
         } else if (status_pph == 0) {
             $(".pph_amount").text("0,00"); // Reset to original value
         }
@@ -1368,13 +1346,13 @@
     function updateGrandTotal() {
         var totalBayarPanjar = 0;
         if ($(".total-bayar-panjar").length) {
-            totalBayarPanjar = convertRupiahToNumber($(".total-bayar-panjar").val()) || 0;
+            totalBayarPanjar = destroyFormatRupiah($(".total-bayar-panjar").val()) || 0;
         }
-        var totalPembayaran = convertRupiahToNumber($(".total-pembayaran").val());
-        var pph_amount = convertRupiahToNumber($(".pph_amount").text());
+        var totalPembayaran = destroyFormatRupiah($(".total-pembayaran").val());
+        var pph_amount = destroyFormatRupiah($(".pph_amount").text());
         var total = totalPembayaran + pph_amount - Number(totalBayarPanjar);
 
-        $(".grand-total").val(formatRupiah(total)); // Update the grand total input field with formatted value
+        $(".grand-total").val(greatFormatRupiah(total)); // Update the grand total input field with formatted value
     }
 </script>
 

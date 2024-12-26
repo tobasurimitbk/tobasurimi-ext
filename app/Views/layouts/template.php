@@ -39,14 +39,79 @@
 
     <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/css/bootstrap-datetimepicker.min.css?v=<?= time(); ?>">
     <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/css/bootstrap-datetimepicker-standalone.css?v=<?= time(); ?>">
+
+
 </head>
 <?php $session = session(); ?>
 
+
+<script>
+    function greatFormatRupiah(x) {
+        var min = false;
+         // Pastikan x memiliki nilai yang valid sebelum memanggil toString
+        if (x === null || x === undefined) {
+            x = ""; // Berikan nilai default jika x null atau undefined
+        }
+
+        x = x.toString();
+        if (x.includes("-")) {
+            min = true;
+        } else {
+            min = false;
+        }
+        x = x.replace(/-/g, "");
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/,/g, "");
+        var bilangan = parts[0];
+
+        if (parts[1] && parts[1] === "00") {
+            parts.pop();
+        }
+
+        var number_string = bilangan.toString(),
+            sisa = number_string.length % 3,
+            rupiah = number_string.substr(0, sisa),
+            ribuan = number_string.substr(sisa).match(/\d{3}/g);
+
+        if (ribuan) {
+            var separator = sisa ? "," : "";
+            rupiah += separator + ribuan.join(",");
+        }
+        parts[0] = rupiah;
+        if (min) {
+            return "-" + parts.join(".");
+        } else {
+            return parts.join(".");
+        }
+
+    }
+
+    function destroyFormatRupiah(x) {
+        if (typeof x === "number") return x; // Jika input sudah berupa angka, langsung kembalikan
+        if (!x) return 0; // Jika input null, undefined, atau kosong, kembalikan 0
+        
+        // Hapus "Rp" dan karakter selain angka dan titik
+        const cleaned = x.replace(/[^\d.]/g, "");
+        
+        // Hapus ".00" di akhir string jika ada
+        const withoutDecimal = cleaned.replace(/\.00$/, "");
+        
+        // Konversi string menjadi angka
+        return parseFloat(withoutDecimal) || 0; // Default ke 0 jika hasilnya NaN
+    }
+
+
+
+</script>
+
+
 <body class="<?= $session->get('toggle');  ?>">
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/js-polyfills/0.1.43/polyfill.min.js" integrity="sha512-lvWiOP+aMKHllm4THsjzNleVuGOh0WGniJ3lgu/nvCbex1LlaQSxySUjAu/LTJw9FhnSL/PVYoQcckg1Q03+fQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> Bootstrap core JavaScript -->
-    <script src="<?= base_url(); ?>assets/_vendor/jquery/jquery.min.js?v=<?= time(); ?>"></script>
+    <!-- Scripts -->
+    <script src="<?= base_url() ?>assets/js/jquery.min.js?v=<?= time(); ?>"></script>
+    <script src="<?= base_url() ?>assets/js/select2.full.min.js?v=<?= time(); ?>"></script>
     <script src="<?= base_url() ?>assets/js/moment.min.js?v=<?= time(); ?>"></script>
-    <script type="text/javascript" src="<?= base_url() ?>assets/js/bootstrap-datetimepicker.min.js?v=<?= time(); ?>"></script>
+    <script src="<?= base_url() ?>assets/js/bootstrap-datetimepicker.min.js?v=<?= time(); ?>"></script>
 
     <script src="<?= base_url() ?>assets/js/select2.min.js?v=<?= time(); ?>"></script>
 

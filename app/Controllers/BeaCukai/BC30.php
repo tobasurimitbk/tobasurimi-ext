@@ -4,6 +4,7 @@ namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
 use App\Helpers\BeaCukaiApi;
+use App\Models\AMPurchaseOrderModel;
 use App\Models\BC30Model;
 use App\Models\CeisaSettingModel;
 use App\Models\MetadataModel;
@@ -19,6 +20,14 @@ use App\Models\PengusahaTPBModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\CountryModel;
 use App\Models\HsCodesModel;
+use App\Models\PenerimaanBarangModel;
+use App\Models\PengembalianBarangDetailModel;
+use App\Models\PengembalianBarangModel;
+use App\Models\RMImportPOModel;
+use App\Models\SalesOrderLainDetailModel;
+use App\Models\SalesOrderLainModel;
+use App\Models\StockDetailModel;
+use App\Models\StockModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -52,6 +61,15 @@ class BC30 extends BaseController
     protected $barangMasterSpesifikasiModel;
     protected $countryModel;
     protected $hsCodeModel;
+    protected $pengembalianBarangModel;
+    protected $pengembalianBarangDetailModel;
+    protected $salesOrderLainModel;
+    protected $rmImportPosModel;
+    protected $amPurchaseOrderModel;
+    protected $salesOrderLainDetailModel;
+    protected $penerimaanBarangModel;
+    protected $stockModel;
+    protected $stockDetailModel;
 
     public function __construct()
     {
@@ -70,6 +88,15 @@ class BC30 extends BaseController
         $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->countryModel = new CountryModel();
         $this->hsCodeModel = new HsCodesModel();
+        $this->pengembalianBarangModel = new PengembalianBarangModel();
+        $this->salesOrderLainModel = new SalesOrderLainModel();
+        $this->pengembalianBarangDetailModel = new PengembalianBarangDetailModel();
+        $this->rmImportPosModel = new RMImportPOModel();
+        $this->amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $this->salesOrderLainDetailModel = new SalesOrderLainDetailModel();
+        $this->penerimaanBarangModel = new PenerimaanBarangModel();
+        $this->stockModel = new StockModel();
+        $this->stockDetailModel = new StockDetailModel();
 
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
@@ -164,7 +191,6 @@ class BC30 extends BaseController
                 "id"                    => encrypt($data->id),
                 "tipe_sales_order"      => $data->tipe_sales_order,
                 "no_order_form"         => $detail != null ? $detail['no_sales_order'] : "-",
-                "no_stuffing"           => $detail != null ? $detail['no_stuffing'] : "-",
                 "customer_name"         => $detail != null ? $detail['nama_customer'] : "-",
                 "no_aju"                => $data->no_aju . " / " . $data->no_daftar,
                 "tanggal_bc_30"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
@@ -193,12 +219,37 @@ class BC30 extends BaseController
 
     public function createAction()
     {
+
+        $typeReference = $this->request->getVar('type_reference');
+        if ($typeReference == "ORDER FORM EKSPOR") {
+            $salesOrderId = $this->request->getVar('reference_id');
+            $pengembalianBarangId = null;
+            $salesOrderLainId = null;
+        } elseif ($typeReference == "RETUR PEMBELIAN") {
+            $salesOrderId = null;
+            $pengembalianBarangId = $this->request->getVar('reference_id');
+            $salesOrderLainId = null;
+            // Update bc_pengeluaran_id
+            $this->pengembalianBarangModel->update($pengembalianBarangId, [
+                'bc_pengeluaran_id' => 1445
+            ]);
+        } elseif ($typeReference == "ORDER FORM LAIN") {
+            $salesOrderId = null;
+            $pengembalianBarangId = null;
+            $salesOrderLainId = $this->request->getVar('reference_id');
+        }
+
+        $tanggal = $this->request->getVar("tanggal") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "";
+
         $this->bc30Model->insert([
             'company_id' => $this->this_company_id,
-            'sales_order_id' => $this->request->getVar('sales_order_id'),
-            'tipe_sales_order' => $this->request->getVar('tipe_sales_order'),
+            'sales_order_id' => $salesOrderId,
+            'pengembalian_barang_id' => $pengembalianBarangId,
+            'sales_order_lain_id' => $salesOrderLainId,
+            'tipe_sales_order' => $this->request->getVar('type_reference'),
             'no_aju' => $this->request->getVar('no_aju'),
             'no_daftar' => $this->request->getVar('no_daftar'),
+            'createdAt' => $tanggal . " " . date('H:i:s'),
             'status_posting' => '0',
         ]);
 
@@ -212,14 +263,35 @@ class BC30 extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
 
+        $typeReference = $this->request->getVar('type_reference');
+        if ($typeReference == "ORDER FORM EKSPOR") {
+            $salesOrderId = $this->request->getVar('reference_id');
+            $pengembalianBarangId = null;
+            $salesOrderLainId = null;
+        } elseif ($typeReference == "RETUR PEMBELIAN") {
+            $salesOrderId = null;
+            $pengembalianBarangId = $this->request->getVar('reference_id');
+            $salesOrderLainId = null;
+        } elseif ($typeReference == "ORDER FORM LAIN") {
+            $salesOrderId = null;
+            $pengembalianBarangId = null;
+            $salesOrderLainId = $this->request->getVar('reference_id');
+        }
+
+        $tanggal = $this->request->getVar("tanggal") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "";
+
         $this->bc30Model->update($id, [
             'company_id' => $this->this_company_id,
-            'sales_order_id' => $this->request->getVar('sales_order_id'),
-            'tipe_sales_order' => $this->request->getVar('tipe_sales_order'),
+            'sales_order_id' => $salesOrderId,
+            'pengembalian_barang_id' => $pengembalianBarangId,
+            'sales_order_lain_id' => $salesOrderLainId,
+            'tipe_sales_order' => $this->request->getVar('type_reference'),
             'no_aju' => $this->request->getVar('no_aju'),
             'no_daftar' => $this->request->getVar('no_daftar'),
+            'createdAt' => $tanggal . " " . date('H:i:s'),
             'status_posting' => '0',
         ]);
+
         return response()->setJSON([
             'status' => true,
             'message' => "Dokumen BC 3.0 Berhasil Diupdate"
@@ -233,6 +305,17 @@ class BC30 extends BaseController
 
         if ($bc30 == null) {
             return redirect()->to('bea-cukai-bc-30');
+        }
+
+        if ($bc30['sales_order_id'] != null) {
+            $bc30['reference_id'] = $bc30['sales_order_id'];
+            $bc30['type_reference'] = "ORDER FORM EKSPOR";
+        } elseif ($bc30['pengembalian_barang_id'] != null) {
+            $bc30['reference_id'] = $bc30['pengembalian_barang_id'];
+            $bc30['type_reference'] = "RETUR PEMBELIAN";
+        } elseif ($bc30['sales_order_lain_id'] != null) {
+            $bc30['reference_id'] = $bc30['sales_order_lain_id'];
+            $bc30['type_reference'] = "ORDER FORM LAIN";
         }
 
         $data = [
@@ -294,6 +377,14 @@ class BC30 extends BaseController
     public function delete()
     {
         $id = decrypt($this->request->getVar('id'));
+        $bc30 = $this->bc30Model->where('id', $id)->first();
+        // Hapus Reference di Pengembalian Barang
+        if ($bc30['pengembalian_barang_id'] != null) {
+            $this->pengembalianBarangModel->where('id', $bc30['pengembalian_barang_id'])->update([
+                'bc_pengeluaran_id' => $bc30['pengembalian_barang_id']
+            ]);
+        }
+
         $this->bc30Model->delete($id);
         return response()->setJSON([
             'status' => true,
@@ -304,8 +395,153 @@ class BC30 extends BaseController
     public function posting()
     {
         $id = decrypt($this->request->getVar('id'));
+        $bc30 = $this->bc30Model->where('id', $id)->first();
+
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        if ($bc30['tipe_sales_order'] == "RETUR PEMBELIAN") {
+            // RETUR PEMBELIAN
+            $pengembalianBarang = $this->pengembalianBarangModel->find($bc30['pengembalian_barang_id']);
+            $penerimaanBarang = $this->penerimaanBarangModel->find($pengembalianBarang['penerimaan_barang_id']);
+
+            if ($penerimaanBarang == null) {
+                return response()->setJSON([
+                    'status' => true,
+                    'message' => "Gagal Posting, Terjadi Kesalahan Saat Menambahkan Stok"
+                ]);
+            } else {
+                $pengembalianBarangDetail =  $this->pengembalianBarangModel->getReturBeaCukaiDetail($bc30['pengembalian_barang_id']);
+                foreach ($pengembalianBarangDetail as $p) {
+                    $stock = $this->stockModel->find($p['stock_id']);
+                    $qty = $p['qty_konversi'];
+
+                    if ($stock['tipe_barang'] == "kemasan") {
+                        $barang2_id = $stock['kemasan_id'];
+                    } else {
+                        $barang2_id = $stock['barang2_id'];
+                    }
+
+                    // BARANG LAMA
+                    $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
+                        $p['stock_id'],
+                        $p['bc_id'],
+                        $p['no_aju'],
+                        $p['stock_dokumen']
+                    );
+
+                    $stok = $this->stockModel->insertStok(
+                        $penerimaanBarang['company_id'],
+                        $penerimaanBarang['warehouse_id'],
+                        $penerimaanBarang['divisi_id'],
+                        $stock['tipe_barang'],
+                        $stock['barang1_id'],
+                        $barang2_id,
+                        ($qty * -1),
+                    );
+
+                    // DETAIL
+                    $stokDetail = $this->stockDetailModel->insertStokDetail(
+                        $stok,
+                        $qty,
+                        "Out",
+                        date('Y-m-d'),
+                        $this->this_user_id,
+                        "RETUR",
+                        $pengembalianBarang['no_surat_jalan'],
+                        $pengembalianBarang['keterangan'],
+                    );
+
+                    // SUB DETAIL
+                    $this->stockDetail2Model->insertStokDetail2(
+                        $p['bc_id'],
+                        $stok,
+                        $stokDetail,
+                        $qty,
+                        $p['no_aju'],
+                        $pengembalianBarang['no_surat_jalan'],
+                        $p['stock_dokumen'],
+                        $stockOldDetail['supplier_id'],
+                        $p['total_harga'],
+                        null,
+                        null,
+                        $stockOldDetail['no_po']
+                    );
+                }
+            }
+        } elseif ($bc30['tipe_sales_order'] == "ORDER FORM LAIN") {
+            // ORDER FORM LAIN
+            // KURANGIN STOK NYA
+            $salesOrderLain = $this->salesOrderLainModel->find($bc30['sales_order_lain_id']);
+            $salesOrderLainList = $this->salesOrderLainDetailModel->where('sales_order_lain_id', $bc30['sales_order_lain_id'])->findAll();
+
+            foreach ($salesOrderLainList as $s) {
+                $stock = $this->stockModel->find($s['stock_id']);
+                $qty = $s['qty_konversi'];
+
+                if ($stock['tipe_barang'] == "kemasan") {
+                    $barang2_id = $stock['kemasan_id'];
+                } else {
+                    $barang2_id = $stock['barang2_id'];
+                }
+
+                // BARANG LAMA
+                $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
+                    $s['stock_id'],
+                    $s['bc_id'],
+                    $s['no_aju'],
+                    $s['stock_dokumen']
+                );
+
+                $stok = $this->stockModel->insertStok(
+                    $salesOrderLain['company_id'],
+                    $salesOrderLain['warehouse_id'],
+                    $salesOrderLain['divisi_id'],
+                    $stock['tipe_barang'],
+                    $stock['barang1_id'],
+                    $barang2_id,
+                    ($qty * -1),
+                );
+
+                // DETAIL
+                $stokDetail = $this->stockDetailModel->insertStokDetail(
+                    $stok,
+                    $qty,
+                    "Out",
+                    date('Y-m-d'),
+                    $this->this_user_id,
+                    "PENJUALAN",
+                    $salesOrderLain['no_sales_order'],
+                    $salesOrderLain['keterangan'],
+                );
+
+                // SUB DETAIL
+                $this->stockDetail2Model->insertStokDetail2(
+                    $s['bc_id'],
+                    $stok,
+                    $stokDetail,
+                    $qty,
+                    $s['no_aju'],
+                    $salesOrderLain['no_sales_order'],
+                    $s['stock_dokumen'],
+                    $stockOldDetail['supplier_id'],
+                    $s['total_harga'],
+                    null,
+                    null,
+                    $stockOldDetail['no_po']
+                );
+            }
+        }
 
         $this->bc30Model->update($id, ['status_posting' => '1']);
+        $db->transComplete();
+
+        if ($db->transStatus() == false) {
+            $db->transRollback();
+        }
+
+        $db->transCommit();
+
         return response()->setJSON([
             'status' => true,
             'message' => "Dokumen BC 3.0 Berhasil Diposting"
@@ -314,11 +550,32 @@ class BC30 extends BaseController
 
     public function dropdownSalesOrder()
     {
-        $tipeSalesOrder = $this->request->getVar('tipe_sales_order');
-        $result = $this->bc30Model->getListSalesOrder(
-            $this->this_company_id,
-            $tipeSalesOrder
-        );
+        $typeReference = $this->request->getVar('type_reference');
+        $referenceId = $this->request->getVar('reference_id');
+
+        if ($typeReference == "ORDER FORM EKSPOR") {
+            $result = $this->bc30Model->getListSalesOrder(
+                $this->this_company_id,
+                "EKSPOR"
+            );
+        } elseif ($typeReference == "RETUR PEMBELIAN") {
+            $result = $this->bc30Model->getListReturPembelian(
+                $this->this_company_id,
+                $referenceId
+            );
+        } else if ($typeReference == "ORDER FORM LAIN") {
+            $result = $this->bc30Model->getListSalesOrderLain(
+                $this->this_company_id,
+                $referenceId
+            );
+        } else {
+            $result = [];
+        }
+
+        for ($i = 0; $i < count($result); $i++) {
+            $result[$i]['reference_id'] = $result[$i]['sales_order_id'];
+            $result[$i]['no_reference'] = $result[$i]['no_sales_order'];
+        }
 
         return response()->setJSON([
             'data' => $result,
@@ -329,20 +586,31 @@ class BC30 extends BaseController
 
     public function getListBarang()
     {
-        $tipeSalesOrder = $this->request->getVar('tipe_sales_order');
-        $salesOrderId = $this->request->getVar('sales_order_id');
+        $typeReference = $this->request->getVar('type_reference');
+        $referenceId = $this->request->getVar('reference_id');
 
-        if (empty($tipeSalesOrder) || empty($salesOrderId)) {
+        if (empty($typeReference) || empty($referenceId)) {
             return response()->setJSON([
                 'data' => [],
                 'token' => csrf_hash(),
                 'status' => true
             ]);
         }
-        $result = $this->bc30Model->getListBarang(
-            $salesOrderId,
-            $tipeSalesOrder
-        );
+
+        if ($typeReference == "ORDER FORM EKSPOR") {
+            $result = $this->bc30Model->getListBarang(
+                $referenceId,
+                $typeReference
+            );
+        } elseif ($typeReference == "RETUR PEMBELIAN") {
+            $result = $this->bc30Model->getListBarangReturEkspor(
+                $referenceId
+            );
+        } elseif ($typeReference == "ORDER FORM LAIN") {
+            $result = $this->bc30Model->getListBarangOrderFormLain(
+                $referenceId
+            );
+        }
 
         return response()->setJSON([
             'data' => $result,
@@ -386,97 +654,206 @@ class BC30 extends BaseController
 
     public function allOutstanding()
     {
-        $bc30Data = $this->bc30Model->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
-        $salesOrderData = $this->salesOrderModel->where('id_company', $this->this_company_id)->where('deletedAt', null)->findAll();
-        $salesOrderExportData = $this->salesOrderExportModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
+        $bc30Data = $this->bc30Model
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+        $salesOrderExportData = $this->salesOrderExportModel
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+        $pengembalianBarangData = $this->pengembalianBarangModel
+            ->select('pengembalian_barang.*')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = pengembalian_barang.penerimaan_barang_id', 'left')
+            ->where('penerimaan_barang.status_penerimaan', "IMPORT")
+            ->where('pengembalian_barang.company_id', $this->this_company_id)
+            ->where('pengembalian_barang.bc_pengeluaran_id', NULL)
+            ->where('pengembalian_barang.deletedAt', null)
+            ->findAll();
+        $salesOrderLainData = $this->salesOrderLainModel->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->where('bc_id', 1445)
+            ->findAll();
 
-        $salesOrderIdUse = [];
-        $allSalesOrderId = [];
-        $salesOrderIdNotUse = [];
+        // Sales Order Export
         $salesOrderExportIdUse = [];
         $salesOrderExportIdNotUse = [];
         $allSalesOrderExportId = [];
 
-        foreach ($salesOrderData as $s) {
-            array_push($allSalesOrderId, $s['id']);
-        }
+        // Pengembalian Barang
+        $pengembalianBarangIdUse = [];
+        $pengembalianBarangIdNotUse = [];
+        $allPengembalianBarangId = [];
 
+        // Sales Order Lain
+        $salesOrderLainIdUse = [];
+        $salesOrderLainIdNotUse = [];
+        $allSalesOrderLainId = [];
+
+        // Sales Order Export
         foreach ($salesOrderExportData as $e) {
             array_push($allSalesOrderExportId, $e['sales_order_export_id']);
         }
 
+        // Pengembalian Barang
+        foreach ($pengembalianBarangData as $p) {
+            array_push($allPengembalianBarangId, $p['id']);
+        }
+
+        // Sales Order Lain
+        foreach ($salesOrderLainData as $s) {
+            array_push($allSalesOrderLainId, $s['id']);
+        }
+
         foreach ($bc30Data as $b) {
-            if ($b['tipe_sales_order'] == "LOKAL") {
-                array_push($salesOrderIdUse, $b['id']);
-            } elseif ($b['tipe_sales_order'] == "INTERNASIONAL") {
-                array_push($salesOrderExportIdUse, $b['id']);
+            if ($b['tipe_sales_order'] == "ORDER FORM EKSPOR") {
+                array_push($salesOrderExportIdUse, $b['sales_order_id']);
+            } elseif ($b['tipe_sales_order'] == "ORDER FORM LAIN") {
+                array_push($salesOrderLainIdUse, $b['sales_order_lain_id']);
+            } elseif ($b['tipe_sales_order'] == "RETUR PEMBELIAN") {
+                array_push($pengembalianBarangIdUse, $b['pengembalian_barang_id']);
             }
         }
-        $salesOrderIdNotUse = array_diff($allSalesOrderId, $salesOrderIdUse);
+
         $salesOrderExportIdNotUse = array_diff($allSalesOrderExportId, $salesOrderExportIdUse);
+        $pengembalianBarangIdNotUse = array_diff($allPengembalianBarangId, $pengembalianBarangIdUse);
+        $salesOrderLainIdNotUse = array_diff($allSalesOrderLainId, $salesOrderLainIdUse);
 
         $list = [];
 
-        foreach ($salesOrderIdNotUse as $idLokal) {
-            $so = $this->salesOrderModel
-                ->select('
-                sales_order.id as sales_order_id,
-                no_sales_order,
-                no_surat_jalan,
-                no_stuffing,
-                customers.name,    
-                ')
-                ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order.surat_jalan_so_id', 'left')
-                ->join('stuffing_lokal', 'stuffing_lokal.sales_order_id = sales_order.id', 'left')
-                ->join('customers', 'customers.id = sales_order.id_customer', 'left')
-                ->where('sales_order.id', $idLokal)
-                ->first();
-
-            $sod = $this->salesOrderDetailModel
-                ->select('count(*) as jumlah_barang, sum(amount) as total_harga')
-                ->where('id_sales_order', $idLokal)
-                ->first();
-
-            if ($so != null) {
-                array_push($list, [
-                    'id' => $so['sales_order_id'],
-                    'tipe_sales_order' => 'LOKAL',
-                    'no_sales_order' => $so['no_sales_order'],
-                    'no_surat_jalan' => empty($so['no_surat_jalan']) ? "-" : "{$so['no_surat_jalan']}",
-                    'no_stuffing' => $so['no_stuffing'],
-                    'customers' => $so['name'],
-                    'jumlah_barang' => $sod['jumlah_barang'],
-                    'total_harga' => number_format($sod['total_harga'], 2)
-                ]);
-            }
-        }
-
+        // Sales Order Ekspor
         foreach ($salesOrderExportIdNotUse as $idExport) {
             $soe = $this->salesOrderExportModel
                 ->select('
                     sales_order_export.sales_order_export_id,
                     sales_order_export_no,
-                    no_stuffing,
-                    companies.company,    
+                    customers.name as customer_name,
+                    customers.address,
+                    metadata.value as valas_name,
                     ')
-                // ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order.surat_jalan_so_id', 'left')
-                ->join('stuffing_internasional', 'stuffing_internasional.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
-                ->join('companies', 'companies.id = sales_order_export.company_id', 'left')
+                ->join('stuffing_internasional', 'stuffing_internasional.sales_order_export_id = sales_order_export.sales_order_export_id')
+                ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+                ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+                ->join('metadata', 'metadata.id = sales_contract.currency', 'left')
                 ->where('sales_order_export.sales_order_export_id', $idExport)
                 ->first();
+
             $soed = $this->salesOrderExportDetailModel
                 ->select('count(*) as jumlah_barang, sum(harga_barang) as total_harga')
                 ->where('sales_order_export_id', $idExport)
                 ->first();
+
             if ($soe != null) {
                 array_push($list, [
-                    'tipe_sales_order' => 'INTERNASIONAL',
-                    'no_sales_order' => $soe['sales_order_export_no'],
-                    'no_surat_jalan' => '-',
-                    'no_stuffing' => $soe['no_stuffing'],
-                    'customers' => $soe['company'],
+                    'id' => $soe['sales_order_export_id'],
+                    'form_pengeluaran' => 'ORDER FORM EKSPOR',
+                    'no_order' => $soe['sales_order_export_no'],
+                    'penerima' => $soe['customer_name'],
+                    'alamat' => $soe['address'],
                     'jumlah_barang' => $soed['jumlah_barang'],
-                    'total_harga' => number_format($soed['total_harga'], 2)
+                    'nilai_barang' => number_format($soed['total_harga'], 2),
+                    'valas' => $soe['valas_name'],
+                ]);
+            }
+        }
+
+        // Pengembalian Barang
+        foreach ($pengembalianBarangIdNotUse as $p) {
+            // Ambil data pengembalian barang
+            $pengembalianBarang = $this->pengembalianBarangModel
+                ->select('
+            pengembalian_barang.id,
+            pengembalian_barang.no_surat_jalan,
+            suppliers.name as customer_name,
+            suppliers.address,
+            penerimaan_barang.status_penerimaan,
+            penerimaan_barang.tipe_bahan
+        ')
+                ->join('penerimaan_barang', 'penerimaan_barang.id = pengembalian_barang.penerimaan_barang_id', 'left')
+                ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+                ->where('pengembalian_barang.id', $p)
+                ->where('bc_pengeluaran_id', null)
+                ->first();
+
+            if ($pengembalianBarang != null) {
+                // Ambil detail pengembalian barang
+                $pengembalianBarangDetail = $this->pengembalianBarangDetailModel
+                    ->select('
+                penerimaan_barang_detail.purchase_order_id,
+                COUNT(*) as jumlah_barang, 
+                SUM(jumlah_return) as sum_jumlah_return,
+                SUM(
+                    penerimaan_barang_detail.harga + 
+                    penerimaan_barang_detail.harga_harian + 
+                    penerimaan_barang_detail.harga_bulanan
+                ) as sum_total_harga
+            ')
+                    ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.id = pengembalian_barang_detail.penerimaan_barang_detail_id', 'left')
+                    ->where('pengembalian_barang_detail.pengembalian_barang_id', $p)
+                    ->first();
+
+                // Tentukan valuta berdasarkan status penerimaan dan tipe bahan
+                if ($pengembalianBarang['status_penerimaan'] === "IMPORT" && $pengembalianBarang['tipe_bahan'] === "BAKU") {
+                    $poValuta = $this->rmImportPosModel
+                        ->select('metadata.value as valas_name')
+                        ->join('metadata', 'metadata.id = rm_import_pos.currency', 'left')
+                        ->where('rm_import_pos.id', $pengembalianBarangDetail['purchase_order_id'])
+                        ->first();
+                } else {
+                    $poValuta = $this->amPurchaseOrderModel
+                        ->select('metadata.value as valas_name')
+                        ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
+                        ->where('am_purchase_orders.id', $pengembalianBarangDetail['purchase_order_id'])
+                        ->first();
+                }
+
+                // Tambahkan ke daftar
+                array_push($list, [
+                    'id' => $pengembalianBarang['id'],
+                    'form_pengeluaran' => 'RETUR PEMBELIAN',
+                    'no_order' => $pengembalianBarang['no_surat_jalan'],
+                    'penerima' => $pengembalianBarang['customer_name'],
+                    'alamat' => $pengembalianBarang['address'],
+                    'jumlah_barang' => $pengembalianBarangDetail['jumlah_barang'],
+                    'nilai_barang' => number_format(
+                        $pengembalianBarangDetail['sum_jumlah_return'] * $pengembalianBarangDetail['sum_total_harga'],
+                        2
+                    ),
+                    'valas' => $poValuta != null ? $poValuta['valas_name'] : "-",
+                ]);
+            }
+        }
+
+        // Sales Order Lain
+        foreach ($salesOrderLainIdNotUse as $s) {
+            $sol = $this->salesOrderLainModel
+                ->select('
+                    sales_order_lain.id,
+                    sales_order_lain.no_sales_order,
+                    customers.name as customer_name,
+                    customers.address,
+                    metadata.value as valas_name
+                    ')
+                ->join('customers', 'customers.id = sales_order_lain.customer_id', 'left')
+                ->join('metadata', 'metadata.id = customers.currency', 'left')
+                ->where('sales_order_lain.id', $s)
+                ->first();
+
+            $sold = $this->salesOrderLainDetailModel
+                ->select('count(*) as jumlah_barang, sum(total_harga) as sum_total_harga')
+                ->where('sales_order_lain_id', $s)
+                ->first();
+
+            if ($sol != null) {
+                array_push($list, [
+                    'id' => $sol['id'],
+                    'form_pengeluaran' => 'ORDER FORM LAIN',
+                    'no_order' => $sol['no_sales_order'],
+                    'penerima' => $sol['customer_name'],
+                    'alamat' => $sol['address'],
+                    'jumlah_barang' => $sold['jumlah_barang'],
+                    'nilai_barang' => number_format($sold['sum_total_harga'], 2),
+                    'valas' => $sol['valas_name'] == null ? "IDR" : $sol['valas_name'],
                 ]);
             }
         }
@@ -495,26 +872,26 @@ class BC30 extends BaseController
 
         $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue('A1', 'No.')
-            ->setCellValue('B1', 'Tipe Sales Order')
-            ->setCellValue('C1', 'No Sales Order')
-            ->setCellValue('D1', 'No Surat Jalan')
-            ->setCellValue('E1', 'No Stuffing')
-            ->setCellValue('F1', 'Customer')
-            ->setCellValue('G1', 'Jumlah Barang')
-            ->setCellValue('H1', 'Nilai Barang');
+            ->setCellValue('B1', 'Tujuan Pengiriman')
+            ->setCellValue('C1', 'No Order')
+            ->setCellValue('D1', 'Penerima')
+            ->setCellValue('E1', 'Alamat')
+            ->setCellValue('F1', 'Jumlah Barang')
+            ->setCellValue('G1', 'Nilai Barang')
+            ->setCellValue('H1', 'Valas');
         $no = 1;
         $column = 2;
 
         foreach ($list as $l) {
             $spreadsheet->setActiveSheetIndex(0)
                 ->setCellValue('A' . $column, $no++)
-                ->setCellValue('B' . $column,  $l->tipe_sales_order)
-                ->setCellValue('C' . $column,  $l->no_sales_order)
-                ->setCellValue('D' . $column,  $l->no_surat_jalan)
-                ->setCellValue('E' . $column,  $l->no_stuffing)
-                ->setCellValue('F' . $column,  $l->customers)
-                ->setCellValue('G' . $column,  $l->jumlah_barang)
-                ->setCellValue('H' . $column,  $l->total_harga);
+                ->setCellValue('B' . $column,  $l->form_pengeluaran)
+                ->setCellValue('C' . $column,  $l->no_order)
+                ->setCellValue('D' . $column,  $l->penerima)
+                ->setCellValue('E' . $column,  $l->alamat)
+                ->setCellValue('F' . $column,  $l->jumlah_barang)
+                ->setCellValue('G' . $column,  $l->nilai_barang)
+                ->setCellValue('H' . $column,  $l->valas);
             $column++;
         }
         $writer = new Xlsx($spreadsheet);
@@ -1304,8 +1681,6 @@ class BC30 extends BaseController
         $id = decrypt($id);
         $bc30 = $this->bc30Model->find($id);
 
-
-
         if ($bc30 == null) {
             return redirect()->to('bea-cukai-bc-30');
         }
@@ -1313,11 +1688,19 @@ class BC30 extends BaseController
         $this->setFlashDataNavigatorSession($id);
         $payload = json_decode($bc30['payload']);
 
+        if ($bc30['tipe_sales_order'] == "ORDER FORM EKSPOR") {
+            $referenceId = $bc30['sales_order_id'];
+        } elseif ($bc30['tipe_sales_order']  == "ORDER FORM LAIN") {
+            $referenceId = $bc30['sales_order_lain_id'];
+        } else {
+            $referenceId = $bc30['pengembalian_barang_id'];
+        }
+
         $data = [
             'bc30' => $bc30,
             'payload' => $payload,
             'barang' =>  $this->bc30Model->barang(
-                $bc30['sales_order_id'],
+                $referenceId,
                 $bc30['tipe_sales_order']
             )
         ];

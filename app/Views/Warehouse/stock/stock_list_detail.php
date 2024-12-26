@@ -383,7 +383,7 @@
             <div class="row mt-3">
                 <div class="col mb-3">
                     <div class="alert alert-secondary">
-                        <label class="form-label font-weight-bold text-black lable-title">DATA PEMASUKAN ATAU PENGELUARAN BARANG DARI MUTASI</label>
+                        <label class="form-label font-weight-bold text-black lable-title">DATA PEMASUKAN ATAU PENGELUARAN BARANG DARI MUTASI ANTAR COMPANY DAN GUDANG INTERNAL</label>
                     </div>
                 </div>
             </div>
@@ -817,7 +817,7 @@
             <div class="row mt-3">
                 <div class="col mb-3">
                     <div class="alert alert-secondary">
-                        <label class="form-label font-weight-bold text-black lable-title">DATA PENGELUARAN BARANG DARI SALES LOKAL / EXPORT / LAINNYA</label>
+                        <label class="form-label font-weight-bold text-black lable-title">DATA PENGELUARAN BARANG DARI SALES LOKAL / EXPORT / LAINNYA / RETUR PEMBELIAN</label>
                     </div>
                 </div>
             </div>
@@ -2023,7 +2023,7 @@
             data: function(data) {
                 data.search = $("#search_no_sales_order").val();
                 data.stok_id = "<?= encrypt($stok['id']) ?>";
-                data.sumber = "PENJUALAN";
+                data.sumber = "PENJUALAN,RETUR";
                 data.dateStart = $('#tgl_awal_stok_penjualan').val();
                 data.dateEnd = $('#tgl_akhir_stok_penjualan').val();
 

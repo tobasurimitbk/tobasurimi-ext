@@ -11,21 +11,29 @@
             </a>
             <?php if (!empty($dataSalesExport)) { ?>
                 <?php if ($dataSalesExport->status === "NEW") { ?>
-                    <button class="btn btn-success posting-spp posting-so float-right">
-                        Posting
-                    </button>
-                    <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                        Simpan
-                    </button>
+                    <?php if (can('Penjualan Ekspor', 'Order Form', 'a')): ?>
+                        <button class="btn btn-success posting-spp posting-so float-right">
+                            Posting
+                        </button>
+                    <?php endif; ?>
+                    <?php if (can('Penjualan Ekspor', 'Order Form', 'u')): ?>
+                        <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                            Simpan
+                        </button>
+                    <?php endif; ?>
                 <?php } ?>
                 <?php if ($dataSalesExport->status === "POSTED") { ?>
-                    <button class="btn btn-success posting-spp unposting-so float-right">
-                        Unposting
-                    </button>
+                    <?php if (can('Penjualan Ekspor', 'Order Form', 'ua')): ?>
+                        <button class="btn btn-success posting-spp unposting-so float-right">
+                            Unposting
+                        </button>
+                    <?php endif; ?>
                 <?php } ?>
-                <button class="btn btn-warning btn-print float-right">
-                    Print
-                </button>
+                <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
+                    <button class="btn btn-warning btn-print float-right">
+                        Print
+                    </button>
+                <?php endif; ?>
             <?php } else { ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                     Simpan
@@ -209,12 +217,12 @@
                             <tr>
                                 <td colspan="5"></td>
                                 <td><b>TOTAL</b></td>
-                                <td><b>0.00</b></td>
-                                <td><b>0.00</b></td>
-                                <td><b>0.00</b></td>
-                                <td><b>0.00</b></td>
-                                <td><b>0.00</b></td>
-                                <td><b>0.00</b></td>
+                                <td><b>0,00</b></td>
+                                <td><b>0,00</b></td>
+                                <td><b>0,00</b></td>
+                                <td><b>0,00</b></td>
+                                <td><b>0,00</b></td>
+                                <td><b>0,00</b></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -273,7 +281,9 @@
             let shipmentDate = $(this).find(':selected').data('shipment-date');
             let currency = $(this).find(':selected').data('currency');
             let tipeHarga = $(this).find(':selected').data('tipe-harga');
-            let potonganHarga = $(this).find(':selected').data('potongan-harga');
+            let potonganHarga = $('#sales_kontrak').val() == "" ?
+                "" :
+                greatFormatRupiah($(this).find(':selected').data('potongan-harga'));
             let keterangan = $(this).find(':selected').data('keterangan');
 
             // console.log(customer);
@@ -513,7 +523,7 @@
                                             })
                                             .then(() => {
                                                 var id = response.id; // Menyimpan nilai response.id ke dalam variabel id
-                                                window.location.href = "<?= base_url("order-form-internasional/id/") ?>" + id; // Mengarahkan ke URL dengan menambahkan id ke belakangnya
+                                                window.location.href = "<?= base_url("order-form-internasional") ?>"; // Mengarahkan ke URL dengan menambahkan id ke belakangnya
                                             })
                                         stopLoading();
                                     } else {
@@ -556,7 +566,7 @@
                                             })
                                             .then(() => {
                                                 var id = response.id; // Menyimpan nilai response.id ke dalam variabel id
-                                                window.location.href = "<?= base_url("order-form-internasional/id/") ?>" + id; // Mengarahkan ke URL dengan menambahkan id ke belakangnya
+                                                window.location.href = "<?= base_url("order-form-internasional") ?>"; // Mengarahkan ke URL dengan menambahkan id ke belakangnya
                                             })
                                         stopLoading();
                                     } else {
@@ -661,12 +671,12 @@
             <tr>
                 <td colspan="5"></td>
                 <td><b>TOTAL</b></td>
-                <td><b>0.00</b></td>
-                <td><b>0.00</b></td>
-                <td><b>0.00</b></td>
-                <td><b>0.00</b></td>
-                <td><b>0.00</b></td>
-                <td><b>0.00</b></td>
+                <td><b>0,00</b></td>
+                <td><b>0,00</b></td>
+                <td><b>0,00</b></td>
+                <td><b>0,00</b></td>
+                <td><b>0,00</b></td>
+                <td><b>0,00</b></td>
             </tr>
         `;
             $('.tfoot').append(row);
@@ -687,13 +697,13 @@
                 newRow.append($('<td>').text(item.kemasan));
                 newRow.append($('<td>').text(item.remark));
                 newRow.append($('<td>').text(item.qty));
-                newRow.append($('<td>').text(formatRupiah2(item.harga)));
-                newRow.append($('<td>').text(formatRupiah2(item.total)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.harga)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.total)));
                 newRow.append($('<td>').html(`
-                <input <?= isset($dataSalesExport) && $dataSalesExport->status === "POSTED" ? "readonly" : "" ?> class="form-control qty-barang-order" oninput="preventNegativeInput(this);updateOrder($(this))" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qtyOrder}">
+                <input  style="height: 40px; padding-bottom: 12px;" <?= isset($dataSalesExport) && $dataSalesExport->status === "POSTED" ? "readonly" : "" ?> class="form-control qty-barang-order" oninput="preventNegativeInput(this);updateOrder($(this))" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qtyOrder}">
             `));
-                newRow.append($('<td>').text(formatRupiah2(item.hargaOrder)));
-                newRow.append($('<td>').text(formatRupiah2(item.totalHargaOrder)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.hargaOrder)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.totalHargaOrder)));
 
                 totalQty += parseFloat(item.qty);
                 totalHarga += parseFloat(item.harga);
@@ -711,11 +721,11 @@
             newRow.append($('<td colspan="5"></td>'));
             newRow.append($('<td><b>TOTAL</b></td>'));
             newRow.append($('<td><b>' + totalQty + '</b></td>'));
-            newRow.append($('<td><b>' + formatRupiah2(totalHarga.toString()) + '</b></td>'));
-            newRow.append($('<td><b>' + formatRupiah2(totalTotalHarga.toString()) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalHarga.toString()) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalTotalHarga.toString()) + '</b></td>'));
             newRow.append($('<td><b>' + totalQtyOrder + '</b></td>'));
-            newRow.append($('<td><b>' + formatRupiah2(totalHargaOrder.toString()) + '</b></td>'));
-            newRow.append($('<td><b>' + formatRupiah2(totalTotalHargaOrder.toString()) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalHargaOrder.toString()) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalTotalHargaOrder.toString()) + '</b></td>'));
             table.find('tfoot').append(newRow);
 
             totalAmount = totalTotalHarga;
@@ -740,8 +750,8 @@
         input.val(qty);
 
         // Update Harga Order dan Total Harga Order
-        $('.dataTable tbody tr:eq(' + index + ') td:eq(10)').text(formatRupiah2(hargaOrder.toString()));
-        $('.dataTable tbody tr:eq(' + index + ') td:eq(11)').text(formatRupiah2(totalHargaOrder.toString()));
+        $('.dataTable tbody tr:eq(' + index + ') td:eq(10)').text(greatFormatRupiah(hargaOrder.toString()));
+        $('.dataTable tbody tr:eq(' + index + ') td:eq(11)').text(greatFormatRupiah(totalHargaOrder.toString()));
 
         // Recalculate Total
         var totalQty = 0;
@@ -759,27 +769,13 @@
         });
 
         $('.foot-detail-table td:eq(5)').text(totalQty);
-        $('.foot-detail-table td:eq(6)').text(formatRupiah2(totalHarga.toString()));
-        $('.foot-detail-table td:eq(7)').text(formatRupiah2(totalTotalHarga.toString()));
+        $('.foot-detail-table td:eq(6)').text(greatFormatRupiah(totalHarga.toString()));
+        $('.foot-detail-table td:eq(7)').text(greatFormatRupiah(totalTotalHarga.toString()));
     }
 
 
     const print = function(url) {
         window.open(url, "_blank");
-    }
-
-    function formatRupiah2(angka) {
-        if (angka != "") {
-            angka = angka.replace(/\./g, ',');
-            angka = angka.replace(/[^\d,]/g, '');
-            var parts = angka.split(',');
-            var ribuan = parts[0];
-            var desimal = parts[1] || '00';
-            var reverse = ribuan.toString().split('').reverse().join('');
-            var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-            return '' + ribuanFormatted + ',' + desimal;
-        }
-
     }
 
     function preventNegativeInput(inputElement) {

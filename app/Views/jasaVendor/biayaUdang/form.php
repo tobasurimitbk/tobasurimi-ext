@@ -120,7 +120,6 @@
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Pilih Penerimaan Surat Jalan</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -280,7 +279,7 @@
         listDataBarang();
     });
 
-    $(".multiple_jasa_vendor_in_id,#vendor_id,#divisi_id")
+    $("#vendor_id,#divisi_id")
         .parent('div')
         .children('span')
         .children('span')

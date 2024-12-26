@@ -6,9 +6,12 @@ use App\Controllers\BaseController;
 use App\Models\CeisaSettingModel;
 use App\Models\DivisisModel;
 use App\Models\HsCodesModel;
+use App\Models\MetadataModel;
 use App\Models\MutasiDetailModel;
 use App\Models\MutasiModel;
 use App\Models\NomorIjinTPBModel;
+use App\Models\PenerimaanMutasiDetailModel;
+use App\Models\PenerimaanMutasiModel;
 use App\Models\PengusahaTPBModel;
 use App\Models\PPBKBDetailModel;
 use App\Models\PPBKBModel;
@@ -38,6 +41,9 @@ class PPBKB extends BaseController
     protected $stockModel;
     protected $stockDetailModel;
     protected $stockDetail2Model;
+    protected $penerimaanMutasiModel;
+    protected $penerimaanMutasiDetailModel;
+    protected $metaDataModel;
     protected $dompdf;
 
     public function __construct()
@@ -57,6 +63,9 @@ class PPBKB extends BaseController
         $this->stockModel = new StockModel();
         $this->stockDetailModel = new StockDetailModel();
         $this->stockDetail2Model = new StockDetail2Model();
+        $this->penerimaanMutasiModel = new PenerimaanMutasiModel();
+        $this->penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
+        $this->metaDataModel = new MetadataModel();
         $this->dompdf = new Dompdf();
 
         $this->akunCeisa = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
@@ -200,7 +209,8 @@ class PPBKB extends BaseController
             'nama' => $this->request->getVar('nama'),
             'jabatan' => $this->request->getVar('jabatan'),
             'status_posting' => '0',
-            'no_daftar' => $this->request->getVar('no_daftar')
+            'no_daftar' => $this->request->getVar('no_daftar'),
+            'penerimaan_otomatis' => $this->request->getVar('penerimaan_otomatis'),
         ]);
 
         foreach (json_decode($_POST['listData']) as $d) {
@@ -233,7 +243,8 @@ class PPBKB extends BaseController
             'tanggal' => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
             'nama' => $this->request->getVar('nama'),
             'jabatan' => $this->request->getVar('jabatan'),
-            'no_daftar' => $this->request->getVar('no_daftar')
+            'no_daftar' => $this->request->getVar('no_daftar'),
+            'penerimaan_otomatis' => $this->request->getVar('penerimaan_otomatis'),
         ]);
 
         // get all id detail
@@ -297,6 +308,9 @@ class PPBKB extends BaseController
     public function posting()
     {
         $id = decrypt($this->request->getVar('id'));
+
+        $db = \Config\Database::connect();
+        $db->transStart();
 
         // PPBKB FIRST
         $ppbkb = $this->ppbkbModel->find($id);
@@ -363,10 +377,156 @@ class PPBKB extends BaseController
 
         $this->ppbkbModel->update($id, ['status_posting' => '1']);
 
+        if ($ppbkb['penerimaan_otomatis'] == 1) {
+            $this->automaticInsertPenerimaanMutasi($id);
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() == false) {
+            $db->transRollback();
+        }
+
+        $db->transCommit();
+
         return response()->setJSON([
             'status' => true,
             'message' => "Dokumen PPBKB Berhasil Diposting"
         ]);
+    }
+
+    private function automaticInsertPenerimaanMutasi($ppbkbId)
+    {
+        $ppbkb = $this->ppbkbModel->where('id', $ppbkbId)->first();
+        $mutasi = $this->mutasiModel->where('id', $ppbkb['mutasi_id'])->where('deletedAt', null)->first();
+        $mutasiDetail = $this->mutasiDetailModel->where('mutasi_id', $mutasi['id'])->where('deletedAt', null)->findAll();
+        $bcMutasiId = $this->metaDataModel->getBCFirst('PPB-KB');
+
+        $id = $this->penerimaanMutasiModel->insert([
+            'company_id' => $this->this_company_id,
+            'divisi_id' => $mutasi['divisi_tujuan_id'],
+            'penerimaan_mutasi_no' => $this->getPenerimaanMutasiNo($mutasi['divisi_tujuan_id']),
+            'multiple_mutasi_id' => "[" . $mutasi['id'] . "]",
+            'multiple_no_mutasi' => json_encode([$mutasi['no_mutasi']], JSON_UNESCAPED_SLASHES),
+            'tanggal' => $ppbkb['tanggal'],
+            'keterangan' => null,
+            'status_posting' => '1',
+            'createdBy' => $this->this_user_id
+        ]);
+
+        foreach ($mutasiDetail as $m) {
+            $this->penerimaanMutasiDetailModel->insert([
+                'penerimaan_mutasi_id' => $id,
+                'mutasi_id' => $m['mutasi_id'],
+                'mutasi_detail_id' => $m['id'],
+                'stock_asal_id' => $m['stock_id'],
+                'bc_asal_id' => $m['bc_id'],
+                'no_aju_asal' => $m['no_aju'],
+                'stock_dokumen_asal' => $m['stock_dokumen'],
+                'bc_mutasi_id' => $bcMutasiId['id'],
+                'no_aju_mutasi' => $ppbkb['no_ppbkb'],
+                'qty' => $m['qty']
+            ]);
+        }
+
+        $this->postingPenerimaanMutasi($id);
+    }
+
+    private function getPenerimaanMutasiNo($divisiId)
+    {
+        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+        $divisi = $this->divisiModel->where('id', $divisiId)->first();
+        $no = $this->penerimaanMutasiModel->get_no(date('m'), date('Y'), $last_day, strtoupper($divisi['divisi']), $divisiId);
+        return $no;
+    }
+
+    private function postingPenerimaanMutasi($id)
+    {
+        // Insert To Inventori (-)
+        $penerimaanMutasi = $this->penerimaanMutasiModel->find($id);
+        $penerimaanMutasiList = $this->penerimaanMutasiDetailModel->where('penerimaan_mutasi_id', $penerimaanMutasi['id'])->where('deletedAt', null)->findAll();
+        // Inventori Stok Minus
+        foreach ($penerimaanMutasiList as $p) {
+            $mutasi = $this->mutasiModel->find($p['mutasi_id']);
+            $stockMutasiAsal = $this->stockModel->find($p['stock_asal_id']);
+
+            if ($stockMutasiAsal['tipe_barang'] == "kemasan") {
+                $barang2Id = $stockMutasiAsal['kemasan_id'];
+            } else {
+                $barang2Id = $stockMutasiAsal['barang2_id'];
+            }
+
+            // INIT STOK NYA (KARENA BARANG NYA BISA AJA TIDAK ADA DI INVENTORI)
+            $stok = $this->stockModel->getStokMaster(
+                $this->this_company_id,
+                $mutasi['warehouse_tujuan_id'],
+                $mutasi['divisi_tujuan_id'],
+                $stockMutasiAsal['tipe_barang'],
+                $stockMutasiAsal['barang1_id'],
+                $barang2Id
+            );
+
+            if ($stok == null) {
+                $stok = $this->stockModel->insertStok(
+                    $this->this_company_id,
+                    $mutasi['warehouse_tujuan_id'],
+                    $mutasi['divisi_tujuan_id'],
+                    $stockMutasiAsal['tipe_barang'],
+                    $stockMutasiAsal['barang1_id'],
+                    $barang2Id,
+                    0
+                );
+            }
+
+            // INSERT LEVEL 1
+            $stok = $this->stockModel->insertStok(
+                $this->this_company_id,
+                $mutasi['warehouse_tujuan_id'],
+                $mutasi['divisi_tujuan_id'],
+                $stockMutasiAsal['tipe_barang'],
+                $stockMutasiAsal['barang1_id'],
+                $barang2Id,
+                $p['qty']
+            );
+
+            // INSERT LEVEL 2
+            $stokDetail = $this->stockDetailModel->insertStokDetail(
+                $stok,
+                $p['qty'],
+                'In',
+                date('Y-m-d'),
+                $this->this_user_id,
+                "MUTASI",
+                $penerimaanMutasi['penerimaan_mutasi_no'],
+                "-",
+            );
+
+            // STOK OLD 
+            $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
+                $p['stock_asal_id'],
+                $p['bc_asal_id'],
+                $p['no_aju_asal'],
+                $p['stock_dokumen_asal']
+            );
+
+            // INSERT LEVEL 3 
+            $this->stockDetail2Model->insertStokDetail2(
+                $p['bc_mutasi_id'],
+                $stok,
+                $stokDetail,
+                $p['qty'],
+                $p['no_aju_mutasi'],
+                $mutasi['no_mutasi'],
+                $mutasi['no_mutasi'] . " (" . $stockOldDetail['no_po'] . ") ",
+                $stockOldDetail['supplier_id'],
+                $stockOldDetail['harga_umum'],
+                $stockOldDetail['harga_harian'],
+                $stockOldDetail['harga_bulanan'],
+                $stockOldDetail['no_po']
+            );
+        }
+
+        $this->penerimaanMutasiModel->update($id, ['status_posting' => '1']);
     }
 
     public function print($id)

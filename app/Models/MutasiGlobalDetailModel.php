@@ -50,9 +50,12 @@ class MutasiGlobalDetailModel extends Model
         $kemasanModel = new KemasanModel();
         $metaDataModel = new MetadataModel();
         $supplierModel = new SupplierModel();
+        $bc27Model = new BC27Model();
 
         $result = array();
+        $bcMutasiId = $metaDataModel->getBCFirst('BC 2.7');
         $mutasiDetail = $this->asArray()->where('mutasi_global_id', $mutasiID)->findAll();
+        $bc27 = $bc27Model->where('mutasi_global_id', $mutasiID)->first();
         foreach ($mutasiDetail as $m) {
             $stockList = $stockDetail2Model->getStockListDetail(
                 $m['stock_id'],
@@ -81,8 +84,12 @@ class MutasiGlobalDetailModel extends Model
                 ->where('penerimaan_barang.no_penerimaan_barang', $stockList['no_dokumen_1'])
                 ->first();
 
-            $stockList['qty'] = $m['qty'];
+
             $bcType = $metaDataModel->find($stockList['bc_id']);
+
+            $stockList['mutasi_global_id'] = $m['mutasi_global_id'];
+            $stockList['mutasi_global_detail_id'] = $m['id'];
+            $stockList['qty'] = $m['qty'];
             $stockList['no_aju'] =  $stockList['no_aju'] == "-" ? "-" : $stockList['no_aju'];
             $stockList['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
             $stockList['stock_date'] = $stockList != null ? date('d/m/Y', strtotime($stockList['stock_date'])) : "-";
@@ -97,6 +104,15 @@ class MutasiGlobalDetailModel extends Model
             $stockList['satuan_id'] = $satuan['id'];
             $stockList['satuan'] = $satuan['kode_satuan'];
             $stockList['total_harga'] = $stockList['harga_umum'] + $stockList['harga_harian'] + $stockList['harga_bulanan'];
+            // ------------
+            $stockList['bc_mutasi_id'] = $bcMutasiId['id'];
+            $stockList['bc_mutasi_name'] = $bcMutasiId['value'];
+            $stockList['no_aju_mutasi'] = $bc27 == null ? "-" : $bc27['no_aju'];
+            $stockList['company_tujuan_id'] = $m['company_tujuan_id'];
+            $stockList['divisi_tujuan_id'] = $m['divisi_tujuan_id'];
+            $stockList['warehouse_tujuan_id'] = $m['warehouse_tujuan_id'];
+            $stockList['stock_mutasi_id'] = $m['stock_mutasi_id'];
+            $stockList['qty_diterima'] = $m['qty_diterima'];
 
             array_push($result, $stockList);
         }

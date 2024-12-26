@@ -99,7 +99,7 @@ class TandaTerimaSupBB extends BaseController
                     "faktur_no"      => $data->faktur_no,
                     "divisi"         => $data->divisi,
                     "supplier_name"  => strtoupper($data->supplierName),
-                    "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur, 0, ',', '.')),
+                    "nominal_faktur" => $data->nominal_faktur,
                     "jumlah_item"    => count($jumlahItem),
                     "invoice_date"   => $data->invoice_date,
                     "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
@@ -179,7 +179,7 @@ class TandaTerimaSupBB extends BaseController
             'dataTandaTerimaFaktur' => $this->tandaTerimaFakturModel->find($id),
             'dataDetailTandaTerimaFaktur' => $this->tandaTerimaFakturDetailModel->getDetail($id),
             'dataPajak' => $this->pajakTandaTerimaFakturModel->where('tanda_terima_faktur_id', $id)->where('deletedAt', null)->findAll(),
-            'dataPenerimaanBarang' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed($tandaTerimaFakturDetail['supplier_id'], $tandaTerimaFakturDetail['divisi_id']),
+            'dataPenerimaanBarang' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed($tandaTerimaFakturDetail['supplier_id'], $tandaTerimaFakturDetail['divisi_id'], $this->this_company_id),
             'isUsed' => $this->tandaTerimaFakturModel->getTandaTerimaFakturInPembayaran($id) == null ? false : true,
             'divisi' => $this->divisiModel->getDivisiAccess(),
         ];
@@ -191,7 +191,7 @@ class TandaTerimaSupBB extends BaseController
     {
         $fakturNo = $this->request->getVar('no_tanda_terima_faktur');
         $check = $this->tandaTerimaFakturModel->where('faktur_no', $fakturNo)->first();
-
+        $dataListPenerimaanBarang = json_decode($_POST['listPenerimaanBarang']);
         if ($check != null) {
             return response()->setJSON([
                 'token' => csrf_hash(),
@@ -202,15 +202,15 @@ class TandaTerimaSupBB extends BaseController
 
         $id = $this->tandaTerimaFakturModel->insert([
             'company_id' => $this->this_company_id,
-            'supplier_id' => $this->request->getVar('supplier_id'),
-            'divisi_id' => $this->request->getVar('divisi_id'),
+            'supplier_id' => $dataListPenerimaanBarang[0]->supplier_id,
+            'divisi_id' => $dataListPenerimaanBarang[0]->divisi_id,
             'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : date('Y-m-d'),
             'faktur_no' => $this->request->getVar('no_tanda_terima_faktur'),
-            'nominal_faktur' => repairDouble($this->request->getVar('total_tambahan_potongan')),
+            'nominal_faktur' => $this->request->getVar('total_tambahan_potongan'),
             'invoice_date' => date('Y-m-d'),
             'receive_date' => $this->request->getVar("tanggal_terima") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_terima")), "Y-m-d") : "",
-            'potongan' => $this->request->getVar('potongan') ? repairDouble($this->request->getVar('potongan')) : 0,
-            'tambahan' => $this->request->getVar('tambahan') ? repairDouble($this->request->getVar('tambahan')) : 0,
+            'potongan' => $this->request->getVar('potongan') ? $this->request->getVar('potongan') : 0,
+            'tambahan' => $this->request->getVar('tambahan') ? $this->request->getVar('tambahan') : 0,
             'recipient' => $this->request->getVar('penerima'),
             'faktur_type' => 'LOKAL',
             'information_tambahan' => $this->request->getVar('keterangan_tambahan'),
@@ -220,7 +220,7 @@ class TandaTerimaSupBB extends BaseController
         ]);
 
         // detail faktur
-        foreach (json_decode($_POST['listPenerimaanBarang']) as $l) {
+        foreach ($dataListPenerimaanBarang as $l) {
             $this->tandaTerimaFakturDetailModel->insert([
                 'tanda_terima_faktur_id' => $id,
                 'penerimaan_barang_detail_id' => $l->penerimaan_barang_detail_id,
@@ -260,14 +260,15 @@ class TandaTerimaSupBB extends BaseController
     public function updateAction()
     {
         $id = decrypt($this->request->getVar('id'));
+        $dataListPenerimaanBarang = json_decode($_POST['listPenerimaanBarang']);
 
         $this->tandaTerimaFakturModel->update($id, [
             'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : "",
-            'nominal_faktur' => repairDouble($this->request->getVar('total_tambahan_potongan')),
+            'nominal_faktur' => $this->request->getVar('total_tambahan_potongan'),
             'invoice_date' => date('Y-m-d'),
             'receive_date' => $this->request->getVar("tanggal_terima") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_terima")), "Y-m-d") : "",
-            'potongan' => $this->request->getVar('potongan') ? repairDouble($this->request->getVar('potongan')) : 0,
-            'tambahan' => $this->request->getVar('tambahan') ? repairDouble($this->request->getVar('tambahan')) : 0,
+            'potongan' => $this->request->getVar('potongan') ? $this->request->getVar('potongan') : 0,
+            'tambahan' => $this->request->getVar('tambahan') ? $this->request->getVar('tambahan') : 0,
             'recipient' => $this->request->getVar('penerima'),
             'faktur_type' => 'LOKAL',
             'information_tambahan' => $this->request->getVar('keterangan_tambahan'),
@@ -278,7 +279,7 @@ class TandaTerimaSupBB extends BaseController
 
         // delete detail first and insert again
         $this->tandaTerimaFakturDetailModel->where('tanda_terima_faktur_id', $id)->delete();
-        foreach (json_decode($_POST['listPenerimaanBarang']) as $l) {
+        foreach ($dataListPenerimaanBarang as $l) {
             $this->tandaTerimaFakturDetailModel->insert([
                 'tanda_terima_faktur_id' => $id,
                 'penerimaan_barang_detail_id' => $l->penerimaan_barang_detail_id,
@@ -352,7 +353,7 @@ class TandaTerimaSupBB extends BaseController
 
         $dataInv = $tandaTerimaFakturModel->asObject()
             ->select("tanda_terima_faktur.*, DATE_FORMAT(tanda_terima_faktur.invoice_date, '%d/%m/%Y') AS invoice_date, suppliers.name AS supplier_name")
-            ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id')
+            ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id', 'left')
             ->find($id);
 
         $dataDet = $tandaTerimaFakturDetModel->asObject()
@@ -362,13 +363,13 @@ class TandaTerimaSupBB extends BaseController
 
         $taxData = $pajakTandaTerimaFakturModel->asObject()
             ->where('tanda_terima_faktur_id', $id)
-            ->where('tax_status', 'Pajak dipungut oleh negara')
+            ->whereNotIn('tax_type', ['PPN Masukan 11%'])
             ->where('deletedAt', null)
             ->findAll();
 
         $taxReturnData = $pajakTandaTerimaFakturModel->asObject()
             ->where('tanda_terima_faktur_id', $id)
-            ->where('tax_status', 'Pajak dikembalikan lagi')
+            ->whereIn('tax_type', ['PPN Masukan 11%', 'PPN Masukan'])
             ->where('deletedAt', null)
             ->findAll();
 
@@ -398,7 +399,7 @@ class TandaTerimaSupBB extends BaseController
         // $total = ($itemTotal + $dataInv->tambahan + $taxTotal - $dataInv->potongan) - $taxPph23;
         $total = ($itemTotal + $dataInv->tambahan + $taxReturnTotal) - $taxPph23;
         $taxTotal += $dataInv->potongan;
-
+        
         $data["data"] = $dataInv;
         $data['invNo'] = $dataInv->faktur_no;
         $data["lpbNo"] = implode(', ', $noList);
@@ -417,6 +418,8 @@ class TandaTerimaSupBB extends BaseController
         $data['taxData'] = $taxData;
 
         // dd($data['taxData']);
+        // var_dump($data);
+        // die;
 
         $this->dompdf->loadHtml(view('Purchase/terimaSupplierLokal/bp/print', $data));
         $this->dompdf->setPaper('A5', 'landscape');
@@ -442,10 +445,11 @@ class TandaTerimaSupBB extends BaseController
     {
         $supplierID = $this->request->getVar('supplierID');
         $divisiID = $this->request->getVar('divisiID');
+        $companyID = $this->this_company_id;
 
         return response()->setJSON([
             'status' => true,
-            'data' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed($supplierID, $divisiID)
+            'data' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed($supplierID, $divisiID, $companyID)
         ]);
     }
 

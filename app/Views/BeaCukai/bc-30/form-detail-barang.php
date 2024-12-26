@@ -218,10 +218,10 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select barang_detail_kode_asal_bahan_baku" id="barang_detail_kode_asal_bahan_baku" name="barang_detail_kode_asal_bahan_baku" aria-label="Floating label select example">
                                         <option value=""></option>
-                                        <option value="1">1 - SEPENUHNYA DIPEROLEH DAN/ATAU DIPRODUKSI DI LUAR DAERAH PABEAN</option>
-                                        <option value="2">2 - SEPENUHNYA DIPEROLEH DAN/ATAU DIPRODUKSI DI TEMPAT LAIN DALAM DAERAH PABEAN</option>
-                                        <option value="3">3 - KAWASAN PABEAN</option>
-                                        <option value="4">4 - LAINNYA</option>
+                                        <option <?= $barang['bcDetail']->kodeAsalBahanBaku == 1 ? 'selected' : '' ?> value="1">1 - SEPENUHNYA DIPEROLEH DAN/ATAU DIPRODUKSI DI LUAR DAERAH PABEAN</option>
+                                        <option <?= $barang['bcDetail']->kodeAsalBahanBaku == 2 ? 'selected' : '' ?> value="2">2 - SEPENUHNYA DIPEROLEH DAN/ATAU DIPRODUKSI DI TEMPAT LAIN DALAM DAERAH PABEAN</option>
+                                        <option <?= $barang['bcDetail']->kodeAsalBahanBaku == 3 ? 'selected' : '' ?> value="3">3 - KAWASAN PABEAN</option>
+                                        <option <?= $barang['bcDetail']->kodeAsalBahanBaku == 4 ? 'selected' : '' ?> value="4">4 - LAINNYA</option>
                                     </select>
                                     <label style="z-index: 1;">Referensi Asal Barang</label>
                                 </div>

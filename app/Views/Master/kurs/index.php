@@ -308,15 +308,6 @@
             $(".dateEnd").focus();
         });
 
-        // METADATA ID
-        $('.metadata_id').select2({
-            placeholder: "Pilih Valas / Buat Baru",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content"),
-            allowClear: true,
-            tags: true
-        })
-
         //CSS SELECT2 FLOATING LABEL
         $('.metadata_id')
             .parent('div')
@@ -337,6 +328,17 @@
             .parent('div')
             .find('label')
             .css('z-index', '1');
+
+        // METADATA ID
+        $('.metadata_id').select2({
+            placeholder: "Pilih Valas / Buat Baru",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content"),
+            allowClear: true,
+            tags: true
+        })
+
+
 
         $(".dataTable_info").addClass("pt-0");
 

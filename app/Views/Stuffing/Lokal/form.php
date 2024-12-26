@@ -101,17 +101,7 @@
                             <label for="floatingInput" style="z-index: 1;">Nama Customer</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating" style="height: 50px;">
-                            <select disabled <?= !empty($stuffingLokal) ? 'disabled' : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($dataAJU as $aju) : ?>
-                                    <option <?= !empty($stuffingLokal) ? ($stuffingLokal['bc_type'] === $aju["id"] ? "selected" : "") : ""; ?> value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">Dokumen Pabean</label>
-                        </div>
-                    </div>
+
                 </div>
             </form>
 

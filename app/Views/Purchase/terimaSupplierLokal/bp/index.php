@@ -158,11 +158,14 @@
             },
             {
                 data: "supplier_name",
-                className: "text-center"
+                className: "text-center",
             },
             {
                 data: "nominal_faktur",
-                className: "text-center"
+                className: "text-center",
+                render: function (data, type, row) {
+                    return data ? greatFormatRupiah(data) : '-';
+                }
             },
             {
                 data: "jumlah_item",

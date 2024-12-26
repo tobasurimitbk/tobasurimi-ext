@@ -5,30 +5,26 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="detailModalLabel">Detail Sales Order</h5>
+                <h5 class="modal-title" id="detailModalLabel">Detail Barang yang Akan Dikeluarkan</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable2" id="dataTable2" width="100%" border="1" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable dataTable2" id="dataTable2" width="100%" border="1" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center;">No</th>
-                                <th style="text-align: center;">Tanggal Keluar</th>
-                                <th style="text-align: center;">Tipe Barang (Internal)</th>
+                                <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Asal</th>
-                                <th style="text-align: center;">Kode Barang (Internal)</th>
-                                <th style="text-align: center;">Barang - Spesifikasi (Internal)</th>
-                                <th style="text-align: center;">Kode Barang (Sales)</th>
-                                <th style="text-align: center;">Barang - Spesifikasi (Sales)</th>
-                                <th style="text-align: center;">No Stuffing / Pengeluaran Barang</th>
+                                <th style="text-align: center;">Kode Barang</th>
+                                <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Departemen / Warehouse Pengeluaran</th>
                                 <th style="text-align: center;">Qty Keluar</th>
-                                <th style="text-align: center;">Satuan (Sales)</th>
-                                <th style="text-align: center;">Satuan (Internal)</th>
-                                <th style="text-align: center;">Harga</th>
+                                <th style="text-align: center;">Satuan</th>
+                                <th style="text-align: center;">Valas</th>
+                                <th style="text-align: center;">Nilai Barang</th>
                             </tr>
                         </thead>
                         <tbody class="body-table">
@@ -71,14 +67,14 @@
                         <thead class="thead-dark">
                             <tr style="text-align: center;">
                                 <th style="text-align:center;">No</th>
-                                <th style="text-align:center;">Tipe Sales Order</th>
-                                <th style="text-align:center;">No Sales Order</th>
-                                <th style="text-align:center;">No Surat Jalan</th>
-                                <th style="text-align:center;">No stuffing </th>
-                                <th style="text-align:center;">Customer</th>
+                                <th style="text-align:center;">Form Pengeluaran</th>
+                                <th style="text-align:center;">No Order</th>
+                                <th style="text-align:center;">Penerima</th>
+                                <th style="text-align:center;">Alamat</th>
                                 <th style="text-align:center;">Jumlah Barang</th>
                                 <th style="text-align:center;">Nilai Barang</th>
-                                <th style="text-align:center;">DETAIL BARANG</th>
+                                <th style="text-align:center;">Valas</th>
+                                <th style="text-align:center;">Detail Barang</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
@@ -95,6 +91,7 @@
     let sort = "id";
     let sortType = "desc";
     $(document).ready(function() {
+        $('[data-toggle="tooltip"]').tooltip();
         drawTable();
     })
 
@@ -120,18 +117,17 @@
                     $.each(res, function(i, v) {
                         var newRow = $('<tr style="border: none">');
                         newRow.append($('<td style="text-align:center;">').text(no++));
-                        newRow.append($('<td style="text-align:center;">').text(v.tipe_sales_order));
-                        newRow.append($('<td style="text-align:center;">').text(v.no_sales_order));
-                        newRow.append($('<td style="text-align:center;">').text(v.no_surat_jalan));
-                        newRow.append($('<td style="text-align:center;">').text(v.no_stuffing));
-
-                        newRow.append($('<td style="text-align:center;">').text(v.customers));
+                        newRow.append($('<td style="text-align:center;">').text(v.form_pengeluaran));
+                        newRow.append($('<td style="text-align:center;">').text(v.no_order));
+                        newRow.append($('<td style="text-align:center;">').text(v.penerima));
+                        newRow.append($('<td style="text-align:center;">').text(v.alamat));
                         newRow.append($('<td style="text-align:center;">').text(v.jumlah_barang));
-                        newRow.append($('<td style="text-align:center;">').text(v.total_harga));
+                        newRow.append($('<td style="text-align:center;">').text(v.nilai_barang));
+                        newRow.append($('<td style="text-align:center;">').text(v.valas));
 
                         newRow.append($('<td style="text-align:center;">').html(`
                             <div class="mt-0">
-                                <button  data-toggle="tooltip" title="Histori LPB" onclick="displayDetails('${v.id}', '${v.tipe_sales_order}')" class="btn btn-success posting-spp">
+                                <button  data-toggle="tooltip" title="Detail Barang" onclick="displayDetails('${v.id}', '${v.form_pengeluaran}')" class="btn btn-success posting-spp">
                                     <i class="fa-solid fa-box"></i>
                                 </button>
                             <div>`));
@@ -150,9 +146,7 @@
 
 
 
-    function displayDetails(id, tipe) {
-        var salesOrderId = id;
-        var tipeSalesOrder = tipe;
+    function displayDetails(reference_id, type_reference) {
         $.ajax({
             url: `<?= base_url('bea-cukai-bc-30/list-barang'); ?>`,
             method: "GET",
@@ -163,8 +157,8 @@
                 stopLoading();
             },
             data: {
-                tipe_sales_order: tipeSalesOrder,
-                sales_order_id: salesOrderId
+                type_reference: type_reference,
+                reference_id: reference_id
             },
             dataType: "json",
             success: function(res) {
@@ -194,18 +188,14 @@
                             ${no++} 
                         `
                 ));
-                newRow.append($('<td style="text-align: center;">').text(v.tanggal_keluar));
                 newRow.append($('<td style="text-align: center;">').text(v.tipe_barang));
-                newRow.append($('<td style="text-align: center;">').text(v.dokumen_asal));
+                newRow.append($('<td style="text-align: center;">').text(v.dokumen_asal + '/' + v.no_aju_warehouse));
                 newRow.append($('<td style="text-align: center;">').text(v.kode_barang_internal));
                 newRow.append($('<td style="text-align: center;">').text(v.nama_barang_internal));
-                newRow.append($('<td style="text-align: center;">').text(v.kode_barang_sales));
-                newRow.append($('<td style="text-align: center;">').text(v.nama_barang_sales));
-                newRow.append($('<td style="text-align: center;">').text(v.no_stuffing));
                 newRow.append($('<td style="text-align: center;">').text(v.divisi + ' / ' + v.warehouse_name));
                 newRow.append($('<td style="text-align: center;">').text(v.qty_keluar));
-                newRow.append($('<td style="text-align: center;">').text(v.kode_satuan_sales));
                 newRow.append($('<td style="text-align: center;">').text(v.kode_satuan_internal));
+                newRow.append($('<td style="text-align: center;">').text(v.mata_uang));
                 newRow.append($('<td style="text-align: center;">').text(v.harga));
                 table.find('tbody').append(newRow);
             });

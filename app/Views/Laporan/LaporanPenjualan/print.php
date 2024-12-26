@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Laporan Pembelian</title>
+  <title>Laporan Penjualan</title>
   <style>
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -56,20 +56,19 @@
       style=" margin-top: -20px;">
     <thead>
       <tr>
-        <th>No.</th>
+        <th>No</th>
         <th>Transaction Date</th>
         <th>Document</th>
         <th>Evidance Num</th>
         <th>Invoice</th>
         <th>Invoice Date</th>
         <th>Tax Invoice</th>
-        <th>PO Num</th>
-        <th>Supplier</th>
+        <th>SO Num</th>
+        <th>Buyer</th>
         <th>Valas</th>
         <th>Exchange Rate</th>
         <th>Nominal Value</th>
         <th>Nominal Value(IDR)</th>
-        <th>Paid Value(IDR)</th>
       </tr>
     </thead>
     <tbody>
@@ -81,14 +80,13 @@
           <td><?= $value['evidance_num'] ?></td>
           <td><?= $value['invoice_num'] ?></td>
           <td><?= $value['invoice_date'] ?></td>
-          <td><?= $value['tax_invoice'] ?></td>
+          <td><?= number_format($value['tax_invoice']) ?></td>
           <td><?= $value['po_num'] ?></td>
           <td><?= $value['supplier_name'] ?></td>
           <td><?= $value['valas'] ?></td>
-          <td><?= $value['exchange'] ?></td>
-          <td><?= $value['nominal'] ?></td>
-          <td><?= $value['nominal_idr'] ?></td>
-          <td><?= $value['paid_idr'] ?></td>
+          <td><?= number_format($value['exchange']) ?></td>
+          <td><?= number_format($value['nominal']) ?></td>
+          <td><?= number_format($value['nominal_idr']) ?></td>
         </tr>
       <?php endforeach; ?>
     </tbody>

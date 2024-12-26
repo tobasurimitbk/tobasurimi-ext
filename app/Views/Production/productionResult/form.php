@@ -244,6 +244,8 @@
                                                 </thead>
                                                 <tbody class="body-table-barang-digunakan" id="body-table-barang-digunakan">
                                                 </tbody>
+                                                <tfoot id="tfoot-barang-digunakan">
+                                                </tfoot>
                                             </table>
                                         </div>
                                     </div>
@@ -271,7 +273,6 @@
                                                         <th>Jenis Barang</th>
                                                         <th>Nama Barang</th>
                                                         <th>Satuan</th>
-                                                        <!-- <th>Qty Target</th> -->
                                                         <th>Qty Hasil</th>
                                                         <th>Berat Isi</th>
                                                         <th>Qty dalam KG</th>
@@ -280,6 +281,8 @@
                                                 </thead>
                                                 <tbody class="body-table-barang-jadi" id="body-table-barang-jadi">
                                                 </tbody>
+                                                <tfoot class="tfoot-table-barang-jadi" id="tfoot-barang-jadi">
+                                                </tfoot>
                                             </table>
                                         </div>
                                     </div>
@@ -351,6 +354,8 @@
                                         <tbody class="body-table-barang-scrap" id="body-table-barang-scrap" style="cursor: pointer;">
 
                                         </tbody>
+                                        <tfoot class="tfoot-table-barang-scrap" id="tfoot-barang-scrap">
+                                        </tfoot>
                                     </table>
                                 </div>
                             </div>
@@ -429,6 +434,8 @@
                                         <tbody class="body-table-barang-filling" id="body-table-barang-filling" style="cursor: pointer;">
 
                                         </tbody>
+                                        <tfoot class="tfoot-table-barang-filling" id="tfoot-barang-filling">
+                                        </tfoot>
                                     </table>
                                 </div>
                             </div>
@@ -1565,75 +1572,107 @@
 
     const drawTableBarangJadi = function() {
         $('.body-table-barang-jadi').empty();
-        $('.tfoot').empty();
+        $('#tfoot-barang-jadi').empty(); // Menggunakan ID khusus untuk footer
+
         var row = '';
         var no = 1;
+
         if (list_items_barang_jadi.length === 0) {
             row += `
                 <tr>
-                    <td colspan="6" class="text-center">Data Barang Tidak Ada</td>
+                    <td colspan="8" class="text-center">Data Barang Tidak Ada</td>
                 </tr>
             `;
-            $('.tfoot').append(row);
+            $('.body-table-barang-jadi').append(row);
         } else {
             list_items_barang_jadi.map((item, index) => {
-                // console.log(item);
                 row += '<tr style="color:whitesmoke;text-align: center;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.kode_barang + '</td>';
                 row += '<td>' + item.type_barang_text + '</td>';
                 row += '<td>' + item.barang_name + '</td>';
                 row += '<td>' + item.kode_satuan + '</td>';
-                // row += '<td>' + item.qty + '</td>';
                 row += '<td>' + `
-        <input class="form-control qty-barang-jadi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qty}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>` +
-                    '</td>';
+                    <input class="form-control qty-barang-jadi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>
+                ` + '</td>';
                 row += '<td>' + `
-        <input class="form-control berat-barang-jadi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qty2}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>` +
-                    '</td>';
+                    <input class="form-control berat-barang-jadi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty2}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>
+                ` + '</td>';
                 row += '<td>' + `
-        <input class="form-control qty-berat-barang-jadi" readonly oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qty_isi}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>` +
-                    '</td>';
+                    <input class="form-control qty-berat-barang-jadi" readonly autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty_isi}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>
+                ` + '</td>';
                 row += '<td>' + `
-        <button type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteRowDetailJadi('${item.barang_detail_id}', '${item.production_result_detail_id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>` +
-                    '</td>';
+                    <button type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteRowDetailJadi('${item.barang_detail_id}', '${item.production_result_detail_id}')"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                ` + '</td>';
 
                 no++;
             });
             $('.body-table-barang-jadi').append(row);
+
+            // Tambahkan footer untuk menampilkan total
+            var totalQtyHasil = 0;
+            var totalBeratIsi = 0;
+            var totalQtyKg = 0;
+            list_items_barang_jadi.forEach(item => {
+                totalQtyHasil += parseFloat(item.qty || 0);
+                totalBeratIsi += parseFloat(item.qty2 || 0);
+                totalQtyKg += parseFloat(item.qty_isi || 0);
+            });
+
+            var footerRow = `
+                <tr style="font-weight: bold;">
+                    <td colspan="5"></td>
+                    <td class="text-center">${totalQtyHasil.toFixed(2)}</td>
+                    <td class="text-center">${totalBeratIsi.toFixed(2)}</td>
+                    <td class="text-center">${totalQtyKg.toFixed(2)}</td>
+                    <td></td>
+                </tr>
+            `;
+            $('#tfoot-barang-jadi').append(footerRow); // Gunakan ID khusus untuk footer
         }
 
+        // Menangani perubahan input Qty Hasil dan Berat Isi
         $('.qty-barang-jadi, .berat-barang-jadi').on('input change', function() {
             var index = $(this).data('index');
             var valueQtyBarangJadi = $('input.qty-barang-jadi[data-index="' + index + '"]').val();
             var valueBeratBarangJadi = $('input.berat-barang-jadi[data-index="' + index + '"]').val();
-            var newValue = $(this).val();
-
 
             var jumlahQtyBeratJadi = parseFloat(valueQtyBarangJadi) * parseFloat(valueBeratBarangJadi);
-
             $('input.qty-berat-barang-jadi[data-index="' + index + '"]').val(jumlahQtyBeratJadi);
+
+            // Simpan nilai baru
             list_items_barang_jadi[index].qty_jadi = valueQtyBarangJadi;
             list_items_barang_jadi[index].berat_isi_jadi = valueBeratBarangJadi;
-            list_items_barang_jadi[index].qty_isi_jadi = jumlahQtyBeratJadi.toFixed(4);
+            list_items_barang_jadi[index].qty_isi_jadi = jumlahQtyBeratJadi.toFixed(2);
+
+            // Render ulang untuk memperbarui footer
+            drawTableBarangJadi();
         });
-    }
+    };
+
 
     const drawTableBarangDigunakan = function() {
         $('.body-table-barang-digunakan').empty();
-        $('.tfoot').empty();
+        $('#tfoot-barang-digunakan').empty(); // Gunakan ID untuk target footer khusus
+
         var row = '';
         var no = 1;
+        var totalQtyDigunakan = 0; // Total qty digunakan
+        var totalQtyRequest = 0; // Total qty permintaan
+
         if (list_items_barang_digunakan.length === 0) {
             row += `
                     <tr>
-                        <td colspan="7" class="text-center">Data Barang Tidak Ada</td>
+                        <td colspan="9" class="text-center">Data Barang Tidak Ada</td>
                     </tr>
                 `;
-            $('.tfoot').append(row);
+            $('.body-table-barang-digunakan').append(row);
         } else {
             list_items_barang_digunakan.map((item, index) => {
                 var qty = item.qty2 ? item.qty2 : item.qty;
+                totalQtyDigunakan += parseFloat(qty || 0);
+                totalQtyRequest += parseFloat(item.qty || 0);
+
                 row += '<tr style="color:whitesmoke;text-align: center;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.ref_no + '</td>';
@@ -1652,21 +1691,34 @@
                 no++;
             });
             $('.body-table-barang-digunakan').append(row);
+
+            // Tambahkan footer untuk menampilkan total
+            var footerRow = `
+                <tr style="font-weight: bold;">
+                    <td colspan="6"></td>
+                    <td class="text-center">${totalQtyRequest.toFixed(2)}</td>
+                    <td colspan="2" style="text-align: center;">${totalQtyDigunakan.toFixed(2)}</td>
+                </tr>
+            `;
+            $('#tfoot-barang-digunakan').append(footerRow); // Gunakan ID untuk target footer khusus
         }
 
-        // Tambahkan event listener untuk mengikuti perubahan nilai qty-barang-jadi
+        // Tambahkan event listener untuk input qty
         $('.qty-barang-digunakan').on('input change', function() {
-            var index = $(this).data('index'); // Dapatkan indeks item dari atribut data-index
-            var newValue = $(this).val(); // Dapatkan nilai yang dimasukkan pengguna
-            list_items_barang_digunakan[index].qty2 = newValue; // Simpan nilai ke dalam list_items_barang_jadi
+            var index = $(this).data('index'); // Dapatkan indeks item
+            var newValue = $(this).val(); // Nilai input dari pengguna
+            list_items_barang_digunakan[index].qty2 = newValue; // Simpan nilai baru
+            drawTableBarangDigunakan(); // Render ulang tabel untuk update total
         });
-    }
+    };
 
     const drawTableBarangScrap = function() {
         $('.body-table-barang-scrap').empty();
         $('.tfoot').empty();
         var row = '';
         var no = 1;
+
+        // Cek apakah data barang scrap ada
         if (list_items_barang_scrap.length === 0) {
             row += `
                 <tr>
@@ -1675,6 +1727,7 @@
             `;
             $('.tfoot').append(row);
         } else {
+            // Looping untuk menampilkan data barang scrap
             list_items_barang_scrap.map(item => {
                 row += '<tr style="color:whitesmoke;text-align: center;">';
                 row += '<td>' + no + '</td>';
@@ -1683,12 +1736,16 @@
                 row += '<td>' + item.divisi_name + '</td>';
                 row += '<td>' + item.warehouse_name + '</td>';
                 row += '<td>' + item.qty + '</td>';
+
+                // Hanya tampilkan tombol delete jika data belum diposting
                 <?php if (!isset($data)) : ?>
-                    row += '<td>' + `
-            <button type="button" class="btn btn-danger" onclick="deleteRowDetailScrap('${item.barang_detail_id}')">
-                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                </button>` +
-                        '</td>';
+                    row += `
+                        <td>
+                            <button type="button" class="btn btn-danger" onclick="deleteRowDetailScrap('${item.barang_detail_id}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        </td>
+                    `;
                 <?php endif; ?>
 
                 no++;
@@ -1702,6 +1759,8 @@
         $('.tfoot').empty();
         var row = '';
         var no = 1;
+
+        // Cek apakah data barang filling ada
         if (list_items_barang_filling.length === 0) {
             row += `
                 <tr>
@@ -1710,6 +1769,7 @@
             `;
             $('.tfoot').append(row);
         } else {
+            // Looping untuk menampilkan data barang filling
             list_items_barang_filling.map(item => {
                 row += '<tr style="color:whitesmoke;text-align: center;">';
                 row += '<td>' + no + '</td>';
@@ -1717,12 +1777,16 @@
                 row += '<td>' + item.nama_barang + '</td>';
                 row += '<td>' + item.kondisi_barang_text + '</td>';
                 row += '<td>' + item.qty + '</td>';
+
+                // Hanya tampilkan tombol delete jika data belum diposting
                 <?php if (!isset($data)) : ?>
-                    row += '<td>' + `
-            <button type="button" class="btn btn-danger" onclick="deleteRowDetailFilling('${item.barang_detail_id}')">
-                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                </button>` +
-                        '</td>';
+                    row += `
+                        <td>
+                            <button type="button" class="btn btn-danger" onclick="deleteRowDetailFilling('${item.barang_detail_id}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        </td>
+                    `;
                 <?php endif; ?>
 
                 no++;

@@ -143,7 +143,19 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales">
+                                <!-- <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales"> -->
+                                <select class="form-select sales_id" name="sales_id" id="sales_id_lokal" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataSales)) {
+                                        foreach ($dataSales as $sales) {
+                                    ?>
+                                            <option value="<?= $sales["id"]; ?>"><?= strtoupper($sales["name"]); ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
                                 <label for="floatingInput">Nama Sales</label>
                             </div>
                         </div>
@@ -206,7 +218,19 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales">
+                                <!-- <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales"> -->
+                                <select class="form-select sales_id" name="sales_id" id="sales_id_internasional" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataSales)) {
+                                        foreach ($dataSales as $sales) {
+                                    ?>
+                                            <option value="<?= $sales["id"]; ?>"><?= strtoupper($sales["name"]); ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
                                 <label for="floatingInput">Nama Sales</label>
                             </div>
                         </div>
@@ -510,164 +534,75 @@
         // TERMIN
         //CSS SELECT2 FLOATING LABEL
         $('.termin').select2({
-            placeholder: "",
+            placeholder: "Pilih Termin",
             theme: "bootstrap-5",
             allowClear: true,
             dropdownParent: $(".add-modal .modal-content")
         });
-        $(".termin")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
 
-        $(".termin")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+        $('.jenis_penjualan').select2({
+            placeholder: "Pilih Jenis Penjualan",
+            theme: "bootstrap-5",
+            allowClear: true,
+            dropdownParent: $(".add-modal .modal-content")
+        });
 
-        $(".termin")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+        $('#sales_id_internasional').select2({
+            placeholder: "Pilih Sales (Opsional)",
+            theme: "bootstrap-5",
+            allowClear: true,
+            dropdownParent: $("#add_modal_internasional")
+        });
 
-        // MATA UANG
-        //CSS SELECT2 FLOATING LABEL
+        $('#sales_id_lokal').select2({
+            placeholder: "Pilih Sales (Opsional)",
+            theme: "bootstrap-5",
+            allowClear: true,
+            dropdownParent: $(".add-modal .modal-content")
+        });
+
+        $('.country_id').select2({
+            placeholder: "Pilih Negara",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal-internasional .modal-content")
+        })
+
         $('.currency').select2({
-            placeholder: "",
+            placeholder: "Pilih Mata Uang",
             theme: "bootstrap-5",
             allowClear: false,
             dropdownParent: $(".add-modal .modal-content")
         });
 
-        $(".currency")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".currency")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".currency")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // COUNTRY
-        //CSS SELECT2 FLOATING LABEL
-        $(".country_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".country_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        $('.country_id').select2({
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal-internasional .modal-content")
-        })
-
-        $(".country_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-8px');
-
-        // TIPE PELANGGAN
-        //CSS SELECT2 FLOATING LABEL
         $('.tipe_pelanggan').select2({
-            placeholder: "",
+            placeholder: "Pilih Tipe Pelanggan",
             theme: "bootstrap-5",
             allowClear: true,
             dropdownParent: $(".add-modal .modal-content")
         });
 
-        $(".tipe_pelanggan")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".tipe_pelanggan")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".tipe_pelanggan")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // PROVINCE PARENT
-        //CSS SELECT2 FLOATING LABEL
         $('.province_parent_id').select2({
-            placeholder: "",
+            placeholder: "Pilih Provinsi",
             theme: "bootstrap-5",
             allowClear: true,
             dropdownParent: $(".add-modal .modal-content")
         });
 
-        $(".province_parent_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".province_parent_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".province_parent_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-
-
-        // CITY PARENT
-        //CSS SELECT2 FLOATING LABEL
         $('.city_parent_id').select2({
-            placeholder: "",
+            placeholder: "Pilih Kabupaten",
             theme: "bootstrap-5",
             allowClear: true,
             dropdownParent: $(".add-modal .modal-content")
         });
 
-        $('.city_parent_id')
+        $(".termin, .sales_id, .currency, .country_id, .tipe_pelanggan, .province_parent_id, .city_parent_id, .jenis_penjualan")
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.city_parent_id')
+        $(".termin, .sales_id, .currency, .country_id, .tipe_pelanggan, .province_parent_id, .city_parent_id, .jenis_penjualan")
             .parent('div')
             .children('span')
             .children('span')
@@ -675,7 +610,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.city_parent_id')
+        $(".termin, .sales_id, .currency, .country_id, .tipe_pelanggan, .province_parent_id, .city_parent_id, .jenis_penjualan")
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -834,6 +769,7 @@
             $(".city_parent_id").append(`<option value=""></option>`)
 
             $(".delete-form").css('display', 'none');
+            $(".sales_id").val(null).change();
 
             $.ajax({
                 url: `<?= base_url("metadata/dropdown"); ?>`,
@@ -936,6 +872,7 @@
                         $(".name").val(res.data.name);
                         $(".address").val(res.data.address);
                         $(".country_id").val(res.data.country_id).change();
+                        $(".sales_id").val(res.data.sales_id).change();
                         validatorInternasional.resetForm();
                         validatorInternasional.reset();
 
@@ -987,6 +924,7 @@
                         $(".jenis_penjualan").val(res.data.jenis_penjualan).change();
 
                         $(".nik").val(res.data.nik);
+                        $(".sales_id").val(res.data.sales_id).change();
 
 
                         validator.resetForm();
@@ -1344,6 +1282,7 @@
         $('.country_id').val(null).change();
         $('.address').val(null);
         $('.delete-form-internasional').hide();
+        $(".sales_id").val(null).change();
     });
 
     $('.btn-hide-form').click(function() {
@@ -1352,6 +1291,7 @@
         $('.name').val(null);
         $('.country_id').val(null).change();
         $('.address').val(null);
+        $(".sales_id").val(null).change();
     });
 
     $(".btn-submit-parent-internasional").click(function() {

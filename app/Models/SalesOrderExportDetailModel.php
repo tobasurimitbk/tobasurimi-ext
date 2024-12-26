@@ -69,7 +69,7 @@ class SalesOrderExportDetailModel extends Model
         $builder = $this->db->table('sales_order_detail_export')
             ->select('sales_order_detail_export.*, barang_master.barang_name as nama_barang, barang_master.kode_barang, satuans.id as id_satuan, satuans.nama_satuan')
             ->join('barang_master', 'barang_master.id = sales_order_detail_export.barang_id', 'left')
-            ->join('satuans', 'satuans.id = sales_order_detail_export.unit', 'left');
+            ->join('satuans', 'satuans.id = sales_order_detail_export.satuan_id', 'left');
         $builder->where($arrCondition);
         $query = $builder->get();
 

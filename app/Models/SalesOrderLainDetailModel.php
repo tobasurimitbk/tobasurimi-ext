@@ -42,6 +42,7 @@ class SalesOrderLainDetailModel extends Model
 
     public function detail($salesOrderLainId)
     {
+        $salesOrderLainModel = new SalesOrderLainModel();
         $stockDetail2Model = new StockDetail2Model();
         $stockModel = new StockModel();
         $barangMasterModel = new BarangMasterModel();
@@ -51,6 +52,14 @@ class SalesOrderLainDetailModel extends Model
         $metaDataModel = new MetadataModel();
 
         $result = array();
+        $salesOrderLain = $salesOrderLainModel->select('sales_order_lain.*,divisis.divisi,warehouses.warehouse_name,metadata.value as valas_name')
+            ->join('divisis', 'divisis.id = sales_order_lain.divisi_id', 'left')
+            ->join('warehouses', 'warehouses.id = sales_order_lain.warehouse_id', 'left')
+            ->join('customers', 'customers.id = sales_order_lain.customer_id', 'left')
+            ->join('metadata', 'metadata.id = customers.currency', 'left')
+            ->where('sales_order_lain.id', $salesOrderLainId)
+            ->first();
+
         $salesOrderLainList = $this->asArray()->where('sales_order_lain_id', $salesOrderLainId)->findAll();
 
         foreach ($salesOrderLainList as $s) {
@@ -103,6 +112,11 @@ class SalesOrderLainDetailModel extends Model
             $stockList['potongan_harga'] = $s['potongan_harga'];
             $stockList['biaya_tambahan'] = $s['biaya_tambahan'];
             $stockList['total_harga'] = $s['total_harga'];
+            $stockList['divisi'] = $salesOrderLain['divisi'];
+            $stockList['warehouse_name'] = $salesOrderLain['warehouse_name'];
+            $stockList['valas_name'] = $salesOrderLain['valas_name'] == null ? "IDR" :  $salesOrderLain['valas_name'];
+            $stockList['barang1_id'] = $stock['barang1_id'];
+            $stockList['kemasan_id'] = $stock['kemasan_id'];
 
             array_push($result, $stockList);
         }

@@ -291,7 +291,7 @@
                         var nominal = "<?= !empty($lemburDetail) ? $lemburDetail['gaji_pokok_per_hari'] : "-" ?>"
                         newRow.append($('<td>').text(indexNumber));
                         newRow.append($('<td>').text(data.name));
-                        newRow.append($('<td>').text(data.nominal != null ? formatRupiah(nominal == "-" ? data.nominal : nominal) : 0));
+                        newRow.append($('<td>').text(data.nominal != null ? greatFormatRupiah(nominal == "-" ? data.nominal : nominal) : 0));
                         table.append(newRow);
                     });
 
@@ -309,22 +309,22 @@
                             column1: "1.",
                             column2: "1/173 x 25 x 1.5",
                             column3: "x",
-                            column4: lemburJamPertama.totalLemburJamPertama + " x " + formatRupiah(response.upah),
-                            column5: formatRupiah(lemburJamPertama.bayaran),
+                            column4: lemburJamPertama.totalLemburJamPertama + " x " + greatFormatRupiah(response.upah),
+                            column5: greatFormatRupiah(lemburJamPertama.bayaran),
                         },
                         {
                             column1: "2.",
                             column2: "1/173 x 25 x 2",
                             column3: "x",
-                            column4: lemburJamBerikutnya.totalLemburJamKedua + " x " + formatRupiah(response.upah),
-                            column5: formatRupiah(lemburJamBerikutnya.bayaran),
+                            column4: lemburJamBerikutnya.totalLemburJamKedua + " x " + greatFormatRupiah(response.upah),
+                            column5: greatFormatRupiah(lemburJamBerikutnya.bayaran),
                         },
                         {
                             column1: "",
                             column2: "",
                             column3: "",
                             column4: "",
-                            column5: formatRupiah(response.lembur.totalBayaran)
+                            column5: greatFormatRupiah(response.lembur.totalBayaran)
                         }
                     ];
 
@@ -593,14 +593,6 @@
         });
 
     });
-
-    // function helper
-    function formatRupiah(angka) {
-        var reverse = angka.toString().split('').reverse().join('');
-        var ribuan = reverse.match(/\d{1,3}/g);
-        var formatted = ribuan.join('.').split('').reverse().join('');
-        return 'Rp. ' + formatted;
-    }
 </script>
 <?php if (!empty($lemburDetail)) : ?>
     <script>

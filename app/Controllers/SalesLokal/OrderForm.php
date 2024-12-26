@@ -95,21 +95,28 @@ class OrderForm extends BaseController
         $dataSatuan = $this->satuanModel->findAll();
         //Get Customers
         $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
-
-        $dataAJU = $this->MetaDataModel->getBCUsed('so_lokal');
-
         $condition = [
             'jabatan_name' => "SALES"
         ];
 
         $sales = $this->employeeModel->getEmployeesComplete($this->this_company_id, $condition);
-
         $dataCompany = $this->companyModel->where('deletedAt', NULL)->asObject()->findAll();
 
         $dataTermin = $this->MetaDataModel
             ->where('metadata.deletedAt', null)
             ->where('metadata.name', 'Termin')
             ->orderBy('CAST(metadata.value AS DECIMAL)', 'ASC')
+            ->findAll();
+
+        $dataTipePelanggan = $this->MetaDataModel
+            ->where('deletedAt', null)
+            ->where('name', "Tipe Pelanggan")
+            ->findAll();
+
+        $dataValuta = $this->MetaDataModel
+            ->where('deletedAt', null)
+            ->where('name', "Valuta")
+            ->where('value', "IDR")
             ->findAll();
 
         $data = [
@@ -122,7 +129,8 @@ class OrderForm extends BaseController
             'dataSatuan' => $dataSatuan,
             "id_user" => session()->get('login')->user_id,
             "seller_name" => session()->get('login')->name,
-            "dataAJU" => $dataAJU,
+            "dataTipePelanggan" => $dataTipePelanggan,
+            "dataValuta" => $dataValuta
         ];
 
         return view('SalesLokal/OrderForm/form', $data);
@@ -190,7 +198,7 @@ class OrderForm extends BaseController
                 "nama_customer" => $customerName,
                 "destination" => $data->destination,
                 "qty_barang" => count($this->SalesOrderDetailModel->where('id_sales_order', $data->id)->where('deletedAt', null)->where('tipe_input', "order_form")->findAll()),
-                "total_harga" => formatRupiah($data->estimated_freight + $data->total_harga),
+                "total_harga" => ($data->estimated_freight + $data->total_harga),
                 "keterangan" => $data->keterangan,
                 "surat_jalan_so_id" => $data->surat_jalan_so_id,
                 "sales_order_invoice_id" => $data->sales_order_invoice_id,
@@ -340,7 +348,6 @@ class OrderForm extends BaseController
 
             $values = [
                 "no_sales_order"        => strtoupper($postData['no_sales_order']),
-                "bc_type"        => $postData['aju_document_type'],
                 "id_user"               => $this->userId,
                 "id_customer"           => $postData['id_customer'],
                 "jenis_penjualan"           => $postData['jenis_penjualan'],
@@ -431,16 +438,8 @@ class OrderForm extends BaseController
 
     public function getById($id = null)
     {
-        //Get data sales order
         $id = decrypt($id);
         $dataSalesOrder = $this->SalesOrderModel->getSalesOrderLokalById(($id));
-
-        $dataAJU = $this->MetaDataModel->getBCUsed('so_lokal');
-        // var_dump($dataSalesOrder);
-        // exit;
-
-
-        // validation
         if ($dataSalesOrder == null) {
             $session = session();
             $session->setFlashdata('error', "Data Sales tidak ditemukan");
@@ -467,7 +466,6 @@ class OrderForm extends BaseController
         ];
 
         $sales = $this->employeeModel->getEmployeesComplete($this->this_company_id, $condition);
-
         $dataTermin = $this->MetaDataModel
             ->where('metadata.deletedAt', null)
             ->where('metadata.name', 'Termin')
@@ -475,8 +473,17 @@ class OrderForm extends BaseController
             ->findAll();
 
         $metadatas = $this->MetaDataModel->findAll();
-
         $dataCompany = $this->companyModel->where('deletedAt', NULL)->asObject()->findAll();
+        $dataTipePelanggan = $this->MetaDataModel
+            ->where('deletedAt', null)
+            ->where('name', "Tipe Pelanggan")
+            ->findAll();
+
+        $dataValuta = $this->MetaDataModel
+            ->where('deletedAt', null)
+            ->where('name', "Valuta")
+            ->where('value', "IDR")
+            ->findAll();
 
         // dd($dataSalesOrder->detail);
         $dataSalesOrder->order_date = $dataSalesOrder->order_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->order_date)) : "";
@@ -490,7 +497,8 @@ class OrderForm extends BaseController
             "dataMetaData"  => $metadatas,
             "id_user" => $dataSalesOrder->id_user,
             "dataTermin" => $dataTermin,
-            "dataAJU" => $dataAJU,
+            "dataTipePelanggan" => $dataTipePelanggan,
+            "dataValuta" => $dataValuta
         ];
 
         return view('SalesLokal/OrderForm/form', $data);
@@ -619,6 +627,8 @@ class OrderForm extends BaseController
                         "tax"                   => $row->statusppn,
                         "discount_percentage"   => $row->disc,
                         "tipe_input"            => "order_form",
+                        "status_ppn"            => $row->statusppn,
+
                         // "dept"                  => $row->dept,
                         // "id_warehouse"          => $row->warehouse_id,
                     ];
@@ -635,6 +645,8 @@ class OrderForm extends BaseController
                         "tax"                   => $row->statusppn,
                         "discount_percentage"   => $row->disc,
                         "tipe_input"            => "order_form",
+                        "status_ppn"            => $row->statusppn,
+
                         // "dept"                  => $row->dept,
                         // "id_warehouse"          => $row->warehouse_id,
                     ];

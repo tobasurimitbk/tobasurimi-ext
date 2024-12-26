@@ -358,19 +358,19 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <input onchange="this.value = formatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_satuan" id="harga_satuan" name="harga_satuan" placeholder="Harga Satuan">
+                                <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_satuan" id="harga_satuan" name="harga_satuan" placeholder="Harga Satuan">
                                 <label for="floatingInput">Harga Satuan</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <input onchange="this.value = formatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control potongan_harga" id="potongan_harga" name="potongan_harga" placeholder="Potongan Harga">
+                                <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control potongan_harga" id="potongan_harga" name="potongan_harga" placeholder="Potongan Harga">
                                 <label for="floatingInput">Potongan Harga</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <input onchange="this.value = formatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control biaya_tambahan" id="biaya_tambahan" name="biaya_tambahan" placeholder="Biaya Tambahan">
+                                <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control biaya_tambahan" id="biaya_tambahan" name="biaya_tambahan" placeholder="Biaya Tambahan">
                                 <label for="floatingInput">Biaya Tambahan</label>
                             </div>
                         </div>
@@ -493,7 +493,7 @@
     });
 
     $('#bc_id').select2({
-        placeholder: "Pilih Dokumen Bea Cukai",
+        placeholder: "Pilih Dokumen Bea Cukai Pengeluaran",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
@@ -503,6 +503,13 @@
         // DROPDOWN DOKUMEN PABEAN
         getListBarang();
         drawTableAsalBarang(listStockAsal);
+
+        var bcId = $('#bc_id option:selected').val(); // BC 3.0 AMBIL CUSTOMER EKSPOR
+        if (bcId == 1445) {
+            $('#tipe_customer').val("INTERNASIONAL").change();
+        } else {
+            $('#tipe_customer').val("LOKAL").change();
+        }
     });
 
     $('#type_barang').select2({
@@ -698,7 +705,7 @@
     // SIMPAN DETAIL
     $('.btn-submit-detail').click(function() {
         if ($('.create-form-detail').valid()) {
-            var totalHarga = convertRupiahToNumber($('#total_harga').val());
+            var totalHarga = destroyFormatRupiah($('#total_harga').val());
             var qtyKonversi = parseFloat($('#qty_konversi').val());
             var id = $('#stock_detail2_id').val();
 
@@ -723,9 +730,9 @@
                     }
                 }
 
-                var hargaSatuan = convertRupiahToNumber($('#harga_satuan').val()) || 0;
-                var potonganHarga = convertRupiahToNumber($('#potongan_harga').val()) || 0;
-                var biayaTambahan = convertRupiahToNumber($('#biaya_tambahan').val()) || 0;
+                var hargaSatuan = destroyFormatRupiah($('#harga_satuan').val()) || 0;
+                var potonganHarga = destroyFormatRupiah($('#potongan_harga').val()) || 0;
+                var biayaTambahan = destroyFormatRupiah($('#biaya_tambahan').val()) || 0;
                 listStockSelected[index].satuan_order_id = $('#satuan_order_id option:selected').val();
                 listStockSelected[index].satuan_order_text = $('#satuan_order_id option:selected').text();
                 listStockSelected[index].qty_order = $('#qty_order').val();
@@ -868,14 +875,14 @@
     $('#harga_satuan,#potongan_harga,#biaya_tambahan').keyup(function() {
         if (qtyKonversi != "") {
             var qtyKonversi = parseFloat($('#qty_konversi').val());
-            var hargaSatuan = convertRupiahToNumber($('#harga_satuan').val());
-            var potonganHarga = convertRupiahToNumber($('#potongan_harga').val());
-            var biayaTambahan = convertRupiahToNumber($('#biaya_tambahan').val());
+            var hargaSatuan = destroyFormatRupiah($('#harga_satuan').val());
+            var potonganHarga = destroyFormatRupiah($('#potongan_harga').val());
+            var biayaTambahan = destroyFormatRupiah($('#biaya_tambahan').val());
 
             var total = (qtyKonversi * hargaSatuan) - potonganHarga + biayaTambahan;
-            $('#total_harga').val(formatRupiah(total));
+            $('#total_harga').val(greatFormatRupiah(total));
         } else {
-            $('#total_harga').val(formatRupiah(0));
+            $('#total_harga').val(greatFormatRupiah(0));
         }
     });
 
@@ -1030,10 +1037,10 @@
                 newRow.append($('<td style="text-align: center;">').text(v.stok_total + " " + v.satuan));
                 newRow.append($('<td style="text-align: center;">').text(v.qty_order + " " + v.satuan_order_text));
                 newRow.append($('<td style="text-align: center;">').text(v.qty_konversi + " " + v.satuan));
-                newRow.append($('<td style="text-align: center;">').text(formatRupiah(v.harga_satuan)));
-                newRow.append($('<td style="text-align: center;">').text(formatRupiah(v.potongan_harga)));
-                newRow.append($('<td style="text-align: center;">').text(formatRupiah(v.biaya_tambahan)));
-                newRow.append($('<td style="text-align: center;">').text(formatRupiah(v.total_harga)));
+                newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.harga_satuan)));
+                newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.potongan_harga)));
+                newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.biaya_tambahan)));
+                newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.total_harga)));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                     <button <?= !empty($salesOrderLain) ? ($salesOrderLain['status_posting'] === "1" ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger mr-1" onclick="deleteDetail(${v.id})"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
@@ -1111,10 +1118,10 @@
                 $('#qty_order').val(parseFloat(first.qty_order));
                 $('#qty_konversi').val(parseFloat(first.qty_konversi));
 
-                $('#harga_satuan').val(formatRupiah(first.harga_satuan));
-                $('#potongan_harga').val(formatRupiah(first.potongan_harga));
-                $('#biaya_tambahan').val(formatRupiah(first.biaya_tambahan));
-                $('#total_harga').val(formatRupiah(first.total_harga));
+                $('#harga_satuan').val(greatFormatRupiah(first.harga_satuan));
+                $('#potongan_harga').val(greatFormatRupiah(first.potongan_harga));
+                $('#biaya_tambahan').val(greatFormatRupiah(first.biaya_tambahan));
+                $('#total_harga').val(greatFormatRupiah(first.total_harga));
 
                 $('#satuan_inventori_name').text(first.satuan);
                 $('#satuan_konversi_name').text(first.satuan);
@@ -1273,27 +1280,6 @@
         }
     }
 
-    function formatRupiah(angka) {
-        var formatter = new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR'
-        });
-        var parsedNumber = parseFloat(angka);
-        if (isNaN(parsedNumber)) {
-            return "0,00";
-        }
-        return formatter.format(parsedNumber).replace('Rp', '').trim();
-    }
-
-    function convertRupiahToNumber(rupiah) {
-        if (rupiah == "") {
-            return 0;
-        } else {
-            var withoutDot = rupiah.replace(/\./g, '');
-            var numberWithDot = withoutDot.replace(',', '.');
-            return parseFloat(numberWithDot);
-        }
-    }
 
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;

@@ -116,7 +116,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" value="0" type="text" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" class="form-control piutang" id="piutang" name="piutang" placeholder="Limit Piutang">
+                                <input autocomplete="one-time-code" value="0" type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control piutang" id="piutang" name="piutang" placeholder="Limit Piutang">
                                 <label for="floatingInput">Limit Piutang</label>
                             </div>
                         </div>
@@ -315,7 +315,7 @@
         // TERMIN
         //CSS SELECT2 FLOATING LABEL
         $('.sales_id').select2({
-            placeholder: "Pilih Sales",
+            placeholder: "Pilih Sales (Opsional)",
             theme: "bootstrap-5",
             allowClear: true,
             dropdownParent: $(".add-modal .modal-content")
@@ -700,7 +700,7 @@
                         $(".email").val(res.data.email);
                         $(".parent_postal_code").val(res.data.postal_code);
                         $(".province_parent_id").val(res.data.province_id).change();
-                        $(".piutang").val(res.data.piutang).change();
+                        $(".piutang").val(greatFormatRupiah(res.data.piutang)).change();
 
                         $(".jenis_penjualan").val(res.data.jenis_penjualan).change();
 
@@ -890,8 +890,10 @@
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
                         let data = new FormData(document.querySelector(".create-form-lokal"));
-                        data.append("currency", "30");
                         let id = $(".id").val();
+                        let piutang = destroyFormatRupiah($('#piutang').val());
+                        data.set('piutang', piutang);
+                        data.append("currency", "30");
 
                         if (id) {
                             <?php if (can('Penjualan Lokal', 'Customer', 'u')) : ?>

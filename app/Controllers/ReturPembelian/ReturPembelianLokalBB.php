@@ -4,6 +4,7 @@ namespace App\Controllers\ReturPembelian;
 
 use App\Controllers\BaseController;
 use App\Models\BC25Model;
+use App\Models\BC30Model;
 use App\Models\BC41Model;
 use App\Models\DivisisModel;
 use App\Models\MetadataModel;
@@ -35,6 +36,7 @@ class ReturPembelianLokalBB extends BaseController
     protected $stockDetailModel;
     protected $stockDetail2Model;
     protected $bc25Model;
+    protected $bc30Model;
     protected $dompdf;
 
     public function __construct()
@@ -51,6 +53,7 @@ class ReturPembelianLokalBB extends BaseController
         $this->metaDataModel = new MetadataModel();
         $this->bc41Model = new BC41Model();
         $this->bc25Model = new BC25Model();
+        $this->bc30Model = new BC30Model();
         $this->stockModel = new StockModel();
         $this->stockDetailModel = new StockDetailModel();
         $this->stockDetail2Model = new StockDetail2Model();
@@ -109,7 +112,7 @@ class ReturPembelianLokalBB extends BaseController
             $status_bc = 0;
             $dokumen_pengeluaran = $this->metaDataModel->where('id', $data->bc_pengeluaran_id)->first();
 
-            if ($data->bc_pengeluaran_id == 0) {
+            if ($data->bc_pengeluaran_id == '0') {
                 // TIDAK ADA
                 if ($data->status_post == "FINISH") {
                     $status_bc = 1;
@@ -122,8 +125,9 @@ class ReturPembelianLokalBB extends BaseController
                 // 49 -> 2.5
                 $bc25 = $this->bc25Model->where('pengembalian_barang_id', $data->id)->first();
                 $bc41 = $this->bc41Model->where('pengembalian_barang_id', $data->id)->first();
+                $bc30 = $this->bc30Model->where('pengembalian_barang_id', $data->id)->first();
 
-                if ($bc25 != null || $bc41 != null) {
+                if ($bc25 != null || $bc41 != null || $bc30 != null) {
                     $status_bc = 1;
                 } else {
                     $status_bc = 0;
@@ -141,7 +145,12 @@ class ReturPembelianLokalBB extends BaseController
                 "warehouse_name"        => $data->warehouse_name,
                 "status_post"           => $data->status_post,
                 "status_bc"             => $status_bc,
-                "dokumen_pengeluaran"   => $dokumen_pengeluaran == null ? "NON PABEAN" : $dokumen_pengeluaran['value'],
+                "dokumen_pengeluaran" =>
+                $data->bc_pengeluaran_id == '0'
+                    ? "NON PABEAN"
+                    : ($data->bc_pengeluaran_id == null
+                        ? "-"
+                        : $dokumen_pengeluaran['value']),
             ]);
         }
 
@@ -161,7 +170,6 @@ class ReturPembelianLokalBB extends BaseController
     {
         $data = [
             'dataDivisi' => $this->divisiModel->getDivisiAccess(),
-            'dataDokumenPabean' => $this->metaDataModel->where('name', "jenis_dok_aju")->where('value', "BC 4.1")->findAll()
         ];
 
         return view('Warehouse/returnBarang/formLokalBB', $data);
@@ -204,7 +212,9 @@ class ReturPembelianLokalBB extends BaseController
 
         $id = $this->pengembalianBarangModel->insert([
             'company_id' => $this->this_company_id,
-            'bc_pengeluaran_id' => $this->request->getVar('bc_pengeluaran_id'),
+            'bc_pengeluaran_id' => ($this->request->getVar('bc_pengeluaran_id') !== "" && $this->request->getVar('bc_pengeluaran_id') !== null)
+                ? $this->request->getVar('bc_pengeluaran_id')
+                : null,
             'penerimaan_barang_id' => $this->request->getVar('penerimaan_barang_id'),
             'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
             'status_post' => "WAITING",
@@ -259,7 +269,9 @@ class ReturPembelianLokalBB extends BaseController
 
         $this->pengembalianBarangModel->update($id, [
             'company_id' => $this->this_company_id,
-            'bc_pengeluaran_id' => $this->request->getVar('bc_pengeluaran_id'),
+            'bc_pengeluaran_id' => ($this->request->getVar('bc_pengeluaran_id') !== "" && $this->request->getVar('bc_pengeluaran_id') !== null)
+                ? $this->request->getVar('bc_pengeluaran_id')
+                : null,
             'penerimaan_barang_id' => $this->request->getVar('penerimaan_barang_id'),
             'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
             'tanggal_surat_jalan' => $this->request->getVar('tanggal_retur_barang') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('tanggal_retur_barang')), "Y-m-d") : "",
@@ -316,7 +328,6 @@ class ReturPembelianLokalBB extends BaseController
 
         $data = [
             'dataDivisi' => $this->divisiModel->getDivisiAccess(),
-            'dataDokumenPabean' => $this->metaDataModel->where('name', "jenis_dok_aju")->where('value', "BC 4.1")->findAll(),
             'dataPengembalianBarang' => $dataPengembalianBarang,
             'dataPengembalianBarangDetail' => $resultPengembalianDetail,
             'dataPenerimaanBarang' => $dataPenerimaanBarang
@@ -394,7 +405,7 @@ class ReturPembelianLokalBB extends BaseController
             ]);
         }
 
-        if ($pengembalianBarang['bc_pengeluaran_id'] == 0) {
+        if ($pengembalianBarang['bc_pengeluaran_id'] == '0') {
             // NON PABEAN LANGSNG POTONG STOK
             try {
                 $penerimaanBarang = $this->penerimaanBarangModel

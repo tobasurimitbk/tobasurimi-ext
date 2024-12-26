@@ -115,7 +115,7 @@ class AmbilPinjamanKaryawan extends BaseController
                     "tidakHadir" => $p->tidak_hadir . " Kali",
                     "statusPinjaman" => $p->status_pinjaman,
                     "isBolehMinjam" => $p->is_boleh_minjam,
-                    "nominalPinjaman" => "Rp " . number_format($p->nominal, 2, ',', '.'),
+                    "nominalPinjaman" => $p->nominal,
                     "is_ambil" => $p->is_ambil,
                     // helper
                     "monthYear" => $p->month_year,

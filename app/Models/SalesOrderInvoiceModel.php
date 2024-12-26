@@ -44,6 +44,7 @@ class SalesOrderInvoiceModel extends Model
         'tax_value',
         'jenis_penjualan',
         'nama_ecommerce',
+        'pay_amount',
     ];
 
     // Dates
@@ -496,8 +497,7 @@ class SalesOrderInvoiceModel extends Model
         $selectQry = "sales_order_invoice.*,
                       DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
                       customers.name AS nama_pelanggan,
-                      customers.kode AS kode_pelanggan,
-                      IFNULL(sales_order.no_sales_order, surat_jalan_so.no_surat_jalan) AS document_no";
+                      customers.kode AS kode_pelanggan";
 
         $salesOrderInvoiceLokal = $this->asObject()
             ->select($selectQry)

@@ -143,7 +143,7 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input value="<?= number_format($barangDetail['qty_lpb'], 2) ?>" readonly id="barang_detail_jumlah_satuan" name="barang_detail_jumlah_satuan" type="text" class="form-control barang_detail_jumlah_satuan" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input value="<?= $barangDetail['qty_lpb'] ?>" readonly id="barang_detail_jumlah_satuan" name="barang_detail_jumlah_satuan" type="text" class="form-control barang_detail_jumlah_satuan" placeholder="">
                                     <label>Jumlah Satuan</label>
                                     <small><i>Jumlah diterima sesuai dengan LPB</i></small>
                                 </div>
@@ -164,7 +164,7 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_jumlah_kemasan" value="<?= $barangDetail['jumlah_kemasan'] ?>" readonly name="barang_detail_jumlah_kemasan" type="text" class="form-control barang_detail_jumlah_kemasan" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input id="barang_detail_jumlah_kemasan" value="<?= $barangDetail['jumlah_kemasan'] ?>" readonly name="barang_detail_jumlah_kemasan" type="text" class="form-control barang_detail_jumlah_kemasan" placeholder="">
                                     <label>Jumlah Kemasan</label>
                                     <small><i>Nama Kemasan(dari LPB) : <?= $barangDetail['kemasan_name'] ?></i></small>
                                 </div>
@@ -184,13 +184,13 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input value="<?= $bc40DokumenBarang != null ? $bc40DokumenBarang['netto'] : '' ?>" id="barang_detail_berat_bersih" name="barang_detail_berat_bersih" type="text" class="form-control barang_detail_berat_bersih" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input value="<?= $bc40DokumenBarang != null ? $bc40DokumenBarang['netto'] : '' ?>" id="barang_detail_berat_bersih" name="barang_detail_berat_bersih" type="text" class="form-control barang_detail_berat_bersih" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Berat Bersih (Kg)</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input value="<?= $bc40DokumenBarang != null ? $bc40DokumenBarang['volume'] : '0' ?>" id="barang_detail_volume" name="barang_detail_volume" type="text" class="form-control barang_detail_volume" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input value="<?= $bc40DokumenBarang != null ? $bc40DokumenBarang['volume'] : '0' ?>" id="barang_detail_volume" name="barang_detail_volume" type="text" class="form-control barang_detail_volume" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Volume (M3)</label>
                                 </div>
                             </div>
@@ -201,23 +201,23 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating">
-                                    <input readonly id="barang_detail_harga_penyerahan" value="<?= formatRupiah($barangDetail['harga'], 2) ?>" maxlength="24" name="barang_detail_harga_penyerahan" type="text" class="form-control barang_detail_harga_penyerahan" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input readonly id="barang_detail_harga_penyerahan" value="<?= number_format($barangDetail['harga']) ?>" maxlength="24" name="barang_detail_harga_penyerahan" type="text" class="form-control barang_detail_harga_penyerahan" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Harga Penyerahan</label>
                                     <small><i>Harga penyerahan sesuai dengan total harga LPB diterima <br> (termasuk diskon & biaya tambahan)</i></small><br>
-                                    <small class="mb-3"><i>Harga Sebelum Diskon: <?= formatRupiah($barangDetail['harga_sebelum_diskon']) ?></i></small>
+                                    <small class="mb-3"><i>Harga Sebelum Diskon: <?= number_format($barangDetail['harga_sebelum_diskon']) ?></i></small>
                                 </div>
                             </div>
 
                             <div class="mt-1">
                                 <div class="form-floating">
-                                    <input id="barang_detail_harga_penggantian" readonly maxlength="24" name="barang_detail_harga_penggantian" type="text" value="<?= formatRupiah($barangDetail['biaya_tambahan']) ?>" class="form-control barang_detail_harga_penggantian" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input id="barang_detail_harga_penggantian" readonly maxlength="24" name="barang_detail_harga_penggantian" type="text" value="<?= number_format($barangDetail['biaya_tambahan']) ?>" class="form-control barang_detail_harga_penggantian" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Harga Penggantian/Nilai Jasa</label>
                                     <small class="mb-3"><i>Diambil dari biaya tambahan Purchase Order</i></small>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_diskon" readonly maxlength="24" name="barang_detail_diskon" type="text" value="<?= formatRupiah($barangDetail['diskon']) ?>" class="form-control barang_detail_fob" placeholder="" onchange="this.value = formatRupiah(this.value)">
+                                    <input id="barang_detail_diskon" readonly maxlength="24" name="barang_detail_diskon" type="text" value="<?= number_format($barangDetail['diskon']) ?>" class="form-control barang_detail_fob" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Diskon</label>
                                 </div>
                             </div>
@@ -857,6 +857,18 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-barang-dokumen"));
+                    var barangDetailHargaPenyerahan = destroyFormatRupiah($('#barang_detail_harga_penyerahan').val());
+                    var barangDetailHargaPenggantian = destroyFormatRupiah($('#barang_detail_harga_penggantian').val());
+                    var barangDetailDiskon = destroyFormatRupiah($('#barang_detail_diskon').val());
+                    var barangDetailVolume = destroyFormatRupiah($('#barang_detail_volume').val());
+                    var barangDetailBeratBersih = destroyFormatRupiah($('#barang_detail_berat_bersih').val());
+
+                    formData.set("barang_detail_harga_penyerahan", barangDetailHargaPenyerahan);
+                    formData.set("barang_detail_harga_penggantian", barangDetailHargaPenggantian);
+                    formData.set("barang_detail_diskon", barangDetailDiskon);
+                    formData.set("barang_detail_volume", barangDetailVolume);
+                    formData.set("barang_detail_berat_bersih", barangDetailBeratBersih);
+
                     formData.append("penerimaan_barang_id", "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>");
                     formData.append("barang1_id", "<?= encrypt($barangDetail['barang1_id']) ?>");
                     formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
@@ -1041,25 +1053,6 @@
                 });
             }
         })
-    }
-
-    // HELPER
-    function formatRupiah(angka) {
-        var formatter = new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR'
-        });
-        var parsedNumber = parseFloat(angka);
-        if (isNaN(parsedNumber)) {
-            return "0,00";
-        }
-        return formatter.format(parsedNumber).replace('Rp', '').trim();
-    }
-
-    function convertRupiahToNumber(rupiah) {
-        var withoutDot = rupiah.replace(/\./g, '');
-        var numberWithDot = withoutDot.replace(',', '.');
-        return parseFloat(numberWithDot);
     }
 </script>
 

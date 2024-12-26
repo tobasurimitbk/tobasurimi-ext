@@ -166,13 +166,13 @@
             <div class="row">
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="gajiPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($payrollDetail['nominal_gaji_harian'], 2, ',', '.') ?>">
+                        <input disabled autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" id="gajiPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($payrollDetail['nominal_gaji_harian'], 2, ',', '.') ?>">
                         <label for="floatingInput">Gaji (Per Hari)</label>
                     </div>
                 </div>
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($payrollDetail['nominal_cadangan'], 2, ',', '.') ?>">
+                        <input disabled autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($payrollDetail['nominal_cadangan'], 2, ',', '.') ?>">
                         <label for="floatingInput">Cadangan (Per Hari)</label>
                     </div>
                 </div>
@@ -458,7 +458,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input name="nominal" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" id="nominalKomponenGaji" class="form-control target input-picker" value="">
+                                <input name="nominal" onkeyup="this.value = greatFormatRupiah(this.value);" autocomplete="one-time-code" type="text" id="nominalKomponenGaji" class="form-control target input-picker" value="">
                                 <label for="nominalKomponenGaji" id="nominalGajiModal">Nominal</label>
                             </div>
 
@@ -506,7 +506,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input name="nominal" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" id="nominalDendaKeterlambatan" class="form-control target input-picker" value="">
+                                <input name="nominal" onkeyup="this.value = greatFormatRupiah(this.value);" autocomplete="one-time-code" type="text" id="nominalDendaKeterlambatan" class="form-control target input-picker" value="">
                                 <label for="nominalDendaKeterlambatan" id="nominalDendaKeterlambatan">Nominal</label>
                             </div>
 
@@ -532,7 +532,7 @@
 
         $('#nominalGajiModal').text("Nominal (" + tipe + ")");
         $('#namaKomponenGaji').val(komponenGaji);
-        $('#nominalKomponenGaji').val(formatRupiah(nominal));
+        $('#nominalKomponenGaji').val(greatFormatRupiah(nominal));
         $("input[name='komponenGajiID']").val(id);
 
         $('#perhitunganGajiModal').modal('show');
@@ -631,7 +631,7 @@
         $('#tanggalKeterlambatan').val(tanggal);
         $('#waktuMasuk').val(checkin);
         $('#totalJamKeterlambatan').val(total_jam_keterlambatan);
-        $('#nominalDendaKeterlambatan').val(formatRupiah(nominal));
+        $('#nominalDendaKeterlambatan').val(greatFormatRupiah(nominal));
 
         $('#rekapKeterlambatanPresensiModal').modal('show');
     });
@@ -761,20 +761,5 @@
 </script>
 
 <script>
-    function formatRupiah(angka) {
-        if (angka === null) {
-            angka = 0;
-        }
-
-        angka = angka.toString();
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return 'Rp. ' + ribuanFormatted + ',' + desimal;
-    }
 </script>
 <?= $this->endSection(); ?>

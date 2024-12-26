@@ -177,7 +177,10 @@
             },
             {
                 data: "total",
-                className: "text-center"
+                className: "text-center",
+                render: function (param) {
+                    return greatFormatRupiah(param);
+                }
             },
             {
                 data: "currencyName",

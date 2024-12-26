@@ -74,7 +74,6 @@
                                 }
                                 ?>
                             </select>
-                            <label for="floatingInput">No Order</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -221,7 +220,10 @@
                 },
                 {
                     data: "harga_barang",
-                    className: "text-center"
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        return greatFormatRupiah(destroyFormatRupiah(data));
+                    }
                 },
                 {
                     data: "disc",
@@ -229,7 +231,10 @@
                 },
                 {
                     data: "amount",
-                    className: "text-center"
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        return greatFormatRupiah(destroyFormatRupiah(data));
+                    }
                 }
             ],
             columnDefs: [{
@@ -550,8 +555,8 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                                window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
-                                            })
+                                            window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
+                                        })
                                 } else {
                                     Swal.fire({
                                         icon: 'error',

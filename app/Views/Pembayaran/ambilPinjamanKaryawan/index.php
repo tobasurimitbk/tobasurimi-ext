@@ -240,7 +240,7 @@
                     let is_boleh_minjam = row.isBolehMinjam;
                     let status_pinjaman = row.statusPinjaman;
                     let id = row.id;
-                    return formatRupiah(nominalPinjaman);
+                    return greatFormatRupiah(nominalPinjaman);
                 }
             },
 

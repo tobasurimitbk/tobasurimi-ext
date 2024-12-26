@@ -77,7 +77,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" placeholder="Nominal Pembayaran">
+                                <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" placeholder="Nominal Pembayaran">
                                 <label for="floatingInput">Nominal Pembayaran</label>
                             </div>
                         </div>
@@ -548,6 +548,8 @@
                         const csrf = $(`[name="${csrfToken}"]`);
                         let id = $('.id').val();
                         let data = new FormData(document.querySelector(".create-form"));
+                        let nominalPembayaran = destroyFormatRupiah($('.nominal_pembayaran').val())
+                        data.set('nominal_pembayaran', nominalPembayaran);
                         if (id) {
                             $.ajax({
                                 url: "<?= base_url("pembayaran-lain/update"); ?>",

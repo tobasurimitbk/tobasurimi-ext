@@ -158,38 +158,52 @@
                 if (status == "NEW") {
                     if (used == "NOT USED") {
                         return `
+                        <?php if (can('Penjualan Ekspor', 'Order Form', 'a')): ?>
                             <button data-toggle="tooltip" title="Posting" onclick="updateStatus('${id}', 'POSTED')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                             </button>
+                            <?php endif; ?>
+                            <?php if (can('Penjualan Ekspor', 'Order Form', 'd')): ?>
                             <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash">
                                 <i class="fa fa-trash"></i>
                             </button>
+                            <?php endif; ?>
+                            <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-internasional/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
+                            <?php endif; ?>
                         `
                     } else {
                         return `
+                            <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-internasional/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
+                            <?php endif; ?>
                         `
                     }
                 } else {
                     if (used == "NOT USED") {
                         return `
+                            <?php if (can('Penjualan Ekspor', 'Order Form', 'ua')): ?>
                             <button data-toggle="tooltip" title="Un Posting" onclick="updateStatus('${id}', 'UNPOST')" type="button" class="btn btn-danger" >
                                 <i class="fa fa-ban" aria-hidden="true"></i>
                             </button>
+                            <?php endif; ?>
+                            <?php if (can('Penjualan Ekspor', 'Order Form', 'ua')): ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-internasional/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
+                            <?php endif; ?>
                         `
                     } else {
                         return `
+                            <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-internasional/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
+                            <?php endif; ?>
                         `
                     }
                 }

@@ -67,8 +67,8 @@ class ProsesRebusDetailModel extends Model
             if ($stock['kemasan_id'] == 0) {
                 $barangMaster = $barangMasterModel->find($stock['barang1_id']);
                 $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stock['barang2_id']);
-                $satuan = $satuanModel->find($barangMasterSpesifikasi['satuan_1']);
-                $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
+                $satuan = $barangMasterSpesifikasi == null ? null : $satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+                $barangName = $barangMaster != null && $barangMasterSpesifikasi != null ? $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'] : null;
             } else {
                 $kemasan = $kemasanModel->find($stock['kemasan_id']);
                 $satuan = $satuanModel->find($kemasan['satuan_id']);
@@ -78,8 +78,8 @@ class ProsesRebusDetailModel extends Model
             if ($stockOutput['kemasan_id'] == 0) {
                 $barangMaster = $barangMasterModel->find($stockOutput['barang1_id']);
                 $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stockOutput['barang2_id']);
-                $barangNameOutput = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
-                $satuanOutput = $satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+                $barangNameOutput = $barangMaster != null && $barangMasterSpesifikasi != null ? $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'] : '';
+                $satuanOutput = $barangMasterSpesifikasi != null ? $satuanModel->find($barangMasterSpesifikasi['satuan_1']) : null;
                 $satuanOutputName = $satuanOutput == null ? "-" : $satuanOutput['kode_satuan'];
             } else {
                 $kemasan = $kemasanModel->find($stockOutput['kemasan_id']);
@@ -98,7 +98,7 @@ class ProsesRebusDetailModel extends Model
             $bcType = $metaDataModel->find($stockList['bc_id']);
             $stockList['no_aju'] =  $stockList['no_aju'] == "-" ? "-" : $stockList['no_aju'];
             $stockList['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
-            $stockList['satuan'] = $satuan['kode_satuan'];
+            $stockList['satuan'] = $satuan == null ? '' : $satuan['kode_satuan'];
             $stockList['barang'] = strtoupper($barangName);
             $stockList['stock_id'] = $stockList['stock_id'];
             $stockList['type_barang'] = $stock['tipe_barang'];

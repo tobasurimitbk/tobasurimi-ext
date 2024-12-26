@@ -499,7 +499,10 @@ $routes->get('/pembayaran-invoice/create', 'Pembayaran\PembayaranInvoice::create
 $routes->get('/pembayaran-invoice/create-ekspor', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceEkspor', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/create-lain', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceLain', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/create-return', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceReturn', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/dropdown-invoice-return', 'Pembayaran\PembayaranInvoice::dropdownInvoiceReturn', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-dokumen-list', 'Pembayaran\PembayaranInvoice::getDokumenList', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/get-dokumen-invoice-lokal/(:segment)', 'Pembayaran\PembayaranInvoice::getDataDokumenInvoiceLokal/$1', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/get-dokumen-invoice-return/(:segment)', 'Pembayaran\PembayaranInvoice::getDataDokumenInvoiceReturn/$1', ['filter' => 'Auth']);
 $routes->get('pembayaran-invoice/get-valas-sales-ekspor', 'Pembayaran\PembayaranInvoice::getValas', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-barang-sales-lokal', 'Pembayaran\PembayaranInvoice::getBarangSalesLokal', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-barang-sales-ekspor', 'Pembayaran\PembayaranInvoice::getBarangSalesEkspor', ['filter' => 'Auth']);
@@ -1399,6 +1402,7 @@ $routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
     $routes->post('delete', 'BeaCukai\BC27::delete');
     $routes->post('posting', 'BeaCukai\BC27::posting');
     $routes->get('check-no-aju', 'BeaCukai\BC27::checkNoAju');
+    $routes->get('divisi', 'BeaCukai\BC27::dropdownDivisiByCompany');
 
     $routes->get('list-mutasi-global', 'BeaCukai\BC27::dropdownMutasiGlobal');
     $routes->get('list-barang-mutasi', 'BeaCukai\BC27::getListMutasiDetail');
@@ -1851,9 +1855,21 @@ $routes->get('/api/sync-attendances', 'API\Attendances::sync_attendance', ['filt
 //Jurnal
 $routes->get('/jurnal', 'Accounting\JurnalUmum\JurnalUmum::index', ['filter' => 'Auth']);
 $routes->post('/jurnal/generate-no-bukti', 'Accounting\JurnalUmum\JurnalUmum::generateNoBukti', ['filter' => 'Auth']);
-$routes->post('/jurnal/addJurnal', 'Accounting\JurnalUmum\JurnalUmum::save', ['filter' => 'Auth']);
+// $routes->post('/jurnal/addJurnal', 'Accounting\JurnalUmum\JurnalUmum::save', ['filter' => 'Auth']);
+$routes->post('/jurnal/import', 'Accounting\JurnalUmum\JurnalUmum::import', ['filter' => 'Auth']);
+$routes->get('/jurnal/import/template', 'Accounting\JurnalUmum\JurnalUmum::templateImport', ['filter' => 'Auth']);
 $routes->post('/jurnal/getSubAkuns', 'Accounting\JurnalUmum\JurnalUmum::searchSubAkun', ['filter' => 'Auth']);
 $routes->post('/jurnal/getSubAkunsExact', 'Accounting\JurnalUmum\JurnalUmum::searchSubAkunExact', ['filter' => 'Auth']);
+$routes->get('/jurnal/all', 'Accounting\JurnalUmum\JurnalUmum::all', ['filter' => 'Auth']);
+$routes->get('/jurnal/create', 'Accounting\JurnalUmum\JurnalUmum::create', ['filter' => 'Auth']);
+$routes->post('/jurnal/save', 'Accounting\JurnalUmum\JurnalUmum::store', ['filter' => 'Auth']);
+$routes->post('/jurnal/update', 'Accounting\JurnalUmum\JurnalUmum::update', ['filter' => 'Auth']);
+$routes->get('/jurnal/id/(:segment)', 'Accounting\JurnalUmum\JurnalUmum::detail/$1', ['filter' => 'Auth']);
+$routes->post('/jurnal/delete', 'Accounting\JurnalUmum\JurnalUmum::delete', ['filter' => 'Auth']);
+$routes->get('/jurnal/print/(:segment)', 'Accounting\JurnalUmum\JurnalUmum::print/$1', ['filter' => 'Auth']);
+$routes->get('/jurnal/print-excel', 'Accounting\JurnalUmum\JurnalUmum::exportExcel', ['filter' => 'Auth']);
+$routes->get('/jurnal/print-pdf', 'Accounting\JurnalUmum\JurnalUmum::exportPdf', ['filter' => 'Auth']);
+
 // set no bukti
 $routes->get('/no-bukti', 'Accounting\NoBuktiAccounting\NoBukti::index', ['filter' => 'Auth']);
 $routes->get('/no-bukti/all', 'Accounting\NoBuktiAccounting\NoBukti::allNoBukti', ['filter' => 'Auth']);
@@ -1955,8 +1971,8 @@ $routes->get('/laporan-accounting/pembelian/printExcel/(:segment)/(:segment)/(:s
 $routes->get('/laporan-accounting/penjualan', 'Laporan\Accounting\Penjualan::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/penjualan', 'Laporan\Accounting\Penjualan::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/penjualan/all', 'Laporan\Accounting\Penjualan::allTransaksi', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/penjualan/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::LaporanPembelianPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/penjualan/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/penjualan/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Penjualan::LaporanPenjualanPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/penjualan/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Penjualan::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/hutang', 'Laporan\Accounting\Hutang::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/hutang', 'Laporan\Accounting\Hutang::index', ['filter' => 'Auth']);
@@ -1976,11 +1992,14 @@ $routes->get('/laporan-accounting/labarugi/printExcel/(:segment)/(:segment)', 'L
 
 $routes->get('/laporan-accounting/bukubesar', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
 $routes->post('/laporan-accounting/bukubesar', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/bukubesar/printPDF/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\BukuBesar::exportPDF/$1/$2/$3', ['filter' => 'Auth']);
+$routes->post('/laporan-accounting/bukubesar/printPDF', 'Laporan\Accounting\BukuBesar::exportPDF', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/bukubesar/printExcel/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\BukuBesar::exportExcel/$1/$2/$3', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/bukubesar/dropdown-account', 'Laporan\Accounting\BukuBesar::dropdownAccount', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/jurnalumum', 'Laporan\Accounting\JurnalUmum::index', ['filter' => 'Auth']);
-$routes->post('/laporan-accounting/jurnalumum', 'Laporan\Accounting\JurnalUmum::index', ['filter' => 'Auth']);
+$routes->post('/laporan-accounting/jurnalumum/getAll', 'Laporan\Accounting\JurnalUmum::getAll', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/jurnalumum/import', 'Laporan\Accounting\JurnalUmum::import', ['filter' => 'Auth']);
+$routes->post('/laporan-accounting/jurnalumum/import', 'Laporan\Accounting\JurnalUmum::import', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/jurnalumum/printPDF/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\JurnalUmum::exportPDF/$1/$2/$3', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/jurnalumum/printExcel/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\JurnalUmum::exportExcel/$1/$2/$3', ['filter' => 'Auth']);
 

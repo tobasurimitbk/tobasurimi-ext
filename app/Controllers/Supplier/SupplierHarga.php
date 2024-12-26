@@ -63,9 +63,9 @@ class SupplierHarga extends BaseController
                 "harga_umum_normal" => $data->harga_umum,
                 "harga_bulanan_normal" => $data->harga_bulanan,
                 "harga_harian_normal" => $data->harga_harian,
-                "harga_umum"        =>  number_format($data->harga_umum, 2, '.', ','),
-                "harga_harian"      =>  number_format($data->harga_harian, 2, '.', ','),
-                "harga_bulanan"     =>  number_format($data->harga_bulanan, 2, '.', ',')
+                "harga_umum"        =>  floatval($data->harga_umum),
+                "harga_harian"      =>  floatval($data->harga_harian),
+                "harga_bulanan"     =>  floatval($data->harga_bulanan)
             ]);
         }
 

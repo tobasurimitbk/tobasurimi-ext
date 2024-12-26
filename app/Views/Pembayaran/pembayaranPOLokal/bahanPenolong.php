@@ -141,7 +141,10 @@
             },
             {
                 data: "amount",
-                className: "text-center"
+                className: "text-center",
+                render: function (data, type, row) {
+                    return greatFormatRupiah(data);
+                },
             },
             {
                 data: "id",

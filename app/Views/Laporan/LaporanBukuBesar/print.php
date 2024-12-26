@@ -49,90 +49,97 @@
 
 <body>
   <h5>Laporan Buku Besar</h5>
-  <h6>PT. TOBA SURIMI INDUSTRIES, Tbk ()</h6>
-  <h6><?= ($dateStart != "All") ? $dateStart : "" ?> - <?= ($dateEnd != "Now") ? $dateEnd : "" ?></h6>
+  <h6>PT. TOBA SURIMI INDUSTRIES, Tbk</h6>
+  <h6><b>Laporan Buku Besar</b> Periode <?= $_POST['dateStart'] ?> s.d <?= @$_POST['dateEnd'] ?></h6>
 
-  <table width="100%" id="table1
+  <?php if (count($jurnalUmum) > 0): ?>
+    <?php foreach ($jurnalUmum as $j): ?>
+      <div style="margin-top: 10px; margin-bottom:10px;">
+        <b><?= $j['number'] ?> - <?= $j['name'] ?></b>
+      </div>
+      <table width="100%" id="table1
       style=" margin-top: -20px;">
-    <thead>
-      <tr>
-        <th>Nama Akun / Tanggal</th>
-        <th>Transaksi</th>
-        <th>No.</th>
-        <th>Deskripsi</th>
-        <th>Debit</th>
-        <th>Kredit</th>
-        <th>Saldo</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php
-      function format_ribuan($nilai)
-      {
-        $nilais = "";
-        if ($nilai < 0) {
-          $nilaiFloat = floatval($nilai);
-          $nilais = '(' . number_format(abs($nilaiFloat), 2, ',', '.') . ')';
-        } else {
-          $nilaiFloat = floatval($nilai);
-          $nilais = number_format($nilaiFloat, 2, ',', '.');
-        }
-        return $nilais;
-      }
-      // kelompok
-      foreach ($dataHeaderAkun as $HeaderAkunData) :
-        foreach ($dataJurnalUmumWithGroup as $JurnalUmumDataGroup) :
-          if ($JurnalUmumDataGroup->header_id == $HeaderAkunData->id) :
-      ?>
-            <tr class="clickable" data-toggle="collapse" data-target=".collapse_<?= $HeaderAkunData->hexid; ?>" aria-expanded="false" data-header-id="<?= $HeaderAkunData->hexid; ?>">
-              <td colspan="7"><i class="fas fa-chevron-down"></i><?= $HeaderAkunData->no_header . "-" . $HeaderAkunData->nama_header; ?></td>
-            </tr>
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Jenis Transaksi</th>
+            <th>No Transaksi</th>
+            <th>Desc</th>
+            <th>Currency</th>
+            <th>Exchange Rate</th>
+            <th>Debit</th>
+            <th>Kredit</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
 
+        <tbody>
+          <tr>
+            <td colspan="8">Saldo Awal : </td>
+            <td><?= toRupiah($j['saldo_lama']) ?></td>
+          </tr>
           <?php
-          endif;
-        endforeach;
-        $saldo = 0;
-        $totalsaldo = 0;
-        $totaldebit = 0;
-        $totalkredit = 0;
-        foreach ($dataJurnalUmum as $JurnalUmumData) :
-          if ($JurnalUmumData->header_id == $HeaderAkunData->id) :
-            if ($JurnalUmumData->debit == 0) {
-              $saldo = $saldo + $JurnalUmumData->debit - $JurnalUmumData->kredit;
-            } else {
-              $saldo = $saldo + $JurnalUmumData->debit;
-            }
-            $totaldebit += $JurnalUmumData->debit;
-            $totalkredit += $JurnalUmumData->kredit;
+          $sisaSaldo = $j['saldo_lama'];
+          $totalKredit = 0;
+          $totalDebit = 0;
+
           ?>
-            <tr class="collapse_<?= $HeaderAkunData->hexid; ?> collapse out">
-              <td><?= date('d-m-Y', strtotime($JurnalUmumData->tanggal_jurnal)); ?></td>
-              <td><?= $JurnalUmumData->value; ?></td>
-              <td><?= $JurnalUmumData->no_transaksi; ?></td>
-              <td><?= $JurnalUmumData->keterangan; ?></td>
-              <td><?= format_ribuan($JurnalUmumData->debit); ?></td>
-              <td><?= format_ribuan($JurnalUmumData->kredit); ?></td>
-              <td><?= format_ribuan($saldo); ?></td>
+          <?php foreach ($j['result'] as $r): ?>
+            <?php
+            $sisaSaldo += ($r['debit'] * $r['kurs']) - ($r['kredit'] * $r['kurs']);
+            $totalDebit += $r['debit'] * $r['kurs'];
+            $totalKredit += $r['kredit'] * $r['kurs'];
+            ?>
+            <tr>
+              <td><?= date('d/m/Y', strtotime($r['tanggal_jurnal'])) ?></td>
+              <td><?= $r['jenis_transaksi'] ?></td>
+              <td><?= $r['no_transaksi'] ?></td>
+              <td><?= $r['keterangan'] ?></td>
+              <td><?= toRupiah(abs($r['debit'] - $r['kredit'])) . " " . "<b>" . $r['valas'] . "</b>" ?></td>
+              <td><?= $r['kurs'] == "1" ? "" : toRupiah($r['kurs']) ?></td>
+              <td><?= toRupiah($r['debit'] * $r['kurs']) ?></td>
+              <td><?= toRupiah($r['kredit'] * $r['kurs']) ?></td>
+              <td><?= toRupiah($sisaSaldo) ?></td>
             </tr>
-          <?php
-          endif;
-        endforeach;
-        foreach ($dataJurnalUmumWithGroup as $JurnalUmumDataGroup) :
-          if ($JurnalUmumDataGroup->header_id == $HeaderAkunData->id) :
-          ?>
-            <tr data-header-id="<?= $HeaderAkunData->hexid; ?>">
-              <td colspan="4" style="text-align: right;">Total <?= $HeaderAkunData->no_header . "-" . $HeaderAkunData->nama_header; ?></td>
-              <td><?= format_ribuan($totaldebit); ?></td>
-              <td><?= format_ribuan($totalkredit); ?></td>
-              <td><?= format_ribuan($totaldebit - $totalkredit); ?></td>
-            </tr>
-      <?php
-          endif;
-        endforeach; // akhir kelompok 
-      endforeach; // akhir kelompok 
-      ?>
-    </tbody>
-  </table>
+          <?php endforeach; ?>
+          <tr>
+            <td colspan="6" style="text-align: center;font-weight:bold;">
+              <b>Sub Total</b>
+            </td>
+            <td>
+              <b>
+                <?= toRupiah($totalDebit) ?>
+              </b>
+            </td>
+            <td>
+              <b>
+                <?= toRupiah($totalKredit) ?>
+              </b>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td colspan="6" style="text-align: center;">
+              <b>Total</b>
+            </td>
+            <td></td>
+            <td></td>
+            <td>
+              <b>
+                <?= toRupiah($sisaSaldo) ?>
+              </b>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    <?php endforeach; ?>
+
+  <?php else: ?>
+
+    <div style="text-align: center;font-size:16px;" role="alert">
+      <h6> Silahkan Pilih Akun yang Akan Dieksekusi</h6>
+    </div>
+  <?php endif; ?>
 </body>
 
 </html>

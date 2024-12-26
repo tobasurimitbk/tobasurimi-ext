@@ -183,13 +183,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_sebenarnya : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_sebenarnya" name="cong_sebenarnya" id="cong_sebenarnya" placeholder="Cong Sebenarnya (Opsional)">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_sebenarnya : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control cong_sebenarnya" name="cong_sebenarnya" id="cong_sebenarnya" placeholder="Cong Sebenarnya (Opsional)">
                             <label for="floatingInput">Cong Sebenarnya (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_batasan : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_batasan" name="cong_batasan" id="cong_batasan" placeholder="Cong Batasan (Opsional)">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_batasan : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control cong_batasan" name="cong_batasan" id="cong_batasan" placeholder="Cong Batasan (Opsional)">
                             <label for="floatingInput">Cong Batasan (Opsional)</label>
                         </div>
                     </div>
@@ -197,7 +197,7 @@
                 <div class="row">
                     <div class="col md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->subsidi_langsung : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control subsidi_langsung" name="subsidi_langsung" id="subsidi_langsung" placeholder="Subsidi Langsung (Opsional)">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->subsidi_langsung : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control subsidi_langsung" name="subsidi_langsung" id="subsidi_langsung" placeholder="Subsidi Langsung (Opsional)">
                             <label for="floatingInput">Tambahan Langsung (Opsional)</label>
                         </div>
                     </div>
@@ -332,13 +332,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Umum" onchange="this.value = formatRupiah2(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Umum" onkeyup="this.value = greatFormatRupiah(this.value)">
                             <label for="floatingInput">Harga Umum</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control daily_price" name="daily_price" id="daily_price" placeholder="Harga Harian" onchange="this.value = formatRupiah2(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control daily_price" name="daily_price" id="daily_price" placeholder="Harga Harian" onkeyup="this.value = greatFormatRupiah(this.value)">
                             <label for="floatingInput">Harga Harian</label>
                         </div>
                     </div>
@@ -346,7 +346,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control monthly_price" name="monthly_price" id="monthly_price" placeholder="Harga Bulanan" onchange="this.value = formatRupiah2(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control monthly_price" name="monthly_price" id="monthly_price" placeholder="Harga Bulanan" onkeyup="this.value = greatFormatRupiah(this.value)">
                             <label for="floatingInput">Harga Bulanan</label>
                         </div>
                     </div>
@@ -361,7 +361,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onchange="this.value = formatRupiah2(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onkeyup="this.value = greatFormatRupiah(this.value)">
                             <label for="floatingInput">Total Harga</label>
                         </div>
                     </div>
@@ -429,10 +429,10 @@
                             <tr>
                                 <td colspan="2"></td>
                                 <td><b>TOTAL</b></td>
-                                <td><b>0.00</b></td>
-                                <td><b>0.00</b></td>
-                                <td><b>0.00</b></td>
-                                <td><b>0.00</b></td>
+                                <td><b>0,00</b></td>
+                                <td><b>0,00</b></td>
+                                <td><b>0,00</b></td>
+                                <td><b>0,00</b></td>
                                 <td colspan="2"></td>
                                 <td style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>"></td>
                             </tr>
@@ -463,6 +463,11 @@
             $('#lpb_otomatis').attr('disabled', true);
         </script>
     <?php endif; ?>
+    <script>
+        $('#cong_sebenarnya').keyup();
+        $('#cong_batasan').keyup();
+        $('#subsidi_langsung').keyup();
+    </script>
 
 <?php else : ?>
     <script>
@@ -580,9 +585,9 @@
             if (id_detail == '') {
                 $(".satuan_id").val(satuan_id).change();
             }
-            $(".harga").val(parseInt(umum.toString().replaceAll(",", "")));
-            $(".daily_price").val(parseInt(harian.toString().replaceAll(",", "")));
-            $(".monthly_price").val(parseInt(bulanan.toString().replaceAll(",", "")));
+            $(".harga").val(greatFormatRupiah(destroyFormatRupiah(umum)));
+            $(".daily_price").val(greatFormatRupiah(destroyFormatRupiah(harian)));
+            $(".monthly_price").val(greatFormatRupiah(destroyFormatRupiah(bulanan)));
 
             $(".qty").val("");
             $(".total").val("");
@@ -871,23 +876,23 @@
 
         $(".qty, .harga, .daily_price, .monthly_price").keyup(function() {
             var qty = $(".qty").val() ? parseFloat($(".qty").val()) : 0;
-            var harga = parseFloat(convertRupiahToNumber($('.harga').val()) || 0);
-            var daily_price = parseFloat(convertRupiahToNumber($('.daily_price').val()) || 0);
-            var monthly_price = parseFloat(convertRupiahToNumber($('.monthly_price').val()) || 0);
+            var harga = destroyFormatRupiah($('.harga').val()) || 0;
+            var daily_price = parseFloat(destroyFormatRupiah($('.daily_price').val()) || 0);
+            var monthly_price = parseFloat(destroyFormatRupiah($('.monthly_price').val()) || 0);
 
             var gabungan_harga = harga + daily_price + monthly_price;
             let total = (gabungan_harga * qty);
-            $(".total").val(formatRupiah2(total));
+            $(".total").val(greatFormatRupiah(total));
         });
 
         $(".total").keyup(function() {
-            var total = parseFloat(convertRupiahToNumber($('.total').val()) || 0);
+            var total = parseFloat(destroyFormatRupiah($('.total').val()) || 0);
             var qty = $(".qty").val() ? parseFloat(Number($(".qty").val())) : 1;
 
             var harga = total / qty;
-            $(".daily_price").val(formatRupiah2('0'));
-            $(".monthly_price").val(formatRupiah2('0'));
-            $(".harga").val(formatRupiah2(harga));
+            $(".daily_price").val(greatFormatRupiah('0'));
+            $(".monthly_price").val(greatFormatRupiah('0'));
+            $(".harga").val(greatFormatRupiah(harga));
         });
 
         $(document).on('click', '.edit-table-detail', function(evt) {
@@ -981,9 +986,17 @@
                             if (result.isConfirmed) {
                                 const csrf = $(`[name="${csrfToken}"]`);
                                 let data = new FormData(document.querySelector(".create-form"));
+                                let congSebenarnya = destroyFormatRupiah($('#cong_sebenarnya').val());
+                                let congBatasan = destroyFormatRupiah($('#cong_batasan').val());
+                                let subsidiLangsung = destroyFormatRupiah($('#subsidi_langsung').val());
+
+                                data.set('cong_sebenarnya', congSebenarnya);
+                                data.set('cong_batasan', congBatasan);
+                                data.set('subsidi_langsung', subsidiLangsung);
                                 data.append("items", JSON.stringify(list_items))
                                 data.append("barang_id", $('.barang_id').val());
                                 data.append("total", total);
+
                                 let id = $(".id").val();
 
                                 // UPDATE
@@ -1261,11 +1274,11 @@
             let kode_satuan = $(".satuan_id option:selected").data('kode_satuan');
             let peti = $(".peti").val()
             let quality = $(".quality").val()
-            let harga = convertRupiahToNumber($(".harga").val() || 0)
-            let daily_price = convertRupiahToNumber($(".daily_price").val() || 0)
+            let harga = destroyFormatRupiah($(".harga").val() || 0)
+            let daily_price = destroyFormatRupiah($(".daily_price").val() || 0)
             let qty = $(".qty").val()
-            let total = convertRupiahToNumber($(".total").val())
-            let monthly_price = convertRupiahToNumber($(".monthly_price").val() || 0)
+            let total = destroyFormatRupiah($(".total").val())
+            let monthly_price = destroyFormatRupiah($(".monthly_price").val() || 0)
             let keterangan = $(".keterangan").val()
             let validate_same = false;
 
@@ -1294,11 +1307,11 @@
                                 list_items[index].kode_satuan = kode_satuan;
                                 list_items[index].peti = peti;
                                 list_items[index].quality = quality;
-                                list_items[index].harga = harga;
-                                list_items[index].daily_price = daily_price;
+                                list_items[index].harga = destroyFormatRupiah(harga);
+                                list_items[index].daily_price = destroyFormatRupiah(daily_price);
                                 list_items[index].qty = qty;
-                                list_items[index].total = total;
-                                list_items[index].monthly_price = monthly_price;
+                                list_items[index].total = destroyFormatRupiah(total);
+                                list_items[index].monthly_price = destroyFormatRupiah(monthly_price);
                                 list_items[index].keterangan = keterangan;
                             }
                         });
@@ -1314,11 +1327,11 @@
                             kode_satuan: kode_satuan,
                             peti: peti,
                             quality: quality,
-                            harga: harga,
-                            daily_price: daily_price,
+                            harga: destroyFormatRupiah(harga),
+                            daily_price: destroyFormatRupiah(daily_price),
                             qty: qty,
-                            total: total,
-                            monthly_price: monthly_price,
+                            total: destroyFormatRupiah(total),
+                            monthly_price: destroyFormatRupiah(monthly_price),
                             keterangan: keterangan
                         });
                     }
@@ -1615,9 +1628,9 @@
             row += '<td>' + no + '</td>';
             row += '<td>' + item.nama_spesifikasi + '</td>';
             row += '<td>' + item.kode_satuan + '</td>';
-            row += '<td>' + formatRupiah2(item.harga) + '</td>';
-            row += '<td>' + formatRupiah2(item.daily_price) + '</td>';
-            row += '<td>' + formatRupiah2(item.monthly_price) + '</td>';
+            row += '<td>' + greatFormatRupiah(item.harga) + '</td>';
+            row += '<td>' + greatFormatRupiah(item.daily_price) + '</td>';
+            row += '<td>' + greatFormatRupiah(item.monthly_price) + '</td>';
             row += '<td>' + item.qty + '</td>';
             row += '<td>' + item.peti + '</td>';
             row += '<td>' + item.quality + '</td>';
@@ -1653,10 +1666,10 @@
                     <tr>
                         <td colspan="2"></td>
                         <td><b>TOTAL</b></td>
-                        <td><b>${formatRupiah2(umumTotal)}</b></td>
-                        <td><b>${formatRupiah2(harianTotal)}</b></td>
-                        <td><b>${formatRupiah2(bulananTotal)}</b></td>
-                        <td><b>${(qtyTotal.toFixed(4))}</b></td>
+                        <td><b>${greatFormatRupiah(umumTotal)}</b></td>
+                        <td><b>${greatFormatRupiah(harianTotal)}</b></td>
+                        <td><b>${greatFormatRupiah(bulananTotal)}</b></td>
+                        <td><b>${(greatFormatRupiah(qtyTotal))}</b></td>
                         <td colspan="2"></td>
                         <td style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>"></td>
                     </tr>
@@ -1684,39 +1697,6 @@
         window.open(url, "_blank");
     }
 
-    function formatRupiah2(x) {
-        let min = false;
-        x = x.toString();
-        if (x.includes("-")) {
-            min = true;
-        } else {
-            min = false;
-        }
-        x = x.replace(/-/g, '');
-
-        let parts = x.split(".");
-        parts[0] = parts[0].replace(/,/g, '');
-        let bilangan = parts[0];
-
-        let number_string = bilangan.toString(),
-            sisa = number_string.length % 3,
-            rupiah = number_string.substr(0, sisa),
-            ribuan = number_string.substr(sisa).match(/\d{3}/g);
-
-        if (ribuan) {
-            let separator = sisa ? ',' : '';
-            rupiah += separator + ribuan.join(',');
-        }
-        parts[0] = rupiah;
-
-        if (parts[1]) {
-            parts[1] = parts[1].slice(0, 2).padEnd(2, '0');
-        } else {
-            parts[1] = '00';
-        }
-
-        return (min ? '-' : '') + parts.join(".");
-    }
 
     function convertRupiahToNumber(rupiah) {
         return rupiah.replace(/,/g, '');

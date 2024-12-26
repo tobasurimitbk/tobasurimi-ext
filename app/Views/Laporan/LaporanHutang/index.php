@@ -4,22 +4,16 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <div class="col-md-10">
-            <h1>Laporan Hutang</h1>
-        </div>
-
-        <div class="col-md-2 text-right">
-            <div class="btn-group">
-                <button type="button" class="btn btn-warning">Export</button>
-                <button type="button" class="btn btn-warning dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                    <span class="sr-only">Toggle Dropdown</span>
-                </button>
-                <div class="dropdown-menu" role="menu">
-                    <a class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-accounting/pembelian/printPDF"); ?>')">PDF</a>
-                    <a class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/pembelian/printExcel"); ?>')">Excel</a>
-                </div>
-            </div>
-        </div>
+        <h1>Laporan Hutang</h1>
+        <?php if (can('Laporan', 'Accounting', 'p')) : ?>
+            <button style="right: 10px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <li><button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-accounting/penjualan/printPDF"); ?>')">PDF</button></li>
+                <li><button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/penjualan/printExcel"); ?>')">EXCEL</button></li>
+            </ul>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -162,9 +156,15 @@
             }, {
                 data: "nominal_idr",
                 className: "text-center",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
             }, {
                 data: "remaining_idr",
                 className: "text-center",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
             }, ],
             columnDefs: [{
                 defaultContent: "-",
