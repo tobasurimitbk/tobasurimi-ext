@@ -739,13 +739,13 @@ class PembayaranInvoice extends BaseController
             // Ambil data return berdasarkan semua ID
             $salesOrderreturnData = $this->salesOrderReturnModel->whereIn('id', $idArray)->findAll();
             $salesOrderReturnDetailData = $this->salesOrderReturnDetailModel
-                ->select('sales_order_return.no_return as no_faktur, sales_order_return_detail.id as sales_order_return_detail_id, sales_order_return_detail.id_sales_order_return as sales_order_return_id, qty_return, harga_barang_return, qty_return, amount_return, kode_barang, barang_name, pembayaran_invoice_detail.keterangan_pajak, pembayaran_invoice_detail.nominal_pajak')
-                ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_detail_id = sales_order_return_detail.id', 'left')
-                ->join('barang_master_sales', 'sales_order_return_detail.id_barang_return = barang_master_sales.id')
-                ->join('sales_order_return', 'sales_order_return_detail.id_sales_order_return = sales_order_return.id', 'left')
-                ->whereIn('id_sales_order_return', $idArray)
-                ->where('sales_order_return_detail.deletedAt', null)
-                ->findAll();
+                    ->select('sales_order_return.no_return as no_faktur, sales_order_return_detail.id as sales_order_return_detail_id, sales_order_return_detail.id_sales_order_return as sales_order_return_id, qty_return, harga_barang_return, qty_return, amount_return, kode_barang, barang_name')
+                    ->join('barang_master_sales', 'sales_order_return_detail.id_barang_return = barang_master_sales.id', 'left')
+                    ->join('sales_order_return', 'sales_order_return_detail.id_sales_order_return = sales_order_return.id', 'left')
+                    ->whereIn('id_sales_order_return', $idArray)
+                    ->where('sales_order_return_detail.deletedAt', null)
+                    ->findAll();
+
 
                
 
