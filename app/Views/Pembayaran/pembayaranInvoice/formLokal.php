@@ -973,7 +973,7 @@ function addSummaryRows(table, total_amount, total_invoice, limit_bayar, totalSu
         const noBuktiPembayaranText = noBuktiPembayaranElement.value.trim();
 
         // Ambil semua opsi yang dipilih dari elemen <select>
-        const selectedNoDokumen = Array.from(noDokumenElement.selectedOptions).map(option => `TERIMA A/ ${option.text}`);
+        const selectedNoDokumen = Array.from(noDokumenElement.selectedOptions).map(option => `TERIMA A/ INVOICE ${option.text}`);
         const selectedCustomer = Array.from(customerElement.selectedOptions).map(option => option.text);
 
         // Gabungkan nilai opsi yang dipilih ke dalam textarea
