@@ -675,6 +675,8 @@
                         });
                         // bahan digunakan produksi
                         res.dataProduksiBahanDigunakan.forEach(function(item) {
+                            console.log(item);
+
                             if (item.barang_name != undefined) {
                                 list_items_barang_digunakan.push(item);
                             }
@@ -1230,9 +1232,9 @@
             var summaryTotalHargaSatuan = 0;
             list_items_saldo_akhir.map((item, index) => {
                 // counting total
-                hargaUmum += item.harga_umum !== null ? parseFloat(item.harga_umum) : 0;
-                hargaHarian += item.harga_harian !== null ? parseFloat(item.harga_harian) : 0;
-                hargaBulanan += item.harga_bulanan !== null ? parseFloat(item.harga_bulanan) : 0;
+                hargaUmum += item.price1 !== null ? parseFloat(item.price1) : 0;
+                hargaHarian += item.price2 !== null ? parseFloat(item.price2) : 0;
+                hargaBulanan += item.price3 !== null ? parseFloat(item.price3) : 0;
                 stok = item.stok_total !== null ? parseFloat(item.stok_total) : 0;
                 totalHarga = (hargaUmum + hargaHarian + hargaBulanan) * stok;
                 totalHargaSatuan = (hargaUmum + hargaHarian + hargaBulanan);

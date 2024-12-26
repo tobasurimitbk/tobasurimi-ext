@@ -904,7 +904,7 @@ class RMPurchaseOrderModel extends Model
         rm_purchase_orders.pph AS poPPH,
         satuans.kode_satuan AS satuanName, 
         CONCAT(rm_purchase_orders.po_no) AS po_no, 
-        (SUM(rm_purchase_order_details.daily_price + rm_purchase_order_details.monthly_price + rm_purchase_order_details.general_price) / SUM(rm_purchase_order_details.qty)) AS avg_price_per_qty
+        (SUM(rm_purchase_order_details.daily_price + rm_purchase_order_details.monthly_price + rm_purchase_order_details.general_price)) AS avg_price_per_qty
     ";
 
         $poBBLokalData = $this->asObject()

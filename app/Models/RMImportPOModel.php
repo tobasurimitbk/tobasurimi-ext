@@ -310,7 +310,7 @@ class RMImportPOModel extends Model
             rm_import_po_details.spesifikasi_id AS barang2_id,
             satuans.kode_satuan AS satuanName, 
             GROUP_CONCAT(rm_import_pos.po_no) AS po_no,
-            (SUM(rm_import_po_details.price) / SUM(rm_import_po_details.qty)) AS avg_price_per_qty
+            (SUM(rm_import_po_details.price)) AS avg_price_per_qty
         ";
 
         $poBBImportData = $this->asObject()

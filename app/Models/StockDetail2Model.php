@@ -421,6 +421,9 @@ class StockDetail2Model extends Model
             stock_details.no_dokumen AS no_dokumen_1,
             stock_details.stock_date,
             stock_details.sumber,
+            SUM(stock_details2.harga_umum) AS price1,
+            SUM(stock_details2.harga_harian) AS price2,
+            SUM(stock_details2.harga_bulanan) AS price3,
             (SUM(CASE WHEN stock_details.status = "In" 
             THEN stock_details2.qty ELSE 0 END) - 
             SUM(CASE WHEN stock_details.status = "Out" 

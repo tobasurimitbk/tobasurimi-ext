@@ -38,6 +38,8 @@ use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\ProductionResultDetailModel;
 use App\Models\ProductionResultModel;
+use App\Models\ProsesRebusDetailModel;
+use App\Models\ProsesRebusModel;
 use App\Models\RasioBahanPenolongModel;
 use App\Models\RasioBarangDigunakanAlokasiModel;
 use App\Models\RasioBarangDigunakanModel;
@@ -106,6 +108,8 @@ class RasioController extends BaseController
     protected $mutasiDetailModel;
     protected $jasaVendorOutModel;
     protected $jasaVendorOutDetailModel;
+    protected $prosesRebusModel;
+    protected $prosesRebusDetailModel;
     protected $tutupBukuModel;
     protected $stockTutupBukuModel;
     protected $materialRequestsModel;
@@ -148,6 +152,8 @@ class RasioController extends BaseController
         $this->jasaVendorInDetailModel = new JasaVendorInDetailModel();
         $this->jasaVendorOutModel = new JasaVendorOutModel();
         $this->jasaVendorOutDetailModel = new JasaVendorOutDetailModel();
+        $this->prosesRebusModel = new ProsesRebusModel();
+        $this->prosesRebusDetailModel = new ProsesRebusDetailModel();
         $this->stockModel = new StockModel();
         $this->stockDetail2Model = new StockDetail2Model();
         $this->barangMasterModel = new BarangMasterModel();
@@ -752,117 +758,135 @@ class RasioController extends BaseController
                 }
                 $totalHarga = $totalQty * $hargaSatuan;
                 $value->totalQtyLPB = $totalQty;
-                $value->totalHargaLPB = $hargaSatuan;
-                $value->hargaSatuanLPB = $hargaSatuan != 0 && $totalQty != 0 ? $hargaSatuan / $totalQty : 0;
+                $value->totalHargaLPB = $hargaSatuan * $totalQty;
+                $value->hargaSatuanLPB = $hargaSatuan != 0 && $totalQty != 0 ? $hargaSatuan : 0;
                 $value->satuanLPB = $satuanLPB;
             }
 
             foreach ($dataProduksiBahanDigunakan as &$value) {
                 $stockDokumenResult = explode(',', $value['stock_dokumen']);
+                // var_dump($stockDokumenResult);
 
                 foreach ($stockDokumenResult as $key => $stockDokumen) {
-                    if (preg_match('/\((PO\/[^)]+)\)/', $stockDokumen, $matches)) {
+                    if (preg_match('/\(([^)]+)\)/', $stockDokumen, $matches)) {
                         // Jika ada teks dalam kurung, gunakan yang di dalam kurung
                         $poNo = $matches[1];
                         $jasaVendorNo = trim(explode(' (', $stockDokumen)[0]);
+                        // var_dump("masuk atas");
                     } else {
                         // Jika tidak ada kurung, gunakan nilai langsung
                         $poNo = $stockDokumen;
                         $jasaVendorNo = 0;
+                        // var_dump("masuk bawah");
                     }
 
                     $poBBLokal = $this->rmPurchaseOrderModel->where('po_no', $poNo)->first();
                     $poBBImport = $this->rmImportPOModel->where('po_no', $poNo)->first();
                     $poBP = $this->amPurchaseOrderModel->where('po_no', $poNo)->first();
                     $jasaVendorIn = $this->jasaVendorInModel->where('no_penerimaan_surat_jalan', $jasaVendorNo)->first();
+                    $prosesRebus = $this->prosesRebusModel->where('no_rebus', $jasaVendorNo)->first();
+
+                    // var_dump($prosesRebus);
+                    // var_dump($jasaVendorNo);
 
                     if ($jasaVendorNo != 0) {
-                        $jasaVendorInDetailCheck = $this->jasaVendorInDetailModel
-                            ->join('stock', "stock.id = jasa_vendor_in_detail.stock_in_id")
-                            ->where('jasa_vendor_in_id', $jasaVendorIn['id'])
-                            ->where('stock.barang1_id', $value['barang1_id'])
-                            ->where('stock.barang2_id', $value['barang2_id'])
-                            ->where('jasa_vendor_in_detail.no_aju_in', $value['no_aju'])
-                            ->findAll();
-                        // var_dump($jasaVendorInDetailCheck);
-                        foreach ($jasaVendorInDetailCheck as $valueJasaVendorIn) {
-                            $jasaVendorOutDetail = $this->jasaVendorOutDetailModel
-                                ->join('stock', "stock.id = jasa_vendor_out_detail.stock_out_id")
-                                ->where('jasa_vendor_out_detail.id', $valueJasaVendorIn['jasa_vendor_out_detail_id'])
-                                ->where('jasa_vendor_out_detail.no_aju_out', $value['no_aju'])
+                        if ($jasaVendorIn) {
+                            $jasaVendorInDetailCheck = $this->jasaVendorInDetailModel
+                                ->join('stock', "stock.id = jasa_vendor_in_detail.stock_in_id")
+                                ->where('jasa_vendor_in_id', $jasaVendorIn['id'])
+                                ->where('stock.barang1_id', $value['barang1_id'])
+                                ->where('stock.barang2_id', $value['barang2_id'])
+                                ->where('jasa_vendor_in_detail.no_aju_in', $value['no_aju'])
                                 ->findAll();
-                            foreach ($jasaVendorOutDetail as $valueJasaVendorOut) {
-                                $totalQty = 0;
-                                $totalHarga = 0;
-                                $hargaSatuan = 0;
-                                $satuanPO = "";
-                                if ($poBBLokal) {
-                                    $poBBLokalDetail = $this->rmPurchaseOrderDetailModel
-                                        ->select('rm_purchase_order_details.*, satuans.kode_satuan')
-                                        ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
-                                        ->where('rm_purchase_order_id', $poBBLokal['id'])
-                                        ->where('barang1_id', $valueJasaVendorOut['barang1_id'])
-                                        ->where('barang2_id', $valueJasaVendorOut['barang2_id'])
-                                        ->findAll();
-                                    foreach ($poBBLokalDetail as $valuePoBBLokal) {
-                                        $kursValue = 1;
-                                        $hargaSatuan = $valuePoBBLokal['general_price'] + $valuePoBBLokal['daily_price'] + $valuePoBBLokal['monthly_price'];
-                                        $totalQty += $valuePoBBLokal['qty'];
-                                        $satuanPO = $valuePoBBLokal['kode_satuan'];
-                                    }
-                                    $totalHarga = $value['qty'] * $hargaSatuan;
-                                }
 
-                                if ($poBBImport) {
-                                    $poBBImportDetail = $this->rmImportPODetailModel
-                                        ->select('rm_import_po_details.*, satuans.kode_satuan, rm_import_pos.currency, rm_import_pos.po_date')
-                                        ->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
-                                        ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left')
-                                        ->where('rm_import_po_id', $poBBImport['id'])
-                                        ->where('barang_id', $valueJasaVendorOut['barang1_id'])
-                                        ->where('spesifikasi_id', $valueJasaVendorOut['barang2_id'])
-                                        ->findAll();
-                                    foreach ($poBBImportDetail as $valuePoBBImport) {
-                                        $kurs = $this->kursModel
-                                            ->where('metadata_id', $valuePoBBImport['currency'])
-                                            ->where('start_date <=', $valuePoBBImport['po_date'])
-                                            ->where('end_date >=', $valuePoBBImport['po_date'])
-                                            ->first();
-                                        $kursValue = $kurs ? $kurs['nilai_kurs'] : 1;
-                                        $hargaSatuanDisc = ($valuePoBBImport['price'] * $kursValue) * ($valuePoBBImport['disc'] / 100);
-                                        $hargaSatuan = ($valuePoBBImport['price'] * $kursValue) - $hargaSatuanDisc;
-                                        $totalQty += $valuePoBBImport['qty'];
-                                        $satuanPO = $valuePoBBImport['kode_satuan'];
+                            foreach ($jasaVendorInDetailCheck as $valueJasaVendorIn) {
+                                $jasaVendorOutDetail = $this->jasaVendorOutDetailModel
+                                    ->join('stock', "stock.id = jasa_vendor_out_detail.stock_out_id")
+                                    ->where('jasa_vendor_out_detail.id', $valueJasaVendorIn['jasa_vendor_out_detail_id'])
+                                    ->where('jasa_vendor_out_detail.no_aju_out', $value['no_aju'])
+                                    ->findAll();
+
+                                foreach ($jasaVendorOutDetail as $valueJasaVendorOut) {
+                                    $totalQty = 0;
+                                    $totalHarga = 0;
+                                    $hargaSatuan = 0;
+                                    $satuanPO = "";
+
+                                    $poDetails = [];
+                                    if ($poBBLokal) {
+                                        $poDetails = $this->rmPurchaseOrderDetailModel
+                                            ->select('rm_purchase_order_details.*, satuans.kode_satuan')
+                                            ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+                                            ->where('rm_purchase_order_id', $poBBLokal['id'])
+                                            ->where('barang1_id', $valueJasaVendorOut['barang1_id'])
+                                            ->where('barang2_id', $valueJasaVendorOut['barang2_id'])
+                                            ->findAll();
+                                    } elseif ($poBBImport) {
+                                        $poDetails = $this->rmImportPODetailModel
+                                            ->select('rm_import_po_details.*, satuans.kode_satuan, rm_import_pos.currency, rm_import_pos.po_date')
+                                            ->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
+                                            ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left')
+                                            ->where('rm_import_po_id', $poBBImport['id'])
+                                            ->where('barang_id', $valueJasaVendorOut['barang1_id'])
+                                            ->where('spesifikasi_id', $valueJasaVendorOut['barang2_id'])
+                                            ->findAll();
+                                    } elseif ($poBP) {
+                                        $poDetails = $this->amPurchaseOrderDetailModel
+                                            ->select('am_purchase_order_details.*, satuans.kode_satuan')
+                                            ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+                                            ->where('am_purchase_order_id', $poBP['id'])
+                                            ->where('barang_id', $valueJasaVendorOut['barang1_id'])
+                                            ->where('spesifikasi_id', $valueJasaVendorOut['barang2_id'])
+                                            ->findAll();
                                     }
-                                    $totalHarga = $totalQty * $hargaSatuan;
-                                }
-                                if ($poBP) {
-                                    $poBPDetail = $this->amPurchaseOrderDetailModel
-                                        ->select('am_purchase_order_details.*, satuans.kode_satuan')
-                                        ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
-                                        ->where('am_purchase_order_id', $poBP['id'])
-                                        ->where('barang_id', $valueJasaVendorOut['barang1_id'])
-                                        ->where('spesifikasi_id', $valueJasaVendorOut['barang2_id'])
-                                        ->findAll();
-                                    foreach ($poBPDetail as $valuePoBPDetail) {
-                                        $kurs = $this->kursModel
-                                            ->where('metadata_id', $valuePoBBImport['currency'])
-                                            ->where('start_date <=', $valuePoBBImport['po_date'])
-                                            ->where('end_date >=', $valuePoBBImport['po_date'])
-                                            ->first();
-                                        $kursValue = $kurs ? $kurs['nilai_kurs'] : 1;
-                                        $disc = $valuePoBPDetail['disc'] / 100;
-                                        $hargaSetelahDisc = $valuePoBPDetail['price'] * $disc;
-                                        $hargaSatuan = $valuePoBPDetail['price'] - $hargaSetelahDisc;
-                                        $totalQty += $valuePoBPDetail['qty'];
-                                        $satuanPO = $valuePoBPDetail['kode_satuan'];
+
+                                    foreach ($poDetails as $poDetail) {
+                                        $kursValue = 1;
+                                        if (isset($poDetail['currency']) && isset($poDetail['po_date'])) {
+                                            $kurs = $this->kursModel
+                                                ->where('metadata_id', $poDetail['currency'])
+                                                ->where('start_date <=', $poDetail['po_date'])
+                                                ->where('end_date >=', $poDetail['po_date'])
+                                                ->first();
+                                            $kursValue = $kurs ? $kurs['nilai_kurs'] : 1;
+                                        }
+                                        $disc = isset($poDetail['disc']) ? $poDetail['disc'] / 100 : 0;
+                                        $hargaSatuan = ($poDetail['price'] * $kursValue) * (1 - $disc);
+                                        $totalQty += $poDetail['qty'];
+                                        $satuanPO = $poDetail['kode_satuan'];
                                     }
+
                                     $totalHarga = $totalQty * $hargaSatuan;
+                                    $value['totalQtyPO'] = $value['qty'];
+                                    $value['totalHargaPO'] = $totalHarga;
+                                    $value['hargaSatuanPO'] = $hargaSatuan;
+                                    $value['satuanPO'] = $satuanPO;
                                 }
+                            }
+                        }
+                        if ($prosesRebus) {
+                            $totalQty = 0;
+                            $totalHarga = 0;
+                            $hargaSatuan = 0;
+                            $satuanPO = "";
+                            $prosesRebusDetailCheck = $this->prosesRebusDetailModel
+                                ->join('stock', 'stock.id = proses_rebus_detail.stock_hasil_rebus_id')
+                                ->join('stock_details', "stock_details.stock_id = proses_rebus_detail.stock_hasil_rebus_id AND stock_details.sumber = 'REBUS'")
+                                ->join('stock_details2', 'stock_details2.stock_id = proses_rebus_detail.stock_hasil_rebus_id AND stock_details2.stock_detail_id = stock_details.id AND stock_details2.stock_dokumen = proses_rebus_detail.stock_dokumen')
+                                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id AND barang_master_spesifikasi.barang_master_id = stock.barang1_id')
+                                ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
+                                ->where('proses_rebus_id', $prosesRebus['id'])
+                                ->where('stock.barang1_id', $value['barang1_id'])
+                                ->where('stock.barang2_id', $value['barang2_id'])
+                                ->findAll();
+
+                            foreach ($prosesRebusDetailCheck as $valueProsesRebusDetail) {
+                                $hargaSatuan = $valueProsesRebusDetail['harga_umum'] + $valueProsesRebusDetail['harga_harian'] + $valueProsesRebusDetail['harga_bulanan'];
+                                $totalHarga = $hargaSatuan * $value['qty'];
                                 $value['totalQtyPO'] = $value['qty'];
-                                $value['totalHargaPO'] = $totalHarga;
                                 $value['hargaSatuanPO'] = $hargaSatuan;
-                                $value['satuanPO'] = $satuanPO;
+                                $value['totalHargaPO'] = $totalHarga;
+                                $value['satuanPO'] = $valueProsesRebusDetail['kode_satuan'];
                             }
                         }
                     } else {
@@ -870,7 +894,7 @@ class RasioController extends BaseController
                         $totalHarga = 0;
                         $hargaSatuan = 0;
                         $satuanPO = "";
-                        if ($poBBLokal) {
+                        if ($poBBLokal && $jasaVendorNo == 0) {
                             $poBBLokalDetail = $this->rmPurchaseOrderDetailModel
                                 ->select('rm_purchase_order_details.*, satuans.kode_satuan')
                                 ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
@@ -887,7 +911,7 @@ class RasioController extends BaseController
                             $totalHarga = $value['qty'] * $hargaSatuan;
                         }
 
-                        if ($poBBImport) {
+                        if ($poBBImport && $jasaVendorNo == 0) {
                             $poBBImportDetail = $this->rmImportPODetailModel
                                 ->select('rm_import_po_details.*, satuans.kode_satuan, rm_import_pos.currency, rm_import_pos.po_date')
                                 ->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
@@ -910,7 +934,7 @@ class RasioController extends BaseController
                             }
                             $totalHarga = $totalQty * $hargaSatuan;
                         }
-                        if ($poBP) {
+                        if ($poBP && $jasaVendorNo == 0) {
                             $poBPDetail = $this->amPurchaseOrderDetailModel
                                 ->select('am_purchase_order_details.*, satuans.kode_satuan')
                                 ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
@@ -940,6 +964,8 @@ class RasioController extends BaseController
                     }
                 }
             }
+            unset($value);
+            // var_dump($dataProduksiBahanDigunakan);
             // akhir fungsi untuk bahan digunakan
 
             // definisi bahan digunakan proses ulang
