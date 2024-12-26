@@ -571,12 +571,12 @@ class PembayaranInvoice extends BaseController
             // Ambil data invoice berdasarkan semua ID
             $salesOrderInvoiceData = $this->salesOrderInvoiceModel->whereIn('id', $idArray)->findAll();
             $salesOrderInvoiceDetailData = $this->salesOrderInvoiceDetailModel
-                    ->select('sales_order_invoice.no_faktur, sales_order_invoice_detail.id as sales_order_invoice_detail_id, sales_order_invoice_detail.id_sales_order_invoice as sales_order_invoice_id, qty_invoice, harga_barang_invoice, qty_invoice, amount_invoice, kode_barang, barang_name')
-                    ->join('barang_master_sales', 'sales_order_invoice_detail.id_barang_invoice = barang_master_sales.id', 'left')
-                    ->join('sales_order_invoice', 'sales_order_invoice_detail.id_sales_order_invoice = sales_order_invoice.id', 'left')
-                    ->where('sales_order_invoice_detail.id_sales_order_invoice', $idArray)
-                    ->where('sales_order_invoice_detail.deletedAt', null)
-                    ->findAll();
+                ->select('sales_order_invoice.no_faktur, sales_order_invoice_detail.id as sales_order_invoice_detail_id, sales_order_invoice_detail.id_sales_order_invoice as sales_order_invoice_id, qty_invoice, harga_barang_invoice, qty_invoice, amount_invoice, kode_barang, barang_name')
+                ->join('barang_master_sales', 'sales_order_invoice_detail.id_barang_invoice = barang_master_sales.id', 'left')
+                ->join('sales_order_invoice', 'sales_order_invoice_detail.id_sales_order_invoice = sales_order_invoice.id', 'left')
+                ->where('sales_order_invoice_detail.id_sales_order_invoice', $idArray)
+                ->where('sales_order_invoice_detail.deletedAt', null)
+                ->findAll();
 
             // Jika ada ID pembayaran, tambahkan detailnya
             if (!empty($pembayaranInvoiceId)) {

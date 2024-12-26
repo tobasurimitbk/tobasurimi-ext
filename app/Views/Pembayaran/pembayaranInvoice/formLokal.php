@@ -777,7 +777,7 @@
             success: function(res) {
                 if (res.status && res.data.length > 0) {
                     res.data.forEach((data) => {
-                            if (!dataList.some(item => item.sales_order_invoice_id === data.sales_order_invoice_id)) {
+                           
                                 dataList.push({
                                     id: getID(),
                                     qty_invoice: data.qty_invoice,
@@ -793,7 +793,7 @@
                                     nama_akun_kas_lain: data.akun_kas_lain || "-",
                                     nama_akun_selisih_lain: data.akun_selisih_lain || "-"
                                 });
-                            }
+                            
                     });
                 }
 
