@@ -428,26 +428,30 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 const cleanListBarang = dataList.map((item, index) => {
-                                    const keterangan = $(`.keterangan-input[data-index="${index}"]`).val() || '';
-                                    const akunDebit = $(`.akun-debit[data-index="${index}"]`).val() || '';
-                                    const akunKredit = $(`.akun-kredit[data-index="${index}"]`).val() || '';
-                                    const pajakValue = destroyFormatRupiah($(`.pajak-input[data-index="${index}"]`).val()) || 0;
+                                    const keteranganBarang = $(`.keteranganBarang[data-index="${index}"]`).val() || '';  
+                                    const keteranganPajak = $(`.keteranganPajak[data-index="${index}"]`).val() || '';  
+                                    const akunDebit = $(`.akun-debit[data-index="${index}"]`).val() || '';         
+                                    const akunKredit = $(`.akun-kredit[data-index="${index}"]`).val() || '';       
+                                    const pajakValue = destroyFormatRupiah($(`.pajak-input[data-index="${index}"]`).val()) || 0; 
 
                                     return {
                                         ...item,
-                                        harga_barang_invoice: destroyFormatRupiah(item.harga_barang_return),
-                                        qty_invoice: destroyFormatRupiah(item.qty_return),
-                                        keterangan_pajak: keterangan,
+                                        harga_barang_invoice: destroyFormatRupiah(item.harga_barang_return),  
+                                        qty_invoice: item.qty_return,
+                                        keterangan: keteranganBarang,
+                                        keterangan_pajak: keteranganPajak,
                                         akun_debit: akunDebit,
                                         akun_kredit: akunKredit,
                                         nominal_pajak: pajakValue,
                                     };
                                 });
 
+                                const totalAmountInvoice = destroyFormatRupiah($(".total_amount_invoice").text()) || 0;
+                                const totalBayar = destroyFormatRupiah($(".total-bayar").val()) || 0;
                                 const formData = new FormData(document.querySelector(".create-form"));
-                                formData.append('total_amount_invoice', destroyFormatRupiah($(".total_amount_invoice").text()));
-                                formData.append('total_bayar', destroyFormatRupiah($(".total-bayar").val()));
-                                formData.append('list_barang', JSON.stringify(cleanListBarang));
+                                formData.append('total_amount_invoice', totalAmountInvoice);
+                                formData.append('total_bayar', totalBayar);
+                                formData.append('list_barang', JSON.stringify(cleanListBarang)); 
 
                                 $.ajax({
                                     url: "<?= base_url("/pembayaran-invoice/update"); ?>",
@@ -511,26 +515,32 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 const cleanListBarang = dataList.map((item, index) => {
-                                    const keterangan = $(`.keterangan-input[data-index="${index}"]`).val() || '';
-                                    const akunDebit = $(`.akun-debit[data-index="${index}"]`).val() || '';
-                                    const akunKredit = $(`.akun-kredit[data-index="${index}"]`).val() || '';
-                                    const pajakValue = destroyFormatRupiah($(`.pajak-input[data-index="${index}"]`).val()) || 0;
+                                    const keteranganBarang = $(`.keteranganBarang[data-index="${index}"]`).val() || '';  
+                                    const keteranganPajak = $(`.keteranganPajak[data-index="${index}"]`).val() || '';  
+                                    const akunDebit = $(`.akun-debit[data-index="${index}"]`).val() || '';         
+                                    const akunKredit = $(`.akun-kredit[data-index="${index}"]`).val() || '';       
+                                    const pajakValue = destroyFormatRupiah($(`.pajak-input[data-index="${index}"]`).val()) || 0; 
 
                                     return {
                                         ...item,
-                                        harga_barang_invoice: destroyFormatRupiah(item.harga_barang_return),
+                                        harga_barang_invoice: destroyFormatRupiah(item.harga_barang_return),  
                                         qty_invoice: item.qty_return,
-                                        keterangan_pajak: keterangan,
+                                        keterangan: keteranganBarang,
+                                        keterangan_pajak: keteranganPajak,
                                         akun_debit: akunDebit,
                                         akun_kredit: akunKredit,
                                         nominal_pajak: pajakValue,
                                     };
                                 });
 
+                                const totalAmountInvoice = destroyFormatRupiah($(".total_amount_invoice").text()) || 0;
+                                const totalBayar = destroyFormatRupiah($(".total-bayar").val()) || 0;
+
                                 const formData = new FormData(document.querySelector(".create-form"));
-                                formData.append('total_amount_invoice', destroyFormatRupiah($(".total_amount_invoice").text()));
-                                formData.append('total_bayar', destroyFormatRupiah($(".total-bayar").val()));
-                                formData.append('list_barang', JSON.stringify(cleanListBarang));
+                                formData.append('total_amount_invoice', totalAmountInvoice);
+                                formData.append('total_bayar', totalBayar);
+                                formData.append('list_barang', JSON.stringify(cleanListBarang)); 
+
                                 $.ajax({
                                     url: "<?= base_url("pembayaran-invoice/save"); ?>",
                                     data: formData,
@@ -848,105 +858,111 @@
         });
     }
 
-
-
     function drawTable(dataList, totalPembayaran, totalSudahDiBayar) {
         const table = $('#dataTable');
+
+        // Header tabel dengan kolom Keterangan setelah No Return
+        table.find('thead').html(`
+            <tr style="color: whitesmoke;">
+                <th style="text-align: center;">No Return</th>
+                <th style="text-align: center; width: 25%;">Keterangan</th>
+                <th style="text-align: center; width: 10%;">Kode Barang</th>
+                <th style="text-align: center; width: 15%;">Nama Barang</th>
+                <th style="text-align: center; width: 7%;">Qty</th>
+                <th style="text-align: center;">Harga Satuan</th>
+                <th style="text-align: center;">Sub Total</th>
+            </tr>
+        `);
         table.find('tbody').empty();
 
         let total_amount = 0;
-        let total_invoice_non_lain = 0;
 
-        // Loop to add rows to the table
         $.each(dataList, function (index, item) {
-            let newRow = $('<tr class="data-row" style="color: whitesmoke; border: 2px solid #ccc;">');
+            // Row untuk data barang
+            let newRow = $('<tr class="data-row" style="color: whitesmoke;">');
 
-            // Table Data Columns
-            newRow.append($('<td class="text-center border-right">').text(item.no_faktur));
+            // Kolom data barang dengan kolom Keterangan setelah No Return
+            newRow.append($('<td class="text-center">').text(item.no_faktur));
+
+            // Input keterangan
+            const keteranganBarang = $('<input type="text" class="form-control keteranganBarang" placeholder="Keterangan..." style="width: 100%;">')
+                .attr('data-index', index);
+            newRow.append($('<td class="text-center">').append(keteranganBarang));
+
+            // Kolom lainnya
             newRow.append($('<td class="text-center">').text(item.kode_barang));
             newRow.append($('<td class="text-center">').text(item.barang_name));
             newRow.append($('<td class="text-center">').text(item.qty_return));
             newRow.append($('<td class="text-center">').text(greatFormatRupiah(item.harga_barang_return)));
 
-            // Subtotal Column
-            const subtotalCell = $('<td class="text-center">').text(greatFormatRupiah(item.harga_barang_return * item.qty_return));
+            // Subtotal berdasarkan harga barang dan qty (tanpa pajak di sini)
+            let subtotalValue = item.harga_barang_return * item.qty_return;
+            const subtotalCell = $('<td class="text-center">').text(greatFormatRupiah(subtotalValue));
+
+            // Update total amount
+            total_amount += subtotalValue;
+
+            // Append to the row
             newRow.append(subtotalCell);
-
-            total_invoice_non_lain += destroyFormatRupiah(item.harga_barang_return) * item.qty_return;
-
             table.find('tbody').append(newRow);
 
-            // Add input row for descriptions, debit and credit accounts, and tax value
-            let inputRow = $('<tr class="input-row" style="background-color: #f9f9f9; color: #333; border: 2px solid #ccc;">');
+            // Row untuk input tambahan (pajak, debit, kredit) - tetap dihitung pajak dan diperbarui subtotal
+            let inputRow = $('<tr class="input-row" style="background-color: #f9f9f9; color: #333;">');
 
-            // Keterangan input
             inputRow.append(
-                $('<td colspan="1" class="text-right border-right">').text(
-                    "Keterangan (" + item.no_faktur + " - " + item.kode_barang + "):"
+                $('<td colspan="1">').text(
+                    "Pajak (" + item.no_faktur + " - " + item.kode_barang + "):"
                 )
             );
             inputRow.append(
                 $('<td colspan="2" class="text-left">').html(
-                    `<input type="text" data-index="${index}" class="form-control keterangan-input" placeholder="Masukkan keterangan" style="width: 100%;">`
+                    `<input type="text" data-index="${index}" class="form-control keteranganPajak" placeholder="Keterangan Pajak..." style="width: 100%;">`
                 )
             );
 
-            // Debit and Kredit Select Inputs
             let debitOptions = '';
             let kreditOptions = '';
-
-            // Generate the options dynamically from subsAkuns data
             $.each(subsAkuns, function (index, subs) {
                 debitOptions += `<option value="${subs.id}">${subs.no_sub} ${subs.nama_sub}</option>`;
                 kreditOptions += `<option value="${subs.id}">${subs.no_sub} ${subs.nama_sub}</option>`;
             });
 
-            let debitCell = $('<td class="text-center">').html(
+            inputRow.append($('<td class="text-center">').html(
                 `<div class="form-floating" style="height: 50px;">
                     <select class="form-select akun-debit" data-index="${index}" id="akun_debit_${index}" name="akun_debit" style="width: 100%;">
                         <option disabled selected value=""></option>
                         ${debitOptions}
                     </select>
-                </div>`
-            );
-            inputRow.append(debitCell);
+                </div>`  
+            ));
 
-            let kreditCell = $('<td class="text-center">').html(
+            inputRow.append($('<td class="text-center">').html(
                 `<div class="form-floating" style="height: 50px;">
                     <select class="form-select akun-kredit" data-index="${index}" id="akun_kredit_${index}" name="akun_kredit" style="width: 100%;">
                         <option disabled selected value=""></option>
                         ${kreditOptions}
                     </select>
                 </div>`
-            );
-            inputRow.append(kreditCell);
+            ));
 
-
-            // Pajak input
-            let pajakInput = $(`<input type="text" data-index="${index}" class="form-control pajak-input" placeholder="Nilai Pajak" style="width: 100%;">`);
-            pajakInput.on('keyup', function () {
-                let pajakValue = destroyFormatRupiah($(this).val()) || 0;
-                let subtotalValue = destroyFormatRupiah(item.harga_barang_return) * destroyFormatRupiah(item.qty_return);
-                if (pajakValue > subtotalValue) {
-                    $(this).val(greatFormatRupiah(subtotalValue));
-                    pajakValue = subtotalValue;
-                } else {
+            // Pajak dan penghitungan subtotal baru setelah pajak
+            const pajakInput = $('<input type="text" class="form-control pajak-input" placeholder="Nilai Pajak" style="width: 100%;">')
+                .attr('data-index', index)
+                .on('keyup', function () {
+                    let pajakValue = destroyFormatRupiah($(this).val()) || 0;
+                    if (pajakValue > subtotalValue) {
+                        pajakValue = subtotalValue;
+                    }
                     $(this).val(greatFormatRupiah(pajakValue));
-                }
 
-                // Perbaikan perhitungan subtotal dengan pembulatan
-                const newSubtotal = Math.round((subtotalValue - pajakValue) * 100) / 100;
-                subtotalCell.text(greatFormatRupiah(newSubtotal));
-            });
+                    // Calculate new subtotal after tax
+                    const newSubtotal = Math.round((subtotalValue - pajakValue) * 100) / 100;
+                    subtotalCell.text(greatFormatRupiah(newSubtotal)); // Update subtotal cell with the new value
+                });
 
-
-            let pajakCell = $('<td class="text-center">');
-            pajakCell.append(pajakInput);
-            inputRow.append(pajakCell);
-
+            inputRow.append($('<td colspan="2" class="text-center">').append(pajakInput));
             table.find('tbody').append(inputRow);
 
-            // Apply Select2 after the row has been appended
             inputRow.find('.akun-debit').select2({
                 placeholder: "Akun Debit",
                 theme: "bootstrap-5"
@@ -958,10 +974,7 @@
             });
         });
 
-        // Total amount calculation
-        total_amount = total_invoice_non_lain;
-
-        // Add summary row for total payment and discounts
+        // Add summary rows with the updated total amount
         addSummaryRows(
             table,
             total_amount,
@@ -982,15 +995,15 @@
         table.find('tbody').append(`
             <tr style="color:whitesmoke;">
                 <td colspan="5" style="text-align: right;">Total Pembayaran</td>
-                <td style="text-align:center;">${greatFormatRupiah(total_amount)}</td>
+                <td colspan="2" style="text-align:center;">${greatFormatRupiah(total_amount)}</td>
             </tr>
             <tr style="color:whitesmoke;">
                 <td colspan="5" style="text-align: right;">Total Sudah Dibayar</td>
-                <td class="total_dibayar" style="text-align:center;">${greatFormatRupiah(total_invoice)}</td>
+                <td colspan="2" class="total_dibayar" style="text-align:center;">${greatFormatRupiah(total_invoice)}</td>
             </tr>
             <tr style="color:whitesmoke;">
                 <td colspan="5" style="text-align: right;">Sisa Pembayaran</td>
-                <td class="total_amount_invoice" style="text-align:center;">${greatFormatRupiah(total_amount - total_invoice)}</td>
+                <td colspan="2" class="total_amount_invoice" style="text-align:center;">${greatFormatRupiah(total_amount - total_invoice)}</td>
             </tr>
         `);
 
@@ -998,7 +1011,7 @@
         table.find('tbody').append(`
             <tr style="color:whitesmoke;">
                 <td colspan="5" style="text-align: right;">Anda Membayar Sebesar</td>
-                <td style="text-align:center;">
+                <td colspan="2" style="text-align:center;">
                     <input 
                         autocomplete="one-time-code" 
                         data-id="" 
@@ -1030,6 +1043,7 @@
             $(this).val(greatFormatRupiah(numberValue));
         });
     }
+
 
     function deleteBarang(id) {
         var indexToRemove = -1;

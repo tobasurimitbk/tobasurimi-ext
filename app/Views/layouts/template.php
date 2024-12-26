@@ -48,6 +48,11 @@
 <script>
     function greatFormatRupiah(x) {
         var min = false;
+         // Pastikan x memiliki nilai yang valid sebelum memanggil toString
+        if (x === null || x === undefined) {
+            x = ""; // Berikan nilai default jika x null atau undefined
+        }
+
         x = x.toString();
         if (x.includes("-")) {
             min = true;
