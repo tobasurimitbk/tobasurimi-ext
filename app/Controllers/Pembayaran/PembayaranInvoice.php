@@ -740,13 +740,15 @@ class PembayaranInvoice extends BaseController
             // Ambil data return berdasarkan semua ID
             $salesOrderreturnData = $this->salesOrderReturnModel->whereIn('id', $idArray)->findAll();
             $salesOrderReturnDetailData = $this->salesOrderReturnDetailModel
-                ->select('sales_order_return.no_return as no_faktur, sales_order_return_detail.id as sales_order_return_detail_id, sales_order_return_detail.id_sales_order_return as sales_order_return_id, qty_return, harga_barang_return, qty_return, amount_return, kode_barang, barang_name, pembayaran_invoice_detail.keterangan_pajak, pembayaran_invoice_detail.nominal_pajak, pembayaran_invoice_detail.akun_kredit, pembayaran_invoice_detail.akun_debit, pembayaran_invoice_detail.keterangan')
+                ->select('sales_order_return.no_return as no_faktur, sales_order_return_detail.id as sales_order_return_detail_id, sales_order_return_detail.id_sales_order_return as sales_order_return_id, qty_return, harga_barang_return, qty_return, amount_return, kode_barang, barang_name, pembayaran_invoice_detail.keterangan_pajak, pembayaran_invoice_detail.nominal_pajak')
                 ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_detail_id = sales_order_return_detail.id', 'left')
                 ->join('barang_master_sales', 'sales_order_return_detail.id_barang_return = barang_master_sales.id')
                 ->join('sales_order_return', 'sales_order_return_detail.id_sales_order_return = sales_order_return.id', 'left')
                 ->whereIn('id_sales_order_return', $idArray)
                 ->where('sales_order_return_detail.deletedAt', null)
                 ->findAll();
+
+               
 
             // Jika ada ID pembayaran, tambahkan detailnya
             if (!empty($pembayaranreturnId)) {
@@ -761,33 +763,27 @@ class PembayaranInvoice extends BaseController
 
             // Proses data dari detail return
             foreach ($salesOrderReturnDetailData as $s) {
-                // Cek apakah kode barang sudah ada dalam dataBarang untuk mencegah duplikasi
-                if (!isset($dataBarang[$s['sales_order_return_detail_id']])) {
-                    $totalAmountreturn += $s['amount_return'];
-                    $dataBarang[$s['sales_order_return_detail_id']] = $s;
-                }
+                $totalAmountreturn += $s['amount_return'];
+                array_push($dataBarang, $s);
             }
 
             // Tambahkan data lain-lain jika ada
             if (isset($pembayaranInvoiceDatail)) {
                 foreach ($pembayaranInvoiceDatail as $p) {
-                    // Cek apakah ID sudah ada di dataBarang
-                    if (!isset($dataBarang[$p['sales_order_invoice_detail_id']])) {
-                        $dataBarang[$p['sales_order_invoice_detail_id']] = [
-                            "sales_order_return_detail_id" => $p['sales_order_invoice_detail_id'],
-                            "sales_order_return_id" => $p['sales_order_invoice_id'],
-                            "qty_return" => $p['qty'],
-                            "harga_barang_return" => $p['harga_satuan'],
-                            "amount_return" => $p['harga_total'],
-                            "kode_barang" => "LAIN-LAIN",
-                            "barang_name" => $p['nama_barang'],
-                            "kas" => $p['nama_barang'],
-                            "id_akun_kredit" => $p['id_akun_kas'],
-                            "id_akun_debit" => $p['id_akun_selisih'],
-                            "akun_kredit" => $p['no_sub_kas'] . ' - ' . $p['nama_sub_kas'],
-                            "akun_debit" => $p['no_sub_selisih'] . ' - ' . $p['nama_sub_selisih'],
-                        ];
-                    }
+                    array_push($dataBarang, [
+                        "sales_order_return_detail_id" => $p['sales_order_invoice_detail_id'],
+                        "sales_order_return_id" => $p['sales_order_invoice_id'],
+                        "qty_return" => $p['qty'],
+                        "harga_barang_return" => $p['harga_satuan'],
+                        "amount_return" => $p['harga_total'],
+                        "kode_barang" => "LAIN-LAIN",
+                        "barang_name" => $p['nama_barang'],
+                        "kas" => $p['nama_barang'],
+                        "id_akun_kredit" => $p['id_akun_kas'],
+                        "id_akun_debit" => $p['id_akun_selisih'],
+                        "akun_kredit" => $p['no_sub_kas'] . ' - ' . $p['nama_sub_kas'], // Gabungkan no_sub_kas dan nama_sub_kas
+                        "akun_debit" => $p['no_sub_selisih'] . ' - ' . $p['nama_sub_selisih'], // Gabungkan no_sub_selisih dan nama_sub_selisih
+                    ]);
                 }
             }
 
@@ -804,7 +800,7 @@ class PembayaranInvoice extends BaseController
 
         // Return data
         return $this->response->setJSON([
-            'data' => array_values($dataBarang), // Mengambil nilai dari dataBarang
+            'data' => $dataBarang,
             'totalPembayaran' => $pembayaranreturnData['total_bayar'] ?? 0,
             'status' => true
         ]);
