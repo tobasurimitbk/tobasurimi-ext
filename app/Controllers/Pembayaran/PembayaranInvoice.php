@@ -327,9 +327,11 @@ class PembayaranInvoice extends BaseController
         $salesOrderReturnData = $this->salesOrderReturnModel
                 ->select('sales_order_return.*, sales_order_invoice.id_customer, sales_order_invoice.total_invoice') // Pilih kolom yang diperlukan
                 ->join('sales_order_invoice', 'sales_order_invoice.id = sales_order_return.id_invoice', 'inner') // Relasi ke invoice
+                ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_id = sales_order_return.id', 'left') // Relasi ke pembayaran_invoice_detail
                 ->where('sales_order_return.deletedAt', null) // Hanya return yang aktif
                 ->where('sales_order_return.id_company', $this->this_company_id) // Perusahaan yang relevan
                 ->where('sales_order_invoice.id_customer', $customer_id_decrypt) // Filter berdasarkan customer
+                ->where('pembayaran_invoice_detail.id', null) // Hanya data yang tidak ada di pembayaran_invoice_detail
                 ->findAll();
 
         foreach ($salesOrderReturnData as $s) {
