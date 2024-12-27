@@ -295,6 +295,8 @@ class PembayaranInvoice extends BaseController
         $customer_id_decrypt = decrypt($customer_id);
         $dokumenList = [];
         $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel->where('deletedAt', null)
+            ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_id = sales_order_invoice.id', 'left') // Relasi ke pembayaran_invoice_detail
+            ->where('pembayaran_invoice_detail.id', null) // Hanya data yang tidak ada di pembayaran_invoice_detail
             ->where('id_company', $this->this_company_id)
             ->where('id_customer', $customer_id_decrypt)
             ->findAll();
