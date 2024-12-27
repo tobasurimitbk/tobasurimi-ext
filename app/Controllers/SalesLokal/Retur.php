@@ -364,9 +364,6 @@ class Retur extends BaseController
                     ->where('sales_order_return_detail.id_sales_order_return', $id)
                     ->findAll();
 
-                    var_dump($returnDetailData, 'ini pesanan');
-                    die;
-
             }
 
             if (!$returnDetailData) {
