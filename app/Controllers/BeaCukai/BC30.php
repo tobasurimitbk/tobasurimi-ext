@@ -19,6 +19,7 @@ use App\Models\KantorBeaCukaiModel;
 use App\Models\PengusahaTPBModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\CountryModel;
+use App\Models\CustomerModel;
 use App\Models\HsCodesModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\PengembalianBarangDetailModel;
@@ -28,6 +29,7 @@ use App\Models\SalesOrderLainDetailModel;
 use App\Models\SalesOrderLainModel;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use App\Models\SupplierModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -186,6 +188,14 @@ class BC30 extends BaseController
 
         foreach ($beaCukaiData['data'] as $data) {
             $detail = $this->bc30Model->detail($data->id);
+            if ($data->tipe_sales_order == "ORDER FORM EKSPOR" || $data->tipe_sales_order == "ORDER FORM LAIN") {
+                // CUSTOMER EKSPOR
+                $tipe_penerima = "CUSTOMER";
+            } else {
+                // SUPPLIER
+                $tipe_penerima = "SUPPLIER";
+            }
+
             array_push($dataBeaCukai, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
@@ -195,6 +205,7 @@ class BC30 extends BaseController
                 "no_aju"                => $data->no_aju . " / " . $data->no_daftar,
                 "tanggal_bc_30"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
                 "status_posting"        => $data->status_posting,
+                "tipe_penerima"         => $tipe_penerima
             ]);
         }
 
@@ -556,7 +567,6 @@ class BC30 extends BaseController
         if ($typeReference == "ORDER FORM EKSPOR") {
             $result = $this->bc30Model->getListSalesOrder(
                 $this->this_company_id,
-                "EKSPOR"
             );
         } elseif ($typeReference == "RETUR PEMBELIAN") {
             $result = $this->bc30Model->getListReturPembelian(
@@ -661,6 +671,7 @@ class BC30 extends BaseController
         $salesOrderExportData = $this->salesOrderExportModel
             ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
+            ->where('used', "USED")
             ->findAll();
         $pengembalianBarangData = $this->pengembalianBarangModel
             ->select('pengembalian_barang.*')

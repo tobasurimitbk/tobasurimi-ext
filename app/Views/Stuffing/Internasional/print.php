@@ -85,7 +85,7 @@
 </head>
 
 <body>
-    <div class="txt-center txt-bold"> <b>PENGELUARAN LOKAL</b></div>
+    <div class="txt-center txt-bold"> <b>PENGELUARAN EKSPOR</b></div>
     <table class="mt-5">
         <tr>
             <td width="550">Tanggal Dibuat : <?= $stuffingInternasional['tanggal']; ?></td>

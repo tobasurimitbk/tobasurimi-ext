@@ -16,26 +16,22 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable2" width="100%" border="1" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th style="text-align: center;" colspan="8">Detail Barang yang Keluar</th>
-                                <th style="text-align: center;" colspan="1">Data Harga</th>
-                            </tr>
-                            <tr>
                                 <th style="text-align: center;">No</th>
-                                <th style="text-align: center;">Asal Barang</th>
-                                <th style="text-align: center;">No Dokumen</th>
-                                <th style="text-align: center;">Supplier</th>
+                                <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Asal</th>
-                                <th style="text-align: center;">Tgl Penerimaan</th>
+                                <th style="text-align: center;">Kode Barang</th>
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
+                                <th style="text-align: center;">Departemen / Warehouse Pengeluaran</th>
                                 <th style="text-align: center;">Qty Keluar</th>
-                                <th style="text-align: center;">Total Harga</th>
+                                <th style="text-align: center;">Satuan</th>
+                                <th style="text-align: center;">Nilai Barang</th>
                             </tr>
                         </thead>
                         <tbody class="body-table">
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td colspan="9" style="text-align: center;">
+                                <td colspan="11" style="text-align: center;">
                                     Tidak Ada Barang
                                 </td>
                             </tr>
@@ -72,11 +68,10 @@
                         <thead class="thead-dark">
                             <tr style="text-align: center;">
                                 <th style="text-align:center;">No</th>
-                                <th style="text-align:center;">Asal Pengeluaran</th>
-                                <th style="text-align:center;">Nama Customer / Supplier</th>
-                                <th style="text-align:center;">No Sales Order</th>
-                                <th style="text-align:center;">Department / Warehouse Pengeluaran</th>
-                                <th style="text-align:center;">Tanggal</th>
+                                <th style="text-align:center;">Tujuan Pengeluaran</th>
+                                <th style="text-align:center;">Order Form</th>
+                                <th style="text-align:center;">Penerima</th>
+                                <th style="text-align:center;">Alamat</th>
                                 <th style="text-align:center;">Jumlah Barang</th>
                                 <th style="text-align:center;">Nilai Barang</th>
                                 <th style="text-align:center;">Detail Barang</th>
@@ -121,16 +116,15 @@
                     $.each(res, function(i, v) {
                         var newRow = $('<tr style="border: none">');
                         newRow.append($('<td style="text-align:center;">').text(no++));
-                        newRow.append($('<td style="text-align:center;">').text(v.asal_pengeluaran));
-                        newRow.append($('<td style="text-align:center;">').text(v.customer));
-                        newRow.append($('<td style="text-align:center;">').text(v.no_sales_order));
-                        newRow.append($('<td style="text-align:center;">').text(v.divisi + " / " + v.warehouse_name));
-                        newRow.append($('<td style="text-align:center;">').text(v.tanggal));
+                        newRow.append($('<td style="text-align:center;">').text(v.reference_type));
+                        newRow.append($('<td style="text-align:center;">').text(v.no_order));
+                        newRow.append($('<td style="text-align:center;">').text(v.penerima));
+                        newRow.append($('<td style="text-align:center;">').text(v.alamat));
                         newRow.append($('<td style="text-align:center;">').text(v.jumlah_barang));
                         newRow.append($('<td style="text-align:center;">').text(v.harga_barang));
                         newRow.append($('<td style="text-align:center;">').html(`
                             <div class="mt-0">
-                                <button  data-toggle="tooltip" title="Detail" onclick="displayDetails('${v.id}','${v.asal_pengeluaran}')" class="btn btn-success posting-spp">
+                                <button  data-toggle="tooltip" title="Detail" onclick="displayDetails('${v.id}','${v.reference_type}')" class="btn btn-success posting-spp">
                                     <i class="fa-solid fa-box"></i>
                                 </button>
                             <div>`));
@@ -138,7 +132,7 @@
                     });
                 } else {
                     var newRow = $('<tr style="border: none">');
-                    newRow.append($('<td colspan ="11"  style="text-align:center;">').text("Tidak ada Dokumen Bea Cukai"));
+                    newRow.append($('<td colspan ="9"  style="text-align:center;">').text("Tidak ada Dokumen Bea Cukai"));
                     table.find('tbody').append(newRow);
                 }
 
@@ -148,7 +142,7 @@
     }
 
 
-    function displayDetails(reference_id, asal_pengeluaran) {
+    function displayDetails(reference_id, reference_type) {
         $.ajax({
             url: `<?= base_url('bea-cukai-bc-25/list-reference-detail'); ?>`,
             method: "GET",
@@ -160,7 +154,7 @@
             },
             data: {
                 reference_id: reference_id,
-                asal_pengeluaran: asal_pengeluaran,
+                reference_type: reference_type,
             },
             dataType: "json",
             success: function(res) {
@@ -193,14 +187,14 @@
                    ${no++} 
                 `
                 ));
-                newRow.append($('<td style="text-align: center;">').text(v.sumber));
-                newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
-                newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
+                newRow.append($('<td style="text-align: center;">').text(v.tipe_barang));
                 newRow.append($('<td style="text-align: center;">').text(v.bc_type + '/' + v.no_aju));
-                newRow.append($('<td style="text-align: center;">').text(v.stock_date));
+                newRow.append($('<td style="text-align: center;">').text(v.kode_barang_internal));
                 newRow.append($('<td style="text-align: center;">').text(v.barang));
-                newRow.append($('<td style="text-align: center;">').text(v.qty_konversi + " " + v.satuan));
-                newRow.append($('<td style="text-align: center;">').text(formatRupiah(v.total_harga)));
+                newRow.append($('<td style="text-align: center;">').text(v.divisi + '/' + v.warehouse_name));
+                newRow.append($('<td style="text-align: center;">').text(v.qty_konversi));
+                newRow.append($('<td style="text-align: center;">').text(v.satuan));
+                newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.total_harga)));
                 table.find('tbody').append(newRow);
 
                 totalHarga = totalHarga + parseFloat(v.total_harga);
@@ -208,33 +202,8 @@
             // GRAND TOTAL
             var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996">');
             newRow.append($('<td style="text-align: right;" colspan="8">').html("<b>GRAND TOTAL</b>"));
-            newRow.append($('<td style="text-align: center;">').text(formatRupiah(totalHarga)));
+            newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(totalHarga)));
             table.find('tbody').append(newRow);
-        }
-    }
-
-    function formatRupiah(angka) {
-        if (angka === null) {
-            angka = 0;
-        }
-        angka = angka.toString();
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return ribuanFormatted + ',' + desimal;
-    }
-
-    function convertRupiahToNumber(rupiah) {
-        if (rupiah == "") {
-            return 0;
-        } else {
-            var withoutDot = rupiah.replace(/\./g, '');
-            var numberWithDot = withoutDot.replace(',', '.');
-            return parseFloat(numberWithDot);
         }
     }
 </script>

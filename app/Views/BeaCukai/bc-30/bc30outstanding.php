@@ -67,8 +67,8 @@
                         <thead class="thead-dark">
                             <tr style="text-align: center;">
                                 <th style="text-align:center;">No</th>
-                                <th style="text-align:center;">Form Pengeluaran</th>
-                                <th style="text-align:center;">No Order</th>
+                                <th style="text-align:center;">Tujuan Pengeluaran</th>
+                                <th style="text-align:center;">Order Form</th>
                                 <th style="text-align:center;">Penerima</th>
                                 <th style="text-align:center;">Alamat</th>
                                 <th style="text-align:center;">Jumlah Barang</th>
@@ -199,33 +199,6 @@
                 newRow.append($('<td style="text-align: center;">').text(v.harga));
                 table.find('tbody').append(newRow);
             });
-        }
-    }
-
-
-
-    function formatRupiah(angka) {
-        if (angka === null) {
-            angka = 0;
-        }
-        angka = angka.toString();
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return ribuanFormatted + ',' + desimal;
-    }
-
-    function convertRupiahToNumber(rupiah) {
-        if (rupiah == "") {
-            return 0;
-        } else {
-            var withoutDot = rupiah.replace(/\./g, '');
-            var numberWithDot = withoutDot.replace(',', '.');
-            return parseFloat(numberWithDot);
         }
     }
 </script>
