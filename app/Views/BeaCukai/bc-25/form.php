@@ -307,8 +307,6 @@
         $('#nama_penerima').val(selected.data('nama_penerima'));
         $('#alamat_penerima').val(selected.data('alamat_penerima'));
         $('#tanggal_reference').val(selected.data('tanggal_reference'));
-        $('#divisi').val(selected.data('divisi'));
-        $('#warehouse_name').val(selected.data('warehouse_name'));
         $('#keterangan').val(selected.data('keterangan'));
         // GET BARANG
         getListBarang();
@@ -733,18 +731,6 @@
                 })
             }
         })
-    }
-
-    function formatRupiah(angka) {
-        var formatter = new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR'
-        });
-        var parsedNumber = parseFloat(angka);
-        if (isNaN(parsedNumber)) {
-            return "0,00";
-        }
-        return formatter.format(parsedNumber).replace('Rp', '').trim();
     }
 </script>
 

@@ -443,7 +443,7 @@ class BC30Model extends Model
                 'no_sales_order' => $r['no_sales_order'],
                 'nama_customer' => $r['nama_penerima'],
                 'alamat_customer' => $r['alamat_penerima'],
-                'tanggal_reference' => date('d/m/Y', strtotime('tanggal_sales_order')),
+                'tanggal_reference' => date('d/m/Y', strtotime($r['tanggal'])),
                 'divisi' => $r['divisi'],
                 'warehouse_name' => $r['warehouse_name'],
                 'keterangan' => $r['keterangan'],

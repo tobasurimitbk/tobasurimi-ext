@@ -235,7 +235,7 @@ class BC25Model extends Model
                 'no_reference' => $r['no_sales_order'],
                 'nama_penerima' => $r['nama_penerima'],
                 'alamat_penerima' => $r['alamat_penerima'],
-                'tanggal_reference' => date('d/m/Y', strtotime('tanggal_sales_order')),
+                'tanggal_reference' => date('d/m/Y', strtotime($r['tanggal'])),
                 'keterangan' => $r['keterangan']
             ];
         }
@@ -245,8 +245,9 @@ class BC25Model extends Model
 
     public function getListPengembalianBarang($companyId, $pengembalianBarangId = null)
     {
-        // KHUSUS LPB LOKAL
+        $bc41Model = new BC41Model();
         $pengembalianBarangModel = new PengembalianBarangModel();
+
         $selectQry = "
             pengembalian_barang.*,
             suppliers.name AS nama_penerima,
@@ -263,6 +264,7 @@ class BC25Model extends Model
             ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id')
             ->where('pengembalian_barang.bc_pengeluaran_id', null)
             ->where('pengembalian_barang.deletedAt', null)
+            ->where('pengembalian_barang.status_post', 'FINISH')
             ->where('pengembalian_barang.company_id', $companyId)
             ->where('penerimaan_barang.status_penerimaan', "LOKAL")
             ->findAll();
@@ -270,12 +272,14 @@ class BC25Model extends Model
 
         foreach ($pengeluaranBarang as $s) {
             $bc25 = $this->where('pengembalian_barang_id', $s['id'])->first();
+            $bc41 = $bc41Model->where('pengembalian_barang_id', $s['id'])->first();
+
             if ($pengembalianBarangId != null) {
-                if ($bc25 == null || $pengembalianBarangId == $s['id']) {
+                if (($bc25 == null && $bc41 == null) || $pengembalianBarangId == $s['id']) {
                     array_push($result, $s);
                 }
             } else {
-                if ($bc25 == null) {
+                if ($bc25 == null && $bc41 == null) {
                     array_push($result, $s);
                 }
             }
@@ -300,6 +304,7 @@ class BC25Model extends Model
     public function getListSalesOrderLokal($companyId, $salesOrderId = null)
     {
         $salesOrderLokalModel = new SalesOrderModel();
+        $bc41Model = new BC41Model();
         // LOKAL
         $selectQry = "
             sales_order.id AS sales_order_id,
@@ -324,12 +329,13 @@ class BC25Model extends Model
         $result = array();
         foreach ($salesOrder as $s) {
             $bc25 = $this->where('sales_order_id', $s['sales_order_id'])->first();
+            $bc41 = $bc41Model->where('sales_order_id', $s['sales_order_id'])->first();
             if ($salesOrderId != null) {
-                if ($bc25 == null || $salesOrderId == $s['sales_order_id']) {
+                if (($bc25 == null && $bc41 == null) || $salesOrderId == $s['sales_order_id']) {
                     array_push($result, $s);
                 }
             } else {
-                if ($bc25 == null) {
+                if ($bc25 == null && $bc41 == null) {
                     array_push($result, $s);
                 }
             }

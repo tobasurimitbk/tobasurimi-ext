@@ -49,8 +49,8 @@
                 <div class="col-md-3 mb-3">
                     <select name="asalPengeluaran" class="form-select asalPengeluaran" id="asalPengeluaran">
                         <option selected value="ALL">PILIH ASAL PENGELUARAN</option>
-                        <option value="ORDER FORM EKSPOR">ORDER FORM EKSPOR</option>
-                        <option value="RETUR PEMBELIAN">RETUR PEMBELIAN EKSPOR</option>
+                        <option value="ORDER FORM LOKAL">ORDER FORM LOKAL</option>
+                        <option value="RETUR PEMBELIAN">RETUR PEMBELIAN LOKAL</option>
                         <option value="ORDER FORM LAIN">ORDER FORM LAIN (SCRAP, KEMASAN, BARANG BEKAS)</option>
                     </select>
                 </div>

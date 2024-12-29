@@ -103,6 +103,7 @@ class SalesOrderLainDetailModel extends Model
             $stockList['satuan_id'] = $satuanId;
             // TAMBAHAN
             $stockList['kode_barang'] = $kodeBarang;
+            $stockList['kode_barang_internal'] = $kodeBarang;
             $stockList['barang_master_name'] = $barangMasterName;
             $stockList['satuan_order_id'] = $s['satuan_order_id'];
             $stockList['satuan_order_text'] = $satuanOrder['kode_satuan'];

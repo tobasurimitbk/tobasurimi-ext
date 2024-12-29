@@ -44,7 +44,7 @@
                             $bc41Model = new BC41Model();
                             ?>
                             <?php foreach ($barang as $b) : ?>
-                                <?php $detailBarang = $bc41Model->detailBarang($bc41['id'], $b['kode_barang'], $bc41['sales_order_lain_id'], $bc41['pengembalian_barang_id']); ?>
+                                <?php $detailBarang = $bc41Model->detailBarang($bc41['id'], $b['kode_barang'], $bc41['sales_order_lain_id'], $bc41['pengembalian_barang_id'], $bc41['sales_order_id']); ?>
                                 <?php $totalHarga += $b['total_harga']; ?>
                                 <tr style="text-align: center; cursor:pointer;" data-kode_barang="<?= encrypt($b['kode_barang']) ?>" data-id="<?= encrypt($bc41['id']) ?>">
                                     <td><?= $i++; ?></td>
@@ -52,7 +52,7 @@
                                         <?php if ($detailBarang['bcDetail'] == null) : ?>
                                             -
                                         <?php else : ?>
-                                            <?= $detailBarang['bcDetail']->posTarif ?>
+                                            <?= $detailBarang['bcDetail']->posTarif ?? "" ?>
                                         <?php endif; ?>
                                     </td>
                                     <td><?= $b['kode_barang'] ?></td>
@@ -64,7 +64,7 @@
                                         <?php if ($detailBarang['bcDetail'] == null) : ?>
                                             -
                                         <?php else : ?>
-                                            <?= $detailBarang['bcDetail']->kodeSatuanBarang ?>
+                                            <?= $detailBarang['bcDetail']->kodeSatuanBarang ?? "" ?>
                                         <?php endif; ?>
                                     </td>
                                     <td>
@@ -73,7 +73,7 @@
                                                 BELUM DIISI
                                             </span>
                                         <?php else : ?>
-                                            <?php if ($detailBarang['bcDetail']->posTarif == "") : ?>
+                                            <?php if ($detailBarang['bcDetail'] == null) : ?>
                                                 <span class="badge badge-danger">
                                                     BELUM DIISI
                                                 </span>

@@ -382,6 +382,7 @@ class PengembalianBarangModel extends Model
 
                 $result[] = [
                     'kode_barang' => $q['kode_barang'],
+                    'kode_barang_internal' => $q['kode_barang'],
                     'barang' => $q['barang'] . " - " . $q['spesifikasi'],
                     'barang_master_name' => $q['barang'],
                     'no_surat_jalan' => $pengembalianBarang['no_surat_jalan'],

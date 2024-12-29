@@ -7,6 +7,7 @@ use App\Helpers\BeaCukaiApi;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\BC25Model;
 use App\Models\BC30Model;
+use App\Models\BC41Model;
 use App\Models\BCPurchaseOrderModel;
 use App\Models\CeisaSettingModel;
 use App\Models\CountryModel;
@@ -62,6 +63,7 @@ class BC25 extends BaseController
     protected $pengembalianBarangDetailModel;
     protected $salesOrderModel;
     protected $salesOrderDetailModel;
+    protected $bc41Model;
 
     public function __construct()
     {
@@ -86,6 +88,7 @@ class BC25 extends BaseController
         $this->pengembalianBarangDetailModel = new PengembalianBarangDetailModel();
         $this->salesOrderModel = new SalesOrderModel();
         $this->salesOrderDetailModel = new SalesOrderDetailModel();
+        $this->bc41Model = new BC41Model();
 
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
@@ -1836,6 +1839,10 @@ class BC25 extends BaseController
             ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
             ->findAll();
+        $bc41Data = $this->bc41Model
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
         $salesOrderLokalData = $this->salesOrderModel
             ->where('id_company', $this->this_company_id)
             ->where('deletedAt', null)
@@ -1890,6 +1897,14 @@ class BC25 extends BaseController
                 array_push($salesOrderLokalIdUse, $b['sales_order_id']);
             } elseif ($b['tipe_sales_order'] == "ORDER FORM LAIN") {
                 array_push($salesOrderLainIdUse, $b['sales_order_lain_id']);
+            } elseif ($b['tipe_sales_order'] == "RETUR PEMBELIAN") {
+                array_push($pengembalianBarangIdUse, $b['pengembalian_barang_id']);
+            }
+        }
+
+        foreach ($bc41Data as $b) {
+            if ($b['tipe_sales_order'] == "ORDER FORM LOKAL") {
+                array_push($salesOrderLokalIdUse, $b['sales_order_id']);
             } elseif ($b['tipe_sales_order'] == "RETUR PEMBELIAN") {
                 array_push($pengembalianBarangIdUse, $b['pengembalian_barang_id']);
             }
