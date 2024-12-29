@@ -11,13 +11,16 @@ use App\Models\SupplierModel;
 use App\Models\SupplierHargaModel;
 use App\Models\BarangMasterModel;
 use App\Models\BagianModel;
+use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\WarehousesModel;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\PenerimaanBarangDetailModel;
-
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Supplier extends BaseController
 {
@@ -30,6 +33,8 @@ class Supplier extends BaseController
     protected $divisiModel;
     protected $is_admin;
     protected $this_user_id;
+    protected $companyModel;
+
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
@@ -47,6 +52,7 @@ class Supplier extends BaseController
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
         $this->divisiModel = new DivisisModel();
+        $this->companyModel = new CompaniesModel();
     }
 
     // bahan baku
@@ -1463,5 +1469,177 @@ class Supplier extends BaseController
 
         exit();
         // return view('Supplier/supplierBahanBaku/print');
+    }
+
+    public function importSupplier()
+    {
+        $rules = [
+            "file" => [
+                'rules' => 'uploaded[file]|ext_in[file,xlsx]',
+                'errors' => [
+                    'uploaded' => 'Tidak ada file yang di-upload.',
+                    'ext_in' => 'File yang di-upload harus berupa file Excel (.xlsx).',
+                ],
+
+            ],
+        ];
+
+        if ($this->validate($rules)) {
+            $file = $this->request->getFile('file');
+            $type = $this->request->getVar('type');
+
+            $spreadsheet = IOFactory::load($file);
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $data = [];
+            $rowIterator = $worksheet->getRowIterator(2);
+            foreach ($rowIterator as $row) {
+                $cellIterator = $row->getCellIterator();
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+                $data[] = $rowData;
+            }
+
+
+            $berhasilTotal = 0;
+
+            for ($i = 0; $i < count($data); $i++) {
+
+                $kodeSupplier = trim($data[$i][0]);
+                $namaSupplier = trim($data[$i][1]);
+                $alamat = trim($data[$i][2]);
+                $kodePos = trim($data[$i][3]);
+                $npwp = trim($data[$i][4]);
+                $notelp = trim($data[$i][5]);
+                $contactPerson = trim($data[$i][6]);
+                $email = trim($data[$i][7]);
+
+                if ($kodeSupplier != null || $kodeSupplier != "") {
+                    $this->supplierModel->insert([
+                        'company_id' => $this->this_company_id,
+                        'user_id' => $this->this_user_id,
+                        'kode' => $kodeSupplier,
+                        'name' => $namaSupplier,
+                        'address' => $alamat,
+                        'no_npwp' => $npwp,
+                        'phone' => $notelp,
+                        'type' => $type,
+                        'contact_person' => $contactPerson,
+                        'postal_code' => $kodePos,
+                        'email' => $email,
+                        'user_id' => $this->this_user_id
+                    ]);
+
+                    $berhasilTotal++;
+                }
+            }
+
+            return response()->setJSON([
+                'message' => "Berhasil Import : $berhasilTotal Data",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } else {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash()
+            ];
+            return response()->setJSON($data);
+        }
+    }
+
+    public function exportExcel()
+    {
+        $payload = [
+            "pageSize" => 10000000,
+            "currentPage" => 1,
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+        ];
+
+        $condition = [
+            "suppliers.type" => $this->request->getVar('type'),
+            "company_id" => $this->this_company_id
+        ];
+
+        $addCondition = [
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            'search'    => ""
+        ];
+
+        $supplierData = $this->supplierModel->getSupplierList($condition, $addCondition, 10000000, 0);
+
+        $list = [];
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($supplierData['data'] as $data) {
+            array_push($list, [
+                "no"            => $no++,
+                "kode"          => $data->kode,
+                "name"          => $data->name,
+                "address"       => $data->address,
+                "postal_code"   => $data->postal_code,
+                "npwp"          => $data->no_npwp,
+                "phone"         => $data->phone,
+                "contact_person" => $data->contact_person,
+                "email" => $data->email
+            ]);
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $column = 2;
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'KODE SUPPLIER')
+            ->setCellValue('B1', 'NAMA SUPPLIER')
+            ->setCellValue('C1', 'ALAMAT')
+            ->setCellValue('D1', 'KODE POS')
+            ->setCellValue('E1', 'NPWP')
+            ->setCellValue('F1', 'NO TELPON')
+            ->setCellValue('G1', 'CONTACT PERSON')
+            ->setCellValue('H1', 'EMAIL');
+
+
+
+        foreach ($list as $l) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $column, $l['kode'])
+                ->setCellValue('B' . $column, $l['name'])
+                ->setCellValue('C' . $column, $l['address'])
+                ->setCellValue('D' . $column, $l['postal_code'])
+                ->setCellValue('E' . $column, $l['npwp'])
+                ->setCellValue('F' . $column, $l['phone'])
+                ->setCellValue('G' . $column, $l['contact_person'])
+                ->setCellValue('H' . $column, $l['email']);
+
+            $sheet->getColumnDimension('A')->setAutoSize(true);
+            $sheet->getColumnDimension('B')->setAutoSize(true);
+            $sheet->getColumnDimension('C')->setAutoSize(true);
+            $sheet->getColumnDimension('D')->setAutoSize(true);
+            $sheet->getColumnDimension('E')->setAutoSize(true);
+            $sheet->getColumnDimension('F')->setAutoSize(true);
+            $sheet->getColumnDimension('G')->setAutoSize(true);
+            $sheet->getColumnDimension('H')->setAutoSize(true);
+
+            $column++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Export_Data_Supplier';
+        foreach (range('A', 'H') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
     }
 }

@@ -93,6 +93,8 @@ $routes->post('/customer/save', 'Master\Customer::saveCustomer', ['filter' => 'A
 $routes->post('/customer/update', 'Master\Customer::updateCustomer', ['filter' => 'Auth']);
 $routes->post('/customer/delete', 'Master\Customer::deleteCustomer', ['filter' => 'Auth']);
 $routes->get('/customer/getLocalInvoiceList/(:num)', 'Master\Customer::getLocalInvoiceList/$1', ['filter' => 'Auth']);
+$routes->post('/customer/import-excel', 'Master\Customer::importCustomer', ['filter' => 'Auth']);
+$routes->get('/customer/export-excel', 'Master\Customer::exportExcel', ['filter' => 'Auth']);
 
 // WAREHOUSE
 $routes->get('/warehouse', 'Master\Warehouse::warehouse', ['filter' => 'Auth']);
@@ -232,6 +234,9 @@ $routes->get('/supplier/ajax', 'Supplier\Supplier::supplierAjax', ['filter' => '
 $routes->get('/supplier/id/(:segment)', 'Supplier\Supplier::getByIdSupplier/$1', ['filter' => 'Auth']);
 $routes->get('/supplier/generate/(:segment)', 'Supplier\Supplier::supplierGenerate/$1', ['filter' => 'Auth']);
 $routes->post('/supplier/delete', 'Supplier\Supplier::deleteSupplier', ['filter' => 'Auth']);
+$routes->post('supplier/import-excel', 'Supplier\Supplier::importSupplier', ['filter' => 'Auth']);
+$routes->get('supplier/export-excel', 'Supplier\Supplier::exportExcel', ['filter' => 'Auth']);
+
 
 // BAHAN BAKU LOKAL
 $routes->get('/supplier-bahan-baku', 'Supplier\Supplier::supplierBahanBaku', ['filter' => 'Auth']);

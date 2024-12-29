@@ -132,9 +132,20 @@
 <section class="section">
     <div class="section-header">
         <h1>Supplier Bahan Penolong</h1>
-        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </button>
+        <?php if (can('Supplier', 'Bahan Penolong', 'p')): ?>
+            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 20px;">
+                Import / Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <li><button class="dropdown-item btn-upload-excel">Import Excel</button></li>
+                <li><button class="dropdown-item" onclick="exportExcel('BAHAN PENOLONG')">Export Excel</button></li>
+            </ul>
+        <?php endif; ?>
+        <?php if (can('Supplier', 'Bahan Penolong', 'c')): ?>
+            <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </button>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -164,7 +175,30 @@
         </div>
     </div>
 </section>
-
+<div class="modal" id="import_excel_modal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Supplier</h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary text-black" role="alert">
+                    UNDUH TEMPLEATE EXCEL <a href="<?= base_url('assets/import/IMPORT_EXCEL_SUPPLIER.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                </div>
+                <form class="form-excel" method="post">
+                    <input type="hidden" name="type" value="BAHAN PENOLONG">
+                    <div class="form-floating" style="height: 50px;">
+                        <input type="file" name="file" id="file" accept=".xlsx" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-import-excel mr-2">Kembali</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-excel">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode";
@@ -637,6 +671,76 @@
             $("#kode").attr("readonly", false);
             $("#kode").val("");
         }
+    }
+
+    $('.btn-upload-excel').click(function() {
+        $('#file').val(null);
+        $('#import_excel_modal').modal('show');
+
+    });
+
+    $('.btn-discard-import-excel').click(function() {
+        $('#import_excel_modal').modal('hide');
+    });
+
+    $('.btn-submit-excel').click(function() {
+        if ($('.form-excel').valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Import Excel?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Kembali',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let csrf = $(`[name="${csrfToken}"]`);
+                    let formData = new FormData(document.querySelector(".form-excel"));
+                    $.ajax({
+                        url: "<?= base_url("supplier/import-excel"); ?>",
+                        data: formData,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                }).then(() => {
+                                    table.ajax.reload();
+                                    $('#import_excel_modal').modal('hide');
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            }
+                        },
+                    });
+
+                }
+            })
+        }
+    });
+
+    const exportExcel = function(type) {
+        var url = "<?= base_url('supplier/export-excel') ?>";
+        window.open(url + `?type=${type}&sort=${sort}&sortType=${sortType}&`, "_blank");
     }
 </script>
 

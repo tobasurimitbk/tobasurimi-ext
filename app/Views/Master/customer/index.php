@@ -1,6 +1,20 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
-
+<style>
+    .btn.btn-dropdown-export {
+        background: #ffa426 !important;
+        font-family: "Poppins", sans-serif !important;
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff !important;
+        margin-left: 0px;
+        letter-spacing: 0;
+        padding: 10px 15px;
+        border: 1px #ffa426 solid !important;
+        border-radius: 4px;
+        min-width: 100px;
+    }
+</style>
 <div class="modal add-modal" id="add_modal" tabindex="-1">
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
@@ -116,7 +130,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" value="0" type="text" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" class="form-control piutang" id="piutang" name="piutang" placeholder="Limit Piutang">
+                                <input autocomplete="one-time-code" type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control piutang" id="piutang" name="piutang" placeholder="Limit Piutang">
                                 <label for="floatingInput">Limit Piutang</label>
                             </div>
                         </div>
@@ -269,10 +283,20 @@
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="lokal" role="tabpanel" aria-labelledby="lokal-tab">
                     <div class="collapse-lokal-list show" id="collapseLokalList">
+
                         <?php if (can('Master Data', 'Customer Global', 'c')) : ?>
                             <button class="btn btn-show-form btn-add mb-1 float-right btn-show-form-lokal" data-btn="create-modal">
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
+                        <?php endif; ?>
+                        <?php if (can('Master Data', 'Customer Global', 'p')) : ?>
+                            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 5px;">
+                                Import / Export
+                            </button>
+                            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                                <li><button class="dropdown-item btn-upload-excel-customer-lokal">Import Excel</button></li>
+                                <li><button class="dropdown-item" onclick="exportExcel('LOKAL')">Export Excel</button></li>
+                            </ul>
                         <?php endif; ?>
                         <div class="row justify-content-end row-col-spp mb-3">
                             <div class="col-md-3 mt-1">
@@ -317,6 +341,15 @@
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
                         <?php endif; ?>
+                        <?php if (can('Master Data', 'Customer Global', 'p')) : ?>
+                            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 5px;">
+                                Import / Export
+                            </button>
+                            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                                <li><button class="dropdown-item btn-upload-excel-customer-global">Import Excel</button></li>
+                                <li><button class="dropdown-item" onclick="exportExcel('INTERNASIONAL')">Export Excel</button></li>
+                            </ul>
+                        <?php endif; ?>
                         <div class="row justify-content-end row-col-spp mb-3">
                             <div class="col-md-3 mt-1">
                                 <select class="form-select company_internasional_search" name="company_internasional_search" id="company_lokal_search" aria-label="Floating label select example">
@@ -357,7 +390,55 @@
         </div>
     </div>
 </section>
+<div class="modal" id="import_customer_lokal_modal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Customer Lokal</h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary text-black" role="alert">
+                    UNDUH TEMPLEATE EXCEL <a href="<?= base_url('assets/import/IMPORT_EXCEL_CUSTOMER.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                </div>
+                <form class="form-excel-customer-lokal" method="post">
+                    <input type="hidden" name="tipe_customer" value="LOKAL">
+                    <div class="form-floating" style="height: 50px;">
+                        <input type="file" name="file" id="file" accept=".xlsx" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-import-excel-customer-lokal mr-2">Kembali</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-excel-customer-lokal">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<div class="modal" id="import_customer_global_modal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Customer Internasional</h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary text-black" role="alert">
+                    UNDUH TEMPLEATE EXCEL <a href="<?= base_url('assets/import/IMPORT_EXCEL_CUSTOMER.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                </div>
+                <form class="form-excel-customer-global" method="post">
+                    <input type="hidden" name="tipe_customer" value="INTERNASIONAL">
+                    <div class="form-floating" style="height: 50px;">
+                        <input type="file" name="file" id="file" accept=".xlsx" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-import-excel-customer-global mr-2">Kembali</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-excel-customer-global">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode";
@@ -919,7 +1000,7 @@
                         $(".email").val(res.data.email);
                         $(".parent_postal_code").val(res.data.postal_code);
                         $(".province_parent_id").val(res.data.province_id).change();
-                        $(".piutang").val(res.data.piutang).change();
+                        $(".piutang").val(greatFormatRupiah(res.data.piutang));
 
                         $(".jenis_penjualan").val(res.data.jenis_penjualan).change();
 
@@ -1162,7 +1243,9 @@
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
                         let data = new FormData(document.querySelector(".create-form-lokal"));
+                        let piutang = destroyFormatRupiah($('#piutang').val());
                         let id = $(".id").val();
+                        data.set("piutang", piutang);
                         data.append("currency", "30");
 
                         if (id) {
@@ -1459,16 +1542,143 @@
         $(".collapse-internasional-list").addClass("show")
     }
 
-    function formatRupiah(angka) {
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return '' + ribuanFormatted + ',' + desimal;
+    const exportExcel = function(tipe_customer) {
+        var url = "<?= base_url('customer/export-excel') ?>";
+        if (tipe_customer == "LOKAL") {
+            var company_id = $('.company_lokal_search').val();
+        } else {
+            var company_id = $('.company_internasional_search').val();
+        }
+
+
+        window.open(url + `?tipe_customer=${tipe_customer}&company_id=${company_id}&sort=${sort}&sortType=${sortType}&`, "_blank");
     }
+
+    $('.btn-upload-excel-customer-lokal').click(function() {
+        $('#import_customer_lokal_modal').modal('show');
+    });
+
+    $('.btn-discard-import-excel-customer-lokal').click(function() {
+        $('#import_customer_lokal_modal').modal('hide');
+    });
+
+    $('.btn-upload-excel-customer-global').click(function() {
+        $('#import_customer_global_modal').modal('show');
+    });
+
+    $('.btn-discard-import-excel-customer-global').click(function() {
+        $('#import_customer_global_modal').modal('hide');
+    });
+
+    $('.btn-submit-excel-customer-lokal').click(function() {
+        if ($('.form-excel-customer-lokal').valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Import Excel?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Kembali',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let csrf = $(`[name="${csrfToken}"]`);
+                    let formData = new FormData(document.querySelector(".form-excel-customer-lokal"));
+                    $.ajax({
+                        url: "<?= base_url("customer/import-excel"); ?>",
+                        data: formData,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                }).then(() => {
+                                    dataTableLokal.ajax.reload();
+                                    $('#import_customer_lokal_modal').modal('hide');
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            }
+                        },
+                    });
+
+                }
+            })
+        }
+    });
+
+    $('.btn-submit-excel-customer-global').click(function() {
+        if ($('.form-excel-customer-global').valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Import Excel?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Kembali',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let csrf = $(`[name="${csrfToken}"]`);
+                    let formData = new FormData(document.querySelector(".form-excel-customer-global"));
+                    $.ajax({
+                        url: "<?= base_url("customer/import-excel"); ?>",
+                        data: formData,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                }).then(() => {
+                                    dataTableInternasional.ajax.reload();
+                                    $('#import_customer_global_modal').modal('hide');
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            }
+                        },
+                    });
+
+                }
+            })
+        }
+    });
 </script>
 
 
