@@ -478,6 +478,10 @@
             }
         });
     }
+
+    $(document).ready(function() {
+        showData();
+    })
 </script>
 
 <?= $this->endSection(); ?>
