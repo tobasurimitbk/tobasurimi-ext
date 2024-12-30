@@ -809,23 +809,20 @@
     });
 
     function getBarangSalesReturn() {
-        let arr = $('.no_dokumen').val();
+        const arr = $('.no_dokumen').val();
+        const pembayaranInvoiceId = "<?= !empty($detail) ? encrypt($detail['id']) : '' ?>";
+
         $.ajax({
             url: "<?= base_url('pembayaran-invoice/get-barang-sales-return'); ?>",
             method: "GET",
-            dataSrc: "data",
             data: {
                 id: JSON.stringify(arr),
-                pembayaran_invoice_id: "<?= !empty($detail) ? encrypt($detail['id']) : '' ?>"
+                pembayaran_invoice_id: pembayaranInvoiceId || null // Kirim null jika tidak ada ID
             },
             dataType: "json",
             success: function (res) {
-                console.log(res);
-
                 if (res.status) {
-                    // Reset dataList sebelum menambahkan data baru
                     dataList = [];
-
                     if (res.data.length > 0) {
                         res.data.forEach((data) => {
                             dataList.push({
@@ -835,154 +832,153 @@
                                 amount_return: data.amount_return,
                                 kode_barang: data.kode_barang,
                                 barang_name: data.barang_name,
-                                keterangan_pajak: data.keterangan_pajak,
-                                nominal_pajak: data.nominal_pajak,
-                                sales_order_invoice_id: data.sales_order_return_id,
-                                sales_order_invoice_detail_id: data.sales_order_return_detail_id,
-                                no_faktur: data.no_faktur ? data.no_faktur : "LAIN-LAIN",
-                                akun_kas_lain: data.id_akun_kas_lain ? data.id_akun_kas_lain : null,
-                                akun_selisih_lain: data.id_akun_selisih_lain ? data.id_akun_selisih_lain : null,
-                                nama_akun_kas_lain: data.akun_kas_lain ? data.akun_kas_lain : "-",
-                                nama_akun_selisih_lain: data.akun_selisih_lain ? data.akun_selisih_lain : "-",
+                                no_faktur: data.no_faktur || "",
+                                keterangan: data.keterangan || "",
+                                keterangan_pajak: data.keterangan_pajak || "",
+                                nominal_pajak: data.nominal_pajak || "",
+                                id_akun_kredit: data.id_akun_kredit || "",
+                                id_akun_debit: data.id_akun_debit || "",
                             });
                         });
                     }
+
+                    drawTable(dataList, res.totalPembayaran, res.totalSudahDiBayar || 0);
                 }
-
-                const totalPembayaran = parseFloat(res.totalPembayaran) || 0;
-                const totalSudahDiBayar = parseFloat(res.totalSudahDiBayar) || 0;
-
-                // Refresh tabel dengan data terbaru
-                drawTable(dataList, totalPembayaran, totalSudahDiBayar);
-            }
+            },
         });
     }
 
     function drawTable(dataList, totalPembayaran, totalSudahDiBayar) {
-        const table = $('#dataTable');
+    const table = $('#dataTable');
 
-        // Header tabel dengan kolom Keterangan setelah No Return
-        table.find('thead').html(`
-            <tr style="color: whitesmoke;">
-                <th style="text-align: center;">No Return</th>
-                <th style="text-align: center; width: 25%;">Keterangan</th>
-                <th style="text-align: center; width: 10%;">Kode Barang</th>
-                <th style="text-align: center; width: 15%;">Nama Barang</th>
-                <th style="text-align: center; width: 7%;">Qty</th>
-                <th style="text-align: center;">Harga Satuan</th>
-                <th style="text-align: center;">Sub Total</th>
-            </tr>
-        `);
-        table.find('tbody').empty();
+    // Header tabel dengan kolom Keterangan setelah No Return
+    table.find('thead').html(`
+        <tr style="color: whitesmoke;">
+            <th style="text-align: center;">No Return</th>
+            <th style="text-align: center; width: 25%;">Keterangan</th>
+            <th style="text-align: center; width: 10%;">Kode Barang</th>
+            <th style="text-align: center; width: 15%;">Nama Barang</th>
+            <th style="text-align: center; width: 7%;">Qty</th>
+            <th style="text-align: center;">Harga Satuan</th>
+            <th style="text-align: center;">Sub Total</th>
+        </tr>
+    `);
+    table.find('tbody').empty();
 
-        let total_amount = 0;
+    let total_amount = 0;
 
-        $.each(dataList, function (index, item) {
-            // Row untuk data barang
-            let newRow = $('<tr class="data-row" style="color: whitesmoke;">');
+    $.each(dataList, function (index, item) {
+        // Row untuk data barang
+        let newRow = $('<tr class="data-row" style="color: whitesmoke;">');
 
-            // Kolom data barang dengan kolom Keterangan setelah No Return
-            newRow.append($('<td class="text-center">').text(item.no_faktur));
+        // Kolom data barang dengan kolom Keterangan setelah No Return
+        newRow.append($('<td class="text-center">').text(item.no_faktur));
 
-            // Input keterangan
-            const keteranganBarang = $('<input type="text" class="form-control keteranganBarang" placeholder="Keterangan..." style="width: 100%;">')
-                .attr('data-index', index);
-            newRow.append($('<td class="text-center">').append(keteranganBarang));
+        // Input keterangan
+        const keteranganBarang = $('<input type="text" class="form-control keteranganBarang" placeholder="Keterangan..." style="width: 100%;">')
+            .attr('data-index', index)
+            .val(item.keterangan || ""); // Pasang nilai dari response
+        newRow.append($('<td class="text-center">').append(keteranganBarang));
 
-            // Kolom lainnya
-            newRow.append($('<td class="text-center">').text(item.kode_barang));
-            newRow.append($('<td class="text-center">').text(item.barang_name));
-            newRow.append($('<td class="text-center">').text(item.qty_return));
-            newRow.append($('<td class="text-center">').text(greatFormatRupiah(item.harga_barang_return)));
+        // Kolom lainnya
+        newRow.append($('<td class="text-center">').text(item.kode_barang));
+        newRow.append($('<td class="text-center">').text(item.barang_name));
+        newRow.append($('<td class="text-center">').text(item.qty_return));
+        newRow.append($('<td class="text-center">').text(greatFormatRupiah(item.harga_barang_return)));
 
-            // Subtotal berdasarkan harga barang dan qty (tanpa pajak di sini)
-            let subtotalValue = item.harga_barang_return * item.qty_return;
-            const subtotalCell = $('<td class="text-center">').text(greatFormatRupiah(subtotalValue));
+        // Subtotal berdasarkan harga barang dan qty (tanpa pajak di sini)
+        let subtotalValue = item.harga_barang_return * item.qty_return;
+        const subtotalCell = $('<td class="text-center">').text(greatFormatRupiah(subtotalValue));
 
-            // Update total amount
-            total_amount += subtotalValue;
+        // Update total amount
+        total_amount += subtotalValue;
 
-            // Append to the row
-            newRow.append(subtotalCell);
-            table.find('tbody').append(newRow);
+        // Append to the row
+        newRow.append(subtotalCell);
+        table.find('tbody').append(newRow);
 
-            // Row untuk input tambahan (pajak, debit, kredit) - tetap dihitung pajak dan diperbarui subtotal
-            let inputRow = $('<tr class="input-row" style="background-color: #f9f9f9; color: #333;">');
+        // Row untuk input tambahan (pajak, debit, kredit)
+        let inputRow = $('<tr class="input-row" style="background-color: #f9f9f9; color: #333;">');
 
-            inputRow.append(
-                $('<td colspan="1">').text(
-                    "Pajak (" + item.no_faktur + " - " + item.kode_barang + "):"
-                )
-            );
-            inputRow.append(
-                $('<td colspan="2" class="text-left">').html(
-                    `<input type="text" data-index="${index}" class="form-control keteranganPajak" placeholder="Keterangan Pajak..." style="width: 100%;">`
-                )
-            );
+        inputRow.append(
+            $('<td colspan="1">').text(
+                "Pajak (" + item.no_faktur + " - " + item.kode_barang + "):"
+            )
+        );
 
-            let debitOptions = '';
-            let kreditOptions = '';
-            $.each(subsAkuns, function (index, subs) {
-                debitOptions += `<option value="${subs.id}">${subs.no_sub} ${subs.nama_sub}</option>`;
-                kreditOptions += `<option value="${subs.id}">${subs.no_sub} ${subs.nama_sub}</option>`;
-            });
+        inputRow.append(
+            $('<td colspan="2" class="text-left">').html(
+                `<input type="text" data-index="${index}" class="form-control keteranganPajak" placeholder="Keterangan Pajak..." style="width: 100%;" value="${item.keterangan_pajak || ''}">`
+            )
+        );
 
-            inputRow.append($('<td class="text-center">').html(
-                `<div class="form-floating" style="height: 50px;">
-                    <select class="form-select akun-debit" data-index="${index}" id="akun_debit_${index}" name="akun_debit" style="width: 100%;">
-                        <option disabled selected value=""></option>
-                        ${debitOptions}
-                    </select>
-                </div>`  
-            ));
-
-            inputRow.append($('<td class="text-center">').html(
-                `<div class="form-floating" style="height: 50px;">
-                    <select class="form-select akun-kredit" data-index="${index}" id="akun_kredit_${index}" name="akun_kredit" style="width: 100%;">
-                        <option disabled selected value=""></option>
-                        ${kreditOptions}
-                    </select>
-                </div>`
-            ));
-
-            // Pajak dan penghitungan subtotal baru setelah pajak
-            const pajakInput = $('<input type="text" class="form-control pajak-input" placeholder="Nilai Pajak" style="width: 100%;">')
-                .attr('data-index', index)
-                .on('keyup', function () {
-                    let pajakValue = destroyFormatRupiah($(this).val()) || 0;
-                    if (pajakValue > subtotalValue) {
-                        pajakValue = subtotalValue;
-                    }
-                    $(this).val(greatFormatRupiah(pajakValue));
-
-                    // Calculate new subtotal after tax
-                    const newSubtotal = Math.round((subtotalValue - pajakValue) * 100) / 100;
-                    subtotalCell.text(greatFormatRupiah(newSubtotal)); // Update subtotal cell with the new value
-                });
-
-            inputRow.append($('<td colspan="2" class="text-center">').append(pajakInput));
-            table.find('tbody').append(inputRow);
-
-            inputRow.find('.akun-debit').select2({
-                placeholder: "Akun Debit",
-                theme: "bootstrap-5"
-            });
-
-            inputRow.find('.akun-kredit').select2({
-                placeholder: "Akun Kredit",
-                theme: "bootstrap-5"
-            });
+        let debitOptions = '';
+        let kreditOptions = '';
+        $.each(subsAkuns, function (subIndex, subs) {
+            debitOptions += `<option value="${subs.id}" ${item.id_akun_debit == subs.id ? 'selected' : ''}>${subs.no_sub} ${subs.nama_sub}</option>`;
+            kreditOptions += `<option value="${subs.id}" ${item.id_akun_kredit == subs.id ? 'selected' : ''}>${subs.no_sub} ${subs.nama_sub}</option>`;
         });
 
-        // Add summary rows with the updated total amount
-        addSummaryRows(
-            table,
-            total_amount,
-            totalPembayaran,
-            totalPembayaran - totalSudahDiBayar,
-            totalSudahDiBayar
-        );
-    }
+        inputRow.append($('<td class="text-center">').html(
+            `<div class="form-floating" style="height: 50px;">
+                <select class="form-select akun-debit" data-index="${index}" id="akun_debit_${index}" name="akun_debit" style="width: 100%;">
+                    <option disabled selected value=""></option>
+                    ${debitOptions}
+                </select>
+            </div>`  
+        ));
+
+        inputRow.append($('<td class="text-center">').html(
+            `<div class="form-floating" style="height: 50px;">
+                <select class="form-select akun-kredit" data-index="${index}" id="akun_kredit_${index}" name="akun_kredit" style="width: 100%;">
+                    <option disabled selected value=""></option>
+                    ${kreditOptions}
+                </select>
+            </div>`
+        ));
+
+        // Pajak dan penghitungan subtotal baru setelah pajak
+        const pajakInput = $('<input type="text" class="form-control pajak-input" placeholder="Nilai Pajak" style="width: 100%;">')
+            .attr('data-index', index)
+            .val(greatFormatRupiah(item.nominal_pajak || 0)) // Pasang nilai pajak dari response
+            .appendTo(inputRow) // Pastikan elemen ditambahkan ke row sebelum listener
+            .on('keyup', function () {
+                let pajakValue = destroyFormatRupiah($(this).val()) || 0;
+                if (pajakValue > subtotalValue) {
+                    pajakValue = subtotalValue;
+                }
+                $(this).val(greatFormatRupiah(pajakValue));
+
+                // Calculate new subtotal after tax
+                const newSubtotal = Math.round((subtotalValue - pajakValue) * 100) / 100;
+                subtotalCell.text(greatFormatRupiah(newSubtotal)); // Update subtotal cell with the new value
+            });
+
+
+        inputRow.append($('<td colspan="2" class="text-center">').append(pajakInput));
+        table.find('tbody').append(inputRow);
+
+        inputRow.find('.akun-debit').select2({
+            placeholder: "Akun Debit",
+            theme: "bootstrap-5"
+        });
+
+        inputRow.find('.akun-kredit').select2({
+            placeholder: "Akun Kredit",
+            theme: "bootstrap-5"
+        });
+    });
+
+    // Add summary rows with the updated total amount
+    addSummaryRows(
+        table,
+        total_amount,
+        totalPembayaran,
+        totalPembayaran - totalSudahDiBayar,
+        totalSudahDiBayar
+    );
+}
+
 
     function addSummaryRows(table, total_amount, total_invoice, limit_bayar, totalSudahDiBayar) {
         // Pastikan semua parameter memiliki nilai default 0 jika undefined, null, atau NaN
@@ -1072,23 +1068,23 @@
     };
 
     function updateKeterangan() {
-    // Ambil elemen <select> dan <textarea>
-    const noDokumenElement = document.getElementById('no_dokumen');
-    const noBuktiPembayaranElement = document.getElementById('no_bukti_pembayaran');
-    const customerElement = document.getElementById('customer');
-    const textareaElement = document.getElementById('keterangan');
+        // Ambil elemen <select> dan <textarea>
+        const noDokumenElement = document.getElementById('no_dokumen');
+        const noBuktiPembayaranElement = document.getElementById('no_bukti_pembayaran');
+        const customerElement = document.getElementById('customer');
+        const textareaElement = document.getElementById('keterangan');
 
-    // Ambil teks dari elemen no_bukti_pembayaran
-    const noBuktiPembayaranText = noBuktiPembayaranElement.value.trim();
+        // Ambil teks dari elemen no_bukti_pembayaran
+        const noBuktiPembayaranText = noBuktiPembayaranElement.value.trim();
 
-    // Ambil semua opsi yang dipilih dari elemen <select>
-    const selectedNoDokumen = Array.from(noDokumenElement.selectedOptions).map(option => `TERIMA A/ ${option.text}`);
-    const selectedCustomer = Array.from(customerElement.selectedOptions).map(option => option.text);
+        // Ambil semua opsi yang dipilih dari elemen <select>
+        const selectedNoDokumen = Array.from(noDokumenElement.selectedOptions).map(option => `TERIMA A/ INVOICE ${option.text}`);
+        const selectedCustomer = Array.from(customerElement.selectedOptions).map(option => option.text);
 
-    // Gabungkan nilai opsi yang dipilih ke dalam textarea
-    const combinedText = [...selectedCustomer, noBuktiPembayaranText, ...selectedNoDokumen].join('; ');
-    textareaElement.value = combinedText;
-}
+        // Gabungkan nilai opsi yang dipilih ke dalam textarea
+        const combinedText = [...selectedCustomer, ...selectedNoDokumen].join('; ');
+        textareaElement.value = combinedText;
+    }
 
 </script>
 

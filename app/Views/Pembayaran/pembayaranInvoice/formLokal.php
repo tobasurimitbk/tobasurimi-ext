@@ -777,7 +777,7 @@
             success: function(res) {
                 if (res.status && res.data.length > 0) {
                     res.data.forEach((data) => {
-                            if (!dataList.some(item => item.sales_order_invoice_id === data.sales_order_invoice_id)) {
+                           
                                 dataList.push({
                                     id: getID(),
                                     qty_invoice: data.qty_invoice,
@@ -793,7 +793,7 @@
                                     nama_akun_kas_lain: data.akun_kas_lain || "-",
                                     nama_akun_selisih_lain: data.akun_selisih_lain || "-"
                                 });
-                            }
+                            
                     });
                 }
 
@@ -973,11 +973,11 @@ function addSummaryRows(table, total_amount, total_invoice, limit_bayar, totalSu
         const noBuktiPembayaranText = noBuktiPembayaranElement.value.trim();
 
         // Ambil semua opsi yang dipilih dari elemen <select>
-        const selectedNoDokumen = Array.from(noDokumenElement.selectedOptions).map(option => `TERIMA A/ ${option.text}`);
+        const selectedNoDokumen = Array.from(noDokumenElement.selectedOptions).map(option => `TERIMA A/ INVOICE ${option.text}`);
         const selectedCustomer = Array.from(customerElement.selectedOptions).map(option => option.text);
 
         // Gabungkan nilai opsi yang dipilih ke dalam textarea
-        const combinedText = [...selectedCustomer, noBuktiPembayaranText, ...selectedNoDokumen].join('; ');
+        const combinedText = [...selectedCustomer, ...selectedNoDokumen].join('; ');
         textareaElement.value = combinedText;
     }
 

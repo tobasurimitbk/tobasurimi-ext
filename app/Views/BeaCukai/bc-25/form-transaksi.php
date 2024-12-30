@@ -61,7 +61,7 @@
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="harga_nilai_pabean" readonly value="<?= $payload->hargaPenyerahan  == "" ? "0" : number_format($payload->hargaPenyerahan * $payload->ndpbm, 2)  ?>" name="harga_nilai_pabean" type="text" class="form-control harga_nilai_pabean">
+                                <input id="harga_nilai_pabean" readonly value="<?= $payload->hargaPenyerahan  == "" ? "0" : number_format($payload->hargaPenyerahan * $payload->ndpbm, 0, 2)  ?>" name="harga_nilai_pabean" type="text" class="form-control harga_nilai_pabean">
                                 <label>Nilai Pabean</label>
                             </div>
                         </div>

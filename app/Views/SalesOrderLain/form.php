@@ -118,7 +118,7 @@
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Dokumen Bea Cukai</label>
+                            <label for="floatingInput" style="z-index: 1;">Dokumen Pengeluaran Bea Cukai</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -493,7 +493,7 @@
     });
 
     $('#bc_id').select2({
-        placeholder: "Pilih Dokumen Bea Cukai Pengeluaran",
+        placeholder: "Pilih Dokumen Pengeluaran Bea Cukai",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {

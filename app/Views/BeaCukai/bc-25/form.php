@@ -54,12 +54,13 @@
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="form-floating mb-3 mt-1" style="height: 50px;">
-                            <select <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select asal_pengeluaran" id="asal_pengeluaran" name="asal_pengeluaran">
+                            <select <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select reference_type" id="reference_type" name="reference_type">
                                 <option value=""></option>
-                                <option <?= !empty($bc25) ? ($bc25['pengembalian_barang_id'] != null ? 'selected' : '') : '' ?> value="RETUR">RETUR</option>
-                                <option <?= !empty($bc25) ? ($bc25['sales_order_lain_id'] != null ? 'selected' : '') : '' ?> value="PENJUALAN">PENJUALAN</option>
+                                <option <?= !empty($bc25) ? ($bc25['sales_order_id'] != null ? 'selected' : '') : '' ?> value="ORDER FORM LOKAL">ORDER FORM LOKAL</option>
+                                <option <?= !empty($bc25) ? ($bc25['pengembalian_barang_id'] != null ? 'selected' : '') : '' ?> value="RETUR PEMBELIAN">RETUR PEMBELIAN LOKAL</option>
+                                <option <?= !empty($bc25) ? ($bc25['sales_order_lain_id'] != null ? 'selected' : '') : '' ?> value="ORDER FORM LAIN">ORDER FORM LAIN (SCRAP, KEMASAN, BARANG BEKAS)</option>
                             </select>
-                            <label style="z-index: 1;">Pilih Asal Pengeluaran</label>
+                            <label style="z-index: 1;">Pilih Tujuan Pengeluaran</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
@@ -68,7 +69,7 @@
                                 <option value=""></option>
                                 <?php if (isset($reference)): ?>
                                     <?php foreach ($reference as $s) : ?>
-                                        <option <?= (!empty($bc25) ? ($bc25['reference_id'] == $s['id'] ? 'selected' : '') : '') ?> data-nama_penerima="<?= $s['nama_penerima'] ?>" data-alamat_penerima="<?= $s['alamat_penerima'] ?>" data-tanggal_reference="<?= $s['tanggal_reference'] ?>" data-divisi="<?= $s['divisi'] ?>" data-warehouse_name="<?= $s['warehouse_name'] ?>" data-keterangan="<?= $s['keterangan'] ?>" value="<?= $s['id'] ?>">
+                                        <option selected <?= (!empty($bc25) ? ($bc25['reference_id'] == $s['id'] ? 'selected' : '') : '') ?> data-nama_penerima="<?= $s['nama_penerima'] ?>" data-alamat_penerima="<?= $s['alamat_penerima'] ?>" data-tanggal_reference="<?= $s['tanggal_reference'] ?>" data-keterangan="<?= $s['keterangan'] ?>" value="<?= $s['id'] ?>">
                                             <?= $s['no_reference'] ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -136,22 +137,15 @@
                         </small>
                     </div>
                     <div class="col-sm-4">
-                        <div class="form-floating mb-3">
-                            <input disabled <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc25) ? $bc25['divisi'] : "" ?>" autocomplete="one-time-code" type="text" class="form-control divisi" id="divisi" name="divisi" placeholder="Departemen">
-                            <label for="floatingInput">Departemen</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="form-floating mb-3">
-                            <input disabled <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc25) ? $bc25['warehouse_name'] : "" ?>" autocomplete="one-time-code" type="text" class="form-control warehouse_name" id="warehouse_name" name="warehouse_name" placeholder="Warehouse">
-                            <label for="floatingInput">Warehouse</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="form-floating mb-3">
+                        <div class="form-floating">
                             <input disabled <?= !empty($bc25) ? ($bc25['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc25) ? $bc25['keterangan'] : "" ?>" autocomplete="one-time-code" type="text" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan">
                             <label for="floatingInput">Keterangan</label>
                         </div>
+                        <small class="mb-3">
+                            <i>
+                                Keterangan dari order form
+                            </i>
+                        </small>
                     </div>
                 </div>
             </form>
@@ -165,19 +159,15 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable1" width="100%" border="1" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="text-align: center;" colspan="8">Detail Barang yang Keluar</th>
-                                    <th style="text-align: center;" colspan="1">Data Harga</th>
-                                </tr>
-                                <tr>
                                     <th style="text-align: center;">No</th>
-                                    <th style="text-align: center;">Asal Barang</th>
-                                    <th style="text-align: center;">No Dokumen</th>
-                                    <th style="text-align: center;">Supplier</th>
+                                    <th style="text-align: center;">Tipe Barang</th>
                                     <th style="text-align: center;">Dokumen Asal</th>
-                                    <th style="text-align: center;">Tgl Penerimaan</th>
+                                    <th style="text-align: center;">Kode Barang</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
+                                    <th style="text-align: center;">Departemen / Warehouse Pengeluaran</th>
                                     <th style="text-align: center;">Qty Keluar</th>
-                                    <th style="text-align: center;">Total Harga</th>
+                                    <th style="text-align: center;">Satuan</th>
+                                    <th style="text-align: center;">Harga</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table">
@@ -230,9 +220,7 @@
                                 <label>Kode Kantor</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12 mt-1">
+                        <div class="col-sm-6 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input id="no_pengajuan" value="<?= !empty($bc25) ? $bc25['no_aju'] : $noAju ?>" name="no_pengajuan" type="text" readonly class="no_pengajuan form-control" placeholder="">
                                 <label>Preview Nomor Pengajuan</label>
@@ -268,7 +256,7 @@
             method: "GET",
             data: {
                 reference_id: "<?= $bc25['reference_id'] ?>",
-                asal_pengeluaran: $('#asal_pengeluaran option:selected').val(),
+                reference_type: $('#reference_type option:selected').val(),
             },
             dataType: "json",
             success: function(res) {
@@ -280,17 +268,17 @@
         });
     <?php endif; ?>
 
-    $('#asal_pengeluaran').select2({
-        placeholder: "Pilih Asal Pengeluaran",
+    $('#reference_type').select2({
+        placeholder: "Pilih Tujuan Pengeluaran",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        var asal_pengeluaran = $('#asal_pengeluaran option:selected').val();
+        var reference_type = $('#reference_type option:selected').val();
         $.ajax({
             url: `<?= base_url('bea-cukai-bc-25/list-reference'); ?>`,
             method: "GET",
             data: {
-                asal_pengeluaran: asal_pengeluaran,
+                reference_type: reference_type,
             },
             beforeSend: function() {
                 setLoading();
@@ -319,8 +307,6 @@
         $('#nama_penerima').val(selected.data('nama_penerima'));
         $('#alamat_penerima').val(selected.data('alamat_penerima'));
         $('#tanggal_reference').val(selected.data('tanggal_reference'));
-        $('#divisi').val(selected.data('divisi'));
-        $('#warehouse_name').val(selected.data('warehouse_name'));
         $('#keterangan').val(selected.data('keterangan'));
         // GET BARANG
         getListBarang();
@@ -378,7 +364,7 @@
         },
     });
 
-    $("#reference_id,#asal_pengeluaran")
+    $("#reference_id,#reference_type")
         .parent('div')
         .children('span')
         .children('span')
@@ -582,7 +568,7 @@
                 stopLoading();
             },
             data: {
-                asal_pengeluaran: $('#asal_pengeluaran option:selected').val(),
+                reference_type: $('#reference_type option:selected').val(),
                 reference_id: $('#reference_id option:selected').val()
             },
             dataType: "json",
@@ -615,14 +601,14 @@
                    ${no++} 
                 `
                 ));
-                newRow.append($('<td style="text-align: center;">').text(v.sumber));
-                newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
-                newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
+                newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
                 newRow.append($('<td style="text-align: center;">').text(v.bc_type + '/' + v.no_aju));
-                newRow.append($('<td style="text-align: center;">').text(v.stock_date));
-                newRow.append($('<td style="text-align: center;">').text(v.kode_barang + " " + v.barang));
-                newRow.append($('<td style="text-align: center;">').text(v.qty_konversi + " " + v.satuan));
-                newRow.append($('<td style="text-align: center;">').text(formatRupiah(v.total_harga)));
+                newRow.append($('<td style="text-align: center;">').text(v.kode_barang));
+                newRow.append($('<td style="text-align: center;">').text(v.barang));
+                newRow.append($('<td style="text-align: center;">').text(v.divisi + "/" + v.warehouse_name));
+                newRow.append($('<td style="text-align: center;">').text(v.qty_konversi));
+                newRow.append($('<td style="text-align: center;">').text(v.satuan));
+                newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.total_harga)));
                 table.find('tbody').append(newRow);
 
                 totalHarga = totalHarga + parseFloat(v.total_harga);
@@ -631,7 +617,7 @@
             // GRAND TOTAL
             var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996">');
             newRow.append($('<td style="text-align: right;" colspan="8">').html("<b>GRAND TOTAL</b>"));
-            newRow.append($('<td style="text-align: center;">').text(formatRupiah(totalHarga)));
+            newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(totalHarga)));
             table.find('tbody').append(newRow);
 
             if (sumberBarang === "-") {
@@ -745,18 +731,6 @@
                 })
             }
         })
-    }
-
-    function formatRupiah(angka) {
-        var formatter = new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR'
-        });
-        var parsedNumber = parseFloat(angka);
-        if (isNaN(parsedNumber)) {
-            return "0,00";
-        }
-        return formatter.format(parsedNumber).replace('Rp', '').trim();
     }
 </script>
 

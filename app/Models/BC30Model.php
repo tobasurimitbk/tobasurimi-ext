@@ -130,8 +130,7 @@ class BC30Model extends Model
         $salesOrderExportDetailModel = new SalesOrderExportDetailModel();
         $satuanModel = new SatuansModel();
 
-        if ($typeReference == "LOKAL") {
-
+        if ($typeReference == "ORDER FORM LOKAL") {
             $selectQry = "
                 barang_master_sales.satuan_id AS satuan_sales_id,
                 barang_master_sales.kode_barang AS kode_barang_sales,
@@ -139,7 +138,7 @@ class BC30Model extends Model
                 barang_master.kode_barang AS kode_barang_internal,
                 barang_master_spesifikasi.satuan_1 AS satuan_internal_id,
                 barang_master.id as barang_master_id,
-                 barang_master.barang_name as nama_barang,
+                barang_master.barang_name as nama_barang,
                 CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) as nama_barang_internal,
                 stuffing_lokal_detail.stock_id_warehouse,
                 stuffing_lokal_detail.bc_id_warehouse,
@@ -174,9 +173,15 @@ class BC30Model extends Model
                 $stock = $stockModel->find($dataResult[$i]['stock_id_warehouse']);
                 $bcType = isset($stockList['bc_id']) ? $metaDataModel->find($stockList['bc_id']) : null;
                 $bcTypeText = $bcType == null ? "NON PABEAN" : $bcType['value'];
-                $salesOrderDetail = $salesOrderDetailModel->where('id_barang', $dataResult[$i]['barang_id_order'])->where('id_sales_order', $salesOrderId)->first();
+                $salesOrderDetail = $salesOrderDetailModel->where('id_barang', $dataResult[$i]['barang_id_order'])->where('id_sales_order', $referenceId)->first();
                 $satuanSales = $satuanModel->find($dataResult[$i]['satuan_sales_id']);
                 $satuanInternal = $satuanModel->find($dataResult[$i]['satuan_internal_id']);
+
+                // Untuk di Form Ceisa
+                $dataResult[$i]['barang1_id'] = $stockList['barang1_id'];
+                $dataResult[$i]['kemasan_id'] = $stockList['kemasan_id'];
+                $dataResult[$i]['total_harga'] = ($dataResult[$i]['qty_keluar'] * $salesOrderDetail['harga_barang']);
+                $dataResult[$i]['barang_master_name'] = $dataResult[$i]['nama_barang'];
 
                 $dataResult[$i]['tanggal_keluar'] = date('d/m/Y', strtotime($dataResult[$i]['tanggal_keluar']));
                 $dataResult[$i]['tipe_barang'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
@@ -313,40 +318,11 @@ class BC30Model extends Model
         return $result;
     }
 
-    public function getListSalesOrder($companyId, $tipeSalesOrder)
+    public function getListSalesOrder($companyId)
     {
-        $salesOrderLokalModel = new SalesOrderModel();
         $salesOrderExportModel = new SalesOrderExportModel();
-
-        if ($tipeSalesOrder == "LOKAL") {
-            // LOKAL
-            $selectQry = "
-                sales_order.id AS sales_order_id,
-                sales_order.no_sales_order,
-                customers.name AS nama_customer,
-                customers.address AS alamat_customer,
-                country.country_name
-            ";
-            $salesOrder = $salesOrderLokalModel
-                ->select($selectQry)
-                ->join('customers', 'customers.id = sales_order.id_customer', 'left')
-                ->join('country', 'country.id = customers.country_id', 'left')
-                ->where('used', "USED")
-                ->where('sales_order.id_company', $companyId)
-                ->where('sales_order.deletedAt', null)
-                ->findAll();
-            $result = array();
-            foreach ($salesOrder as $i => $s) {
-                $bc23 = $this->where('sales_order_id', $s['sales_order_id'])->where('tipe_sales_order', "LOKAL")->first();
-                if ($bc23 == null) {
-                    $salesOrder[$i]['alamat_customer'] =  $salesOrder[$i]['alamat_customer'] == "" ? "-" :  $salesOrder[$i]['alamat_customer'];
-                    $salesOrder[$i]['country_name'] =  $salesOrder[$i]['country_name'] == "" ? "-" :  $salesOrder[$i]['alamat_customer'];
-                    array_push($result, $salesOrder[$i]);
-                }
-            }
-        } else {
-            // INTERNASIONAL
-            $selectQry = "
+        // INTERNASIONAL
+        $selectQry = "
             sales_order_export.sales_order_export_id AS sales_order_id,
             sales_order_export.sales_order_export_no AS no_sales_order,
             customers.name AS nama_customer,
@@ -354,23 +330,22 @@ class BC30Model extends Model
             country.country_name
         ";
 
-            $salesOrder = $salesOrderExportModel
-                ->select($selectQry)
-                ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
-                ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
-                ->join('country', 'country.id = customers.country_id', 'left')
-                ->where('used', "USED")
-                ->where('sales_contract.company_id', $companyId)
-                ->where('sales_contract.deletedAt', null)
-                ->findAll();
-            $result = array();
-            foreach ($salesOrder as $i => $s) {
-                $bc23 = $this->where('sales_order_id', $s['sales_order_id'])->where('tipe_sales_order', "ORDER FORM EKSPOR")->first();
-                if ($bc23 == null) {
-                    $salesOrder[$i]['alamat_customer'] =  $salesOrder[$i]['alamat_customer'] == "" ? "-" :  $salesOrder[$i]['alamat_customer'];
-                    $salesOrder[$i]['country_name'] =  $salesOrder[$i]['country_name'] == "" ? "-" :  $salesOrder[$i]['alamat_customer'];
-                    array_push($result, $salesOrder[$i]);
-                }
+        $salesOrder = $salesOrderExportModel
+            ->select($selectQry)
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('country', 'country.id = customers.country_id', 'left')
+            ->where('used', "USED")
+            ->where('sales_contract.company_id', $companyId)
+            ->where('sales_contract.deletedAt', null)
+            ->findAll();
+        $result = array();
+        foreach ($salesOrder as $i => $s) {
+            $bc23 = $this->where('sales_order_id', $s['sales_order_id'])->where('tipe_sales_order', "ORDER FORM EKSPOR")->first();
+            if ($bc23 == null) {
+                $salesOrder[$i]['alamat_customer'] =  $salesOrder[$i]['alamat_customer'] == "" ? "-" :  $salesOrder[$i]['alamat_customer'];
+                $salesOrder[$i]['country_name'] =  $salesOrder[$i]['country_name'] == "" ? "-" :  $salesOrder[$i]['alamat_customer'];
+                array_push($result, $salesOrder[$i]);
             }
         }
 
@@ -468,7 +443,7 @@ class BC30Model extends Model
                 'no_sales_order' => $r['no_sales_order'],
                 'nama_customer' => $r['nama_penerima'],
                 'alamat_customer' => $r['alamat_penerima'],
-                'tanggal_reference' => date('d/m/Y', strtotime('tanggal_sales_order')),
+                'tanggal_reference' => date('d/m/Y', strtotime($r['tanggal'])),
                 'divisi' => $r['divisi'],
                 'warehouse_name' => $r['warehouse_name'],
                 'keterangan' => $r['keterangan'],

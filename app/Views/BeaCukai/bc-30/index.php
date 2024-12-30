@@ -82,8 +82,9 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center;">No</th>
-                                <th onclick="changeSort('bc_30.tipe_pengeluaran')" style="text-align: center;">Tipe Pengeluaran</th>
+                                <th onclick="changeSort('bc_30.tipe_pengeluaran')" style="text-align: center;">Tujuan Pengeluaran</th>
                                 <th onclick="changeSort('bc_30.sales_order_id')" class="sort" style="text-align: center;">No Order Form</th>
+                                <th style="text-align: center;">Tipe Penerima</th>
                                 <th style="text-align: center;">Penerima</th>
                                 <th onclick="changeSort('bc_30.no_aju')" class="sort" style="text-align: center;">No Aju / Daftar</th>
                                 <th onclick="changeSort('bc_30.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
@@ -158,6 +159,12 @@
                 sortable: false
             },
             {
+                data: "tipe_penerima",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
                 data: "customer_name",
                 className: "text-center",
                 searchable: false,
@@ -174,8 +181,6 @@
             {
                 data: "status_posting",
                 className: "text-center",
-                searchable: false,
-                sortable: false,
                 render: function(data, type, row) {
                     let htmlRes = '';
 

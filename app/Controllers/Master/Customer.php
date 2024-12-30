@@ -13,6 +13,9 @@ use App\Models\EmployeesModel;
 use App\Models\ListAddressesModel;
 use App\Models\SalesOrderModel;
 use App\Models\SalesOrderInvoiceModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Customer extends BaseController
 {
@@ -449,5 +452,165 @@ class Customer extends BaseController
             'salesName' => $customerData->salesName
         ];
         echo json_encode($data);
+    }
+
+    public function importCustomer()
+    {
+        $rules = [
+            "file" => [
+                'rules' => 'uploaded[file]|ext_in[file,xlsx]',
+                'errors' => [
+                    'uploaded' => 'Tidak ada file yang di-upload.',
+                    'ext_in' => 'File yang di-upload harus berupa file Excel (.xlsx).',
+                ],
+
+            ],
+        ];
+
+        if ($this->validate($rules)) {
+            $file = $this->request->getFile('file');
+            $tipeCustomer = $this->request->getVar('tipe_customer');
+
+            $spreadsheet = IOFactory::load($file);
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $data = [];
+            $rowIterator = $worksheet->getRowIterator(2);
+            foreach ($rowIterator as $row) {
+                $cellIterator = $row->getCellIterator();
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+                $data[] = $rowData;
+            }
+
+
+            $berhasilTotal = 0;
+
+            for ($i = 0; $i < count($data); $i++) {
+
+                $kodeCustomer = trim($data[$i][0]);
+                $namaCustomer = trim($data[$i][1]);
+                $alamat = trim($data[$i][2]);
+                $email = trim($data[$i][3]);
+                $nohp = trim($data[$i][4]);
+                $company = trim($data[$i][5]);
+
+                $companyFirst =  $this->CompanyModel->where('company', $company)->first();
+
+                if ($companyFirst != null) {
+                    $this->CustomerModel->insert([
+                        'company_id' => $companyFirst['id'],
+                        'user_id' => $this->this_user_id,
+                        'kode' => $kodeCustomer,
+                        'name' => $namaCustomer,
+                        'address' => $alamat,
+                        'email' => $email,
+                        'phone' => $nohp,
+                        'tipe_customer' => $tipeCustomer
+                    ]);
+
+                    $berhasilTotal++;
+                }
+            }
+
+            return response()->setJSON([
+                'message' => "Berhasil Import : $berhasilTotal Data",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } else {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash()
+            ];
+            return response()->setJSON($data);
+        }
+    }
+
+    public function exportExcel()
+    {
+        $payload = [
+            "pageSize" => 10000000,
+            "currentPage" => 1,
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+        ];
+
+        $condition = [
+            'tipe_customer' => $this->request->getVar('tipe_customer'),
+            'customers.deletedAt' => null,
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search") != '' ? $this->request->getGet("search") : '',
+            "company_id"    => $this->request->getGet('company_id') != '' ? $this->request->getGet("company_id") : '',
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+        $dataCompanyUserLogin = $this->CompanyModel->getCompaniesUserLogin();
+        $customerData = $this->CustomerModel->getList($condition, $dataCompanyUserLogin, $addCondition, 10000000, 0);
+
+        $list = [];
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($customerData['data'] as $data) {
+            array_push($list, [
+                "no"            => $no++,
+                "kode"          => $data->kode,
+                "name"          => $data->name,
+                "address"       => $data->address,
+                "email"         => $data->email,
+                "phone"         => $data->phone,
+                "companyName"   => $data->companyName,
+            ]);
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $column = 2;
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'KODE CUSTOMER')
+            ->setCellValue('B1', 'NAMA CUSTOMER')
+            ->setCellValue('C1', 'ALAMAT')
+            ->setCellValue('D1', 'EMAIL')
+            ->setCellValue('E1', 'NO HP')
+            ->setCellValue('F1', 'COMPANY');
+
+        foreach ($list as $l) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $column, $l['kode'])
+                ->setCellValue('B' . $column, $l['name'])
+                ->setCellValue('C' . $column, $l['address'])
+                ->setCellValue('D' . $column, $l['phone'])
+                ->setCellValue('E' . $column, $l['email'])
+                ->setCellValue('F' . $column, $l['companyName']);
+
+            $sheet->getColumnDimension('A')->setAutoSize(true);
+            $sheet->getColumnDimension('B')->setAutoSize(true);
+            $sheet->getColumnDimension('C')->setAutoSize(true);
+            $sheet->getColumnDimension('D')->setAutoSize(true);
+            $sheet->getColumnDimension('E')->setAutoSize(true);
+            $sheet->getColumnDimension('F')->setAutoSize(true);
+
+            $column++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Export_Data_Customer';
+        foreach (range('A', 'K') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
     }
 }

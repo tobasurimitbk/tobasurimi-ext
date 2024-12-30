@@ -378,10 +378,11 @@ class PengembalianBarangModel extends Model
                 $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($q['spesifikasi_id']);
                 $satuan = $satuanModel->find($barangMasterSpesifikasi['satuan_1']);
                 $satuanName = $satuan == null ? "-" : $satuan['kode_satuan'];
-
+                $bcType =  $metaDataModel->find($dataStock['bc_id']);
 
                 $result[] = [
                     'kode_barang' => $q['kode_barang'],
+                    'kode_barang_internal' => $q['kode_barang'],
                     'barang' => $q['barang'] . " - " . $q['spesifikasi'],
                     'barang_master_name' => $q['barang'],
                     'no_surat_jalan' => $pengembalianBarang['no_surat_jalan'],
@@ -390,12 +391,12 @@ class PengembalianBarangModel extends Model
                     'warehouse_name' => $penerimanBarang['warehouse_name'],
                     'sumber' => $dataStock == null ? "-" : $dataStock['sumber'],
                     'stock_dokumen' => $dataStock == null ? "-" : $dataStock['stock_dokumen'],
-                    'bc_type' =>  $dataStock == null ? "-" : $metaDataModel->find($dataStock['bc_id'])['value'],
+                    'bc_type' =>  $dataStock == null ? "-" : ($bcType == null ? "NON PABEAN" : $bcType['value']),
                     'no_aju' => $dataStock == null ? "-" : $dataStock['no_aju'],
                     'stock_date' => $dataStock == null ? "-" : date('d/m/Y', strtotime($dataStock['stock_date'])),
                     'qty_konversi' => $pengembalianBarangDetail == null ? 0 : $pengembalianBarangDetail['jumlah_return'],
                     'satuan' => $satuanName,
-                    'total_harga' => $dataStock == null ? 0 : ($dataStock['harga_umum'] + $dataStock['harga_harian'] + $dataStock['harga_bulanan']),
+                    'total_harga' => $dataStock == null ? 0 : ($dataStock['harga_umum'] + $dataStock['harga_harian'] + $dataStock['harga_bulanan']) *  $pengembalianBarangDetail['jumlah_return'],
                     'supplier_name' => $dataStock == null ? "-" : $dataStock['supplier_name'],
                     'barang1_id' => $dataStock == null ? null : $dataStock['barang1_id'],
                     'barang2_id' => $dataStock == null ? null : $dataStock['barang2_id'],
@@ -404,7 +405,8 @@ class PengembalianBarangModel extends Model
                     'bc_id' => $dataStock == null ? null : $dataStock['bc_id'],
                     'stock_dokumen' => $dataStock == null ? null : $dataStock['stock_dokumen'],
                     'tipe_barang' => $dataStock == null ? null : strtoupper(str_replace('_', ' ', $dataStock['tipe_barang'])),
-                    'valas_name' => isset($valasName) ? $valasName : ''
+                    'valas_name' => isset($valasName) ? $valasName : '',
+                    'type_barang_text' =>  $dataStock == null ? null : strtoupper(str_replace('_', ' ', $dataStock['tipe_barang'])),
                 ];
             }
         }

@@ -48,8 +48,9 @@
                 <div class="col-md-3 mb-3">
                     <select name="asalPengeluaran" class="form-select asalPengeluaran" id="asalPengeluaran">
                         <option selected value="ALL">PILIH ASAL PENGELUARAN</option>
-                        <option value="RETUR">ASAL : RETUR</option>
-                        <option value="PENJUALAN">ASAL : PENJUALAN</option>
+                        <option value="ORDER FORM LOKAL">ORDER FORM LOKAL</option>
+                        <option value="RETUR PEMBELIAN">RETUR PEMBELIAN LOKAL</option>
+                        <option value="ORDER FORM LAIN">ORDER FORM LAIN (SCRAP, KEMASAN, BARANG BEKAS)</option>
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
@@ -80,17 +81,13 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center;">No</th>
-                                <th style="text-align: center;">Asal Pengeluaran</th>
-                                <th onclick="changeSort('sales_order_lain.divisi_id')" style="text-align: center;">Departemen</th>
-                                <th onclick="changeSort('sales_order_lain.warehouse_id')" style="text-align: center;">Warehouse</th>
-                                <th onclick="changeSort('sales_order_lain.no_sales_order')" class="sort" style="text-align: center;">No Order Form</th>
-                                <th onclick="changeSort('pengembalian_barang.no_surat_jalan')" class="sort" style="text-align: center;">No Retur</th>
-                                <th onclick="changeSort('customers.name')" style="text-align: center;">Customer</th>
-                                <th onclick="changeSort('suppliers.name')" style="text-align: center;">Supplier</th>
+                                <th onclick="changeSort('bc_41.tipe_sales_order')" class="sort" style="text-align: center;">Tujuan Pengeluaran</th>
+                                <th style="text-align: center;">No Order Form</th>
+                                <th style="text-align: center;">Tipe Penerima</th>
+                                <th style="text-align: center;">Penerima</th>
                                 <th onclick="changeSort('bc_41.no_aju')" class="sort" style="text-align: center;">No Aju / Daftar</th>
                                 <th onclick="changeSort('bc_41.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
                                 <th onclick="changeSort('bc_41.status_posting')" style="text-align: center;">Status Posting</th>
-                                <th onclick="changeSort('bc_41.status_dokumen')" style="text-align: center;">Status Dokumen</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
@@ -132,7 +129,6 @@
                 data.selesaiTanggalBC41 = $('.selesaiTanggalBC41').val();
                 data.statusPosting = $('.statusPosting').val();
                 data.noAju = $('.noAju').val();
-                data.tipeSalesOrder = $('.tipeSalesOrder').val();
                 data.asalPengeluaran = $('.asalPengeluaran').val();
                 data.sort = sort;
                 data.sortType = sortType;
@@ -152,33 +148,23 @@
                 width: "5%"
             },
             {
-                data: "asal_pengeluaran",
+                data: "tipe_sales_order",
+                className: "text-center",
+            },
+            {
+                data: "no_order_form",
                 className: "text-center",
                 sortable: false,
             },
             {
-                data: "divisi",
-                className: "text-center"
+                data: "tipe_penerima",
+                className: "text-center",
+                sortable: false,
             },
             {
-                data: "warehouse_name",
+                data: "nama_penerima",
                 className: "text-center",
-            },
-            {
-                data: "no_sales_order",
-                className: "text-center",
-            },
-            {
-                data: "no_surat_jalan",
-                className: "text-center",
-            },
-            {
-                data: "customer_name",
-                className: "text-center",
-            },
-            {
-                data: "supplier_name",
-                className: "text-center",
+                sortable: false,
             },
             {
                 data: "no_aju",
@@ -186,8 +172,9 @@
             },
             {
                 data: "tanggal_bc_41",
-                className: "text-center"
+                className: "text-center",
             },
+
             {
                 data: "status_posting",
                 className: "text-center",
@@ -204,39 +191,6 @@
                             <div class="text-danger">
                                 BELUM POSTING
                             </div>`
-                    }
-
-                    return htmlRes;
-                }
-            },
-            {
-                data: "status_dokumen",
-                className: "text-center",
-                searchable: false,
-                sortable: false,
-                render: function(data, type, row) {
-                    let htmlRes = '';
-
-                    if (row.status_dokumen == "BELUM DIBUAT") {
-                        htmlRes += `
-                        <div class="text-danger">
-                            BELUM DIBUAT
-                        </div>`
-                    } else if (row.status_dokumen == "BELUM LENGKAP") {
-                        htmlRes += `
-                        <div class="text-warning">
-                            BELUM LENGKAP
-                        </div>`
-                    } else if (row.status_dokumen == "SUDAH KIRIM") {
-                        htmlRes += `
-                        <div class="text-success">
-                            SUDAH KIRIM
-                        </div>`
-                    } else if (row.status_dokumen == "SIAP KIRIM") {
-                        htmlRes += `
-                        <div class="text-primary">
-                            SIAP KIRIM
-                        </div>`
                     }
 
                     return htmlRes;

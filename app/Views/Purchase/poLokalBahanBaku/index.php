@@ -5,9 +5,11 @@
 <section class="section">
     <div class="section-header">
         <h1>PO Lokal Bahan Baku</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("po-lokal-bahan-baku/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        <?php if (can('Pembelian', 'PO Lokal BB', 'c')): ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("po-lokal-bahan-baku/create"); ?>">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </a>
+        <?php endif; ?>
     </div>
     <div class="card">
         <?= csrf_field() ?>
@@ -178,7 +180,7 @@
             {
                 data: "total",
                 className: "text-center",
-                render: function (param) {
+                render: function(param) {
                     return greatFormatRupiah(param);
                 }
             },

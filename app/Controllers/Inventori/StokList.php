@@ -1865,21 +1865,58 @@ class StokList extends BaseController
                     ->where('bc_30.company_id', $this->this_company_id)
                     ->first();
 
-                $bc25 = $this->bc25Model
-                    ->select('bc_25.no_aju, sales_order_lain.bc_id, customers.name AS customer_name')
+                $bc25SalesOrderLain = $this->bc25Model
+                    ->select('bc_25.no_aju, sales_order_lain.bc_id as bc_type, customers.name AS customer_name')
                     ->join('sales_order_lain', 'sales_order_lain.id = bc_25.sales_order_lain_id', 'left')
                     ->join('customers', 'customers.id = sales_order_lain.customer_id', 'left')
                     ->where('sales_order_lain.no_sales_order', $data->no_dokumen2)
                     ->where('bc_25.company_id', $this->this_company_id)
                     ->first();
 
-                $bc41 = $this->bc41Model
+                $bc25SalesOrderLokal = $this->bc25Model
+                    ->select('bc_25.no_aju,bc_25.tipe_sales_order, sales_order.bc_type, customers.name AS customer_name')
+                    ->join('sales_order', 'sales_order.id = bc_25.sales_order_id', 'left')
+                    ->join('stuffing_lokal', 'stuffing_lokal.sales_order_id = sales_order.id', 'left')
+                    ->join('customers', 'customers.id = sales_order.id_customer', 'left')
+                    ->where('bc_25.company_id', $this->this_company_id)
+                    ->where('stuffing_lokal.no_stuffing', $data->no_dokumen2)
+                    ->first();
+
+                $bc25PengembalianBarang = $this->bc25Model
+                    ->select('bc_25.no_aju, bc_25.tipe_sales_order, pengembalian_barang.bc_pengeluaran_id as bc_type, suppliers.name as customer_name')
+                    ->join('pengembalian_barang', 'pengembalian_barang.id = bc_25.pengembalian_barang_id', 'left')
+                    ->join('penerimaan_barang', 'penerimaan_barang.id = pengembalian_barang.penerimaan_barang_id', 'left')
+                    ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id')
+                    ->where('pengembalian_barang.no_surat_jalan', $data->no_dokumen2)
+                    ->where('bc_25.company_id', $this->this_company_id)
+                    ->first();
+
+                $bc41SalesOrderLain = $this->bc41Model
                     ->select('bc_41.no_aju, sales_order_lain.bc_id, customers.name AS customer_name')
                     ->join('sales_order_lain', 'sales_order_lain.id = bc_41.sales_order_lain_id', 'left')
                     ->join('customers', 'customers.id = sales_order_lain.customer_id', 'left')
                     ->where('sales_order_lain.no_sales_order', $data->no_dokumen2)
                     ->where('bc_41.company_id', $this->this_company_id)
                     ->first();
+
+                $bc41SalesOrderLokal = $this->bc41Model
+                    ->select('bc_41.no_aju,bc_41.tipe_sales_order, sales_order.bc_type, customers.name AS customer_name')
+                    ->join('sales_order', 'sales_order.id = bc_41.sales_order_id', 'left')
+                    ->join('stuffing_lokal', 'stuffing_lokal.sales_order_id = sales_order.id', 'left')
+                    ->join('customers', 'customers.id = sales_order.id_customer', 'left')
+                    ->where('bc_41.company_id', $this->this_company_id)
+                    ->where('stuffing_lokal.no_stuffing', $data->no_dokumen2)
+                    ->first();
+
+                $bc41PengembalianBarang = $this->bc41Model
+                    ->select('bc_41.no_aju, bc_41.tipe_sales_order, pengembalian_barang.bc_pengeluaran_id as bc_type, suppliers.name as customer_name')
+                    ->join('pengembalian_barang', 'pengembalian_barang.id = bc_41.pengembalian_barang_id', 'left')
+                    ->join('penerimaan_barang', 'penerimaan_barang.id = pengembalian_barang.penerimaan_barang_id', 'left')
+                    ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id')
+                    ->where('pengembalian_barang.no_surat_jalan', $data->no_dokumen2)
+                    ->where('bc_41.company_id', $this->this_company_id)
+                    ->first();
+
 
                 if ($bc30Internasional != null) {
                     // STUFFING INTERNASIONAL BC 3.0 SUDAH DIBUAT
@@ -1904,22 +1941,50 @@ class StokList extends BaseController
                     $data->customer_name = $bc30SalesOrderLain['customer_name'];
                     $data->tipe_sales_order = "PENJUALAN LAIN";
                     $data->no_dokumen2 = "-"; // STUFFING NO GA ADA
-                } elseif ($bc25 != null) {
-                    // BEA CUKAI 2.5
-                    $dokumenBC = $this->metaDataModel->find($bc25['bc_id']);
+                } elseif ($bc25SalesOrderLain != null) {
+                    // BEA CUKAI 2.5 SALES ORDER LAIN
+                    $dokumenBC = $this->metaDataModel->find($bc25SalesOrderLain['bc_type']);
                     $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
-                    $data->no_aju = $bc25['no_aju'];
-                    $data->customer_name = $bc25['customer_name'];
+                    $data->no_aju = $bc25SalesOrderLain['no_aju'];
+                    $data->customer_name = $bc25SalesOrderLain['customer_name'];
+                    $data->tipe_sales_order = $bc25SalesOrderLain['tipe_sales_order'];
+                    $data->no_dokumen2 = "-"; // STUFFING NO GA ADA
+                } elseif ($bc25SalesOrderLokal != null) {
+                    // BEA CUKAI 2.5 SALES ORDER LOKAL
+                    $dokumenBC = $this->metaDataModel->find($bc25SalesOrderLokal['bc_type']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc25SalesOrderLokal['no_aju'];
+                    $data->customer_name = $bc25SalesOrderLokal['customer_name'];
+                    $data->tipe_sales_order = $bc25SalesOrderLokal['tipe_sales_order'];
+                } elseif ($bc25PengembalianBarang != null) {
+                    // BEA CUKAI 2.5 RETUR
+                    $dokumenBC = $this->metaDataModel->find($bc25PengembalianBarang['bc_type']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc25PengembalianBarang['no_aju'];
+                    $data->customer_name = $bc25PengembalianBarang['customer_name'];
+                    $data->tipe_sales_order = $bc25PengembalianBarang['tipe_sales_order'];
+                } elseif ($bc41SalesOrderLain != null) {
+                    // BEA CUKAI 4.1 SALES ORDER LAIN
+                    $dokumenBC = $this->metaDataModel->find($bc41SalesOrderLain['bc_id']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc41SalesOrderLain['no_aju'];
+                    $data->customer_name = $bc41SalesOrderLain['customer_name'];
                     $data->tipe_sales_order = "PENJUALAN LAIN";
                     $data->no_dokumen2 = "-"; // STUFFING NO GA ADA
-                } elseif ($bc41 != null) {
-                    // BEA CUKAI 4.1
-                    $dokumenBC = $this->metaDataModel->find($bc41['bc_id']);
+                } elseif ($bc41SalesOrderLokal != null) {
+                    // BEA CUKAI 4.1 SALES ORDER LOKAL
+                    $dokumenBC = $this->metaDataModel->find($bc41SalesOrderLokal['bc_type']);
                     $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
-                    $data->no_aju = $bc41['no_aju'];
-                    $data->customer_name = $bc41['customer_name'];
-                    $data->tipe_sales_order = "PENJUALAN LAIN";
-                    $data->no_dokumen2 = "-"; // STUFFING NO GA ADA
+                    $data->no_aju = $bc41SalesOrderLokal['no_aju'];
+                    $data->customer_name = $bc41SalesOrderLokal['customer_name'];
+                    $data->tipe_sales_order = $bc41SalesOrderLokal['tipe_sales_order'];
+                } elseif ($bc41PengembalianBarang != null) {
+                    // BEA CUKAI 4.1 RETUR
+                    $dokumenBC = $this->metaDataModel->find($bc41PengembalianBarang['bc_type']);
+                    $bcName = $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'];
+                    $data->no_aju = $bc41PengembalianBarang['no_aju'];
+                    $data->customer_name = $bc41PengembalianBarang['customer_name'];
+                    $data->tipe_sales_order = $bc41PengembalianBarang['tipe_sales_order'];
                 } else {
                     // BELUM DIBUAT SAMA SEKALI DOKUMEN BC 3.O NYA
                     $dokumenBC = $this->metaDataModel->find($data->bc_id);
