@@ -375,8 +375,8 @@ class RasioController extends BaseController
                         'kurs'                    => $s->kurs,
                     ]);
                 }
-            } 
-                
+            }
+
 
             if (!empty($barang_frozen_jadi)) {
                 foreach ($barang_frozen_jadi as $f) {
@@ -410,7 +410,7 @@ class RasioController extends BaseController
                     }
                 }
             }
-            
+
 
 
             foreach ($barang_digunakan_material_2 as $bd) {
@@ -1819,8 +1819,12 @@ class RasioController extends BaseController
         // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
         $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
         $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
+        $data = [
+            'setting_costing_details.company_id' => $this->this_company_id,
+            'setting_costing_details.divisi_id' => $this->request->getVar('department'),
+        ];
 
-        $settingCosting = $this->settingCosting->getSettingCosting();
+        $settingCosting = $this->settingCosting->getSettingCosting($data);
 
         foreach ($settingCosting as &$valueSetting) {
             $condition = [
@@ -1876,373 +1880,373 @@ class RasioController extends BaseController
         }
     }
 
-    public function getSaldoAkhir()
-    {
-        $dataResults = [];
-        $data = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
-            "bahan_baku",
-            $this->request->getVar('divisi_id')
-        );
-        foreach ($data as $value) {
-            $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
-                $value['stock_id']
-            );
-            $stock = $this->stockModel->find($value['stock_id']);
-            if ($stock['kemasan_id'] == 0) {
-                $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
-                $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
-                $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
-                $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
-            } else {
-                $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
-                $satuan = $this->satuanModel->find($kemasan['satuan_id']);
-                $barangName = $kemasan['name'];
-            }
-            for ($i = 0; $i < count($dataResult); $i++) {
-                $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
+    // public function getSaldoAkhir()
+    // {
+    //     $dataResults = [];
+    //     $data = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
+    //         "bahan_baku",
+    //         $this->request->getVar('divisi_id')
+    //     );
+    //     foreach ($data as $value) {
+    //         $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
+    //             $value['stock_id']
+    //         );
+    //         $stock = $this->stockModel->find($value['stock_id']);
+    //         if ($stock['kemasan_id'] == 0) {
+    //             $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
+    //             $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
+    //             $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+    //             $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
+    //         } else {
+    //             $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
+    //             $satuan = $this->satuanModel->find($kemasan['satuan_id']);
+    //             $barangName = $kemasan['name'];
+    //         }
+    //         for ($i = 0; $i < count($dataResult); $i++) {
+    //             $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
 
-                $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
-                $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
-                $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
-                $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
-                $dataResult[$i]['barang'] = strtoupper($barangName);
-                $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
-                $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-                $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
-                $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-                $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
-            }
+    //             $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
+    //             $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
+    //             $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+    //             $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
+    //             $dataResult[$i]['barang'] = strtoupper($barangName);
+    //             $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+    //             $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+    //             $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
+    //             $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
+    //             $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
+    //         }
 
-            // Merge current dataResult into dataResults
-            $dataResults = array_merge($dataResults, $dataResult);
-        }
-        // var_dump($dataResults);
-        return response()->setJSON([
-            'data' => $dataResults,
-            'token' => csrf_hash(),
-            'status' => true
-        ]);
-    }
+    //         // Merge current dataResult into dataResults
+    //         $dataResults = array_merge($dataResults, $dataResult);
+    //     }
+    //     // var_dump($dataResults);
+    //     return response()->setJSON([
+    //         'data' => $dataResults,
+    //         'token' => csrf_hash(),
+    //         'status' => true
+    //     ]);
+    // }
 
-    public function getSaldoAwal()
-    {
-        // $monthData = $this->request->getVar('bulan');
-        // list($month, $year) = explode('/', $monthData);
-        // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
-        $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
-        $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
-        $conditionProduction = [
-            'tanggal_awal' => $tanggal_awal,
-            'tanggal_akhir' => $tanggal_akhir,
-            'divisi_id' => $this->request->getVar('department'),
-            'kategori_id' => $this->request->getVar('kategori'),
-        ];
-        $kursValue = 1;
-        $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
+    // public function getSaldoAwal()
+    // {
+    //     // $monthData = $this->request->getVar('bulan');
+    //     // list($month, $year) = explode('/', $monthData);
+    //     // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+    //     $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+    //     $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
+    //     $conditionProduction = [
+    //         'tanggal_awal' => $tanggal_awal,
+    //         'tanggal_akhir' => $tanggal_akhir,
+    //         'divisi_id' => $this->request->getVar('department'),
+    //         'kategori_id' => $this->request->getVar('kategori'),
+    //     ];
+    //     $kursValue = 1;
+    //     $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
 
-        $dataResults = [];
-        $dataStockModel = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
-            "bahan_baku",
-            $this->request->getVar('divisi_id')
-        );
+    //     $dataResults = [];
+    //     $dataStockModel = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
+    //         "bahan_baku",
+    //         $this->request->getVar('divisi_id')
+    //     );
 
-        foreach ($dataStockModel as $value) {
-            $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
-                $value['stock_id']
-            );
-            $stock = $this->stockModel->find($value['stock_id']);
-            if ($stock['kemasan_id'] == 0) {
-                $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
-                $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
-                $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
-                $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
-            } else {
-                $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
-                $satuan = $this->satuanModel->find($kemasan['satuan_id']);
-                $barangName = $kemasan['name'];
-            }
-            for ($i = 0; $i < count($dataResult); $i++) {
-                $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
+    //     foreach ($dataStockModel as $value) {
+    //         $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
+    //             $value['stock_id']
+    //         );
+    //         $stock = $this->stockModel->find($value['stock_id']);
+    //         if ($stock['kemasan_id'] == 0) {
+    //             $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
+    //             $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
+    //             $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+    //             $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
+    //         } else {
+    //             $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
+    //             $satuan = $this->satuanModel->find($kemasan['satuan_id']);
+    //             $barangName = $kemasan['name'];
+    //         }
+    //         for ($i = 0; $i < count($dataResult); $i++) {
+    //             $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
 
-                $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
-                $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
-                $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
-                $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
-                $dataResult[$i]['barang'] = strtoupper($barangName);
-                $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
-                $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-                $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
-                $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-                $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
+    //             $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
+    //             $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
+    //             $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+    //             $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
+    //             $dataResult[$i]['barang'] = strtoupper($barangName);
+    //             $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+    //             $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+    //             $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
+    //             $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
+    //             $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
 
-                // Initialize stok_produksi to 0
-                $dataResult[$i]['stok_produksi'] = 0;
+    //             // Initialize stok_produksi to 0
+    //             $dataResult[$i]['stok_produksi'] = 0;
 
-                foreach ($productionResultDataTitle as $valueProductionResultData) {
-                    if ($valueProductionResultData['stock_id'] == $dataResult[$i]['stock_id']) {
-                        $dataResult[$i]['stok_produksi'] = $valueProductionResultData['qty'];
-                        break;
-                    }
-                    // var_dump($dataResult);
-                    // var_dump($valueProductionResultData);
-                }
-            }
+    //             foreach ($productionResultDataTitle as $valueProductionResultData) {
+    //                 if ($valueProductionResultData['stock_id'] == $dataResult[$i]['stock_id']) {
+    //                     $dataResult[$i]['stok_produksi'] = $valueProductionResultData['qty'];
+    //                     break;
+    //                 }
+    //                 // var_dump($dataResult);
+    //                 // var_dump($valueProductionResultData);
+    //             }
+    //         }
 
-            // Merge current dataResult into dataResults
-            $dataResults = array_merge($dataResults, $dataResult);
-        }
-        // var_dump($productionResultDataTitle);
-        // var_dump($dataResults);
-        // exit;
-        return response()->setJSON([
-            'data' => $dataResults,
-            'token' => csrf_hash(),
-            'status' => true
-        ]);
-    }
+    //         // Merge current dataResult into dataResults
+    //         $dataResults = array_merge($dataResults, $dataResult);
+    //     }
+    //     // var_dump($productionResultDataTitle);
+    //     // var_dump($dataResults);
+    //     // exit;
+    //     return response()->setJSON([
+    //         'data' => $dataResults,
+    //         'token' => csrf_hash(),
+    //         'status' => true
+    //     ]);
+    // }
 
-    public function getSaldoAdjusment()
-    {
-        // $monthData = $this->request->getVar('bulan');
-        // list($month, $year) = explode('/', $monthData);
-        // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
-        $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
-        $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
+    // public function getSaldoAdjusment()
+    // {
+    //     // $monthData = $this->request->getVar('bulan');
+    //     // list($month, $year) = explode('/', $monthData);
+    //     // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+    //     $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+    //     $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
 
-        $adjusment = $this->adjusmentModel
-            ->select('adjusment.*, adjusment_detail.*')
-            ->join('adjusment_detail', 'adjusment_detail.adjusment_id = adjusment.id', 'left')
-            ->where('adjusment.tanggal >=', $tanggal_awal)
-            ->where('adjusment.tanggal <=', $tanggal_akhir)
-            ->where('adjusment.divisi_id', $this->request->getVar('divisi_id'))
-            ->where('adjusment.company_id', $this->this_company_id)
-            ->where('adjusment.status_posting', "1")
-            ->where('adjusment.deletedAt', null)
-            ->where('adjusment_detail.deletedAt', null)
-            ->findAll();
-        // var_dump($adjusment);
-        // exit;
-        foreach ($adjusment as &$value) {
-            $stockDetail2Model = $this->stockDetail2Model
-                ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
-                ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
-                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
-                ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-                ->where('stock_dokumen', $value['stock_dokumen'])
-                ->where('bc_id', $value['bc_id'])
-                ->where('no_aju', $value['no_aju'])
-                ->where('barang1_id', $value['barang1_id'])
-                ->where('barang2_id', $value['barang2_id'])
-                ->first();
-            $value['harga_umum'] = $stockDetail2Model['harga_umum'];
-            $value['harga_harian'] = $stockDetail2Model['harga_harian'];
-            $value['harga_bulanan'] = $stockDetail2Model['harga_bulanan'];
-            $value['barang'] = $stockDetail2Model['barang_name'] . ' - ' . $stockDetail2Model['spesifikasi'];
-            $value['satuan'] = $stockDetail2Model['kode_satuan'];
-        }
-        // var_dump($adjusment);
-        // exit;
-        return response()->setJSON([
-            'data' => $adjusment,
-            'token' => csrf_hash(),
-            'status' => true
-        ]);
-    }
+    //     $adjusment = $this->adjusmentModel
+    //         ->select('adjusment.*, adjusment_detail.*')
+    //         ->join('adjusment_detail', 'adjusment_detail.adjusment_id = adjusment.id', 'left')
+    //         ->where('adjusment.tanggal >=', $tanggal_awal)
+    //         ->where('adjusment.tanggal <=', $tanggal_akhir)
+    //         ->where('adjusment.divisi_id', $this->request->getVar('divisi_id'))
+    //         ->where('adjusment.company_id', $this->this_company_id)
+    //         ->where('adjusment.status_posting', "1")
+    //         ->where('adjusment.deletedAt', null)
+    //         ->where('adjusment_detail.deletedAt', null)
+    //         ->findAll();
+    //     // var_dump($adjusment);
+    //     // exit;
+    //     foreach ($adjusment as &$value) {
+    //         $stockDetail2Model = $this->stockDetail2Model
+    //             ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
+    //             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
+    //             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
+    //             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+    //             ->where('stock_dokumen', $value['stock_dokumen'])
+    //             ->where('bc_id', $value['bc_id'])
+    //             ->where('no_aju', $value['no_aju'])
+    //             ->where('barang1_id', $value['barang1_id'])
+    //             ->where('barang2_id', $value['barang2_id'])
+    //             ->first();
+    //         $value['harga_umum'] = $stockDetail2Model['harga_umum'];
+    //         $value['harga_harian'] = $stockDetail2Model['harga_harian'];
+    //         $value['harga_bulanan'] = $stockDetail2Model['harga_bulanan'];
+    //         $value['barang'] = $stockDetail2Model['barang_name'] . ' - ' . $stockDetail2Model['spesifikasi'];
+    //         $value['satuan'] = $stockDetail2Model['kode_satuan'];
+    //     }
+    //     // var_dump($adjusment);
+    //     // exit;
+    //     return response()->setJSON([
+    //         'data' => $adjusment,
+    //         'token' => csrf_hash(),
+    //         'status' => true
+    //     ]);
+    // }
 
-    public function getSaldoJual()
-    {
-        // $monthData = $this->request->getVar('bulan');
-        // list($month, $year) = explode('/', $monthData);
-        // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
-        $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
-        $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
+    // public function getSaldoJual()
+    // {
+    //     // $monthData = $this->request->getVar('bulan');
+    //     // list($month, $year) = explode('/', $monthData);
+    //     // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+    //     $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+    //     $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
 
-        $mutasi = $this->mutasiModel
-            ->select('mutasi.*, mutasi_detail.*')
-            ->join('mutasi_detail', 'mutasi_detail.mutasi_id = mutasi.id', 'left')
-            ->where('mutasi.tanggal >=', $tanggal_awal)
-            ->where('mutasi.tanggal <=', $tanggal_akhir)
-            ->where('mutasi.divisi_asal_id', $this->request->getVar('divisi_id'))
-            ->where('mutasi.company_id', $this->this_company_id)
-            ->where('mutasi.status_posting', "1")
-            ->where('mutasi.deletedAt', null)
-            ->where('mutasi_detail.deletedAt', null)
-            ->findAll();
-        // var_dump($mutasi);
-        // exit;
-        foreach ($mutasi as &$value) {
-            $stockDetail2Model = $this->stockDetail2Model
-                ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
-                ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
-                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
-                ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-                ->where('stock_details2.stock_dokumen', $value['stock_dokumen'])
-                ->where('stock_details2.bc_id', $value['bc_id'])
-                ->where('stock_details2.no_aju', $value['no_aju'])
-                ->where('stock_details2.stock_id', $value['stock_id'])
-                ->first();
-            $value['harga_umum'] = $stockDetail2Model['harga_umum'];
-            $value['harga_harian'] = $stockDetail2Model['harga_harian'];
-            $value['harga_bulanan'] = $stockDetail2Model['harga_bulanan'];
-            $value['barang'] = $stockDetail2Model['barang_name'] . ' - ' . $stockDetail2Model['spesifikasi'];
-            $value['satuan'] = $stockDetail2Model['kode_satuan'];
-        }
-        // var_dump($mutasi);
-        // exit;
-        return response()->setJSON([
-            'data' => $mutasi,
-            'token' => csrf_hash(),
-            'status' => true
-        ]);
-    }
+    //     $mutasi = $this->mutasiModel
+    //         ->select('mutasi.*, mutasi_detail.*')
+    //         ->join('mutasi_detail', 'mutasi_detail.mutasi_id = mutasi.id', 'left')
+    //         ->where('mutasi.tanggal >=', $tanggal_awal)
+    //         ->where('mutasi.tanggal <=', $tanggal_akhir)
+    //         ->where('mutasi.divisi_asal_id', $this->request->getVar('divisi_id'))
+    //         ->where('mutasi.company_id', $this->this_company_id)
+    //         ->where('mutasi.status_posting', "1")
+    //         ->where('mutasi.deletedAt', null)
+    //         ->where('mutasi_detail.deletedAt', null)
+    //         ->findAll();
+    //     // var_dump($mutasi);
+    //     // exit;
+    //     foreach ($mutasi as &$value) {
+    //         $stockDetail2Model = $this->stockDetail2Model
+    //             ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
+    //             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
+    //             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
+    //             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+    //             ->where('stock_details2.stock_dokumen', $value['stock_dokumen'])
+    //             ->where('stock_details2.bc_id', $value['bc_id'])
+    //             ->where('stock_details2.no_aju', $value['no_aju'])
+    //             ->where('stock_details2.stock_id', $value['stock_id'])
+    //             ->first();
+    //         $value['harga_umum'] = $stockDetail2Model['harga_umum'];
+    //         $value['harga_harian'] = $stockDetail2Model['harga_harian'];
+    //         $value['harga_bulanan'] = $stockDetail2Model['harga_bulanan'];
+    //         $value['barang'] = $stockDetail2Model['barang_name'] . ' - ' . $stockDetail2Model['spesifikasi'];
+    //         $value['satuan'] = $stockDetail2Model['kode_satuan'];
+    //     }
+    //     // var_dump($mutasi);
+    //     // exit;
+    //     return response()->setJSON([
+    //         'data' => $mutasi,
+    //         'token' => csrf_hash(),
+    //         'status' => true
+    //     ]);
+    // }
 
-    public function getSaldoTrimming()
-    {
-        // $monthData = $this->request->getVar('bulan');
-        // list($month, $year) = explode('/', $monthData);
-        // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
-        $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
-        $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
-        $conditionProduction = [
-            'tanggal_awal' => $tanggal_awal,
-            'tanggal_akhir' => $tanggal_akhir,
-            'divisi_id' => $this->request->getVar('department'),
-            'kategori_id' => $this->request->getVar('kategori'),
-        ];
-        $kursValue = 1;
-        $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
+    // public function getSaldoTrimming()
+    // {
+    //     // $monthData = $this->request->getVar('bulan');
+    //     // list($month, $year) = explode('/', $monthData);
+    //     // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+    //     $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+    //     $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
+    //     $conditionProduction = [
+    //         'tanggal_awal' => $tanggal_awal,
+    //         'tanggal_akhir' => $tanggal_akhir,
+    //         'divisi_id' => $this->request->getVar('department'),
+    //         'kategori_id' => $this->request->getVar('kategori'),
+    //     ];
+    //     $kursValue = 1;
+    //     $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
 
-        $dataResults = [];
-        $dataStockModel = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
-            "bahan_setengah_jadi",
-            $this->request->getVar('divisi_id')
-        );
+    //     $dataResults = [];
+    //     $dataStockModel = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
+    //         "bahan_setengah_jadi",
+    //         $this->request->getVar('divisi_id')
+    //     );
 
-        foreach ($dataStockModel as $value) {
-            $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
-                $value['stock_id']
-            );
-            $stock = $this->stockModel->find($value['stock_id']);
-            if ($stock['kemasan_id'] == 0) {
-                $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
-                $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
-                $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
-                $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
-            } else {
-                $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
-                $satuan = $this->satuanModel->find($kemasan['satuan_id']);
-                $barangName = $kemasan['name'];
-            }
-            for ($i = 0; $i < count($dataResult); $i++) {
-                $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
+    //     foreach ($dataStockModel as $value) {
+    //         $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
+    //             $value['stock_id']
+    //         );
+    //         $stock = $this->stockModel->find($value['stock_id']);
+    //         if ($stock['kemasan_id'] == 0) {
+    //             $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
+    //             $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
+    //             $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+    //             $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
+    //         } else {
+    //             $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
+    //             $satuan = $this->satuanModel->find($kemasan['satuan_id']);
+    //             $barangName = $kemasan['name'];
+    //         }
+    //         for ($i = 0; $i < count($dataResult); $i++) {
+    //             $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
 
-                $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
-                $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
-                $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
-                $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
-                $dataResult[$i]['barang'] = strtoupper($barangName);
-                $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
-                $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-                $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
-                $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-                $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
+    //             $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
+    //             $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
+    //             $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+    //             $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
+    //             $dataResult[$i]['barang'] = strtoupper($barangName);
+    //             $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+    //             $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+    //             $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
+    //             $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
+    //             $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
 
-                // Initialize stok_produksi to 0
-                $dataResult[$i]['stok_produksi'] = 0;
+    //             // Initialize stok_produksi to 0
+    //             $dataResult[$i]['stok_produksi'] = 0;
 
-                foreach ($productionResultDataTitle as $valueProductionResultData) {
-                    if ($valueProductionResultData['stock_id'] == $dataResult[$i]['stock_id']) {
-                        $dataResult[$i]['stok_produksi'] = $valueProductionResultData['qty'];
-                        break;
-                    }
-                }
-            }
+    //             foreach ($productionResultDataTitle as $valueProductionResultData) {
+    //                 if ($valueProductionResultData['stock_id'] == $dataResult[$i]['stock_id']) {
+    //                     $dataResult[$i]['stok_produksi'] = $valueProductionResultData['qty'];
+    //                     break;
+    //                 }
+    //             }
+    //         }
 
-            // Merge current dataResult into dataResults
-            $dataResults = array_merge($dataResults, $dataResult);
-        }
-        // var_dump($dataResults);
-        // exit;
-        return response()->setJSON([
-            'data' => $dataResults,
-            'token' => csrf_hash(),
-            'status' => true
-        ]);
-    }
+    //         // Merge current dataResult into dataResults
+    //         $dataResults = array_merge($dataResults, $dataResult);
+    //     }
+    //     // var_dump($dataResults);
+    //     // exit;
+    //     return response()->setJSON([
+    //         'data' => $dataResults,
+    //         'token' => csrf_hash(),
+    //         'status' => true
+    //     ]);
+    // }
 
-    public function getSaldoKopek()
-    {
-        // $monthData = $this->request->getVar('bulan');
-        // list($month, $year) = explode('/', $monthData);
-        // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
-        $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
-        $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
-        $conditionProduction = [
-            'tanggal_awal' => $tanggal_awal,
-            'tanggal_akhir' => $tanggal_akhir,
-            'divisi_id' => $this->request->getVar('department'),
-            'kategori_id' => $this->request->getVar('kategori'),
-        ];
-        $kursValue = 1;
-        $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
+    // public function getSaldoKopek()
+    // {
+    //     // $monthData = $this->request->getVar('bulan');
+    //     // list($month, $year) = explode('/', $monthData);
+    //     // $convertedDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+    //     $tanggal_awal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_awal'))));
+    //     $tanggal_akhir = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_akhir'))));
+    //     $conditionProduction = [
+    //         'tanggal_awal' => $tanggal_awal,
+    //         'tanggal_akhir' => $tanggal_akhir,
+    //         'divisi_id' => $this->request->getVar('department'),
+    //         'kategori_id' => $this->request->getVar('kategori'),
+    //     ];
+    //     $kursValue = 1;
+    //     $productionResultDataTitle = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
 
-        $dataResults = [];
-        $dataStockModel = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
-            "bahan_baku",
-            $this->request->getVar('divisi_id')
-        );
+    //     $dataResults = [];
+    //     $dataStockModel = $this->stockModel->getBarangAndStockConditionWithoutWarehouse(
+    //         "bahan_baku",
+    //         $this->request->getVar('divisi_id')
+    //     );
 
-        foreach ($dataStockModel as $value) {
-            $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
-                $value['stock_id']
-            );
-            $stock = $this->stockModel->find($value['stock_id']);
-            if ($stock['kemasan_id'] == 0) {
-                $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
-                $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
-                $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
-                $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
-            } else {
-                $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
-                $satuan = $this->satuanModel->find($kemasan['satuan_id']);
-                $barangName = $kemasan['name'];
-            }
-            for ($i = 0; $i < count($dataResult); $i++) {
-                $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
+    //     foreach ($dataStockModel as $value) {
+    //         $dataResult = $this->stockDetail2Model->getStockListWithBCDocNoGroup(
+    //             $value['stock_id']
+    //         );
+    //         $stock = $this->stockModel->find($value['stock_id']);
+    //         if ($stock['kemasan_id'] == 0) {
+    //             $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
+    //             $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
+    //             $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+    //             $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
+    //         } else {
+    //             $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
+    //             $satuan = $this->satuanModel->find($kemasan['satuan_id']);
+    //             $barangName = $kemasan['name'];
+    //         }
+    //         for ($i = 0; $i < count($dataResult); $i++) {
+    //             $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
 
-                $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
-                $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
-                $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
-                $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
-                $dataResult[$i]['barang'] = strtoupper($barangName);
-                $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
-                $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-                $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
-                $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-                $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
+    //             $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
+    //             $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
+    //             $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+    //             $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
+    //             $dataResult[$i]['barang'] = strtoupper($barangName);
+    //             $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+    //             $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+    //             $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
+    //             $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
+    //             $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
 
-                // Initialize stok_produksi to 0
-                $dataResult[$i]['stok_produksi'] = 0;
+    //             // Initialize stok_produksi to 0
+    //             $dataResult[$i]['stok_produksi'] = 0;
 
-                foreach ($productionResultDataTitle as $valueProductionResultData) {
-                    if ($valueProductionResultData['stock_id'] == $dataResult[$i]['stock_id']) {
-                        $dataResult[$i]['stok_produksi'] = $valueProductionResultData['qty'];
-                        break;
-                    }
-                }
-            }
+    //             foreach ($productionResultDataTitle as $valueProductionResultData) {
+    //                 if ($valueProductionResultData['stock_id'] == $dataResult[$i]['stock_id']) {
+    //                     $dataResult[$i]['stok_produksi'] = $valueProductionResultData['qty'];
+    //                     break;
+    //                 }
+    //             }
+    //         }
 
-            // Merge current dataResult into dataResults
-            $dataResults = array_merge($dataResults, $dataResult);
-        }
-        // var_dump($dataResults);
-        // exit;
-        return response()->setJSON([
-            'data' => $dataResults,
-            'token' => csrf_hash(),
-            'status' => true
-        ]);
-    }
+    //         // Merge current dataResult into dataResults
+    //         $dataResults = array_merge($dataResults, $dataResult);
+    //     }
+    //     // var_dump($dataResults);
+    //     // exit;
+    //     return response()->setJSON([
+    //         'data' => $dataResults,
+    //         'token' => csrf_hash(),
+    //         'status' => true
+    //     ]);
+    // }
 
     public function formatHarga($harga)
     {

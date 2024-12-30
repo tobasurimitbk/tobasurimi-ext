@@ -38,65 +38,6 @@
 
                             </tbody>
                         </table>
-                        <!-- <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                            <thead class="thead-dark">
-                                <tr style="font-weight: bold !important;font-size: 14px !important;">
-                                    <th colspan="2">Keterangan</th>
-                                    <th>Akun COA</th>
-                                </tr>
-                            </thead>
-                            <tbody class="body-table" id="body-table">
-                                <?php if (isset($settingCosting)) : ?>
-                                    <?php foreach ($settingCosting as $valueSetting) : ?>
-                                        <?php if ($valueSetting['parent_id'] == NULL) : ?>
-                                            <tr>
-                                                <td colspan="2" style="font-weight: bold !important;font-size: 14px !important;"><?= $valueSetting['name'] ?></td>
-                                                <td>
-                                                    <select class="coa_id" name="coa_id<?= $valueSetting['id'] ?>" id="coa_id<?= $valueSetting['id'] ?>" onchange="submitData(<?= $valueSetting['id'] ?>, this.value)">
-                                                        <option value=""></option>
-                                                        <?php foreach ($subAkuns as $s) : ?>
-                                                            <option value="<?= $s->id ?>" <?= $valueSetting['coa'] ==  $s->id ? "selected" : "" ?>><?= $s->no_sub ?> - <?= $s->nama_sub ?></option>
-                                                        <?php endforeach; ?>
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                            <?php foreach ($settingCosting as $childSetting) : ?>
-                                                <?php if ($childSetting['parent_id'] == $valueSetting['id']) : ?>
-                                                    <tr>
-                                                        <td width="20%" style="font-weight: bold !important;font-size: 13px !important;"><?= $childSetting['name'] ?></td>
-                                                        <td width="20%"></td>
-                                                        <td>
-                                                            <select class="coa_id" name="coa_id<?= $childSetting['id'] ?>" id="coa_id<?= $childSetting['id'] ?>" onchange="submitData(<?= $childSetting['id'] ?>, this.value)">
-                                                                <option value=""></option>
-                                                                <?php foreach ($subAkuns as $s) : ?>
-                                                                    <option value="<?= $s->id ?>" <?= $valueSetting['coa'] ==  $s->id ? "selected" : "" ?>><?= $s->no_sub ?> - <?= $s->nama_sub ?></option>
-                                                                <?php endforeach; ?>
-                                                            </select>
-                                                        </td>
-                                                    </tr>
-                                                    <?php foreach ($settingCosting as $childParentSetting) : ?>
-                                                        <?php if ($childParentSetting['parent_id'] == $childSetting['id']) : ?>
-                                                            <tr>
-                                                                <td width="20%"></td>
-                                                                <td width="20%"><?= $childParentSetting['name'] ?></td>
-                                                                <td>
-                                                                    <select class="coa_id" name="coa_id<?= $childParentSetting['id'] ?>" id="coa_id<?= $childParentSetting['id'] ?>" onchange="submitData(<?= $childParentSetting['id'] ?>, this.value)">
-                                                                        <option value=""></option>
-                                                                        <?php foreach ($subAkuns as $s) : ?>
-                                                                            <option value="<?= $s->id ?>" <?= $valueSetting['coa'] ==  $s->id ? "selected" : "" ?>><?= $s->no_sub ?> - <?= $s->nama_sub ?></option>
-                                                                        <?php endforeach; ?>
-                                                                    </select>
-                                                                </td>
-                                                            </tr>
-                                                        <?php endif; ?>
-                                                    <?php endforeach; ?>
-                                                <?php endif; ?>
-                                            <?php endforeach; ?>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </tbody>
-                        </table> -->
                     </div>
                 </div>
             </div>

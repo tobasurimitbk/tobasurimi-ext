@@ -319,8 +319,8 @@
 
         var hargaSatuan = 0;
         list_items_barang_digunakan.forEach((item, index) => {
-            totalHarga = (parseFloat(item.totalHargaPO) + parseFloat(hargaTotalBiaya)) / parseFloat(list_items_barang_digunakan.length);
-            hargaSatuan = parseFloat(totalHarga) / parseFloat(item.totalQtyPO);
+            hargaSatuan = parseFloat(item.hargaSatuanPO) + (parseFloat(hargaTotalBiaya) / parseFloat(list_items_barang_digunakan.length));
+            totalHarga = (parseFloat(hargaSatuan) * parseFloat(item.totalQtyPO));
             list_items_barang_digunakan_alokasi.push({
                 'barang1_id': item.barang1_id,
                 'barang2_id': item.barang2_id,

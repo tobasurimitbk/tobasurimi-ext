@@ -151,18 +151,18 @@
                                     <option value="" data-code=""></option>
                                     <?php
                                     // Ambil daftar akun_pemakaian yang sudah dipilih pada mode update
-                                    $selectedAkunPemakaian = !empty($rasio) && !empty($rasio->akun_pemakaian) 
-                                                            ? explode(',', $rasio->akun_pemakaian) 
-                                                            : [];
-                                    
+                                    $selectedAkunPemakaian = !empty($rasio) && !empty($rasio->akun_pemakaian)
+                                        ? explode(',', $rasio->akun_pemakaian)
+                                        : [];
+
                                     if (!empty($subAkuns)) {
                                         foreach ($subAkuns as $sub) {
                                             $isSelected = in_array($sub->id, $selectedAkunPemakaian) ? "selected" : "";
-                                            ?>
+                                    ?>
                                             <option value="<?= $sub->id; ?>" <?= $isSelected; ?>>
                                                 <?= $sub->no_sub; ?> <?= $sub->nama_sub; ?>
                                             </option>
-                                            <?php
+                                    <?php
                                         }
                                     }
                                     ?>
@@ -418,13 +418,13 @@
         // getListWarehouseAsal()
     });
 
-    $(document).ready(function () {
+    $(document).ready(function() {
         // Inisialisasi Select2
         $('#akun_pemakaian').select2({
             placeholder: "Pilih Akun",
             theme: "bootstrap-5",
             allowClear: true
-        }).change(function () {
+        }).change(function() {
             // Reset semua array data
             list_items_barang_jadi_trimming = [];
             list_items_barang_jadi_frozen = [];
@@ -710,7 +710,7 @@
                         });
                         // bahan digunakan produksi
                         res.dataProduksiBahanDigunakan.forEach(function(item) {
-                            console.log(item);
+                            // console.log(item);
 
                             if (item.barang_name != undefined) {
                                 list_items_barang_digunakan.push(item);
@@ -851,7 +851,7 @@
         var tanggal_akhir = $('#tanggal_akhir').val();
         var kategori = $('#kategori').val();
         var akun_pemakaian = $('#akun_pemakaian').val();
-        if (department_id && tanggal_awal && tanggal_akhir && kategori && akun_pemakaian) {
+        if (department_id && tanggal_awal && tanggal_akhir && kategori && akun_pemakaian.length > 0) {
             setLoading();
             $.ajax({
                 url: `<?= base_url('rasio/get-barang-digunakan-penolong'); ?>`,
@@ -967,9 +967,8 @@
         }
     }
 
-    const drawTableDigunakanMaterialII = function () {
+    const drawTableDigunakanMaterialII = function() {
         // Kosongkan isi tabel dan footer
-        console.log(list_items_barang_digunakan_material_2.length);
         $('.body-detail-table-digunakan-material-2').empty();
         $('.tfoot-detail-table-digunakan-material-2').empty();
 
@@ -981,13 +980,15 @@
             // Kelompokkan data berdasarkan `account_id`
             const groupedData = list_items_barang_digunakan_material_2.reduce((acc, item) => {
                 if (!acc[item.account_id]) {
-                    acc[item.account_id] = { 
-                        account_name: item.account_name, 
-                        totalQtyPO: 0, 
-                        totalHargaPO: 0 
+                    acc[item.account_id] = {
+                        account_name: item.account_name,
+                        totalQtyPO: 0,
+                        qty_produksi: 0,
+                        totalHargaPO: 0
                     };
                 }
                 acc[item.account_id].totalQtyPO += parseFloat(item.totalQtyPO) || 0;
+                acc[item.account_id].qty_produksi += parseFloat(item.qty_produksi) || 0;
                 acc[item.account_id].totalHargaPO += parseFloat(item.totalHargaPO) || 0;
                 return acc;
             }, {});
@@ -1005,7 +1006,7 @@
                     <tr style="text-align: center;">
                         <td>${index + 1}</td>
                         <td>${group.account_name}</td>
-                        <td>${group.totalQtyPO.toLocaleString()}</td>
+                        <td>${group.qty_produksi.toLocaleString()}</td>
                         <td>${greatFormatRupiah(group.totalHargaPO)}</td>
                         <td>${greatFormatRupiah(hargaSatuanRataRata)}</td>
                     </tr>
@@ -1169,7 +1170,7 @@
             $('.body-detail-table-digunakan').append(row);
             $('.qtyTotalDigunakan').val(parseFloat(totalQtySummary).toLocaleString());
             $('.hargaTotalDigunakan').val(greatFormatRupiah(parseFloat(totalHargaSummary)));
-            $('.hargaSatuanDigunakan').val(greatFormatRupiah(parseFloat(hargaSatuanSummary)));
+            $('.hargaSatuanDigunakan').val(greatFormatRupiah(parseFloat(totalHargaSummary) / parseFloat(totalQtySummary)));
         }
     }
 
@@ -1693,7 +1694,7 @@
                 rowDigunakan += '<tr style="color:whitesmoke;text-align: center;">';
                 rowDigunakan += '<td>' + no + '</td>';
                 rowDigunakan += '<td>' + item.parent_name + '</td>';
-                rowDigunakan += '<td>' + item.barang_name + ' - ' + item.spesifikasi + '</td>';
+                rowDigunakan += '<td>' + item.account_name + '</td>';
                 rowDigunakan += '<td>' + (item.satuanPO !== undefined ? item.satuanPO : item.satuan_request) + '</td>';
                 rowDigunakan += '<td>' + item.qty_produksi + '</td>';
                 list_items_barang_jadi_material_2.map((item2, index2) => {
@@ -3634,7 +3635,7 @@
 
             hideShowTab();
         }
-        <?php endif; ?>
+    <?php endif; ?>
 </script>
 
 <?= $this->endSection(); ?>

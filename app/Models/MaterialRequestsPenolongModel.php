@@ -314,7 +314,7 @@ class MaterialRequestsPenolongModel extends Model
         material_request_penolong_details.material_request_id,
         material_request_penolong_details.barang1_id,
         material_request_penolong_details.barang2_id,
-        material_request_penolong_details.qty2 as qty_produksi,
+        SUM(material_request_penolong_details.qty2) as qty_produksi,
         material_request_penolong_details.satuan as satuan_request,
         stock_details2.stock_dokumen,
         stock_details.no_dokumen,
