@@ -760,8 +760,13 @@
     }
 
     function getDataDokumenInvoice(customerId) {
+        var pembayaranInvoiceDetail = $('.id').val();
+        let url = `<?= base_url("pembayaran-invoice/get-dokumen-invoice-return"); ?>/${customerId}`;
+        if (pembayaranInvoiceDetail) {
+            url += `?pembayaran_invoice_id=${pembayaranInvoiceDetail}`;
+        }
         $.ajax({
-            url: `<?= base_url("pembayaran-invoice/get-dokumen-invoice-return"); ?>/${customerId}`,
+            url: url,
             method: "GET",
             dataType: "json",
             success: function(res) {
@@ -777,7 +782,6 @@
                         `<option value="${item.id}">${item.no_return}</option>`
                     );
                 });
-
 
                 <?php if (isset($detail) && !empty($detail['invoice_id'])): ?>
                     const selectedIds = "<?= $detail['invoice_id']; ?>"

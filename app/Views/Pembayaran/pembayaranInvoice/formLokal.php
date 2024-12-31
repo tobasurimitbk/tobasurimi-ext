@@ -182,8 +182,6 @@
                                     <th style="text-align: center;">No Invoice</th>
                                     <th style="text-align: center;">Kode Barang</th>
                                     <th style="text-align: center;">Nama Barang / Invoice</th>
-                                    <th style="text-align: center;">Akun Debit Lain</th>
-                                    <th style="text-align: center;">Akun Kredit Lain</th>
                                     <th style="text-align: center;">Qty</th>
                                     <th style="text-align: center;">Harga Satuan</th>
                                     <th style="text-align: center;">Sub Total</th>
@@ -726,8 +724,13 @@
 
 
     function getDataDokumenInvoice(customerId) {
+        var pembayaranInvoiceDetail = $('.id').val();
+        let url = `<?= base_url("pembayaran-invoice/get-dokumen-invoice-lokal"); ?>/${customerId}`;
+        if (pembayaranInvoiceDetail) {
+            url += `?pembayaran_invoice_id=${pembayaranInvoiceDetail}`;
+        }
         $.ajax({
-            url: `<?= base_url("pembayaran-invoice/get-dokumen-invoice-lokal"); ?>/${customerId}`,
+            url: url,
             method: "GET",
             dataType: "json",
             success: function(res) {
@@ -810,113 +813,111 @@
     }
 
     function drawTable(dataList, totalPembayaran, totalSudahDiBayar) {
-    const table = $('#dataTable');
-    table.find('tbody').empty();
+        const table = $('#dataTable');
+        table.find('tbody').empty();
 
-    let total_amount = 0;
+        let total_amount = 0;
 
-    // Mengelompokkan data berdasarkan kombinasi no_faktur dan barang_name
-    let groupedData = dataList.reduce((acc, item) => {
-        let key = `${item.no_faktur}-${item.barang_name}`;
-        if (!acc[key]) {
-            acc[key] = [];
-        }
-        acc[key].push(item);
-        return acc;
-    }, {});
-
-    // Loop untuk menambahkan baris ke tabel
-    Object.keys(groupedData).forEach(key => {
-        let group = groupedData[key];
-        let isFirstRow = true;
-
-        group.forEach((item, index) => { // Tambahkan `index` sebagai parameter
-            let newRow = $('<tr style="color:whitesmoke;">');
-            if (isFirstRow) {
-                newRow.append(
-                    $('<td rowspan="' + group.length + '" style="text-align:center;">').text(item.no_faktur)
-                );
-                isFirstRow = false;
+        // Mengelompokkan data berdasarkan kombinasi no_faktur dan barang_name
+        let groupedData = dataList.reduce((acc, item) => {
+            let key = `${item.no_faktur}-${item.barang_name}`;
+            if (!acc[key]) {
+                acc[key] = [];
             }
-            newRow.append($('<td style="text-align:center;">').text(item.kode_barang));
-            newRow.append($('<td style="text-align:center;">').text(item.barang_name));
-            newRow.append($('<td style="text-align:center;">').text(item.nama_akun_kas_lain || '-'));
-            newRow.append($('<td style="text-align:center;">').text(item.nama_akun_selisih_lain || '-'));
-            newRow.append($('<td style="text-align:center;">').text(item.qty_invoice));
-            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.harga_barang_invoice)));
-            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.amount_invoice)));
-            // Tambahkan baris ke tabel
-            table.find('tbody').append(newRow);
+            acc[key].push(item);
+            return acc;
+        }, {});
 
-            // Update total amounts
-            total_amount += parseFloat(item.amount_invoice);
+        // Loop untuk menambahkan baris ke tabel
+        Object.keys(groupedData).forEach(key => {
+            let group = groupedData[key];
+            let isFirstRow = true;
+
+            group.forEach((item, index) => { // Tambahkan `index` sebagai parameter
+                let newRow = $('<tr style="color:whitesmoke;">');
+                if (isFirstRow) {
+                    newRow.append(
+                        $('<td rowspan="' + group.length + '" style="text-align:center;">').text(item.no_faktur)
+                    );
+                    isFirstRow = false;
+                }
+                newRow.append($('<td style="text-align:center;">').text(item.kode_barang));
+                newRow.append($('<td style="text-align:center;">').text(item.barang_name));
+                newRow.append($('<td style="text-align:center;">').text(item.qty_invoice));
+                newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.harga_barang_invoice)));
+                newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.amount_invoice)));
+                // Tambahkan baris ke tabel
+                table.find('tbody').append(newRow);
+
+                // Update total amounts
+                total_amount += parseFloat(item.amount_invoice);
+            });
         });
-    });
 
-    // Menambahkan baris total pembayaran dan potongan
-    addSummaryRows(table, total_amount, totalPembayaran, totalSudahDiBayar);
-}
+        // Menambahkan baris total pembayaran dan potongan
+        addSummaryRows(table, total_amount, totalPembayaran, totalSudahDiBayar);
+    }
 
-function addSummaryRows(table, total_amount, total_invoice, limit_bayar, totalSudahDiBayar) {
-    // Pastikan semua parameter memiliki nilai default 0 jika undefined, null, atau NaN
-    total_amount = isNaN(total_amount) ? 0 : total_amount;
-    total_invoice = isNaN(total_invoice) ? 0 : total_invoice;
-    limit_bayar = isNaN(limit_bayar) ? 0 : limit_bayar;
-    totalSudahDiBayar = isNaN(totalSudahDiBayar) ? 0 : totalSudahDiBayar;
+    function addSummaryRows(table, total_amount, total_invoice, limit_bayar, totalSudahDiBayar) {
+        // Pastikan semua parameter memiliki nilai default 0 jika undefined, null, atau NaN
+        total_amount = isNaN(total_amount) ? 0 : total_amount;
+        total_invoice = isNaN(total_invoice) ? 0 : total_invoice;
+        limit_bayar = isNaN(limit_bayar) ? 0 : limit_bayar;
+        totalSudahDiBayar = isNaN(totalSudahDiBayar) ? 0 : totalSudahDiBayar;
 
-    // Tambahkan baris untuk Total Pembayaran, Total Sudah Dibayar, dan Sisa Pembayaran
-    table.find('tbody').append(`
-        <tr style="color:whitesmoke;">
-            <td colspan="7" style="text-align: right;">Total Pembayaran</td>
-            <td style="text-align:center;">${greatFormatRupiah(total_amount)}</td>
-        </tr>
-        <tr style="color:whitesmoke;">
-            <td colspan="7" style="text-align: right;">Total Sudah Dibayar</td>
-            <td class="total_dibayar" style="text-align:center;">${greatFormatRupiah(total_invoice)}</td>
-        </tr>
-        <tr style="color:whitesmoke;">
-            <td colspan="7" style="text-align: right;">Sisa Pembayaran</td>
-            <td class="total_amount_invoice" style="text-align:center;">${greatFormatRupiah(total_amount - total_invoice)}</td>
-        </tr>
-    `);
+        // Tambahkan baris untuk Total Pembayaran, Total Sudah Dibayar, dan Sisa Pembayaran
+        table.find('tbody').append(`
+            <tr style="color:whitesmoke;">
+                <td colspan="5" style="text-align: right;">Total Pembayaran</td>
+                <td style="text-align:center;">${greatFormatRupiah(total_amount)}</td>
+            </tr>
+            <tr style="color:whitesmoke;">
+                <td colspan="5" style="text-align: right;">Total Sudah Dibayar</td>
+                <td class="total_dibayar" style="text-align:center;">${greatFormatRupiah(total_invoice)}</td>
+            </tr>
+            <tr style="color:whitesmoke;">
+                <td colspan="5" style="text-align: right;">Sisa Pembayaran</td>
+                <td class="total_amount_invoice" style="text-align:center;">${greatFormatRupiah(total_amount - total_invoice)}</td>
+            </tr>
+        `);
 
-    // Tambahkan baris untuk input Total Bayar
-    table.find('tbody').append(`
-        <tr style="color:whitesmoke;">
-            <td colspan="7" style="text-align: right;">Anda Membayar Sebesar</td>
-            <td style="text-align:center;">
-                <input 
-                    autocomplete="one-time-code" 
-                    data-id="" 
-                    onkeyup="this.value = greatFormatRupiah(this.value)"
-                    class="form-control total-bayar trigger-input" 
-                    type="text" 
-                    value="" 
-                    name="total_bayar"
-                    placeholder="Masukkan jumlah pembayaran">
-            </td>
-        </tr>
-    `);
+        // Tambahkan baris untuk input Total Bayar
+        table.find('tbody').append(`
+            <tr style="color:whitesmoke;">
+                <td colspan="5" style="text-align: right;">Anda Membayar Sebesar</td>
+                <td style="text-align:center;">
+                    <input 
+                        autocomplete="one-time-code" 
+                        data-id="" 
+                        onkeyup="this.value = greatFormatRupiah(this.value)"
+                        class="form-control total-bayar trigger-input" 
+                        type="text" 
+                        value="" 
+                        name="total_bayar"
+                        placeholder="Masukkan jumlah pembayaran">
+                </td>
+            </tr>
+        `);
 
-    // Tambahkan event listener untuk validasi input
-    table.find('input.total-bayar').on('change', function() {
-        let rawValue = $(this).val(); // Ambil nilai input
-        let cleanValue = rawValue.replace(/[^0-9]/g, ''); // Hapus karakter non-digit
-        let numberValue = parseInt(cleanValue) || 0; // Konversi ke angka, default 0
+        // Tambahkan event listener untuk validasi input
+        table.find('input.total-bayar').on('change', function() {
+            let rawValue = $(this).val(); // Ambil nilai input
+            let cleanValue = rawValue.replace(/[^0-9]/g, ''); // Hapus karakter non-digit
+            let numberValue = parseInt(cleanValue) || 0; // Konversi ke angka, default 0
 
-        let sisaPembayaran = total_amount - total_invoice; // Hitung sisa pembayaran
+            let sisaPembayaran = total_amount - total_invoice; // Hitung sisa pembayaran
 
-        // Validasi nilai input
-        if (numberValue > sisaPembayaran) {
-            numberValue = sisaPembayaran; // Tidak boleh lebih besar dari sisa pembayaran
-        } else if (numberValue < 0) {
-            numberValue = 0; // Tidak boleh kurang dari 0
-        }
+            // Validasi nilai input
+            if (numberValue > sisaPembayaran) {
+                numberValue = sisaPembayaran; // Tidak boleh lebih besar dari sisa pembayaran
+            } else if (numberValue < 0) {
+                numberValue = 0; // Tidak boleh kurang dari 0
+            }
 
-        // Tampilkan nilai yang sudah divalidasi dalam format Rupiah
-        $(this).val(greatFormatRupiah(numberValue));
-    });
-}
+            // Tampilkan nilai yang sudah divalidasi dalam format Rupiah
+            $(this).val(greatFormatRupiah(numberValue));
+        });
+    }
 
     function deleteBarang(id) {
         var indexToRemove = -1;
