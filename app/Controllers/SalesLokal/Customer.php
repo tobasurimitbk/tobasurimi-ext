@@ -78,7 +78,7 @@ class Customer extends BaseController
                 'tipe_customer' => $this->request->getGet('customerType'),
                 // 'customers.company_id' => $this->this_company_id,
                 'customers.deletedAt' => null,
-                'customers.sales_id' => session()->get('login')->user_id
+                'customers.user_id' => session()->get('login')->user_id
             ];
         }
 
