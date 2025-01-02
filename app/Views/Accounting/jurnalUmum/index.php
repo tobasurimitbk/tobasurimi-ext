@@ -5,16 +5,14 @@
 <section class="section">
     <div class="section-header d-flex justify-content-end">
         <h1 class="me-auto">Jurnal Umum</h1>
-        <button class="btn btn-lg" id="buttonImportModals" style="background-color:rgb(29, 64, 180); color: white; padding: 8px 16px; font-size: 14px; border: none; display: inline-flex; align-items: center; gap: 8px; margin-right: 230px;">
-            <i class="fa fa-arrow-down" aria-hidden="true"></i> Import
-        </button>
         <?php if (can('Accounting', 'Jurnal', 'p')) : ?>
             <button class="btn btn-discard btn-dropdown-export dropdown-toggle" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-                Export
+                Import / Export
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <li><button class="dropdown-item" onclick="pdfExcel('<?= base_url("jurnal/print-pdf"); ?>')">PDF</button></li>
-                <li><button class="dropdown-item" onclick="pdfExcel('<?= base_url("jurnal/print-excel"); ?>')">EXCEL</button></li>
+                <li><button class="dropdown-item" id="btn_import_excel">Import Excel</button></li>
+                <li><button class="dropdown-item" onclick="pdfExcel('<?= base_url("jurnal/print-pdf"); ?>')">Export Pdf</button></li>
+                <li><button class="dropdown-item" onclick="pdfExcel('<?= base_url("jurnal/print-excel"); ?>')">Export Excel</button></li>
             </ul>
         <?php endif; ?>
         <?php if (can('Accounting', 'Jurnal', 'c')) : ?>
@@ -81,36 +79,30 @@
         </div>
     </div>
 </section>
-<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="importModalLabel">Import Data</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal" id="import_excel_modal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Jurnal Umum</h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary text-black" role="alert">
+                    UNDUH TEMPLEATE EXCEL <a href="#" onclick="downloadTemplate()" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
                 </div>
-                <div class="modal-body">
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <button class="btn btn-outline-primary" onclick="downloadTemplate()">
-                                <i class="bi bi-download"></i> Download Template
-                            </button>
-                        </div>
+                <form class="form-excel" method="post">
+                    <div class="form-floating" style="height: 50px;">
+                        <input type="file" name="file" id="file" accept=".xlsx" class="form-control">
                     </div>
-                    <div class="row">
-                        <div class="col-12 col-md-6 mb-3">
-                            <label for="excelFileInput" class="form-label">Select Excel File</label>
-                            <input type="file" id="excelFileInput" class="form-control" accept=".xlsx,.xls">
-                        </div>
-                    </div>
-                    <p class="text-muted">Upload your Excel file here, then click "Import" to upload data.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="importExcel()">Import</button>
-                </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-import-excel mr-2">Kembali</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-excel">Simpan</button>
             </div>
         </div>
+    </div>
 </div>
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "created_at";
@@ -365,7 +357,7 @@
             xhrFields: {
                 responseType: 'blob' // Pastikan menerima file sebagai blob
             },
-            success: function (data, status, xhr) {
+            success: function(data, status, xhr) {
                 const fileName = xhr.getResponseHeader('Content-Disposition')
                     .split('filename=')[1]
                     .replace(/"/g, '');
@@ -378,7 +370,7 @@
                 a.click();
                 window.URL.revokeObjectURL(url);
             },
-            error: function (xhr, status, error) {
+            error: function(xhr, status, error) {
                 console.error('Error downloading template:', error);
             }
         });
@@ -387,55 +379,53 @@
 
     // Function to handle the Excel file upload using AJAX
     function importExcel() {
-    const fileInput = document.getElementById('excelFileInput');
-    const file = fileInput.files[0];
-    const csrf = $(`[name="${csrfToken}"]`);
-    
-    if (file) {
-        const formData = new FormData();
-        formData.append('file', file);
+        const fileInput = document.getElementById('excelFileInput');
+        const file = fileInput.files[0];
+        const csrf = $(`[name="${csrfToken}"]`);
 
-        $.ajax({
-            url: '<?= base_url("jurnal/import"); ?>',
-            type: 'POST',
-            data: formData,
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            contentType: false,
-            processData: false,
-            success: function(response) {
-                if (response.success) {
-                    alert('Import successful');
-                } else {
-                    alert('Import failed: ' + response.message);
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            $.ajax({
+                url: '<?= base_url("jurnal/import"); ?>',
+                type: 'POST',
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    if (response.success) {
+                        alert('Import successful');
+                    } else {
+                        alert('Import failed: ' + response.message);
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert('Error importing file: ' + errorThrown);
                 }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                alert('Error importing file: ' + errorThrown);
-            }
-        });
-    } else {
-        alert('Please select a file to import.');
+            });
+        } else {
+            alert('Please select a file to import.');
+        }
     }
-}
 
 
     $(document).ready(function() {
-        $('#buttonImportModals').on('click', function() {
-            // Ensure modal is properly initialized
-            $('#importModal').modal({
-            backdrop: 'static', // Prevent clicking outside to close
-            keyboard: false // Prevent closing with the escape key
-            });
-            $('#importModal').modal('show'); // Show the modal
+        $('#btn_import_excel').click(function() {
+            $('#file').val(null);
+            $('#import_excel_modal').modal('show');
         });
+
+        $('#btn-discard-import-excel').click(function() {
+            $('#import_excel_modal').modal('hide');
+        })
     });
-
-
 </script>
 <?= $this->endSection(); ?>
