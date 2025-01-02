@@ -708,7 +708,7 @@ class Barang extends BaseController
 
                 // if excel null
                 if ($data[$i][1] != null) {
-                    if ($kodeBarang == null && $barangName == null && $parentBarang != null) {
+                    if ($kodeBarang == null && $parentBarang != null) {
                         // MASTER BARANG INSERTED
                         $barangMasterModel->insert([
                             'company_id' => $this->this_company_id,
