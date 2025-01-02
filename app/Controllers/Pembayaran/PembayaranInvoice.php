@@ -858,6 +858,10 @@ class PembayaranInvoice extends BaseController
                         'harga_satuan' => $l->harga_barang_invoice,
                         'harga_total' => $l->amount_invoice,
                     ]);
+
+                    $this->salesOrderInvoiceModel->update($l->sales_order_invoice_id, [
+                        "status_pelunasan" => "PAID"
+                    ]);
                 }
 
                 return response()->setJSON([
@@ -954,6 +958,10 @@ class PembayaranInvoice extends BaseController
                         'akun_debit' => $l->akun_debit,
                         'keterangan_pajak' => $l->keterangan_pajak,
                         'nominal_pajak' => $l->nominal_pajak
+                    ]);
+
+                    $this->salesOrderReturnModel->update($l->sales_order_invoice_id, [
+                        "already_paid" => 1
                     ]);
                 }
 

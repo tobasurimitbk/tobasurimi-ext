@@ -158,7 +158,8 @@ class Supplier extends BaseController
                 "id"            => encrypt($data->id),
                 "name"          => strtoupper($data->name),
                 "address"       => strtoupper($data->address),
-                "no_npwp"       => formatNpwp($data->no_npwp)
+                "no_npwp"       => formatNpwp($data->no_npwp),
+                "phone"       => formatNpwp($data->phone)
             ]);
         }
 

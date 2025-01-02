@@ -84,6 +84,7 @@ class Retur extends BaseController
             ->select('sales_order_invoice.*, customers.id as customer_id, customers.name as customer_name, customers.kode as customer_kode, customers.address as customer_address')
             ->join('customers', 'customers.id = sales_order_invoice.id_customer')
             ->where('company_id', $this->this_company_id)
+            ->where('status_pelunasan', "PAID")
             ->where('id_sales_order_return', null)
             ->where('sales_order_invoice.deletedAt', null)
             ->findAll();
@@ -165,8 +166,9 @@ class Retur extends BaseController
                 "returnNo"      => $data->returnNo,
                 "customerName"  => $data->customerName,
                 "invNo"         => $data->invNo,
+                "already_paid"  => $data->already_paid,
                 "returnDate"    => date("d/m/Y", strtotime($data->returnDate)),
-                "is_approved"    => $data->is_approved
+                "is_approved"   => $data->is_approved
             ]);
         }
 
