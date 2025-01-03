@@ -163,7 +163,8 @@
                                 <th onclick="changeSort('kode')" class="sort">Kode</th>
                                 <th onclick="changeSort('name')" class="sort">Nama</th>
                                 <th onclick="changeSort('no_npwp')" class="sort">NPWP</th>
-                                <th onclick="changeSort('address')" class="sort">Alamat</th>
+                                <th onclick="changeSort('address')" class="sort">No Telephone</th>
+                                <th onclick="changeSort('phone')" class="sort">Alamat</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -300,6 +301,9 @@
             className: "text-center"
         }, {
             data: "no_npwp",
+            className: "text-center"
+        }, {
+            data: "phone",
             className: "text-center"
         }, {
             data: "address",

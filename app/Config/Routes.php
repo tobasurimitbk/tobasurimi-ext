@@ -192,6 +192,7 @@ $routes->post('/satuan/save', 'Master\Satuan::saveSatuan', ['filter' => 'Auth'])
 $routes->post('/satuan/update', 'Master\Satuan::updateSatuan', ['filter' => 'Auth']);
 $routes->post('/satuan/delete', 'Master\Satuan::deleteSatuan', ['filter' => 'Auth']);
 $routes->get('/satuan/export-excel', 'Master\Satuan::exportExcel', ['filter' => 'Auth']);
+$routes->post('/satuan/import-excel', 'Master\Satuan::importSatuan', ['filter' => 'Auth']);
 
 // SHIFT
 $routes->get('/shift', 'Master\Shift::shift', ['filter' => 'Auth']);

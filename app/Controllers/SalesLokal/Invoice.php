@@ -153,7 +153,13 @@ class Invoice extends BaseController
             $pembayaranInvoice = $this->pembayaranInvoiceModel->where('invoice_id', $data->id)->where('status_posting', "1")->findAll();
             $statusPembayaranInvoice = "";
 
-            if ($pembayaranInvoice) {
+            // if ($pembayaranInvoice) {
+            //     $statusPembayaranInvoice = "LUNAS";
+            // } else {
+            //     $statusPembayaranInvoice = "BELUM LUNAS";
+            // }
+
+            if ($data->status_pelunasan = "PAID") {
                 $statusPembayaranInvoice = "LUNAS";
             } else {
                 $statusPembayaranInvoice = "BELUM LUNAS";

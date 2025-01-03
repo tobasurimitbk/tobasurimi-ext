@@ -7,6 +7,7 @@ use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\SatuansModel;
 use Exception;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -416,5 +417,71 @@ class Satuan extends BaseController
 
         echo $excelOutput;
         exit();
+    }
+
+    public function importSatuan()
+    {
+        $rules = [
+            "file" => [
+                'rules' => 'uploaded[file]|ext_in[file,xlsx]',
+                'errors' => [
+                    'uploaded' => 'Tidak ada file yang di-upload.',
+                    'ext_in' => 'File yang di-upload harus berupa file Excel (.xlsx).',
+                ],
+
+            ],
+        ];
+
+        if ($this->validate($rules)) {
+            $file = $this->request->getFile('file');
+
+            $spreadsheet = IOFactory::load($file);
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $data = [];
+            $rowIterator = $worksheet->getRowIterator(2);
+            foreach ($rowIterator as $row) {
+                $cellIterator = $row->getCellIterator();
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+                $data[] = $rowData;
+            }
+
+
+            $berhasilTotal = 0;
+
+            for ($i = 0; $i < count($data); $i++) {
+
+                $kodeSatuan = strtoupper(trim($data[$i][1]));
+                $namaSatuan = trim($data[$i][2]);
+
+                $satuanFirst =  $this->SatuansModel->where('kode_satuan', $kodeSatuan)->first();
+
+                if ($satuanFirst == null) {
+                    $this->SatuansModel->insert([
+                        'kode_satuan' => $kodeSatuan,
+                        'nama_satuan' => $namaSatuan,
+                    ]);
+
+                    $berhasilTotal++;
+                }
+            }
+
+            return response()->setJSON([
+                'message' => "Berhasil Import : $berhasilTotal Data",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } else {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash()
+            ];
+            return response()->setJSON($data);
+        }
     }
 }

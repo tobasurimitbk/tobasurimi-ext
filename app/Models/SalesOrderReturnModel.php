@@ -25,6 +25,7 @@ class SalesOrderReturnModel extends Model
         'id_company',
         'is_approved',
         'id_warehouse',
+        'already_paid',
     ];
 
     // Dates
@@ -68,6 +69,7 @@ class SalesOrderReturnModel extends Model
         $selectQry = "sales_order_return.id AS id,
                       sales_order_return.no_return AS returnNo,
                       sales_order_return.tanggal_return AS returnDate,
+                      sales_order_return.already_paid AS already_paid,
                       sales_order_return.is_approved AS is_approved,
                       sales_order_invoice.no_faktur AS invNo,
                       customers.name AS customerName";

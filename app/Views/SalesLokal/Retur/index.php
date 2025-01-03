@@ -24,6 +24,7 @@
                                 <th>Nama Customer</th>
                                 <th>No. Invoice</th>
                                 <th>Tanggal Return</th>
+                                <th>Status Pembayaran</th>
                                 <th>Approved</th>
                             </tr>
                         </thead>
@@ -107,6 +108,12 @@
         }, {
             data: "returnDate",
             className: "text-center"
+        }, {
+            data: "already_paid",
+            className: "text-center",
+            render: function(data, type, row) {
+                return data == 1 ? "Sudah Dibayar" : "Belum Dibayar";
+            }
         }, {
             data: "is_approved",
             className: "text-center actions",

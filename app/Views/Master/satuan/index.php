@@ -29,7 +29,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
-                <button type="submit" class="btn btn-submit-form">Simpan</button>
+                <button type="submit" class="btn btn-submit-form" id="btn-submit-form">Simpan</button>
                 <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
         </div>
@@ -41,10 +41,11 @@
     <div class="section-header">
         <h1>Data Satuan</h1>
         <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-            Export
+            Import / Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item" onclick="excel('<?= base_url("satuan/export-excel"); ?>')">EXCEL</button></li>
+            <li><button class="dropdown-item btn-upload-excel">Import Excel</button></li>
+            <li><button class="dropdown-item" onclick="excel('<?= base_url("satuan/export-excel"); ?>')">Export Excel</button></li>
         </ul>
         <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
@@ -76,6 +77,31 @@
         </div>
     </div>
 </section>
+
+<div class="modal" id="import_excel_modal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Satuan</h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary text-black" role="alert">
+                    UNDUH TEMPLEATE EXCEL <a href="<?= base_url('assets/import/IMPORT_SATUAN.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                </div>
+                <form class="form-excel" method="post">
+                    <input type="hidden" name="type" value="BAHAN BAKU">
+                    <div class="form-floating" style="height: 50px;">
+                        <input type="file" name="file" id="file" accept=".xlsx" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard mr-2" id="btn-discard-import-excel">Kembali</button>
+                <button type="submit" class="btn btn-submit-form" id="btn-submit-excel">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -301,7 +327,7 @@
             })
         })
 
-        $(".btn-submit-form").click(function() {
+        $("#btn-submit-form").click(function() {
             if ($(".create-form").valid()) {
                 Swal.fire({
                     icon: 'question',
@@ -430,6 +456,71 @@
 
         window.open(url + `?search=${search}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
+
+    $('.btn-upload-excel').click(function() {
+        $('#file').val(null);
+        $('#import_excel_modal').modal('show');
+
+    });
+
+    $('#btn-discard-import-excel').click(function() {
+        $('#import_excel_modal').modal('hide');
+    });
+
+    $('#btn-submit-excel').click(function() {
+        if ($('.form-excel').valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Import Excel?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Kembali',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let csrf = $(`[name="${csrfToken}"]`);
+                    let formData = new FormData(document.querySelector(".form-excel"));
+                    $.ajax({
+                        url: "<?= base_url("satuan/import-excel"); ?>",
+                        data: formData,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                }).then(() => {
+                                    table.ajax.reload();
+                                    $('#import_excel_modal').modal('hide');
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            }
+                        },
+                    });
+
+                }
+            })
+        }
+    });
 </script>
 
 
