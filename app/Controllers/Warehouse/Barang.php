@@ -415,9 +415,6 @@ class Barang extends BaseController
                 $hargaTerakhir = "-";
                 $supplierTerakhir = "-";
             }
-
-
-
             // HARGA TERAKHIR
             array_push($rdata, [
                 "no"                    => $no++,

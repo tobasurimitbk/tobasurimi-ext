@@ -420,10 +420,10 @@
 
     $(document).ready(function() {
         // Inisialisasi Select2
-        $('#akun_pemakaian').select2({
+        $('.akun_pemakaian').select2({
             placeholder: "Pilih Akun",
             theme: "bootstrap-5",
-            allowClear: true
+            // allowClear: true
         }).change(function() {
             // Reset semua array data
             list_items_barang_jadi_trimming = [];
@@ -444,6 +444,32 @@
             getDataCost();
             // getListWarehouseAsal() // Uncomment jika diperlukan
         });
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.akun_pemakaian')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.akun_pemakaian')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.akun_pemakaian')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        $('.akun_pemakaian')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         // Jika ada data yang relevan pada load pertama (mode update), langsung panggil AJAX
         if ($('#akun_pemakaian').val() !== null && $('#akun_pemakaian').val().length > 0) {

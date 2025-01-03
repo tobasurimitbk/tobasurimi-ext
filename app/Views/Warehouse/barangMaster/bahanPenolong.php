@@ -474,7 +474,7 @@
 
     $(document).ready(function() {
 
-        $(".search").keyup(function() {
+        $(".search").change(function() {
             table.ajax.reload();
         });
 

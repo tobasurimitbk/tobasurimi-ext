@@ -68,54 +68,50 @@ class BarangMasterModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'barang_master.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "barang_master.*, barang_master_spesifikasi.id as spesifikasi_id, barang_master_spesifikasi.spesifikasi, barang_master_spesifikasi.satuan_1, barang_master_spesifikasi.satuan_2, barang_master_spesifikasi.konversi_satuan_2, barang_master_spesifikasi.satuan_3, barang_master_spesifikasi.konversi_satuan_3,
-                    parent_barang.parent_name AS kelompok_barang";
-
-        $barangDataQry = $this->asArray()
-            ->select($selectQry)
-            ->where($condition)
+        // Hitung total data tanpa filter
+        $totalData = $this->where($condition)
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
-            ->orderBy($sort, $sortType);
+            ->countAllResults();
 
-        $totalData = $barangDataQry->countAllResults(false);
-
-        if ($addCondition['search'] || $addCondition['filter_coa']) {
-            $barangDataQry->groupStart();
-        }
+        $barangDataQry = $this->asArray()
+            ->select([
+                'barang_master.id',
+                'barang_master.kode_barang',
+                'barang_master.barang_name',
+                'barang_master_spesifikasi.id as spesifikasi_id',
+                'barang_master_spesifikasi.spesifikasi',
+                'barang_master_spesifikasi.satuan_1',
+                'barang_master_spesifikasi.satuan_2',
+                'barang_master_spesifikasi.konversi_satuan_2',
+                'barang_master_spesifikasi.satuan_3',
+                'barang_master_spesifikasi.konversi_satuan_3',
+                'parent_barang.parent_name AS kelompok_barang'
+            ])
+            ->where($condition)
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left');
 
         if ($addCondition['search']) {
-            $barangDataQry->like('barang_master.barang_name', $addCondition['search']);
-            $barangDataQry->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search']);
+            $barangDataQry->groupStart()
+                ->like('barang_master.barang_name', $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('parent_barang.parent_name', $addCondition['search'])
+                ->groupEnd();
         }
-
-        if ($addCondition['search']) {
-            $barangDataQry->orLike('barang_master.kode_barang', $addCondition['search']);
-        }
-
-        if ($addCondition['search']) {
-            $barangDataQry->orLike('parent_barang.parent_name', $addCondition['search']);
-        }
-
 
         if ($addCondition['filter_coa']) {
             $barangDataQry->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left');
-        }
 
-        if ($addCondition['filter_coa'] == "belum") {
-            $barangDataQry->where('account_barang.ap_id', NULL);
-        }
-
-        if ($addCondition['filter_coa'] == "sudah") {
-            $barangDataQry->where('account_barang.ap_id !=', NULL);
-        }
-
-        if ($addCondition['search'] || $addCondition['filter_coa']) {
-            $barangDataQry->groupEnd();
+            if ($addCondition['filter_coa'] == "belum") {
+                $barangDataQry->where('account_barang.ap_id', NULL);
+            } elseif ($addCondition['filter_coa'] == "sudah") {
+                $barangDataQry->where('account_barang.ap_id !=', NULL);
+            }
         }
 
         $totalFilteredData = $barangDataQry->countAllResults(false);
-        $data = $barangDataQry->findAll($limit, $offset);
+        $data = $barangDataQry->orderBy($sort, $sortType)->findAll($limit, $offset);
 
         return [
             'data'              => $data,
