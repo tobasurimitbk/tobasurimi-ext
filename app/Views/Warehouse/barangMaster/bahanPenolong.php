@@ -487,6 +487,8 @@
 
                 if (query.length >= 3) {
                     table.ajax.reload(null, false);
+                } else if (length === 0) {
+                    table.ajax.reload(); // Reload untuk menghapus filter jika input kosong
                 }
             }, 600)
         )
