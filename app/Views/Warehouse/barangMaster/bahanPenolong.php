@@ -473,10 +473,23 @@
     });
 
     $(document).ready(function() {
+        function debounce(func, delay) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
 
-        $(".search").change(function() {
-            table.ajax.reload();
-        });
+        $(".search").keyup(
+            debounce(function() {
+                let query = $(this).val();
+
+                if (query.length >= 3) {
+                    table.ajax.reload(null, false);
+                }
+            }, 600)
+        )
 
         $(".filter_coa").change(function() {
             table.ajax.reload();
