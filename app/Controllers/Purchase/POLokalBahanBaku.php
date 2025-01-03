@@ -778,7 +778,7 @@ class POLokalBahanBaku extends BaseController
             'purchase_requests.divisi_id' => $id,
             'purchase_requests.is_posted' => '1',
             'purchase_requests.request_status' => 'waiting',
-            'purchase_requests.user_id' => $this->this_user_id,
+            // 'purchase_requests.user_id' => $this->this_user_id,
             // 'purchase_requests.spp_type' => $spp_type
         ];
         $data = $this->sppModel->where($condition)->like('purchase_requests.spp_type', $spp_type)->findAll();
