@@ -28,10 +28,10 @@ class Barang extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->kodeBahanBaku = "BL-BB";
         $this->kodeBahanPenolong = "BL-BP";
-        $this->kodeBahanJadi = "BJ-BB";
-        $this->kodeBahanScrap = "BS-BB";
-        $this->kodeBahanModal = "BM-BB";
-        $this->kodeBahanSetengahJadi = "BSJ-BB";
+        $this->kodeBahanJadi = "BL-BJ";
+        $this->kodeBahanScrap = "BL-BS";
+        $this->kodeBahanModal = "BL-BM";
+        $this->kodeBahanSetengahJadi = "BL-BSJ";
     }
 
     public function bahanBakuView()
