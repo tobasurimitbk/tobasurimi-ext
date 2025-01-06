@@ -97,6 +97,7 @@ class BarangMasterModel extends Model
                 ->like('barang_master.barang_name', $addCondition['search'])
                 ->orLike('barang_master.kode_barang', $addCondition['search'])
                 ->orLike('parent_barang.parent_name', $addCondition['search'])
+                ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
                 ->groupEnd();
         }
 
