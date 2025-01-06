@@ -86,7 +86,7 @@ class BarangMasterModel extends Model
                 'barang_master_spesifikasi.konversi_satuan_2',
                 'barang_master_spesifikasi.satuan_3',
                 'barang_master_spesifikasi.konversi_satuan_3',
-                'parent_barang.parent_name AS kelompok_barang'
+                'parent_barang.parent_name AS kelompok_barang',
             ])
             ->where($condition)
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
@@ -98,6 +98,7 @@ class BarangMasterModel extends Model
                 ->orLike('barang_master.kode_barang', $addCondition['search'])
                 ->orLike('parent_barang.parent_name', $addCondition['search'])
                 ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
+                ->orLike("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
                 ->groupEnd();
         }
 
