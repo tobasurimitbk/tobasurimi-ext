@@ -492,6 +492,12 @@ class Barang extends BaseController
                         'token' => csrf_hash(),
 
                     ]);
+                } else {
+                    // KODE LAIN BUAT YANG BARU
+                    return response()->setJSON([
+                        'codeNew' => "$codeName-0001",
+                        'token' => csrf_hash(),
+                    ]);
                 }
             }
         } catch (Exception $e) {
