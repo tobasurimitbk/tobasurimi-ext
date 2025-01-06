@@ -481,9 +481,9 @@ class Barang extends BaseController
             foreach ($lastBarang as $value) {
                 $lastCode = $value->kode_barang;
                 $lastCodeExp = explode('-', $lastCode);
-                $length = strlen($lastCodeExp[1]);
+                $length = strlen($lastCodeExp[2]);
                 if ($length == 4) {
-                    $lastIncrement = (int)$lastCodeExp[1];
+                    $lastIncrement = (int)$lastCodeExp[2];
 
                     $newIncrement = str_pad(($lastIncrement + 1), 4, '0', STR_PAD_LEFT);
 
