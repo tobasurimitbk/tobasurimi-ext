@@ -26,12 +26,12 @@ class Barang extends BaseController
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->kodeBahanBaku = "BB";
-        $this->kodeBahanPenolong = "BP";
-        $this->kodeBahanJadi = "BJ";
-        $this->kodeBahanScrap = "BS";
-        $this->kodeBahanModal = "BM";
-        $this->kodeBahanSetengahJadi = "BSJ";
+        $this->kodeBahanBaku = "BL-BB";
+        $this->kodeBahanPenolong = "BL-BP";
+        $this->kodeBahanJadi = "BL-BJ";
+        $this->kodeBahanScrap = "BL-BS";
+        $this->kodeBahanModal = "BL-BM";
+        $this->kodeBahanSetengahJadi = "BL-BSJ";
     }
 
     public function bahanBakuView()
@@ -481,9 +481,9 @@ class Barang extends BaseController
             foreach ($lastBarang as $value) {
                 $lastCode = $value->kode_barang;
                 $lastCodeExp = explode('-', $lastCode);
-                $length = strlen($lastCodeExp[1]);
+                $length = strlen($lastCodeExp[2]);
                 if ($length == 4) {
-                    $lastIncrement = (int)$lastCodeExp[1];
+                    $lastIncrement = (int)$lastCodeExp[2];
 
                     $newIncrement = str_pad(($lastIncrement + 1), 4, '0', STR_PAD_LEFT);
 
@@ -491,6 +491,12 @@ class Barang extends BaseController
                         'codeNew' => $codeName . "-" . $newIncrement,
                         'token' => csrf_hash(),
 
+                    ]);
+                } else {
+                    // KODE LAIN BUAT YANG BARU
+                    return response()->setJSON([
+                        'codeNew' => "$codeName-0001",
+                        'token' => csrf_hash(),
                     ]);
                 }
             }
