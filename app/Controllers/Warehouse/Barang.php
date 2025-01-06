@@ -26,12 +26,12 @@ class Barang extends BaseController
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->kodeBahanBaku = "BB";
-        $this->kodeBahanPenolong = "BP";
-        $this->kodeBahanJadi = "BJ";
-        $this->kodeBahanScrap = "BS";
-        $this->kodeBahanModal = "BM";
-        $this->kodeBahanSetengahJadi = "BSJ";
+        $this->kodeBahanBaku = "BL-BB";
+        $this->kodeBahanPenolong = "BL-BP";
+        $this->kodeBahanJadi = "BJ-BB";
+        $this->kodeBahanScrap = "BS-BB";
+        $this->kodeBahanModal = "BM-BB";
+        $this->kodeBahanSetengahJadi = "BSJ-BB";
     }
 
     public function bahanBakuView()
