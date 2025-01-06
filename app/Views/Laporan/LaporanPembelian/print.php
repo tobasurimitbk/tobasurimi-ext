@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Laporan Pembelian</title>
+  <title>Laporan Pembelian PT. TOBA SURIMI INDUSTRIES, Tbk (<?= session()->get("login")->this_company; ?>)</title>
   <style>
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -15,24 +15,30 @@
       font-weight: normal;
       font-size: 18px;
       margin-bottom: 10px;
-      text-align: center;
+      text-align: left;
       font-weight: bold;
       margin-top: 8px;
     }
 
     h6 {
-      font-weight: normal;
       font-size: 13px;
-      text-align: center;
+      text-align: left;
       font-weight: bold;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-weight: normal;
+      font-size: 10px;
       margin-top: 10px;
       margin-bottom: 10px;
     }
 
     @page {
       size: 7.44in 10in landscape;
-      margin: 5px;
-      padding: 20px;
+      margin: 30px;
+      padding: 100px;
     }
 
     table {
@@ -40,17 +46,25 @@
     }
 
     #table1,
-    th,
+    th {
+      border: 1.5px solid #000000;
+      font-weight: bold;
+      font-size: 10px;
+    }
+
+    #table1,
     td {
-      border: 1px solid #999;
+      border: 1.5px solid #000000;
+      font-weight: normal;
+      font-size: 9px;
+      margin-left: 10px;
     }
   </style>
 </head>
 
 <body>
-  <h5>Laporan Pembelian</h5>
-  <h6>PT. TOBA SURIMI INDUSTRIES, Tbk ()</h6>
-  <h6><?= ($dateStart != "All") ? $dateStart : "" ?> - <?= ($dateEnd != "Now") ? $dateEnd : "" ?></h6>
+  <h6>PT. TOBA SURIMI INDUSTRIES, Tbk (<?= session()->get("login")->this_company; ?>)</h6>
+  <p><b>Purchase Report</b> Period :<?= ($dateStart != "All") ? $dateStart : "" ?> - <?= ($dateEnd != "Now") ? $dateEnd : "" ?></p>
 
   <table width="100%" id="table1
       style=" margin-top: -20px;">

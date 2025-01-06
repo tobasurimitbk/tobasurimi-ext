@@ -212,7 +212,7 @@ class Pembelian extends BaseController
             "draw"              => intval($this->request->getGet("draw")),
             "recordsTotal"      => $res['totalData'],
             "recordsFiltered"   => $res['totalFilteredData'],
-            "data"              => $rdata,
+            "data"              => $addCondition['startdate'] != "" && $addCondition['lastdate'] != "" ? $rdata : [],
             "payload"           => $payload,
         ];
 
@@ -372,10 +372,13 @@ class Pembelian extends BaseController
 
         // var_dump($data);
         // exit;
+        $filename = 'Laporan Pembelian PT. TOBA SURIMI INDUSTRIES, Tbk (' . session()->get("login")->this_company . ')';
+        $encodedFilename = rawurlencode($filename . '.xlsx');
+
         $dompdf->loadHtml(view('Laporan/LaporanPembelian/print', $data));
-        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
-        $dompdf->stream("Laporan Pembelian ", array("Attachment" => false));
+        $dompdf->stream($encodedFilename, array("Attachment" => false));
 
         exit(0);
     }
@@ -400,23 +403,33 @@ class Pembelian extends BaseController
             "lastdate" => $tglAkhir != "now" ? $tglAkhir : "",
         ];
 
+        // Menggabungkan sel dari A1 hingga N1 dan mengisi dengan teks "Purchase Order"
         $spreadsheet->setActiveSheetIndex(0)
-            ->setCellValue('A1', 'No.')
-            ->setCellValue('B1', 'Transaction Date')
-            ->setCellValue('C1', 'Document')
-            ->setCellValue('D1', 'Evidance Num')
-            ->setCellValue('E1', 'Invoice')
-            ->setCellValue('F1', 'Invoice Date')
-            ->setCellValue('G1', 'Tax Invoice')
-            ->setCellValue('H1', 'PO Num')
-            ->setCellValue('I1', 'Supplier')
-            ->setCellValue('J1', 'Valas')
-            ->setCellValue('K1', 'Exchange Rate')
-            ->setCellValue('L1', 'Nominal Value')
-            ->setCellValue('M1', 'Nominal Value(IDR)')
-            ->setCellValue('N1', 'Paid Value(IDR)');
+            ->mergeCells('A1:N1')
+            ->setCellValue('A1', 'Purchase Order')
+            ->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
+        // Menggabungkan sel dari A1 hingga N1 dan mengisi dengan teks "Purchase Order"
+        $spreadsheet->setActiveSheetIndex(0)
+            ->mergeCells('A2:N2')
+            ->setCellValue('A2', 'Periode : ' . ($tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All") . " - " . ($tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now"))
+            ->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A3', 'No.')
+            ->setCellValue('B3', 'Transaction Date')
+            ->setCellValue('C3', 'Document')
+            ->setCellValue('D3', 'Evidance Num')
+            ->setCellValue('E3', 'Invoice')
+            ->setCellValue('F3', 'Invoice Date')
+            ->setCellValue('G3', 'Tax Invoice')
+            ->setCellValue('H3', 'PO Num')
+            ->setCellValue('I3', 'Supplier')
+            ->setCellValue('J3', 'Valas')
+            ->setCellValue('K3', 'Exchange Rate')
+            ->setCellValue('L3', 'Nominal Value')
+            ->setCellValue('M3', 'Nominal Value(IDR)')
+            ->setCellValue('N3', 'Paid Value(IDR)');
 
         $res = $this->penerimaanBarangModel->getPenerimaanBarangListForPrintAccounting($condition, $addCondition);
         $metaValuta = $this->metadataModel->get_by_name('Valuta');
@@ -424,7 +437,7 @@ class Pembelian extends BaseController
         $rdata = [];
 
         $no = 1;
-        $column = 2;
+        $column = 4;
         foreach ($res['data'] as $data) {
             // CARI BC NYA DI BC_PURCHASE ORDER
             $bc23PurchaseOrder = $this->bcPurchaseOrderModel->select('
@@ -530,10 +543,11 @@ class Pembelian extends BaseController
         }
 
         $writer = new Xlsx($spreadsheet);
-        $filename = 'Laporan-Pembelian';
+        $filename = 'Laporan Pembelian PT. TOBA SURIMI INDUSTRIES, Tbk (' . session()->get("login")->this_company . ')';
+        $encodedFilename = rawurlencode($filename . '.xlsx');
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Content-Disposition: attachment; filename="' . $encodedFilename . '"');
         header('Cache-Control: max-age=0');
 
         $writer->save('php://output');

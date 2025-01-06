@@ -121,6 +121,12 @@
             ajax: {
                 url: "<?= base_url("laporan-accounting/pembelian/all"); ?>",
                 dataSrc: "data",
+                beforeSend: function(xhr) {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading()
+                },
                 data: function(data) {
                     data.search = $(".search").val();
                     data.filter = $(".list_supplier").val();
@@ -277,22 +283,38 @@
         return formattedDate;
     }
     const printPDF = function(url) {
-        var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
-        var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
+        var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "";
+        var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "";
         var search = $(".search").val() ? $(".search").val() : "all";
         var filter = $(".list_supplier").val() ? $(".list_supplier").val() : "all";
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
         // console.log(url2);
-        window.open(url2, "_blank");
+        if (tanggal_awal == "" || tanggal_akhir == "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Tanggal tidak boleh kosong!',
+            });
+        } else {
+            window.open(url2, "_blank");
+        }
     }
     const printExcel = function(url) {
-        var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
-        var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
+        var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "";
+        var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "";
         var search = $(".search").val() ? $(".search").val() : "all";
         var filter = $(".list_supplier").val() ? $(".list_supplier").val() : "all";
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
         // console.log(url2);
-        window.open(url2, "_blank");
+        if (tanggal_awal == "" || tanggal_akhir == "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Tanggal tidak boleh kosong!',
+            });
+        } else {
+            window.open(url2, "_blank");
+        }
     }
 </script>
 <?= $this->endSection(); ?>
