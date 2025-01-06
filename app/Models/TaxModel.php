@@ -44,6 +44,7 @@ class TaxModel extends Model
     {
         $arrCondition = [
             'deletedAt' => null,
+            'company_id' => session()->get("login")->this_company_id,
             'type' => $type
         ];
 
