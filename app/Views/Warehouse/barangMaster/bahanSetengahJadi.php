@@ -1001,7 +1001,7 @@
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                 },
-                method: "POST",
+                method: "GET",
                 success: function(res) {
                     csrf.val(res.token);
                     $("input[name='kode_barang']").attr("readonly", true);
