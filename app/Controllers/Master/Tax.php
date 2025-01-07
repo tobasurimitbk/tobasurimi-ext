@@ -34,7 +34,9 @@ class Tax extends BaseController
             "sortType" => $this->request->getGet("sortType"),
         ];
 
-        $condition = [];
+        $condition = [
+            'company_id' => session()->get("login")->this_company_id,
+        ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),

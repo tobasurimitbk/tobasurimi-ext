@@ -1863,7 +1863,6 @@ $routes->get('/jurnal', 'Accounting\JurnalUmum\JurnalUmum::index', ['filter' => 
 $routes->post('/jurnal/generate-no-bukti', 'Accounting\JurnalUmum\JurnalUmum::generateNoBukti', ['filter' => 'Auth']);
 // $routes->post('/jurnal/addJurnal', 'Accounting\JurnalUmum\JurnalUmum::save', ['filter' => 'Auth']);
 $routes->post('/jurnal/import', 'Accounting\JurnalUmum\JurnalUmum::import', ['filter' => 'Auth']);
-$routes->get('/jurnal/import/template', 'Accounting\JurnalUmum\JurnalUmum::templateImport', ['filter' => 'Auth']);
 $routes->post('/jurnal/getSubAkuns', 'Accounting\JurnalUmum\JurnalUmum::searchSubAkun', ['filter' => 'Auth']);
 $routes->post('/jurnal/getSubAkunsExact', 'Accounting\JurnalUmum\JurnalUmum::searchSubAkunExact', ['filter' => 'Auth']);
 $routes->get('/jurnal/all', 'Accounting\JurnalUmum\JurnalUmum::all', ['filter' => 'Auth']);

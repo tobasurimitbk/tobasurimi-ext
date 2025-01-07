@@ -217,7 +217,7 @@
                     <!-- <td><?= $detail->additional_cost ?></b></td> -->
                     <!-- <td><?= $detail->nilaiPpn ?></b></td> -->
                     <!-- <td><?= $detail->nilaiPph ?></b></td> -->
-                    <td style="padding-left: 5px; "><?= $detail->qty . " " . $detail->nama_satuan ?></b></td>
+                    <td style="padding-left: 5px; "><?= $detail->qty . " " . $detail->kode_satuan ?></b></td>
                     <td style="padding-left: 5px;"><?= $detail->kode_barang ?></b></td>
                     <td style="padding-left: 5px;"><?= $detail->nama_barang . " " . $detail->spesifikasi ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= "" . number_format(formatter($detail->price, "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
