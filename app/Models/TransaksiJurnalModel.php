@@ -28,7 +28,8 @@ class TransaksiJurnalModel extends Model
         'no_bukti',
         'valas',
         'exchange_rate',
-        'uraian_transaksi'
+        'uraian_transaksi',
+        'valas_id'
     ];
 
     // Dates

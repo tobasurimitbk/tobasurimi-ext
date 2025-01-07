@@ -87,17 +87,17 @@
             </div>
             <div class="modal-body">
                 <div class="alert alert-secondary text-black" role="alert">
-                    UNDUH TEMPLEATE EXCEL <a href="#" onclick="downloadTemplate()" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                    UNDUH TEMPLEATE EXCEL <a href="<?= base_url('assets/import/IMPORT_JURNAL.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
                 </div>
                 <form class="form-excel" method="post">
                     <div class="form-floating" style="height: 50px;">
-                        <input type="file" name="file" id="file" accept=".xlsx" class="form-control">
+                        <input type="file" name="file" id="excelFileInput" accept=".xlsx" class="form-control">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard btn-discard-import-excel mr-2">Kembali</button>
-                <button type="submit" class="btn btn-submit-form btn-submit-excel">Simpan</button>
+                <button type="button" id="btn-discard-import-excel" class="btn btn-hide-form btn-discard btn-discard-import-excel mr-2">Kembali</button>
+                <button type="submit" onclick="importExcel()" class="btn btn-submit-form btn-submit-excel">Simpan</button>
             </div>
         </div>
     </div>
@@ -350,70 +350,79 @@
         window.open(url + `?start_date=${start_date}&end_date=${end_date}&type_transaksi=${type_transaksi}&search=${search}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 
-    function downloadTemplate() {
-        $.ajax({
-            url: '<?= base_url("jurnal/import/template") ?>', // Endpoint di BE
-            method: 'GET',
-            xhrFields: {
-                responseType: 'blob' // Pastikan menerima file sebagai blob
-            },
-            success: function(data, status, xhr) {
-                const fileName = xhr.getResponseHeader('Content-Disposition')
-                    .split('filename=')[1]
-                    .replace(/"/g, '');
-                const url = window.URL.createObjectURL(data);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-            },
-            error: function(xhr, status, error) {
-                console.error('Error downloading template:', error);
-            }
-        });
-    }
-
-
     // Function to handle the Excel file upload using AJAX
     function importExcel() {
-        const fileInput = document.getElementById('excelFileInput');
-        const file = fileInput.files[0];
-        const csrf = $(`[name="${csrfToken}"]`);
 
-        if (file) {
-            const formData = new FormData();
-            formData.append('file', file);
+        Swal.fire({
+            icon: 'question',
+            title: 'Import Jurnal Umum ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const fileInput = document.getElementById('excelFileInput');
+                const file = fileInput.files[0];
+                const csrf = $(`[name="${csrfToken}"]`);
 
-            $.ajax({
-                url: '<?= base_url("jurnal/import"); ?>',
-                type: 'POST',
-                data: formData,
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    setLoading();
-                },
-                complete: function() {
-                    stopLoading();
-                },
-                contentType: false,
-                processData: false,
-                success: function(response) {
-                    if (response.success) {
-                        alert('Import successful');
-                    } else {
-                        alert('Import failed: ' + response.message);
-                    }
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    alert('Error importing file: ' + errorThrown);
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    $.ajax({
+                        url: '<?= base_url("jurnal/import"); ?>',
+                        type: 'POST',
+                        data: formData,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        location.reload()
+                                    }
+                                })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error importing file: ' + errorThrown,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Please select a file to import.',
+                        confirmButtonColor: '#4e73df',
+                    })
                 }
-            });
-        } else {
-            alert('Please select a file to import.');
-        }
+            }
+        })
+
+
     }
 
 
