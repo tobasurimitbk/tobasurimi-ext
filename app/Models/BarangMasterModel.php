@@ -70,6 +70,9 @@ class BarangMasterModel extends Model
 
         // Hitung total data tanpa filter
         $totalData = $this->where($condition)
+            ->select([
+                'barang_master.id',
+            ])
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
             ->countAllResults();
@@ -88,9 +91,9 @@ class BarangMasterModel extends Model
                 'barang_master_spesifikasi.konversi_satuan_3',
                 'parent_barang.parent_name AS kelompok_barang',
             ])
-            ->where($condition)
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left');
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+            ->where($condition);
 
         if ($addCondition['search']) {
             $barangDataQry->groupStart()
