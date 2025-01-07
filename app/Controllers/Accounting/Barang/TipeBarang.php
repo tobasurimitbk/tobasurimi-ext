@@ -176,9 +176,9 @@ class TipeBarang extends BaseController
                 $dataNamaAP = $dataAP['no_sub'];
             }
 
-            if ($data['pemakaian_id'] != null) {
+            if ($data['pemakaian_id'] != null || $data['pemakaian_id'] != "0") {
                 $dataPemakaian = $this->Sub_AkunsModel->where('id', $data['pemakaian_id'])->first();
-                $dataNamaPemakaian = $dataPemakaian['no_sub'];
+                $dataNamaPemakaian = $dataPemakaian['no_sub'] ?? "-";
             }
 
             // var_dump($data['ar_id']);
