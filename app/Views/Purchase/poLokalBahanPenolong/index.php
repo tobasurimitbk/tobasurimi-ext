@@ -34,7 +34,7 @@
                 <div class="col mb-3">
                     <div class="form-floating spp-ptspp" style="height: 50px;">
                         <select class="form-select form-out-search is_posted" name="is_posted" id="is_posted" aria-label="Floating label select example">
-                            <option value="">PILIH STATUS SPP</option>
+                            <option value="">PILIH STATUS PO</option>
                             <option value="SUDAH POSTING">SUDAH POSTING</option>
                             <option value="BELUM POSTING">BELUM POSTING</option>
                         </select>
