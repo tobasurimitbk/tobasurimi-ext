@@ -966,13 +966,13 @@
             })
         } else
 
-        if (validate_same) {
-            Swal.fire({
-                icon: 'error',
-                title: "Barang Sudah Ada",
-                confirmButtonColor: '#4e73df',
-            })
-        } else {
+            // if (validate_same) {
+            //     Swal.fire({
+            //         icon: 'error',
+            //         title: "Barang Sudah Ada",
+            //         confirmButtonColor: '#4e73df',
+            //     })
+            // } else {
 
             if (barang_detail_id) {
                 if ($(".detail-form").valid()) {
@@ -1015,8 +1015,8 @@
                 }
             }
 
-        }
     }
+    // }
 
     const updateStatusPosting = function(status) {
         Swal.fire({
