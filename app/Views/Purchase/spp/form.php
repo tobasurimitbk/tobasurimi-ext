@@ -70,7 +70,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataSPP) ? 'readonly' : '' ?> autocomplete="one-time-code" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control spp_no" id="spp_no" name="spp_no" placeholder="No. SPP" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
+                                    <input <?= !empty($dataSPP) ? ($dataSPP->is_posted == "1" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control spp_no" id="spp_no" name="spp_no" placeholder="No. SPP" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
                                     <label for="floatingInput">No. SPP</label>
                                 </div>
                                 <div style="<?= !empty($dataSPP) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -663,6 +663,13 @@
                                             }).then((result) => {
                                                 window.location.replace("<?= base_url('spp') ?>");
                                             })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            });
+                                            csrf.val(response.token);
                                         }
 
                                     }
@@ -701,6 +708,13 @@
                                         }).then((result) => {
                                             window.location.replace("<?= base_url('spp') ?>");
                                         })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        });
+                                        csrf.val(response.token);
                                     }
                                 }
                             });

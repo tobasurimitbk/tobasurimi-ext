@@ -215,6 +215,7 @@ class POLokalBahanPenolong extends BaseController
 
 
         $addCondition = [
+            "is_posted"     => $this->request->getVar("is_posted"),
             "search"        => $this->request->getVar("search"),
             "sort"          => $this->request->getVar("sort"),
             "sortType"      => $this->request->getVar("sortType"),

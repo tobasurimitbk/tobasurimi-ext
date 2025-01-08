@@ -183,13 +183,22 @@ class AMPurchaseOrderModel extends Model
 
         $totalData = $poDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['is_posted']) {
             $poDataQry->groupStart();
         }
 
         if ($addCondition['search']) {
             $poDataQry->like('am_purchase_orders.po_no', $addCondition['search'])->orLike('purchase_requests.spp_no', $addCondition['search']);
         }
+
+        if ($addCondition['is_posted']) {
+            if ($addCondition['is_posted'] == "SUDAH POSTING") {
+                $poDataQry->where('am_purchase_orders.is_posted', 1);
+            } else {
+                $poDataQry->where('am_purchase_orders.is_posted', 0);
+            }
+        }
+
 
         if ($addCondition['dateStart']) {
             $poDataQry->where('am_purchase_orders.po_date >=', $addCondition['dateStart']);
@@ -199,7 +208,7 @@ class AMPurchaseOrderModel extends Model
             $poDataQry->where('am_purchase_orders.po_date <=', $addCondition['dateEnd']);
         }
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['is_posted']) {
             $poDataQry->groupEnd();
         }
 
