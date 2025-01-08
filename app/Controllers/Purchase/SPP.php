@@ -141,6 +141,7 @@ class SPP extends BaseController
 
 
         $addCondition = [
+            "is_posted"     => $this->request->getVar('is_posted'),
             "search"        => $this->request->getVar("search"),
             "spp_type"      => $this->request->getVar("spp_type"),
             "sort"          => $this->request->getVar("sort"),
@@ -196,6 +197,18 @@ class SPP extends BaseController
 
     public function saveSPP()
     {
+        $sppNoFirst = $this->SppModel->where('company_id', $this->this_company_id)
+            ->where('spp_no', $this->request->getVar('spp_no'))
+            ->first();
+
+        // Validasi Nomor SPP
+        if ($sppNoFirst != null) {
+            return response()->setJSON([
+                "status"  => false,
+                "message" => "Nomor SPP Sudah Dipakai",
+                'token'   => csrf_hash(),
+            ]);
+        }
 
         $id = $this->SppModel->insert([
             'company_id' => $this->this_company_id,
@@ -233,6 +246,20 @@ class SPP extends BaseController
     {
 
         $id = decrypt($this->request->getVar('id'));
+
+        $sppNoFirst = $this->SppModel->where('company_id', $this->this_company_id)
+            ->where('spp_no', $this->request->getVar('spp_no'))
+            ->where('id <>', $id)
+            ->first();
+
+        // Validasi Nomor SPP
+        if ($sppNoFirst != null) {
+            return response()->setJSON([
+                "status"  => false,
+                "message" => "Nomor SPP Sudah Dipakai",
+                'token'   => csrf_hash(),
+            ]);
+        }
 
         $this->SppModel->update($id, [
             "request_date" => $this->request->getVar("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("request_date")))) : "",
