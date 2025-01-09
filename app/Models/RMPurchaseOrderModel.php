@@ -139,6 +139,8 @@ class RMPurchaseOrderModel extends Model
         if ($addCondition['search']) {
             $bbLokalDataQry
                 ->like('po_no', $addCondition['search']);
+            $bbLokalDataQry->orLike('suppliers.name', $addCondition['search']);
+            $bbLokalDataQry->orLike('divisis.divisi', $addCondition['search']);
         }
 
         if ($addCondition['dateStart']) {

@@ -831,7 +831,7 @@
             },
         });
 
-        $(".barang_id,.supplier_id").change(function() {
+        $(".barang_id,.supplier_id,.divisi_id").change(function() {
             $.ajax({
                 url: `<?= base_url("po-lokal-bahan-baku/get-spesifikasi-barang-supplier"); ?>`,
                 method: "GET",
@@ -843,7 +843,8 @@
                 },
                 data: {
                     barang_id: $(".barang_id option:selected").val(),
-                    supplier_id: $(".supplier_id option:selected").val()
+                    supplier_id: $(".supplier_id option:selected").val(),
+                    divisi_id: $('.divisi_id option:selected').val()
                 },
                 dataType: "json",
                 success: function(res) {

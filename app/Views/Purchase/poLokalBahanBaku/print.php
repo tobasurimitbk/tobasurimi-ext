@@ -361,16 +361,16 @@
                         <td class="txt-right">0.00</td>
                     <?php } ?>
                 </tr>
-                <tr class="table-border">
+                <!-- <tr class="table-border">
                     <td class="skip" colspan="5">TAMBAHAN LANGSUNG</td>
                     <td class="txt-right"><?= number_format(formatter($dataPO->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
-                </tr>
+                </tr> -->
                 <tr class="table-border">
                     <td class="skip" colspan="5">DIBAYARKAN</td>
                     <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                        <td class="txt-right"><?= number_format($nilai_total + $dataPO->subsidi_langsung - ($nilai_total * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
+                        <td class="txt-right"><?= number_format($nilai_total - ($nilai_total * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
                     <?php } else { ?>
-                        <td class="txt-right"><?= number_format(formatter($nilai_total + $dataPO->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                        <td class="txt-right"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                     <?php } ?>
                 </tr>
             </table>
@@ -605,11 +605,18 @@
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td>TAMBAHAN LANGSUNG</td>
+                    <td><?= number_format(formatter($dataPO->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                     <td>DIBAYARKAN</td>
                     <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                        <td><?= number_format(($dataPO->totalTambahan) - ($dataPO->totalTambahan * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
+                        <td><?= number_format(($dataPO->totalTambahan + $dataPO->subsidi_langsung) - ($dataPO->totalTambahan * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
                     <?php } else { ?>
-                        <td><?= number_format(($dataPO->totalTambahan), 2, '.', ',') ?></td>
+                        <td><?= number_format(($dataPO->totalTambahan + $dataPO->subsidi_langsung), 2, '.', ',') ?></td>
                     <?php } ?>
                 </tr>
             </table>

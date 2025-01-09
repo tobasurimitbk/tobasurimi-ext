@@ -48,7 +48,7 @@
                     </select>
                 </div>
                 <div class="col">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik No Penerimaan" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data LPB" value="" />
                 </div>
             </div>
             <div class="row">

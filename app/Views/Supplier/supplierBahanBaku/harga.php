@@ -39,6 +39,19 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select divisi_id" name="divisi_id" id="divisi_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataDivisi as $d) : ?>
+                                    <option value="<?= $d["id"]; ?>">
+                                        <?= $d["divisi"]; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Pilih Departemen</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select bahan_baku" name="bahan_baku" id="bahan_baku" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataBarang as $b) : ?>
@@ -58,8 +71,6 @@
                             <label for="floatingInput">Pilih Spesifikasi</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_umum" id="harga_umum" name="harga_umum" placeholder="Harga Umum">
@@ -72,8 +83,6 @@
                             <label for="floatingInput">Harga Harian</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_bulanan" id="harga_bulanan" name="harga_bulanan" placeholder="Harga Bulanan">
@@ -81,6 +90,7 @@
                         </div>
                     </div>
                 </div>
+
             </form>
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
@@ -100,7 +110,7 @@
             <div class="row">
                 <div class="row justify-content-end mb-3">
                     <div class="col-md-4">
-                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Barang / Spesifikasi" value="" />
+                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Departemen / Barang / Spesifikasi" value="" />
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -108,6 +118,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th width="10">No</th>
+                                <th>Departemen</th>
                                 <th>Barang</th>
                                 <th>Spesifikasi</th>
                                 <th>Harga Umum</th>
@@ -169,6 +180,9 @@
                 className: "text-center",
                 sortable: false
             }, {
+                data: "divisi",
+                className: "text-center"
+            }, {
                 data: "bahan_baku_name",
                 className: "text-center"
             }, {
@@ -207,10 +221,12 @@
                     let harga_umum = row.harga_umum_normal;
                     let harga_bulanan = row.harga_bulanan_normal;
                     let harga_harian = row.harga_harian_normal;
+                    let divisi_id = row.divisi_id;
 
                     return `
                         <button class="btn btn-warning posting-spp mr-1 edit-table-detail" 
                         data-id="${id}" 
+                        data-divisi_id="${divisi_id}"
                         data-bahan_baku="${bahan_baku}"
                         data-spesifikasi_id="${spesifikasi_id}"
                         data-harga_umum="${harga_umum}"
@@ -242,6 +258,7 @@
     $(document).ready(function() {
         $(document).on('click', '.edit-table-detail', function() {
             var id = $(this).data('id');
+            var divisi_id = $(this).data('divisi_id');
             var bahan_baku = $(this).data('bahan_baku');
             var harga_umum = greatFormatRupiah($(this).data('harga_umum'));
             var harga_bulanan = greatFormatRupiah($(this).data('harga_bulanan'));
@@ -249,6 +266,7 @@
             var spesifikasi_id = $(this).data('spesifikasi_id');
 
             $('.id').val(id);
+            $('.divisi_id').val(divisi_id).change();
             $('.bahan_baku').val(bahan_baku).change();
             $('.spesifikasi_id_hidden').val(spesifikasi_id);
             $('.harga_umum').val(harga_umum);
@@ -269,6 +287,12 @@
 
     $('.spesifikasi_id').select2({
         placeholder: "Pilih Spesifikasi",
+        theme: "bootstrap-5",
+        allowClear: true
+    })
+
+    $('.divisi_id').select2({
+        placeholder: "Pilih Departemen",
         theme: "bootstrap-5",
         allowClear: true
     })
@@ -300,6 +324,9 @@
 
     var validator = $(".harga-form").validate({
         rules: {
+            divisi_id: {
+                required: true
+            },
             bahan_baku: {
                 required: true
             },
@@ -317,6 +344,9 @@
             }
         },
         messages: {
+            divisi_id: {
+                required: "Departemen wajib diisi"
+            },
             bahan_baku: {
                 required: "Bahan Baku wajib diisi"
             },
@@ -454,7 +484,6 @@
                     $(".spesifikasi_id").append(`<option ${spesifikasi_id === item.id ? 'selected' : ''} value="${item.id}">${item.spesifikasi}</option>`);
                 });
                 var spesifikasi_id_hidden = $('.spesifikasi_id_hidden').val();
-                console.log(spesifikasi_id_hidden);
                 if (spesifikasi_id_hidden) {
                     $('.spesifikasi_id').val(spesifikasi_id_hidden).change();
                 }

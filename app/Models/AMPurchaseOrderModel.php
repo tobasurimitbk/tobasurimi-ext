@@ -189,6 +189,9 @@ class AMPurchaseOrderModel extends Model
 
         if ($addCondition['search']) {
             $poDataQry->like('am_purchase_orders.po_no', $addCondition['search'])->orLike('purchase_requests.spp_no', $addCondition['search']);
+            $poDataQry->orLike('suppliers.name', $addCondition['search']);
+            $poDataQry->orLike('divisis.divisi', $addCondition['search']);
+            $poDataQry->orLike('purchase_requests.spp_no', $addCondition['search']);
         }
 
         if ($addCondition['is_posted']) {
