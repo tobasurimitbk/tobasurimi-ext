@@ -149,14 +149,14 @@ class AMPurchaseOrderModel extends Model
     {
         $availableSort = [
             'poDate'           => 'am_purchase_orders.po_date',
-            'divisiName'      => 'divisis.divisi',
+            'divisiName'       => 'divisis.divisi',
             'poNo'             => 'am_purchase_orders.po_no',
-            'sppNo'             => 'purchase_requests.spp_no',
-            'supplierName'      => 'suppliers.name',
-            'divisis'             => 'am_purchase_orders.total',
-            'createdAt'         => 'am_purchase_orders.createdAt',
-            'updatedAt'         => 'am_purchase_orders.updatedAt',
-            'statusPenerimaan'  => 'am_purchase_orders.status_penerimaan'
+            'sppNo'            => 'purchase_requests.spp_no',
+            'supplierName'     => 'suppliers.name',
+            'divisis'          => 'am_purchase_orders.total',
+            'createdAt'        => 'am_purchase_orders.createdAt',
+            'updatedAt'        => 'am_purchase_orders.updatedAt',
+            'statusPenerimaan' => 'am_purchase_orders.status_penerimaan'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -178,42 +178,40 @@ class AMPurchaseOrderModel extends Model
             ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
             ->join('am_purchase_order_details', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
             ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
-            ->groupBy(('am_purchase_orders.id'))
+            ->groupBy('am_purchase_orders.id')
             ->orderBy($sort, $sortType);
 
-        $totalData = $poDataQry->countAllResults(false);
-
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['is_posted']) {
-            $poDataQry->groupStart();
-        }
-
-        if ($addCondition['is_posted']) {
+        // Filter is_posted (diluar groupStart)
+        if (isset($addCondition['is_posted'])) {
             if ($addCondition['is_posted'] == "SUDAH POSTING") {
                 $poDataQry->where('am_purchase_orders.is_posted', 1);
-            } else {
+            } elseif ($addCondition['is_posted'] == "BELUM POSTING") {
                 $poDataQry->where('am_purchase_orders.is_posted', 0);
             }
         }
 
-        if ($addCondition['search']) {
-            $poDataQry->like('am_purchase_orders.po_no', $addCondition['search'])->orLike('purchase_requests.spp_no', $addCondition['search']);
-            $poDataQry->orLike('suppliers.name', $addCondition['search']);
-            $poDataQry->orLike('divisis.divisi', $addCondition['search']);
-            $poDataQry->orLike('purchase_requests.spp_no', $addCondition['search']);
-        }
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $poDataQry->groupStart();
 
-        if ($addCondition['dateStart']) {
-            $poDataQry->where('am_purchase_orders.po_date >=', $addCondition['dateStart']);
-        }
+            if ($addCondition['search']) {
+                $poDataQry->like('am_purchase_orders.po_no', $addCondition['search'])
+                    ->orLike('purchase_requests.spp_no', $addCondition['search'])
+                    ->orLike('suppliers.name', $addCondition['search'])
+                    ->orLike('divisis.divisi', $addCondition['search']);
+            }
 
-        if ($addCondition['dateEnd']) {
-            $poDataQry->where('am_purchase_orders.po_date <=', $addCondition['dateEnd']);
-        }
+            if ($addCondition['dateStart']) {
+                $poDataQry->where('am_purchase_orders.po_date >=', $addCondition['dateStart']);
+            }
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['is_posted']) {
+            if ($addCondition['dateEnd']) {
+                $poDataQry->where('am_purchase_orders.po_date <=', $addCondition['dateEnd']);
+            }
+
             $poDataQry->groupEnd();
         }
 
+        $totalData = $poDataQry->countAllResults(false);
         $totalFilteredData = $poDataQry->countAllResults(false);
         $data = $poDataQry->findAll($limit, $offset);
 
@@ -221,10 +219,11 @@ class AMPurchaseOrderModel extends Model
             'data'              => $data,
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData,
-            'sort'  => $sort,
-            'sortType'  => $sortType
+            'sort'              => $sort,
+            'sortType'          => $sortType,
         ];
     }
+
 
 
     public function getPOById($id)
