@@ -187,13 +187,6 @@ class AMPurchaseOrderModel extends Model
             $poDataQry->groupStart();
         }
 
-        if ($addCondition['search']) {
-            $poDataQry->like('am_purchase_orders.po_no', $addCondition['search'])->orLike('purchase_requests.spp_no', $addCondition['search']);
-            $poDataQry->orLike('suppliers.name', $addCondition['search']);
-            $poDataQry->orLike('divisis.divisi', $addCondition['search']);
-            $poDataQry->orLike('purchase_requests.spp_no', $addCondition['search']);
-        }
-
         if ($addCondition['is_posted']) {
             if ($addCondition['is_posted'] == "SUDAH POSTING") {
                 $poDataQry->where('am_purchase_orders.is_posted', 1);
@@ -202,6 +195,12 @@ class AMPurchaseOrderModel extends Model
             }
         }
 
+        if ($addCondition['search']) {
+            $poDataQry->like('am_purchase_orders.po_no', $addCondition['search'])->orLike('purchase_requests.spp_no', $addCondition['search']);
+            $poDataQry->orLike('suppliers.name', $addCondition['search']);
+            $poDataQry->orLike('divisis.divisi', $addCondition['search']);
+            $poDataQry->orLike('purchase_requests.spp_no', $addCondition['search']);
+        }
 
         if ($addCondition['dateStart']) {
             $poDataQry->where('am_purchase_orders.po_date >=', $addCondition['dateStart']);
