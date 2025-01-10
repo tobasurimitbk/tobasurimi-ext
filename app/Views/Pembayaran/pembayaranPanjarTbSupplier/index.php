@@ -34,17 +34,6 @@
 
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select jenis_panjar" name="jenis_panjar" id="jenis_panjar">
-                                    <option value="" selected></option>
-                                    <option value="PANJAR">PANJAR</option>
-                                    <option value="PANJAR_TB">PANJAR TB</option>
-                                </select>
-                                <label for="floatingInput">Jenis Panjar</label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select tipe_supplier" name="tipe_supplier" id="tipe_supplier">
                                     <option value="" selected></option>
                                     <option value="INTERNASIONAL">INTERNASIONAL</option>
@@ -150,7 +139,6 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSort('no_panjar')">No. Panjar</th>
-                                <th onclick="changeSort('jenis_panjar')">Jenis Panjar</th>
                                 <th onclick="changeSort('supplier_id')">Supplier</th>
                                 <th onclick="changeSort('payment_date')">Payment Date</th>
                                 <th onclick="changeSort('payment_amount')">Total Panjar</th>
@@ -205,7 +193,6 @@
                             <tr>
                                 <td style="width: 10px;text-align: center;color:#E7323A;font-weight:bold;">No</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;" class="nomor">Nomor PO</td>
-                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Jenis Panjar</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;">Total Panjar</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;">Bayar Panjar</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;">Payment Date</td>
@@ -277,10 +264,6 @@
                 data: "no_panjar",
                 className: "text-center",
                 // width: "10%"
-            },
-            {
-                data: "jenis_panjar",
-                className: "text-center"
             },
             {
                 data: "supplier",
@@ -359,12 +342,7 @@
         rules: {
             total_panjar: {
                 required: true,
-            },
-            tipe_panjar: {
-                required: true,
-            },
-            jenis_panjar: {
-                required: true,
+
             },
             payment_date: {
                 required: true
@@ -372,18 +350,11 @@
             name: {
                 required: true
             }
+
         },
         messages: {
             total_panjar: {
                 required: "total panjar wajib diisi",
-
-            },
-            tipe_panjar: {
-                required: "tipe panjar wajib diisi",
-
-            },
-            jenis_panjar: {
-                required: "jenis panjar wajib diisi",
 
             },
             payment_date: {
@@ -547,16 +518,6 @@
 
     $('#tipe_supplier').select2({
         placeholder: "Pilih Tipe Supplier",
-        theme: "bootstrap-5",
-    });
-
-    $('#tipe_panjar').select2({
-        placeholder: "Pilih Tipe Panjar",
-        theme: "bootstrap-5",
-    });
-
-    $('#jenis_panjar').select2({
-        placeholder: "Pilih Jenis Panjar",
         theme: "bootstrap-5",
     });
 

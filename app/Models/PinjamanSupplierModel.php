@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class PanjarSupplierModel extends Model
+class PinjamanSupplierModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'panjar_supplier';
+    protected $table            = 'pinjaman_supplier';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -17,13 +17,12 @@ class PanjarSupplierModel extends Model
 
     protected $allowedFields = [
         'company_id',
-        'no_panjar',
+        'no_pinjaman',
         'supplier_id',
         'payment_date',
-        'total_panjar',
-        'jenis_panjar',
-        'tipe_panjar',
-        'sisa_panjar',
+        'total_pinjaman',
+
+        'sisa_pinjaman',
         'is_posted'
     ];
     // Dates
@@ -50,41 +49,41 @@ class PanjarSupplierModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getPanjarSupplierList($addCondition, $condition, $limit = 10, $offset = 0)
+    public function getPinjamanSupplierList($addCondition, $condition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'no_panjar'     => 'panjar_supplier.no_panjar',
-            'supplier_id'   => 'panjar_supplier.supplier_id',
-            'payment_date'  => 'panjar_supplier.payment_date',
-            'total_panjar'  => 'panjar_supplier.total_panjar',
-            'createdAt'     => 'panjar_supplier.createdAt',
-            'updatedAt'     => 'panjar_supplier.updatedAt'
+            'no_pinjaman'     => 'pinjaman_supplier.no_pinjaman',
+            'supplier_id'   => 'pinjaman_supplier.supplier_id',
+            'payment_date'  => 'pinjaman_supplier.payment_date',
+            'total_pinjaman'  => 'pinjaman_supplier.total_pinjaman',
+            'createdAt'     => 'pinjaman_supplier.createdAt',
+            'updatedAt'     => 'pinjaman_supplier.updatedAt'
 
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'panjar_supplier.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'pinjaman_supplier.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "panjar_supplier.*,name";
+        $selectQry = "pinjaman_supplier.*,name";
         $supplierDataQry = $this->asObject()
             ->select($selectQry)
-            ->join('suppliers', 'panjar_supplier.supplier_id = suppliers.id', 'left')
+            ->join('suppliers', 'pinjaman_supplier.supplier_id = suppliers.id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
         $totalData = $supplierDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || !empty($addCondition['panjar_status'])) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || !empty($addCondition['pinjaman_status'])) {
             $supplierDataQry->groupStart();
         }
 
 
-        if (!empty($addCondition['panjar_status'])) {
-            if ($addCondition['panjar_status'] == "ALL") {
+        if (!empty($addCondition['pinjaman_status'])) {
+            if ($addCondition['pinjaman_status'] == "ALL") {
                 // JIKA ALL
                 $supplierDataQry->whereIn('is_posted', ['1', '0']);
             } else {
-                $status = $addCondition['panjar_status'] == "NOT_POSTING" ? '0' : '1';
+                $status = $addCondition['pinjaman_status'] == "NOT_POSTING" ? '0' : '1';
                 $supplierDataQry->where('is_posted', $status);
             }
         }
@@ -95,7 +94,7 @@ class PanjarSupplierModel extends Model
 
 
         if ($addCondition['search']) {
-            $supplierDataQry->like('no_panjar', $addCondition['search'])->orLike('name', $addCondition['search']);
+            $supplierDataQry->like('no_pinjaman', $addCondition['search'])->orLike('name', $addCondition['search']);
         }
 
         if ($addCondition['dateStart']) {
@@ -105,7 +104,7 @@ class PanjarSupplierModel extends Model
             $supplierDataQry->where('payment_date <=', $addCondition['dateEnd']);
         }
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || !empty($addCondition['panjar_status'])) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || !empty($addCondition['pinjaman_status'])) {
             $supplierDataQry->groupEnd();
         }
 
@@ -122,51 +121,50 @@ class PanjarSupplierModel extends Model
     }
 
     //get panjar supplier by id array 
-    public function getPanjarSupplierbyIDarray($id)
+    public function getPinjamanSupplierbyIDarray($id)
     {
-        $selectQry = "panjar_supplier.*,type,name";
+        $selectQry = "pinjaman_supplier.*,type,name";
         $panjarSupplierData = $this->asObject()
             ->select($selectQry)
-            ->join('suppliers', 'panjar_supplier.supplier_id = suppliers.id', 'left')
-            ->whereIn('panjar_supplier.id', $id)
+            ->join('suppliers', 'pinjaman_supplier.supplier_id = suppliers.id', 'left')
+            ->whereIn('pinjaman_supplier.id', $id)
             ->findAll();
         return $panjarSupplierData;
     }
 
     //get panjar id not use array
-    public function getPanjarSupplierbyID($id)
+    public function getPinjamanSupplierbyID($id)
     {
-        $selectQry = "panjar_supplier.*,type,name";
+        $selectQry = "pinjaman_supplier.*,type,name";
         $panjarSupplierData = $this->asObject()
             ->select($selectQry)
-            ->join('suppliers', 'panjar_supplier.supplier_id = suppliers.id', 'left')
+            ->join('suppliers', 'pinjaman_supplier.supplier_id = suppliers.id', 'left')
             ->find($id);
         return $panjarSupplierData;
     }
 
     // public function getSisaPembayaranbyID($id){
     //     $condition = [
-    //         'panjar_supplier.id' => $id,
+    //         'pinjaman_supplier.id' => $id,
     //         'deletedAt' => NULL
     //     ];
-    //     $selectQry = "panjar_supplier"
+    //     $selectQry = "pinjaman_supplier"
     // }
 
-    public function getPanjarSupplierbySupplierId($id, $companyId)
+    public function getPinjamanSupplierbySupplierId($id, $companyId)
     {
 
         $condition = [
-            'panjar_supplier.supplier_id ' => $id,
-            'panjar_supplier.deletedAt' => null,
-            'panjar_supplier.jenis_panjar' => "PANJAR",
+            'pinjaman_supplier.supplier_id ' => $id,
+            'pinjaman_supplier.deletedAt' => null,
             'is_posted' => '1',
-            'panjar_supplier.company_id' => $companyId
+            'pinjaman_supplier.company_id' => $companyId
         ];
 
-        $selectQry = "panjar_supplier.*";
+        $selectQry = "pinjaman_supplier.*";
         $panjarSupplierData = $this->asObject()
             ->select($selectQry)
-            // ->join('local_po_payment_panjar', 'panjar_supplier.id = local_po_payment_panjar.panjar_id', 'left')
+            // ->join('local_po_payment_pinjaman', 'pinjaman_supplier.id = local_po_payment_panjar.pinjaman_id', 'left')
             ->where($condition)
             ->findAll();
 
@@ -174,26 +172,6 @@ class PanjarSupplierModel extends Model
     }
 
 
-    public function getPanjarTBSupplierbySupplierId($id, $companyId)
-    {
-
-        $condition = [
-            'panjar_supplier.supplier_id ' => $id,
-            'panjar_supplier.deletedAt' => null,
-            'panjar_supplier.jenis_panjar' => "PANJAR_TB",
-            'is_posted' => '1',
-            'panjar_supplier.company_id' => $companyId
-        ];
-
-        $selectQry = "panjar_supplier.*";
-        $panjarSupplierData = $this->asObject()
-            ->select($selectQry)
-            // ->join('local_po_payment_panjar', 'panjar_supplier.id = local_po_payment_panjar.panjar_id', 'left')
-            ->where($condition)
-            ->findAll();
-
-        return $panjarSupplierData;
-    }
 
 
     public function getNumber($companyId)
@@ -205,8 +183,8 @@ class PanjarSupplierModel extends Model
         $lastStr =  convertBulanToAngkaRomawi($month) . '/' . $year;
 
         // AMBIL NO PANJAR TERAKHIR DI BULAN & TAHUN INI
-        $builder = $this->asArray()->select('no_panjar')
-            ->orderBy('no_panjar', "DESC")
+        $builder = $this->asArray()->select('no_pinjaman')
+            ->orderBy('no_pinjaman', "DESC")
             ->where('company_id', $companyId)
             ->where('createdAt >=', $year . "-" . $month . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59")
@@ -216,7 +194,7 @@ class PanjarSupplierModel extends Model
         $lastNumber = 1;
 
         if ($builder != null) {
-            $explode = explode('/', $builder['no_panjar']); // CONVERT TO ARRAY BY (/)
+            $explode = explode('/', $builder['no_pinjaman']); // CONVERT TO ARRAY BY (/)
             $number = intval($explode[3]); // CARI DIGIT ANGKA
             if ($number > $lastNumber) {
                 $lastNumber = $number;
@@ -234,19 +212,20 @@ class PanjarSupplierModel extends Model
     {
 
         $condition = [
-            'panjar_supplier.id' => $id,
+            'pinjaman_supplier.id' => $id,
 
         ];
 
-        $selectQry = "no_panjar, bayar_panjar, panjar_supplier.supplier_id, multiple_lpb_no, name, local_po_payments.payment_date";
+        $selectQry = "no_panjar, bayar_panjar, pinjaman_supplier.supplier_id, multiple_lpb_no, name, local_po_payments.payment_date";
         $historyPembayaranPanjarData = $this->asObject()
             ->select($selectQry)
-            ->join('local_po_payment_panjar', 'panjar_supplier.id = local_po_payment_panjar.panjar_id', 'inner')
+            ->join('local_po_payment_pinjaman', 'pinjaman_supplier.id = local_po_payment_panjar.pinjaman_id', 'inner')
             ->join('local_po_payments', 'local_po_payments.id = local_po_payment_panjar.local_po_payment_id', 'inner')
-            ->join('suppliers', 'panjar_supplier.supplier_id = suppliers.id', 'inner')
+            ->join('suppliers', 'pinjaman_supplier.supplier_id = suppliers.id', 'inner')
             ->where($condition)
             ->findAll();
 
         return $historyPembayaranPanjarData;
     }
+    
 }
