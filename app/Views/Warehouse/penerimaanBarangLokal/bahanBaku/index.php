@@ -221,6 +221,11 @@
                         if (bc_type !== '0' && in_bc === 'out') {
                             string += buttonUnpost;
                         }
+
+                        if (bc_type === '0') {
+                            string += buttonUnpost;
+                        }
+
                         return string + `</div>`;
                     }
 

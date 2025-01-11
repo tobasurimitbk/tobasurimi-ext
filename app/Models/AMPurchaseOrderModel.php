@@ -539,7 +539,8 @@ class AMPurchaseOrderModel extends Model
             return [
                 'hargaTerakhirNumber' => 0,
                 'hargaTerakhir' => '-',
-                'supplierTerakhir' => '-'
+                'supplierTerakhir' => '-',
+                'dataPO' => null
             ];
         } else {
             return [

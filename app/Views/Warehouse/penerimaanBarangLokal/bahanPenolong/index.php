@@ -225,6 +225,11 @@
                             <?php endif; ?>
                            `;
                         if (bc_type !== '0' && in_bc === 'out') {
+                            // UNTUK LO
+                            string += buttonUnpost;
+                        }
+
+                        if (bc_type === '0') {
                             string += buttonUnpost;
                         }
 
