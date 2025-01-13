@@ -47,7 +47,7 @@
                     </select>
                 </div>
                 <div class="col">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik No Penerimaan" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data LPB" value="" />
                 </div>
             </div>
             <div class="row">
@@ -225,6 +225,11 @@
                             <?php endif; ?>
                            `;
                         if (bc_type !== '0' && in_bc === 'out') {
+                            // UNTUK LO
+                            string += buttonUnpost;
+                        }
+
+                        if (bc_type === '0') {
                             string += buttonUnpost;
                         }
 

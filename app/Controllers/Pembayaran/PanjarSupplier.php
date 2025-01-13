@@ -57,6 +57,12 @@ class PanjarSupplier extends BaseController
                 "no_panjar" => [
                     "rules" => "required"
                 ],
+                "tipe_panjar" => [
+                    "rules" => "required"
+                ],
+                "jenis_panjar" => [
+                    "rules" => "required"
+                ],
                 "payment_date" => [
                     "rules" => "required"
                 ],
@@ -91,6 +97,7 @@ class PanjarSupplier extends BaseController
 
                 "company_id"    => $this->this_company_id,
                 "supplier_id"   => $this->request->getVar('supplier_id'),
+                "jenis_panjar"   => $this->request->getVar('jenis_panjar'),
                 "no_panjar"     => $this->request->getPost("no_panjar"),
                 "payment_date"  => $this->request->getVar("payment_date"),
                 "total_panjar"  => repairDouble($this->request->getVar("total_panjar")),
@@ -263,11 +270,10 @@ class PanjarSupplier extends BaseController
         $payload = [
             "pageSize"      => $this->request->getGet("length"),
             "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search"                 => $this->request->getGet("search"),
-            "panjar_status"         => $this->request->getVar("panjar_status"),
+            "search"        => $this->request->getGet("search"),
+            "panjar_status" => $this->request->getVar("panjar_status"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
 
@@ -311,6 +317,7 @@ class PanjarSupplier extends BaseController
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
                 "no_panjar"     => $data->no_panjar,
+                "jenis_panjar"     => str_replace('_', ' ', $data->jenis_panjar),
                 "supplier"      => $data->name,
                 "payment_date"  => date('d/m/Y', strtotime($data->payment_date)),
                 "total_panjar"  => number_format($data->total_panjar, 2),

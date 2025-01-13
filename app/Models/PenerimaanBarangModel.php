@@ -80,14 +80,24 @@ class PenerimaanBarangModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'penerimaan_barang.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "penerimaan_barang.*, warehouses.warehouse_name, suppliers.name as supplier_name, COUNT(penerimaan_barang_detail.id) AS itemCount, divisis.divisi";
+        $selectQry = "penerimaan_barang.*, 
+        warehouses.warehouse_name, suppliers.name as supplier_name, 
+        COUNT(penerimaan_barang_detail.id) AS itemCount, 
+        divisis.divisi";
         $penerimaanBarangDataQry = $this->asObject()
             ->select($selectQry)
             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
             ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'right')
-            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
-            ->groupBy(('penerimaan_barang.id'))
+            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left');
+
+        if ($condition['penerimaan_barang.status_penerimaan'] == "LOKAL" && $condition['tipe_bahan'] == "PENOLONG") {
+            // KHSUSUS LPB BP
+            $penerimaanBarangDataQry->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left');
+            $penerimaanBarangDataQry->join('purchase_requests', 'am_purchase_orders.purchase_request_id = purchase_requests.id', 'left');
+        }
+
+        $penerimaanBarangDataQry->groupBy(('penerimaan_barang.id'))
             ->where($condition)
             ->orderBy($sort, $sortType);
 
@@ -99,6 +109,14 @@ class PenerimaanBarangModel extends Model
 
         if ($addCondition['search']) {
             $penerimaanBarangDataQry->like('penerimaan_barang.no_penerimaan_barang', $addCondition['search']);
+            $penerimaanBarangDataQry->orLike('suppliers.name', $addCondition['search']);
+            $penerimaanBarangDataQry->orLike('warehouses.warehouse_name', $addCondition['search']);
+            $penerimaanBarangDataQry->orLike('penerimaan_barang.multiple_po_no', $addCondition['search']);
+            $penerimaanBarangDataQry->orLike('divisis.divisi', $addCondition['search']);
+
+            if ($condition['penerimaan_barang.status_penerimaan'] == "LOKAL" && $condition['tipe_bahan'] == "PENOLONG") {
+                $penerimaanBarangDataQry->orLike('purchase_requests.spp_no', $addCondition['search']);
+            }
         }
 
         if ($addCondition['status']) {

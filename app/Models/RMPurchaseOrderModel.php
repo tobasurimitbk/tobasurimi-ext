@@ -139,6 +139,8 @@ class RMPurchaseOrderModel extends Model
         if ($addCondition['search']) {
             $bbLokalDataQry
                 ->like('po_no', $addCondition['search']);
+            $bbLokalDataQry->orLike('suppliers.name', $addCondition['search']);
+            $bbLokalDataQry->orLike('divisis.divisi', $addCondition['search']);
         }
 
         if ($addCondition['dateStart']) {
@@ -876,7 +878,8 @@ class RMPurchaseOrderModel extends Model
             return [
                 'hargaTerakhirNumber' => 0,
                 'hargaTerakhir' => '-',
-                'supplierTerakhir' => '-'
+                'supplierTerakhir' => '-',
+                'dataPO' => null
             ];
         } else {
             $totalPrice = $res['general_price'] + $res['daily_price'] + $res['monthly_price'];

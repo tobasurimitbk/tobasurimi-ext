@@ -150,7 +150,7 @@ class POLokalBahanBaku extends BaseController
             $dataBBLokalDetail = $this->RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
             $dataBarang = $this->barangModel->getBySupplier($dataBBLokal->supplier_id);
 
-            $data["dataSpesifikasi"] = $this->SupplierHargaModel->getSupplierHarga($dataBBLokal->supplier_id, $dataBBLokal->barang_id);
+            $data["dataSpesifikasi"] = $this->SupplierHargaModel->getSupplierHarga($dataBBLokal->supplier_id, $dataBBLokal->barang_id, $dataBBLokal->divisi_id);
             $data["dataSPP"] = $this->sppModel->find($dataBBLokal->purchase_request_id);
             $data["dataListSPP"] = $this->sppModel->where('request_status', "waiting")->where('is_posted', '1')->where('divisi_id', $dataBBLokal->divisi_id)->where('spp_type', "Lokal BB")->where('deletedAt', null)->findAll();
             $data["dataBarang"] = $dataBarang;
@@ -885,11 +885,16 @@ class POLokalBahanBaku extends BaseController
     {
         $supplier_id = $this->request->getVar('supplier_id');
         $bahan_baku_id = $this->request->getVar('barang_id');
+        $divisi_id = $this->request->getVar('divisi_id');
 
         return response()->setJSON([
             'status' => true,
             'token' => csrf_hash(),
-            'data' => $this->SupplierHargaModel->getSupplierHarga($supplier_id, $bahan_baku_id)
+            'data' => $this->SupplierHargaModel->getSupplierHarga(
+                $supplier_id,
+                $bahan_baku_id,
+                $divisi_id,
+            )
         ]);
     }
 

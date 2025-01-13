@@ -1667,6 +1667,9 @@ class JurnalUmum extends BaseController
 
         if ($typeBarang == "bahan_penolong") {
             $dataPO = $this->aMPurchaseOrderModel->getPOByNoPO($noPO, $this->this_company_id, $barang1ID, $barang2ID);
+            if ($dataPO['dataPO'] == null) {
+                return;
+            }
             $kategori = $dataPO["dataPO"]["po_type"];
             $kursData = $this->kursModel->getByMetaId($dataPO["dataPO"]["currency"], $dataPO["dataPO"]["po_date"]);
             if ($kursData) {
@@ -1678,6 +1681,9 @@ class JurnalUmum extends BaseController
             $valasText = $this->MetadataModel->asObject()->find($dataPO["dataPO"]["currency"]);
         } else if ($typeBarang == "bahan_baku") {
             $dataPO = $this->rMPurchaseOrderModel->getPOByNoPO($noPO, $this->this_company_id, $barang1ID, $barang2ID);
+            if ($dataPO['dataPO'] == null) {
+                return;
+            }
             if ($dataPO) {
                 $kategori = "LOKAL";
                 $kurs = 1;

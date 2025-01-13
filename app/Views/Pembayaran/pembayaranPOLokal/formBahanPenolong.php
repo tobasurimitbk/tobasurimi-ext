@@ -195,11 +195,15 @@
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Potongan Panjar</button>
                         </li>
-
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="potongan-pinjaman" data-bs-toggle="tab" data-bs-target="#potongan-pinjaman-pane" type="button" role="tab" aria-controls="potongan-pinjaman-pane" aria-selected="false">Pinjaman Supplier</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="potongan-panjar-tb-tab" data-bs-toggle="tab" data-bs-target="#potongan-panjar-tb-tab-pane" type="button" role="tab" aria-controls="potongan-panjar-tb-tab-pane" aria-selected="false">Panjar TB Supplier</button>
+                        </li>
                     </ul>
                     <div class="tab-content" id="myTabContent">
                         <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="table-responsive">
@@ -246,8 +250,55 @@
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
+                        </div>                   
+                        <div class="tab-pane fade" id="potongan-pinjaman-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                            <div class="row">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable-pinjaman" width="100%" cellspacing="0">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>No</th>
+                                                <th onclick="changeSort('no_pinjaman')">No. Pinjaman</th>
+                                                <th onclick="changeSort('payment_date')">Payment Date</th>
+                                                <th onclick="changeSort('payment_amount')">Total Pinjaman</th>
+                                                <th>Sisa Pinjaman</th>
+                                                <th>Bayar Pinjaman </th>
+                                            </tr>
 
+                                        </thead>
+                                        <tbody class="body-table" id="body-table-pinjaman" style="cursor: pointer;">
+                                            <tr style="color: whitesmoke;">
+                                                <td colspan="7" style="text-align: center;">Tidak ada pinjaman</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="potongan-panjar-tb-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                            <div class="row">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable-panjar-TB" width="100%" cellspacing="0">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>No</th>
+                                                <th onclick="changeSort('no_panjar')">No. Panjar TB</th>
+                                                <th onclick="changeSort('payment_date')">Payment Date</th>
+                                                <th onclick="changeSort('payment_amount')">Total Panjar TB</th>
+                                                <th>Sisa Panjar TB</th>
+                                                <th>Bayar Panjar TB </th>
+                                            </tr>
+
+                                        </thead>
+                                        <tbody class="body-table" id="body-table-panjar-TB" style="cursor: pointer;">
+                                            <tr style="color: whitesmoke;">
+                                                <td colspan="7" style="text-align: center;">Tidak ada Panjar TB</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -266,6 +317,9 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     var listPanjar = [];
+    var listPanjarTB = [];
+    var listPinjaman = [];
+    var listPembayaran = [];
 
     <?php if (!empty($detail)) : ?>
 
@@ -280,12 +334,20 @@
             },
             dataType: "json",
             success: function(res) {
-
-
-                drawPaidTable(res);
-                drawPaidPanjarTable(res);
+                listPembayaran = [];
+                listPembayaran = response.data.detail;
                 listPanjar = [];
-                listPanjar = res.panjar_list;
+                listPinjaman = [];
+                listPanjarTB = [];
+                listPanjar = response.data.panjar
+                listPinjaman = response.data.pinjaman
+                listPanjarTB = response.data.panjarTB
+
+                csrf.val(response.token);
+                drawPaidPanjarTable(listPanjar);
+                drawPaidPinjamanTable(listPinjaman);
+                drawPaidPanjarTBTable(listPanjarTB);
+                drawPaidTable(response.data);
             }
         })
     <?php endif; ?>
@@ -453,6 +515,20 @@
                 listPanjar[i].bayar_panjar = input_user;
             });
 
+
+            $.each(listPinjaman, function(i, v) {
+                var element = $('input[data-id="' + v.id + '"].bayar_pinjaman');
+                var input_user = (element.val());
+                listPinjaman[i].bayar_pinjaman = input_user;
+            });
+
+
+            $.each(listPanjarTB, function(i, v) {
+                var element = $('input[data-id="' + v.id + '"].bayar_panjar_tb');
+                var input_user = (element.val());
+                listPanjarTB[i].bayar_panjar = input_user;
+            });
+
             if (id) {
                 // UPDATE
 
@@ -462,6 +538,19 @@
                     var input_user = (element.val());
 
                     listPanjar[i].bayar_panjar = input_user;
+                });
+
+                $.each(listPinjaman, function(i, v) {
+                    var element = $('input[data-id="' + v.id + '"].bayar_pinjaman');
+                    var input_user = (element.val());
+                    listPinjaman[i].bayar_pinjaman = input_user;
+                });
+
+
+                $.each(listPanjarTB, function(i, v) {
+                    var element = $('input[data-id="' + v.id + '"].bayar_panjar_tb');
+                    var input_user = (element.val());
+                    listPanjarTB[i].bayar_panjar = input_user;
                 });
 
                 if ($(".create-form").valid()) {
@@ -478,10 +567,17 @@
                         if (result.isConfirmed) {
                             let formData = new FormData(document.querySelector(".create-form"));
                             let nominalPembayaran = destroyFormatRupiah($('.nominal_pembayaran').val());
-                            let totalPembayaranPanjar = destroyFormatRupiah($('.total_pembayaran_panjar').val());
+                            let totalPembayaranPanjar = destroyFormatRupiah($('[name="total_pembayaran_panjar"]').val());
+                            let totalPembayaranPanjarTB = destroyFormatRupiah($('[name="total_pembayaran_panjar_tb"]').val());
+                            let totalPembayaranPinjaman = destroyFormatRupiah($('[name="total_pembayaran_pinjaman"]').val());
                             formData.set('nominal_pembayaran', nominalPembayaran);
                             formData.set('total_pembayaran_panjar', totalPembayaranPanjar);
+                            formData.set('total_pembayaran_panjar_tb', totalPembayaranPanjarTB);
+                            formData.set('total_pembayaran_pinjaman', totalPembayaranPinjaman);
                             formData.append("panjarList", JSON.stringify(listPanjar));
+                            formData.append("pinjamanList", JSON.stringify(listPinjaman));
+                            formData.append("panjarTBList", JSON.stringify(listPanjarTB));
+                            formData.append("pembayaranList", JSON.stringify(listPembayaran));
                             $.ajax({
 
                                 url: "<?= base_url("/pembayaran-po-lokal-bp/update"); ?>",
@@ -544,15 +640,22 @@
                         cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            const data = new FormData(document.querySelector(".create-form"));
+                            let formData = new FormData(document.querySelector(".create-form"));
                             let nominalPembayaran = destroyFormatRupiah($('.nominal_pembayaran').val());
-                            let totalPembayaranPanjar = destroyFormatRupiah($('.total_pembayaran_panjar').val());
+                            let totalPembayaranPanjar = destroyFormatRupiah($('[name="total_pembayaran_panjar"]').val());
+                            let totalPembayaranPanjarTB = destroyFormatRupiah($('[name="total_pembayaran_panjar_tb"]').val());
+                            let totalPembayaranPinjaman = destroyFormatRupiah($('[name="total_pembayaran_pinjaman"]').val());
                             formData.set('nominal_pembayaran', nominalPembayaran);
                             formData.set('total_pembayaran_panjar', totalPembayaranPanjar);
-                            data.append("panjarList", JSON.stringify(listPanjar));
+                            formData.set('total_pembayaran_panjar_tb', totalPembayaranPanjarTB);
+                            formData.set('total_pembayaran_pinjaman', totalPembayaranPinjaman);
+                            formData.append("panjarList", JSON.stringify(listPanjar));
+                            formData.append("pinjamanList", JSON.stringify(listPinjaman));
+                            formData.append("panjarTBList", JSON.stringify(listPanjarTB));
+                            formData.append("pembayaranList", JSON.stringify(listPembayaran));
                             $.ajax({
                                 url: "<?= base_url("pembayaran-po-lokal-bp/create"); ?>",
-                                data: data,
+                                data: formData,
                                 beforeSend: function(xhr) {
                                     setLoading();
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -615,6 +718,8 @@
             },
             dataType: "json",
             success: function(res) {
+                listPembayaran = [];
+                listPembayaran = res.detail;
                 const table = $('#dataTable');
 
                 var detail = res.detail;
@@ -672,13 +777,27 @@
                 table.find('tbody').append(newRow6);
 
 
-
                 var newRow8 = $('<tr>');
                 newRow8.append($('<td style="text-align:right;" colspan="6"><b>Potongan Panjar</b></td>'));
                 newRow8.append($('<td style="text-align:center;"><b>' +
                     '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value="" name = "total_pembayaran_panjar" readonly>' +
                     '</b></td>'));
                 table.find('tbody').append(newRow8);
+
+
+                var newRow9 = $('<tr>');
+                newRow9.append($('<td style="text-align:right;" colspan="6"><b>Potongan Pinjaman</b></td>'));
+                newRow9.append($('<td style="text-align:center;"><b>' +
+                    '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-pinjaman trigger-input" type="text" value="" name = "total_pembayaran_pinjaman" readonly>' +
+                    '</b></td>'));
+                table.find('tbody').append(newRow9);
+
+                var newRow10 = $('<tr>');
+                newRow10.append($('<td style="text-align:right;" colspan="6"><b>Potongan Panjar TB</b></td>'));
+                newRow10.append($('<td style="text-align:center;"><b>' +
+                    '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar-tb trigger-input" type="text" value="" name = "total_pembayaran_panjar_tb" readonly>' +
+                    '</b></td>'));
+                table.find('tbody').append(newRow10);
 
                 var newRow7 = $('<tr>');
                 newRow7.append($('<td style="text-align:right;" colspan="6">').text('Sub Total'));
@@ -697,6 +816,26 @@
 
                 });
 
+                $(document).on("input", ".bayar_pinjaman", function() {
+                    var totalBayarPinjaman = updateTotalBayarPinjaman();
+                    var newSubtotal = subTotal - totalBayarPinjaman;
+                    subCountTotal = newSubtotal;
+
+                    $('input.nominal_pembayaran').attr('oninput', `limitInputBayar(this, ${subCountTotal})`);
+                    $('.subtotal').text(greatFormatRupiah(subCountTotal));
+
+                });
+
+                
+                $(document).on("input", ".bayar_panjar_tb", function() {
+                    var totalBayarPanjarTB = updateTotalBayarPanjarTB();
+                    var newSubtotal = subTotal - totalBayarPanjarTB;
+                    subCountTotal = newSubtotal;
+
+                    $('input.nominal_pembayaran').attr('oninput', `limitInputBayar(this, ${subCountTotal})`);
+                    $('.subtotal').text(greatFormatRupiah(subCountTotal));
+
+                });
 
 
                 var newRow9 = $('<tr>');
@@ -791,7 +930,7 @@
         newRow2.append($('<td style="text-align:right;" colspan="6">').text('Potongan'));
         newRow2.append($('<td>').text(greatFormatRupiah(detail.potongan)));
         table.find('tbody').append(newRow2);
-
+        
         var newRow3 = $('<tr>');
         newRow3.append($('<td style="text-align:right;" colspan="6">').text('Setelah Tambahan dan Potongan'));
         newRow3.append($('<td>').text(greatFormatRupiah(detail.nominal_faktur)));
@@ -810,6 +949,20 @@
             '</b></td>'));
         table.find('tbody').append(newRow8);
 
+        var newRow9 = $('<tr>');
+        newRow9.append($('<td style="text-align:right;" colspan="6"><b>Potongan Pinjaman</b></td>'));
+        newRow9.append($('<td style="text-align:center;"><b>' +
+            '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-pinjaman trigger-input" type="text" value="" name = "total_pembayaran_pinjaman" readonly>' +
+            '</b></td>'));
+        table.find('tbody').append(newRow9);
+
+        var newRow10 = $('<tr>');
+        newRow10.append($('<td style="text-align:right;" colspan="6"><b>Potongan Panjar TB</b></td>'));
+        newRow10.append($('<td style="text-align:center;"><b>' +
+            '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar-tb trigger-input" type="text" value="" name = "total_pembayaran_panjar_tb" readonly>' +
+            '</b></td>'));
+        table.find('tbody').append(newRow10);
+
         var newRow7 = $('<tr>');
         newRow7.append($('<td style="text-align:right;" colspan="6">').text('Sub Total'));
         newRow7.append($('<td class="subtotal">').text(greatFormatRupiah(subTotal)));
@@ -820,6 +973,27 @@
         $(document).on("input", ".bayar_panjar", function() {
             var totalBayarPanjar = updateTotalBayarPanjar();
             var newSubtotal = subTotal - totalBayarPanjar;
+            subCountTotal = newSubtotal;
+
+            $('input.nominal_pembayaran').attr('oninput', `limitInputBayar(this, ${subCountTotal})`);
+            $('.subtotal').text(greatFormatRupiah(subCountTotal));
+
+        });
+
+        $(document).on("input", ".bayar_pinjaman", function() {
+            var totalBayarPinjaman = updateTotalBayarPinjaman();
+            var newSubtotal = subTotal - totalBayarPinjaman;
+            subCountTotal = newSubtotal;
+
+            $('input.nominal_pembayaran').attr('oninput', `limitInputBayar(this, ${subCountTotal})`);
+            $('.subtotal').text(greatFormatRupiah(subCountTotal));
+
+        });
+
+                
+        $(document).on("input", ".bayar_panjar_tb", function() {
+            var totalBayarPanjarTB = updateTotalBayarPanjarTB();
+            var newSubtotal = subTotal - totalBayarPanjarTB;
             subCountTotal = newSubtotal;
 
             $('input.nominal_pembayaran').attr('oninput', `limitInputBayar(this, ${subCountTotal})`);
@@ -1036,13 +1210,16 @@
             },
             dataType: "json",
             success: function(res) {
-                //after getting the data
-                // console.log(res);
                 listPanjar = [];
-                listPanjar = res.data;
-                appendPanjarNo(listPanjar);
+                listPanjarTB = [];
+                listPinjaman = [];
+                listPanjar = res.data.panjarList;      // Mengakses "panjarList"
+                listPanjarTB = res.data.panjarTBList; // Mengakses "panjarTBList"
+                listPinjaman = res.data.pinjamList;   // Mengakses "pinjamList"
 
-                // console.log(listPanjar);
+                appendPanjarNo(listPanjar);
+                appendPanjarTBNo(listPanjarTB);
+                appendPinjamanNo(listPinjaman);
             }
         });
     });
@@ -1091,6 +1268,94 @@
 
     }
 
+     // append the panjar TB data
+     function appendPanjarTBNo(data) {
+        const tablePanjar = $('#dataTable-panjar-TB');
+        tablePanjar.find('tbody').empty();
+        tablePanjar.find('tfoot').empty();
+
+        if (data.length > 0) {
+            let no = 1;
+            let found = false;
+            $("#no_panjar").empty();
+            tablePanjar.find('tbody').empty();
+
+            $.each(data, function(i, v) {
+                if (v.sisa_panjar_number > 0) {
+                    found = true;
+
+                    var newRow = $('<tr style="color:whitesmoke;">');
+                    newRow.append($('<td style="width: 10px;">').text(no++));
+                    newRow.append($('<td>').text(v.no_panjar));
+                    newRow.append($('<td>').text(formatDate(v.payment_date)));
+                    newRow.append($('<td>').text((v.total_panjar)));
+                    newRow.append($('<td>').text((v.sisa_panjar)));
+
+                    newRow.append($('<td>').html(
+                        `
+                        <input  class="form-control bayar_panjar_tb" onchange="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this, ${v.sisa_panjar_number})" autocomplete="one-time-code" data-id="${v.id}"  type="text" value="" name = "bayar_panjar_tb" style="height:40px">
+                            `
+                    ));
+                    tablePanjar.find('tbody').append(newRow);
+                }
+
+            });
+            if (!found) {
+                var newRow = $('<tr style="color:whitesmoke;">');
+                newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Panjar TB</td>'));
+                tablePanjar.find('tbody').append(newRow);
+            }
+        } else {
+            var newRow = $('<tr style="color:whitesmoke;">');
+            newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Panjar TB</td>'));
+            tablePanjar.find('tbody').append(newRow);
+        }
+    }
+
+    // append the pinjaman data
+    function appendPinjamanNo(data) {
+        const tablePinjaman = $('#dataTable-pinjaman');
+        tablePinjaman.find('tbody').empty();
+        tablePinjaman.find('tfoot').empty();
+
+        if (data.length > 0) {
+            let no = 1;
+            let found = false;
+            $("#no_pinjaman").empty();
+            tablePinjaman.find('tbody').empty();
+
+            $.each(data, function(i, v) {
+                if (v.sisa_pinjaman_number > 0) {
+                    found = true;
+
+                    var newRow = $('<tr style="color:whitesmoke;">');
+                    newRow.append($('<td style="width: 10px;">').text(no++));
+                    newRow.append($('<td>').text(v.no_pinjaman));
+                    newRow.append($('<td>').text(formatDate(v.payment_date)));
+                    newRow.append($('<td>').text((v.total_pinjaman)));
+                    newRow.append($('<td>').text((v.sisa_pinjaman)));
+
+                    newRow.append($('<td>').html(
+                        `
+                        <input  class="form-control bayar_pinjaman" onchange="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this, ${v.sisa_pinjaman_number})" autocomplete="one-time-code" data-id="${v.id}"  type="text" value="" name = "bayar_pinjaman" style="height:40px">
+                            `
+                    ));
+                    tablePinjaman.find('tbody').append(newRow);
+                }
+
+            });
+            if (!found) {
+                var newRow = $('<tr style="color:whitesmoke;">');
+                newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Pinjaman</td>'));
+                tablePinjaman.find('tbody').append(newRow);
+            }
+        } else {
+            var newRow = $('<tr style="color:whitesmoke;">');
+            newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Pinjaman</td>'));
+            tablePinjaman.find('tbody').append(newRow);
+        }
+
+    }
 
 
     function limitInputBayar(input, maxAmount) {
@@ -1118,9 +1383,41 @@
         return sum;
     }
 
+    function updateTotalBayarPanjarTB() {
+        var sum = 0;
+        $(".bayar_panjar_tb").each(function() {
+            sum += convertRupiahToNumber($(this).val());
+        });
+        $(".total-bayar-panjar-tb").val(greatFormatRupiah(sum));
+        return sum;
+    }
+    
+    function updateTotalBayarPinjaman() {
+        var sum = 0;
+        $(".bayar_pinjaman").each(function() {
+            sum += convertRupiahToNumber($(this).val());
+        });
+        $(".total-bayar-pinjaman").val(greatFormatRupiah(sum));
+        return sum;
+    }
+
     $(document).on("input", ".bayar_panjar", function() {
         var totalBayarPanjar = updateTotalBayarPanjar();
         updateSubTotal(totalBayarPanjar);
+
+    });
+
+
+    $(document).on("input", ".bayar_panjar_tb", function() {
+        var totalBayarPanjarTB = updateTotalBayarPanjarTB();
+        updateSubTotal(totalBayarPanjarTB);
+
+    });
+
+
+    $(document).on("input", ".bayar_pinjaman", function() {
+        var totalBayarPinjaman = updateTotalBayarPinjaman();
+        updateSubTotal(totalBayarPinjaman);
 
     });
 
@@ -1128,6 +1425,15 @@
         var countSubTotal = newSubtotal;
         return countSubTotal;
     }
+
+    function formatDate(dateString) {
+
+        let parts = dateString.split("-");
+        let reversedParts = parts.reverse();
+        let formattedDate = reversedParts.join("/");
+        return formattedDate;
+    }
+
 </script>
 
 <?= $this->endSection(); ?>

@@ -497,6 +497,18 @@ $routes->post('/panjar-supplier/delete', 'Pembayaran\PanjarSupplier::deletePanja
 $routes->get('/panjar-supplier/history-pembayaran', 'Pembayaran\PanjarSupplier::dropDownHistoryPembayaranPanjar', ['filter' => 'Auth']);
 $routes->get('/panjar-supplier/generate-no-panjar', 'Pembayaran\PanjarSupplier::generateNoPanjar', ['filter' => 'Auth']);
 
+
+// PEMBAYARAN PINJAMAN SUPPLIER
+$routes->get('/pinjaman-supplier', 'Pembayaran\pinjamanSupplier::index', ['filter' => 'Auth']);
+$routes->get('/pinjaman-supplier/list-supplier', 'Pembayaran\PinjamanSupplier::dropdownSupplierByType', ['filter' => 'Auth']);
+$routes->post('/pinjaman-supplier/save', 'Pembayaran\pinjamanSupplier::savePinjamanSupplier', ['filter' => 'Auth']);
+$routes->get('/pinjaman-supplier/all', 'Pembayaran\pinjamanSupplier::allPinjamanSupplier', ['filter' => 'Auth']);
+$routes->get('/pinjaman-supplier/id/(:segment)', 'Pembayaran\pinjamanSupplier::getByIdPinjamanSupplier/$1', ['filter' => 'Auth']);
+$routes->post('/pinjaman-supplier/update', 'Pembayaran\pinjamanSupplier::updatePinjamanSupplier', ['filter' => 'Auth']);
+$routes->post('/pinjaman-supplier/update-status', 'Pembayaran\pinjamanSupplier::updateStatusPinjamanSupplier', ['filter' => 'Auth']);
+$routes->post('/pinjaman-supplier/delete', 'Pembayaran\pinjamanSupplier::deletePinjamanSupplier', ['filter' => 'Auth']);
+$routes->get('/pinjaman-supplier/generate-no-pinjaman', 'Pembayaran\PinjamanSupplier::generateNoPinjaman', ['filter' => 'Auth']);
+
 // PEMBAYARAN INVOICE
 $routes->get('/pembayaran-invoice', 'Pembayaran\PembayaranInvoice::index', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/id/(:segment)', 'Pembayaran\PembayaranInvoice::getById/$1', ['filter' => 'Auth']);

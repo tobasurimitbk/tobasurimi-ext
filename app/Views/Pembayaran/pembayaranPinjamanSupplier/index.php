@@ -6,18 +6,18 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Panjar Supplier</h5>
+                <h5 class="modal-title"><label class="title-name"></label>Pinjaman Supplier</h5>
             </div>
             <div class="modal-body">
-                <form class="create-form" role="form" method="POST" enctype="multipart/form-data" action="panjar-supplier/save">
+                <form class="create-form" role="form" method="POST" enctype="multipart/form-data" action="pinjaman-supplier/save">
                     <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id">
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control name" id="no_panjar" name="no_panjar" placeholder="no_panjar">
-                                    <label for="floatingInput">No Panjar</label>
+                                    <input autocomplete="one-time-code" type="text" class="form-control name" id="no_pinjaman" name="no_pinjaman" placeholder="no_pinjaman">
+                                    <label for="floatingInput">No Pinjaman</label>
                                 </div>
                                 <div style="" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: -8px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
@@ -28,18 +28,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="date" class="form-control name" id="payment_date" name="payment_date" placeholder="payment_date">
-                                <label for="floatingInput">Tanggal Panjar</label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select jenis_panjar" name="jenis_panjar" id="jenis_panjar">
-                                    <option value="" selected></option>
-                                    <option value="PANJAR">PANJAR</option>
-                                    <option value="PANJAR_TB">PANJAR TB</option>
-                                </select>
-                                <label for="floatingInput">Jenis Panjar</label>
+                                <label for="floatingInput">Tanggal Pinjaman</label>
                             </div>
                         </div>
 
@@ -63,22 +52,22 @@
                                 <label for="floatingInput">Supplier</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <!-- <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select tipe_panjar" name="tipe_panjar" id="tipe_panjar">
+                                <select class="form-select tipe_pinjaman" name="tipe_pinjaman" id="tipe_pinjaman">
                                     <option value="" selected></option>
                                     <option value="MERAH">Merah</option>
                                     <option value="PUTIH">Putih</option>
 
                                 </select>
-                                <label for="floatingInput">Tipe Panjar</label>
+                                <label for="floatingInput">Tipe Pinjaman</label>
                             </div>
-                        </div>
+                        </div> -->
 
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control name" id="total_panjar" name="total_panjar" placeholder="Nama" oninput="preventNegativeInput(this)" onkeyup="this.value = greatFormatRupiah(this.value)">
-                                <label for="floatingInput">Total Panjar</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="total_pinjaman" name="total_pinjaman" placeholder="Nama" oninput="preventNegativeInput(this)" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <label for="floatingInput">Total Pinjaman</label>
                             </div>
                         </div>
 
@@ -88,11 +77,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
-                <?php if (can('Pembayaran', 'Panjar Supplier', 'c')) : ?>
+                <?php if (can('Pembayaran', 'Pinjaman Supplier', 'c')) : ?>
                     <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
                 <?php endif; ?>
                 <?php ?>
-                <?php if (can('Pembayaran', 'Panjar Supplier', 'd')) : ?>
+                <?php if (can('Pembayaran', 'Pinjaman Supplier', 'd')) : ?>
                     <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
                 <?php endif; ?>
             </div>
@@ -103,7 +92,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Panjar Supplier</h1>
+        <h1>Pinjaman Supplier</h1>
         <button class="btn btn-show-form btn-add float-right" id="btn-display-modal">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </button>
@@ -130,7 +119,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating spp-ptspp mb-3" style="height: 50px;">
-                        <select class="form-select kategori panjar_status form-out-search" name="panjar_status" id="panjar_status" aria-label="Floating label select example">
+                        <select class="form-select kategori pinjaman_status form-out-search" name="pinjaman_status" id="pinjaman_status" aria-label="Floating label select example">
                             <option value="ALL">STATUS POSTING:SEMUA</option>
                             <option value="NOT_POSTING">STATUS POSTING:BELUM POSTING</option>
                             <option value="POSTING">STATUS POSTING:SUDAH POSTING</option>
@@ -149,12 +138,11 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="changeSort('no_panjar')">No. Panjar</th>
-                                <th onclick="changeSort('jenis_panjar')">Jenis Panjar</th>
+                                <th onclick="changeSort('no_pinjaman')">No. Pinjaman</th>
                                 <th onclick="changeSort('supplier_id')">Supplier</th>
                                 <th onclick="changeSort('payment_date')">Payment Date</th>
-                                <th onclick="changeSort('payment_amount')">Total Panjar</th>
-                                <th onclick="changeSort('payment_amt_left')">Sisa Panjar</th>
+                                <th onclick="changeSort('payment_amount')">Total Pinjaman</th>
+                                <th onclick="changeSort('payment_amt_left')">Sisa Pinjaman</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -173,7 +161,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="historiModalLabel">Histori Pembayaran Panjar</h5>
+                <h5 class="modal-title" id="historiModalLabel">Histori Pembayaran Pinjaman</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -182,8 +170,8 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly autocomplete="one-time-code" type="text" class="form-control nomor_panjar" name="nomor_panjar" id="nomor_panjar">
-                            <label for="floatingInput">No Panjar</label>
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control nomor_pinjaman" name="nomor_pinjaman" id="nomor_pinjaman">
+                            <label for="floatingInput">No Pinjaman</label>
                         </div>
                     </div>
                     <div class="col-sm-6">
@@ -205,9 +193,8 @@
                             <tr>
                                 <td style="width: 10px;text-align: center;color:#E7323A;font-weight:bold;">No</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;" class="nomor">Nomor PO</td>
-                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Jenis Panjar</td>
-                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Total Panjar</td>
-                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Bayar Panjar</td>
+                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Total Pinjaman</td>
+                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Bayar Pinjaman</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;">Payment Date</td>
                             </tr>
                         </thead>
@@ -227,7 +214,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "no_panjar";
+    let sort = "no_pinjaman";
     let sortType = "desc";
     let trigger = true;
 
@@ -246,14 +233,14 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("panjar-supplier/all"); ?>",
+            url: "<?= base_url("pinjaman-supplier/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
                 data.status = $(".is_posted").val();
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
-                data.panjar_status = $('.panjar_status option:selected').val();
+                data.pinjaman_status = $('.pinjaman_status option:selected').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -274,13 +261,9 @@
                 width: "5%"
             },
             {
-                data: "no_panjar",
+                data: "no_pinjaman",
                 className: "text-center",
                 // width: "10%"
-            },
-            {
-                data: "jenis_panjar",
-                className: "text-center"
             },
             {
                 data: "supplier",
@@ -291,11 +274,11 @@
                 className: "text-center"
             },
             {
-                data: "total_panjar",
+                data: "total_pinjaman",
                 className: "text-center"
             },
             {
-                data: "sisa_panjar",
+                data: "sisa_pinjaman",
                 className: "text-center"
             },
             {
@@ -313,7 +296,7 @@
                         return `
                         <div class="mt-0">
         
-                            <button data-toggle="tooltip" title="Posting" onclick="updateStatus('${id}', 1)" class="btn btn-success posting-panjar-supplier">
+                            <button data-toggle="tooltip" title="Posting" onclick="updateStatus('${id}', 1)" class="btn btn-success posting-pinjaman-supplier">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                             </button>
 
@@ -357,14 +340,9 @@
     // INIT VALIDATOR
     var validator = $(".create-form").validate({
         rules: {
-            total_panjar: {
+            total_pinjaman: {
                 required: true,
-            },
-            tipe_panjar: {
-                required: true,
-            },
-            jenis_panjar: {
-                required: true,
+
             },
             payment_date: {
                 required: true
@@ -372,18 +350,11 @@
             name: {
                 required: true
             }
+
         },
         messages: {
-            total_panjar: {
-                required: "total panjar wajib diisi",
-
-            },
-            tipe_panjar: {
-                required: "tipe panjar wajib diisi",
-
-            },
-            jenis_panjar: {
-                required: "jenis panjar wajib diisi",
+            total_pinjaman: {
+                required: "total pinjaman wajib diisi",
 
             },
             payment_date: {
@@ -429,7 +400,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("panjar-supplier/delete"); ?>",
+                    url: "<?= base_url("pinjaman-supplier/delete"); ?>",
                     data: {
                         id: id,
                     },
@@ -476,7 +447,7 @@
                 let id = $(".id").val();
                 setLoading()
                 $.ajax({
-                    url: "<?= base_url("panjar-supplier/delete"); ?>",
+                    url: "<?= base_url("pinjaman-supplier/delete"); ?>",
                     data: {
                         id: id
                     },
@@ -550,16 +521,6 @@
         theme: "bootstrap-5",
     });
 
-    $('#tipe_panjar').select2({
-        placeholder: "Pilih Tipe Panjar",
-        theme: "bootstrap-5",
-    });
-
-    $('#jenis_panjar').select2({
-        placeholder: "Pilih Jenis Panjar",
-        theme: "bootstrap-5",
-    });
-
     $('#supplier_id').select2({
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
@@ -584,7 +545,7 @@
         validator.reset();
 
         $.ajax({
-            url: "<?= base_url("panjar-supplier/id"); ?>" + "/" + id,
+            url: "<?= base_url("pinjaman-supplier/id"); ?>" + "/" + id,
             method: "GET",
             dataType: "json",
             beforeSend: function() {
@@ -602,21 +563,21 @@
                         appendDropdownSupplier(res.supplier);
                         // APPEND TO FORM
                         $("#id").val(id);
-                        $("#no_panjar").val(res.data.no_panjar);
+                        $("#no_pinjaman").val(res.data.no_pinjaman);
                         $("#payment_date").val(res.data.payment_date);
                         $("#tipe_supplier").val(res.data.type).change();
                         $("#supplier_id").val(res.data.supplier_id);
                         $("#payment_date").val(res.data.payment_date);
-                        $("#total_panjar").val(formatRupiah(res.data.total_panjar));
-                        $("#sisa_panjar").val(res.data.fax);
+                        $("#total_pinjaman").val(formatRupiah(res.data.total_pinjaman));
+                        $("#sisa_pinjaman").val(res.data.fax);
                         $(".add-modal").modal("show");
                         $('#auto_generate').css('display', 'none');
-                        $("#no_panjar").prop("disabled", true);
+                        $("#no_pinjaman").prop("disabled", true);
                         if (res.data.is_posted === "1") {
                             $("#payment_date").prop("disabled", true);
                             $("#tipe_supplier").prop("disabled", true);
                             $("#supplier_id").prop("disabled", true);
-                            $("#total_panjar").prop("disabled", true);
+                            $("#total_pinjaman").prop("disabled", true);
                             $(".delete-form").css('display', 'none');
                         }
 
@@ -625,11 +586,11 @@
                         });
 
                         function enableFields() {
-                            $("#no_panjar").prop("disabled", false);
+                            $("#no_pinjaman").prop("disabled", false);
                             $("#payment_date").prop("disabled", false);
                             $("#tipe_supplier").prop("disabled", false);
                             $("#supplier_id").prop("disabled", false);
-                            $("#total_panjar").prop("disabled", false);
+                            $("#total_pinjaman").prop("disabled", false);
                             $(".delete-form").css('display', '');
                             $('#auto_generate').css('display', '');
                         }
@@ -654,7 +615,7 @@
     $('#tipe_supplier').change(function() {
         var typeSupplier = $('#tipe_supplier option:selected').val();
         $.ajax({
-            url: `<?= base_url('panjar-supplier/list-supplier'); ?>`,
+            url: `<?= base_url('pinjaman-supplier/list-supplier'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -688,28 +649,28 @@
         let value = document.getElementById('auto_generate').checked ? true : false;
         if (value) {
             $.ajax({
-                url: `<?= base_url("/panjar-supplier/generate-no-panjar"); ?>`,
+                url: `<?= base_url("/pinjaman-supplier/generate-no-pinjaman"); ?>`,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
                     if (res) {
-                        $("#no_panjar").val(res);
-                        $("#no_panjar").attr("readonly", true);
+                        $("#no_pinjaman").val(res);
+                        $("#no_pinjaman").attr("readonly", true);
                     } else {
                         Swal.fire({
                             icon: 'error',
                             title: res.message,
                             confirmButtonColor: '#4e73df',
                         })
-                        $("#no_panjar").attr("readonly", false);
+                        $("#no_pinjaman").attr("readonly", false);
                         $("#auto_generate").prop("checked", false);
-                        $("#no_panjar").val("");
+                        $("#no_pinjaman").val("");
                     }
                 }
             })
         } else {
-            $("#no_panjar").attr("readonly", false);
-            $("#no_panjar").val("");
+            $("#no_pinjaman").attr("readonly", false);
+            $("#no_pinjaman").val("");
         }
 
     }
@@ -731,12 +692,12 @@
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     let data = new FormData(document.querySelector(".create-form"));
-                    let totalPanjar = destroyFormatRupiah($('#total_panjar').val());
-                    data.set('total_panjar', totalPanjar);
+                    let totalPinjaman = destroyFormatRupiah($('#total_pinjaman').val());
+                    data.set('total_pinjaman', totalPinjaman);
                     let id = $(".id").val();
 
                     $.ajax({
-                        url: id ? "<?= base_url("panjar-supplier/update"); ?>" : "<?= base_url("panjar-supplier/save"); ?>",
+                        url: id ? "<?= base_url("pinjaman-supplier/update"); ?>" : "<?= base_url("pinjaman-supplier/save"); ?>",
                         data: data,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -808,7 +769,7 @@
                 console.log("ID:", id); // Debugging
                 console.log("Status:", status); // Debugging
                 $.ajax({
-                    url: "<?= base_url("panjar-supplier/update-status"); ?>",
+                    url: "<?= base_url("pinjaman-supplier/update-status"); ?>",
                     data: {
                         id: id,
                         status: status
@@ -860,7 +821,7 @@
         table.ajax.reload();
     })
 
-    $(".panjar_status").change(function() {
+    $(".pinjaman_status").change(function() {
         table.ajax.reload();
     })
 
@@ -893,15 +854,15 @@
     function displayHistory(id) {
         // console.log(id);
         $.ajax({
-            url: "<?= base_url("/panjar-supplier/history-pembayaran"); ?>",
+            url: "<?= base_url("/pinjaman-supplier/history-pembayaran"); ?>",
             data: {
                 id: id
             },
             method: "GET",
             success: function(response) {
                 console.log(response);
-                $('#nomor_panjar').val(response.panjar_detail.no_panjar);
-                $('#supplier_name').val(response.panjar_detail.name);
+                $('#nomor_pinjaman').val(response.pinjaman_detail.no_pinjaman);
+                $('#supplier_name').val(response.pinjaman_detail.name);
                 const table = $('#tableHistori');
                 var no = 1;
 
@@ -912,8 +873,8 @@
                         var newRow = $('<tr>');
                         newRow.append($('<td style="text-align:center;">').text(no++));
                         newRow.append($('<td style="text-align:center;">').text(v.multiple_lpb_no));
-                        newRow.append($('<td style="text-align:center;">').text(v.total_panjar));
-                        newRow.append($('<td style="text-align:center;">').text(v.bayar_panjar));
+                        newRow.append($('<td style="text-align:center;">').text(v.total_pinjaman));
+                        newRow.append($('<td style="text-align:center;">').text(v.bayar_pinjaman));
                         newRow.append($('<td style="text-align:center;">').text(v.payment_date));
                         table.find('tbody').append(newRow);
                     });
@@ -922,7 +883,7 @@
                     newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Pembayaran</td>'));
                     table.find('tbody').append(newRow);
                 }
-                if (response.panjar_detail.type === 'BAHAN PENOLONG') {
+                if (response.pinjaman_detail.type === 'BAHAN PENOLONG') {
                     $(".nomor").text("Nomor Tanda Terima Faktur");
                 } else {
                     $(".nomor").text("Nomor PO");

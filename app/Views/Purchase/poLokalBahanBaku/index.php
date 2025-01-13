@@ -32,7 +32,7 @@
                     </div>
                 </div>
                 <div class="col mb-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik No PO" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data PO" value="" />
                 </div>
             </div>
             <div class="row">

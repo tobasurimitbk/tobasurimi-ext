@@ -56,6 +56,8 @@ class SupplierHarga extends BaseController
             array_push($dataSupplier, [
                 "no"                => $no++,
                 "id"                => encrypt($data->id),
+                "divisi"            => $data->divisi,
+                "divisi_id"         => $data->divisi_id,
                 "bahan_baku"        => $data->bahan_baku_id,
                 "spesifikasi_id"    => $data->spesifikasi_id,
                 "bahan_baku_name"   => $data->bahan_baku_name,
@@ -89,6 +91,7 @@ class SupplierHarga extends BaseController
             ->where('bahan_baku_id', $this->request->getVar('bahan_baku'))
             ->where('spesifikasi_id', $this->request->getVar('spesifikasi_id'))
             ->where('supplier_id', $this->request->getVar('supplier_id'))
+            ->where('divisi_id', $this->request->getVar('divisi_id'))
             ->where('deletedAt', null)
             ->first();
 
@@ -112,6 +115,7 @@ class SupplierHarga extends BaseController
         }
 
         $this->SupplierHargaModel->insert([
+            'divisi_id' => $this->request->getVar('divisi_id'),
             'supplier_id' => $this->request->getVar('supplier_id'),
             'bahan_baku_id' => $this->request->getVar('bahan_baku'),
             'spesifikasi_id' => $this->request->getVar('spesifikasi_id'),
@@ -132,6 +136,23 @@ class SupplierHarga extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
 
+        $checkDuplicate = $this->SupplierHargaModel
+            ->where('bahan_baku_id', $this->request->getVar('bahan_baku'))
+            ->where('spesifikasi_id', $this->request->getVar('spesifikasi_id'))
+            ->where('supplier_id', $this->request->getVar('supplier_id'))
+            ->where('divisi_id', $this->request->getVar('divisi_id'))
+            ->where('id <>', $id)
+            ->where('deletedAt', null)
+            ->first();
+
+        if ($checkDuplicate != null) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => "Spesifikasi harga barang sudah diset"
+            ]);
+        }
+
         $barangMaster = $this->BarangMasterModel->find($this->request->getVar('bahan_baku'));
         $barangSpesifikasi = $this->BarangMasterSpesifikasiModel->find($this->request->getVar('spesifikasi_id'));
 
@@ -143,8 +164,8 @@ class SupplierHarga extends BaseController
             ]);
         }
 
-
         $this->SupplierHargaModel->update($id, [
+            'divisi_id' => $this->request->getVar('divisi_id'),
             'supplier_id' => $this->request->getVar('supplier_id'),
             'bahan_baku_id' => $this->request->getVar('bahan_baku'),
             'spesifikasi_id' => $this->request->getVar('spesifikasi_id'),
