@@ -420,10 +420,10 @@ class PenerimaanBarangModel extends Model
         $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
         $rmPurchaseOrder = new RMPurchaseOrderModel();
         $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
-        $supplierHargaModel = new SupplierHargaModel();
         $stockDetailModel = new StockDetailModel();
         $stockModel = new StockModel();
         $stockDetail2Model = new StockDetail2Model();
+        $barangMasterModel = new BarangMasterModel();
 
         $rmDetail =  $rmPurchaseOrder->where('id', $poID)->first();
         $rmBarangDetail = $rmPurchaseOrderDetailModel->where('rm_purchase_order_id', $poID)->findAll();
@@ -511,9 +511,9 @@ class PenerimaanBarangModel extends Model
 
         foreach ($rmBarangDetail as $r) {
             $selectQry = "
-                supplier_harga.bahan_baku_id, 
-                supplier_harga.spesifikasi, 
+                barang_master.id as bahan_baku_id, 
                 barang_master.barang_name,
+                barang_master_spesifikasi.spesifikasi,
                 barang_master_spesifikasi.satuan_1,
                 barang_master_spesifikasi.satuan_2,
                 barang_master_spesifikasi.satuan_3,
@@ -521,10 +521,10 @@ class PenerimaanBarangModel extends Model
                 barang_master_spesifikasi.konversi_satuan_3,
             ";
 
-            $barang = $supplierHargaModel->select($selectQry)
-                ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id', 'left')
-                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = supplier_harga.spesifikasi_id', 'left')
-                ->where('supplier_harga.id', $r['supplier_harga_id'])
+            $barang = $barangMasterModel->select($selectQry)
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                ->where('barang_master.id', $r['barang1_id'])
+                ->where('barang_master_spesifikasi.id', $r['barang2_id'])
                 ->first();
 
             $nilaiKonversi = 1;

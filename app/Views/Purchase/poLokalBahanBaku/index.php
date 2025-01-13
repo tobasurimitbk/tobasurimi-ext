@@ -31,6 +31,16 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-3">
+                    <div class="form-floating spp-ptspp" style="height: 50px;">
+                        <select class="form-select form-out-search is_posted" name="is_posted" id="is_posted" aria-label="Floating label select example">
+                            <!-- <option value="">PILIH STATUS SPP</option> -->
+                            <option value="SUDAH POSTING">STATUS : SUDAH POSTING</option>
+                            <option value="BELUM POSTING" selected>STATUS : BELUM POSTING</option>
+                        </select>
+                        <label for="floatingInput" class="l-spp-ptspp">Status PO</label>
+                    </div>
+                </div>
                 <div class="col mb-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data PO" value="" />
                 </div>
@@ -140,6 +150,7 @@
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
                 data.status = $(".status").val();
+                data.is_posted = $('.is_posted').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -340,7 +351,7 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd").change(function() {
+        $(".dateStart, .dateEnd, .is_posted").change(function() {
             table.ajax.reload();
         })
 

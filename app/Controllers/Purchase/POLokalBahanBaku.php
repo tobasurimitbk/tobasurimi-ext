@@ -194,6 +194,7 @@ class POLokalBahanBaku extends BaseController
             "sortType"      => $this->request->getVar("sortType"),
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "is_posted"     => $this->request->getVar("is_posted"),
         ];
         $limit = $this->request->getVar("length");
         $offset = $this->request->getVar("start");

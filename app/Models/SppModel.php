@@ -83,7 +83,15 @@ class SppModel extends Model
 
         $totalData = $purchaseRequestsDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['is_posted']) {
+        if ($addCondition['is_posted']) {
+            if ($addCondition['is_posted'] == "SUDAH POSTING") {
+                $purchaseRequestsDataQry->where('is_posted', 1);
+            } else {
+                $purchaseRequestsDataQry->where('is_posted', 0);
+            }
+        }
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $purchaseRequestsDataQry->groupStart();
         }
         if ($addCondition['search']) {
@@ -96,21 +104,13 @@ class SppModel extends Model
                 ->like('spp_type', $addCondition['spp_type']);
         }
 
-        if ($addCondition['is_posted']) {
-            if ($addCondition['is_posted'] == "SUDAH POSTING") {
-                $purchaseRequestsDataQry->where('is_posted', 1);
-            } else {
-                $purchaseRequestsDataQry->where('is_posted', 0);
-            }
-        }
-
         if ($addCondition['dateStart']) {
             $purchaseRequestsDataQry->where('purchase_requests.request_date >=',  $addCondition['dateStart']);
         }
         if ($addCondition['dateEnd']) {
             $purchaseRequestsDataQry->where('purchase_requests.request_date <=', $addCondition['dateEnd']);
         }
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['is_posted']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $purchaseRequestsDataQry->groupEnd();
         }
 
