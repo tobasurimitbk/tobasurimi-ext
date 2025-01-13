@@ -71,16 +71,18 @@ class AccountBarangModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "barang_master.kode_barang,
-                    barang_master.barang_name,
-                    account_barang.*,
-                    divisis.id AS divisi_id,
-                    divisis.divisi";
+                  barang_master.barang_name,
+                  account_barang.*,
+                  divisis.divisi,
+                  GROUP_CONCAT(barang_master_spesifikasi.spesifikasi SEPARATOR ', ') AS spesifikasi";
 
         $barangDataQry = $this->asArray()
             ->select($selectQry)
             ->where($condition)
             ->join('barang_master', 'barang_master.id = account_barang.barang_master_id', 'left')
             ->join('divisis', 'divisis.id = account_barang.divisi_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+            ->groupBy('account_barang.id') // Pastikan hasil spesifik untuk setiap account_barang
             ->orderBy($sort, $sortType);
 
         $totalData = $barangDataQry->countAllResults(false);
@@ -107,8 +109,6 @@ class AccountBarangModel extends Model
 
         $totalFilteredData = $barangDataQry->countAllResults(false);
         $data = $barangDataQry->findAll($limit, $offset);
-
-        // var_dump($data);
 
         return [
             'data'              => $data,

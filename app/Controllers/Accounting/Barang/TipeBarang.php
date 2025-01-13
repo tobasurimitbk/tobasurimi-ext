@@ -181,10 +181,18 @@ class TipeBarang extends BaseController
                 $dataNamaPemakaian = $dataPemakaian['no_sub'] ?? "-";
             }
 
-            // var_dump($data['ar_id']);
-            // var_dump($data['ap_id']);
-            // var_dump($data['pemakaian_id']);
-            // var_dump($data);
+            $parentNameParts = explode(',', str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'] . " - " . $data['spesifikasi']);
+            $parentNameFormatted = '';
+            $lineLimit = 4; // Batas elemen per baris
+            foreach ($parentNameParts as $index => $part) {
+                $parentNameFormatted .= $part;
+                if (($index + 1) % $lineLimit == 0) {
+                    $parentNameFormatted .= '<br>'; // Tambahkan baris baru setiap 4 elemen
+                } else {
+                    $parentNameFormatted .= ', ';
+                }
+            }
+            $parentNameFormatted = rtrim($parentNameFormatted, ', ');
 
             if ($addCondition['filter_coa'] == "belum") {
                 if ($dataNamaAP == "-" || $dataAP == "-") {
@@ -192,7 +200,7 @@ class TipeBarang extends BaseController
                         "no"                    => $no++,
                         "id"                    => $data['id'],
                         "divisi_id"             => $data['divisi_id'],
-                        "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
+                        "parent_name"           => $parentNameFormatted,
                         "divisi"                => strtoupper($data['divisi']),
                         "ap_id"                 => $data['ap_id'],
                         "ar_id"                 => $data['ar_id'],
@@ -208,7 +216,7 @@ class TipeBarang extends BaseController
                         "no"                    => $no++,
                         "id"                    => $data['id'],
                         "divisi_id"             => $data['divisi_id'],
-                        "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
+                        "parent_name"           => $parentNameFormatted,
                         "divisi"                => strtoupper($data['divisi']),
                         "ap_id"                 => $data['ap_id'],
                         "ar_id"                 => $data['ar_id'],

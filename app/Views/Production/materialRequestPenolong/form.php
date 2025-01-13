@@ -610,9 +610,9 @@
 
         var validator = $(".create-form").validate({
             rules: {
-                kode_produksi: {
-                    required: true
-                },
+                // kode_produksi: {
+                //     required: true
+                // },
                 date_request: {
                     required: true
                 },
@@ -630,9 +630,9 @@
                 }
             },
             messages: {
-                kode_produksi: {
-                    required: "Kode produksi wajib diisi"
-                },
+                // kode_produksi: {
+                //     required: "Kode produksi wajib diisi"
+                // },
                 date_request: {
                     required: "Tanggal request wajib diisi"
                 },
