@@ -205,6 +205,8 @@ class POLokalBahanBaku extends BaseController
 
         foreach ($poData['data'] as $data) {
             $detailPurchase = $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $data->id)->where('deletedAt', null)->findAll();
+            $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "BAKU")->where('status_penerimaan', "LOKAL")->like('multiple_po_id', $data->id)->first();
+
             $totalHarga = 0;
             foreach ($detailPurchase as $d) {
                 $totalHarga += ($d['general_price'] + $d['daily_price'] + $d['monthly_price']) * $d['qty'];
@@ -222,6 +224,7 @@ class POLokalBahanBaku extends BaseController
                 "total"         => "" . number_format(formatter($totalHarga + $data->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ','),
                 "is_posted"     => $data->is_posted,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
+                "un_posting" => $unPostingCheck == null ? 0 : 1,
             ]);
         }
 
