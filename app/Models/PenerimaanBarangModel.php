@@ -103,7 +103,12 @@ class PenerimaanBarangModel extends Model
 
         $totalData = $penerimaanBarangDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['status'] || $addCondition['startdate'] || $addCondition['lastdate']) {
+
+        if (isset($addCondition['status'])) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.status_post', $addCondition['status']);
+        }
+
+        if ($addCondition['search'] ||  $addCondition['startdate'] || $addCondition['lastdate']) {
             $penerimaanBarangDataQry->groupStart();
         }
 
@@ -119,10 +124,6 @@ class PenerimaanBarangModel extends Model
             }
         }
 
-        if ($addCondition['status']) {
-            $penerimaanBarangDataQry->where('penerimaan_barang.status_post', $addCondition['status']);
-        }
-
         if ($addCondition['startdate']) {
             $penerimaanBarangDataQry->where('penerimaan_barang.createdAt >=', $addCondition['startdate'] . " 00:00:00");
         }
@@ -131,7 +132,7 @@ class PenerimaanBarangModel extends Model
             $penerimaanBarangDataQry->where('penerimaan_barang.createdAt <=', $addCondition['lastdate'] . " 23:59:59");
         }
 
-        if ($addCondition['search'] || $addCondition['status'] || $addCondition['startdate'] || $addCondition['lastdate']) {
+        if ($addCondition['search'] ||  $addCondition['startdate'] || $addCondition['lastdate']) {
             $penerimaanBarangDataQry->groupEnd();
         }
 
