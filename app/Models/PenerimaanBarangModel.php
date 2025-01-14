@@ -316,7 +316,7 @@ class PenerimaanBarangModel extends Model
         $builder = $this->db->table('penerimaan_barang');
         $builder->select('no_penerimaan_barang');
         $builder->orderBy('no_penerimaan_barang', 'desc');
-        $builder->where('penerimaan_barang.warehouse_id', $warehouseID);
+        // $builder->where('penerimaan_barang.warehouse_id', $warehouseID);
         $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('no_penerimaan_barang', $lastStr);
