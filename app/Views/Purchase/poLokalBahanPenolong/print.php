@@ -253,9 +253,10 @@
         </table>
 
         <div class="footer">
+            <b><u>Keterangan: <?= $dataPOLokal->keterangan ?></u></b>
             <table class="w-100 sign-table border-collapse " style="padding-top: 0px;margin-left:-30px;">
                 <tr>
-                    <td style="text-align: center;"><b><u>Keterangan: <?= $dataPOLokal->keterangan ?></u></b></td>
+                    <td style="text-align: center;"></td>
                 </tr>
                 <tr style="border: 0px;">
                     <td style="height: 30px; border: 0px; text-align:center; ">Pemesan Order :</td>
