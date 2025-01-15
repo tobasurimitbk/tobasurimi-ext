@@ -135,32 +135,22 @@ class TipeBarang extends BaseController
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
-            "filter_coa"        => $this->request->getGet("filter_coa"),
+            "filter_coa"    => $this->request->getGet("filter_coa"),
             'filter_divisi' => $this->request->getGet('filter_divisi'),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType")
         ];
 
-        $divisiAccess = $this->divisiModel->getDivisiAccess();
-        $divisiAccessArr = [];
-
-        foreach ($divisiAccess as $d) {
-            array_push($divisiAccessArr, $d['id']);
-        }
-
-        $dataNamaAP = "";
-        $dataNamaAR = "";
-        $dataNamaPemakaian = "";
-
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
+        // Get the filtered result
         $res = $this->accountBarangModel->getListForAccount($condition, $addCondition, $limit, $offset);
 
         $rdata = [];
-
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
+        // Filter the data and populate rdata
         foreach ($res['data'] as $data) {
             $dataNamaAP = "-";
             $dataNamaAR = "-";
@@ -194,6 +184,7 @@ class TipeBarang extends BaseController
             }
             $parentNameFormatted = rtrim($parentNameFormatted, ', ');
 
+            // Filter the records based on the filter conditions
             if ($addCondition['filter_coa'] == "belum") {
                 if ($dataNamaAP == "-" || $dataAP == "-") {
                     array_push($rdata, [
@@ -243,17 +234,22 @@ class TipeBarang extends BaseController
             }
         }
 
+        // Calculate the total records and filtered records based on rdata
+        $recordsFiltered = count($rdata); // Filtered data count
+        $recordsTotal = $res['totalData']; // Total unfiltered records
+
         $data = [
             "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $res['totalData'],
-            "recordsFiltered"   => $res['totalFilteredData'],
+            "recordsTotal"      => $recordsTotal,
+            "recordsFiltered"   => $recordsFiltered,
             "data"              => $rdata,
             "payload"           => $payload,
-            "test" => $_GET
+            "test"              => $_GET
         ];
 
         return response()->setJSON($data);
     }
+
 
     // public function allTipeBarang()
     // {
