@@ -136,7 +136,7 @@
                             <label for="floatingInput">Departemen</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4" style="display: none;">
                         <div class="form-floating " style="height: 50px;">
                             <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select spp_id" id="spp_id" name="spp_id" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -167,10 +167,6 @@
                             <label for="floatingInput">Barang Bahan Baku</label>
                         </div>
                     </div>
-
-
-                </div>
-                <div class="row mt-2">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select pph" id="pph" name="pph" aria-label="Floating label select example">
@@ -181,6 +177,10 @@
                             <label for="floatingInput">PPH</label>
                         </div>
                     </div>
+
+                </div>
+                <div class="row mt-2">
+
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_sebenarnya : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control cong_sebenarnya" name="cong_sebenarnya" id="cong_sebenarnya" placeholder="Cong Sebenarnya (Opsional)">
@@ -193,21 +193,14 @@
                             <label for="floatingInput">Cong Batasan (Opsional)</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->subsidi_langsung : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control subsidi_langsung" name="subsidi_langsung" id="subsidi_langsung" placeholder="Subsidi Langsung (Opsional)">
                             <label for="floatingInput">Tambahan Langsung (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-
-                    </div>
-                    <div class="col-md-4">
-
-                    </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-4">
                         <label class="form-label font-weight-bold modal-sub-title" style="font-size: 14px;">Buatkan LPB Otomatis</label>
@@ -257,7 +250,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3 form-lpb" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->jumlah_kemasan : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jumlah_kemasan" name="jumlah_kemasan" id="jumlah_kemasan" placeholder="Jumlah Kemasan">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->jumlah_kemasan : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" oninput="preventNegativeInput(this)" class="form-control jumlah_kemasan" name="jumlah_kemasan" id="jumlah_kemasan" placeholder="Jumlah Kemasan">
                             <label for="floatingInput">Jumlah Kemasan</label>
                         </div>
                     </div>
@@ -1670,7 +1663,7 @@
                         <td><b>${greatFormatRupiah(umumTotal)}</b></td>
                         <td><b>${greatFormatRupiah(harianTotal)}</b></td>
                         <td><b>${greatFormatRupiah(bulananTotal)}</b></td>
-                        <td><b>${(greatFormatRupiah(qtyTotal))}</b></td>
+                        <td><b>${(greatFormatRupiah(qtyTotal.toFixed(2)))}</b></td>
                         <td colspan="2"></td>
                         <td style="<?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? "display: none;" : "") : ""; ?>"></td>
                     </tr>
@@ -1703,6 +1696,18 @@
         return rupiah.replace(/,/g, '');
     }
 
+    function preventNegativeInput(inputElement) {
+        var inputValue = inputElement.value;
+        var numericValue = inputValue.replace(/[^0-9.]/g, '');
+        numericValue = numericValue.replace(/^0+/g, '');
+        numericValue = numericValue.replace(/^\./g, '0.');
+        if (parseFloat(numericValue) < 0 || isNaN(parseFloat(numericValue))) {
+            inputElement.value = '0';
+        } else {
+            inputElement.value = numericValue;
+        }
+    }
+
     <?php if (!empty($dataPOLokal)) : ?>
         <?php foreach ($dataPOLokal->rm_purchase_order_details as $detail) : ?>
             list_items.push({
@@ -1719,7 +1724,7 @@
                 qty: "<?= $detail->qty ?>",
                 total: "<?= ($detail->general_price + $detail->daily_price + $detail->monthly_price) * $detail->qty ?>",
                 monthly_price: "<?= $detail->monthly_price ?>",
-                keterangan: "<?= $detail->note ?>",
+                keterangan: "<?= trim($detail->note) ?>",
             });
         <?php endforeach; ?>
         drawTable();

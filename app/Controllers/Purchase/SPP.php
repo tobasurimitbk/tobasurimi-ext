@@ -179,7 +179,7 @@ class SPP extends BaseController
                 "is_posted"     => $data->is_posted,
                 "itemCount"     => $data->itemCount,
                 "createdAt"     => date('d/m/Y', strtotime($data->createdAt)),
-                "status" => $status == null ? "OPEN" : "CLOSED"
+                "status" => $status == null || $data->request_status != "finished" ? "OPEN" : "CLOSED"
             ]);
         }
 

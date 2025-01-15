@@ -572,9 +572,15 @@ class PenerimaanBarangImportBP extends BaseController
     public function delete()
     {
         $id = decrypt($this->request->getVar('id'));
-
-        $this->penerimaanBarangModel->where('id', $id)->delete();
+        // GET PENERIMAAN BARANG
+        $penerimaanBarang = $this->penerimaanBarangModel->where('id', $id)->first();
         $penerimaanBarangList = $this->penerimaanBarangDetailModel->asObject()->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();
+        // UPDATE STATUS PENERIMAAN PO MENJADI 0
+        foreach (json_decode($penerimaanBarang['multiple_po_id']) as $p) {
+            $this->amPurchaseOrderModel->update($p, ['status_penerimaan' => 0]);
+        }
+        // DELETE PENERIMAAN BARANG
+        $this->penerimaanBarangModel->where('id', $id)->delete();
         foreach ($penerimaanBarangList as $b) {
             // update remeaning di detail po
             $last = $this->amPurchaseOrderDetailModel->where('id', $b->purchase_order_details_id)

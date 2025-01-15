@@ -166,31 +166,46 @@ class SupplierModel extends Model
 
     public function generateSupplierCode($type, $company_id): string
     {
+        // Template untuk kode berdasarkan tipe
         $month = idate('m');
         $year = date('y');
-        $romanMonth = romanMonthNumber($month);
-        $numberTemplate = "$type";
+        $romanMonth = romanMonthNumber($month); // Fungsi romanMonthNumber harus terdefinisi sebelumnya
 
+        // Format khusus untuk BP
+        if ($type === "BP") {
+            $numberTemplate = "SL-BP";
+        } else {
+            $numberTemplate = $type;
+        }
+
+        // Ambil data terakhir berdasarkan template dan perusahaan
         $lastData = $this->asObject()
             ->where('company_id', $company_id)
-            ->like('kode', $numberTemplate . '-')
-            ->orderBy('createdAt', 'DESC')
+            ->like('kode', $numberTemplate . '%')
+            ->orderBy('kode', 'DESC')
             ->first();
 
-
+        // Jika ada data terakhir, ambil angka increment terakhir, tambahkan 1
         if (!empty($lastData)) {
-            $asd = explode('-', $lastData->kode);
-            $lastIncrement = intval($asd[1]) + 1;
-            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
-
-            $invNumber =  $numberTemplate . "-" . $paddedNumber;
+            $asd = explode($type === "BP" ? 'SL-BP' : '-', $lastData->kode);
+            $lastIncrement = intval(end($asd)) + 1; // Ambil elemen terakhir sebagai angka
         } else {
+            $lastIncrement = 1; // Jika tidak ada data terakhir, mulai dari 1
+        }
 
-            $invNumber = $numberTemplate . '-' . '001';
+        // Format angka dengan 3 digit (contoh: 001, 002, ...)
+        $paddedNumber = str_pad($lastIncrement, 3, '0', STR_PAD_LEFT);
+
+        // Gabungkan template dengan angka yang sudah diproses
+        if ($type === "BP") {
+            $invNumber = $numberTemplate . $paddedNumber;
+        } else {
+            $invNumber = $numberTemplate . '-' . $paddedNumber;
         }
 
         return $invNumber;
     }
+
 
     public function getKwitansiTB($supplierID, $year, $month)
     {

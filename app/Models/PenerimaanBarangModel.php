@@ -103,7 +103,12 @@ class PenerimaanBarangModel extends Model
 
         $totalData = $penerimaanBarangDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['status'] || $addCondition['startdate'] || $addCondition['lastdate']) {
+
+        if (isset($addCondition['status'])) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.status_post', $addCondition['status']);
+        }
+
+        if ($addCondition['search'] ||  $addCondition['startdate'] || $addCondition['lastdate']) {
             $penerimaanBarangDataQry->groupStart();
         }
 
@@ -119,19 +124,15 @@ class PenerimaanBarangModel extends Model
             }
         }
 
-        if ($addCondition['status']) {
-            $penerimaanBarangDataQry->where('penerimaan_barang.status_post', $addCondition['status']);
-        }
-
         if ($addCondition['startdate']) {
-            $penerimaanBarangDataQry->where('penerimaan_barang.createdAt >=', $addCondition['startdate'] . " 00:00:00");
+            $penerimaanBarangDataQry->where('penerimaan_barang.tanggal >=', $addCondition['startdate']);
         }
 
         if ($addCondition['lastdate']) {
-            $penerimaanBarangDataQry->where('penerimaan_barang.createdAt <=', $addCondition['lastdate'] . " 23:59:59");
+            $penerimaanBarangDataQry->where('penerimaan_barang.tanggal <=', $addCondition['lastdate']);
         }
 
-        if ($addCondition['search'] || $addCondition['status'] || $addCondition['startdate'] || $addCondition['lastdate']) {
+        if ($addCondition['search'] ||  $addCondition['startdate'] || $addCondition['lastdate']) {
             $penerimaanBarangDataQry->groupEnd();
         }
 
@@ -315,7 +316,8 @@ class PenerimaanBarangModel extends Model
         $builder = $this->db->table('penerimaan_barang');
         $builder->select('no_penerimaan_barang');
         $builder->orderBy('no_penerimaan_barang', 'desc');
-        $builder->where('penerimaan_barang.warehouse_id', $warehouseID);
+        $builder->where('company_id', session()->get("login")->this_company_id);
+        // $builder->where('penerimaan_barang.warehouse_id', $warehouseID);
         $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('no_penerimaan_barang', $lastStr);
@@ -420,10 +422,10 @@ class PenerimaanBarangModel extends Model
         $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
         $rmPurchaseOrder = new RMPurchaseOrderModel();
         $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
-        $supplierHargaModel = new SupplierHargaModel();
         $stockDetailModel = new StockDetailModel();
         $stockModel = new StockModel();
         $stockDetail2Model = new StockDetail2Model();
+        $barangMasterModel = new BarangMasterModel();
 
         $rmDetail =  $rmPurchaseOrder->where('id', $poID)->first();
         $rmBarangDetail = $rmPurchaseOrderDetailModel->where('rm_purchase_order_id', $poID)->findAll();
@@ -511,9 +513,9 @@ class PenerimaanBarangModel extends Model
 
         foreach ($rmBarangDetail as $r) {
             $selectQry = "
-                supplier_harga.bahan_baku_id, 
-                supplier_harga.spesifikasi, 
+                barang_master.id as bahan_baku_id, 
                 barang_master.barang_name,
+                barang_master_spesifikasi.spesifikasi,
                 barang_master_spesifikasi.satuan_1,
                 barang_master_spesifikasi.satuan_2,
                 barang_master_spesifikasi.satuan_3,
@@ -521,10 +523,10 @@ class PenerimaanBarangModel extends Model
                 barang_master_spesifikasi.konversi_satuan_3,
             ";
 
-            $barang = $supplierHargaModel->select($selectQry)
-                ->join('barang_master', 'barang_master.id = supplier_harga.bahan_baku_id', 'left')
-                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = supplier_harga.spesifikasi_id', 'left')
-                ->where('supplier_harga.id', $r['supplier_harga_id'])
+            $barang = $barangMasterModel->select($selectQry)
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                ->where('barang_master.id', $r['barang1_id'])
+                ->where('barang_master_spesifikasi.id', $r['barang2_id'])
                 ->first();
 
             $nilaiKonversi = 1;

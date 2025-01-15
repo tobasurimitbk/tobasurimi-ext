@@ -58,7 +58,7 @@
                                 <th>No.</th>
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
-                                <th>No. PO</th>
+                                <!-- <th>No. PO</th> -->
                                 <th>No SPP</th>
                                 <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
                                 <th onclick="changeSort('createdAt')">Tanggal</th>
@@ -147,12 +147,12 @@
                 data: "no_penerimaan_barang",
                 className: "text-center"
             },
-            {
-                data: "multiple_po_no",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
+            // {
+            //     data: "multiple_po_no",
+            //     className: "text-center",
+            //     searchable: false,
+            //     sortable: false
+            // },
             {
                 data: "spp_no",
                 className: "text-center",

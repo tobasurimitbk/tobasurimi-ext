@@ -133,6 +133,14 @@ class RMPurchaseOrderModel extends Model
 
         $totalData = $bbLokalDataQry->countAllResults(false);
 
+        if ($addCondition['is_posted']) {
+            if ($addCondition['is_posted'] == "SUDAH POSTING") {
+                $bbLokalDataQry->where('is_posted', 1);
+            } else {
+                $bbLokalDataQry->where('is_posted', 0);
+            }
+        }
+
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $bbLokalDataQry->groupStart();
         }
