@@ -490,6 +490,7 @@ class PenerimaanBarangLokalBP extends BaseController
         // delete first in penerimaan_barang_detail
         // $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->delete();
 
+        $penerimaanBarangDetailId = array();
         foreach (json_decode($barangs) as $b) {
             $poDetail = $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->first();
             $barang = null;
@@ -543,6 +544,32 @@ class PenerimaanBarangLokalBP extends BaseController
                     ->where('purchase_order_details_id', $b->am_purchase_order_details_id)
                     ->delete();
             }
+
+            array_push($penerimaanBarangDetailId, $b->penerimaan_barang_detail_id);
+        }
+
+        // REMOVE BARANG
+        $penerimaanBarangDetailRemovedList = $this->penerimaanBarangDetailModel
+            ->whereNotIn('id', $penerimaanBarangDetailId)
+            ->where('penerimaan_barang_id', $id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        foreach ($penerimaanBarangDetailRemovedList as $p) {
+            $last = $this->amPurchaseOrderDetailModel
+                ->where('id',  $p['purchase_order_details_id'])
+                ->where('am_purchase_order_id', $p['purchase_order_id'])
+                ->first();
+
+            $this->amPurchaseOrderDetailModel
+                ->where('id', $p['purchase_order_details_id'])
+                ->where('am_purchase_order_id', $p['purchase_order_id'])
+                ->set('remaining_qty', $last['remaining_qty'] +  $p['jml_masuk_konversi'])
+                ->set('qty_diterima', $last['qty_diterima'] - $p['jml_masuk_konversi'])
+                ->update();
+
+            $this->penerimaanBarangDetailModel
+                ->delete($p['id']);
         }
 
         return response()->setJSON([

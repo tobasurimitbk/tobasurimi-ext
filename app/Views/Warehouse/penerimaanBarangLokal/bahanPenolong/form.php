@@ -955,6 +955,9 @@
                 <button class="btn btn-warning posting-spp mr-1" onclick="editModal('${v.am_purchase_order_id}', '${v.am_purchase_order_details_id}')">
                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                 </button>
+                  <button class="btn btn-danger posting-spp mr-1" onclick="deleteDetail('${v.am_purchase_order_id}', '${v.am_purchase_order_details_id}')">
+                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                </button>
                 `
                         <?php endif; ?> <?php else : ?> `
                 <button class="btn btn-warning posting-spp mr-1" onclick="editModal('${v.am_purchase_order_id}', '${v.am_purchase_order_details_id}')">
