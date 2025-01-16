@@ -67,13 +67,15 @@
                             <th>No</th>
                             <th>Tipe Barang</th>
                             <th onclick="changeSort('stock_details2.supplier_id')">Supplier</th>
+                            <th>Kode Barang</th>
                             <th onclick="changeSort('barang_master.barang_name')">Barang</th>
                             <th onclick="changeSort('divisis.divisi')">Departemen</th>
                             <th onclick="changeSort('warehouses.warehouse_name')">Warehouse</th>
                             <th onclick="changeSort('stock_details2.bc_id')">Dokumen Pabean</th>
                             <th onclick="changeSort('stock_details2.bc_id')">Dokumen Referensi</th>
                             <th onclick="changeSort('stock_details.sumber')">Sumber</th>
-                            <th onclick="changeSort('stock_details.no_dokumen')">Dokumen</th>
+                            <th onclick="changeSort('stock_details.no_dokumen')">Referensi</th>
+                            <th onclick="changeSort('stock_details.keterangan')">Keterangan</th>
                             <th onclick="changeSort('stock_details2.tanggal')">Tanggal</th>
                             <th onclick="changeSort('stock_details2.qty')">Qty</th>
                         </tr>
@@ -155,11 +157,11 @@
                 data: "supplier_name",
                 className: "text-center",
             },
-            // {
-            //     data: "kode_barang",
-            //     className: "text-center",
-            //     orderable: false
-            // },
+            {
+                data: "kode_barang",
+                className: "text-center",
+                orderable: false
+            },
             {
                 data: "barang",
                 className: "text-center",
@@ -192,6 +194,10 @@
 
             {
                 data: "dokumen",
+                className: "text-center",
+            },
+            {
+                data: "keterangan",
                 className: "text-center",
             },
             {

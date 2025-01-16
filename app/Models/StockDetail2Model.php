@@ -226,7 +226,8 @@ class StockDetail2Model extends Model
             'stock.barang1_id' => 'stock.barang1_id',
             'stock_details2.qty' => 'stock_details2.qty',
             'stock_details2.no_aju' => 'stock_details2.no_aju',
-            'stock_details.tanggal' => 'stock_details.stock_date'
+            'stock_details.tanggal' => 'stock_details.stock_date',
+            'stock_details.keterangan' => 'stock_details.keterangan'
 
         ];
 

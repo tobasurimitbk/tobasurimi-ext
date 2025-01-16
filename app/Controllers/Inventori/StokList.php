@@ -1090,6 +1090,7 @@ class StokList extends BaseController
             "stock.deletedAt" => null,
             "stock_details.sumber" => trim($this->request->getVar('sumber')),
             "stock_details.deletedAt" => null,
+            "stock_details.status" => "In"
         ];
 
         $dataQry = $this->stockDetail2Model->getListStokLog($condition, $addCondition, $limit, $offset);
