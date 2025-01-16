@@ -171,6 +171,7 @@ class PembayaranPOLokal extends BaseController
                 'tanda_terima_faktur_id' => $this->request->getVar('tanda_terima_faktur_id'),
 
                 'amount' => repairDouble($this->request->getVar('nominal_pembayaran')),
+                'payment_panjar_date' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_panjar_date')))),
                 'payment_date' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
                 'payment_method' => $this->request->getVar('payment_method'),
 
@@ -306,6 +307,7 @@ class PembayaranPOLokal extends BaseController
                 'tanda_terima_faktur_id' => $this->request->getVar('tanda_terima_faktur_id'),
 
                 'amount' => $lastAmount["amount"] + repairDouble($this->request->getVar('nominal_pembayaran')),
+                'payment_panjar_date' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_panjar_date')))),
                 'payment_date' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
                 'payment_method' => $this->request->getVar('payment_method'),
 

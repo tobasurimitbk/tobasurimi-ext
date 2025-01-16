@@ -183,6 +183,17 @@
                             <label for="floatingInput" style="z-index: 1;">Kredit (Opsional)</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" class="form-control input-picker due_date" id="payment_panjar_date" name="payment_panjar_date" placeholder="Tanggal Pembayaran Panjar (Opsional)" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> value="<?= !empty($detail) ? date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_panjar_date'])) : '' ?>">
+                                <label for="floatingInput">Tanggal Pembayaran Panjar</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                 </div>

@@ -548,29 +548,32 @@
     $('#tipe_supplier').select2({
         placeholder: "Pilih Tipe Supplier",
         theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
     });
 
     $('#tipe_panjar').select2({
         placeholder: "Pilih Tipe Panjar",
         theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
     });
 
     $('#jenis_panjar').select2({
         placeholder: "Pilih Jenis Panjar",
         theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
     });
 
     $('#supplier_id').select2({
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
     });
 
 
-    $("#tipe_supplier, #supplier_id")
+       $("#tipe_supplier, #supplier_id")
         .parent('div')
         .find('label')
         .css('z-index', '1');
-
 
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
@@ -681,8 +684,6 @@
             $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`)
         })
     }
-
-    changeStatus();
 
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
