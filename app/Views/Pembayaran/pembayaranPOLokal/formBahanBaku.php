@@ -404,19 +404,19 @@
             },
             success: function(response) {
                 listPembayaran = [];
-                listPembayaran = response.data.detail;
+                listPembayaran = response.data;
                 listPanjar = [];
                 listPinjaman = [];
                 listPanjarTB = [];
                 listPanjar = response.data.panjar
                 listPinjaman = response.data.pinjaman
-                listPanjarTB = response.data.panjarTB
+                listPanjarTB = response.data.panjar_tb
 
                 csrf.val(response.token);
                 drawPaidPanjarTable(listPanjar);
                 drawPaidPinjamanTable(listPinjaman);
                 drawPaidPanjarTBTable(listPanjarTB);
-                drawPaidTable(response.data);
+                drawPaidTable(listPembayaran);
             }
         });
     <?php endif; ?>
@@ -692,12 +692,52 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         let formData = new FormData(document.querySelector(".create-form"));
+                        // Format angka sebelum dimasukkan ke formData
+                        let nominalPembayaran = destroyFormatRupiah($('.nominal_pembayaran').val());
+                        let totalPembayaran = destroyFormatRupiah($('[name="total_pembayaran"]').val());
+                        let totalPembayaranPanjar = destroyFormatRupiah($('[name="total_pembayaran_panjar"]').val());
+                        let totalPembayaranPanjarTB = destroyFormatRupiah($('[name="total_pembayaran_panjar_tb"]').val());
+                        let totalPembayaranPinjaman = destroyFormatRupiah($('[name="total_pembayaran_pinjaman"]').val());
+                        formData.set('nominal_pembayaran', nominalPembayaran);
+                        formData.set('total_pembayaran', totalPembayaran);
+                        formData.set('total_pembayaran_panjar', totalPembayaranPanjar);
+                        formData.set('total_pembayaran_panjar_tb', totalPembayaranPanjarTB);
+                        formData.set('total_pembayaran_pinjaman', totalPembayaranPinjaman);
+
+                        // Format list data sebelum dimasukkan
+                        const formatList = (list) => {
+                            return list.map(item => {
+                                for (const key in item) {
+                                    if (typeof item[key] === 'string' && item[key].includes(',')) {
+                                        item[key] = destroyFormatRupiah(item[key]);
+                                    }
+                                }
+                                return item;
+                            });
+                        };
+
+                        // Format semua list
+                        let formattedPanjarList = formatList(listPanjar);
+                        let formattedPinjamanList = formatList(listPinjaman);
+                        let formattedPanjarTBList = formatList(listPanjarTB);
+
+                        // Format pembayaranList
+                        let formattedPembayaranList = {
+                            ...listPembayaran,
+                            detail: formatList(listPembayaran.detail || []),
+                            panjar: formatList(listPembayaran.panjar || []),
+                            panjar_tb: formatList(listPembayaran.panjar_tb || []),
+                            pinjaman: formatList(listPembayaran.pinjaman || [])
+                        };
+
+                        // Append formatted lists to formData
                         formData.append("poIDList", JSON.stringify(listPoID));
                         formData.append("poNoList", JSON.stringify(listPoNo));
-                        formData.append("panjarList", JSON.stringify(listPanjar));
-                        formData.append("pinjamanList", JSON.stringify(listPinjaman));
-                        formData.append("panjarTBList", JSON.stringify(listPanjarTB));
-                        formData.append("pembayaranList", JSON.stringify(listPembayaran));
+                        formData.append("panjarList", JSON.stringify(formattedPanjarList));
+                        formData.append("pinjamanList", JSON.stringify(formattedPinjamanList));
+                        formData.append("panjarTBList", JSON.stringify(formattedPanjarTBList));
+                        formData.append("pembayaranList", JSON.stringify(formattedPembayaranList));
+
                         $.ajax({
 
                             url: "<?= base_url("pembayaran-po-lokal-bb/update"); ?>",
@@ -761,14 +801,60 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             let formData = new FormData(document.querySelector(".create-form"));
+                            // Format angka sebelum dimasukkan ke formData
+                            let nominalPembayaran = destroyFormatRupiah($('.nominal_pembayaran').val());
+                            let totalPembayaran = destroyFormatRupiah($('[name="total_pembayaran"]').val());
+                            let totalPembayaranPanjar = destroyFormatRupiah($('[name="total_pembayaran_panjar"]').val());
+                            let totalPembayaranPanjarTB = destroyFormatRupiah($('[name="total_pembayaran_panjar_tb"]').val());
+                            let totalPembayaranPinjaman = destroyFormatRupiah($('[name="total_pembayaran_pinjaman"]').val());
+                            formData.set('nominal_pembayaran', nominalPembayaran);
+                            formData.set('total_pembayaran', totalPembayaran);
+                            formData.set('total_pembayaran_panjar', totalPembayaranPanjar);
+                            formData.set('total_pembayaran_panjar_tb', totalPembayaranPanjarTB);
+                            formData.set('total_pembayaran_pinjaman', totalPembayaranPinjaman);
+                            const formatList = (list) => {
+                                if (!Array.isArray(list)) return []; // Pastikan `list` adalah array
+                                return list.map(item => {
+                                    for (const key in item) {
+                                        if (typeof item[key] === 'string' && item[key].includes(',')) {
+                                            item[key] = destroyFormatRupiah(item[key]);
+                                        }
+                                    }
+                                    return item;
+                                });
+                            };
+                            
+
+                            // Pastikan pembayaranList berbentuk array
+                            let formattedPembayaranList = Array.isArray(listPembayaran)
+                                ? listPembayaran
+                                : Object.values(listPembayaran);
+
+                            // Format item dalam pembayaranList
+                            formattedPembayaranList = formattedPembayaranList.map(item => {
+                                Object.keys(item).forEach(key => {
+                                    if (typeof item[key] === 'string' && item[key].includes(',')) {
+                                        item[key] = destroyFormatRupiah(item[key]);
+                                    }
+                                });
+                                return item;
+                            });
+
+                            // Append formatted pembayaranList to formData
+                            formData.append("pembayaranList", JSON.stringify(formattedPembayaranList));
+
+                            // Format semua list
+                            let formattedPanjarList = formatList(listPanjar);
+                            let formattedPinjamanList = formatList(listPinjaman);
+                            let formattedPanjarTBList = formatList(listPanjarTB);
+
+                            // Append formatted lists to formData
                             formData.append("no_bukti_pembayaran", $('#no_bukti_pembayaran').val());
                             formData.append("poIDList", JSON.stringify(listPoID));
                             formData.append("poNoList", JSON.stringify(listPoNo));
-                            formData.append("panjarList", JSON.stringify(listPanjar));
-                            formData.append("pinjamanList", JSON.stringify(listPinjaman));
-                            formData.append("panjarTBList", JSON.stringify(listPanjarTB));
-                            formData.append("pembayaranList", JSON.stringify(listPembayaran));
-
+                            formData.append("panjarList", JSON.stringify(formattedPanjarList));
+                            formData.append("pinjamanList", JSON.stringify(formattedPinjamanList));
+                            formData.append("panjarTBList", JSON.stringify(formattedPanjarTBList));
                             $.ajax({
                                 url: "<?= base_url("pembayaran-po-lokal-bb/create"); ?>",
                                 data: formData,
@@ -1022,6 +1108,13 @@
         table.find('tbody').empty();
 
         $.each(data.detail, function(i, v) {
+            listPoID.push({
+                poID: v.penerimaan_barang_id
+            });
+            // push po no
+            listPoNo.push({
+                poNo: v.no_penerimaan_barang
+            });
             console.log(greatFormatRupiah(v.total_tagihan), v.total_tagihan)
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align:center;">').text(no++));
@@ -1032,7 +1125,7 @@
             newRow.append($('<td style="text-align:center;">').text(v.barang));
             newRow.append($('<td style="text-align:center;">').text(v.total_order));
             newRow.append($('<td style="text-align:center;">').text(v.total_diterima));
-            // newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.total_tagihan)));
+            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.total_tagihan)));
             // newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.sisa_pembayaran)));
             newRow.append($('<td class="hidden" style="display:none;">').html(
                 `
@@ -1071,6 +1164,31 @@
         // newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value="' + greatFormatRupiah(data.total_bayar_panjar) + ' " name = "total_pembayaran_panjar" readonly>' +
+            '</b></td>'));
+
+        table.find('tbody').append(newRow);
+
+        var newRow = $('<tr>');
+        newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN PANJAR TB</b></td>'));
+        newRow.append(($('<td </td>')));
+        newRow.append(($('<td </td>')));
+        // newRow.append(($('<td </td>')));
+        // newRow.append(($('<td </td>')));
+        newRow.append($('<td style="text-align:center;"><b>' +
+            '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar-tb trigger-input" type="text" value="' + greatFormatRupiah(data.total_bayar_panjar_tb) + ' " name = "total_pembayaran_panjar_tb" readonly>' +
+            '</b></td>'));
+
+        table.find('tbody').append(newRow);
+
+
+        var newRow = $('<tr>');
+        newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN PINJAMAN</b></td>'));
+        newRow.append(($('<td </td>')));
+        newRow.append(($('<td </td>')));
+        // newRow.append(($('<td </td>')));
+        // newRow.append(($('<td </td>')));
+        newRow.append($('<td style="text-align:center;"><b>' +
+            '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-pinjaman trigger-input" type="text" value="' + greatFormatRupiah(data.total_bayar_pinjaman) + ' " name = "total_pembayaran_pinjaman" readonly>' +
             '</b></td>'));
 
         table.find('tbody').append(newRow);
@@ -1319,7 +1437,7 @@
 
 
     function drawPaidPanjarTBTable(data) {
-        const tablePanjar = $('#dataTable-panjar-TB');
+        const tablePanjarTB = $('#dataTable-panjar-TB');
         tablePanjarTB.find('tbody').empty();
         tablePanjarTB.find('tfoot').empty();
 
@@ -1339,7 +1457,7 @@
 
                 newRow.append($('<td>').html(
                     `
-                        <input<?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> onchange="this.value = greatFormatRupiah(this.value)"  class="form-control bayar_panjar" oninput="limitInputBayar(this, ${v.sisa_panjar_number})" autocomplete="one-time-code" data-id="${v.id}"  class="form-control" type="text" value="${v.bayar_panjar}" name = "bayar_panjar" style="height:40px">
+                        <input<?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> onchange="this.value = greatFormatRupiah(this.value)"  class="form-control bayar_panjar_tb" oninput="limitInputBayar(this, ${v.sisa_panjar_number})" autocomplete="one-time-code" data-id="${v.id}"  class="form-control" type="text" value="${v.bayar_panjar}" name = "bayar_panjar_tb" style="height:40px">
                             `
                 ));
                 tablePanjarTB.find('tbody').append(newRow);
