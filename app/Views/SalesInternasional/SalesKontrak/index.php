@@ -166,8 +166,10 @@
                     let status_posting = row.status_posting;
                     let status_closed = row.status_closed;
 
+                    let res = '';
+
                     if (status_posting === "0") {
-                        return `
+                        res += `
                         <div class="mt-0">
                             <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'p')) : ?>
                                 <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("sales-kontrak/print/"); ?>${id}')" style="box-shadow: none !important;">
@@ -185,17 +187,17 @@
                                 </button>
                             <?php endif; ?>
                         </div>
-                    `;
+                        `;
                     }
+
                     if (status_posting === "1") {
-                        var res = '';
                         res += `
                         <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'p')) : ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("sales-kontrak/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
-                    `;
+                        `;
 
                         if (status_closed == "0") {
                             res += `
@@ -204,15 +206,24 @@
                                     <i class="fa-solid fa-ban"></i>    
                                 </button>
                             <?php endif; ?>
-                        `;
+                            `;
                         }
-
-                        return `
-                        <div class="mt-0">
-                            ${res}
-                        </div>
-                    `;
                     }
+
+                    // Tambahkan tombol duplikasi di akhir
+                    res += `
+                    <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'c')) : ?>
+                        <button data-toggle="tooltip" title="Duplikasi" onclick="duplicate('${id}')" class="btn btn-primary duplicate-btn">
+                            <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
+                        </button>
+                    <?php endif; ?>
+                    `;
+
+                    return `
+                    <div class="mt-0">
+                        ${res}
+                    </div>
+                    `;
                 }
             }
         ],
@@ -336,6 +347,25 @@
             }
         })
     }
+
+    function duplicate(id) {
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Tindakan ini akan menduplikasi data yang dipilih.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, duplikasi!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect ke route yang ditentukan
+                window.location.href = `/sales-kontrak/duplicate/${id}`;
+            }
+        });
+    }
+
 
     const print = function(url) {
         window.open(url, "_blank");
