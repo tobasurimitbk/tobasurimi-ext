@@ -368,11 +368,7 @@
         });
     </script>
 <?php else: ?>
-    <script>
-        $(document).ready(function() {
-            changeStatus();
-        });
-    </script>
+
 <?php endif; ?>
 
 <script>
