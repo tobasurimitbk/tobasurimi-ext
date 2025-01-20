@@ -94,7 +94,7 @@ class OrderForm extends BaseController
         $dataBanks = $this->BanksModel->search_list(array(), 'name');
         $dataSatuan = $this->satuanModel->findAll();
         //Get Customers
-        $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
+        $customers = $this->CustomerModel->getCustomerLokal($this->userId);
         $condition = [
             'jabatan_name' => "SALES LOKAL"
         ];
