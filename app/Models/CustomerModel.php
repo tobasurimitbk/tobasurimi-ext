@@ -216,7 +216,7 @@ class CustomerModel extends Model
         return $this->asArray()->where('company_id', $companyID)->where('tipe_customer', "INTERNASIONAL")->where('deletedAt', null)->where('user_id', $user_id)->orderBy('createdAt', "DESC")->findAll();
     }
 
-    public function getCustomerLokal($user_id, $companyID)
+    public function getCustomerLokal($user_id)
     {
         return $this->asArray()
             ->select('customers.*, customers.sales_id AS salesName')
@@ -225,7 +225,6 @@ class CustomerModel extends Model
             ->where('customers.tipe_customer', 'LOKAL')
             ->where('employees.deletedAt', null)
             ->where('customers.user_id', $user_id)
-            ->where('customers.company_id', $companyID)
             ->orderBy('createdAt', "DESC")
             ->findAll();
     }
