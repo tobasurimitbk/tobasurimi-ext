@@ -434,6 +434,8 @@
         placeholder: "Pilih Departemen",
         theme: "bootstrap-5"
     }).change(function() {
+        list_penerimaan_selected = [];
+        drawTableSelected(list_penerimaan_selected); // Perbarui tabel selected
         listDaftarPenerimaanBarang();
     });
 
@@ -441,6 +443,8 @@
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5"
     }).change(function() {
+        list_penerimaan_selected = [];
+        drawTableSelected(list_penerimaan_selected); // Perbarui tabel selected
         listDaftarPenerimaanBarang();
     });
 
