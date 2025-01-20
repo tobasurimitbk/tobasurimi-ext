@@ -452,14 +452,17 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('#select-item-btn').click(function() {
-        list_penerimaan_selected = [];
-        <?php if (!empty($dataTandaTerimaFaktur)) : ?>
-            daftarPenerimaanFromDB();
-        <?php endif; ?>
+    $('#select-item-btn').click(function () {
+        // Jangan reset langsung list_penerimaan_selected
+        var selectedSupplierId = null;
 
-        var checkedCheckboxes = $(".child:checked");
-        var dataIds = checkedCheckboxes.map(function() {
+        if (list_penerimaan_selected.length > 0) {
+            // Ambil supplier_id dari data yang sudah dipilih
+            selectedSupplierId = list_penerimaan_selected[0].supplier_id;
+        }
+
+        var checkedCheckboxes = $(".child:checked"); // Ambil checkbox yang dipilih
+        var dataIds = checkedCheckboxes.map(function () {
             return $(this).data("id");
         }).get();
 
@@ -470,50 +473,74 @@
                 confirmButtonColor: '#4e73df',
                 confirmButtonText: 'Ok'
             });
-        } else {
-            // Collect all supplier names from selected rows
-            var supplierNames = checkedCheckboxes.map(function() {
-                return $(this).closest('tr').find('td:nth-child(5)').text().trim(); // Assuming supplier_name is the 5th column
-            }).get();
+            return;
+        }
 
-            // Check for unique supplier names
-            var uniqueSuppliers = [...new Set(supplierNames)];
-            if (uniqueSuppliers.length > 1) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Semua data penerimaan harus dari supplier yang sama!',
-                    confirmButtonColor: '#4e73df',
-                    confirmButtonText: 'Ok'
-                });
-                return; // Stop further execution
-            }
+        // Validasi supplier names
+        var supplierIds = checkedCheckboxes.map(function () {
+            return $(this).closest('tr').find('td:nth-child(5)').data("supplier-id"); // Ambil supplier_id dari atribut data
+        }).get();
 
-            // Proceed with data processing
-            $.each(list_penerimaan_barang, function(i, v) {
+        var uniqueSuppliers = [...new Set(supplierIds)];
+        if (uniqueSuppliers.length > 1 || (selectedSupplierId && uniqueSuppliers[0] !== selectedSupplierId)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Semua data penerimaan harus dari supplier yang sama!',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
+        // Proses data berdasarkan input yang dipilih
+        var updatedList = []; // Array untuk menyimpan data yang masih ada
+        $.each(list_penerimaan_barang, function (i, v) {
+            if (v) { // Pastikan elemen valid
                 if ($.inArray(Number(v.penerimaan_barang_detail_id), dataIds) !== -1) {
                     var targetInputElement = $('input[data-id_input_diterima="' + v.penerimaan_barang_detail_id + '"]');
-                    var targetValue = targetInputElement.val();
-                    var sisaDiterima = Number(v.qty_akan_diterima) < Number(targetValue) ? Number(v.qty_akan_diterima) : Number(targetValue);
+                    var targetValue = Number(targetInputElement.val()); // Ambil nilai input
 
-                    list_penerimaan_selected.push({
-                        penerimaan_barang_detail_id: v.penerimaan_barang_detail_id,
-                        po_no: v.po_no,
-                        tanggal: v.tanggal,
-                        no_penerimaan_barang: v.no_penerimaan_barang,
-                        nama_barang_dok: v.nama_barang_dok,
-                        qty_lpb: v.qty_lpb,
-                        qty_retur: v.qty_retur,
-                        qty_telah_diterima: v.qty_telah_diterima,
-                        qty_akan_diterima: sisaDiterima,
-                        kode_satuan: v.kode_satuan,
-                        harga: v.harga,
-                        divisi_id: v.divisi_id,
-                        supplier_id: v.supplier_id,
-                    });
+                    if (!isNaN(targetValue) && targetValue > 0) {
+                        var sisaDiterima = Math.min(v.qty_akan_diterima, targetValue); // Hitung sisa yang diterima
+
+                        // Kurangi qty_akan_diterima
+                        v.qty_akan_diterima -= sisaDiterima;
+
+                        // Tambahkan ke list_penerimaan_selected
+                        list_penerimaan_selected.push({
+                            penerimaan_barang_detail_id: v.penerimaan_barang_detail_id,
+                            po_no: v.po_no,
+                            tanggal: v.tanggal,
+                            no_penerimaan_barang: v.no_penerimaan_barang,
+                            nama_barang_dok: v.nama_barang_dok,
+                            qty_lpb: v.qty_lpb,
+                            qty_retur: v.qty_retur,
+                            qty_telah_diterima: v.qty_telah_diterima,
+                            qty_akan_diterima: sisaDiterima,
+                            kode_satuan: v.kode_satuan,
+                            harga: v.harga,
+                            divisi_id: v.divisi_id,
+                            supplier_id: v.supplier_id,
+                            supplier_name: v.supplier_name,
+                        });
+
+                        // Simpan elemen ke daftar baru jika qty_akan_diterima masih ada
+                        if (v.qty_akan_diterima > 0) {
+                            updatedList.push(v);
+                        }
+                    }
+                } else {
+                    // Simpan data yang tidak terpengaruh
+                    updatedList.push(v);
                 }
-            });
-            drawTableSelected(list_penerimaan_selected);
-        }
+            }
+        });
+
+        list_penerimaan_barang = updatedList; // Perbarui array utama
+
+        // Refresh tampilan
+        drawTableSelected(list_penerimaan_selected); // Tampilkan data yang dipilih
+        drawTableDaftarPenerimaanBarang(list_penerimaan_barang); // Perbarui tabel utama
     });
 
 
@@ -787,17 +814,59 @@
         // CREATE
         function deleteDetailRow(id) {
             var indexToRemove = -1;
+            var removedItem = null;
+
+            // Cari item yang dihapus dari list_penerimaan_selected
             for (var i = 0; i < list_penerimaan_selected.length; i++) {
                 if (list_penerimaan_selected[i].penerimaan_barang_detail_id === id) {
                     indexToRemove = i;
+                    removedItem = list_penerimaan_selected[i];
                     break;
                 }
             }
+
             if (indexToRemove !== -1) {
-                list_penerimaan_selected.splice(indexToRemove, 1);
+                list_penerimaan_selected.splice(indexToRemove, 1); // Hapus dari selected list
             }
 
-            drawTableSelected(list_penerimaan_selected);
+            // Jika ada item yang dihapus, kembalikan ke list_penerimaan_barang
+            if (removedItem) {
+                var itemFound = false;
+
+                // Periksa apakah item sudah ada di tabel utama (list_penerimaan_barang)
+                for (var j = 0; j < list_penerimaan_barang.length; j++) {
+                    if (list_penerimaan_barang[j].penerimaan_barang_detail_id === removedItem.penerimaan_barang_detail_id) {
+                        // Tambahkan qty_akan_diterima kembali ke item yang sesuai
+                        list_penerimaan_barang[j].qty_akan_diterima += removedItem.qty_akan_diterima;
+                        itemFound = true;
+                        break;
+                    }
+                }
+
+                // Jika item belum ada di list_penerimaan_barang, tambahkan item ke dalam daftar
+                if (!itemFound) {
+                    list_penerimaan_barang.push({
+                        penerimaan_barang_detail_id: removedItem.penerimaan_barang_detail_id,
+                        po_no: removedItem.po_no,
+                        tanggal: removedItem.tanggal,
+                        no_penerimaan_barang: removedItem.no_penerimaan_barang,
+                        nama_barang_dok: removedItem.nama_barang_dok,
+                        qty_lpb: removedItem.qty_lpb,
+                        qty_retur: removedItem.qty_retur,
+                        qty_telah_diterima: removedItem.qty_telah_diterima,
+                        qty_akan_diterima: removedItem.qty_akan_diterima,
+                        kode_satuan: removedItem.kode_satuan,
+                        harga: removedItem.harga,
+                        divisi_id: removedItem.divisi_id,
+                        supplier_id: removedItem.supplier_id,
+                        supplier_name: removedItem.supplier_name,
+                    });
+                }
+            }
+
+            // Refresh tampilan
+            drawTableSelected(list_penerimaan_selected); // Perbarui tabel selected
+            drawTableDaftarPenerimaanBarang(list_penerimaan_barang); // Perbarui tabel utama
         }
     <?php else : ?>
         // UPDATE (Jika update langsung delete ke server)
@@ -935,7 +1004,6 @@
 
         const table = $('#selectedItemTable');
         const tbody = table.find('tbody');
-
         $.each(data, function(i, v) {
             var harga = (Number(v.qty_akan_diterima) * Number(v.harga));
             var newRow = $('<tr>');
