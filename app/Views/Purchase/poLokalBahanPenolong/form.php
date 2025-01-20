@@ -453,7 +453,7 @@
             },
             method: "GET",
             success: function(response) {
-                if (response.hargaTerakhir !== "-") {
+                if (response.res.hargaTerakhirNumber !== 0) {
                     $('#harga_satuan').val(greatFormatRupiah(response.res.hargaTerakhirNumber)).keyup();
                 } else {
                     $('#harga_satuan').val('');
@@ -486,7 +486,7 @@
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
-        $('#total').val(greatFormatRupiah(total));
+        $('#total').val(total == 0 ? '' : greatFormatRupiah(total));
     });
 
     // CHANGE TOTAL
@@ -498,7 +498,7 @@
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var hargaSatuan = (((total / qty)));
-        $('#harga_satuan').val(greatFormatRupiah(hargaSatuan));
+        $('#harga_satuan').val(hargaSatuan == 0 ? '' : greatFormatRupiah(hargaSatuan));
     });
 
     // VALIDATOR DETAIL
@@ -1016,7 +1016,7 @@
             }
         }
         $('#barang_id, #barang_update_id').val(item.spesifikasi_id).change();
-        $('#harga_satuan').val(greatFormatRupiah(item.harga_satuan));
+        $('#harga_satuan').val(item.harga_satuan == 0 ? '' : greatFormatRupiah(item.harga_satuan));
         $('#qty').val(parseFloat(item.qty));
         $('#diskon').val(parseFloat(item.diskon));
         $('#biaya_tambahan').val((item.biaya_tambahan == 0) ? greatFormatRupiah(0) : greatFormatRupiah(item.biaya_tambahan));
@@ -1025,7 +1025,7 @@
         $('#pph').val(item.pph);
         $('#satuan_id').val(item.satuan_id).change();
         // $('#biaya_tambahan').change();
-        $('#total').val(greatFormatRupiah(item.total));
+        $('#total').val(item.total == 0 ? '' : greatFormatRupiah(item.total));
         // attr barang_id disabled
         $('#barang_id').attr('disabled', true);
         // setTimeout(function() {
