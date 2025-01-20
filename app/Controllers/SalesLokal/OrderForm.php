@@ -99,7 +99,7 @@ class OrderForm extends BaseController
             'jabatan_name' => "SALES LOKAL"
         ];
 
-        $sales = $this->employeeModel->getEmployeesComplete($this->this_company_id, $condition);
+        $sales = $this->employeeModel->getEmployeesComplete($condition);
         $dataCompany = $this->companyModel->where('deletedAt', NULL)->asObject()->findAll();
 
         $dataTermin = $this->MetaDataModel
