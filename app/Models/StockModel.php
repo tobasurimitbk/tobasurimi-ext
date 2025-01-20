@@ -1094,11 +1094,13 @@ class StockModel extends Model
                 stock_details2.harga_umum,
                 stock_details2.harga_harian,
                 stock_details2.harga_bulanan,
+                stock_details.no_dokumen,
                 stock.tipe_barang,
                 stock.barang1_id,
                 stock.barang2_id,
                 stock.kemasan_id
             ')
+                ->distinct()
                 ->join('stock_details2', 'stock_details2.stock_detail_id = stock_details.id', 'left')
                 ->join('stock', 'stock_details2.stock_id = stock.id', 'left')
                 ->where('stock.company_id', $penerimaanBarang['company_id'])

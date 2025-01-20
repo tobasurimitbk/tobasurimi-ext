@@ -1276,6 +1276,7 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->post('create', 'BeaCukai\BC40::createPurchaseOrderAction');
     $routes->post('po/update', 'BeaCukai\BC40::updatePurchaseOrderAction/$1');
     $routes->post('posting', 'BeaCukai\BC23::posting');
+    $routes->post('unposting', 'BeaCukai\BC40::unPosting');
 
     // OUTSTANDING
     $routes->get('bc-23-outstanding-all', 'BeaCukai\BC23::allOutstanding');
@@ -1337,7 +1338,7 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
 });
 
 // BC 4.0
-$routes->group('bea-cukai-bc-40/', ['filter' => 'Auth'], function ($routes) {
+$routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->get('', 'BeaCukai\BC40::index');
     $routes->get('online', 'BeaCukai\BC40::online');
     $routes->get('download-response', 'BeaCukai\BC40::downloadResponPdf');
@@ -1353,6 +1354,7 @@ $routes->group('bea-cukai-bc-40/', ['filter' => 'Auth'], function ($routes) {
     $routes->post('create', 'BeaCukai\BC40::createPurchaseOrderAction');
     $routes->post('po/update', 'BeaCukai\BC40::updatePurchaseOrderAction/$1');
     $routes->post('posting', 'BeaCukai\BC40::posting');
+    $routes->post('unposting', 'BeaCukai\BC40::unPosting');
 
     // OUTSTANDING
     $routes->get('bc-40-outstanding-all', 'BeaCukai\BC40::allOutstanding');
