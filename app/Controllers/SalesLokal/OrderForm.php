@@ -96,7 +96,7 @@ class OrderForm extends BaseController
         //Get Customers
         $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
         $condition = [
-            'jabatan_name' => "LOKAL"
+            'jabatan_name' => "SALES LOKAL"
         ];
 
         $sales = $this->employeeModel->getEmployeesComplete($this->this_company_id, $condition);
