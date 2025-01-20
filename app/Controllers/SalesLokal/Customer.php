@@ -46,7 +46,7 @@ class Customer extends BaseController
             'jabatan_name' => "SALES LOKAL"
         ];
 
-        $sales = $this->employeeModel->getEmployeesComplete($this->this_company_id, $condition);
+        $sales = $this->employeeModel->getEmployeesComplete($condition);
 
         $data = [
             "dataProvinces" => $dataProvinces,

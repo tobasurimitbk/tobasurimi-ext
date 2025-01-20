@@ -386,11 +386,10 @@ class EmployeesModel extends Model
         return $res;
     }
 
-    public function getEmployeesComplete($company_id, $condition = null)
+    public function getEmployeesComplete($condition = null)
     {
         $arrCondition = [
             'employees.deletedAt' => null,
-            'employees.company_id' => $company_id,
             'employees.status' => "Aktif"
         ];
 
