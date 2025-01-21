@@ -501,12 +501,12 @@ $routes->get('/panjar-supplier/generate-no-panjar', 'Pembayaran\PanjarSupplier::
 // PEMBAYARAN PINJAMAN SUPPLIER
 $routes->get('/pinjaman-supplier', 'Pembayaran\PinjamanSupplier::index', ['filter' => 'Auth']);
 $routes->get('/pinjaman-supplier/list-supplier', 'Pembayaran\PinjamanSupplier::dropdownSupplierByType', ['filter' => 'Auth']);
-$routes->post('/pinjaman-supplier/save', 'Pembayaran\pinjamanSupplier::savePinjamanSupplier', ['filter' => 'Auth']);
-$routes->get('/pinjaman-supplier/all', 'Pembayaran\pinjamanSupplier::allPinjamanSupplier', ['filter' => 'Auth']);
-$routes->get('/pinjaman-supplier/id/(:segment)', 'Pembayaran\pinjamanSupplier::getByIdPinjamanSupplier/$1', ['filter' => 'Auth']);
-$routes->post('/pinjaman-supplier/update', 'Pembayaran\pinjamanSupplier::updatePinjamanSupplier', ['filter' => 'Auth']);
-$routes->post('/pinjaman-supplier/update-status', 'Pembayaran\pinjamanSupplier::updateStatusPinjamanSupplier', ['filter' => 'Auth']);
-$routes->post('/pinjaman-supplier/delete', 'Pembayaran\pinjamanSupplier::deletePinjamanSupplier', ['filter' => 'Auth']);
+$routes->post('/pinjaman-supplier/save', 'Pembayaran\PinjamanSupplier::savePinjamanSupplier', ['filter' => 'Auth']);
+$routes->get('/pinjaman-supplier/all', 'Pembayaran\PinjamanSupplier::allPinjamanSupplier', ['filter' => 'Auth']);
+$routes->get('/pinjaman-supplier/id/(:segment)', 'Pembayaran\PinjamanSupplier::getByIdPinjamanSupplier/$1', ['filter' => 'Auth']);
+$routes->post('/pinjaman-supplier/update', 'Pembayaran\PinjamanSupplier::updatePinjamanSupplier', ['filter' => 'Auth']);
+$routes->post('/pinjaman-supplier/update-status', 'Pembayaran\PinjamanSupplier::updateStatusPinjamanSupplier', ['filter' => 'Auth']);
+$routes->post('/pinjaman-supplier/delete', 'Pembayaran\PinjamanSupplier::deletePinjamanSupplier', ['filter' => 'Auth']);
 $routes->get('/pinjaman-supplier/generate-no-pinjaman', 'Pembayaran\PinjamanSupplier::generateNoPinjaman', ['filter' => 'Auth']);
 
 // PEMBAYARAN INVOICE
