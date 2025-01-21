@@ -519,11 +519,13 @@
     $('#tipe_supplier').select2({
         placeholder: "Pilih Tipe Supplier",
         theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
     });
 
     $('#supplier_id').select2({
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
     });
 
 
@@ -572,14 +574,14 @@
                         $("#sisa_pinjaman").val(res.data.fax);
                         $(".add-modal").modal("show");
                         $('#auto_generate').css('display', 'none');
-                        $("#no_pinjaman").prop("disabled", true);
-                        if (res.data.is_posted === "1") {
-                            $("#payment_date").prop("disabled", true);
-                            $("#tipe_supplier").prop("disabled", true);
-                            $("#supplier_id").prop("disabled", true);
-                            $("#total_pinjaman").prop("disabled", true);
-                            $(".delete-form").css('display', 'none');
-                        }
+                        // $("#no_pinjaman").prop("disabled", true);
+                        // if (res.data.is_posted === "1") {
+                        //     $("#payment_date").prop("disabled", true);
+                        //     $("#tipe_supplier").prop("disabled", true);
+                        //     $("#supplier_id").prop("disabled", true);
+                        //     $("#total_pinjaman").prop("disabled", true);
+                        //     $(".delete-form").css('display', 'none');
+                        // }
 
                         $('.modal').on('hidden.bs.modal', function() {
                             enableFields();
