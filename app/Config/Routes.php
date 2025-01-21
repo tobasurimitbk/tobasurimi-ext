@@ -499,7 +499,7 @@ $routes->get('/panjar-supplier/generate-no-panjar', 'Pembayaran\PanjarSupplier::
 
 
 // PEMBAYARAN PINJAMAN SUPPLIER
-$routes->get('/pinjaman-supplier', 'Pembayaran\pinjamanSupplier::index', ['filter' => 'Auth']);
+$routes->get('/pinjaman-supplier', 'Pembayaran\PinjamanSupplier::index', ['filter' => 'Auth']);
 $routes->get('/pinjaman-supplier/list-supplier', 'Pembayaran\PinjamanSupplier::dropdownSupplierByType', ['filter' => 'Auth']);
 $routes->post('/pinjaman-supplier/save', 'Pembayaran\pinjamanSupplier::savePinjamanSupplier', ['filter' => 'Auth']);
 $routes->get('/pinjaman-supplier/all', 'Pembayaran\pinjamanSupplier::allPinjamanSupplier', ['filter' => 'Auth']);
