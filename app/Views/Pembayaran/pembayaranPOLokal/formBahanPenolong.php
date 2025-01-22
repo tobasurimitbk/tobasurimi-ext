@@ -1067,8 +1067,6 @@
         newRow5.append($('<td>').text(greatFormatRupiah(res.tax_dikembalikan_lagi.taxAmt)));
         table.find('tbody').append(newRow5);
 
-
-
         var newRow8 = $('<tr>');
         newRow8.append($('<td style="text-align:right;" colspan="6"><b>Potongan Panjar</b></td>'));
         newRow8.append($('<td style="text-align:center;"><b>' +
@@ -1094,8 +1092,6 @@
         newRow7.append($('<td style="text-align:right;" colspan="6">').text('Sub Total'));
         newRow7.append($('<td class="subtotal">').text(greatFormatRupiah(subTotal)));
         table.find('tbody').append(newRow7);
-
-
 
         $(document).on("input", ".bayar_panjar", function() {
             var totalBayarPanjar = updateTotalBayarPanjar();
