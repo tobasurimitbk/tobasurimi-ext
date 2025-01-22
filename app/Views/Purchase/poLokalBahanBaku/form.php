@@ -879,15 +879,15 @@
             $(".total").val(greatFormatRupiah(total));
         });
 
-        $(".total").keyup(function() {
-            var total = parseFloat(destroyFormatRupiah($('.total').val()) || 0);
-            var qty = $(".qty").val() ? parseFloat(Number($(".qty").val())) : 1;
+        // $(".total").keyup(function() {
+        //     var total = parseFloat(destroyFormatRupiah($('.total').val()) || 0);
+        //     var qty = $(".qty").val() ? parseFloat(Number($(".qty").val())) : 1;
 
-            var harga = total / qty;
-            $(".daily_price").val(greatFormatRupiah('0'));
-            $(".monthly_price").val(greatFormatRupiah('0'));
-            $(".harga").val(greatFormatRupiah(harga));
-        });
+        //     var harga = total / qty;
+        //     $(".daily_price").val(greatFormatRupiah('0'));
+        //     $(".monthly_price").val(greatFormatRupiah('0'));
+        //     $(".harga").val(greatFormatRupiah(harga));
+        // });
 
         $(document).on('click', '.edit-table-detail', function(evt) {
             var id_detail = $(this).data("id");
