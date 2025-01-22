@@ -136,7 +136,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['due_date'] ? date("d/m/Y", strtotime($dataSalesKontrak['due_date'])) : "") : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Due Date">
+                                    <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['due_date'] ? date("d/m/Y", strtotime($dataSalesKontrak['due_date'])) : "") : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Due Date (Opsional)">
                                     <label for="floatingInput">Due Date</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -204,6 +204,12 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['shipment_date_text'] : ""; ?>" type="text" class="form-control shipment_date_text" id="shipment_date_text" name="shipment_date_text" placeholder="Shipment Date Text(Opsional)">
+                            <label for="floatingInput">Shipment Date</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['keterangan'] : ""; ?>" type="text" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan (Opsional)">
                             <label for="floatingInput">Keterangan (Opsional)</label>
                         </div>
@@ -237,7 +243,6 @@
                             <label for="floatingInput">Print Out Sales Kontak</label>
                         </div>
                     </div>
-
                 </div>
                 <div class="row">
                     <div class="col mb-3">
@@ -757,9 +762,6 @@
             dicharge_port: {
                 required: true
             },
-            due_date: {
-                required: true
-            },
             tolerance: {
                 required: true
             },
@@ -794,9 +796,6 @@
             },
             dicharge_port: {
                 required: "Dicharge port wajib diisi"
-            },
-            due_date: {
-                required: "Due date wajib diisi"
             },
             tolerance: {
                 required: "Tolerance wajib diisi"
