@@ -439,27 +439,27 @@
             selected.data('satuan_3')
         );
 
-        $.ajax({
-            url: "<?= base_url("po-lokal-bahan-penolong/histori-harga"); ?>",
-            data: {
-                id: $('#barang_id').find("option:selected").data("barang_id"),
-                spesifikasi_id: $('#barang_id').find("option:selected").data("spesifikasi_id")
-            },
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            method: "GET",
-            success: function(response) {
-                if (response.res.hargaTerakhirNumber !== 0) {
-                    $('#harga_satuan').val(greatFormatRupiah(response.res.hargaTerakhirNumber)).keyup();
-                } else {
-                    $('#harga_satuan').val('');
-                }
-            },
-        });
+        // $.ajax({
+        //     url: "<?= base_url("po-lokal-bahan-penolong/histori-harga"); ?>",
+        //     data: {
+        //         id: $('#barang_id').find("option:selected").data("barang_id"),
+        //         spesifikasi_id: $('#barang_id').find("option:selected").data("spesifikasi_id")
+        //     },
+        //     beforeSend: function() {
+        //         setLoading();
+        //     },
+        //     complete: function() {
+        //         stopLoading();
+        //     },
+        //     method: "GET",
+        //     success: function(response) {
+        //         if (response.res.hargaTerakhirNumber !== 0) {
+        //             $('#harga_satuan').val(greatFormatRupiah(response.res.hargaTerakhirNumber)).keyup();
+        //         } else {
+        //             $('#harga_satuan').val('');
+        //         }
+        //     },
+        // });
     });
 
     $('.form-select')
