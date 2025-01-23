@@ -800,6 +800,7 @@
             }
 
             $(".kode").val($(".kode_barang option:selected").val());
+            console.log(nama)
             $(".nama_barang").val(nama);
             $(".barang_id").val(barang_id);
             $(".barang_spesifikasi_id").val(barang_spesifikasi_id);
