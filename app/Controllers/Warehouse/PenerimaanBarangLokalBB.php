@@ -783,7 +783,7 @@ class PenerimaanBarangLokalBB extends BaseController
                 ->findAll();
 
             $retur_am_po_detail_list = $this->pengembalianBarangModel->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();
-            $bc_purchase_order_detail_list = $this->bcPurchaseOrder->like('multiple_lpb_id', $id)->where('deletedAt', null)->findAll();
+            $bc_purchase_order_detail_list = $this->bcPurchaseOrder->where('company_id', $this->this_company_id)->like('multiple_lpb_id', $id)->where('deletedAt', null)->findAll();
 
             if ($penerimaanBarang['bc_type'] == 0) {
                 $cekStockLpbUsed = $this->stockModel->checkStockLpbUsed(
