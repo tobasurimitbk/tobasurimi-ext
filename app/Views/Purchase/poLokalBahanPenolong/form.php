@@ -169,6 +169,19 @@
                             <label for="floatingInput">Catatan (Opsional)</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select ppn" name="ppn" id="ppn" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($ppn as $p) : ?>
+                                    <option value="<?= $p['id'] ?>">
+                                        <?= $p['name'] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Pilih PPN (Opsional)</label>
+                        </div>
+                    </div>
                 </div>
             </form>
             <div class="col-subtitle-modal">
@@ -281,19 +294,7 @@
                             <label for="floatingInput">Keterangan (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select ppn" name="ppn" id="ppn" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($ppn as $p) : ?>
-                                    <option value="<?= $p['id'] ?>">
-                                        <?= $p['name'] ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">Pilih PPN (Opsional)</label>
-                        </div>
-                    </div>
+
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select pph" name="pph" id="pph" aria-label="Floating label select example">
@@ -499,6 +500,12 @@
 
         var hargaSatuan = (((total / qty)));
         $('#harga_satuan').val(hargaSatuan == 0 ? '' : greatFormatRupiah(hargaSatuan));
+    });
+
+    // PPN CHANGE
+    $('#ppn').change(function() {
+        // Set Global Ppn
+        setGlobalPpn();
     });
 
     // VALIDATOR DETAIL
@@ -1129,6 +1136,8 @@
                         });
                     });
                     drawTabel(listBarang);
+                    // Set Global Ppn
+                    setGlobalPpn();
                 },
                 onError: function(response) {
                     alert("ERROR")
@@ -1149,6 +1158,15 @@
                 }
             });
         });
+    }
+
+    function setGlobalPpn() {
+        // Set PPN
+        // PPN untuk semua list barang hasilnya sama
+        var ppn = $('#ppn option:selected').val();
+        for (let i = 0; i < listBarang.length; i++) {
+            listBarang[i].ppn = ppn;
+        }
     }
 </script>
 <!-- Edit Script -->
@@ -1172,7 +1190,10 @@
                 keterangan: "<?= $l['keterangan'] ?>",
                 ppn: "<?= $l['ppn'] ?>",
                 pph: "<?= $l['pph'] ?>"
-            })
+            });
+            // Set PPN
+            // PPN untuk semua list barang hasilnya sama
+            $('#ppn').val("<?= $l['ppn'] ?>")
         <?php endforeach; ?>
         drawTabel(listBarang);
 
