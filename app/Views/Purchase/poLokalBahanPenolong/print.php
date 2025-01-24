@@ -115,7 +115,7 @@
             bottom: 15;
             width: 100%;
             height: 90px;
-            margin-top: 10px;
+            margin-top: 30px;
         }
     </style>
 </head>
@@ -192,7 +192,7 @@
             </tr>
         </table>
         <br>
-        <div class="mt-025 txt-bold" style="margin-bottom: 3px; margin-top:20px;">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
+        <div class="txt-bold" style="margin-bottom: 3px; margin-top:2px;">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
         <table class="item-table mt-050">
             <tr>
                 <!-- <th>No</th> -->
