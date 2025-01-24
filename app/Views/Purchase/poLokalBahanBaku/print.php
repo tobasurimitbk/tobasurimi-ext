@@ -583,51 +583,125 @@
                 </tr>
             </table>
 
-            <table class="cong-table item-table txt-right">
-                <tr>
-                    <th>QTY</th>
-                    <th>CONG SEBENARNYA</th>
-                    <th>CONG BATASAN</th>
-                    <th>SELISIH</th>
-                    <th>TOTAL TAMBAHAN</th>
-                </tr>
-                <tr>
-                    <td><?= $dataPO->totalQty ?></td>
-                    <td><?= $dataPO->cong_sebenarnya ?></td>
-                    <td><?= $dataPO->cong_batasan ?></td>
-                    <td><?= $dataPO->selisih ?></td>
-                    <td><?= number_format($dataPO->totalTambahan, 2, '.', ',') ?></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>TAMBAHAN LANGSUNG</td>
-                    <td><?= number_format(formatter($dataPO->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>PPH</td>
-                    <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
+            <!-- request dari bu ningsih -->
+            <?php if ($dataPO->pph === "Company") { ?>
+                <table class="cong-table item-table txt-right">
+                    <tr>
+                        <th>QTY</th>
+                        <th>CONG SEBENARNYA</th>
+                        <th>CONG BATASAN</th>
+                        <th>SELISIH</th>
+                        <th>TOTAL TAMBAHAN</th>
+                    </tr>
+                    <tr>
+                        <td><?= $dataPO->totalQty ?></td>
+                        <td><?= $dataPO->cong_sebenarnya ?></td>
+                        <td><?= $dataPO->cong_batasan ?></td>
+                        <td><?= $dataPO->selisih ?></td>
+                        <td><?= number_format($dataPO->totalTambahan, 2, '.', ',') ?></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>TAMBAHAN LANGSUNG</td>
+                        <td><?= number_format(formatter($dataPO->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>PPH</td>
                         <td"><?= number_format(($dataPO->totalTambahan * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
-                        <?php } else { ?>
-                            <td>0.00</td>
-                        <?php } ?>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>DIBAYARKAN</td>
-                    <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                        <td><?= number_format(($dataPO->totalTambahan + $dataPO->subsidi_langsung) + ($dataPO->totalTambahan * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
-                    <?php } else { ?>
-                        <td><?= number_format(($dataPO->totalTambahan + $dataPO->subsidi_langsung), 2, '.', ',') ?></td>
-                    <?php } ?>
-                </tr>
-            </table>
+
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>DIBAYARKAN</td>
+                        <td><?= number_format(($dataPO->totalTambahan + $dataPO->subsidi_langsung)  ($dataPO->totalTambahan * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
+                    </tr>
+                </table>
+            <?php } elseif($dataPO->pph === "Supplier") { ?>
+                <table class="cong-table item-table txt-right">
+                    <tr>
+                        <th>QTY</th>
+                        <th>CONG SEBENARNYA</th>
+                        <th>CONG BATASAN</th>
+                        <th>SELISIH</th>
+                        <th>TOTAL TAMBAHAN</th>
+                    </tr>
+                    <tr>
+                        <td><?= $dataPO->totalQty ?></td>
+                        <td><?= $dataPO->cong_sebenarnya ?></td>
+                        <td><?= $dataPO->cong_batasan ?></td>
+                        <td><?= $dataPO->selisih ?></td>
+                        <td><?= number_format(($dataPO->totalTambahan + $dataPO->subsidi_langsung)  ($dataPO->totalTambahan * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>TAMBAHAN LANGSUNG</td>
+                        <td><?= number_format(formatter($dataPO->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>PPH</td>
+                        <td"><?= number_format(($dataPO->totalTambahan * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
+
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>DIBAYARKAN</td>
+                        <td><?= number_format($dataPO->totalTambahan, 2, '.', ',') ?></td>
+                    </tr>
+                </table>
+            <?php } else { ?>
+                <table class="cong-table item-table txt-right">
+                    <tr>
+                        <th>QTY</th>
+                        <th>CONG SEBENARNYA</th>
+                        <th>CONG BATASAN</th>
+                        <th>SELISIH</th>
+                        <th>TOTAL TAMBAHAN</th>
+                    </tr>
+                    <tr>
+                        <td><?= $dataPO->totalQty ?></td>
+                        <td><?= $dataPO->cong_sebenarnya ?></td>
+                        <td><?= $dataPO->cong_batasan ?></td>
+                        <td><?= $dataPO->selisih ?></td>
+                        <td>000</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>TAMBAHAN LANGSUNG</td>
+                        <td>000</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>PPH</td>
+                        <td">000</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>DIBAYARKAN</td>
+                        <td>000</td>
+                    </tr>
+                </table>
+            <?php } ?>
+           
             <table class="w-100 sign-table border-collapse signed-info footer mt-3">
                 <tr>
                     <th>
