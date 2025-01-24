@@ -311,12 +311,13 @@ class PenerimaanBarangModel extends Model
 
     public function get_no($bln, $thn, $last_day, $warehouseKode, $warehouseID)
     {
-        $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
+        $lastStr = convertBulanToAngkaRomawi($bln) . '/' . $thn;
 
         $builder = $this->db->table('penerimaan_barang');
         $builder->select('no_penerimaan_barang');
-        $builder->orderBy('no_penerimaan_barang', 'desc');
+        $builder->orderBy('no_penerimaan_barang', 'asc'); // Urutkan secara ascending untuk mempermudah deteksi celah
         $builder->where('company_id', session()->get("login")->this_company_id);
+        $builder->where('penerimaan_barang.deletedAt', null);
         // $builder->where('penerimaan_barang.warehouse_id', $warehouseID);
         $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59");
@@ -325,25 +326,46 @@ class PenerimaanBarangModel extends Model
 
         $kode = 'LPB/' . $warehouseKode;
 
-        $lastPenerimaan = '1';
+        $existingNumbers = [];
 
+        // Ambil semua nomor yang sudah ada
         if (!empty($query->getResultArray())) {
             foreach ($query->getResultArray() as $string) {
                 $explode = explode('/', $string['no_penerimaan_barang']);
-                $number = intval($explode[2]);
-
-                if ($number > $lastPenerimaan) {
-                    $lastPenerimaan = $number;
+                if (isset($explode[2]) && is_numeric($explode[2])) {
+                    $existingNumbers[] = intval($explode[2]);
                 }
+            }
+        }
+
+        // Cari celah nomor atau gunakan nomor berikutnya
+        $lastPenerimaan = 1; // Nomor awal default
+        sort($existingNumbers); // Pastikan daftar nomor diurutkan
+
+        $foundGap = false; // Flag untuk mendeteksi celah
+
+        foreach ($existingNumbers as $number) {
+            if ($number != $lastPenerimaan) {
+                // Jika ada celah, gunakan nomor yang hilang
+                $foundGap = true;
+                break;
             }
             $lastPenerimaan++;
         }
 
+        if (!$foundGap) {
+            // Jika tidak ada celah, lanjutkan dari nomor terakhir
+            $lastPenerimaan = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
+        }
+
+        // Format nomor dengan dua digit
         $formattedLastPenerimaan = sprintf("%02d", $lastPenerimaan);
         $generatedNo = $kode . '/' . $formattedLastPenerimaan . '/' . $lastStr;
 
         return $generatedNo;
     }
+
+
 
     public function getReceivedItemsBySupplier($supplierId, $condition = [], $limit = 10, $offset = 0)
     {

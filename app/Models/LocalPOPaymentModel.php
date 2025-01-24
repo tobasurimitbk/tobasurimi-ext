@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Controllers\Pembayaran\PanjarSupplier;
 use App\Controllers\Supplier\SupplierHarga;
+use App\Models\LocalPOPaymentPinjamanModel;
 use CodeIgniter\Model;
 
 class LocalPOPaymentModel extends Model
@@ -659,6 +661,9 @@ class LocalPOPaymentModel extends Model
 
         $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
         $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
+        $localPOPinjamanModel = new LocalPOPaymentPinjamanModel();
+        $panjarSupplierModel = new PanjarSupplierModel();
+        $pinjamanSupplierModel = new PinjamanSupplierModel();
 
 
         $condition = [
@@ -744,9 +749,10 @@ class LocalPOPaymentModel extends Model
 
 
         $panjarList = $localPOPaymentPanjarModel
-            ->select('*, no_panjar')
+            ->select('local_po_payment_panjar.*, panjar_supplier.payment_date, panjar_supplier.no_panjar, panjar_supplier.total_panjar, local_po_payments.potongan_harga')
             ->join("local_po_payments", 'local_po_payment_panjar.local_po_payment_id = local_po_payments.id')
             ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
+            ->where('panjar_supplier.jenis_panjar', "PANJAR")
             ->where('local_po_payments.deletedAt', null)
             ->where('local_po_payments.id', $pembayaranId)
             ->where('type', 'BB')
@@ -756,21 +762,133 @@ class LocalPOPaymentModel extends Model
             $panjarList[$i]['bayar_panjar_number'] = intval($p['bayar_panjar']);
             $panjarList[$i]['total_panjar_number'] = intval($p['total_panjar']);
             $panjarList[$i]['potongan__harga_number'] = intval($p['potongan_harga']);
-            $panjarList[$i]['sisa_panjar'] = $localPOPaymentPanjarModel
-                ->getTotalPembayaranPanjar($p['panjar_id'], "BB")['total_bayar_panjar'] - $panjarList[$i]['total_panjar_number'];
+            $panjarList[$i]['sisa_panjar'] = $panjarList[$i]['total_panjar_number'] - $localPOPaymentPanjarModel
+            ->getTotalPembayaranPanjar($p['panjar_id'], "BB")['total_bayar_panjar'];
         }
+
+        if (empty($panjarList)) {
+            $panjarList = $localPOPaymentPanjarModel->select('local_po_payment_panjar.*, panjar_supplier.payment_date, panjar_supplier.no_panjar, panjar_supplier.total_panjar, local_po_payments.potongan_harga')
+                                ->join("local_po_payments", 'local_po_payment_panjar.local_po_payment_id = local_po_payments.id')
+                                ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
+                                ->where('panjar_supplier.jenis_panjar', "PANJAR")
+                                ->where('local_po_payments.deletedAt', null)
+                                ->where('type', 'BB')
+                                ->findAll();
+
+            foreach ($panjarList as $i => $p) {
+                $panjarList[$i]['bayar_panjar'] = 0; // Tetapkan langsung ke 0
+                $panjarList[$i]['bayar_panjar_number'] = 0; // Tetapkan langsung ke 0
+                $panjarList[$i]['total_panjar_number'] = intval($p['total_panjar']);
+                $panjarList[$i]['potongan__harga_number'] = intval($p['potongan_harga']);
+                $panjarList[$i]['sisa_panjar'] = $panjarList[$i]['total_panjar_number'] - $localPOPaymentPanjarModel
+                ->getTotalPembayaranPanjar($p['panjar_id'], "BB")['total_bayar_panjar'];
+            }
+        }
+
+
+        $panjarTBList = $localPOPaymentPanjarModel
+            ->select('local_po_payment_panjar.*, panjar_supplier.no_panjar,panjar_supplier.payment_date, panjar_supplier.total_panjar, local_po_payments.potongan_harga')
+            ->join("local_po_payments", 'local_po_payment_panjar.local_po_payment_id = local_po_payments.id')
+            ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
+            ->where('panjar_supplier.jenis_panjar', "PANJAR_TB")
+            ->where('local_po_payments.deletedAt', null)
+            ->where('local_po_payments.id', $pembayaranId)
+            ->where('type', 'BB')
+            ->findAll();
+
+        foreach ($panjarTBList as $i => $p) {
+            $panjarTBList[$i]['bayar_panjar_number'] = intval($p['bayar_panjar']);
+            $panjarTBList[$i]['total_panjar_number'] = intval($p['total_panjar']);
+            $panjarTBList[$i]['potongan__harga_number'] = intval($p['potongan_harga']);
+            $panjarTBList[$i]['sisa_panjar'] = $panjarTBList[$i]['total_panjar_number'] - $localPOPaymentPanjarModel
+            ->getTotalPembayaranPanjar($p['panjar_id'], "BB")['total_bayar_panjar'];
+        }
+
+
+        if (empty($panjarTBList)) {
+            $panjarTBList = $localPOPaymentPanjarModel->select('local_po_payment_panjar.*, panjar_supplier.payment_date, panjar_supplier.no_panjar, panjar_supplier.total_panjar, local_po_payments.potongan_harga')
+                                ->join("local_po_payments", 'local_po_payment_panjar.local_po_payment_id = local_po_payments.id')
+                                ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
+                                ->where('panjar_supplier.jenis_panjar', "PANJAR_TB")
+                                ->where('local_po_payments.deletedAt', null)
+                                ->where('type', 'BB')
+                                ->findAll();
+
+            foreach ($panjarTBList as $i => $p) {
+                $panjarTBList[$i]['bayar_panjar'] = 0; // Tetapkan langsung ke 0
+                $panjarTBList[$i]['bayar_panjar_number'] = 0; // Tetapkan langsung ke 0
+                $panjarTBList[$i]['bayar_panjar_number'] = intval($p['bayar_panjar']);
+                $panjarTBList[$i]['total_panjar_number'] = intval($p['total_panjar']);
+                $panjarTBList[$i]['potongan__harga_number'] = intval($p['potongan_harga']);
+                $panjarTBList[$i]['sisa_panjar'] = $panjarTBList[$i]['total_panjar_number'] - $localPOPaymentPanjarModel
+                ->getTotalPembayaranPanjar($p['panjar_id'], "BB")['total_bayar_panjar'];
+            }
+        }
+
+        $pinjamanList = $localPOPinjamanModel
+            ->select('local_po_payment_pinjaman.*, pinjaman_supplier.payment_date, pinjaman_supplier.no_pinjaman, pinjaman_supplier.total_pinjaman, local_po_payments.potongan_harga')    
+            ->join("local_po_payments", 'local_po_payment_pinjaman.local_po_payment_id = local_po_payments.id')
+            ->join('pinjaman_supplier', 'local_po_payment_pinjaman.pinjaman_id = pinjaman_supplier.id')
+            ->where('local_po_payments.deletedAt', null)
+            ->where('local_po_payments.id', $pembayaranId)
+            ->where('type', 'BB')
+            ->findAll();
+
+        foreach ($pinjamanList as $i => $p) {
+            $pinjamanList[$i]['bayar_pinjaman_number'] = intval($p['bayar_pinjaman']);
+            $pinjamanList[$i]['total_pinjaman_number'] = intval($p['total_pinjaman']);
+            $pinjamanList[$i]['potongan__harga_number'] = intval($p['potongan_harga']);
+            $pinjamanList[$i]['sisa_pinjaman'] = $pinjamanList[$i]['total_pinjaman_number'] - $localPOPinjamanModel
+            ->getTotalPembayaranPinjaman($p['pinjaman_id'], "BB")['total_bayar_pinjaman'];
+        } 
+
+        if (empty($pinjamanList)) {
+            $pinjamanList = $localPOPinjamanModel->select('local_po_payment_pinjaman.*, pinjaman_supplier.payment_date, pinjaman_supplier.no_pinjaman, pinjaman_supplier.total_pinjaman, local_po_payments.potongan_harga')    
+                        ->join("local_po_payments", 'local_po_payment_pinjaman.local_po_payment_id = local_po_payments.id')
+                        ->join('pinjaman_supplier', 'local_po_payment_pinjaman.pinjaman_id = pinjaman_supplier.id')
+                        ->where('local_po_payments.deletedAt', null)
+                        ->where('type', 'BB')
+                        ->findAll();
+
+            foreach ($pinjamanList as $i => $p) {
+                $pinjamanList[$i]['bayar_pinjaman'] = 0; // Tetapkan langsung ke 0
+                $pinjamanList[$i]['bayar_pinjaman_number'] = 0; // Tetapkan langsung ke 0
+                $pinjamanList[$i]['bayar_pinjaman_number'] = intval($p['bayar_pinjaman']);
+                $pinjamanList[$i]['total_pinjaman_number'] = intval($p['total_pinjaman']);
+                $pinjamanList[$i]['potongan__harga_number'] = intval($p['potongan_harga']);
+                $pinjamanList[$i]['sisa_pinjaman'] = $pinjamanList[$i]['total_pinjaman_number'] - $localPOPinjamanModel
+                ->getTotalPembayaranPinjaman($p['pinjaman_id'], "BB")['total_bayar_pinjaman'];
+                      
+            } 
+        }
+
+
 
         $total_bayar_panjar = 0;
         foreach ($panjarList as $p) {
             $total_bayar_panjar += intval($p['bayar_panjar']);
         }
 
-        $total_akhir = $total_pembayaran - $total_bayar_panjar;
+        $total_bayar_panjar_tb = 0;
+        foreach ($panjarTBList as $p) {
+            $total_bayar_panjar_tb += intval($p['bayar_panjar']);
+        }
+
+        $total_bayar_pinjaman = 0;
+        foreach ($pinjamanList as $p) {
+            $total_bayar_pinjaman += intval($p['bayar_pinjaman']);
+        }
+
+        $total_akhir = $total_pembayaran - $total_bayar_panjar - $total_bayar_panjar_tb - $total_bayar_pinjaman;
         $result = [
             'detail'  => $paymentDetail,
             'panjar'    => $panjarList,
+            'panjar_tb'    => $panjarTBList,
+            'pinjaman'    => $pinjamanList,
             'total_order'   => $total_order,
             'total_bayar_panjar' => $total_bayar_panjar,
+            'total_bayar_panjar_tb' => $total_bayar_panjar_tb,
+            'total_bayar_pinjaman' => $total_bayar_pinjaman,
             'total_diterima' => $total_diterima,
             'total_tagihan' => $total_tagihan,
             'total_pembayaran'  => $total_pembayaran,

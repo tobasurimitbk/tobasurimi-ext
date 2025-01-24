@@ -26,7 +26,7 @@ class TerimaFakturLokal extends BaseController
     }
 
     public function createTerimaFakturLokal()
-    {   
+    {
         $supplierModel = new SupplierModel();
 
         //Get Supplier
@@ -58,7 +58,7 @@ class TerimaFakturLokal extends BaseController
             ->select($selectQry)
             ->join('users', 'users.id = tanda_terima_faktur_lokal.createdBy')
             ->find($id);
-        
+
         $supplierList = $supplierModel->asObject()
             ->where('kategori', 'LOKAL')
             ->findAll();
@@ -149,10 +149,10 @@ class TerimaFakturLokal extends BaseController
         echo json_encode($data);
         return;
     }
-    
+
     public function saveTerimaFakturLokal()
     {
-        try{
+        try {
             $tandaTerimaFakturLokalModel = new TandaTerimaFakturLokalModel();
 
             $rules = [
@@ -172,7 +172,7 @@ class TerimaFakturLokal extends BaseController
                     "rules" => "permit_empty"
                 ],
             ];
-    
+
             if (!$this->validate($rules)) {
                 $errorList = $this->validator->getErrors();
                 $data = [
@@ -207,9 +207,7 @@ class TerimaFakturLokal extends BaseController
             ];
             echo json_encode($data);
             return;
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"    => false,
                 "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -222,7 +220,7 @@ class TerimaFakturLokal extends BaseController
 
     public function updateTerimaFakturLokal()
     {
-        try{
+        try {
             $tandaTerimaFakturLokalModel = new TandaTerimaFakturLokalModel();
 
             $id = $this->request->getPost("id");
@@ -244,7 +242,7 @@ class TerimaFakturLokal extends BaseController
                     "rules" => "permit_empty"
                 ],
             ];
-    
+
             if (!$this->validate($rules)) {
                 $errorList = $this->validator->getErrors();
                 $data = [
@@ -289,9 +287,7 @@ class TerimaFakturLokal extends BaseController
             ];
             echo json_encode($data);
             return;
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"    => false,
                 "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -304,7 +300,7 @@ class TerimaFakturLokal extends BaseController
 
     public function deleteTerimafakturLokal()
     {
-        try{
+        try {
             $tandaTerimaFakturLokalModel = new TandaTerimaFakturLokalModel();
 
             $id = $this->request->getPost("id");
@@ -337,9 +333,7 @@ class TerimaFakturLokal extends BaseController
                 'token'     => csrf_hash()
             ];
             echo json_encode($data);
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -360,12 +354,13 @@ class TerimaFakturLokal extends BaseController
         $numberTemplate = "TTL/$romanMonth/$year/";
 
         $lastData = $tandaTerimaFakturLokalModel->asObject()
+            ->where('company_id', $this->this_company_id)
             ->like('inv_no', $numberTemplate, 'after')
             ->orderBy('createdAt', 'DESC')
             ->first();
 
         $invNo = "{$numberTemplate}0001";
-        
+
         if (!empty($lastData)) {
             $exploded = explode('/', $lastData->inv_no);
             $lastIncrement = (int)$exploded[3] + 1;
@@ -377,4 +372,3 @@ class TerimaFakturLokal extends BaseController
         return $invNo;
     }
 }
-?>

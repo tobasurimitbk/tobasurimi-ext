@@ -31,6 +31,7 @@ use App\Models\StockDetailModel;
 use App\Models\StockModel;
 use App\Models\SupplierHargaModel;
 use App\Models\SupplierModel;
+use Config\Database;
 use Dompdf\Dompdf;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -2400,5 +2401,67 @@ class BC40 extends BaseController
 
         $writer->save('php://output');
         die;
+    }
+
+    public function unPosting()
+    {
+        try {
+            $db = Database::connect();
+            $db->transBegin();
+
+            // BC PURCHASE ORDER ID
+            $id = decrypt($this->request->getVar('id'));
+            $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $id)->first();
+            $lpbIdArr = json_decode($bcPurchaseOrder['multiple_lpb_id']);
+            $penerimaanBarang = $this->penerimaanBarangModel->whereIn('id', $lpbIdArr)->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
+
+            $message = '';
+            foreach ($penerimaanBarang as $p) {
+                $cekStockLpbUsed = $this->stockModel->checkStockLpbUsed(
+                    $p['id']
+                );
+
+                if ($cekStockLpbUsed != null) {
+                    $message = $cekStockLpbUsed;
+                    break;
+                }
+            }
+
+            if ($message != '') {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Gagal UnPosting : " . $cekStockLpbUsed,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // \var_dump($penerimaanBarang);
+            // die;
+
+            foreach ($penerimaanBarang as $p) {
+                $this->stockModel->unPostingStockLPB(
+                    $p['id']
+                );
+            }
+
+            $this->bcPurchaseOrderModel->update($bcPurchaseOrder['id'], [
+                'status_posting' => '0'
+            ]);
+
+            $db->transCommit();
+            return response()->setJSON([
+                'status' => true,
+                'message' => "Dokumen berhasil di unpost ",
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Gagal Posting : Terjadi kesalahan saat unposting lpb",
+                'error' => $e->getTrace(),
+                'token' => csrf_hash()
+            ]);
+        }
     }
 }

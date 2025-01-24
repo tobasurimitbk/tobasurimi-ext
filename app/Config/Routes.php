@@ -499,14 +499,14 @@ $routes->get('/panjar-supplier/generate-no-panjar', 'Pembayaran\PanjarSupplier::
 
 
 // PEMBAYARAN PINJAMAN SUPPLIER
-$routes->get('/pinjaman-supplier', 'Pembayaran\pinjamanSupplier::index', ['filter' => 'Auth']);
+$routes->get('/pinjaman-supplier', 'Pembayaran\PinjamanSupplier::index', ['filter' => 'Auth']);
 $routes->get('/pinjaman-supplier/list-supplier', 'Pembayaran\PinjamanSupplier::dropdownSupplierByType', ['filter' => 'Auth']);
-$routes->post('/pinjaman-supplier/save', 'Pembayaran\pinjamanSupplier::savePinjamanSupplier', ['filter' => 'Auth']);
-$routes->get('/pinjaman-supplier/all', 'Pembayaran\pinjamanSupplier::allPinjamanSupplier', ['filter' => 'Auth']);
-$routes->get('/pinjaman-supplier/id/(:segment)', 'Pembayaran\pinjamanSupplier::getByIdPinjamanSupplier/$1', ['filter' => 'Auth']);
-$routes->post('/pinjaman-supplier/update', 'Pembayaran\pinjamanSupplier::updatePinjamanSupplier', ['filter' => 'Auth']);
-$routes->post('/pinjaman-supplier/update-status', 'Pembayaran\pinjamanSupplier::updateStatusPinjamanSupplier', ['filter' => 'Auth']);
-$routes->post('/pinjaman-supplier/delete', 'Pembayaran\pinjamanSupplier::deletePinjamanSupplier', ['filter' => 'Auth']);
+$routes->post('/pinjaman-supplier/save', 'Pembayaran\PinjamanSupplier::savePinjamanSupplier', ['filter' => 'Auth']);
+$routes->get('/pinjaman-supplier/all', 'Pembayaran\PinjamanSupplier::allPinjamanSupplier', ['filter' => 'Auth']);
+$routes->get('/pinjaman-supplier/id/(:segment)', 'Pembayaran\PinjamanSupplier::getByIdPinjamanSupplier/$1', ['filter' => 'Auth']);
+$routes->post('/pinjaman-supplier/update', 'Pembayaran\PinjamanSupplier::updatePinjamanSupplier', ['filter' => 'Auth']);
+$routes->post('/pinjaman-supplier/update-status', 'Pembayaran\PinjamanSupplier::updateStatusPinjamanSupplier', ['filter' => 'Auth']);
+$routes->post('/pinjaman-supplier/delete', 'Pembayaran\PinjamanSupplier::deletePinjamanSupplier', ['filter' => 'Auth']);
 $routes->get('/pinjaman-supplier/generate-no-pinjaman', 'Pembayaran\PinjamanSupplier::generateNoPinjaman', ['filter' => 'Auth']);
 
 // PEMBAYARAN INVOICE
@@ -622,6 +622,7 @@ $routes->post('master-barang-lokal/get', 'SalesLokal\Barang::get', ['filter' => 
 // Sales Kontrak
 $routes->get('/sales-kontrak', 'SalesInternasional\SalesKontrak::index', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/id/(:segment)', 'SalesInternasional\SalesKontrak::detail/$1', ['filter' => 'Auth']);
+$routes->get('/sales-kontrak/duplicate/(:segment)', 'SalesInternasional\SalesKontrak::duplicate/$1', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/print/(:segment)', 'SalesInternasional\SalesKontrak::print/$1', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/create', 'SalesInternasional\SalesKontrak::createView', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/all', 'SalesInternasional\SalesKontrak::all', ['filter' => 'Auth']);
@@ -1275,6 +1276,7 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->post('create', 'BeaCukai\BC40::createPurchaseOrderAction');
     $routes->post('po/update', 'BeaCukai\BC40::updatePurchaseOrderAction/$1');
     $routes->post('posting', 'BeaCukai\BC23::posting');
+    $routes->post('unposting', 'BeaCukai\BC40::unPosting');
 
     // OUTSTANDING
     $routes->get('bc-23-outstanding-all', 'BeaCukai\BC23::allOutstanding');
@@ -1336,7 +1338,7 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
 });
 
 // BC 4.0
-$routes->group('bea-cukai-bc-40/', ['filter' => 'Auth'], function ($routes) {
+$routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->get('', 'BeaCukai\BC40::index');
     $routes->get('online', 'BeaCukai\BC40::online');
     $routes->get('download-response', 'BeaCukai\BC40::downloadResponPdf');
@@ -1352,6 +1354,7 @@ $routes->group('bea-cukai-bc-40/', ['filter' => 'Auth'], function ($routes) {
     $routes->post('create', 'BeaCukai\BC40::createPurchaseOrderAction');
     $routes->post('po/update', 'BeaCukai\BC40::updatePurchaseOrderAction/$1');
     $routes->post('posting', 'BeaCukai\BC40::posting');
+    $routes->post('unposting', 'BeaCukai\BC40::unPosting');
 
     // OUTSTANDING
     $routes->get('bc-40-outstanding-all', 'BeaCukai\BC40::allOutstanding');

@@ -22,6 +22,7 @@ class LocalPOPaymentBPModel extends Model
         'tanda_terima_faktur_id',
         'payment_no',
         'payment_date',
+        'payment_panjar_date',
         'payment_method',
         'status_pph',
         'pembayaran_oleh',

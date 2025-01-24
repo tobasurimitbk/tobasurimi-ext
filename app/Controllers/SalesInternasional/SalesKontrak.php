@@ -67,7 +67,7 @@ class SalesKontrak extends BaseController
         $dataSatuan = $this->satuanModel->findAll();
         $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->where('type_barang_sales', 'EKSPOR')->orderBy('createdAt', "DESC")->findAll();
         $condition = [
-            'jabatan_name' => "SALES"
+            'jabatan_name' => "SALES INTERNASIONAL"
         ];
         $sales = $this->employessModel->getEmployeesComplete($this->this_company_id, $condition);
 
@@ -120,6 +120,45 @@ class SalesKontrak extends BaseController
         ];
 
         return view('SalesInternasional/SalesKontrak/form', $data);
+    }
+
+
+    public function duplicate($id)
+    {
+        $id = decrypt($id);
+
+        $dataSalesKontrak = $this->salesKontrakModel->find($id);
+        $dataSalesKontrakDetail = $this->salesKontrakDetailModel->detail($id);
+        $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id, $this->this_company_id);
+        $dataCountry = $this->countryModel->findAll();
+        $dataValuta = $this->metaDataModel->get_by_name('Valuta');
+        $dataTipeHarga = $this->metaDataModel->get_by_name('Tipe Harga Sales Ekspor');
+        $dataSatuan = $this->satuanModel->findAll();
+        $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->orderBy('createdAt', "DESC")->findAll();
+        $isClosed = $this->salesOrderExportModel->where('sales_contract_id', $id)->findAll();
+        $condition = [
+            'jabatan_name' => "SALES"
+        ];
+        $sales = $this->employessModel->getEmployeesComplete($this->this_company_id, $condition);
+
+        if ($dataSalesKontrak == null) {
+            return redirect()->to('sales-kontrak');
+        }
+
+        $data = [
+            "dataCustomer" => $dataCustomer,
+            "dataCountry" => $dataCountry,
+            "dataValuta" => $dataValuta,
+            "dataTipeHarga" => $dataTipeHarga,
+            'dataSatuan' => $dataSatuan,
+            'dataBarang' => $dataBarang,
+            'dataSalesKontrak' => $dataSalesKontrak,
+            'dataSalesKontrakDetail' => $dataSalesKontrakDetail,
+            'isClosed' => count($isClosed) == 0 ? '0' : '1',
+            "dataSales" => $sales,
+        ];
+
+        return view('SalesInternasional/SalesKontrak/form_duplicate', $data);
     }
 
     public function all()
@@ -220,6 +259,7 @@ class SalesKontrak extends BaseController
             'total_amount' => $this->request->getVar('total_amount'),
             'tolerance' => $this->request->getVar('tolerance'),
             'shipment_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("shipment_date")), "Y-m-d") : "",
+            'shipment_date_text' =>  $this->request->getVar("shipment_date_text"),
             'payment_term' => $this->request->getVar('payment_term'),
             'potongan_harga' => $this->request->getVar('potongan_harga'),
             'documents_required' => $this->request->getVar('documents_required'),
@@ -280,6 +320,7 @@ class SalesKontrak extends BaseController
             'total_amount' => $this->request->getVar('total_amount'),
             'tolerance' => $this->request->getVar('tolerance'),
             'shipment_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("shipment_date")), "Y-m-d") : "",
+            'shipment_date_text' =>  $this->request->getVar("shipment_date_text"),
             'payment_term' => $this->request->getVar('payment_term'),
             'potongan_harga' => $this->request->getVar('potongan_harga'),
             'documents_required' => $this->request->getVar('documents_required'),

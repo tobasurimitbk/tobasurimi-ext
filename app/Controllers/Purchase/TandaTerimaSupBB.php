@@ -399,7 +399,7 @@ class TandaTerimaSupBB extends BaseController
         // $total = ($itemTotal + $dataInv->tambahan + $taxTotal - $dataInv->potongan) - $taxPph23;
         $total = ($itemTotal + $dataInv->tambahan + $taxReturnTotal) - $taxPph23;
         $taxTotal += $dataInv->potongan;
-        
+
         $data["data"] = $dataInv;
         $data['invNo'] = $dataInv->faktur_no;
         $data["lpbNo"] = implode(', ', $noList);
@@ -463,6 +463,7 @@ class TandaTerimaSupBB extends BaseController
         $numberTemplate = "/TT/$romanMonth/$year";
 
         $lastData = $tandaTerimaFakturModel->asObject()
+            ->where('company_id', $this->this_company_id)
             ->like('faktur_no', $numberTemplate, 'before')
             ->orderBy('createdAt', 'DESC')
             ->first();

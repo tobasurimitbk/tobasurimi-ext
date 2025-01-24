@@ -94,12 +94,12 @@ class OrderForm extends BaseController
         $dataBanks = $this->BanksModel->search_list(array(), 'name');
         $dataSatuan = $this->satuanModel->findAll();
         //Get Customers
-        $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
+        $customers = $this->CustomerModel->getCustomerLokal($this->userId);
         $condition = [
-            'jabatan_name' => "SALES"
+            'jabatan_name' => "SALES LOKAL"
         ];
 
-        $sales = $this->employeeModel->getEmployeesComplete($this->this_company_id, $condition);
+        $sales = $this->employeeModel->getEmployeesComplete($condition);
         $dataCompany = $this->companyModel->where('deletedAt', NULL)->asObject()->findAll();
 
         $dataTermin = $this->MetaDataModel

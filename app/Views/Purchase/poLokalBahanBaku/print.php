@@ -418,7 +418,11 @@
                 <tr>
                     <td style="vertical-align: top;">BANYAKNYA UANG (AMOUNT)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;"><?= terbilang(formatter(($nilai_total), "STR_TO_FLOAT")) ?></td>
+                    <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
+                        <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(round($nilai_total - ($nilai_total * $dataPO->nilai_pph2)), "STR_TO_FLOAT"))) ?></td>
+                    <?php } else { ?>
+                        <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(($nilai_total), "STR_TO_FLOAT"))) ?></td>
+                    <?php } ?>
                 </tr>
                 <tr>
                     <td style="vertical-align: top;">UNTUK PEMBAYARAN (FOR PAYMENT)</td>
@@ -498,7 +502,11 @@
                 <tr>
                     <td style="vertical-align: top;">Banyaknya Uang <br> (Amount)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(($nilai_total_harian), "STR_TO_FLOAT"))) ?></td>
+                    <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
+                        <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(round(($nilai_total_harian - ($nilai_total_harian * $dataPO->nilai_pph2))), "STR_TO_FLOAT"))) ?></td>
+                    <?php } else { ?>
+                        <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(($nilai_total_harian), "STR_TO_FLOAT"))) ?></td>
+                    <?php } ?>
                 </tr>
                 <tr>
                     <td style="vertical-align: top;">Untuk Pembayaran <br> (For Payment)</td>
@@ -614,7 +622,7 @@
                     <td></td>
                     <td>DIBAYARKAN</td>
                     <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                        <td><?= number_format(($dataPO->totalTambahan + $dataPO->subsidi_langsung) - ($dataPO->totalTambahan * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
+                        <td><?= number_format(($dataPO->totalTambahan + $dataPO->subsidi_langsung) + ($dataPO->totalTambahan * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
                     <?php } else { ?>
                         <td><?= number_format(($dataPO->totalTambahan + $dataPO->subsidi_langsung), 2, '.', ',') ?></td>
                     <?php } ?>

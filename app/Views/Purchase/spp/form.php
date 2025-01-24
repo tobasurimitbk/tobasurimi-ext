@@ -800,6 +800,7 @@
             }
 
             $(".kode").val($(".kode_barang option:selected").val());
+            console.log(nama)
             $(".nama_barang").val(nama);
             $(".barang_id").val(barang_id);
             $(".barang_spesifikasi_id").val(barang_spesifikasi_id);
@@ -2205,7 +2206,7 @@
                 'barang_id': "<?= encrypt($d->barang1_id) ?>",
                 'barang_spesifikasi_id': "<?= encrypt($d->barang2_id) ?>",
                 'kode_barang': "<?= $d->kode_barang ?>",
-                'nama_barang': "<?= $d->nama_barang ?>",
+                'nama_barang': <?= json_encode($d->barang_name . " " . $d->spesifikasi) ?>,
                 'nama_satuan': "<?= $d->kode_satuan ?>",
                 'satuan_id': "<?= $d->unit ?>",
                 'qty': "<?= $d->qty ?>",

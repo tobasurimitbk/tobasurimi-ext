@@ -182,19 +182,19 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly autocomplete="one-time-code" type="text" class="form-control nomor_panjar" name="nomor_panjar" id="nomor_panjar">
+                            <input autocomplete="one-time-code" type="text" class="form-control nomor_panjar" name="nomor_panjar" id="nomor_panjar">
                             <label for="floatingInput">No Panjar</label>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly autocomplete="one-time-code" type="text" class="form-control supplier_name" name="supplier_name" id="supplier_name">
+                            <input autocomplete="one-time-code" type="text" class="form-control supplier_name" name="supplier_name" id="supplier_name">
                             <label for="floatingInput">Supplier</label>
                         </div>
                     </div>
                     <!-- <div class="col-sm-12">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly autocomplete="one-time-code" type="text" class="form-control lpb_no" name="lpb_no" id="lpb_no">
+                            <input autocomplete="one-time-code" type="text" class="form-control lpb_no" name="lpb_no" id="lpb_no">
                             <label for="floatingInput">Nomor LPB</label>
                         </div>
                     </div> -->
@@ -548,29 +548,32 @@
     $('#tipe_supplier').select2({
         placeholder: "Pilih Tipe Supplier",
         theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
     });
 
     $('#tipe_panjar').select2({
         placeholder: "Pilih Tipe Panjar",
         theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
     });
 
     $('#jenis_panjar').select2({
         placeholder: "Pilih Jenis Panjar",
         theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
     });
 
     $('#supplier_id').select2({
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
     });
 
 
-    $("#tipe_supplier, #supplier_id")
+       $("#tipe_supplier, #supplier_id")
         .parent('div')
         .find('label')
         .css('z-index', '1');
-
 
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
@@ -611,14 +614,14 @@
                         $("#sisa_panjar").val(res.data.fax);
                         $(".add-modal").modal("show");
                         $('#auto_generate').css('display', 'none');
-                        $("#no_panjar").prop("disabled", true);
-                        if (res.data.is_posted === "1") {
-                            $("#payment_date").prop("disabled", true);
-                            $("#tipe_supplier").prop("disabled", true);
-                            $("#supplier_id").prop("disabled", true);
-                            $("#total_panjar").prop("disabled", true);
-                            $(".delete-form").css('display', 'none');
-                        }
+                        // $("#no_panjar").prop("disabled", true);
+                        // if (res.data.is_posted === "1") {
+                        //     $("#payment_date").prop("disabled", true);
+                        //     $("#tipe_supplier").prop("disabled", true);
+                        //     $("#supplier_id").prop("disabled", true);
+                        //     $("#total_panjar").prop("disabled", true);
+                        //     $(".delete-form").css('display', 'none');
+                        // }
 
                         $('.modal').on('hidden.bs.modal', function() {
                             enableFields();
@@ -682,8 +685,6 @@
         })
     }
 
-    changeStatus();
-
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
         if (value) {
@@ -694,21 +695,21 @@
                 success: function(res) {
                     if (res) {
                         $("#no_panjar").val(res);
-                        $("#no_panjar").attr("readonly", true);
+                       
                     } else {
                         Swal.fire({
                             icon: 'error',
                             title: res.message,
                             confirmButtonColor: '#4e73df',
                         })
-                        $("#no_panjar").attr("readonly", false);
+                      
                         $("#auto_generate").prop("checked", false);
                         $("#no_panjar").val("");
                     }
                 }
             })
         } else {
-            $("#no_panjar").attr("readonly", false);
+         
             $("#no_panjar").val("");
         }
 

@@ -166,6 +166,18 @@ class LocalPOPaymentPinjamanModel extends Model
             ->where($condition)
             ->findAll();
 
+            if (empty($result)) {
+                $pinjamanSupplier = new PinjamanSupplierModel();
+    
+                $dataPinjaman = $pinjamanSupplier->select("local_po_payment_pinjaman.id, pinjaman_supplier.no_pinjaman, pinjaman_supplier.payment_date, pinjaman_supplier.total_pinjaman, local_po_payment_pinjaman.pinjaman_id,
+                local_po_payment_pinjaman.bayar_pinjaman, sum(local_po_payment_pinjaman.bayar_pinjaman) as total_bayar_pinjaman")
+                            ->where("pinjaman_supplier.type_pinjaman", "BP")
+                            ->join('local_po_payment_pinjaman', 'local_po_payment_pinjaman.id = pinjaman_supplier.id', 'left')
+                            ->findAll();
+                
+                $result = $dataPinjaman;
+            }
+
         foreach ($result as $i => $r) {
             $totalPembayaranPinjaman = $this->getTotalPembayaranPinjaman($r['pinjaman_id'], "BP");
             $result[$i]['payment_date'] = date('d/m/Y', strtotime($r['payment_date']));

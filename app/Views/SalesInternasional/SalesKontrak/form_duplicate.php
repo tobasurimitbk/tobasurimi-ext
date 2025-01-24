@@ -4,51 +4,14 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name"><?= !empty($dataSalesKontrak) ? "Update Sales Kontrak" : "Tambah Sales Kontrak" ?></h1>
+        <h1 class="title-name">Duplikasi Sales Kontrak</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("sales-kontrak"); ?>">
                 Kembali
             </a>
-            <?php if (!empty($dataSalesKontrak)) { ?>
-                <?php if (!$dataSalesKontrak['status_posting']) { ?>
-                    <?php ?>
-                    <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'd')) : ?>
-                        <button class="btn btn-hapus delete-parent float-right">
-                            Hapus
-                        </button>
-                    <?php endif; ?>
-                <?php } ?>
-                <?php if (!$dataSalesKontrak['status_posting']) { ?>
-                    <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'a')) : ?>
-                        <button class="btn btn-success posting-spp posting-so float-right" onclick="updateStatusPosting('1')">
-                            Posting
-                        </button>
-                    <?php endif; ?>
-                <?php } ?>
-                <?php if ($dataSalesKontrak['status_posting'] && !$isClosed) { ?>
-                    <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'ua')) : ?>
-                        <button class="btn btn-success posting-spp unposting-so float-right" onclick="updateStatusPosting('0')">
-                            Un Posting
-                        </button>
-                    <?php endif; ?>
-                <?php } ?>
-                <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'p')) : ?>
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("sales-kontrak/print/"); ?><?= encrypt($dataSalesKontrak['id']); ?>')">
-                        Print
-                    </button>
-                <?php endif; ?>
-                <?php if (!$dataSalesKontrak['status_posting']) { ?>
-                    <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'u')) : ?>
-                        <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                            Simpan
-                        </button>
-                    <?php endif; ?>
-                <?php } ?>
-            <?php } else { ?>
-                <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                    Simpan
+                <button class="btn btn-show-form btn-primary btn-save float-right btn-submit-parent">
+                    Duplikasi
                 </button>
-            <?php } ?>
         </div>
     </div>
     <div class="card">
@@ -66,7 +29,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? 'readonly=true' : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['sales_contract_no'] : ""; ?>" type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
+                                    <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['sales_contract_no'] : ""; ?>" type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
                                     <label for="floatingInput">No Sales Kontrak</label>
                                 </div>
                                 <div style="<?= !empty($dataSalesKontrak)  ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -114,7 +77,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['customer_po_no'] : ""; ?>" type="text" class="form-control customer_po_no" id="customer_po_no" name="customer_po_no" placeholder="No. PO">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['customer_po_no'] : ""; ?>" type="text" class="form-control customer_po_no" id="customer_po_no" name="customer_po_no" placeholder="No. PO">
                             <label for="floatingInput">No. PO (Opsional)</label>
                         </div>
                     </div>
@@ -122,13 +85,13 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['loading_port'] : ""; ?>" type="text" class="form-control loading_port" id="loading_port" name="loading_port" placeholder="Loading Port">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['loading_port'] : ""; ?>" type="text" class="form-control loading_port" id="loading_port" name="loading_port" placeholder="Loading Port">
                             <label for="floatingInput">Loading Port</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['dicharge_port'] : ""; ?>" type="text" class="form-control dicharge_port" id="dicharge_port" name="dicharge_port" placeholder="Dicharge Port">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['dicharge_port'] : ""; ?>" type="text" class="form-control dicharge_port" id="dicharge_port" name="dicharge_port" placeholder="Dicharge Port">
                             <label for="floatingInput">Dicharge Port</label>
                         </div>
                     </div>
@@ -136,7 +99,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['due_date'] ? date("d/m/Y", strtotime($dataSalesKontrak['due_date'])) : "") : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Due Date (Opsional)">
+                                    <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['due_date'] ? date("d/m/Y", strtotime($dataSalesKontrak['due_date'])) : "") : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Due Date">
                                     <label for="floatingInput">Due Date</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -149,13 +112,13 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['payment_term'] : ""; ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Opsional)">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['payment_term'] : ""; ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Opsional)">
                             <label for="floatingInput">Payment Term (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['tolerance'] : ""; ?>" type="text" class="form-control tolerance" id="tolerance" name="tolerance" placeholder="Tolerance">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['tolerance'] : ""; ?>" type="text" class="form-control tolerance" id="tolerance" name="tolerance" placeholder="Tolerance">
                             <label for="floatingInput">Tolerance</label>
                         </div>
                     </div>
@@ -198,19 +161,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="preventNegativeInput(this)" autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['potongan_harga'] : ""; ?>" type="text" class="form-control potongan_harga" id="potongan_harga" name="potongan_harga" placeholder="Potongan Harga (Opsional)">
+                            <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="preventNegativeInput(this)" autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['potongan_harga'] : ""; ?>" type="text" class="form-control potongan_harga" id="potongan_harga" name="potongan_harga" placeholder="Potongan Harga (Opsional)">
                             <label for="floatingInput">Potongan Harga (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['shipment_date_text'] : ""; ?>" type="text" class="form-control shipment_date_text" id="shipment_date_text" name="shipment_date_text" placeholder="Shipment Date Text(Opsional)">
-                            <label for="floatingInput">Shipment Date</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['keterangan'] : ""; ?>" type="text" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan (Opsional)">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['keterangan'] : ""; ?>" type="text" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan (Opsional)">
                             <label for="floatingInput">Keterangan (Opsional)</label>
                         </div>
                     </div>
@@ -223,13 +180,13 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['broker'] : ""; ?>" type="text" class="form-control broker" id="broker" name="broker" placeholder="Agency / Broker (Opsional)">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['broker'] : ""; ?>" type="text" class="form-control broker" id="broker" name="broker" placeholder="Agency / Broker (Opsional)">
                             <label for="floatingInput">Agency / Broker (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['komisi'] : ""; ?>" type="text" class="form-control komisi" id="komisi" name="komisi" placeholder="Komisi Broker (Opsional)">
+                            <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['komisi'] : ""; ?>" type="text" class="form-control komisi" id="komisi" name="komisi" placeholder="Komisi Broker (Opsional)">
                             <label for="floatingInput">Komisi Broker (Opsional)</label>
                         </div>
                     </div>
@@ -243,6 +200,7 @@
                             <label for="floatingInput">Print Out Sales Kontak</label>
                         </div>
                     </div>
+
                 </div>
                 <div class="row">
                     <div class="col mb-3">
@@ -252,13 +210,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <textarea autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control documents_required" id="documents_required" name="documents_required" placeholder="Document Required"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['documents_required'] : ""; ?></textarea>
+                            <textarea autocomplete="one-time-code" class="full-textarea form-control documents_required" id="documents_required" name="documents_required" placeholder="Document Required"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['documents_required'] : ""; ?></textarea>
                             <label for="floatingInput">Document Required</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <textarea autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Special Instructions"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['special_instructions'] : ""; ?></textarea>
+                            <textarea autocomplete="one-time-code" class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Special Instructions"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['special_instructions'] : ""; ?></textarea>
                             <label for="floatingInput">Special Instructions</label>
                         </div>
                     </div>
@@ -271,17 +229,9 @@
                         <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
                     </div>
                     <div class="col-md-6">
-                        <?php if (!empty($dataSalesKontrak)) { ?>
-                            <?php if (!$dataSalesKontrak['status_posting']) { ?>
-                                <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
-                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                                </button>
-                            <?php } ?>
-                        <?php } else { ?>
                             <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
-                        <?php } ?>
                     </div>
                 </div>
             </div>
@@ -762,6 +712,9 @@
             dicharge_port: {
                 required: true
             },
+            due_date: {
+                required: true
+            },
             tolerance: {
                 required: true
             },
@@ -796,6 +749,9 @@
             },
             dicharge_port: {
                 required: "Dicharge port wajib diisi"
+            },
+            due_date: {
+                required: "Due date wajib diisi"
             },
             tolerance: {
                 required: "Tolerance wajib diisi"
@@ -1239,58 +1195,15 @@
                 data.append("total_amount", totalAmount);
                 data.append("listBarang", listDataBarang);
 
-                if (id) {
-                    // UPDATE
-                    Swal.fire({
+                 // CREATE
+                 Swal.fire({
                         icon: 'question',
-                        title: 'Simpan Data?',
+                        title: 'Duplikasi Data?',
                         confirmButtonColor: '#4e73df',
                         cancelButtonColor: '#d33',
                         showCancelButton: true,
                         reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Kembali',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: "<?= base_url("sales-kontrak/update"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    setLoading();
-                                },
-                                complete: function() {
-                                    stopLoading();
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                        confirmButtonText: 'Ok'
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            window.location.href = "<?= base_url('sales-kontrak') ?>"
-                                        }
-                                    });
-                                },
-                            });
-                        }
-                    });
-                } else {
-                    // CREATE
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
+                        confirmButtonText: 'Duplikasi',
                         cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -1323,7 +1236,6 @@
                             });
                         }
                     });
-                }
             }
         }
     })

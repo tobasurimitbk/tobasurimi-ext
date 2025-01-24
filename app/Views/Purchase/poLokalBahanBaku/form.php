@@ -354,7 +354,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onkeyup="this.value = greatFormatRupiah(this.value)">
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onkeyup="this.value = greatFormatRupiah(this.value)">
                             <label for="floatingInput">Total Harga</label>
                         </div>
                     </div>
@@ -879,15 +879,15 @@
             $(".total").val(greatFormatRupiah(total));
         });
 
-        $(".total").keyup(function() {
-            var total = parseFloat(destroyFormatRupiah($('.total').val()) || 0);
-            var qty = $(".qty").val() ? parseFloat(Number($(".qty").val())) : 1;
+        // $(".total").keyup(function() {
+        //     var total = parseFloat(destroyFormatRupiah($('.total').val()) || 0);
+        //     var qty = $(".qty").val() ? parseFloat(Number($(".qty").val())) : 1;
 
-            var harga = total / qty;
-            $(".daily_price").val(greatFormatRupiah('0'));
-            $(".monthly_price").val(greatFormatRupiah('0'));
-            $(".harga").val(greatFormatRupiah(harga));
-        });
+        //     var harga = total / qty;
+        //     $(".daily_price").val(greatFormatRupiah('0'));
+        //     $(".monthly_price").val(greatFormatRupiah('0'));
+        //     $(".harga").val(greatFormatRupiah(harga));
+        // });
 
         $(document).on('click', '.edit-table-detail', function(evt) {
             var id_detail = $(this).data("id");

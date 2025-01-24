@@ -312,7 +312,7 @@
                 var formData = new FormData();
                 formData.append('id', id);
                 $.ajax({
-                    url: "<?= base_url("pembayaran-po-lokal/delete"); ?>",
+                    url: "<?= base_url("pembayaran-po-lokal-bb/delete"); ?>",
                     data: formData,
                     method: "POST",
                     dataType: "json",

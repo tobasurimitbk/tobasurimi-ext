@@ -318,6 +318,7 @@ class StokHistori extends BaseController
                         "tanggal" => date('d/m/Y - H:i:s', strtotime($data->createdAt)),
                         "dokumen" => $no_dokumen,
                         "stok" =>  $in_out . " " . $data->stok_total . ($satuan_1 != null ? " " . $satuan_1['kode_satuan'] : ''),
+                        "keterangan" => $data->keterangan
                     ]);
                 }
             } else {
@@ -349,6 +350,7 @@ class StokHistori extends BaseController
                         "tanggal" => date('d/m/Y - H:i:s', strtotime($data->createdAt)),
                         "dokumen" => $no_dokumen,
                         "stok" =>  $in_out . " " . $data->stok_total . ($satuan_1 != null ? " " . $satuan_1['kode_satuan'] : ''),
+                        "keterangan" => $data->keterangan
                     ]);
                 }
             }

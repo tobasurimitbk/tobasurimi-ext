@@ -53,7 +53,9 @@ class SppDetailModel extends Model
         $selectQry = "purchase_request_details.*,
                     barang_master.kode_barang,
                     satuans.nama_satuan AS nama_satuan,
-                    satuans.kode_satuan AS kode_satuan";
+                    satuans.kode_satuan AS kode_satuan,
+                    barang_master.barang_name,
+                    barang_master_spesifikasi.spesifikasi";
 
         $condition = [
             "purchase_request_id" => $id,
@@ -64,6 +66,7 @@ class SppDetailModel extends Model
             ->where($condition)
             ->join('barang_master', 'purchase_request_details.barang1_id = barang_master.id', 'left')
             ->join('satuans', 'purchase_request_details.unit = satuans.id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = purchase_request_details.barang2_id', 'left')
             ->findAll();
 
         return $sppDetailData;

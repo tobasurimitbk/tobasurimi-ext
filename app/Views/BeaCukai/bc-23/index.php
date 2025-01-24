@@ -333,6 +333,15 @@
                                 </button>
                             `;
                         }
+
+                        <?php if (can('Bea Cukai', 'BC 2.3', 'ua')): ?>
+                            buttonUnpost = `<button data-toggle="tooltip" title="Unpost" class="btn btn-danger btn-print" onclick="unpostingAction('${row.id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-ban fa-sm" aria-hidden="true"></i>
+                                </button>
+                        `;
+                        <?php else: ?>
+                            buttonUnpost = ``;
+                        <?php endif; ?>
                     }
 
                     return htmlRes;
@@ -626,6 +635,60 @@
                 })
             }
         })
+    }
+
+    function unpostingAction(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan di unposting?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Un Posting',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("bea-cukai-bc-23/unposting"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+
+                        }
+                    },
+
+                });
+            }
+        })
+
     }
 
     function kirimCeisaAction(id) {

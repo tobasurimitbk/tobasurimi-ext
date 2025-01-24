@@ -162,7 +162,7 @@ class Warehouse extends BaseController
 
             if ($this->validate($rules)) {
 
-                $first = $this->WarehousesModel->where('company_id', $this->this_company_id)->where('code_warehouse', ($this->request->getVar('code_warehouse')))->first();
+                $first = $this->WarehousesModel->where('company_id', $this->this_company_id)->where('code_warehouse', ($this->request->getVar('code_warehouse')))->where('divisi_id', $this->request->getVar('divisi_id'))->first();
                 if ($first != null) {
                     return response()->setJSON([
                         'status' => false,
@@ -290,6 +290,7 @@ class Warehouse extends BaseController
                 $warehouseSameName = $this->WarehousesModel
                     ->where('code_warehouse', $values['code_warehouse'])
                     ->where('company_id', $this->this_company_id)
+                    ->where('divisi_id', $values['divisi_id'])
                     ->where('id !=', $id)
                     ->first();
 
@@ -377,7 +378,7 @@ class Warehouse extends BaseController
 
             $dataStock = $this->stockModel->where('warehouse_id', $id)->first();
             $dataLPB = $this->penerimaanBarangModel->where('warehouse_id', $id)->first();
-            
+
             // Check if data exists and return error if so
             if ($dataStock || $dataLPB) {
                 $data = [

@@ -59,7 +59,7 @@ class Barang extends BaseController
             'type_barang_sales' => "EKSPOR",
             'type_barang' => $this->request->getVar('type_barang'),
             'satuan_id' => $this->request->getVar('satuan_id'),
-            'harga_pokok' => repairDouble($this->request->getVar('harga_pokok')),
+            // 'harga_pokok' => repairDouble($this->request->getVar('harga_pokok')),
             'harga_jual' => repairDouble($this->request->getVar('harga_jual'))
         ]);
 
@@ -96,7 +96,7 @@ class Barang extends BaseController
             'barang_name' => strtoupper($this->request->getVar('barang_name')),
             'type_barang_sales' => "EKSPOR",
             'satuan_id' => $this->request->getVar('satuan_id'),
-            'harga_pokok' => repairDouble($this->request->getVar('harga_pokok')),
+            // 'harga_pokok' => repairDouble($this->request->getVar('harga_pokok')),
             'harga_jual' => repairDouble($this->request->getVar('harga_jual'))
         ]);
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\PanjarSupplierModel;
 use CodeIgniter\Model;
 use PHPUnit\TextUI\XmlConfiguration\Group;
 
@@ -152,8 +153,10 @@ class LocalPOPaymentPanjarModel extends Model
     {
         $condition = [
             'local_po_payment_panjar.local_po_payment_id' => $id,
-            'type'  => $type
+            'local_po_payment_panjar.type'  => $type,
+            'panjar_supplier.jenis_panjar'  => "PANJAR",
         ];
+
 
         $selectQry = "local_po_payment_panjar.id, panjar_supplier.no_panjar, panjar_supplier.payment_date, panjar_supplier.total_panjar, local_po_payment_panjar.panjar_id,
         local_po_payment_panjar.bayar_panjar, sum(local_po_payment_panjar.bayar_panjar) as total_bayar_panjar";
@@ -163,18 +166,78 @@ class LocalPOPaymentPanjarModel extends Model
             ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
             ->join('local_po_payment_bp', 'local_po_payment_bp.id = local_po_payment_panjar.local_po_payment_id')
             ->groupBy('local_po_payment_panjar.panjar_id')
+            ->where('panjar_supplier.jenis_panjar', "PANJAR")
             ->where($condition)
             ->findAll();
 
-        foreach ($result as $i => $r) {
-            $totalPembayaranPanjar = $this->getTotalPembayaranPanjar($r['panjar_id'], "BP");
-            $result[$i]['payment_date'] = date('d/m/Y', strtotime($r['payment_date']));
+
+            if (empty($result)) {
+                $panjarSupplier = new PanjarSupplierModel();
+
+                $dataPanjar = $panjarSupplier->select("local_po_payment_panjar.id, panjar_supplier.no_panjar, panjar_supplier.payment_date, panjar_supplier.total_panjar, local_po_payment_panjar.panjar_id,
+                                        local_po_payment_panjar.bayar_panjar, sum(local_po_payment_panjar.bayar_panjar) as total_bayar_panjar")
+                                        ->where('jenis_panjar', "PANJAR")
+                                        ->where("local_po_payment_panjar.type", "BP")
+                                        ->join('local_po_payment_panjar', 'local_po_payment_panjar.id = panjar_supplier.id', 'left')
+                                        ->findAll();
+
+                $result = $dataPanjar;
+
+            }
+
+            foreach ($result as $i => $r) {
+                $totalPembayaranPanjar = $this->getTotalPembayaranPanjar($r['panjar_id'], "BP");
+                $result[$i]['payment_date'] = date('d/m/Y', strtotime($r['payment_date']));
 
 
-            $result[$i]['total_pembayaran'] = $totalPembayaranPanjar;
+                $result[$i]['total_pembayaran'] = $totalPembayaranPanjar;
+            }
+
+
+
+        return $result;
+    }
+
+
+    public function getPembayaranPanjarTBDetailsbyIdandType($id, $type)
+    {
+        $condition = [
+            'local_po_payment_panjar.local_po_payment_id' => $id,
+            'local_po_payment_panjar.type'  => $type,
+        ];
+
+        $selectQry = "local_po_payment_panjar.id, panjar_supplier.no_panjar, panjar_supplier.payment_date, panjar_supplier.total_panjar, local_po_payment_panjar.panjar_id,
+        local_po_payment_panjar.bayar_panjar, sum(local_po_payment_panjar.bayar_panjar) as total_bayar_panjar, panjar_supplier.jenis_panjar";
+
+        $result = $this
+            ->select($selectQry)
+            ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
+            ->join('local_po_payment_bp', 'local_po_payment_bp.id = local_po_payment_panjar.local_po_payment_id')
+            ->groupBy('local_po_payment_panjar.panjar_id')
+            ->where('panjar_supplier.jenis_panjar', '=', 'PANJAR_TB')
+            ->where($condition)
+            ->findAll();
+
+        if (empty($result)) {
+            $panjarSupplier = new PanjarSupplierModel();
+
+            $dataPanjar = $panjarSupplier->select("local_po_payment_panjar.id, panjar_supplier.no_panjar, panjar_supplier.payment_date, panjar_supplier.total_panjar, local_po_payment_panjar.panjar_id,
+            local_po_payment_panjar.bayar_panjar, sum(local_po_payment_panjar.bayar_panjar) as total_bayar_panjar")
+                        ->where('jenis_panjar', "PANJAR")
+                        ->where("local_po_payment_panjar.type", "BP")
+                        ->join('local_po_payment_panjar', 'local_po_payment_panjar.id = panjar_supplier.id', 'left')
+                        ->findAll();
+
+            $result = $dataPanjar;
         }
 
+            foreach ($result as $i => $r) {
+                $totalPembayaranPanjar = $this->getTotalPembayaranPanjar($r['panjar_id'], "BP");
+                $result[$i]['payment_date'] = date('d/m/Y', strtotime($r['payment_date']));
 
+
+                $result[$i]['total_pembayaran'] = $totalPembayaranPanjar;
+            }
 
         return $result;
     }

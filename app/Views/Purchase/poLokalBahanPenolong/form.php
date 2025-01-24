@@ -90,7 +90,7 @@
                                     <label for="floatingInput">No. PO</label>
                                 </div>
                                 <div <?= !empty($poDetail) ? 'style="display:none;"' : ''; ?> class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 25px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 25px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -169,6 +169,19 @@
                             <label for="floatingInput">Catatan (Opsional)</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select ppn" name="ppn" id="ppn" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($ppn as $p) : ?>
+                                    <option value="<?= $p['id'] ?>">
+                                        <?= $p['name'] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Pilih PPN (Opsional)</label>
+                        </div>
+                    </div>
                 </div>
             </form>
             <div class="col-subtitle-modal">
@@ -242,7 +255,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control harga_satuan" name="harga_satuan" id="harga_satuan" placeholder="Harga Satuan" onchange="this.value = greatFormatRupiah(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control harga_satuan" name="harga_satuan" id="harga_satuan" placeholder="Harga Satuan" onkeyup="this.value = greatFormatRupiah(this.value)">
                             <label for="floatingInput">Harga Satuan</label>
                         </div>
                     </div>
@@ -263,13 +276,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control biaya_tambahan" name="biaya_tambahan" id="biaya_tambahan" placeholder="Biaya Tambahan" onchange="this.value = greatFormatRupiah(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control biaya_tambahan" name="biaya_tambahan" id="biaya_tambahan" placeholder="Biaya Tambahan" onkeyup="this.value = greatFormatRupiah(this.value)">
                             <label for="floatingInput">Biaya Tambahan (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onchange="this.value = greatFormatRupiah(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control total" name="total" id="total" placeholder="Total" onkeyup="this.value = greatFormatRupiah(this.value)">
                             <label for="floatingInput">Total</label>
                         </div>
                     </div>
@@ -281,19 +294,7 @@
                             <label for="floatingInput">Keterangan (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select ppn" name="ppn" id="ppn" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($ppn as $p) : ?>
-                                    <option value="<?= $p['id'] ?>">
-                                        <?= $p['name'] ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">Pilih PPN (Opsional)</label>
-                        </div>
-                    </div>
+
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select pph" name="pph" id="pph" aria-label="Floating label select example">
@@ -367,6 +368,8 @@
             changeStatus();
         });
     </script>
+<?php else: ?>
+
 <?php endif; ?>
 
 <script>
@@ -437,27 +440,27 @@
             selected.data('satuan_3')
         );
 
-        $.ajax({
-            url: "<?= base_url("po-lokal-bahan-penolong/histori-harga"); ?>",
-            data: {
-                id: $('#barang_id').find("option:selected").data("barang_id"),
-                spesifikasi_id: $('#barang_id').find("option:selected").data("spesifikasi_id")
-            },
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            method: "GET",
-            success: function(response) {
-                if (response.hargaTerakhir !== "-") {
-                    $('#harga_satuan').val(greatFormatRupiah(response.res.hargaTerakhirNumber));
-                } else {
-                    $('#harga_satuan').val(greatFormatRupiah('0'));
-                }
-            },
-        });
+        // $.ajax({
+        //     url: "<?= base_url("po-lokal-bahan-penolong/histori-harga"); ?>",
+        //     data: {
+        //         id: $('#barang_id').find("option:selected").data("barang_id"),
+        //         spesifikasi_id: $('#barang_id').find("option:selected").data("spesifikasi_id")
+        //     },
+        //     beforeSend: function() {
+        //         setLoading();
+        //     },
+        //     complete: function() {
+        //         stopLoading();
+        //     },
+        //     method: "GET",
+        //     success: function(response) {
+        //         if (response.res.hargaTerakhirNumber !== 0) {
+        //             $('#harga_satuan').val(greatFormatRupiah(response.res.hargaTerakhirNumber)).keyup();
+        //         } else {
+        //             $('#harga_satuan').val('');
+        //         }
+        //     },
+        // });
     });
 
     $('.form-select')
@@ -476,7 +479,7 @@
     });
 
     // HARGA SATUAN DAN QTY CHANE
-    $('#harga_satuan,#qty,#biaya_tambahan,#diskon').change(function() {
+    $('#harga_satuan,#qty,#biaya_tambahan,#diskon').keyup(function() {
         var hargaSatuan = parseFloat(destroyFormatRupiah($('#harga_satuan').val())) || 0;
         var qty = parseFloat($('#qty').val()) || 1;
         var biayaTambahan = parseFloat(destroyFormatRupiah($('#biaya_tambahan').val())) || 0;
@@ -484,11 +487,11 @@
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
-        $('#total').val(greatFormatRupiah(total));
+        $('#total').val(total == 0 ? '' : greatFormatRupiah(total));
     });
 
     // CHANGE TOTAL
-    $('#total').change(function() {
+    $('#total').keyup(function() {
         var total = parseFloat(destroyFormatRupiah($('#total').val())) || 0;
         var qty = parseFloat($('#qty').val()) || 1;
         var biayaTambahan = parseFloat(destroyFormatRupiah($('#biaya_tambahan').val())) || 0;
@@ -496,7 +499,13 @@
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var hargaSatuan = (((total / qty)));
-        $('#harga_satuan').val(greatFormatRupiah(hargaSatuan));
+        $('#harga_satuan').val(hargaSatuan == 0 ? '' : greatFormatRupiah(hargaSatuan));
+    });
+
+    // PPN CHANGE
+    $('#ppn').change(function() {
+        // Set Global Ppn
+        setGlobalPpn();
     });
 
     // VALIDATOR DETAIL
@@ -1014,7 +1023,7 @@
             }
         }
         $('#barang_id, #barang_update_id').val(item.spesifikasi_id).change();
-        $('#harga_satuan').val(greatFormatRupiah(item.harga_satuan));
+        $('#harga_satuan').val(item.harga_satuan == 0 ? '' : greatFormatRupiah(item.harga_satuan));
         $('#qty').val(parseFloat(item.qty));
         $('#diskon').val(parseFloat(item.diskon));
         $('#biaya_tambahan').val((item.biaya_tambahan == 0) ? greatFormatRupiah(0) : greatFormatRupiah(item.biaya_tambahan));
@@ -1023,7 +1032,7 @@
         $('#pph').val(item.pph);
         $('#satuan_id').val(item.satuan_id).change();
         // $('#biaya_tambahan').change();
-        $('#total').val(greatFormatRupiah(item.total));
+        $('#total').val(item.total == 0 ? '' : greatFormatRupiah(item.total));
         // attr barang_id disabled
         $('#barang_id').attr('disabled', true);
         // setTimeout(function() {
@@ -1032,7 +1041,8 @@
     }
 
     function resetForm() {
-        $('#barang_id').attr('disabled', false);
+        // $('#barang_id').attr('disabled', false);
+        $(".satuan_id").val(null).change();
         $(".detail-form input, .detail-form select").val("");
         $(".barang_id").val("").change();
         $(".diskon").val('0');
@@ -1126,6 +1136,8 @@
                         });
                     });
                     drawTabel(listBarang);
+                    // Set Global Ppn
+                    setGlobalPpn();
                 },
                 onError: function(response) {
                     alert("ERROR")
@@ -1146,6 +1158,15 @@
                 }
             });
         });
+    }
+
+    function setGlobalPpn() {
+        // Set PPN
+        // PPN untuk semua list barang hasilnya sama
+        var ppn = $('#ppn option:selected').val();
+        for (let i = 0; i < listBarang.length; i++) {
+            listBarang[i].ppn = ppn;
+        }
     }
 </script>
 <!-- Edit Script -->
@@ -1169,7 +1190,10 @@
                 keterangan: "<?= $l['keterangan'] ?>",
                 ppn: "<?= $l['ppn'] ?>",
                 pph: "<?= $l['pph'] ?>"
-            })
+            });
+            // Set PPN
+            // PPN untuk semua list barang hasilnya sama
+            $('#ppn').val("<?= $l['ppn'] ?>")
         <?php endforeach; ?>
         drawTabel(listBarang);
 
