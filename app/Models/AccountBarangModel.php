@@ -16,6 +16,8 @@ class AccountBarangModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'barang_master_id',
+        'barang_master_spesifikasi_id',
+        'keterangan',
         'company_id',
         'ap_id',
         'ar_id',
@@ -74,14 +76,15 @@ class AccountBarangModel extends Model
                   barang_master.barang_name,
                   account_barang.*,
                   divisis.divisi,
-                  GROUP_CONCAT(barang_master_spesifikasi.spesifikasi SEPARATOR ', ') AS spesifikasi";
+                  barang_master_spesifikasi.spesifikasi";
 
         $barangDataQry = $this->asArray()
             ->select($selectQry)
             ->where($condition)
+            ->where('account_barang.deleted_at', null)
             ->join('barang_master', 'barang_master.id = account_barang.barang_master_id', 'left')
             ->join('divisis', 'divisis.id = account_barang.divisi_id', 'left')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = account_barang.barang_master_spesifikasi_id', 'left')
             ->groupBy('account_barang.id') // Pastikan hasil spesifik untuk setiap account_barang
             ->orderBy($sort, $sortType);
 
@@ -137,12 +140,14 @@ class AccountBarangModel extends Model
         }
     }
 
-    public function checkAccountBarang($company_id, $divisi_id, $barang_id)
+    public function checkAccountBarang($company_id, $divisi_id, $barang_id, $spesifikasi_id, $keterangan)
     {
         $accountBarang = $this->asArray()
             ->where('company_id', $company_id)
             ->where('divisi_id', $divisi_id)
             ->where('barang_master_id', $barang_id)
+            ->where('barang_master_spesifikasi_id', $spesifikasi_id)
+            ->where('keterangan', $keterangan)
             ->where('deleted_at', null)
             ->first();
 
@@ -153,15 +158,17 @@ class AccountBarangModel extends Model
         }
     }
 
-    public function insertAccountBarang($company_id, $divisi_id, $barang_id)
+    public function insertAccountBarang($company_id, $divisi_id, $barang_id, $spesifikasi_id, $keterangan = null)
     {
-        if ($this->checkAccountBarang($company_id, $divisi_id, $barang_id)) {
+        if ($this->checkAccountBarang($company_id, $divisi_id, $barang_id, $spesifikasi_id, $keterangan)) {
         } else {
             // BELUM ADA
             $accountBarang = $this->insert([
                 'company_id' => $company_id,
                 'divisi_id' => $divisi_id,
                 'barang_master_id' => $barang_id,
+                'barang_master_spesifikasi_id' => $spesifikasi_id,
+                'keterangan' => $keterangan,
             ]);
             return $accountBarang;
         }

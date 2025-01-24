@@ -2,6 +2,7 @@
 
 namespace App\Controllers\Warehouse;
 
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Controllers\BaseController;
 
 use App\Models\AMPurchaseOrderModel;
@@ -41,6 +42,7 @@ class PenerimaanBarangLokal extends BaseController
     private $stockDetailModel;
     protected $beaCukaiModel;
     protected $supplierHargaModel;
+    protected $jurnalController;
 
     protected $dompdf;
 
@@ -61,6 +63,7 @@ class PenerimaanBarangLokal extends BaseController
         $this->satuanModel = new SatuansModel();
         $this->stockDetailModel = new StockDetailModel();
         $this->supplierHargaModel = new SupplierHargaModel();
+        $this->jurnalController = new JurnalUmum();
 
         $this->dompdf = new Dompdf();
     }
@@ -132,7 +135,7 @@ class PenerimaanBarangLokal extends BaseController
                     if ($tipe_bahan === "BAKU") {
                         $supplier_id = $dataPenerimaanBarang->supplier_id;
 
-                        $dataNo = $this->rmPurchaseOrderModel->getNoPenerimaanBarang($supplier_id, $this->this_company_id);
+                        $dataNo = $this->rmPurchaseOrderModel->getNoPenerimaanBarang($supplier_id, $this->this_company_id, $dataPenerimaanBarang->divisi_id);
 
                         //Get Supplier
                         $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN BAKU');
@@ -525,6 +528,22 @@ class PenerimaanBarangLokal extends BaseController
             }
 
             $multiple_po_id = json_decode($dataPenerimaanBarang->multiple_po_id);
+            foreach ($multiple_po_id as $key => $value) {
+                $result = $this->jurnalController->insertDataPembelian($value, "BAHAN " . $dataPenerimaanBarang->tipe_bahan, $dataPenerimaanBarang->status_penerimaan, "pembelian");
+                if ($result) {
+                    $responseBody = json_decode($result->getBody(), true);
+                    if ($responseBody && isset($responseBody['status'])) {
+                        $data = [
+                            "status"    => false,
+                            "message"   => $responseBody['message'],
+                            "payload"   => "",
+                            'token'     => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                        return;
+                    }
+                }
+            }
             $tipe_bahan = $dataPenerimaanBarang->tipe_bahan;
             $detail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $tipe_bahan, "LOKAL");
             $this->penerimaanBarangModel->db->transException(true)->transStart();
@@ -551,21 +570,6 @@ class PenerimaanBarangLokal extends BaseController
                     $this->stockDetailModel->addOrReduceStock($packaging, $dataPenerimaanBarang->warehouse_id, 'Scrap', $packaging_qty, 'OUT', '');
                 }
             }
-
-            // automate close po check item by check ech po number
-            // foreach ($multiple_po_id as $item) {
-            //     if ($tipe_bahan === "BAKU") {
-            //         $this->rmPurchaseOrderModel
-            //             ->where('id', $item)
-            //             ->set('status_penerimaan', 1)
-            //             ->update();
-            //     } elseif ($tipe_bahan === "PENOLONG") {
-            //         $this->amPurchaseOrderModel
-            //             ->where('id', $item)
-            //             ->set('status_penerimaan', 1)
-            //             ->update();
-            //     }
-            // }
 
             $response = $this->penerimaanBarangModel
                 ->where(['id' => $id])

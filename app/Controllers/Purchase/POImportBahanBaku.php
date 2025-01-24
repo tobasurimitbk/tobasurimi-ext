@@ -275,7 +275,7 @@ class POImportBahanBaku extends BaseController
                 'note' => $b->keterangan,
                 'total' => repairDouble2($b->total),
             ]);
-            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, $b->keterangan);
         }
 
         $this->sppModel->update($this->request->getVar('spp_id'), [
@@ -292,7 +292,7 @@ class POImportBahanBaku extends BaseController
     }
 
     public function updatePOImportBahanBaku()
-    {   
+    {
         $id = decrypt($this->request->getPost("id"));
 
         if ($this->request->getVar('poNo') != "AUTO GENERATE") {
@@ -382,7 +382,7 @@ class POImportBahanBaku extends BaseController
                     'total' => $b->total,
                 ]);
                 array_push($id_detail_all, $check['id']);
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, $b->keterangan);
             } else {
                 // NEW BARANG
                 // DELETE
@@ -407,7 +407,7 @@ class POImportBahanBaku extends BaseController
                     'total' => repairDouble2($b->total),
                 ]);
                 array_push($id_detail_all, $id_detail_new);
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, $b->keterangan);
             }
         }
 
@@ -435,18 +435,18 @@ class POImportBahanBaku extends BaseController
             'token'     => csrf_hash()
         ];
 
-        $result = $this->jurnalController->insertDataPembelian(decrypt($this->request->getVar('id')), "BAHAN BAKU", "IMPORT", "pembelian");
+        // $result = $this->jurnalController->insertDataPembelian(decrypt($this->request->getVar('id')), "BAHAN BAKU", "IMPORT", "pembelian");
 
-        if ($result) {
-            $responseBody = json_decode($result->getBody(), true);
-            if ($responseBody && isset($responseBody['status'])) {
-                $data["status"] =  false;
-                $data["message"] = $responseBody['message'];
-                $data["token"] = csrf_hash();
-            }
-        } else {
-            $this->rmImportPOModel->update(decrypt($this->request->getVar('id')), ['is_posted' => $this->request->getVar('status')]);
-        }
+        // if ($result) {
+        //     $responseBody = json_decode($result->getBody(), true);
+        //     if ($responseBody && isset($responseBody['status'])) {
+        //         $data["status"] =  false;
+        //         $data["message"] = $responseBody['message'];
+        //         $data["token"] = csrf_hash();
+        //     }
+        // } else {
+        $this->rmImportPOModel->update(decrypt($this->request->getVar('id')), ['is_posted' => $this->request->getVar('status')]);
+        // }
         return response()->setJSON($data);
     }
 

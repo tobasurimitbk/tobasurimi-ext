@@ -487,7 +487,6 @@
     $('.filter_coa').select2({
         placeholder: "Filter Akun",
         theme: "bootstrap-5",
-        allowClear: true,
     })
 
     //CSS SELECT2 FLOATING LABEL

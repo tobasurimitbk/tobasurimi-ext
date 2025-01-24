@@ -172,7 +172,7 @@ class POLokalBahanPenolong extends BaseController
                 'total' => repairDouble($d->total),
                 'remaining_qty' => $d->qty
             ]);
-            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id);
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id, $d->spesifikasi_id, $d->keterangan);
         }
 
 
@@ -427,7 +427,7 @@ class POLokalBahanPenolong extends BaseController
                 ]);
                 array_push($id_detail_all, $check['id']);
 
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id, $d->spesifikasi_id, $d->keterangan);
             } else {
                 // NEW BARANG
                 // DELETE
@@ -455,7 +455,7 @@ class POLokalBahanPenolong extends BaseController
                 ]);
                 array_push($id_detail_all, $id_detail_new);
 
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id, $d->spesifikasi_id, $d->keterangan);
             }
         }
 
@@ -481,19 +481,19 @@ class POLokalBahanPenolong extends BaseController
         $id = decrypt($this->request->getPost("id"));
         $status = $this->request->getVar('status');
 
-        $result = $this->jurnalController->insertDataPembelian($id, "BAHAN PENOLONG", "LOKAL", "pembelian");
-        if ($result) {
-            $responseBody = json_decode($result->getBody(), true);
-            if ($responseBody && isset($responseBody['status'])) {
-                $data["status"] =  false;
-                $data["message"] = $responseBody['message'];
-                $data["token"] = csrf_hash();
-            }
-        } else {
-            $this->aMPurchaseOrderModel->update($id, [
-                'is_posted' => $status == 1 ? true : false
-            ]);
-        }
+        // $result = $this->jurnalController->insertDataPembelian($id, "BAHAN PENOLONG", "LOKAL", "pembelian");
+        // if ($result) {
+        //     $responseBody = json_decode($result->getBody(), true);
+        //     if ($responseBody && isset($responseBody['status'])) {
+        //         $data["status"] =  false;
+        //         $data["message"] = $responseBody['message'];
+        //         $data["token"] = csrf_hash();
+        //     }
+        // } else {
+        $this->aMPurchaseOrderModel->update($id, [
+            'is_posted' => $status == 1 ? true : false
+        ]);
+        // }
 
 
         return response()->setJSON($data);

@@ -305,11 +305,12 @@ class POLokalBahanBaku extends BaseController
                 'note' => $r->keterangan,
                 'qty' => $r->qty,
                 'qty_diterima' => 0,
-                'remeaining_qty' => $r->qty,
+                'remaining_qty' => $r->qty,
                 'general_price' => $r->harga,
                 'daily_price' => $r->daily_price,
                 'monthly_price' => $r->monthly_price
             ]);
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"), $r->spesifikasi_id, $r->keterangan);
         }
 
         $detailPurchase = $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->where('deletedAt', null)->findAll();
@@ -322,7 +323,6 @@ class POLokalBahanBaku extends BaseController
             'total' => $totalHarga  + $this->request->getVar("subsidi_langsung")
         ]);
 
-        $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"));
 
         return response()->setJSON([
             'message' => "PO Lokal Bahan Baku Berhasil Disimpan",
@@ -411,7 +411,7 @@ class POLokalBahanBaku extends BaseController
                     'note' => $r->keterangan,
                     'qty' => $r->qty,
                     'qty_diterima' => 0,
-                    'remeaining_qty' => $r->qty,
+                    'remaining_qty' => $r->qty,
                     'general_price' => $r->harga,
                     'daily_price' => $r->daily_price,
                     'monthly_price' => $r->monthly_price
@@ -439,7 +439,7 @@ class POLokalBahanBaku extends BaseController
                     'note' => $r->keterangan,
                     'qty' => $r->qty,
                     'qty_diterima' => 0,
-                    'remeaining_qty' => $r->qty,
+                    'remaining_qty' => $r->qty,
                     'general_price' => $r->harga,
                     'daily_price' => $r->daily_price,
                     'monthly_price' => $r->monthly_price
@@ -447,6 +447,7 @@ class POLokalBahanBaku extends BaseController
 
                 array_push($id_detail_all, $id_detail_new);
             }
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"), $r->spesifikasi_id, $r->keterangan ?? null);
         }
 
         $this->RMPurchaseOrderDetailModel
@@ -454,7 +455,6 @@ class POLokalBahanBaku extends BaseController
             ->whereNotIn('id', $id_detail_all)
             ->delete();
 
-        $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"));
 
         return response()->setJSON([
             'message' => "PO Lokal Bahan Baku Berhasil Diupdate",
@@ -531,24 +531,39 @@ class POLokalBahanBaku extends BaseController
                     "payload"   => json_encode($payload),
                     'token'     => csrf_hash()
                 ];
-                $result = $this->jurnalController->insertDataPembelian($id, "BAHAN BAKU", "LOKAL", "pembelian");
-                if ($result) {
-                    $responseBody = json_decode($result->getBody(), true);
-                    if ($responseBody && isset($responseBody['status'])) {
-                        $data["status"] =  false;
-                        $data["message"] = $responseBody['message'];
-                        $data["token"] = csrf_hash();
-                    }
-                } else {
-                    if ($payload['is_posted']) {
-                        $detail = $this->RMPurchaseOrderModel->where('id', $id)->first();
-                        // cek if warehouse_id != null
-                        if ($detail['warehouse_id'] != null && $detail['warehouse_id'] != 0) {
+                // $result = $this->jurnalController->insertDataPembelian($id, "BAHAN BAKU", "LOKAL", "pembelian");
+                // if ($result) {
+                //     $responseBody = json_decode($result->getBody(), true);
+                //     if ($responseBody && isset($responseBody['status'])) {
+                //         $data["status"] =  false;
+                //         $data["message"] = $responseBody['message'];
+                //         $data["token"] = csrf_hash();
+                //     }
+                // } else {
+                if ($payload['is_posted']) {
+                    $detail = $this->RMPurchaseOrderModel->where('id', $id)->first();
+                    // cek if warehouse_id != null
+                    if ($detail['warehouse_id'] != null && $detail['warehouse_id'] != 0) {
+                        $result = $this->jurnalController->insertDataPembelian($id, "BAHAN BAKU", "LOKAL", "pembelian");
+                        if ($result) {
+                            $responseBody = json_decode($result->getBody(), true);
+                            if ($responseBody && isset($responseBody['status'])) {
+                                $data = [
+                                    "status"    => false,
+                                    "message"   => $responseBody['message'],
+                                    "payload"   => "",
+                                    'token'     => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                                return;
+                            }
+                        } else {
                             $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type'], $detail['po_date']);
                         }
                     }
-                    $this->RMPurchaseOrderModel->update($id, $payload);
                 }
+                $this->RMPurchaseOrderModel->update($id, $payload);
+                // }
                 echo json_encode($data);
             } else {
                 $data = [
