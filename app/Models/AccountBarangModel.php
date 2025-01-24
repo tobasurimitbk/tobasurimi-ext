@@ -94,15 +94,15 @@ class AccountBarangModel extends Model
             $barangDataQry->groupStart();
         }
 
-        if ($addCondition['filter_divisi']) {
+        if ($addCondition['filter_divisi'] && $addCondition['filter_divisi'] != "") {
             $barangDataQry->where('divisis.id', $addCondition['filter_divisi']);
         }
 
-        if ($addCondition['search']) {
+        if ($addCondition['search'] && $addCondition['search'] != "") {
             $barangDataQry->like('barang_master.barang_name', $addCondition['search']);
         }
 
-        if ($addCondition['search']) {
+        if ($addCondition['search'] && $addCondition['search'] != "") {
             $barangDataQry->orLike('barang_master.kode_barang', $addCondition['search']);
         }
 
