@@ -490,7 +490,7 @@
                 } else if (query.length === 0) {
                     table.ajax.reload(); // Reload untuk menghapus filter jika input kosong
                 }
-            }, 600)
+            }, 400)
         )
 
         $(".filter_coa").change(function() {
