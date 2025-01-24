@@ -695,13 +695,15 @@
                 newRow.append($('<td>').text(item.barang_name));
                 newRow.append($('<td>').text(item.satuan_order_name));
                 newRow.append($('<td>').text(item.kemasan));
-                newRow.append($('<td>').text(item.remark));
+                newRow.append($('<td>').html(`
+                    <input  style="height: 40px; padding-bottom: 12px;" <?= isset($dataSalesExport) && $dataSalesExport->status === "POSTED" ? "readonly" : "" ?> class="form-control remark" oninput="preventNegativeInput(this);updateRemark($(this))" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.remark}">
+                `));
                 newRow.append($('<td>').text(item.qty));
                 newRow.append($('<td>').text(greatFormatRupiah(item.harga)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.total)));
                 newRow.append($('<td>').html(`
-                <input  style="height: 40px; padding-bottom: 12px;" <?= isset($dataSalesExport) && $dataSalesExport->status === "POSTED" ? "readonly" : "" ?> class="form-control qty-barang-order" oninput="preventNegativeInput(this);updateOrder($(this))" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qtyOrder}">
-            `));
+                    <input  style="height: 40px; padding-bottom: 12px;" <?= isset($dataSalesExport) && $dataSalesExport->status === "POSTED" ? "readonly" : "" ?> class="form-control qty-barang-order" oninput="preventNegativeInput(this);updateOrder($(this))" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qtyOrder}">
+                `));
                 newRow.append($('<td>').text(greatFormatRupiah(item.hargaOrder)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.totalHargaOrder)));
 
@@ -731,6 +733,14 @@
             totalAmount = totalTotalHarga;
         }
     }
+
+
+
+    function updateRemark(input){
+
+    }
+
+
 
     function updateOrder(input) {
         var index = input.data('index');
