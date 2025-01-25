@@ -1056,7 +1056,12 @@ class JurnalUmum extends BaseController
                             $totalPO += $totalPOqty;
                             $barangAPFound = false;
                             foreach ($dataAccountBarang as $value) {
-                                if ($dataBBDetail->barang1_id == $value->barang_master_id && $dataBBDetail->barang2_id == $value->barang_master_spesifikasi_id && $dataBBDetail->note == $value->keterangan && $dataBB->divisi_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
+                                if ($dataBBDetail->barang1_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataBBDetail->barang2_id == $value->barang_master_spesifikasi_id && $dataBBDetail->note == $value->keterangan && $dataBB->divisi_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
+                                    $barangAP = $value->ap_id;
+                                    $barangAR = $value->ar_id;
+                                    $barangAPFound = true;
+                                }
+                                if ($dataBBDetail->barang1_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataBB->divisi_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
                                     $barangAP = $value->ap_id;
                                     $barangAR = $value->ar_id;
                                     $barangAPFound = true;
@@ -1224,7 +1229,12 @@ class JurnalUmum extends BaseController
                             $totalPO += repairDouble($dataBBDetail->total);
                             $barangAPFound = false;
                             foreach ($dataAccountBarang as $value) {
-                                if ($dataBBDetail->barang_id == $value->barang_master_id && $dataBBDetail->spesifikasi_id == $value->barang_master_spesifikasi_id && $dataBBDetail->note == $value->keterangan && $dataBB->division_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
+                                if ($dataBBDetail->barang_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataBBDetail->spesifikasi_id == $value->barang_master_spesifikasi_id && $dataBBDetail->note == $value->keterangan && $dataBB->division_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
+                                    $barangAP = $value->ap_id;
+                                    $barangAR = $value->ar_id;
+                                    $barangAPFound = true;
+                                }
+                                if ($dataBBDetail->barang1_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataBB->divisi_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
                                     $barangAP = $value->ap_id;
                                     $barangAR = $value->ar_id;
                                     $barangAPFound = true;
@@ -1378,7 +1388,12 @@ class JurnalUmum extends BaseController
                         $totalPO += repairDouble($dataBPDetail->total);
                         $barangAPFound = false;
                         foreach ($dataAccountBarang as $value) {
-                            if ($dataBPDetail->barang_id == $value->barang_master_id && $dataBPDetail->spesifikasi_id == $value->barang_master_spesifikasi_id && $dataBPDetail->note == $value->keterangan && $dataBP->division_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
+                            if ($dataBPDetail->barang_id == $value->barang_master_id && $dataBP->company_id == $value->company_id && $dataBPDetail->spesifikasi_id == $value->barang_master_spesifikasi_id && $dataBPDetail->note == $value->keterangan && $dataBP->division_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
+                                $barangAP = $value->ap_id;
+                                $barangAR = $value->ar_id;
+                                $barangAPFound = true;
+                            }
+                            if ($dataBPDetail->barang_id == $value->barang_master_id && $dataBP->company_id == $value->company_id && $dataBP->division_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
                                 $barangAP = $value->ap_id;
                                 $barangAR = $value->ar_id;
                                 $barangAPFound = true;
