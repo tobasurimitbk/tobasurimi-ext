@@ -398,7 +398,7 @@ class Barang extends BaseController
             $satuan1_kode = isset($satuan1) ? $satuan1->kode_satuan : "-";
             $satuan2_kode = (isset($satuan2) && $data['satuan_2'] != 0) ? $satuan2->kode_satuan : "-";
             $satuan3_kode = (isset($satuan3) && $data['satuan_3'] != 0) ? $satuan3->kode_satuan : "-";
-            $accountBarang = $accountBarangModel->asObject()->where('barang_master_id', $data['id'])->where('deleted_at', null)->first();
+            $accountBarang = $accountBarangModel->asObject()->where('company_id', $this->this_company_id)->where('barang_master_id', $data['id'])->where('deleted_at', null)->first();
 
             $aksesSupplierLokalBP = can('Pembelian', 'PO Lokal BP', 'r');
             $aksesSupplierImportBP = can('Pembelian', 'PO Import BP', 'r');
