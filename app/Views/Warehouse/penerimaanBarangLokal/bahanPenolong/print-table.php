@@ -123,10 +123,11 @@
                 <td><b>No</b></td>
                 <td><b>Departemen</b></td>
                 <td><b>No Penerimaan</b></td>
-                <td><b>No Po</b></td>
+                <td><b>No SPP</b></td>
                 <td><b>Gudang</b></td>
                 <td><b>Tanggal</b></td>
                 <td><b>Supplier</b></td>
+                <td><b>Dokumen</b></td>
                 <td><b>Jumlah Item</b></td>
             </tr>
         </thead>
@@ -137,16 +138,17 @@
                         <td><?= $d['no'] ?></td>
                         <td><?= $d['divisi'] ?></td>
                         <td><?= $d['no_penerimaan_barang'] ?></td>
-                        <td><?= $d['multiple_po_no'] ?></td>
+                        <td><?= $d['spp_no'] ?></td>
                         <td><?= $d['warehouse_name'] ?></td>
                         <td><?= $d['createdAt'] ?></td>
                         <td><?= $d['supplier_name'] ?></td>
+                        <td><?= $d['bc_type_name'] ?></td>
                         <td><?= $d['itemCount'] ?></td>
                     </tr>
                 <?php endforeach; ?>
             <?php else : ?>
                 <tr>
-                    <td colspan="8" style="text-align: center;">
+                    <td colspan="9" style="text-align: center;">
                         Tidak Ada Data Penerimaan Barang
                     </td>
                 </tr>

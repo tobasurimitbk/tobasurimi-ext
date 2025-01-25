@@ -139,12 +139,12 @@
                 </td>
             </tr>
             <tr>
-                <!-- <td>
-                    <div><span class="txt-bold">Dokumen : <?= ($dataPenerimaanBarang->bc_type == '0') ? "Non Pabean - 0" : $dataPenerimaanBarang->bc_type ?></span></div>
-                </td> -->
                 <td>
-                    <div><span class="txt-bold">Ket. Kemasan : <?= $dataPenerimaanBarang->kemasan; ?></span></div>
+                    <div><span class="txt-bold">Dokumen : <?= ($dataPenerimaanBarang->bc_type == null) ? "Non Pabean" : $dataPenerimaanBarang->bc_type ?></span></div>
                 </td>
+                <!-- <td>
+                    <div><span class="txt-bold">Ket. Kemasan : <?= $dataPenerimaanBarang->kemasan; ?></span></div>
+                </td> -->
             </tr>
         </table>
         <table class="item-table mt-050">

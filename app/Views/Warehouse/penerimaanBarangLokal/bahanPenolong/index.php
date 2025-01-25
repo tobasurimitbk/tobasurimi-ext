@@ -58,11 +58,11 @@
                                 <th>No.</th>
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
-                                <!-- <th>No. PO</th> -->
                                 <th>No SPP</th>
                                 <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
                                 <th onclick="changeSort('createdAt')">Tanggal</th>
                                 <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
+                                <th onclick="changeSort('metadata.value')" class="sort">Dokumen</th>
                                 <th>Jumlah Item</th>
                                 <th>Actions</th>
                             </tr>
@@ -169,6 +169,10 @@
             },
             {
                 data: "supplier_name",
+                className: "text-center"
+            },
+            {
+                data: "bc_type_name",
                 className: "text-center"
             },
             {

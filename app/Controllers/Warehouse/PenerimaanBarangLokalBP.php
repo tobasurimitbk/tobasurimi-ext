@@ -155,6 +155,7 @@ class PenerimaanBarangLokalBP extends BaseController
                 "bc_type"               => $data->bc_type,
                 "in_bc"                 => $bc_purchase_order_detail_list != null ? 'in' : 'out',
                 "retur_status"          => ($pengembalianBarang != null) ? ($pengembalianBarang['status_post'] == "WAITING" ? 0 : 1) : null,
+                "bc_type_name"          => $data->bc_type_name == null ? "NON PABEAN" : $data->bc_type_name
             ]);
         }
 
@@ -177,7 +178,7 @@ class PenerimaanBarangLokalBP extends BaseController
 
         $condition = [
             "penerimaan_barang.company_id" => $this->this_company_id,
-            "status_penerimaan" => "LOKAL",
+            "penerimaan_barang.status_penerimaan" => "LOKAL",
             "penerimaan_barang.deletedAt" => null,
             "penerimaan_barang_detail.deletedAt" => null,
             "tipe_bahan" => "PENOLONG"
@@ -199,18 +200,32 @@ class PenerimaanBarangLokalBP extends BaseController
         $no = 1;
 
         foreach ($penerimaanBarangData['data'] as $data) {
+            $multiSpp = $this->amPurchaseOrderModel->getSPP(json_decode($data->multiple_po_id));
+            $bc_purchase_order_detail_list = $this->bcPurchaseOrder->like('multiple_lpb_id', $data->id)->where('deletedAt', null)->findAll();
+            $pengembalianBarang = $this->pengembalianBarangModel->where('penerimaan_barang_id', $data->id)->first();
+
+            $sppNo = "";
+            foreach ($multiSpp as $s) {
+                $sppNo .= $s['spp_no'] . ", ";
+            }
+
             array_push($dataPenerimaanBarang, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
-                "divisi"                => $data->divisi,
                 "no_penerimaan_barang"  => $data->no_penerimaan_barang,
+                "divisi"                => $data->divisi,
                 "warehouse_name"        => $data->warehouse_name,
                 "tipe_bahan"            => $data->tipe_bahan,
-                "createdAt"             => $data->createdAt ? date("d/m/Y", strtotime($data->tanggal)) : "",
+                "createdAt"             => $data->tanggal ? date("d/m/Y", strtotime($data->tanggal)) : "",
                 "supplier_name"         => $data->supplier_name,
                 "itemCount"             => $data->itemCount,
+                "spp_no"                => $sppNo,
                 "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
                 "status_post"           => $data->status_post,
+                "bc_type"               => $data->bc_type,
+                "in_bc"                 => $bc_purchase_order_detail_list != null ? 'in' : 'out',
+                "retur_status"          => ($pengembalianBarang != null) ? ($pengembalianBarang['status_post'] == "WAITING" ? 0 : 1) : null,
+                "bc_type_name"          => $data->bc_type_name == null ? "NON PABEAN" : $data->bc_type_name
             ]);
         }
 
@@ -231,7 +246,7 @@ class PenerimaanBarangLokalBP extends BaseController
 
         $condition = [
             "penerimaan_barang.company_id" => $this->this_company_id,
-            "status_penerimaan" => "LOKAL",
+            "penerimaan_barang.status_penerimaan" => "LOKAL",
             "penerimaan_barang.deletedAt" => null,
             "penerimaan_barang_detail.deletedAt" => null,
             "tipe_bahan" => "PENOLONG"
@@ -253,14 +268,22 @@ class PenerimaanBarangLokalBP extends BaseController
         $no = 1;
 
         foreach ($penerimaanBarangData['data'] as $data) {
+            $multiSpp = $this->amPurchaseOrderModel->getSPP(json_decode($data->multiple_po_id));
+
+            $sppNo = "";
+            foreach ($multiSpp as $s) {
+                $sppNo .= $s['spp_no'] . ", ";
+            }
+
             array_push($dataPenerimaanBarang, [
                 "NO"                    => $no++,
                 "DEPARTEMEN"            => $data->divisi,
-                "NO PENERIMAAN BARANG"  => $data->no_penerimaan_barang,
-                "NO PO"                 => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
+                "NO PENERIMAAN"         => $data->no_penerimaan_barang,
+                "NO SPP"                => $sppNo,
                 "GUDANG"                => $data->warehouse_name,
-                "TANGGAL"               => $data->createdAt ? date("d/m/Y", strtotime($data->tanggal)) : "",
+                "TANGGAL"               => $data->tanggal ? date("d/m/Y", strtotime($data->tanggal)) : "",
                 "SUPPLIER"              => $data->supplier_name,
+                "DOKUMEN"               => $data->bc_type_name == null ? "NON PABEAN" : $data->bc_type_name,
                 "JUMLAH ITEM"           => $data->itemCount,
             ]);
         }
@@ -284,7 +307,7 @@ class PenerimaanBarangLokalBP extends BaseController
         } else {
             $header = array_keys($dataPenerimaanBarang[0]);
             $sheet->fromArray($header, null, 'A1');
-            $sheet->getStyle('A1:H1')->applyFromArray([
+            $sheet->getStyle('A1:I1')->applyFromArray([
                 'font' => [
                     'bold' => true,
                 ],
