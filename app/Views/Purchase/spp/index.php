@@ -49,7 +49,7 @@
                         <label for="floatingInput" class="l-spp-ptspp">Tipe SPP</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <!-- <div class="col-md-2">
                     <div class="form-floating spp-ptspp" style="height: 50px;">
                         <select class="form-select kategori spp_type form-out-search" name="spp_type" id="spp_type" aria-label="Floating label select example">
                             <option value="">PILIH TIPE SPP</option>
@@ -58,6 +58,17 @@
                             <?php endforeach; ?>
                         </select>
                         <label for="floatingInput" class="l-spp-ptspp">Tipe SPP</label>
+                    </div>
+                </div> -->
+                <div class="col-md-2">
+                    <div class="form-floating spp-ptspp" style="height: 50px;">
+                        <select class="form-select divisi_id form-out-search" name="divisi_id" id="divisi_id" aria-label="Floating label select example">
+                            <option value="">PILIH DEPARTEMEN</option>
+                            <?php foreach ($dataDivisi as $d) : ?>
+                                <option <?= (!empty($dataSPP) ? ($dataSPP->divisi_id == $d['value'] ? 'selected' : '') : '') ?> value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput" class="l-spp-ptspp"></label>
                     </div>
                 </div>
                 <div class="col mb-2">
@@ -121,6 +132,7 @@
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
                 data.is_posted = $(".is_posted").val();
+                data.divisi_id = $('.divisi_id').val();
                 data.sort = sort;
                 data.sortType = sortType;
             },
@@ -284,7 +296,7 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd, .is_posted").change(function() {
+        $(".dateStart, .dateEnd, .is_posted, .divisi_id").change(function() {
             table.ajax.reload();
         })
 
