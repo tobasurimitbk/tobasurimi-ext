@@ -20,6 +20,7 @@ class TandaTerimaFakturModel extends Model
         'supplier_id',
         'divisi_id',
         'faktur_no',
+        'faktur_keluar_no',
         'jatuh_tempo',
         'nominal_faktur',
         'invoice_date',
@@ -281,6 +282,35 @@ class TandaTerimaFakturModel extends Model
         $lastData = $tandaTerimaFakturModel->asObject()
             ->where('company_id', session()->get("login")->this_company_id)
             ->like('faktur_no', $numberTemplate, 'before')
+            ->orderBy('createdAt', 'DESC')
+            ->first();
+
+        $invNumber = '001' . $numberTemplate;
+
+        if (!empty($lastData)) {
+            $asd = explode('/', $lastData->faktur_no);
+            $lastIncrement = intval($asd[0]) + 1;
+            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+
+            $invNumber = $paddedNumber . $numberTemplate;
+        }
+
+        return $invNumber;
+    }
+
+
+    public function getNoKeluar()
+    {
+        $tandaTerimaFakturModel = new TandaTerimaFakturModel();
+
+        $month = idate('m');
+        $year = date('y');
+        $romanMonth = romanMonthNumber($month);
+        $numberTemplate = "/TT/$romanMonth/$year";
+
+        $lastData = $tandaTerimaFakturModel->asObject()
+            ->where('company_id', session()->get("login")->this_company_id)
+            ->like('faktur_keluar_no', $numberTemplate, 'before')
             ->orderBy('createdAt', 'DESC')
             ->first();
 

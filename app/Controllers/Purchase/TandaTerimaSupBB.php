@@ -159,6 +159,7 @@ class TandaTerimaSupBB extends BaseController
         $data = [
             'dataSupplier' => $this->supplierModel->getSupplierByType("BAHAN PENOLONG"),
             'noTandaTerima' => $this->tandaTerimaFakturModel->getNo(),
+            'noTandaKeluar' => $this->tandaTerimaFakturModel->getNoKeluar(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
             'isUsed' => false
         ];
@@ -176,6 +177,7 @@ class TandaTerimaSupBB extends BaseController
 
         $data = [
             'dataSupplier' => $this->supplierModel->getSupplierByType("BAHAN PENOLONG"),
+            'dataTandaTerimaFaktur' => $this->tandaTerimaFakturModel->find($id),
             'dataTandaTerimaFaktur' => $this->tandaTerimaFakturModel->find($id),
             'dataDetailTandaTerimaFaktur' => $this->tandaTerimaFakturDetailModel->getDetail($id),
             'dataPajak' => $this->pajakTandaTerimaFakturModel->where('tanda_terima_faktur_id', $id)->where('deletedAt', null)->findAll(),
@@ -206,6 +208,7 @@ class TandaTerimaSupBB extends BaseController
             'divisi_id' => $dataListPenerimaanBarang[0]->divisi_id,
             'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : date('Y-m-d'),
             'faktur_no' => $this->request->getVar('no_tanda_terima_faktur'),
+            'faktur_keluar_no' => $this->request->getVar('no_tanda_keluar_faktur'),
             'nominal_faktur' => $this->request->getVar('total_tambahan_potongan'),
             'invoice_date' => date('Y-m-d'),
             'receive_date' => $this->request->getVar("tanggal_terima") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_terima")), "Y-m-d") : "",
@@ -263,6 +266,10 @@ class TandaTerimaSupBB extends BaseController
         $dataListPenerimaanBarang = json_decode($_POST['listPenerimaanBarang']);
 
         $this->tandaTerimaFakturModel->update($id, [
+            'supplier_id' => $dataListPenerimaanBarang[0]->supplier_id,
+            'divisi_id' => $dataListPenerimaanBarang[0]->divisi_id,
+            'faktur_no' => $this->request->getVar('no_tanda_terima_faktur'),
+            'faktur_keluar_no' => $this->request->getVar('no_tanda_keluar_faktur'),
             'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : "",
             'nominal_faktur' => $this->request->getVar('total_tambahan_potongan'),
             'invoice_date' => date('Y-m-d'),
@@ -402,6 +409,7 @@ class TandaTerimaSupBB extends BaseController
 
         $data["data"] = $dataInv;
         $data['invNo'] = $dataInv->faktur_no;
+        $data['invKeluarNo'] = $dataInv->faktur_keluar_no;
         $data["lpbNo"] = implode(', ', $noList);
         $data["itemName"] = implode(', ', $itemsList);
         $data['taxList'] = implode(', ', $taxList);
@@ -418,8 +426,6 @@ class TandaTerimaSupBB extends BaseController
         $data['taxData'] = $taxData;
 
         // dd($data['taxData']);
-        // var_dump($data);
-        // die;
 
         $this->dompdf->loadHtml(view('Purchase/terimaSupplierLokal/bp/print', $data));
         $this->dompdf->setPaper('A5', 'landscape');
@@ -465,6 +471,37 @@ class TandaTerimaSupBB extends BaseController
         $lastData = $tandaTerimaFakturModel->asObject()
             ->where('company_id', $this->this_company_id)
             ->like('faktur_no', $numberTemplate, 'before')
+            ->orderBy('createdAt', 'DESC')
+            ->first();
+
+        $invNumber = '001' . $numberTemplate;
+
+        if (!empty($lastData)) {
+            $asd = explode('/', $lastData->faktur_no);
+            $lastIncrement = intval($asd[0]) + 1;
+            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+
+            $invNumber = $paddedNumber . $numberTemplate;
+        }
+
+        return response()->setJSON([
+            'data' => $invNumber,
+            'status' => true
+        ]);
+    }
+
+    public function generateTandaKeluarFakturNumber()
+    {
+        $tandaTerimaFakturModel = new TandaTerimaFakturModel();
+
+        $month = idate('m');
+        $year = date('y');
+        $romanMonth = romanMonthNumber($month);
+        $numberTemplate = "/TT/$romanMonth/$year";
+
+        $lastData = $tandaTerimaFakturModel->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->like('faktur_keluar_no', $numberTemplate, 'before')
             ->orderBy('createdAt', 'DESC')
             ->first();
 
