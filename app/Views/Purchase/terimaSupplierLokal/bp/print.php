@@ -100,7 +100,7 @@
 
 <body style="border: 0px solid;font-size: 11px;">
 
-    <div style="margin: 25px; padding: 25px" class="<?= empty($taxReturnList) ? 'pagebreak' : '' ?>">
+    <div style="margin: 25px; padding: 25px" class="<?= !empty($taxReturnList) ? 'pagebreak' : '' ?>">
         <table class="w-100">
             <tr>
                 <td>
@@ -242,7 +242,7 @@
         </table>
     </div>  
 
-    <?php if (empty($taxReturnList)) { ?>
+    <?php if (!empty($taxReturnList)) { ?>
          <div style="background-color: #ffe4e1; padding: 1rem; border: 1px solid #ffb6c1; height: 93.2%">
             <div style="padding: 25px; margin: 25px;">
             <table class="w-100">
