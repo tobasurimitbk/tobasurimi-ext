@@ -73,7 +73,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker po_date" id="po_date" name="po_date" placeholder="Tanggal Dibuat" <?= !empty($poDetail) ?  'readonly value="' . formatYMDtoDMY($poDetail['po_date']) . '"' : 'value="' . formatYMDtoDMY($today) . '"' ?>>
+                                    <input autocomplete="one-time-code" class="form-control input-picker po_date" <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'readonly' : '') : ''  ?> id="po_date" name="po_date" placeholder="Tanggal Dibuat" <?= !empty($poDetail) ? 'value="' . formatYMDtoDMY($poDetail['po_date']) . '"' : 'value="' . formatYMDtoDMY($today) . '"' ?>>
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -260,10 +260,19 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="number" class="form-control qty" name="qty" id="qty" placeholder="Qty">
+                        <div class="form-floating" style="height: 50px;">
+                            <input <?= isset($checkLpb) ? ($checkLpb != null ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="number" class="form-control qty" name="qty" id="qty" placeholder="Qty">
                             <label for="floatingInput">QTY</label>
                         </div>
+                        <?php if (isset($checkLpb)): ?>
+                            <?php if ($checkLpb != null) : ?>
+                                <small>
+                                    <i>
+                                        PO Sudah dibuatkan LPB dengan nomor <b><?= $checkLpb['no_penerimaan_barang'] ?></b>, sehingga anda hanya diizinkan update harga saja
+                                    </i>
+                                </small>
+                            <?php endif; ?>
+                        <?php endif; ?>
                     </div>
 
                 </div>
@@ -936,9 +945,12 @@
                         `
                             <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.spesifikasi_id}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                            </button><button class="btn btn-danger" onclick="deleteRow('${v.spesifikasi_id}')">
+                            </button>
+                            <?php if ($checkLpb == null) : ?>
+                            <button class="btn btn-danger" onclick="deleteRow('${v.spesifikasi_id}')">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
+                            <?php endif ?>
                         `
                     ));
                 <?php else : ?>

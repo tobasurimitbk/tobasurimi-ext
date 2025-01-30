@@ -13,6 +13,7 @@ use App\Models\SppModel;
 use App\Models\MetadataModel;
 use App\Models\DivisisModel;
 use App\Models\CompaniesModel;
+use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\SatuansModel;
 use App\Models\SppDetailModel;
@@ -40,6 +41,7 @@ class POLokalBahanPenolong extends BaseController
     protected $sppModel;
     protected $sppDetailModel;
     protected $accountBarangModel;
+    protected $penerimaanBarangDetailModel;
 
     protected $jurnalController;
 
@@ -65,6 +67,7 @@ class POLokalBahanPenolong extends BaseController
         $this->sppModel = new SppModel();
         $this->sppDetailModel = new SppDetailModel();
         $this->accountBarangModel = new AccountBarangModel();
+        $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
     }
 
     public function poLokalBahanPenolong()
@@ -231,7 +234,7 @@ class POLokalBahanPenolong extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($poData['data'] as $data) {
-            $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "PENOLONG")->where('status_penerimaan', "LOKAL")->like('multiple_po_id', $data->id)->first();
+            $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "PENOLONG")->where('status_penerimaan', "LOKAL")->where('status_post', "FINISH")->where('company_id', $this->this_company_id)->like('multiple_po_id', $data->id)->first();
 
             array_push($dataPOLokal, [
                 "no"            => $no++,
@@ -308,6 +311,8 @@ class POLokalBahanPenolong extends BaseController
             ->where($amPurchaseOrderDetailCondition)
             ->findAll();
 
+        $checkLpb = $this->penerimaanBarangModel->where('tipe_bahan', "PENOLONG")->where('status_penerimaan', "LOKAL")->where('company_id', $this->this_company_id)->like('multiple_po_id', $id)->first();
+
         if ($poDetail == null) {
             return redirect()->to('po-lokal-bahan-penolong');
         }
@@ -329,7 +334,8 @@ class POLokalBahanPenolong extends BaseController
             "pph" => $this->taxModel->getTaxByType("pph"),
             "poDetail" => $poDetail,
             "unPosting" => $unPostingCheck == null ? 0 : 1,
-            "listBarang" => $listBarang
+            "listBarang" => $listBarang,
+            'checkLpb' => $checkLpb // Cek apakah PO sudah dibuat LPB atau belum, jika sudah hanya diizinkan update harga aja jika belum bisa update qty
 
         ];
 
@@ -374,6 +380,7 @@ class POLokalBahanPenolong extends BaseController
 
         $dataAmPurchaseOrderData = [
             'po_no' => $noPoNew,
+            'po_date' => formatDMYtoYMD($this->request->getVar('poDate')),
             'payment_date' => formatDMYtoYMD($this->request->getVar('paymentDate')),
             'po_type' => "Lokal",
             'purchase_request_id' => !empty($this->request->getVar('spp_id')) ? $this->request->getVar('spp_id') : $firstData['purchase_request_id'],
@@ -459,6 +466,45 @@ class POLokalBahanPenolong extends BaseController
             }
         }
 
+        // Auto Update Harga di LPB
+        $penerimaanBarang = $this->penerimaanBarangModel
+            ->where('penerimaan_barang.deletedAt', null)
+            ->where('tipe_bahan', "PENOLONG")
+            ->where('status_penerimaan', "LOKAL")
+            ->where('company_id', $this->this_company_id)
+            ->like('multiple_po_id', $id)
+            ->findAll();
+        $penerimaanBarangIds = array();
+        foreach ($penerimaanBarang as $p) {
+            array_push($penerimaanBarangIds, $p['id']);
+        }
+
+        if (count($penerimaanBarangIds) != 0) {
+
+            $poDetail = $this->aMPurchaseOrderDetailModel
+                ->where('am_purchase_order_details.deletedAt', null)
+                ->where('am_purchase_order_details.am_purchase_order_id', $id)
+                ->findAll();
+
+            foreach ($poDetail as $p) {
+
+                // PO SUDAH DIBUATKAN LPB NYA
+                $penerimaanBarangDetail = $this->penerimaanBarangDetailModel
+                    ->whereIn('penerimaan_barang_id', $penerimaanBarangIds)
+                    ->where('purchase_order_id', $p['am_purchase_order_id'])
+                    ->where('purchase_order_details_id', $p['id'])
+                    ->where('penerimaan_barang_detail.deletedAt', null)
+                    ->findAll();
+
+                foreach ($penerimaanBarangDetail as $pbd) {
+                    $this->penerimaanBarangDetailModel->update($pbd['id'], [
+                        'harga' => $p['price'],
+                        'sub_total' => ($p['price'] * $pbd['jml_masuk_konversi']),
+                    ]);
+                }
+            }
+        }
+
         $this->aMPurchaseOrderDetailModel
             ->where('am_purchase_order_id', $id)
             ->whereNotIn('id', $id_detail_all)
@@ -518,6 +564,15 @@ class POLokalBahanPenolong extends BaseController
         $id = decrypt($this->request->getVar("id"));
 
         $firstData = $this->aMPurchaseOrderModel->find($id);
+        $checkLpb = $this->penerimaanBarangModel->where('tipe_bahan', "PENOLONG")->where('status_penerimaan', "LOKAL")->where('company_id', $this->this_company_id)->like('multiple_po_id', $firstData['id'])->first();
+
+        if ($checkLpb != null) {
+            return response()->setJSON([
+                'message' => "Gagal Hapus, PO Sudah Dibuatkan LPB dengan Nomor : " . $checkLpb['no_penerimaan_barang'],
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
 
         $this->sppModel->update($firstData['purchase_request_id'], [
             'request_status' => 'waiting'

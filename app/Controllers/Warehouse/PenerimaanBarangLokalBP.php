@@ -661,6 +661,22 @@ class PenerimaanBarangLokalBP extends BaseController
             $penerimaanBarang = $this->penerimaanBarangModel->where('id', $id)->first();
             $penerimaanBarangList = $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();
 
+            foreach (json_decode($penerimaanBarang['multiple_po_id']) as $p) {
+                $amPurchaseOrder = $this->amPurchaseOrderModel
+                    ->select('am_purchase_orders.*,purchase_requests.spp_no')
+                    ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
+                    ->where('am_purchase_orders.id', $p)
+                    ->first();
+                if ($amPurchaseOrder['is_posted'] == 0) {
+                    return response()->setJSON([
+                        'status' => false,
+                        'message' => "Purchase Order dengan nomor SPP : " . $amPurchaseOrder['spp_no'] . ", dengan nomor PO : " . $amPurchaseOrder['po_no'] . " Belum Diposting",
+                        'token' => csrf_hash()
+                    ]);
+                    break;
+                }
+            }
+
             $multiple_po_id = json_decode($penerimaanBarang['multiple_po_id']);
             foreach ($multiple_po_id as $key => $value) {
                 $result = $this->jurnalUmumController->insertDataPembelian($value, "BAHAN " . $penerimaanBarang['tipe_bahan'], $penerimaanBarang['status_penerimaan'], "pembelian");
