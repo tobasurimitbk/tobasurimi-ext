@@ -674,8 +674,9 @@ class POLokalBahanBaku extends BaseController
                 $dataPO->totalDailyPaid = number_format(($totalDailyPrice + $totalDailyPrice * $pphTax), 2, '.', ',');
                 $dataPO->amount = terbilang($totalPrice);
                 $dataPO->amountDaily = terbilang($totalDailyPrice);
-                $dataPO->selisih = ($dataPO->cong_batasan ? formatter($dataPO->cong_batasan, "STR_TO_FLOAT") : 0) - ($dataPO->cong_sebenarnya ? formatter($dataPO->cong_sebenarnya, "STR_TO_FLOAT") : 0);
-                $dataPO->totalTambahan = $dataPO->selisih * $totalQty;
+                // $dataPO->selisih = ($dataPO->cong_batasan ? formatter($dataPO->cong_batasan, "STR_TO_FLOAT") : 0) - ($dataPO->cong_sebenarnya ? formatter($dataPO->cong_sebenarnya, "STR_TO_FLOAT") : 0);
+                $dataPO->selisih = $dataPO->subsidi_langsung / $dataPO->nilai_pph;
+                $dataPO->totalTambahan = $dataPO->selisih;
                 $dataPO->pphTambahan = $dataPO->totalTambahan;
 
                 if ($dataPODetail) {

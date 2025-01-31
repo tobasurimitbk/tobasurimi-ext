@@ -584,132 +584,113 @@
             </table>
 
             <?php if ($dataPO->pph === "Company") { ?>
-    <table class="cong-table item-table txt-right">
-        <tr>
-            <th>QTY</th>
-            <th>CONG SEBENARNYA</th>
-            <th>CONG BATASAN</th>
-            <th>SELISIH</th>
-            <th>TOTAL TAMBAHAN</th>
-        </tr>
-        <tr>
-            <td><?= htmlspecialchars($dataPO->totalQty ?? 0) ?></td>
-            <td><?= htmlspecialchars($dataPO->cong_sebenarnya ?? 0) ?></td>
-            <td><?= htmlspecialchars($dataPO->cong_batasan ?? 0) ?></td>
-            <td><?= htmlspecialchars($dataPO->selisih ?? 0) ?></td>
-            <td><?= number_format($dataPO->totalTambahan ?? 0, 2, '.', ',') ?></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>TAMBAHAN LANGSUNG</td>
-            <td><?= number_format($dataPO->subsidi_langsung ?? 0, 2, '.', ',') ?></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>PPH</td>
-            <td><?= number_format(($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0), 2, '.', ',') ?></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>DIBAYARKAN</td>
-            <td><?= number_format(
-                ($dataPO->totalTambahan ?? 0) + ($dataPO->subsidi_langsung ?? 0) - (($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0)),
-                2,
-                '.',
-                ','
-            ) ?></td>
-        </tr>
-    </table>
-<?php } elseif ($dataPO->pph === "Supplier") { ?>
-    <table class="cong-table item-table txt-right">
-        <tr>
-            <th>QTY</th>
-            <th>CONG SEBENARNYA</th>
-            <th>CONG BATASAN</th>
-            <th>SELISIH</th>
-            <th>TOTAL TAMBAHAN</th>
-        </tr>
-        <tr>
-            <td><?= htmlspecialchars($dataPO->totalQty ?? 0) ?></td>
-            <td><?= htmlspecialchars($dataPO->cong_sebenarnya ?? 0) ?></td>
-            <td><?= htmlspecialchars($dataPO->cong_batasan ?? 0) ?></td>
-            <td><?= htmlspecialchars($dataPO->selisih ?? 0) ?></td>
-            <td><?= number_format(
-                ($dataPO->totalTambahan ?? 0) + ($dataPO->subsidi_langsung ?? 0) - (($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0)),
-                2,
-                '.',
-                ','
-            ) ?></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>TAMBAHAN LANGSUNG</td>
-            <td><?= number_format($dataPO->subsidi_langsung ?? 0, 2, '.', ',') ?></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>PPH</td>
-            <td><?= number_format(($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0), 2, '.', ',') ?></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>DIBAYARKAN</td>
-            <td><?= number_format($dataPO->totalTambahan ?? 0, 2, '.', ',') ?></td>
-        </tr>
-    </table>
-<?php } else { ?>
-    <table class="cong-table item-table txt-right">
-        <tr>
-            <th>QTY</th>
-            <th>CONG SEBENARNYA</th>
-            <th>CONG BATASAN</th>
-            <th>SELISIH</th>
-            <th>TOTAL TAMBAHAN</th>
-        </tr>
-        <tr>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>000</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>TAMBAHAN LANGSUNG</td>
-            <td>000</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>PPH</td>
-            <td>000</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>DIBAYARKAN</td>
-            <td>000</td>
-        </tr>
-    </table>
-<?php } ?>
+                <table class="cong-table item-table txt-right">
+                    <tr>
+                        <th>QTY</th>
+                        <th>CONG SEBENARNYA</th>
+                        <th>CONG BATASAN</th>
+                        <th>SELISIH</th>
+                        <th>TOTAL TAMBAHAN</th>
+                    </tr>
+                    <tr>
+                        <td><?= htmlspecialchars($dataPO->totalQty ?? 0) ?></td>
+                        <td><?= htmlspecialchars($dataPO->cong_sebenarnya ?? 0) ?></td>
+                        <td><?= htmlspecialchars($dataPO->cong_batasan ?? 0) ?></td>
+                        <td><?= number_format($dataPO->selisih ?? 0, 2, '.', ',') ?></td>
+                        <td><?= number_format($dataPO->totalTambahan ?? 0, 2, '.', ',') ?></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>PPH</td>
+                        <td><?= number_format(($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0), 2, '.', ',') ?></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>DIBAYARKAN</td>
+                        <td><?= number_format(
+                                ($dataPO->totalTambahan ?? 0)  - (($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0)),
+                                2,
+                                '.',
+                                ','
+                            ) ?></td>
+                    </tr>
+                </table>
+            <?php } elseif ($dataPO->pph === "Supplier") { ?>
+                <table class="cong-table item-table txt-right">
+                    <tr>
+                        <th>QTY</th>
+                        <th>CONG SEBENARNYA</th>
+                        <th>CONG BATASAN</th>
+                        <th>SELISIH</th>
+                        <th>TOTAL TAMBAHAN</th>
+                    </tr>
+                    <tr>
+                        <td><?= htmlspecialchars($dataPO->totalQty ?? 0) ?></td>
+                        <td><?= htmlspecialchars($dataPO->cong_sebenarnya ?? 0) ?></td>
+                        <td><?= htmlspecialchars($dataPO->cong_batasan ?? 0) ?></td>
+                        <td><?= number_format($dataPO->selisih ?? 0, 2, '.', ',') ?></td>
+                        <td><?= number_format($dataPO->totalTambahan ?? 0, 2, '.', ',') ?></td>
+                    </tr>
 
-           
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>PPH</td>
+                        <td><?= number_format(($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0), 2, '.', ',') ?></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>DIBAYARKAN</td>
+                        <td><?= number_format(
+                                ($dataPO->totalTambahan ?? 0)  - (($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0)),
+                                2,
+                                '.',
+                                ','
+                            ) ?></td>
+                    </tr>
+                </table>
+            <?php } else { ?>
+                <table class="cong-table item-table txt-right">
+                    <tr>
+                        <th>QTY</th>
+                        <th>CONG SEBENARNYA</th>
+                        <th>CONG BATASAN</th>
+                        <th>SELISIH</th>
+                        <th>TOTAL TAMBAHAN</th>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>000</td>
+                    </tr>
+
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>PPH</td>
+                        <td>000</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>DIBAYARKAN</td>
+                        <td>000</td>
+                    </tr>
+                </table>
+            <?php } ?>
+
+
             <table class="w-100 sign-table border-collapse signed-info footer mt-3">
                 <tr>
                     <th>
