@@ -209,8 +209,23 @@ class POLokalBahanBaku extends BaseController
             $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "BAKU")->where('status_penerimaan', "LOKAL")->like('multiple_po_id', $data->id)->first();
 
             $totalHarga = 0;
+            $totalQty = 0;
             foreach ($detailPurchase as $d) {
                 $totalHarga += ($d['general_price'] + $d['daily_price'] + $d['monthly_price']) * $d['qty'];
+                $totalQty += $d['qty'];
+            }
+
+            $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
+            $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.005;
+            $selisih =  ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung);
+            $totalTambahan = ($selisih * $totalQty) - (($selisih * $totalQty) * $nilaiPph2);
+
+            if ($data->pph == "Company") {
+                $selisih = ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung) / $nilaiPph;
+                $totalTambahan = $selisih;
+            } else {
+                $selisih =  ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung);
+                $totalTambahan = ($selisih * $totalQty) - (($selisih * $totalQty) * $nilaiPph2);
             }
 
             array_push($dataPOLokal, [
@@ -222,8 +237,9 @@ class POLokalBahanBaku extends BaseController
                 "companyName"   => $data->companyName,
                 "supplierName"  => $data->supplierName,
                 "itemCount"     => $data->itemCount,
-                "total"         => "" . number_format(formatter($totalHarga + $data->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ','),
+                "total"         => "" . number_format(formatter($totalHarga + $totalTambahan, "STR_TO_FLOAT"), 2, '.', ','),
                 "is_posted"     => $data->is_posted,
+                "harga_sum"     => $totalHarga,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
                 "un_posting" => $unPostingCheck == null ? 0 : 1,
             ]);
@@ -674,9 +690,16 @@ class POLokalBahanBaku extends BaseController
                 $dataPO->totalDailyPaid = number_format(($totalDailyPrice + $totalDailyPrice * $pphTax), 2, '.', ',');
                 $dataPO->amount = terbilang($totalPrice);
                 $dataPO->amountDaily = terbilang($totalDailyPrice);
-                // $dataPO->selisih = ($dataPO->cong_batasan ? formatter($dataPO->cong_batasan, "STR_TO_FLOAT") : 0) - ($dataPO->cong_sebenarnya ? formatter($dataPO->cong_sebenarnya, "STR_TO_FLOAT") : 0);
-                $dataPO->selisih = $dataPO->subsidi_langsung / $dataPO->nilai_pph;
-                $dataPO->totalTambahan = $dataPO->selisih;
+                if ($dataPO->pph == "Company") {
+                    $dataPO->selisih = (($dataPO->cong_batasan ? $dataPO->cong_batasan : 0) - ($dataPO->cong_sebenarnya ? $dataPO->cong_sebenarnya : 0) + $dataPO->subsidi_langsung) / $dataPO->nilai_pph;
+                    $dataPO->totalTambahan = $dataPO->selisih;
+                } else {
+                    $dataPO->selisih = (($dataPO->cong_batasan ? $dataPO->cong_batasan : 0) - ($dataPO->cong_sebenarnya ? $dataPO->cong_sebenarnya : 0) + $dataPO->subsidi_langsung);
+                    $dataPO->totalTambahan = ($dataPO->selisih * $totalQty);
+                }
+                // dd($dataPO->selisih, $dataPO->cong_batasan, $dataPO->cong_sebenarnya);
+                // $dataPO->selisih = $dataPO->subsidi_langsung / $dataPO->nilai_pph;
+                // dd($dataPO->totalTambahan, $dataPO->selisih, $dataPO->totalQty,  $dataPO->nilai_pph2);
                 $dataPO->pphTambahan = $dataPO->totalTambahan;
 
                 if ($dataPODetail) {

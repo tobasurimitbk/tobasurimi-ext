@@ -594,8 +594,8 @@
                     </tr>
                     <tr>
                         <td><?= htmlspecialchars($dataPO->totalQty ?? 0) ?></td>
-                        <td><?= htmlspecialchars($dataPO->cong_sebenarnya ?? 0) ?></td>
-                        <td><?= htmlspecialchars($dataPO->cong_batasan ?? 0) ?></td>
+                        <td><?= number_format($dataPO->cong_sebenarnya ?? 0, 2, '.', ',') ?></td>
+                        <td><?= number_format($dataPO->cong_batasan ?? 0, 2, '.', ',') ?></td>
                         <td><?= number_format($dataPO->selisih ?? 0, 2, '.', ',') ?></td>
                         <td><?= number_format($dataPO->totalTambahan ?? 0, 2, '.', ',') ?></td>
                     </tr>
@@ -630,8 +630,8 @@
                     </tr>
                     <tr>
                         <td><?= htmlspecialchars($dataPO->totalQty ?? 0) ?></td>
-                        <td><?= htmlspecialchars($dataPO->cong_sebenarnya ?? 0) ?></td>
-                        <td><?= htmlspecialchars($dataPO->cong_batasan ?? 0) ?></td>
+                        <td><?= number_format($dataPO->cong_sebenarnya ?? 0, 2, '.', ',') ?></td>
+                        <td><?= number_format($dataPO->cong_batasan ?? 0, 2, '.', ',') ?></td>
                         <td><?= number_format($dataPO->selisih ?? 0, 2, '.', ',') ?></td>
                         <td><?= number_format($dataPO->totalTambahan ?? 0, 2, '.', ',') ?></td>
                     </tr>
