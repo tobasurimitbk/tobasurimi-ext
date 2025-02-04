@@ -823,7 +823,7 @@ class POLokalBahanPenolong extends BaseController
                     'nama_barang' => $s['barang_name'] . " " . $s['spesifikasi'],
                     'satuan_id' => $s['unit'],
                     'nama_satuan' => $s['kode_satuan'],
-                    'harga_satuan' => ($hargaTerakhir['hargaTerakhirNumber']),
+                    'harga_satuan' => round($hargaTerakhir['hargaTerakhirNumber'], 2),
                     'qty' => $totalQtySisa,
                     'diskon' => '0',
                     'biaya_tambahan' => '0',
