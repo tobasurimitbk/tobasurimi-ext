@@ -530,6 +530,48 @@ class OrderForm extends BaseController
         return;
     }
 
+    public function updateRemark()
+    {
+        try {
+            $id = $this->request->getPost("id");
+            $remark = $this->request->getPost("remark");
+           
+
+            $payload = [
+                "remark" => $remark,
+            ];
+
+            $response = $this->salesOrderExportDetailModel->update($id, $payload);
+
+            if ($response) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Berhasil Ubah Remark",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = "Gagal Ubah Remark";
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } catch (\Exception $e) {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
     public function print($id = null)
     {
         $id = decrypt($id);

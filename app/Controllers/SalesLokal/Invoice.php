@@ -81,7 +81,7 @@ class Invoice extends BaseController
     {
         //Get Customers
         // $customers = $this->CustomerModel->asObject()->select(['id', 'name'])->where('company_id', $this->this_company_id)->findAll();
-        $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
+        $customers = $this->CustomerModel->getCustomerLokal($this->userId);
         $tipeShipping = $this->MetadataModel->asObject()->select(['id', 'value'])->where('name', 'tipe_shipping_via')->findAll();
         // $noFaktur = $this->getNomorFaktur();
         $taxData = $this->taxModel->getTaxByType('ppn');
@@ -114,13 +114,13 @@ class Invoice extends BaseController
 
         if ($this->is_admin == '1') {
             $condition = [
-                "sales_order_invoice.id_company"    => $this->this_company_id,
+                // "sales_order_invoice.id_company"    => $this->this_company_id,
                 "sales_order_invoice.deletedAt" => null,
                 "sales_order_invoice.tipe_invoice" => 'LOKAL',
             ];
         } else {
             $condition = [
-                "sales_order_invoice.id_company"    => $this->this_company_id,
+                // "sales_order_invoice.id_company"    => $this->this_company_id,
                 "sales_order_invoice.deletedAt" => null,
                 "sales_order_invoice.tipe_invoice" => 'LOKAL',
                 "sales_order_invoice.id_user" => $this->userId
@@ -256,7 +256,7 @@ class Invoice extends BaseController
             $postItemsData = json_decode($this->request->getPost('items'), true);
             $documentData = null;
 
-            $checkINV = $this->SalesOrderInvoiceModel->where('id_company', $this->this_company_id)->where('UPPER(no_faktur)', strtoupper($postData['no_faktur']))->findAll();
+            $checkINV = $this->SalesOrderInvoiceModel->where('UPPER(no_faktur)', strtoupper($postData['no_faktur']))->findAll();
             if ($checkINV) {
                 $data = [
                     "status"    => false,
@@ -291,7 +291,9 @@ class Invoice extends BaseController
                 "status_tax"        => $this->request->getPost('tax_status') ? 'true' : 'false',
                 "tipe_invoice"      => 'LOKAL',
                 "status_pelunasan"  => 'UNPAID',
-                "id_company"        => $this->this_company_id,
+                "id_company"        => ($this->this_company_id != 16) 
+                                        ? $this->request->getPost('company_id') 
+                                        : $this->this_company_id,
                 "tax_id"            => $this->request->getPost('taxes'),
                 "tax_value"         => ($tax = $this->taxModel->find($this->request->getPost('taxes'))) ? $tax['tax_value'] : null,
             ];
@@ -471,10 +473,10 @@ class Invoice extends BaseController
 
 
 
-        $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur($this->this_company_id);
+        $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur();
 
         // $customers = $this->CustomerModel->asObject()->select(['id', 'name'])->where('company_id', $this->this_company_id)->findAll();
-        $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
+        $customers = $this->CustomerModel->getCustomerLokal($this->userId);
 
 
         // var_dump($documentData);
@@ -999,7 +1001,7 @@ class Invoice extends BaseController
                 ->where('sales_order.id_customer', $customer_id)
                 ->where('sales_order.surat_jalan_so_id', NULL)
                 ->where('sales_order_detail.qty_sekarang !=', 0)
-                ->where('sales_order.id_company', $this->this_company_id)
+                // ->where('sales_order.id_company', $this->this_company_id)
                 ->groupBy('sales_order.no_sales_order');
         } else { // pengiriman
             $documentList = $this->SuratJalanModel->asObject()
@@ -1008,7 +1010,7 @@ class Invoice extends BaseController
                 ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
                 ->where('sales_order.id_customer', $customer_id)
                 ->where('sales_order_detail.qty_sekarang !=', 0)
-                ->where('sales_order.id_company', $this->this_company_id)
+                // ->where('sales_order.id_company', $this->this_company_id)
                 ->groupBy('surat_jalan_so.no_surat_jalan');
         }
 
@@ -1341,7 +1343,7 @@ class Invoice extends BaseController
         $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
 
         $lastData = $this->SalesOrderInvoiceModel->asObject()
-            ->where('id_company', $this->this_company_id)
+            // ->where('id_company', $this->this_company_id)
             ->like('no_faktur', $numberTemplate)
             ->orderBy('createdAt', 'DESC')
             ->first();
@@ -1384,7 +1386,7 @@ class Invoice extends BaseController
             ->select('sales_order_return_detail.stock_dokumen as stock_dokumen')
             ->where('type_barang_sales', 'LOKAL')
             ->where('barang_master_sales.deletedAt', null)
-            ->where('barang_master_sales.company_id', $this->this_company_id)
+            // ->where('barang_master_sales.company_id', $this->this_company_id)
             ->where('sales_order_return.is_approved', 1)
             ->groupBy('id_barang')
             ->findAll();

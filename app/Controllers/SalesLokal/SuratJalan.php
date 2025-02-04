@@ -62,7 +62,7 @@ class SuratJalan extends BaseController
     public function createView()
     {
         //Get Customers
-        $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
+        $customers = $this->CustomerModel->getCustomerLokal($this->userId);
 
 
 
@@ -94,12 +94,12 @@ class SuratJalan extends BaseController
         if ($this->is_admin == '1') {
             $condition = [
                 "surat_jalan_so.deletedAt" => null,
-                "surat_jalan_so.id_company" => $this->this_company_id,
+                // "surat_jalan_so.id_company" => $this->this_company_id,
             ];
         } else {
             $condition = [
                 "surat_jalan_so.deletedAt" => null,
-                "surat_jalan_so.id_company" => $this->this_company_id,
+                // "surat_jalan_so.id_company" => $this->this_company_id,
                 'surat_jalan_so.id_user' => $this->userId
             ];
         }
@@ -255,9 +255,11 @@ class SuratJalan extends BaseController
                 "note"          => $this->request->getPost('note'),
                 'multiple_id_so' => json_encode($idArray),
                 'multiple_no_so' => json_encode($noArray),
-                "id_company"     => $this->this_company_id,
+                "id_company"    => ($this->this_company_id != 16) 
+                                ? $this->request->getPost('company_id') 
+                                : $this->this_company_id,
             ];
-            $checkSJ = $this->SuratJalanModel->where('id_company', $this->this_company_id)->where('UPPER(no_surat_jalan)', strtoupper($this->request->getVar('no_surat_jalan')))->findAll();
+            $checkSJ = $this->SuratJalanModel->where('UPPER(no_surat_jalan)', strtoupper($this->request->getVar('no_surat_jalan')))->findAll();
             if ($checkSJ) {
                 $data = [
                     "status"    => false,
@@ -309,13 +311,13 @@ class SuratJalan extends BaseController
             return view('errors/html/error_404', ['message' => 'Not Found']);
         }
 
-        $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
+        $customers = $this->CustomerModel->getCustomerLokal($this->userId);
 
         $dataSuratJalan->shipping_date = date("m/d/Y", strtotime($dataSuratJalan->shipping_date));
         $dataSo = $this->SalesOrderModel
             ->asObject()
             ->where(['id_customer' => $dataSuratJalan->id_customer, 'tipe_sales_order' => 'LOKAL', 'deletedAt' => null])
-            ->where('id_company', $this->this_company_id)
+            // ->where('id_company', $this->this_company_id)
             ->select(['id', 'no_sales_order'])
             ->findAll();
 
@@ -498,7 +500,7 @@ class SuratJalan extends BaseController
         $condition = [
             'id_customer'               => $idCustomer,
             'tipe_sales_order'          => 'LOKAL',
-            "sales_order.id_company"    => $this->this_company_id,
+            // "sales_order.id_company"    => $this->this_company_id,
             'surat_jalan_so_id'         => null,
             'sales_order_invoice_id'    => null
         ];
@@ -645,12 +647,6 @@ class SuratJalan extends BaseController
 
     public function generateNomorSuratJalan()
     {
-        // $code = "SJ";
-        // $currentYear = date('Y');
-        // $currentMonth = date('m');
-        // $number = $this->SuratJalanModel->getNumber($currentMonth . "/" . $currentYear . "/", $this->this_company_id);
-        // $noSuratJalan = "TSI/" . $code . "/" . $currentMonth . "/" . $currentYear . "/" . $number;
-
         $code = "TSI/SJ";
         $currentYear = date('y'); // Get last two digits of the year
         $currentMonth = date('n'); // Get numeric month without leading zeros
@@ -658,7 +654,7 @@ class SuratJalan extends BaseController
         $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
 
         $lastData = $this->SuratJalanModel->asObject()
-            ->where('id_company', $this->this_company_id)
+            // ->where('id_company', $this->this_company_id)
             ->like('no_surat_jalan', $numberTemplate)
             ->orderBy('createdAt', 'DESC')
             ->first();

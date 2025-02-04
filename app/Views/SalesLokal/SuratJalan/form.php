@@ -150,6 +150,18 @@
                             <label for="floatingInput">Nama Ecommerce</label>
                         </div>
                     </div>
+                    <?php if (session()->get("login")->this_company_id != 16) { ?>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select company_id" name="company_id" id="company_id" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                    <option value="1">KIM 1</option>
+                                    <option value="2">KIM 2</option>
+                                    <option value="15">GLOBAL</option>
+                                </select>
+                                <label for="floatingInput">Pilih Customer</label>
+                            </div>
+                        </div>
+                    <?php } ?>
                     <input autocomplete="one-time-code" type="hidden" class="form-control id_user" id="id_user" name="id_user" value="<?= $id_user ?>">
                 </div>
 
@@ -260,15 +272,21 @@
             allowClear: true
         })
 
+        $('#company_id').select2({
+            placeholder: "Pilih Company",
+            theme: "bootstrap-5",
+            allowClear: true
+        })
+
         //CSS SELECT2 FLOATING LABEL
-        $('.id_customer')
+        $('.id_customer, #company_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.id_customer')
+        $('.id_customer, #company_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -276,7 +294,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.id_customer')
+        $('.id_customer, #company_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -502,25 +520,37 @@
                             processData: false,
                             contentType: false,
                             success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        stopLoading();
+                                        Swal.fire({
                                             icon: 'success',
                                             title: response.message,
+                                            showCancelButton: true,
+                                            showDenyButton: true,
+                                            confirmButtonText: 'Cetak',
+                                            denyButtonText: 'Baru',
+                                            cancelButtonText: 'Tutup',
+                                            confirmButtonColor: '#4e73df', // Biru
+                                            denyButtonColor: '#28a745', // Hijau
+                                            cancelButtonColor: '#dc3545', // Merah
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                // Cetak
+                                                window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
+                                            } else if (result.isDenied) {
+                                                // Buat baru
+                                                window.location.reload();
+                                            }
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
                                             confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            window.location.href = "<?= base_url("surat-jalan"); ?>";
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
+                                        });
+                                        stopLoading();
+                                    }
                             },
                             onError: function(response) {
                                 csrf.val(response.token);
@@ -546,25 +576,37 @@
                             processData: false,
                             contentType: false,
                             success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
+                                    stopLoading();
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        Swal.fire({
                                             icon: 'success',
                                             title: response.message,
+                                            showCancelButton: true,
+                                            showDenyButton: true,
+                                            confirmButtonText: 'Cetak',
+                                            denyButtonText: 'Baru',
+                                            cancelButtonText: 'Tutup',
+                                            confirmButtonColor: '#4e73df', // Biru
+                                            denyButtonColor: '#28a745', // Hijau
+                                            cancelButtonColor: '#dc3545', // Merah
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                // Cetak
+                                                window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
+                                            } else if (result.isDenied) {
+                                                // Buat baru
+                                                window.location.reload();
+                                            }
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
                                             confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
+                                        });
+                                        stopLoading();
+                                    }
                             },
                             onError: function(response) {
                                 csrf.val(response.token);

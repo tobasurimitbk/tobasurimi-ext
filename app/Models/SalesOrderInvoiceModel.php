@@ -436,7 +436,7 @@ class SalesOrderInvoiceModel extends Model
         return $dataSalesOrderInvoice;
     }
 
-    public function generateNoFaktur($id_company): string
+    public function generateNoFaktur(): string
     {
         $format = "LKL/INV";
         $month = idate('m');
@@ -450,7 +450,7 @@ class SalesOrderInvoiceModel extends Model
         //     ->first();
 
         $lastData = $this->asObject()
-            ->where('id_company', $id_company)
+            // ->where('id_company', $id_company)
             ->where("no_faktur LIKE '%$numberTemplate%'")
             ->orderBy('createdAt', 'DESC')
             ->first();

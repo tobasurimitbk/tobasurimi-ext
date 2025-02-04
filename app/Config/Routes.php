@@ -647,6 +647,7 @@ $routes->post('/order-form-internasional/save', 'SalesInternasional\OrderForm::s
 $routes->post('/order-form-internasional/update', 'SalesInternasional\OrderForm::update', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/update-status', 'SalesInternasional\OrderForm::updateStatus', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/generate-no-order-form', 'SalesInternasional\OrderForm::generateNomorSalesOrderInternasional', ['filter' => 'Auth']);
+$routes->post('/order-form-internasional/update-remark', 'SalesInternasional\OrderForm::updateRemark', ['filter' => 'Auth']);
 
 // Master Barang Internasional
 $routes->get('master-barang-internasional', 'SalesInternasional\Barang::bahanJadiView', ['filter' => 'Auth']);
