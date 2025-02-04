@@ -111,11 +111,8 @@ class PenerimaanBarangModel extends Model
             $penerimaanBarangDataQry->where('penerimaan_barang.status_post', $addCondition['status']);
         }
 
-        if ($addCondition['search'] ||  $addCondition['startdate'] || $addCondition['lastdate']) {
-            $penerimaanBarangDataQry->groupStart();
-        }
-
         if ($addCondition['search']) {
+            $penerimaanBarangDataQry->groupStart();
             $penerimaanBarangDataQry->like('penerimaan_barang.no_penerimaan_barang', $addCondition['search']);
             $penerimaanBarangDataQry->orLike('suppliers.name', $addCondition['search']);
             $penerimaanBarangDataQry->orLike('warehouses.warehouse_name', $addCondition['search']);
@@ -126,6 +123,12 @@ class PenerimaanBarangModel extends Model
             if ($condition['penerimaan_barang.status_penerimaan'] == "LOKAL" && $condition['tipe_bahan'] == "PENOLONG") {
                 $penerimaanBarangDataQry->orLike('purchase_requests.spp_no', $addCondition['search']);
             }
+
+            $penerimaanBarangDataQry->groupEnd();
+        }
+
+        if ($addCondition['startdate'] || $addCondition['lastdate']) {
+            $penerimaanBarangDataQry->groupStart();
         }
 
         if ($addCondition['startdate']) {
@@ -136,7 +139,7 @@ class PenerimaanBarangModel extends Model
             $penerimaanBarangDataQry->where('penerimaan_barang.tanggal <=', $addCondition['lastdate']);
         }
 
-        if ($addCondition['search'] ||  $addCondition['startdate'] || $addCondition['lastdate']) {
+        if ($addCondition['startdate'] || $addCondition['lastdate']) {
             $penerimaanBarangDataQry->groupEnd();
         }
 

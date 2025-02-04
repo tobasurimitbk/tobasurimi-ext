@@ -190,26 +190,27 @@ class AMPurchaseOrderModel extends Model
             }
         }
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
-            $poDataQry->groupStart();
+        if (isset($addCondition['search'])) {
+            $poDataQry->groupStart() // Mulai grouping kondisi pencarian
+                ->like('am_purchase_orders.po_no', $addCondition['search'])
+                ->orLike('purchase_requests.spp_no', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->groupEnd(); // Tutup grouping pencarian
+        }
 
-            if ($addCondition['search']) {
-                $poDataQry->like('am_purchase_orders.po_no', $addCondition['search'])
-                    ->orLike('purchase_requests.spp_no', $addCondition['search'])
-                    ->orLike('suppliers.name', $addCondition['search'])
-                    ->orLike('divisis.divisi', $addCondition['search']);
-            }
-
-            if ($addCondition['dateStart']) {
+        // Pisahkan filter tanggal dari pencarian agar tidak terkena efek `LIKE`
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $poDataQry->groupStart(); // Pastikan tanggal hanya masuk dalam satu blok kondisi
+            if (!empty($addCondition['dateStart'])) {
                 $poDataQry->where('am_purchase_orders.po_date >=', $addCondition['dateStart']);
             }
-
-            if ($addCondition['dateEnd']) {
+            if (!empty($addCondition['dateEnd'])) {
                 $poDataQry->where('am_purchase_orders.po_date <=', $addCondition['dateEnd']);
             }
-
             $poDataQry->groupEnd();
         }
+
 
         $totalData = $poDataQry->countAllResults(false);
         $totalFilteredData = $poDataQry->countAllResults(false);
