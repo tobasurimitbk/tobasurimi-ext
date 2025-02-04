@@ -827,7 +827,7 @@ class POLokalBahanPenolong extends BaseController
                     'qty' => $totalQtySisa,
                     'diskon' => '0',
                     'biaya_tambahan' => '0',
-                    'total' => ($hargaTerakhir['hargaTerakhirNumber'] * $totalQtySisa),
+                    'total' => (round($hargaTerakhir['hargaTerakhirNumber'], 2) * $totalQtySisa),
                     'keterangan' => $s['note'],
                     'ppn' => '',
                     'pph' => ''
