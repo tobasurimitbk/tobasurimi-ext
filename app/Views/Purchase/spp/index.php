@@ -25,7 +25,7 @@
                 <div class="col mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" disabled placeholder="Tanggal Awal" value="01<?= date('/m/Y') ?>">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -33,7 +33,7 @@
                 </div>
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" disabled placeholder="Tanggal Akhir">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
@@ -299,6 +299,18 @@
         $(".dateStart, .dateEnd, .is_posted, .divisi_id").change(function() {
             table.ajax.reload();
         })
+
+        $(".is_posted").change(function() {
+            var is_posted = $(this).val();
+            if (is_posted == "SUDAH POSTING") {
+                // Ubah Status Disbled StartDate dan EndDate menjadi false
+                $(".dateStart, .dateEnd").attr('disabled', false);
+            } else {
+                // Ubah Status Disbled StartDate dan EndDate menjadi false
+                $(".dateStart, .dateEnd").attr('disabled', true);
+
+            }
+        });
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();

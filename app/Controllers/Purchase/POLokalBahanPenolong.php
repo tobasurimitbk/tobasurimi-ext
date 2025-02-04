@@ -225,6 +225,13 @@ class POLokalBahanPenolong extends BaseController
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
+
+        if ($addCondition['is_posted'] == "BELUM POSTING") {
+            // Jika Belum Posting Matikan Filter Start Date End Date
+            $addCondition['dateStart'] = "";
+            $addCondition['dateEnd'] = "";
+        }
+
         $limit = $this->request->getVar("length");
         $offset = $this->request->getVar("start");
         $poData = $this->aMPurchaseOrderModel->getPOLokalBPList($condition, $addCondition, $limit, $offset);
