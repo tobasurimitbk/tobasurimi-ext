@@ -210,32 +210,50 @@ class POLokalBahanBaku extends BaseController
             $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
             $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.005;
 
-            if ($data->pph == "Company") {
-                $pph = $nilaiPph;
-            } else {
-                $pph = $nilaiPph2;
-            }
-
-            $totalHarga = 0;
             $totalQty = 0;
-            $totalHargaPph = 0;
+            // Tanpa PPH
+            $nilaiTotalBulanan = 0;
+            $nilaiTotalUmum = 0;
+            $nilaiTotalHarian = 0;
+            // Dengan PPH
+            $nilaiTotalBulananWithPPH = 0;
+            $nilaiTotalUmumWithPPH = 0;
+            $nilaiTotalHarianWithPPH = 0;
+            // Total Tambahan
+            $totalTambahan = 0;
+            $totalTambahanWithPPH = 0;
+
+            // Nilai PPH
+            // $nilaiPPHBulanan = 0;
+            // $nilaiPPHumum = 0;
+            // $nilaiPPHHarian = 0;
+
             foreach ($detailPurchase as $d) {
-                $harga = ($d['general_price'] + $d['daily_price'] + $d['monthly_price']) * $d['qty'];
-                $totalHarga += ($d['general_price'] + $d['daily_price'] + $d['monthly_price']) * $d['qty'];
-                $totalHargaPph += $harga + ($harga * $pph);
+                $nilaiTotalHarian +=  ($d['daily_price'] * $d['qty']);
+                $nilaiTotalUmum +=  ($d['general_price'] * $d['qty']);
+                $nilaiTotalBulanan += ($d['monthly_price'] * $d['qty']);
                 $totalQty += $d['qty'];
             }
 
-            $selisih =  ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung);
-            $totalTambahan = ($selisih * $totalQty) - (($selisih * $totalQty) * $nilaiPph2);
+            if ($data->pph === "Company" || $data->pph === "Supplier") {
+                $nilaiTotalBulananWithPPH = $nilaiTotalBulanan - ($nilaiTotalBulanan * $nilaiPph2);
+                $nilaiTotalUmumWithPPH = $nilaiTotalUmum - ($nilaiTotalUmum * $nilaiPph2);
+                $nilaiTotalHarianWithPPH = $nilaiTotalHarian - ($nilaiTotalHarian * $nilaiPph2);
+            }
 
             if ($data->pph == "Company") {
                 $selisih = ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung) / $nilaiPph;
                 $totalTambahan = $selisih;
+                $totalTambahanWithPPH = $totalTambahan - ($totalTambahan * $nilaiPph2);
             } else {
                 $selisih =  ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung);
-                $totalTambahan = ($selisih * $totalQty) - (($selisih * $totalQty) * $nilaiPph2);
+                $totalTambahan = ($selisih * $totalQty);
+                $totalTambahanWithPPH = $totalTambahan - ($totalTambahan * $nilaiPph2);
             }
+
+            // NILAI SEBELUM PPH
+            $totalBeforePph = $nilaiTotalBulanan + $nilaiTotalHarian + $nilaiTotalUmum + $totalTambahan;
+            $totalAfterPph = $nilaiTotalBulananWithPPH + $nilaiTotalHarianWithPPH + $nilaiTotalUmumWithPPH + $totalTambahanWithPPH;
 
             array_push($dataPOLokal, [
                 "no"            => $no++,
@@ -246,9 +264,9 @@ class POLokalBahanBaku extends BaseController
                 "companyName"   => $data->companyName,
                 "supplierName"  => $data->supplierName,
                 "itemCount"     => $data->itemCount,
-                "total"         => "" . number_format(formatter($totalHargaPph + $totalTambahan, "STR_TO_FLOAT"), 2, '.', ','),
+                "total_after_pph" => "" . number_format(formatter($totalAfterPph, "STR_TO_FLOAT"), 2, '.', ','),
+                "total_before_pph" => "" . number_format(formatter($totalBeforePph, "STR_TO_FLOAT"), 2, '.', ','),
                 "is_posted"     => $data->is_posted,
-                "harga_sum"     => $totalHarga,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
                 "un_posting" => $unPostingCheck == null ? 0 : 1,
             ]);
