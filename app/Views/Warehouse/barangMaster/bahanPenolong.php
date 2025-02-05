@@ -1333,14 +1333,14 @@
                     drawTable();
                 } else {
                     let isDuplicate = list_items.some(function(item) {
-                        return item.spesifikasi.toUpperCase() === spek.toUpperCase();
+                        return item.spesifikasi === spek;
                     });
 
                     if (!isDuplicate) {
                         list_items.push({
                             'spek_id': getID(),
                             'spesifikasi_id': "",
-                            'spesifikasi': spek.toUpperCase(),
+                            'spesifikasi': spek,
                             'satuan_1': satuan1_id,
                             'satuan_1_text': satuan1_text,
                             'satuan_2': satuan2_id,
