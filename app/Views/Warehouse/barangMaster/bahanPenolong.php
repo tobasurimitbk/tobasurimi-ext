@@ -1367,7 +1367,7 @@
     $(document).on('click', '.edit-table-detail', function(evt) {
         resetFormDetail();
         $(".title-detail-name .btn-text").text("Update");
-        $(".title-detail-icon").removeClass("fa-plus").addClass("fa-exchange");
+        $(".title-detail-icon").removeClass("fa-plus").addClass("fa-pencil");
 
         validator_spek.resetForm();
         validator_spek.reset();
