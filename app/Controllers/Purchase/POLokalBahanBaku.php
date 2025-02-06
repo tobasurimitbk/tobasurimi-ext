@@ -281,7 +281,7 @@ class POLokalBahanBaku extends BaseController
                 "companyName"   => $data->companyName,
                 "supplierName"  => $data->supplierName,
                 "itemCount"     => $data->itemCount,
-                "qtyTotal"      => $totalQty,
+                "qtyTotal"      => round($totalQty, 2),
                 "total_after_pph" => "" . number_format(formatter($totalAfterPph, "STR_TO_FLOAT"), 2, '.', ','),
                 "total_before_pph" => "" . number_format(formatter($totalBeforePph, "STR_TO_FLOAT"), 2, '.', ','),
                 "is_posted"     => $data->is_posted,
