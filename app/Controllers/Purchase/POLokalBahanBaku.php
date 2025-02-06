@@ -210,6 +210,14 @@ class POLokalBahanBaku extends BaseController
             $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
             $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.005;
 
+            // PUNYA NPWP 0.25
+            // GK PUNYA 0.5
+            // 314.54 RUPIAH 
+            // sebelum pph 2,635
+            // 2,642,105.26 SEBELUM PPH
+            // 26,35.500 SESUDAH PPH
+            // 325 KTP 
+
             $totalQty = 0;
             // Tanpa PPH
             $nilaiTotalBulanan = 0;
@@ -229,13 +237,22 @@ class POLokalBahanBaku extends BaseController
             // $nilaiPPHHarian = 0;
 
             foreach ($detailPurchase as $d) {
-                $nilaiTotalHarian +=  ($d['daily_price'] * $d['qty']);
-                $nilaiTotalUmum +=  ($d['general_price'] * $d['qty']);
-                $nilaiTotalBulanan += ($d['monthly_price'] * $d['qty']);
+
+                if ($data->pph === "None" || $data->pph === "Supplier") {
+                    $nilaiTotalHarian +=  ($d['daily_price'] * $d['qty']);
+                    $nilaiTotalUmum +=  ($d['general_price'] * $d['qty']);
+                    $nilaiTotalBulanan += ($d['monthly_price'] * $d['qty']);
+                } else {
+                    // COMPANY
+                    $nilaiTotalHarian +=  (($d['daily_price'] / $nilaiPph) * $d['qty']);
+                    $nilaiTotalUmum +=  (($d['general_price'] / $nilaiPph) * $d['qty']);
+                    $nilaiTotalBulanan += (($d['monthly_price'] / $nilaiPph) * $d['qty']);
+                }
+
                 $totalQty += $d['qty'];
             }
 
-            if ($data->pph === "Company" || $data->pph === "Supplier") {
+            if ($data->pph === "Supplier" || $data->pph === "Company") {
                 $nilaiTotalBulananWithPPH = $nilaiTotalBulanan - ($nilaiTotalBulanan * $nilaiPph2);
                 $nilaiTotalUmumWithPPH = $nilaiTotalUmum - ($nilaiTotalUmum * $nilaiPph2);
                 $nilaiTotalHarianWithPPH = $nilaiTotalHarian - ($nilaiTotalHarian * $nilaiPph2);
