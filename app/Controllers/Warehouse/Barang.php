@@ -158,7 +158,7 @@ class Barang extends BaseController
             'parent_type_id' => decrypt($this->request->getVar('parent_type_id')) == 0 ? $this->request->getVar('parent_type_id') : decrypt($this->request->getVar('parent_type_id')),
             // 'divisi_id' => decrypt($this->request->getVar('divisi_id')),
             'kode_barang' => $this->request->getVar('kode_barang'),
-            'barang_name' => strtoupper($this->request->getVar('barang_name')),
+            'barang_name' => $this->request->getVar('barang_name'),
             'type_barang' => $type,
             'minimum_stock' => str_replace('.', '', $this->request->getVar('minimum_stock')),
         ]);
@@ -176,7 +176,7 @@ class Barang extends BaseController
             }
             $result[] = array(
                 'barang_master_id' => $barangMasterID,
-                'spesifikasi' => strtoupper($value->spesifikasi),
+                'spesifikasi' => $value->spesifikasi,
                 'satuan_1' => $value->satuan_1,
                 'satuan_2' => $value->satuan_2 != "" ? $value->satuan_2 : 0,
                 'konversi_satuan_2' => $value->konversi_satuan_2 ? $value->konversi_satuan_2 : 1,
@@ -208,7 +208,7 @@ class Barang extends BaseController
             'company_id' => $this->this_company_id,
             'parent_type_id' => decrypt($this->request->getVar('parent_type_id')),
             // 'divisi_id' => decrypt($this->request->getVar('divisi_id')),
-            'barang_name' => strtoupper($this->request->getVar('barang_name')),
+            'barang_name' => $this->request->getVar('barang_name'),
             'type_barang' => $type,
             'minimum_stock' => str_replace('.', '', $this->request->getVar('minimum_stock')),
         ]);
@@ -225,7 +225,7 @@ class Barang extends BaseController
                         $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_jual));
                     }
                     $barangSpesifikasiModel->update($value->spesifikasi_id, [
-                        'spesifikasi' => strtoupper($value->spesifikasi),
+                        'spesifikasi' => $value->spesifikasi,
                         'satuan_1' => $value->satuan_1,
                         'satuan_2' => $value->satuan_2 != "" ? $value->satuan_2 : 0,
                         'konversi_satuan_2' => $value->konversi_satuan_2 ? $value->konversi_satuan_2 : 1,
@@ -246,7 +246,7 @@ class Barang extends BaseController
                     }
                     $result = [
                         'barang_master_id' => $id,
-                        'spesifikasi' => strtoupper($value->spesifikasi),
+                        'spesifikasi' => $value->spesifikasi,
                         'satuan_1' => $value->satuan_1,
                         'satuan_2' => $value->satuan_2 != "" ? $value->satuan_2 : 0,
                         'konversi_satuan_2' => $value->konversi_satuan_2,
@@ -419,9 +419,9 @@ class Barang extends BaseController
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data['id']),
-                "kelompok_barang"       => strtoupper($data['kelompok_barang']),
+                "kelompok_barang"       => $data['kelompok_barang'],
                 "kode_barang"           => $data['kode_barang'],
-                "barang_name"           => strtoupper($data['barang_name'] . " - " . $data['spesifikasi']),
+                "barang_name"           => $data['barang_name'] . " - " . $data['spesifikasi'],
                 "satuan"                => $satuan1_kode, // Adjust 'some_property' to the actual property you want to display
                 "satuan2"               => $satuan2_kode == "-" ? "-" : $satuan2_kode . " (" . $data['konversi_satuan_2'] . " " . $satuan1_kode . ")",
                 "satuan3"               => $satuan3_kode == "-" ? "-" : $satuan3_kode . " (" . $data['konversi_satuan_3'] . " " . $satuan1_kode . ")",
@@ -578,9 +578,9 @@ class Barang extends BaseController
             $dataBarang[$i]['id'] = encrypt($dataBarang[$i]['id']);
             $dataBarang[$i]['parent_type_id'] = encrypt($dataBarang[$i]['parent_type_id']);
             $dataBarang[$i]['barang_master_spesifikasi_id'] = encrypt($dataBarang[$i]['barang_master_spesifikasi_id']);
-            $dataBarang[$i]['barang_name'] = strtoupper(
+            $dataBarang[$i]['barang_name'] = 
                 str_replace(['"'], "'", $dataBarang[$i]['barang_name_master'] . ' ' . $dataBarang[$i]['spesifikasi'])
-            );
+            ;
         }
 
         $data = [
@@ -719,7 +719,7 @@ class Barang extends BaseController
                             'company_id' => $this->this_company_id,
                             'parent_type_id' => $parentBarang['id'],
                             'kode_barang' => trim($data[$i][1]),
-                            'barang_name' => strtoupper(trim($data[$i][2])),
+                            'barang_name' => trim($data[$i][2]),
                             'type_barang' => $type_barang,
                             'minimum_stock' => 0,
                         ]);
@@ -742,13 +742,13 @@ class Barang extends BaseController
                         // CHECK BARANG MASTER SPESIFIKASI NAME
                         $barangMasterSpesifikasi = $barangMasterSpesifikasiModel
                             ->where('barang_master_id', $barangMaster['id'])
-                            ->where('spesifikasi', strtoupper(trim($data[$i][3])))
+                            ->where('spesifikasi', trim($data[$i][3]))
                             ->first();
 
                         if ($barangMasterSpesifikasi == null) {
                             $barangMasterSpesifikasiModel->insert([
                                 'barang_master_id' => $barangMaster['id'],
-                                'spesifikasi' => strtoupper(trim($data[$i][3])),
+                                'spesifikasi' => trim($data[$i][3]),
                                 'satuan_1' => $satuan['id'],
                                 'satuan_2' => 0,
                                 'konversi_satuan_2' => 1,

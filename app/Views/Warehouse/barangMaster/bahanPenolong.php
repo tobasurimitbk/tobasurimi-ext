@@ -1333,14 +1333,14 @@
                     drawTable();
                 } else {
                     let isDuplicate = list_items.some(function(item) {
-                        return item.spesifikasi.toUpperCase() === spek.toUpperCase();
+                        return item.spesifikasi === spek;
                     });
 
                     if (!isDuplicate) {
                         list_items.push({
                             'spek_id': getID(),
                             'spesifikasi_id': "",
-                            'spesifikasi': spek.toUpperCase(),
+                            'spesifikasi': spek,
                             'satuan_1': satuan1_id,
                             'satuan_1_text': satuan1_text,
                             'satuan_2': satuan2_id,
@@ -1367,7 +1367,7 @@
     $(document).on('click', '.edit-table-detail', function(evt) {
         resetFormDetail();
         $(".title-detail-name .btn-text").text("Update");
-        $(".title-detail-icon").removeClass("fa-plus").addClass("fa-exchange");
+        $(".title-detail-icon").removeClass("fa-plus").addClass("fa-pencil");
 
         validator_spek.resetForm();
         validator_spek.reset();
