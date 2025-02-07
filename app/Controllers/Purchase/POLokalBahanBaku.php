@@ -282,7 +282,7 @@ class POLokalBahanBaku extends BaseController
                 "supplierName"  => $data->supplierName,
                 "itemCount"     => $data->itemCount,
                 "qtyTotal"      => round($totalQty, 2),
-                "total_after_pph" => "" . number_format(formatter($totalAfterPph, "STR_TO_FLOAT"), 2, '.', ','),
+                "total_after_pph" => "" . number_format(formatter($totalAfterPph == 0 ? $totalBeforePph : $totalAfterPph, "STR_TO_FLOAT"), 2, '.', ','),
                 "total_before_pph" => "" . number_format(formatter($totalBeforePph, "STR_TO_FLOAT"), 2, '.', ','),
                 "is_posted"     => $data->is_posted,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
@@ -306,12 +306,7 @@ class POLokalBahanBaku extends BaseController
     {
 
         $first = $this->RMPurchaseOrderModel
-            ->where('po_no', !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->get_new_no_po(
-                date('m'),
-                date('Y'),
-                getLastDay(),
-                $this->this_company_id
-            ) : $this->request->getVar("po_no"))
+            ->where('po_no', $this->request->getVar("po_no"))
             ->where('company_id', $this->this_company_id)
             ->first();
 
@@ -334,12 +329,7 @@ class POLokalBahanBaku extends BaseController
             "kemasan_id" => $this->request->getVar('kemasan_id'),
             "jumlah_kemasan" => $this->request->getVar('jumlah_kemasan'),
             "kemasan_tambahan" => $this->request->getVar('kemasan_tambahan'),
-            "po_no" => !empty($this->request->getVar("auto_generate")) ? $this->RMPurchaseOrderModel->get_new_no_po(
-                date('m'),
-                date('Y'),
-                getLastDay(),
-                $this->this_company_id
-            ) : $this->request->getVar("po_no"),
+            "po_no" =>  $this->request->getVar("po_no"),
             "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
             "pph" => $this->request->getVar("pph"),
             "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
@@ -990,10 +980,15 @@ class POLokalBahanBaku extends BaseController
 
     public function generateNoPO()
     {
+        // yyyy-mm-dd
+        $tanggal = date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))));
+        $tanggalExplode = explode('-', $tanggal);
+        $year = $tanggalExplode[0];
+        $month = $tanggalExplode[1];
+
         $no = $this->RMPurchaseOrderModel->get_new_no_po(
-            date('m'),
-            date('Y'),
-            getLastDay(),
+            $month,
+            $year,
             $this->this_company_id
         );
         return json_encode($no);
