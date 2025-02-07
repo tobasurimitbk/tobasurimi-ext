@@ -91,8 +91,11 @@ class SppModel extends Model
             }
         }
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['divisi_id']) {
             $purchaseRequestsDataQry->groupStart();
+        }
+        if ($addCondition['divisi_id']) {
+            $purchaseRequestsDataQry->where('purchase_requests.divisi_id', $addCondition['divisi_id']);
         }
         if ($addCondition['search']) {
             $purchaseRequestsDataQry
@@ -110,7 +113,9 @@ class SppModel extends Model
         if ($addCondition['dateEnd']) {
             $purchaseRequestsDataQry->where('purchase_requests.request_date <=', $addCondition['dateEnd']);
         }
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['divisi_id']) {
             $purchaseRequestsDataQry->groupEnd();
         }
 

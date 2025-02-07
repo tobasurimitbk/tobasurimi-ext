@@ -386,6 +386,18 @@
                             </div>
                         </div>
                     </div>
+                    <?php if (session()->get("login")->this_company_id != 16) { ?>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select company_id" name="company_id" id="company_id" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                    <option value="1">KIM 1</option>
+                                    <option value="2">KIM 2</option>
+                                    <option value="15">GLOBAL</option>
+                                </select>
+                                <label for="floatingInput">Pilih Customer</label>
+                            </div>
+                        </div>
+                    <?php } ?>
                 </form>
             </div>
             <div class="modal-footer">
@@ -676,7 +688,13 @@
                 $(".qty-awal").val("");
                 $(".qty-sekarang").val("");
             }
-        });
+        }); 
+
+        $('#company_id').select2({
+            placeholder: "Pilih Company",
+            theme: "bootstrap-5",
+            allowClear: true
+        })
 
         //CSS SELECT2 FLOATING LABEL
         $('.ship_via, .id_customer, .id_surat_jalan, .id_barang')
@@ -1038,24 +1056,36 @@
                                 processData: false,
                                 contentType: false,
                                 success: function(response) {
+                                    stopLoading();
                                     csrf.val(response.token);
                                     if (response.status) {
-                                        stopLoading()
                                         Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                window.location.href = "<?= base_url("invoice-penjualan-lokal"); ?>";
-                                            })
+                                            icon: 'success',
+                                            title: response.message,
+                                            showCancelButton: true,
+                                            showDenyButton: true,
+                                            confirmButtonText: 'Cetak',
+                                            denyButtonText: 'Baru',
+                                            cancelButtonText: 'Tutup',
+                                            confirmButtonColor: '#4e73df', // Biru
+                                            denyButtonColor: '#28a745', // Hijau
+                                            cancelButtonColor: '#dc3545', // Merah
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                // Cetak
+                                                window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
+                                            } else if (result.isDenied) {
+                                                // Buat baru
+                                                window.location.reload();
+                                            }
+                                        });
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
+                                        });
+                                        stopLoading();
                                     }
                                 },
                                 onError: function(response) {
@@ -1082,24 +1112,36 @@
                                 processData: false,
                                 contentType: false,
                                 success: function(response) {
+                                    stopLoading();
                                     csrf.val(response.token);
                                     if (response.status) {
-                                        stopLoading()
                                         Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                window.location.href = `<?= base_url("invoice-penjualan-lokal/print"); ?>/${response.id}`;
-                                            })
+                                            icon: 'success',
+                                            title: response.message,
+                                            showCancelButton: true,
+                                            showDenyButton: true,
+                                            confirmButtonText: 'Cetak',
+                                            denyButtonText: 'Baru',
+                                            cancelButtonText: 'Tutup',
+                                            confirmButtonColor: '#4e73df', // Biru
+                                            denyButtonColor: '#28a745', // Hijau
+                                            cancelButtonColor: '#dc3545', // Merah
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                // Cetak
+                                                window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
+                                            } else if (result.isDenied) {
+                                                // Buat baru
+                                                window.location.reload();
+                                            }
+                                        });
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
+                                        });
+                                        stopLoading();
                                     }
                                 },
                                 onError: function(response) {

@@ -242,10 +242,10 @@
 
     <table class="signature-table">
         <tr style="vertical-align: top;">
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Disiapkan</td>
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Disetujui Oleh</td>
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Diantar Oleh</td>
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Diterima Oleh</td>
+            <td style="height: 55px;border-bottom: 1px solid;width: 90px">Disiapkan</td>
+            <td style="height: 55px;border-bottom: 1px solid;width: 90px">Disetujui Oleh</td>
+            <td style="height: 55px;border-bottom: 1px solid;width: 90px">Diantar Oleh</td>
+            <td style="height: 55px;border-bottom: 1px solid;width: 90px">Diterima Oleh</td>
         </tr>
         <tr>
             <td>Date: </td>

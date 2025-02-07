@@ -25,7 +25,7 @@
                 <div class="col mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" disabled placeholder="Tanggal Awal" value="01<?= date('/m/Y') ?>">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -33,7 +33,7 @@
                 </div>
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" disabled placeholder="Tanggal Akhir">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
@@ -49,7 +49,7 @@
                         <label for="floatingInput" class="l-spp-ptspp">Tipe SPP</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <!-- <div class="col-md-2">
                     <div class="form-floating spp-ptspp" style="height: 50px;">
                         <select class="form-select kategori spp_type form-out-search" name="spp_type" id="spp_type" aria-label="Floating label select example">
                             <option value="">PILIH TIPE SPP</option>
@@ -58,6 +58,17 @@
                             <?php endforeach; ?>
                         </select>
                         <label for="floatingInput" class="l-spp-ptspp">Tipe SPP</label>
+                    </div>
+                </div> -->
+                <div class="col-md-2">
+                    <div class="form-floating spp-ptspp" style="height: 50px;">
+                        <select class="form-select divisi_id form-out-search" name="divisi_id" id="divisi_id" aria-label="Floating label select example">
+                            <option value="">PILIH DEPARTEMEN</option>
+                            <?php foreach ($dataDivisi as $d) : ?>
+                                <option <?= (!empty($dataSPP) ? ($dataSPP->divisi_id == $d['value'] ? 'selected' : '') : '') ?> value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput" class="l-spp-ptspp"></label>
                     </div>
                 </div>
                 <div class="col mb-2">
@@ -121,6 +132,7 @@
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
                 data.is_posted = $(".is_posted").val();
+                data.divisi_id = $('.divisi_id').val();
                 data.sort = sort;
                 data.sortType = sortType;
             },
@@ -284,9 +296,21 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd, .is_posted").change(function() {
+        $(".dateStart, .dateEnd, .is_posted, .divisi_id").change(function() {
             table.ajax.reload();
         })
+
+        $(".is_posted").change(function() {
+            var is_posted = $(this).val();
+            if (is_posted == "SUDAH POSTING") {
+                // Ubah Status Disbled StartDate dan EndDate menjadi false
+                $(".dateStart, .dateEnd").attr('disabled', false);
+            } else {
+                // Ubah Status Disbled StartDate dan EndDate menjadi false
+                $(".dateStart, .dateEnd").attr('disabled', true);
+
+            }
+        });
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();

@@ -168,7 +168,7 @@ class PenerimaanBarangLokalBB extends BaseController
 
         $condition = [
             "penerimaan_barang.company_id" => $this->this_company_id,
-            "status_penerimaan" => "LOKAL",
+            "penerimaan_barang.status_penerimaan" => "LOKAL",
             "penerimaan_barang.deletedAt" => null,
             "penerimaan_barang_detail.deletedAt" => null,
             "tipe_bahan" => "BAKU"
@@ -222,7 +222,7 @@ class PenerimaanBarangLokalBB extends BaseController
 
         $condition = [
             "penerimaan_barang.company_id" => $this->this_company_id,
-            "status_penerimaan" => "LOKAL",
+            "penerimaan_barang.status_penerimaan" => "LOKAL",
             "penerimaan_barang.deletedAt" => null,
             "penerimaan_barang_detail.deletedAt" => null,
             "tipe_bahan" => "BAKU"

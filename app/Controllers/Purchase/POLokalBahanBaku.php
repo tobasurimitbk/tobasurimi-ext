@@ -207,11 +207,70 @@ class POLokalBahanBaku extends BaseController
         foreach ($poData['data'] as $data) {
             $detailPurchase = $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $data->id)->where('deletedAt', null)->findAll();
             $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "BAKU")->where('status_penerimaan', "LOKAL")->like('multiple_po_id', $data->id)->first();
+            $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
+            $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.005;
 
-            $totalHarga = 0;
+            // PUNYA NPWP 0.25
+            // GK PUNYA 0.5
+            // 314.54 RUPIAH 
+            // sebelum pph 2,635
+            // 2,642,105.26 SEBELUM PPH
+            // 26,35.500 SESUDAH PPH
+            // 325 KTP 
+
+            $totalQty = 0;
+            // Tanpa PPH
+            $nilaiTotalBulanan = 0;
+            $nilaiTotalUmum = 0;
+            $nilaiTotalHarian = 0;
+            // Dengan PPH
+            $nilaiTotalBulananWithPPH = 0;
+            $nilaiTotalUmumWithPPH = 0;
+            $nilaiTotalHarianWithPPH = 0;
+            // Total Tambahan
+            $totalTambahan = 0;
+            $totalTambahanWithPPH = 0;
+
+            // Nilai PPH
+            // $nilaiPPHBulanan = 0;
+            // $nilaiPPHumum = 0;
+            // $nilaiPPHHarian = 0;
+
             foreach ($detailPurchase as $d) {
-                $totalHarga += ($d['general_price'] + $d['daily_price'] + $d['monthly_price']) * $d['qty'];
+
+                if ($data->pph === "None" || $data->pph === "Supplier") {
+                    $nilaiTotalHarian +=  ($d['daily_price'] * $d['qty']);
+                    $nilaiTotalUmum +=  ($d['general_price'] * $d['qty']);
+                    $nilaiTotalBulanan += ($d['monthly_price'] * $d['qty']);
+                } else {
+                    // COMPANY
+                    $nilaiTotalHarian +=  (($d['daily_price'] / $nilaiPph) * $d['qty']);
+                    $nilaiTotalUmum +=  (($d['general_price'] / $nilaiPph) * $d['qty']);
+                    $nilaiTotalBulanan += (($d['monthly_price'] / $nilaiPph) * $d['qty']);
+                }
+
+                $totalQty += $d['qty'];
             }
+
+            if ($data->pph === "Supplier" || $data->pph === "Company") {
+                $nilaiTotalBulananWithPPH = $nilaiTotalBulanan - ($nilaiTotalBulanan * $nilaiPph2);
+                $nilaiTotalUmumWithPPH = $nilaiTotalUmum - ($nilaiTotalUmum * $nilaiPph2);
+                $nilaiTotalHarianWithPPH = $nilaiTotalHarian - ($nilaiTotalHarian * $nilaiPph2);
+            }
+
+            if ($data->pph == "Company") {
+                $selisih = ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung) / $nilaiPph;
+                $totalTambahan = $selisih;
+                $totalTambahanWithPPH = $totalTambahan - ($totalTambahan * $nilaiPph2);
+            } else {
+                $selisih =  ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung);
+                $totalTambahan = ($selisih * $totalQty);
+                $totalTambahanWithPPH = $totalTambahan - ($totalTambahan * $nilaiPph2);
+            }
+
+            // NILAI SEBELUM PPH
+            $totalBeforePph = $nilaiTotalBulanan + $nilaiTotalHarian + $nilaiTotalUmum + $totalTambahan;
+            $totalAfterPph = $nilaiTotalBulananWithPPH + $nilaiTotalHarianWithPPH + $nilaiTotalUmumWithPPH + $totalTambahanWithPPH;
 
             array_push($dataPOLokal, [
                 "no"            => $no++,
@@ -222,7 +281,9 @@ class POLokalBahanBaku extends BaseController
                 "companyName"   => $data->companyName,
                 "supplierName"  => $data->supplierName,
                 "itemCount"     => $data->itemCount,
-                "total"         => "" . number_format(formatter($totalHarga + $data->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ','),
+                "qtyTotal"      => round($totalQty, 2),
+                "total_after_pph" => "" . number_format(formatter($totalAfterPph, "STR_TO_FLOAT"), 2, '.', ','),
+                "total_before_pph" => "" . number_format(formatter($totalBeforePph, "STR_TO_FLOAT"), 2, '.', ','),
                 "is_posted"     => $data->is_posted,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
                 "un_posting" => $unPostingCheck == null ? 0 : 1,
@@ -674,8 +735,18 @@ class POLokalBahanBaku extends BaseController
                 $dataPO->totalDailyPaid = number_format(($totalDailyPrice + $totalDailyPrice * $pphTax), 2, '.', ',');
                 $dataPO->amount = terbilang($totalPrice);
                 $dataPO->amountDaily = terbilang($totalDailyPrice);
-                $dataPO->selisih = ($dataPO->cong_batasan ? formatter($dataPO->cong_batasan, "STR_TO_FLOAT") : 0) - ($dataPO->cong_sebenarnya ? formatter($dataPO->cong_sebenarnya, "STR_TO_FLOAT") : 0);
-                $dataPO->totalTambahan = $dataPO->selisih * $totalQty;
+                if ($dataPO->pph == "Company") {
+                    // Pakai nilai_pph
+                    $dataPO->selisih = (($dataPO->cong_batasan ? $dataPO->cong_batasan : 0) - ($dataPO->cong_sebenarnya ? $dataPO->cong_sebenarnya : 0) + $dataPO->subsidi_langsung) / $dataPO->nilai_pph;
+                    $dataPO->totalTambahan = $dataPO->selisih;
+                } else {
+                    // Pakai nilai_pph2
+                    $dataPO->selisih = (($dataPO->cong_batasan ? $dataPO->cong_batasan : 0) - ($dataPO->cong_sebenarnya ? $dataPO->cong_sebenarnya : 0) + $dataPO->subsidi_langsung);
+                    $dataPO->totalTambahan = ($dataPO->selisih * $totalQty);
+                }
+                // dd($dataPO->selisih, $dataPO->cong_batasan, $dataPO->cong_sebenarnya);
+                // $dataPO->selisih = $dataPO->subsidi_langsung / $dataPO->nilai_pph;
+                // dd($dataPO->totalTambahan, $dataPO->selisih, $dataPO->totalQty,  $dataPO->nilai_pph2);
                 $dataPO->pphTambahan = $dataPO->totalTambahan;
 
                 if ($dataPODetail) {

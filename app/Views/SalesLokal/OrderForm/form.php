@@ -194,6 +194,18 @@
                             <label for="floatingInput">No PO (Opsional)</label>
                         </div>
                     </div>
+                    <?php if (session()->get("login")->this_company_id != 16) { ?>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select company_id" name="company_id" id="company_id" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                    <option value="1">KIM 1</option>
+                                    <option value="2">KIM 2</option>
+                                    <option value="15">GLOBAL</option>
+                                </select>
+                                <label for="floatingInput">Pilih Company</label>
+                            </div>
+                        </div>
+                    <?php } ?>
                 </div>
 
             </form>
@@ -506,7 +518,24 @@
                                 <label for="floatingInput">Jenis Penjualan (Opsional)</label>
                             </div>
                         </div>
-
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <!-- <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales"> -->
+                                <select class="form-select sales_id" name="sales_id" id="sales_id" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataSales)) {
+                                        foreach ($dataSales as $sales) {
+                                    ?>
+                                            <option value="<?= $sales["id"]; ?>"><?= strtoupper($sales["name"]); ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Nama Sales</label>
+                            </div>
+                        </div> 
                     </div>
                 </form>
             </div>
@@ -852,7 +881,12 @@
             placeholder: "Pilih Satuan",
             theme: "bootstrap-5",
         });
-
+        
+        $('#company_id').select2({
+            placeholder: "Pilih Company",
+            theme: "bootstrap-5",
+            allowClear: true
+        })
         // Customer
         $('.id_customer').select2({
             placeholder: "Pilih Nama Customer",
@@ -907,7 +941,7 @@
             allowClear: true,
             theme: "bootstrap-5",
         }).change(function() {});
-
+        
         $('.id_sales').select2({
             placeholder: "Pilih Nama Sales",
             allowClear: true,
@@ -976,6 +1010,14 @@
             allowClear: true
         })
 
+          //SALES
+          $('.sales_id').select2({
+            placeholder: "Pilih Sales (Opsional)",
+            theme: "bootstrap-5",
+            allowClear: true,
+            dropdownParent: $(".addCustomerModal"),
+        });
+
         $('#jenis_penjualan_customer').select2({
             placeholder: "Pilih Jenis Penjualan",
             theme: "bootstrap-5",
@@ -984,14 +1026,14 @@
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.id_customer, .satuan_id, .termin, .id_sales, .jenis_penjualan, .id_barang, .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer')
+        $('.id_customer, .satuan_id, .sales_id, .termin, .id_sales, .jenis_penjualan, .id_barang, .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.id_customer, .satuan_id, .termin, .id_sales, .jenis_penjualan, .id_barang,  .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer')
+        $('.id_customer, .satuan_id, .sales_id, .termin, .id_sales, .jenis_penjualan, .id_barang,  .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer')
             .parent('div')
             .children('span')
             .children('span')
@@ -999,7 +1041,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.id_customer, .satuan_id, .termin, .id_sales, .jenis_penjualan, .id_barang,  .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer')
+        $('.id_customer, .satuan_id, .sales_id, .termin, .id_sales, .jenis_penjualan, .id_barang,  .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -1647,21 +1689,34 @@
                                 success: function(response) {
                                     csrf.val(response.token);
                                     if (response.status) {
+                                        stopLoading();
                                         Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                window.location.href = "<?= base_url('order-form-lokal') ?>"
-                                            })
+                                            icon: 'success',
+                                            title: response.message,
+                                            showCancelButton: true,
+                                            showDenyButton: true,
+                                            confirmButtonText: 'Cetak',
+                                            denyButtonText: 'Baru',
+                                            cancelButtonText: 'Tutup',
+                                            confirmButtonColor: '#4e73df', // Biru
+                                            denyButtonColor: '#28a745', // Hijau
+                                            cancelButtonColor: '#dc3545', // Merah
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                // Cetak
+                                                window.location.href = `<?= base_url("order-form-lokal/print"); ?>/${response.id}`;
+                                            } else if (result.isDenied) {
+                                                // Buat baru
+                                                window.location.reload();
+                                            }
+                                        });
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
+                                        });
+                                        stopLoading();
                                     }
                                 },
                                 onError: function(response) {
@@ -1702,23 +1757,37 @@
                                 processData: false,
                                 contentType: false,
                                 success: function(response) {
+                                    stopLoading();
                                     csrf.val(response.token);
                                     if (response.status) {
+                                        stopLoading();
                                         Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
+                                            icon: 'success',
+                                            title: response.message,
+                                            showCancelButton: true,
+                                            showDenyButton: true,
+                                            confirmButtonText: 'Cetak',
+                                            denyButtonText: 'Baru',
+                                            cancelButtonText: 'Tutup',
+                                            confirmButtonColor: '#4e73df', // Biru
+                                            denyButtonColor: '#28a745', // Hijau
+                                            cancelButtonColor: '#dc3545', // Merah
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                // Cetak
                                                 window.location.href = `<?= base_url("order-form-lokal/print"); ?>/${response.id}`;
-                                            })
+                                            } else if (result.isDenied) {
+                                                // Buat baru
+                                                window.location.reload();
+                                            }
+                                        });
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
+                                        });
+                                        stopLoading();
                                     }
                                 },
                                 onError: function(response) {

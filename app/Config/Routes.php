@@ -363,6 +363,7 @@ $routes->get('/tanda-terima-faktur-lokal-bp/create', 'Purchase\TandaTerimaSupBB:
 $routes->get('/tanda-terima-faktur-lokal-bp/id/(:segment)', 'Purchase\TandaTerimaSupBB::update/$1', ['filter' => 'Auth']);
 $routes->get('/tanda-terima-faktur-lokal-bp/print/(:segment)', 'Purchase\TandaTerimaSupBB::print/$1', ['filter' => 'Auth']);
 $routes->get('/tanda-terima-faktur-lokal-bp/generate-tanda-terima-no', 'Purchase\TandaTerimaSupBB::generateTandaTerimaFakturNumber', ['filter' => 'Auth']);
+$routes->get('/tanda-terima-faktur-lokal-bp/generate-tanda-keluar-no', 'Purchase\TandaTerimaSupBB::generateTandaKeluarFakturNumber', ['filter' => 'Auth']);
 $routes->get('/tanda-terima-faktur-lokal-bp/daftar-penerimaan-barang', 'Purchase\TandaTerimaSupBB::listPenerimaanBarang', ['filter' => 'Auth']);
 $routes->post('/tanda-terima-faktur-lokal-bp/create', 'Purchase\TandaTerimaSupBB::createAction', ['filter' => 'Auth']);
 $routes->post('/tanda-terima-faktur-lokal-bp/update', 'Purchase\TandaTerimaSupBB::updateAction', ['filter' => 'Auth']);
@@ -646,6 +647,7 @@ $routes->post('/order-form-internasional/save', 'SalesInternasional\OrderForm::s
 $routes->post('/order-form-internasional/update', 'SalesInternasional\OrderForm::update', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/update-status', 'SalesInternasional\OrderForm::updateStatus', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/generate-no-order-form', 'SalesInternasional\OrderForm::generateNomorSalesOrderInternasional', ['filter' => 'Auth']);
+$routes->post('/order-form-internasional/update-remark', 'SalesInternasional\OrderForm::updateRemark', ['filter' => 'Auth']);
 
 // Master Barang Internasional
 $routes->get('master-barang-internasional', 'SalesInternasional\Barang::bahanJadiView', ['filter' => 'Auth']);

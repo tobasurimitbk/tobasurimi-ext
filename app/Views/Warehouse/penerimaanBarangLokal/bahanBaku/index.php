@@ -10,8 +10,8 @@
                 Export
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <li><button class="dropdown-item" onclick="pdf('<?= base_url("penerimaan-barang-lokal-bp/print-table"); ?>')">PDF</button></li>
-                <li><button class="dropdown-item" onclick="pdf('<?= base_url("penerimaan-barang-lokal-bp/export-excel"); ?>')">EXCEL</button></li>
+                <li><button class="dropdown-item" onclick="pdf('<?= base_url("penerimaan-barang-lokal-bb/print-table"); ?>')">PDF</button></li>
+                <li><button class="dropdown-item" onclick="pdf('<?= base_url("penerimaan-barang-lokal-bb/export-excel"); ?>')">EXCEL</button></li>
             </ul>
         <?php endif; ?>
         <?php if (can('Warehouse', 'P. Barang Lokal BB', 'c')) : ?>

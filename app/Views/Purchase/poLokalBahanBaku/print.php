@@ -583,7 +583,6 @@
                 </tr>
             </table>
 
-            <!-- request dari bu ningsih -->
             <?php if ($dataPO->pph === "Company") { ?>
                 <table class="cong-table item-table txt-right">
                     <tr>
@@ -594,36 +593,33 @@
                         <th>TOTAL TAMBAHAN</th>
                     </tr>
                     <tr>
-                        <td><?= $dataPO->totalQty ?></td>
-                        <td><?= $dataPO->cong_sebenarnya ?></td>
-                        <td><?= $dataPO->cong_batasan ?></td>
-                        <td><?= $dataPO->selisih ?></td>
-                        <td><?= number_format($dataPO->totalTambahan, 2, '.', ',') ?></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>TAMBAHAN LANGSUNG</td>
-                        <td><?= number_format(formatter($dataPO->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                        <td><?= htmlspecialchars($dataPO->totalQty ?? 0) ?></td>
+                        <td><?= number_format($dataPO->cong_sebenarnya ?? 0, 2, '.', ',') ?></td>
+                        <td><?= number_format($dataPO->cong_batasan ?? 0, 2, '.', ',') ?></td>
+                        <td><?= number_format($dataPO->selisih ?? 0, 2, '.', ',') ?></td>
+                        <td><?= number_format($dataPO->totalTambahan ?? 0, 2, '.', ',') ?></td>
                     </tr>
                     <tr>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td>PPH</td>
-                        <td"><?= number_format(($dataPO->totalTambahan * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
-
+                        <td><?= number_format(($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0), 2, '.', ',') ?></td>
                     </tr>
                     <tr>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td>DIBAYARKAN</td>
-                        <td><?= number_format(($dataPO->totalTambahan + $dataPO->subsidi_langsung)  ($dataPO->totalTambahan * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
+                        <td><?= number_format(
+                                ($dataPO->totalTambahan ?? 0)  - (($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0)),
+                                2,
+                                '.',
+                                ','
+                            ) ?></td>
                     </tr>
                 </table>
-            <?php } elseif($dataPO->pph === "Supplier") { ?>
+            <?php } elseif ($dataPO->pph === "Supplier") { ?>
                 <table class="cong-table item-table txt-right">
                     <tr>
                         <th>QTY</th>
@@ -633,33 +629,31 @@
                         <th>TOTAL TAMBAHAN</th>
                     </tr>
                     <tr>
-                        <td><?= $dataPO->totalQty ?></td>
-                        <td><?= $dataPO->cong_sebenarnya ?></td>
-                        <td><?= $dataPO->cong_batasan ?></td>
-                        <td><?= $dataPO->selisih ?></td>
-                        <td><?= number_format(($dataPO->totalTambahan + $dataPO->subsidi_langsung)  ($dataPO->totalTambahan * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
+                        <td><?= htmlspecialchars($dataPO->totalQty ?? 0) ?></td>
+                        <td><?= number_format($dataPO->cong_sebenarnya ?? 0, 2, '.', ',') ?></td>
+                        <td><?= number_format($dataPO->cong_batasan ?? 0, 2, '.', ',') ?></td>
+                        <td><?= number_format($dataPO->selisih ?? 0, 2, '.', ',') ?></td>
+                        <td><?= number_format($dataPO->totalTambahan ?? 0, 2, '.', ',') ?></td>
                     </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>TAMBAHAN LANGSUNG</td>
-                        <td><?= number_format(formatter($dataPO->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
-                    </tr>
+
                     <tr>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td>PPH</td>
-                        <td"><?= number_format(($dataPO->totalTambahan * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
-
+                        <td><?= number_format(($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0), 2, '.', ',') ?></td>
                     </tr>
                     <tr>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td>DIBAYARKAN</td>
-                        <td><?= number_format($dataPO->totalTambahan, 2, '.', ',') ?></td>
+                        <td><?= number_format(
+                                ($dataPO->totalTambahan ?? 0)  - (($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0)),
+                                2,
+                                '.',
+                                ','
+                            ) ?></td>
                     </tr>
                 </table>
             <?php } else { ?>
@@ -672,25 +666,19 @@
                         <th>TOTAL TAMBAHAN</th>
                     </tr>
                     <tr>
-                        <td><?= $dataPO->totalQty ?></td>
-                        <td><?= $dataPO->cong_sebenarnya ?></td>
-                        <td><?= $dataPO->cong_batasan ?></td>
-                        <td><?= $dataPO->selisih ?></td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
                         <td>000</td>
                     </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>TAMBAHAN LANGSUNG</td>
-                        <td>000</td>
-                    </tr>
+
                     <tr>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td>PPH</td>
-                        <td">000</td>
+                        <td>000</td>
                     </tr>
                     <tr>
                         <td></td>
@@ -701,7 +689,8 @@
                     </tr>
                 </table>
             <?php } ?>
-           
+
+
             <table class="w-100 sign-table border-collapse signed-info footer mt-3">
                 <tr>
                     <th>

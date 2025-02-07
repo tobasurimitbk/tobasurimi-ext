@@ -55,8 +55,10 @@
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                                 <th onclick="changeSort('supplier')" class="sort">Supplier</th>
-                                <th onclick="changeSort('total')" class="sort">Total</th>
-                                <th>Order</th>
+                                <th onclick="changeSort('total')" class="sort">Total Sebelum PPH</th>
+                                <th onclick="changeSort('total')" class="sort">Total Setelah PPH</th>
+                                <th>Item Order</th>
+                                <th>Qty</th>
                                 <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
                                 <th>Action</th>
                             </tr>
@@ -189,7 +191,14 @@
                 className: "text-center"
             },
             {
-                data: "total",
+                data: "total_before_pph",
+                className: "text-center",
+                render: function(param) {
+                    return greatFormatRupiah(param);
+                }
+            },
+            {
+                data: "total_after_pph",
                 className: "text-center",
                 render: function(param) {
                     return greatFormatRupiah(param);
@@ -197,6 +206,12 @@
             },
             {
                 data: "itemCount",
+                className: "text-center",
+                searchable: false,
+                sortable: false,
+            },
+            {
+                data: "qtyTotal",
                 className: "text-center",
                 searchable: false,
                 sortable: false,

@@ -152,12 +152,12 @@ class OrderForm extends BaseController
 
         if ($this->is_admin == '1') {
             $condition = [
-                "sales_order.id_company" => $this->this_company_id,
+                // "sales_order.id_company" => $this->this_company_id,
                 "sales_order.deletedAt" => null,
             ];
         } elseif ($this->is_admin == '0') {
             $condition = [
-                "sales_order.id_company" => $this->this_company_id,
+                // "sales_order.id_company" => $this->this_company_id,
                 "sales_order.deletedAt" => null,
                 'sales_order.id_user' => $this->userId
             ];
@@ -361,12 +361,14 @@ class OrderForm extends BaseController
                 "destination"           => $customerData->address,
                 "estimated_freight"     => $estimatedFreight,
                 "total_harga"           => $postData['total'],
-                "id_company"            => $this->this_company_id,
+                "id_company"            => ($this->this_company_id != 16) 
+                                            ? $this->request->getPost('company_id') 
+                                            : $this->this_company_id,
                 "tipe_sales_order"      => 'LOKAL',
                 "ppn"      => $status_ppn
             ];
 
-            $checkSO = $this->SalesOrderModel->where('id_company', $this->this_company_id)->where('UPPER(no_sales_order)', strtoupper($this->request->getVar('no_sales_order')))->findAll();
+            $checkSO = $this->SalesOrderModel->where('UPPER(no_sales_order)', strtoupper($this->request->getVar('no_sales_order')))->findAll();
             if ($checkSO) {
                 $data = [
                     "status"    => false,
@@ -465,7 +467,7 @@ class OrderForm extends BaseController
             'jabatan_name' => "SALES"
         ];
 
-        $sales = $this->employeeModel->getEmployeesComplete($this->this_company_id, $condition);
+        $sales = $this->employeeModel->getEmployeesComplete($condition);
         $dataTermin = $this->MetaDataModel
             ->where('metadata.deletedAt', null)
             ->where('metadata.name', 'Termin')
@@ -807,7 +809,7 @@ class OrderForm extends BaseController
             ->select('satuans.nama_satuan as nama_satuan')
             ->where('type_barang_sales', 'LOKAL')
             ->where('barang_master_sales.deletedAt', null)
-            ->where('barang_master_sales.company_id', $this->this_company_id)
+            // ->where('barang_master_sales.company_id', $this->this_company_id)
             ->groupBy('id_barang')
             ->findAll();
 
@@ -975,7 +977,7 @@ class OrderForm extends BaseController
         $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
 
         $lastData = $this->SalesOrderModel->asObject()
-            ->where('id_company', $this->this_company_id)
+            // ->where('id_company', $this->this_company_id)
             ->like('no_sales_order', $numberTemplate)
             ->orderBy('createdAt', 'DESC')
             ->first();
@@ -1051,7 +1053,7 @@ class OrderForm extends BaseController
 
     public function dropdownCustomer()
     {
-        $dataCustomer = $this->CustomerModel->getCustomerLokal($this->userId, $this->this_company_id);
+        $dataCustomer = $this->CustomerModel->getCustomerLokal($this->userId);
         return response()->setJSON([
             'data' => $dataCustomer,
             'token' => csrf_hash(),

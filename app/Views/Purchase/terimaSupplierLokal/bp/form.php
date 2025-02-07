@@ -77,6 +77,19 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <div class="input-group input-group-password">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input readonly autocomplete="one-time-code" <?= !empty($dataTandaTerimaFaktur) ? 'readonly' : '' ?> type="text" class="form-control no_tanda_keluar_faktur" id="no_tanda_keluar_faktur" name="no_tanda_keluar_faktur" placeholder="No Tanda Keluar Faktur" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['faktur_keluar_no'] : $noTandaKeluar ?>">
+                                            <label for="floatingInput">No Keluar Faktur</label>
+                                        </div>
+                                        <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                            <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px; <?= !empty($dataTandaTerimaFaktur) ? 'display:none' : '' ?> " class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatusKeluar()">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input <?= $isUsed ? 'disabled' : '' ?> autocomplete="one-time-code" value="<?= !empty($dataTandaTerimaFaktur) ? date('d/m/Y', strtotime($dataTandaTerimaFaktur['receive_date'])) : date('d/m/Y') ?>" class="form-control input-picker datepicker" id="tanggal_terima" name="tanggal_terima" placeholder="Tanggal Terima Faktur">
@@ -87,6 +100,8 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-4">
                                 <?php if (!empty($dataTandaTerimaFaktur)) : ?>
                                     <input autocomplete="one-time-code" name="supplier_id" value="<?= $dataTandaTerimaFaktur['supplier_id'] ?>" type="hidden" class="form-control ">
@@ -102,8 +117,6 @@
                                     <label for="floatingInput" style="z-index: 1;">Supplier</label>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input type="text" readonly autocomplete="one-time-code" value="" class="form-control nominal_faktur" id="nominal_faktur" name="nominal_faktur" placeholder="Nominal Faktur">
@@ -123,9 +136,11 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select <?= !empty($dataTandaTerimaFaktur) ? 'disabled' : '' ?> class="form-select divisi_id" name="divisi_id" id="divisi_id">
+                                    <select class="form-select divisi_id" name="divisi_id" id="divisi_id">
                                         <option value=""></option>
                                         <option value="all">All</option>
                                         <?php foreach ($divisi as $d) : ?>
@@ -606,6 +621,9 @@
             no_tanda_terima_faktur: {
                 required: true
             },
+            no_tanda_keluar_faktur: {
+                required: true
+            },
             tanggal_terima: {
                 required: true
             },
@@ -631,6 +649,9 @@
         messages: {
             no_tanda_terima_faktur: {
                 required: "No terima faktur wajib diisi"
+            },
+            no_tanda_keluar_faktur: {
+                required: "No Keluar faktur wajib diisi"
             },
             tanggal_terima: {
                 required: "Tanggal faktur wajib diisi"
@@ -1175,6 +1196,40 @@
         }
     }
 
+
+    function changeStatusKeluar() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
+        if (value) {
+            $(".no_tanda_keluar_faktur").attr("readonly", true);
+            $.ajax({
+                url: `<?= base_url("tanda-terima-faktur-lokal-bp/generate-tanda-keluar-no"); ?>`,
+                method: "GET",
+                data: {
+                    warehouseID: $('#warehouse_id').val()
+                },
+                dataType: "json",
+                success: function(res) {
+                    if (res.status) {
+                        $(".no_tanda_keluar_faktur").val(res.data);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        $(".no_tanda_keluar_faktur").attr("readonly", false);
+                        $("#auto_generate").prop("checked", false);
+                        $(".no_tanda_keluar_faktur").val("");
+                    }
+                }
+            })
+        } else {
+            $(".no_tanda_keluar_faktur").attr("readonly", false);
+            $(".no_tanda_keluar_faktur").val("");
+        }
+    }
+
+
     function preventNegativeInput(inputElement) {
         var inputValue = inputElement.value;
         var numericValue = inputValue.replace(/[^0-9.]/g, '');
@@ -1217,7 +1272,7 @@
 <?php if (!empty($dataTandaTerimaFaktur)) : ?>
     <script>
         $('#supplier_id').val("<?= $dataTandaTerimaFaktur['supplier_id'] ?>").change();
-        $('#supplier_id').attr('disabled', true);
+        // $('#supplier_id').attr('disabled', true);
 
         function daftarPenerimaanFromDB() {
             <?php foreach ($dataDetailTandaTerimaFaktur as $d) : ?>

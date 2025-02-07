@@ -117,6 +117,7 @@ class RMPurchaseOrderModel extends Model
 
         $selectQry = "rm_purchase_orders.*, 
             suppliers.name AS supplierName,
+            suppliers.no_npwp as supplierNPWP,
             companies.company AS companyName,
             divisis.divisi,
             COUNT(rm_purchase_order_details.id) AS itemCount";

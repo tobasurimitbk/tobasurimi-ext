@@ -120,6 +120,12 @@ class PenerimaanBarangLokalBP extends BaseController
             "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
+        if ($addCondition['status'] == "BELUM POSTING") {
+            // Jika Belum Posting Matikan Filter Start Date End Date
+            $addCondition['startdate'] = "";
+            $addCondition['lastdate'] = "";
+        }
+
         $limit = $this->request->getVar("length");
         $offset = $this->request->getVar("start");
         $penerimaanBarangData = $this->penerimaanBarangModel->getPenerimaanBarangList($condition, $addCondition, $limit, $offset);
@@ -155,6 +161,7 @@ class PenerimaanBarangLokalBP extends BaseController
                 "bc_type"               => $data->bc_type,
                 "in_bc"                 => $bc_purchase_order_detail_list != null ? 'in' : 'out',
                 "retur_status"          => ($pengembalianBarang != null) ? ($pengembalianBarang['status_post'] == "WAITING" ? 0 : 1) : null,
+                "bc_type_name"          => $data->bc_type_name == null ? "NON PABEAN" : $data->bc_type_name
             ]);
         }
 
@@ -177,7 +184,7 @@ class PenerimaanBarangLokalBP extends BaseController
 
         $condition = [
             "penerimaan_barang.company_id" => $this->this_company_id,
-            "status_penerimaan" => "LOKAL",
+            "penerimaan_barang.status_penerimaan" => "LOKAL",
             "penerimaan_barang.deletedAt" => null,
             "penerimaan_barang_detail.deletedAt" => null,
             "tipe_bahan" => "PENOLONG"
@@ -199,18 +206,32 @@ class PenerimaanBarangLokalBP extends BaseController
         $no = 1;
 
         foreach ($penerimaanBarangData['data'] as $data) {
+            $multiSpp = $this->amPurchaseOrderModel->getSPP(json_decode($data->multiple_po_id));
+            $bc_purchase_order_detail_list = $this->bcPurchaseOrder->like('multiple_lpb_id', $data->id)->where('deletedAt', null)->findAll();
+            $pengembalianBarang = $this->pengembalianBarangModel->where('penerimaan_barang_id', $data->id)->first();
+
+            $sppNo = "";
+            foreach ($multiSpp as $s) {
+                $sppNo .= $s['spp_no'] . ", ";
+            }
+
             array_push($dataPenerimaanBarang, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
-                "divisi"                => $data->divisi,
                 "no_penerimaan_barang"  => $data->no_penerimaan_barang,
+                "divisi"                => $data->divisi,
                 "warehouse_name"        => $data->warehouse_name,
                 "tipe_bahan"            => $data->tipe_bahan,
-                "createdAt"             => $data->createdAt ? date("d/m/Y", strtotime($data->tanggal)) : "",
+                "createdAt"             => $data->tanggal ? date("d/m/Y", strtotime($data->tanggal)) : "",
                 "supplier_name"         => $data->supplier_name,
                 "itemCount"             => $data->itemCount,
+                "spp_no"                => $sppNo,
                 "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
                 "status_post"           => $data->status_post,
+                "bc_type"               => $data->bc_type,
+                "in_bc"                 => $bc_purchase_order_detail_list != null ? 'in' : 'out',
+                "retur_status"          => ($pengembalianBarang != null) ? ($pengembalianBarang['status_post'] == "WAITING" ? 0 : 1) : null,
+                "bc_type_name"          => $data->bc_type_name == null ? "NON PABEAN" : $data->bc_type_name
             ]);
         }
 
@@ -231,7 +252,7 @@ class PenerimaanBarangLokalBP extends BaseController
 
         $condition = [
             "penerimaan_barang.company_id" => $this->this_company_id,
-            "status_penerimaan" => "LOKAL",
+            "penerimaan_barang.status_penerimaan" => "LOKAL",
             "penerimaan_barang.deletedAt" => null,
             "penerimaan_barang_detail.deletedAt" => null,
             "tipe_bahan" => "PENOLONG"
@@ -253,14 +274,22 @@ class PenerimaanBarangLokalBP extends BaseController
         $no = 1;
 
         foreach ($penerimaanBarangData['data'] as $data) {
+            $multiSpp = $this->amPurchaseOrderModel->getSPP(json_decode($data->multiple_po_id));
+
+            $sppNo = "";
+            foreach ($multiSpp as $s) {
+                $sppNo .= $s['spp_no'] . ", ";
+            }
+
             array_push($dataPenerimaanBarang, [
                 "NO"                    => $no++,
                 "DEPARTEMEN"            => $data->divisi,
-                "NO PENERIMAAN BARANG"  => $data->no_penerimaan_barang,
-                "NO PO"                 => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
+                "NO PENERIMAAN"         => $data->no_penerimaan_barang,
+                "NO SPP"                => $sppNo,
                 "GUDANG"                => $data->warehouse_name,
-                "TANGGAL"               => $data->createdAt ? date("d/m/Y", strtotime($data->tanggal)) : "",
+                "TANGGAL"               => $data->tanggal ? date("d/m/Y", strtotime($data->tanggal)) : "",
                 "SUPPLIER"              => $data->supplier_name,
+                "DOKUMEN"               => $data->bc_type_name == null ? "NON PABEAN" : $data->bc_type_name,
                 "JUMLAH ITEM"           => $data->itemCount,
             ]);
         }
@@ -284,7 +313,7 @@ class PenerimaanBarangLokalBP extends BaseController
         } else {
             $header = array_keys($dataPenerimaanBarang[0]);
             $sheet->fromArray($header, null, 'A1');
-            $sheet->getStyle('A1:H1')->applyFromArray([
+            $sheet->getStyle('A1:I1')->applyFromArray([
                 'font' => [
                     'bold' => true,
                 ],
@@ -637,6 +666,22 @@ class PenerimaanBarangLokalBP extends BaseController
         try {
             $penerimaanBarang = $this->penerimaanBarangModel->where('id', $id)->first();
             $penerimaanBarangList = $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();
+
+            foreach (json_decode($penerimaanBarang['multiple_po_id']) as $p) {
+                $amPurchaseOrder = $this->amPurchaseOrderModel
+                    ->select('am_purchase_orders.*,purchase_requests.spp_no')
+                    ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
+                    ->where('am_purchase_orders.id', $p)
+                    ->first();
+                if ($amPurchaseOrder['is_posted'] == 0) {
+                    return response()->setJSON([
+                        'status' => false,
+                        'message' => "Purchase Order dengan nomor SPP : " . $amPurchaseOrder['spp_no'] . ", dengan nomor PO : " . $amPurchaseOrder['po_no'] . " Belum Diposting",
+                        'token' => csrf_hash()
+                    ]);
+                    break;
+                }
+            }
 
             $multiple_po_id = json_decode($penerimaanBarang['multiple_po_id']);
             foreach ($multiple_po_id as $key => $value) {

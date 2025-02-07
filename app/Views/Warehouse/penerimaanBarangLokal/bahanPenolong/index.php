@@ -26,7 +26,7 @@
                 <div class="col">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal" disabled value="01<?= date('/m/Y') ?>">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -34,7 +34,7 @@
                 </div>
                 <div class="col">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal" disabled>
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
@@ -58,11 +58,11 @@
                                 <th>No.</th>
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
-                                <!-- <th>No. PO</th> -->
                                 <th>No SPP</th>
                                 <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
                                 <th onclick="changeSort('createdAt')">Tanggal</th>
                                 <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
+                                <th onclick="changeSort('metadata.value')" class="sort">Dokumen</th>
                                 <th>Jumlah Item</th>
                                 <th>Actions</th>
                             </tr>
@@ -91,18 +91,18 @@
         "stateDuration": -1,
         "stateSaveCallback": function(settings, data) {
             data.searchValue = $(".search").val();
-            data.dateStart = $(".dateStart").val();
-            data.dateEnd = $(".dateEnd").val();
-            data.status = $(".status").val();
+            // data.dateStart = $(".dateStart").val();
+            // data.dateEnd = $(".dateEnd").val();
+            // data.status = $(".status").val();
             localStorage.setItem('DataTables_' + settings.sInstance, JSON.stringify(data));
         },
         "stateLoadCallback": function(settings) {
             const data = JSON.parse(localStorage.getItem('DataTables_' + settings.sInstance));
             if (data) {
                 $(".search").val(data.searchValue);
-                $(".dateStart").val(data.dateStart);
-                $(".dateEnd").val(data.dateEnd);
-                $(".status").val(data.status);
+                // $(".dateStart").val(data.dateStart);
+                // $(".dateEnd").val(data.dateEnd);
+                // $(".status").val(data.status);
             }
             return data;
         },
@@ -169,6 +169,10 @@
             },
             {
                 data: "supplier_name",
+                className: "text-center"
+            },
+            {
+                data: "bc_type_name",
                 className: "text-center"
             },
             {
@@ -290,6 +294,18 @@
         $(".dateStart, .dateEnd, .status").change(function() {
             table.ajax.reload();
         })
+
+        $(".status").change(function() {
+            var status = $(this).val();
+            if (status == "finish") {
+                // Ubah Status Disbled StartDate dan EndDate menjadi false
+                $(".dateStart, .dateEnd").attr('disabled', false);
+            } else {
+                // Ubah Status Disbled StartDate dan EndDate menjadi false
+                $(".dateStart, .dateEnd").attr('disabled', true);
+
+            }
+        });
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();

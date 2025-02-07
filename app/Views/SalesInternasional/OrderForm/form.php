@@ -696,7 +696,7 @@
                 newRow.append($('<td>').text(item.satuan_order_name));
                 newRow.append($('<td>').text(item.kemasan));
                 newRow.append($('<td>').html(`
-                    <input  style="height: 40px; padding-bottom: 12px;" <?= isset($dataSalesExport) && $dataSalesExport->status === "POSTED" ? "readonly" : "" ?> class="form-control remark" oninput="preventNegativeInput(this);updateRemark($(this))" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.remark}">
+                    <input  style="height: 40px; padding-bottom: 12px;" <?= isset($dataSalesExport) && $dataSalesExport->status === "POSTED" ? "readonly" : "" ?> class="form-control remark" onkeyup="preventNegativeInput(this);updateRemark($(this))" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" data-id="${item.id_detail}" value="${item.remark}">
                 `));
                 newRow.append($('<td>').text(item.qty));
                 newRow.append($('<td>').text(greatFormatRupiah(item.harga)));
@@ -734,13 +734,48 @@
         }
     }
 
+    function updateRemark(input) {
+        const csrf = $(`[name="${csrfToken}"]`);
+        const remarkId = $(input).attr("data-id") // Ambil ID input
+        const remarkValue = $(input).val();    // Ambil nilai remark
 
-
-    function updateRemark(input){
-
+        $.ajax({
+            url: "<?= base_url("order-form-internasional/update-remark"); ?>",
+            data: {
+                id: remarkId,
+                remark: remarkValue,  // Kirim nilai remark
+                status: "POSTED"
+            },
+            method: "POST",
+            dataType: "json",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            success: function(response) {
+                if (response.status) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                    .then(() => {
+                        stopLoading()
+                    })
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                    stopLoading()
+                }
+            }
+        });
     }
-
-
 
     function updateOrder(input) {
         var index = input.data('index');

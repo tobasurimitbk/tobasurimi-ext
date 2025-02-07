@@ -57,7 +57,8 @@ class SPP extends BaseController
     public function spp()
     {
         $dataSppType =  $this->MetadataModel->get_by_name("Tipe SPP");
-        return view('Purchase/spp/index', ['dataSppType' => $dataSppType]);
+        $dataDivisi = $this->DivisisModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
+        return view('Purchase/spp/index', ['dataSppType' => $dataSppType, 'dataDivisi' => $dataDivisi]);
     }
 
     public function createSPP()
@@ -141,6 +142,7 @@ class SPP extends BaseController
 
 
         $addCondition = [
+            "divisi_id"     => $this->request->getVar('divisi_id'),
             "is_posted"     => $this->request->getVar('is_posted'),
             "search"        => $this->request->getVar("search"),
             "spp_type"      => $this->request->getVar("spp_type"),
@@ -149,6 +151,12 @@ class SPP extends BaseController
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
+
+        if ($addCondition['is_posted'] == "BELUM POSTING") {
+            // Jika Belum Posting Matikan Filter Start Date End Date
+            $addCondition['dateStart'] = "";
+            $addCondition['dateEnd'] = "";
+        }
 
         $limit = $this->request->getVar("length");
         $offset = $this->request->getVar("start");
