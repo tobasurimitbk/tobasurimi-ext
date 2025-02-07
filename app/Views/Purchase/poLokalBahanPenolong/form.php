@@ -496,7 +496,7 @@
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
-        $('#total').val(total == 0 ? '' : greatFormatRupiah(total));
+        $('#total').val(total == 0 ? '' : greatFormatRupiah(total.toFixed(2)));
     });
 
     // CHANGE TOTAL
@@ -508,7 +508,7 @@
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var hargaSatuan = (((total / qty)));
-        $('#harga_satuan').val(hargaSatuan == 0 ? '' : greatFormatRupiah(hargaSatuan));
+        $('#harga_satuan').val(hargaSatuan == 0 ? '' : greatFormatRupiah(hargaSatuan.toFixed(2)));
     });
 
     // PPN CHANGE
