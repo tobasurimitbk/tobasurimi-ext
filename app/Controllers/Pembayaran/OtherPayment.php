@@ -186,8 +186,9 @@ class OtherPayment extends BaseController
     public function posting()
     {
         $id = decrypt($this->request->getVar('id'));
+        $this->jurnalController->insertDataPembayaran($id, "LAIN-LAIN");
+        // exit;
         $this->otherPaymentModel->update($id, ['status_posting' => '1']);
-        $result = $this->jurnalController->insertDataPembayaran($id, "LAIN-LAIN");
 
         return response()->setJSON([
             'status' => true,

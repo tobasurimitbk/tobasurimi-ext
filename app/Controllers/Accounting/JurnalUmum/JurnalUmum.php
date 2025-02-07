@@ -25,6 +25,7 @@ use App\Models\LocalPOPaymentModel;
 use App\Models\LocalPOPaymentDetailModel;
 use App\Models\ImportPOPaymentModel;
 use App\Models\KursModel;
+use App\Models\OtherPaymentModel;
 use App\Models\PembayaranInvoiceDetailModel;
 use App\Models\PembayaranInvoiceModel;
 use App\Models\PenerimaanBarangModel;
@@ -67,6 +68,7 @@ class JurnalUmum extends BaseController
     protected $localPOPaymentModel;
     protected $localPOPaymentDetailModel;
     protected $importPOPaymentModel;
+    protected $otherPaymentModel;
     protected $penerimaanBarangModel;
     protected $metadataModel;
     protected $kursModel;
@@ -105,6 +107,7 @@ class JurnalUmum extends BaseController
         $this->localPOPaymentModel = new LocalPOPaymentModel();
         $this->localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
         $this->importPOPaymentModel = new ImportPOPaymentModel();
+        $this->otherPaymentModel = new OtherPaymentModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->metadataModel = new MetadataModel();
         $this->kursModel = new KursModel();
@@ -1531,7 +1534,7 @@ class JurnalUmum extends BaseController
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
                     'no_bukti' => $no_transaksi_jurnal,
-                    'valas' => 'IDR',
+                    'valas' => '20',
                     'exchange_rate' => 1,
                 );
 
@@ -1568,7 +1571,7 @@ class JurnalUmum extends BaseController
                             'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
                             'debit'             => ($sumValue),
                             'kredit'            => 0,
-                            'valas'             => 'IDR',
+                            'valas'             => '20',
                             'kurs'              => 1,
                             'keterangan'        => "Pembayaran PO " . $dataPO,
                             'id_inputer'        => session()->get("login")->user_id
@@ -1581,7 +1584,7 @@ class JurnalUmum extends BaseController
                             'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
                             'debit'             => 0,
                             'kredit'            => ($sumValue),
-                            'valas'             => 'IDR',
+                            'valas'             => '20',
                             'kurs'              => 1,
                             'keterangan'        => "Pembayaran PO " . $dataPO,
                             'id_inputer'        => session()->get("login")->user_id
@@ -1590,7 +1593,7 @@ class JurnalUmum extends BaseController
                 }
                 $this->jurnalUmumModel->insertJurnalBatch($result);
             }
-        } else {
+        } else if ($module == "IMPORT") {
             $POimport = $this->importPOPaymentModel->asObject()->where('deletedAt', null)->where('id', $payID)->first();
             if ($POimport) {
                 $totalPO = 0;
@@ -1633,8 +1636,8 @@ class JurnalUmum extends BaseController
                 $resultTransaksiJurnal = array(
                     'no_transaksi' => $no_transaksi_jurnal,
                     'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
-                    'total_debit' => repairDouble($POimport->payment_amt)  * repairDouble($POimport->current_exchange_rate),
-                    'total_kredit' => repairDouble($POimport->payment_amt)  * repairDouble($POimport->current_exchange_rate),
+                    'total_debit' => repairDouble($POimport->payment_amt),
+                    'total_kredit' => repairDouble($POimport->payment_amt),
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
                     'no_bukti' => $no_transaksi_jurnal,
@@ -1655,7 +1658,7 @@ class JurnalUmum extends BaseController
                     'id_coa' =>  $POimport->akun_kas,
                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
                     'debit' => 0,
-                    'kredit' => repairDouble($POimport->payment_amt) * repairDouble($POimport->current_exchange_rate),
+                    'kredit' => repairDouble($POimport->payment_amt),
                     'valas' => $POimport->currency,
                     'kurs' => $POimport->current_exchange_rate,
                     'keterangan' => "Pembayaran PO " . $dataPO,
@@ -1665,11 +1668,75 @@ class JurnalUmum extends BaseController
                     'id_transaksi' => $id_transaksi_jurnal,
                     'id_coa' =>  $POimport->akun_selisih == 0 || $POimport->akun_selisih == NULL ? $UtangAR : $POimport->akun_selisih,
                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
-                    'debit' => repairDouble($POimport->payment_amt) * repairDouble($POimport->current_exchange_rate),
+                    'debit' => repairDouble($POimport->payment_amt),
                     'kredit' => 0,
                     'valas' => $POimport->currency,
                     'kurs' => $POimport->current_exchange_rate,
                     'keterangan' => "Pembayaran PO " . $dataPO,
+                    'id_inputer' => session()->get("login")->user_id
+                );
+                $this->jurnalUmumModel->insertJurnalBatch($result);
+            }
+        } else if ($module == "LAIN-LAIN") {
+            $otherPayment = $this->otherPaymentModel->asObject()->where('deletedAt', null)->where('id', $payID)->first();
+            if ($otherPayment) {
+                $totalPO = 0;
+                $kursData = 1;
+                $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'PEMBAYARAN')->first();
+                if ($otherPayment->valas != "20") {
+                    $kursData = $this->kursModel->getKursCurrent($otherPayment->valas, $otherPayment->tanggal)['nilai_kurs'];
+                    if (!$kursData) {
+                        return response()->setJSON([
+                            'status' => false,
+                            'message' => "Data kurs untuk tanggal " . date('Y-m-d', strtotime($otherPayment->tanggal)) . " tidak tersedia.",
+                            'token' => csrf_hash()
+                        ]);
+                    }
+                }
+
+                // start inisialisasi kode transaksi
+                $kodeTransaksi = $dataMetadataTipeTransaksi->description;
+                $idTransaksi = $dataMetadataTipeTransaksi->id;
+                // end inisialisasi kode transaksi
+
+                // input ke transaksi jurnal
+                $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
+                $resultTransaksiJurnal = array(
+                    'no_transaksi' => $no_transaksi_jurnal,
+                    'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $otherPayment->tanggal))),
+                    'total_debit' => repairDouble($otherPayment->nominal),
+                    'total_kredit' => repairDouble($otherPayment->nominal),
+                    'metode_input' => 'system',
+                    'type_transaksi' => $idTransaksi,
+                    'no_bukti' => $no_transaksi_jurnal,
+                    'valas' => $otherPayment->valas,
+                    'exchange_rate' => $kursData,
+                );
+
+                // ambil id dari transaksi jurnal untuk jurnal umum
+                $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
+                //untuk insert ke jurnal umum
+
+                $result[] = array(
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' =>  $otherPayment->akun_kas,
+                    'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $otherPayment->tanggal))),
+                    'debit' => 0,
+                    'kredit' => repairDouble($otherPayment->nominal),
+                    'valas' => $otherPayment->valas,
+                    'kurs' => $kursData,
+                    'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " " . $otherPayment->keterangan,
+                    'id_inputer' => session()->get("login")->user_id
+                );
+                $result[] = array(
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' =>  $otherPayment->akun_selisih,
+                    'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $otherPayment->tanggal))),
+                    'debit' => repairDouble($otherPayment->nominal),
+                    'kredit' => 0,
+                    'valas' => $otherPayment->valas,
+                    'kurs' => $kursData,
+                    'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " " . $otherPayment->keterangan,
                     'id_inputer' => session()->get("login")->user_id
                 );
                 $this->jurnalUmumModel->insertJurnalBatch($result);

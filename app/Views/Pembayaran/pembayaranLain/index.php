@@ -91,7 +91,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating  mb-3" style="height: 50px;">
-                                <select class="form-select" name="akun_kas" id="akun_kas">
+                                <select class="form-select" name="akun_kas" id="akun_kas" required>
                                     <option disabled selected value=""></option>
                                     <?php foreach ($subsAkuns as $subs) : ?>
                                         <option value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
@@ -102,13 +102,13 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating  mb-3" style="height: 50px;">
-                                <select class="form-select" name="akun_selisih" id="akun_selisih">
+                                <select class="form-select" name="akun_selisih" id="akun_selisih" required>
                                     <option disabled selected value=""></option>
                                     <?php foreach ($subsAkuns as $subs) : ?>
                                         <option value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
                                     <?php endforeach ?>
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Kredit (Opsional)</label>
+                                <label for="floatingInput" style="z-index: 1;">Kredit</label>
                             </div>
                         </div>
                     </div>
@@ -443,7 +443,7 @@
         });
 
         $('#akun_selisih').select2({
-            placeholder: "Pilih Kredit (Opsional)",
+            placeholder: "Pilih Kredit",
             theme: "bootstrap-5",
             dropdownParent: $('#add_modal')
         });
