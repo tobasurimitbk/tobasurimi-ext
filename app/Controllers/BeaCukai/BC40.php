@@ -2011,8 +2011,8 @@ class BC40 extends BaseController
                     'lpb_date' => date('d/m/Y', strtotime($p['lpb_date'])),
                     'lpb_no' => $p['no_penerimaan_barang'],
                     'purchase_order_id' => $p['purchase_order_id'],
-                    'qty_lpb' => $p['qty_lpb'],
-                    'qty_po' => $p['qty_po'],
+                    'qty_lpb' => round($p['qty_lpb'], 2),
+                    'qty_po' => round($p['qty_po'], 2),
                     'barang_id' => $p['barang_id'],
                     'po_no' => $p['po_no'],
                     'po_date' => date('d/m/Y', strtotime($p['po_date'])),
@@ -2028,8 +2028,8 @@ class BC40 extends BaseController
                         'lpb_date' => date('d/m/Y', strtotime($p['lpb_date'])),
                         'lpb_no' => $p['no_penerimaan_barang'],
                         'purchase_order_id' => $p['purchase_order_id'],
-                        'qty_lpb' => $p['qty_lpb'],
-                        'qty_po' => $p['qty_po'],
+                        'qty_lpb' => round($p['qty_lpb'], 2),
+                        'qty_po' => round($p['qty_po'], 2),
                         'barang_id' => $p['barang_id'],
                         'po_no' => $p['po_no'],
                         'po_date' => date('d/m/Y', strtotime($p['po_date'])),
@@ -2285,8 +2285,8 @@ class BC40 extends BaseController
                             'po_no' => $row['po_no'],
                             'kode_barang' => $row['kode_barang'],
                             'barang' => $row['barang_name'],
-                            'qty_po' => $row['qty_po'],
-                            'qty_lpb' => $row['qty_lpb'],
+                            'qty_po' => round($row['qty_po'], 2),
+                            'qty_lpb' => round($row['qty_lpb'], 2),
                             'sub_total' => number_format($row['sub_total'], 2)
                         ]);
                     }
@@ -2336,8 +2336,8 @@ class BC40 extends BaseController
                             'po_no' => $row['po_no'],
                             'kode_barang' => $row['kode_barang'],
                             'barang' => $row['barang_name'],
-                            'qty_po' => $row['qty_po'],
-                            'qty_lpb' => $row['qty_lpb'],
+                            'qty_po' => round($row['qty_po'], 2),
+                            'qty_lpb' => round($row['qty_lpb'], 2),
                             'sub_total' => number_format($row['sub_total'], 2)
                         ]);
                     }
