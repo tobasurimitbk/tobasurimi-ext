@@ -439,9 +439,7 @@
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        $('#nama_barang').val($(this).find("option:selected").data("nama_barang") + " - " + $(this).find("option:selected").data("spesifikasi_name"));
-        $('#nama_kategori').val($(this).find("option:selected").data("parent_name"));
-        // $('#satuan_id').val(($(this).find("option:selected").data("satuan_id")));
+        var selectedNamaBarang = $('#barang_id option:selected').text();
         var selected = $('#barang_id option:selected');
         activeFieldSatuanId(
             selected.data('satuan_id'),
@@ -449,27 +447,17 @@
             selected.data('satuan_3')
         );
 
-        // $.ajax({
-        //     url: "<?= base_url("po-lokal-bahan-penolong/histori-harga"); ?>",
-        //     data: {
-        //         id: $('#barang_id').find("option:selected").data("barang_id"),
-        //         spesifikasi_id: $('#barang_id').find("option:selected").data("spesifikasi_id")
-        //     },
-        //     beforeSend: function() {
-        //         setLoading();
-        //     },
-        //     complete: function() {
-        //         stopLoading();
-        //     },
-        //     method: "GET",
-        //     success: function(response) {
-        //         if (response.res.hargaTerakhirNumber !== 0) {
-        //             $('#harga_satuan').val(greatFormatRupiah(response.res.hargaTerakhirNumber)).keyup();
-        //         } else {
-        //             $('#harga_satuan').val('');
-        //         }
-        //     },
-        // });
+        $('#nama_kategori').val($(this).find("option:selected").data("parent_name"));
+
+        try {
+            const match = selectedNamaBarang.match(/\(\s*(.*?)\s*\)/);
+            if (!match) {
+                $('#nama_barang').val($(this).find("option:selected").data("nama_barang") + " - " + $(this).find("option:selected").data("spesifikasi_name"));
+            }
+            $('#nama_barang').val(match[1]);
+        } catch (error) {
+            $('#nama_barang').val($(this).find("option:selected").data("nama_barang") + " - " + $(this).find("option:selected").data("spesifikasi_name"));
+        }
     });
 
     $('.form-select')
@@ -677,18 +665,32 @@
                         confirmButtonText: 'Oke',
                     })
                 } else {
-                    var indexToRemove = -1;
+                    var indexToUpdate = -1;
                     for (var i = 0; i < listBarang.length; i++) {
                         if (listBarang[i].spesifikasi_id == barang_update_id) {
-                            indexToRemove = i;
+                            indexToUpdate = i;
                             break;
                         }
                     }
-                    if (indexToRemove !== -1) {
-                        listBarang.splice(indexToRemove, 1);
-                        insertList();
-                        resetForm();
-                    }
+
+                    listBarang[indexToUpdate] = {
+                        barang_id: $('#barang_id').find("option:selected").data("barang_id"),
+                        spesifikasi_id: $('#barang_id').val(),
+                        kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
+                        nama_barang: $('#nama_barang').val(),
+                        satuan_id: $('#satuan_id').val(),
+                        nama_satuan: $('#satuan_id').find("option:selected").data("kode_satuan"),
+                        qty: parseFloat($('#qty').val()),
+                        diskon: parseFloat($('#diskon').val()),
+                        harga_satuan: destroyFormatRupiah($('#harga_satuan').val() || 0),
+                        biaya_tambahan: destroyFormatRupiah($('#biaya_tambahan').val() || 0),
+                        total: destroyFormatRupiah($('#total').val()),
+                        keterangan: $('#keterangan').val(),
+                        ppn: $('#ppn').val(),
+                        pph: $('#pph').val()
+                    };
+                    drawTabel(listBarang);
+                    resetForm();
                 }
 
             } else {

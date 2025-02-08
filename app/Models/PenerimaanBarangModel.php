@@ -316,22 +316,25 @@ class PenerimaanBarangModel extends Model
         return $sppData;
     }
 
-    public function get_no($bln, $thn, $last_day, $warehouseKode, $warehouseID)
+    public function get_no($bln, $thn, $warehouseKode, $statusPenerimaan, $tipeBahan, $prefix)
     {
         $lastStr = convertBulanToAngkaRomawi($bln) . '/' . $thn;
+        $first_day = "$thn-$bln-01";
+        $last_day = date("Y-m-t", strtotime($first_day));
 
         $builder = $this->db->table('penerimaan_barang');
         $builder->select('no_penerimaan_barang');
-        $builder->orderBy('no_penerimaan_barang', 'asc'); // Urutkan secara ascending untuk mempermudah deteksi celah
+        $builder->orderBy('no_penerimaan_barang', 'asc');
         $builder->where('company_id', session()->get("login")->this_company_id);
+        $builder->where('status_penerimaan', $statusPenerimaan);
+        $builder->where('tipe_bahan', $tipeBahan);
+        $builder->where('tanggal >=', $first_day);
+        $builder->where('tanggal <=', $last_day);
         $builder->where('penerimaan_barang.deletedAt', null);
-        // $builder->where('penerimaan_barang.warehouse_id', $warehouseID);
-        $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
-            ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('no_penerimaan_barang', $lastStr);
         $query = $builder->get();
 
-        $kode = 'LPB/' . $warehouseKode;
+        $kode = $prefix . '/' . $warehouseKode;
 
         $existingNumbers = [];
 
@@ -516,8 +519,10 @@ class PenerimaanBarangModel extends Model
         // no lpb
         $warehouseModel = new WarehousesModel();
         $warehouse = $warehouseModel->where('id', $warehouseID)->first();
-        $lastDay = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-        $no = $penerimaanBarangModel->get_no(date('m'), date('Y'), $lastDay, $warehouse['code_warehouse'], $warehouseID);
+        $tanggalExplode = explode('-', $rmDetail['po_date']);
+        $year = $tanggalExplode[0];
+        $month = $tanggalExplode[1];
+        $no = $penerimaanBarangModel->get_no($month, $year, $warehouse['code_warehouse'], "LOKAL", "BAKU", "LPB-LBB");
 
         $payloadPenerimaanBarang = [
             "company_id" => $rmDetail['company_id'],
