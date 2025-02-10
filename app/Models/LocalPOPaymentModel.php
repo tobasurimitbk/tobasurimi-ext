@@ -983,15 +983,16 @@ class LocalPOPaymentModel extends Model
             'penerimaan_barang.deletedAt' => null,
             'status_post' => 'FINISH',
             'tipe_bahan' => 'BAKU',
-            'status_penerimaan' => 'LOKAL',
-            'supplier_id' => $supplierID,
-            'divisi_id' => $divisiID,
+            'penerimaan_barang.status_penerimaan' => 'LOKAL',
+            'penerimaan_barang.supplier_id' => $supplierID,
+            'penerimaan_barang.divisi_id' => $divisiID,
             'penerimaan_barang.company_id'  => $companyID
         ];
 
         $lpbList = $penerimaanBarangModel
-            ->select('penerimaan_barang.id as lpbID, no_penerimaan_barang as lpbNO, purchase_order_id as poID, penerimaan_barang_detail.id, harga, harga_harian, jml_masuk')
+            ->select('penerimaan_barang.id as lpbID, no_penerimaan_barang as lpbNO, purchase_order_id as poID, penerimaan_barang_detail.id, harga, harga_harian, jml_masuk, rm_purchase_orders.po_no')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id')
+            ->join('rm_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
             ->where($conditionPenerimaanBarang)
             ->findAll();
 

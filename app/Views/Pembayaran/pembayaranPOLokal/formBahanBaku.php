@@ -64,7 +64,7 @@
                                     <label for="floatingInput">No. Pembayaran</label>
                                 </div>
                                 <div style="<?= !empty($detail) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input  <?= empty($detail) ? "checked" : "" ?>  autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -159,14 +159,14 @@
                                             <option selected value="<?= $d; ?>"><?= $d; ?> </option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <label for="floatingInput" style="z-index: 1;">No Dokumen LPB</label>
+                                    <label for="floatingInput" style="z-index: 1;">No PO</label>
                                 </div>
                             <?php else : ?>
                                 <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                                     <select class="form-select" name="lpb[]" id="lpb">
                                         <option disabled selected value=""></option>
                                     </select>
-                                    <label for="floatingInput" style="z-index: 1;">No Dokumen LPB</label>
+                                    <label for="floatingInput" style="z-index: 1;">No PO</label>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -398,6 +398,9 @@
 <?php else : ?>
     <script>
         $('.bulanan-form,.harian-form').hide();
+        $(document).ready(function() {
+            changeStatus();
+        });
     </script>
 <?php endif; ?>
 <script>
@@ -1082,7 +1085,7 @@
                 $("#lpb").empty();
                 $("#lpb").append(`<option value=""></option>`);
                 response.data.forEach(function(item) {
-                    $("#lpb").append(`<option  value="${item.lpbID}">${item.lpbNO}</option>`);
+                    $("#lpb").append(`<option  value="${item.lpbID}">${item.po_no}</option>`);
                 });
 
             }

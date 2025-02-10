@@ -1049,7 +1049,8 @@
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                     <button type="button" class="btn btn-danger" onclick="deleteDetailRow('${v.penerimaan_barang_detail_id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-                `
+                    <button type="button" class="btn btn-primary" onclick="editDetailRow('${v.penerimaan_barang_detail_id}')" ><i class="fa fa-pencil fa-sm" aria-hidden="true"></i></button>
+                `   
                 ));
             <?php endif; ?>
 
