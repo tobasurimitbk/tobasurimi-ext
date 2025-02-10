@@ -548,6 +548,10 @@ class Barang extends BaseController
                 "po_date"               => date('d/m/Y', strtotime($data['po_date'])),
                 "nama_supplier"         => $data['nama_supplier'],
                 "nama_barang"           => $data['nama_barang'],
+                'divisi'                => $data['divisi'],
+                'note'                  => $data['note'],
+                'qty'                   => floatval($data['qty']),
+                'kode_satuan'           => $data['kode_satuan'],
                 "price"                 => number_format($data['price'], 2, ',', '.'),
             ]);
         }
@@ -578,9 +582,8 @@ class Barang extends BaseController
             $dataBarang[$i]['id'] = encrypt($dataBarang[$i]['id']);
             $dataBarang[$i]['parent_type_id'] = encrypt($dataBarang[$i]['parent_type_id']);
             $dataBarang[$i]['barang_master_spesifikasi_id'] = encrypt($dataBarang[$i]['barang_master_spesifikasi_id']);
-            $dataBarang[$i]['barang_name'] = 
-                str_replace(['"'], "'", $dataBarang[$i]['barang_name_master'] . ' ' . $dataBarang[$i]['spesifikasi'])
-            ;
+            $dataBarang[$i]['barang_name'] =
+                str_replace(['"'], "'", $dataBarang[$i]['barang_name_master'] . ' ' . $dataBarang[$i]['spesifikasi']);
         }
 
         $data = [

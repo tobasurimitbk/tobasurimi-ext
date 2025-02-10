@@ -414,6 +414,8 @@ class AMPurchaseOrderModel extends Model
             'suppliers.name'  => 'suppliers.name',
             'barang_master_spesifikasi.spesifikasi' => 'barang_master_spesifikasi.spesifikasi',
             'am_purchase_order_details.price' => 'am_purchase_order_details.price',
+            'am_purchase_orders.division_id' => 'am_purchase_orders.division_id',
+            'am_purchase_orders.note' => 'am_purchase_orders.note',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -424,17 +426,23 @@ class AMPurchaseOrderModel extends Model
             CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) as nama_barang, 
             am_purchase_orders.po_no,
             am_purchase_orders.po_date,
+            am_purchase_orders.note,
             suppliers.name as nama_supplier,
-            am_purchase_order_details.price
+            am_purchase_order_details.price,
+            am_purchase_order_details.qty,
+            divisis.divisi,
+            satuans.kode_satuan
         ";
 
         $poDataQry = $this->asArray()
             ->select($selectQry)
             ->where($condition)
-            ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id')
-            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id')
-            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
+            ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id', 'left')
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id', 'left')
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id', 'left')
+            ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
+            ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $poDataQry->countAllResults(false);
