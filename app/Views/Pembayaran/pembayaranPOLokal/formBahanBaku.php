@@ -58,8 +58,15 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? 'value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
-                            <label for="floatingInput">No. Pembayaran</label>
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" <?= !empty($detail) ? ($detail->is_posted == '1' ? 'disabled=true' : '')   : ''; ?> type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. PO" value="<?= !empty($detail) ? $detail['pembayaranDetail']['payment_no']: ""; ?>">
+                                    <label for="floatingInput">No. Pembayaran</label>
+                                </div>
+                                <div style="<?= !empty($detail) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -548,7 +555,7 @@
     });
 
     $('#payment_date').change(function() {
-        changeStatus();
+        // changeStatus();
     });
 
     $('#bank_id').select2({
@@ -583,6 +590,7 @@
         placeholder: "Pilih Departemen",
         theme: "bootstrap-5"
     }).change(function() {
+        changeStatus();
         generateLPBNo();
         resetTable();
     });
@@ -1082,37 +1090,30 @@
     }
 
     function changeStatus() {
-        const csrfToken = '<?= csrf_token() ?>';
-        const csrf = $(`[name="${csrfToken}"]`);
-        var bank_id = $('#bank_id').val();
-        var payment_date = $('#payment_date').val();
-        var formData = new FormData();
-        formData.append("type", "Bahan Baku");
-        formData.append("bank_id", bank_id);
-        formData.append("payment_date", payment_date)
+        let value = document.getElementById('auto_generate').checked ? true : false;
+        let bankId = $("#bank_id option:selected").text();
+        let divisiId = $("#divisi_id option:selected").text();
 
-        $.ajax({
-            url: "<?= base_url("pembayaran-po-lokal-bb/generate-no-pembayaran"); ?>",
-            data: formData,
-            method: "POST",
-            dataType: "json",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                csrf.val(response.token);
-                $(".no_bukti_pembayaran").val(response.paymentNo);
-            },
-            onError: function(response) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Terjadi kesalahan pada sistem',
-                    confirmButtonColor: '#4e73df',
-                });
-            }
-        });
+        if (value) {
+            let url = "<?= base_url('pembayaran-po-lokal-bb/generate-no-pembayaran'); ?>";
+            url += `?divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}`;
+
+            $.ajax({
+                url: url,
+                method: "GET",
+                dataType: "json",
+                success: function (response) {
+                    console.log("Nomor pembayaran berhasil di-generate:", response);
+                    // Misalnya ingin menampilkan hasil ke input field
+                    $("#no_bukti_pembayaran").val(response.paymentNo);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Terjadi kesalahan:", error);
+                }
+            });
+        } else {
+            $("#no_bukti_pembayaran").val("");
+        }
     }
 
     function drawPaidTable(data) {

@@ -1305,53 +1305,28 @@ class PembayaranPOLokal extends BaseController
     public function generatePaymentNoLokalBB()
     {
         $localPOPaymentModel = new LocalPOPaymentModel();
+        $divisi = str_replace(' ', '', trim($this->request->getGet('divisiId')));
+        $bank = str_replace(' ', '', trim($this->request->getGet('bankId')));
 
-
-        $bankID = $this->request->getVar('bank_id');
-        $paymentDate = $this->request->getVar('payment_date');
-        $bank = $this->banksModel->find($bankID);
-
-        $paymentNo = "";
-
-        if (!empty($paymentDate)) {
-            $paymentDataFormated = date_format(date_create_from_format("d/m/Y", $paymentDate), "Y-m-d");
-            $month = date('m', strtotime($paymentDataFormated));
-            $year = date('Y', strtotime($paymentDataFormated));
-
-            $numberTemplate = $bank['kode_bank'] . "/$year/$month/";
-
-            $lastData = $localPOPaymentModel->asObject()
-
-                ->where('bank_id', $bank['id'])
-                ->like('payment_no', $numberTemplate, 'after')
-                ->orderBy('createdAt', 'DESC')
-                ->first();
-
-            $paymentNo = "{$numberTemplate}001";
-
-            if (!empty($lastData)) {
-                $exploded = explode('/', $lastData->payment_no);
-                $lastIncrement = (int)$exploded[3] + 1;
-
-                $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
-                $paymentNo = $numberTemplate . $paddedNumber;
-            }
-        } else {
-            $paymentNo = "";
-        }
-
+        $paymentNo = $localPOPaymentModel->get_new_no_po(
+                        $divisi,
+                        $bank,
+                        date('m'),
+                        date('Y'),
+                        getLastDay(),
+                        $this->this_company_id
+                    );
+        
         return response()->setJSON([
             'paymentNo' => $paymentNo,
             'token' => csrf_hash(),
             'success' => true,
-
         ]);
     }
 
     public function generatePaymentNoBP()
     {
         $localPOPaymentBPModel = new LocalPOPaymentBPModel();
-
 
         $paymentNo = "BP/";
         $month = date('m');
