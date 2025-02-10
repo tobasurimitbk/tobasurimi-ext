@@ -983,15 +983,16 @@ class LocalPOPaymentModel extends Model
             'penerimaan_barang.deletedAt' => null,
             'status_post' => 'FINISH',
             'tipe_bahan' => 'BAKU',
-            'status_penerimaan' => 'LOKAL',
-            'supplier_id' => $supplierID,
-            'divisi_id' => $divisiID,
+            'penerimaan_barang.status_penerimaan' => 'LOKAL',
+            'penerimaan_barang.supplier_id' => $supplierID,
+            'penerimaan_barang.divisi_id' => $divisiID,
             'penerimaan_barang.company_id'  => $companyID
         ];
 
         $lpbList = $penerimaanBarangModel
-            ->select('penerimaan_barang.id as lpbID, no_penerimaan_barang as lpbNO, purchase_order_id as poID, penerimaan_barang_detail.id, harga, harga_harian, jml_masuk')
+            ->select('penerimaan_barang.id as lpbID, no_penerimaan_barang as lpbNO, purchase_order_id as poID, penerimaan_barang_detail.id, harga, harga_harian, jml_masuk, rm_purchase_orders.po_no')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id')
+            ->join('rm_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
             ->where($conditionPenerimaanBarang)
             ->findAll();
 
@@ -1054,4 +1055,42 @@ class LocalPOPaymentModel extends Model
     }
 
     public function getlistLPBmonth() {}
+
+
+    public function get_new_no_po($divisi, $bank, $bln, $thn, $last_day, $companyID)
+    {
+        // Format header dari parameter yang diterima
+        $headParts = array_filter([$divisi, $bank]); // Hapus elemen kosong
+        $head = !empty($headParts) ? implode('/', $headParts) . '/' : ''; // Gabungkan dengan "/" jika ada data
+    
+        // Tambahkan bulan dan tahun
+        $head .= $bln . $thn . '/';
+    
+        // Ambil nomor terakhir berdasarkan format yang sesuai
+        $lastPO = $this->select('payment_no')
+            ->like('payment_no', $head) // Cari dengan prefix yang sudah terbentuk
+            ->where('local_po_payments.createdAt >=', "{$thn}-{$bln}-01 00:00:00")
+            ->where('local_po_payments.createdAt <=', "{$last_day} 23:59:59")
+            ->where('local_po_payments.company_id', $companyID)
+            ->orderBy('payment_no', "DESC")
+            ->first();
+    
+        // Nomor urut awal
+        $counterFirst = '000001';
+    
+        if ($lastPO == null) {
+            return $head . $counterFirst;
+        } else {
+            try {
+                $last = explode('/', $lastPO['payment_no']);
+                $poLastDigit = isset($last[count($last) - 1]) ? (int) $last[count($last) - 1] : 0;
+                $counterNext = str_pad($poLastDigit + 1, strlen($counterFirst), '0', STR_PAD_LEFT);
+                return $head . $counterNext;
+            } catch (Exception $e) {
+                return 'ERROR GENERATE NUMBER ' . date('Y-m-d');
+            }
+        }
+    }
+    
+
 }
