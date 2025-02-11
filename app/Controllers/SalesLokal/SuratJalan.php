@@ -65,8 +65,6 @@ class SuratJalan extends BaseController
         $customers = $this->CustomerModel->getCustomerLokal($this->userId);
 
 
-
-
         $data = [
             "dataCustomers" => $customers,
             "id_user" => session()->get('login')->user_id,
@@ -259,7 +257,7 @@ class SuratJalan extends BaseController
                                 ? $this->request->getPost('company_id') 
                                 : $this->this_company_id,
             ];
-            $checkSJ = $this->SuratJalanModel->where('UPPER(no_surat_jalan)', strtoupper($this->request->getVar('no_surat_jalan')))->findAll();
+            $checkSJ = $this->SuratJalanModel->where('deletedAt', NULL)->where('UPPER(no_surat_jalan)', strtoupper($this->request->getVar('no_surat_jalan')))->findAll();
             if ($checkSJ) {
                 $data = [
                     "status"    => false,
@@ -313,7 +311,7 @@ class SuratJalan extends BaseController
 
         $customers = $this->CustomerModel->getCustomerLokal($this->userId);
 
-        $dataSuratJalan->shipping_date = date("m/d/Y", strtotime($dataSuratJalan->shipping_date));
+        $dataSuratJalan->shipping_date = date("d/m/Y", strtotime($dataSuratJalan->shipping_date));
         $dataSo = $this->SalesOrderModel
             ->asObject()
             ->where(['id_customer' => $dataSuratJalan->id_customer, 'tipe_sales_order' => 'LOKAL', 'deletedAt' => null])
@@ -338,8 +336,8 @@ class SuratJalan extends BaseController
             $getJenisPenjualan = "By Ecommerce";
         } else {
             $getJenisPenjualan = "";
-        }
-
+        }   
+        
         $data = [
             "data" => $dataSuratJalan,
             "dataCustomers" => $customers,
@@ -383,24 +381,42 @@ class SuratJalan extends BaseController
             return redirect()->to('/surat-jalan/id/' . encrypt($id))->back()->withInput();
         }
 
-        // $dataSo = $this->request->getPost('id_so');
+        $dataSo = $this->request->getPost('id_so');
 
-        // $idArray = array();
-        // $noArray = array();
+        $idArray = array();
+        $noArray = array();
 
-        // foreach ($dataSo as $payload) {
-        //     $delimiter = ",";
-        //     $parts = explode($delimiter, $payload);
-        //     array_push($idArray, $parts[0]);
-        //     array_push($noArray, $parts[1]);
-        // }
+        foreach ($dataSo as $soId) {
+            $soData = $this->SalesOrderModel->asObject()->find($soId);
+
+            if (empty($soData)) {
+                $data = [
+                    "status"    => false,
+                    "message"   => "Sales Order tidak ditemukan!",
+                    'token'     => csrf_hash(),
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            $idArray[] = $soId;
+            $noArray[] = $soData->no_sales_order;
+        }
 
         $shippingDate = $this->request->getPost('shipping_date');
 
         $values = [
-            "shipping_date" =>  $shippingDate ? date("Y/m/d", strtotime(str_replace("/", "-", $shippingDate))) : "",
-            "no_surat_jalan" => $this->request->getVar('no_surat_jalan'),
-            "no_po" => $this->request->getPost('no_po'),
+            "id_user"       => $this->userId,
+            "id_customer"   => $this->request->getPost('id_customer'),
+            "shipping_date" =>  $shippingDate ? date("Y-m-d", strtotime(str_replace("/", "-", $shippingDate))) : "",
+            "no_surat_jalan" => strtoupper($this->request->getVar('no_surat_jalan')),
+            "no_po"         => $this->request->getPost('no_po'),
+            "note"          => $this->request->getPost('note'),
+            'multiple_id_so' => json_encode($idArray),
+            'multiple_no_so' => json_encode($noArray),
+            "id_company"    => ($this->this_company_id != 16) 
+                            ? $this->request->getPost('company_id') 
+                            : $this->this_company_id,
         ];
         try {
 

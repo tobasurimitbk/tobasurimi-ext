@@ -44,7 +44,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" <?= !empty($data) ? 'readonly' : '' ?> class="form-control no_sales_order" id="no_sales_order" name="no_sales_order" placeholder="No. Sales Order" required <?= !empty($data) ? 'disabled value="' . $data->no_sales_order . '"' : '' ?>>
+                                    <input autocomplete="one-time-code" type="text" class="form-control no_sales_order" id="no_sales_order" name="no_sales_order" placeholder="No. Sales Order" required <?= !empty($data) ? 'value="' . $data->no_sales_order . '"' : '' ?>>
                                     <label for="floatingInput">No. Order</label>
                                 </div>
                                 <div class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -56,7 +56,7 @@
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" name="order_date" type="text" value="<?= !empty($data) ? $data->order_date : date('d/m/Y', strtotime(date('Y-m-d'))) ?>" class="form-control order_date" id="order_date">
+                                <input autocomplete="one-time-code" name="order_date" type="text" value="<?= !empty($data) ? $data->order_date : date('d/m/Y', strtotime(date('Y-m-d'))) ?>" class="form-control order_date" id="order_date">
                                 <label>Tanggal Pemesanan</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
@@ -67,7 +67,7 @@
                     <div class="col-md-4">
                         <div class="input-group">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                <select class="form-select id_customer" name="id_customer" id="id_customer">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataCustomers)) {
@@ -99,7 +99,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select jenis_penjualan" name="jenis_penjualan" id="jenis_penjualan" <?= !empty($data) ? 'disabled' : ''; ?>>
+                            <select class="form-select jenis_penjualan" name="jenis_penjualan" id="jenis_penjualan">
                                 <option value=""></option>
                                 <option value="1" <?= !empty($data) ? ($data->jenis_penjualan == 1 ? "selected" : "") : ""; ?>>By Sales</option>
                                 <option value="2" <?= !empty($data) ? ($data->jenis_penjualan == 2 ? "selected" : "") : ""; ?>>By Office</option>
@@ -110,7 +110,7 @@
                     </div>
                     <div class="col-md-4 nama_sales_div">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_sales" name="id_sales" id="id_sales" <?= !empty($data) ? 'disabled' : ''; ?>>
+                            <select class="form-select id_sales" name="id_sales" id="id_sales">
                                 <option value=""></option>
                                 <?php foreach ($dataSales ?? [] as $sales) : ?>
                                     <option value="<?= $sales['id']; ?>" <?= !empty($data) ? ($data->sales_id == $sales['id'] ? "selected" : "") : ""; ?>><?= $sales['name']; ?></option>
@@ -129,20 +129,20 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control customerphone" id="customerphone" name="customerphone" value="<?= $data->customerPhone ?? ''; ?>" disabled>
+                            <input autocomplete="one-time-code" type="text" class="form-control customerphone" id="customerphone" name="customerphone" value="<?= $data->customerPhone ?? ''; ?>">
                             <label for="floatingInput">No. Telp</label>
                         </div>
                     </div>
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control" id="tagihan_ke" name="tagihan_ke" disabled value="<?= $data->address ?? '' ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control" id="tagihan_ke" name="tagihan_ke" value="<?= $data->address ?? '' ?>">
                             <label for="floatingInput">Alamat Konsumen</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select termin " name="termin" id="termin_order_form" <?= !empty($data) ? 'disabled' : ''; ?>>
+                            <select class="form-select termin " name="termin" id="termin_order_form">
                                 <option value=""></option>
                                 <?php foreach ($dataTermin ?? [] as $termin) : ?>
                                     <option value="<?= $termin['id']; ?>" <?= !empty($data) ? ($data->payment_terms == $termin['id'] ? "selected" : "") : ""; ?>><?= $termin['value']; ?></option>
@@ -158,14 +158,14 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="hidden" class="hidden_tipe_pelanggan" id="hidden_tipe_pelanggan" name="hidden_tipe_pelanggan" value="<?= $data->tipe_pelanggan ?? '' ?>">
-                            <input autocomplete="one-time-code" disabled class="form-control input-picker tipe_pelanggan" id="tipe_pelanggan" name="tipe_pelanggan" placeholder="Tipe Pelanggan" value="<?= $data->tipe_pelanggan_value ?? '' ?>">
+                            <input autocomplete="one-time-code" class="form-control input-picker tipe_pelanggan" id="tipe_pelanggan" name="tipe_pelanggan" placeholder="Tipe Pelanggan" value="<?= $data->tipe_pelanggan_value ?? '' ?>">
                             <label for="floatingInput">Tipe Pelanggan</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input placeholder="Tanggal Pengiriman" <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" name="shipping_date" type="text" value="<?= !empty($data) ? $data->shipping_date : '' ?>" class="form-control shipping_date" id="shipping_date">
+                                <input placeholder="Tanggal Pengiriman" autocomplete="one-time-code" name="shipping_date" type="text" value="<?= !empty($data) ? $data->shipping_date : '' ?>" class="form-control shipping_date" id="shipping_date">
                                 <label>Tanggal Pengiriman</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
@@ -175,7 +175,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($data) ? 'readonly' : '' ?> onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');formatNumber(this)" autocomplete="one-time-code" class="form-control input-picker" id="estimated_freight" name="estimated_freight" value="<?= number_format($data->estimated_freight ?? 0); ?>" placeholder="Biaya Kirim">
+                            <input onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');formatNumber(this)" autocomplete="one-time-code" class="form-control input-picker" id="estimated_freight" name="estimated_freight" value="<?= number_format($data->estimated_freight ?? 0); ?>" placeholder="Biaya Kirim">
                             <label for="floatingInput">Biaya Kirim</label>
                         </div>
                     </div>
@@ -183,13 +183,13 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating ff-ket mb-3" style="height: 80px;">
-                            <textarea autocomplete="one-time-code" <?= !empty($data) ? 'disabled=true' : ''; ?> class="form-control parent_keterangan text-area-all" style="height: 100%" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
+                            <textarea autocomplete="one-time-code"  class="form-control parent_keterangan text-area-all" style="height: 100%" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
                             <label for="floatingInput">Keterangan (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($data) ? 'readonly' : '' ?> autocomplete="one-time-code" type="text" class="form-control 
+                            <input autocomplete="one-time-code" type="text" class="form-control 
                             no_po" id="no_po" name="no_po" value="<?= !empty($data) ? $data->no_po : ""; ?>">
                             <label for="floatingInput">No PO (Opsional)</label>
                         </div>
@@ -197,7 +197,7 @@
                     <?php if (session()->get("login")->this_company_id != 16) { ?>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select company_id" name="company_id" id="company_id" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                <select class="form-select company_id" name="company_id" id="company_id">
                                     <option value="1">KIM 1</option>
                                     <option value="2">KIM 2</option>
                                     <option value="15">GLOBAL</option>
@@ -521,7 +521,7 @@
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <!-- <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales"> -->
-                                <select class="form-select sales_id" name="sales_id" id="sales_id" <?= !empty($data) ? 'disabled' : ''; ?>>
+                                <select class="form-select sales_id" name="sales_id" id="sales_id">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataSales)) {
