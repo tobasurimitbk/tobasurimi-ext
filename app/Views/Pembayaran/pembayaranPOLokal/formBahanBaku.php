@@ -177,7 +177,7 @@
                             <select <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> class="form-select " name="payment_method" id="payment_method">
                                 <option disabled selected value="">Pilih Metode Pembayaran</option>
                                 <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Cash" ? 'selected' : '') : '' ?> value="Cash">Cash</option>
-                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Debit" ? 'selected' : '') : '' ?> value="Debit">Debit</option>
+                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Bank" ? 'selected' : '') : '' ?> value="Bank">Bank</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                         </div>
@@ -1275,7 +1275,7 @@
         newRow.append(($('<td </td>')));
         // newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:right;" ><b>' +
-            '<input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="'+ greatFormatRupiah(TotalHarga) +'" name = "total_pembayaran"  readonly>' +
+            '<input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="'+ greatFormatRupiah(TotalHarga).toFixed(2) +'" name = "total_pembayaran"  readonly>' +
             '</b></td>'));
         table.find('tbody').append(newRow);
 
