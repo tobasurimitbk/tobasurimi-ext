@@ -531,7 +531,8 @@ class Barang extends BaseController
         $addCondition = [
             'search' => $this->request->getGet('search'),
             "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType")
+            "sortType" => $this->request->getGet("sortType"),
+            "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : ""
         ];
 
         $limit = $this->request->getGet("length");

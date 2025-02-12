@@ -96,13 +96,18 @@ class BarangMasterModel extends Model
             ->where($condition);
 
         if ($addCondition['search']) {
-            $barangDataQry->groupStart()
-                ->like('barang_master.barang_name', $addCondition['search'])
-                ->orLike('barang_master.kode_barang', $addCondition['search'])
-                ->orLike('parent_barang.parent_name', $addCondition['search'])
-                ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
-                ->orLike("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
-                ->groupEnd();
+            $search = strtolower($addCondition['search']); // Ubah ke lowercase biar tidak case-sensitive
+            $keywords = explode(' ', strtolower($search));
+
+            $barangDataQry->groupStart();
+            foreach ($keywords as $s) {
+                $barangDataQry->like('LOWER(barang_master.barang_name)', $s)
+                    ->orLike('LOWER(barang_master.kode_barang)', $s)
+                    ->orLike('LOWER(parent_barang.parent_name)', $s)
+                    ->orLike('LOWER(barang_master_spesifikasi.spesifikasi)', $s)
+                    ->orLike("LOWER(CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi))", $s);
+            }
+            $barangDataQry->groupEnd();
         }
 
         if ($addCondition['filter_coa']) {

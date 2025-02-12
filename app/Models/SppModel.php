@@ -99,7 +99,8 @@ class SppModel extends Model
         }
         if ($addCondition['search']) {
             $purchaseRequestsDataQry
-                ->like('spp_no', $addCondition['search']);
+                ->like('spp_no', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search']);
         }
 
         if ($addCondition['spp_type']) {
@@ -218,5 +219,17 @@ class SppModel extends Model
         $generatedSppNo = $increment . '/' . $lastStr;
 
         return $generatedSppNo;
+    }
+
+    public function getListSPP($company_id)
+    {
+        $sppResult = $this->asArray()
+            ->select('purchase_requests.*,divisis.divisi')
+            ->join('divisis', 'divisis.id = purchase_requests.divisi_id', 'left')
+            ->where('purchase_requests.deletedAt', null)
+            ->where('purchase_requests.company_id', $company_id)
+            ->findAll();
+
+        return $sppResult;
     }
 }
