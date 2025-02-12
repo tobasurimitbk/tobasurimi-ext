@@ -438,6 +438,24 @@
         });
     <?php endif; ?>
 
+    const customMatcher = function(params, data) {
+        if ($.trim(params.term) === '') {
+            return data;
+        }
+
+        if (typeof data.text === 'undefined') {
+            return null;
+        }
+
+        let term = params.term.toLowerCase().split(" ");
+        let text = data.text.toLowerCase();
+
+        let isMatch = term.every(t => text.includes(t));
+
+        return isMatch ? data : null;
+    }
+
+
     var validator_detail = $(".detail-form").validate({
         rules: {
             kode_barang: {
@@ -568,6 +586,7 @@
 
     // KODE BARANG
     $('.kode_barang').select2({
+        matcher: customMatcher,
         placeholder: "Pilih Kode Barang",
         theme: "bootstrap-5",
         dropdownParent: $(".detail-modal .modal-content"),

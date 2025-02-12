@@ -287,6 +287,8 @@ class AMPurchaseOrderModel extends Model
         return $query->getResultArray();
     }
 
+    public function getSupplierBySpp($sppId) {}
+
     public function getNoPenerimaanBarangBySPP($po_type, $supplier_id, $multiple_spp_id)
     {
         $arrCondition = [
@@ -451,8 +453,19 @@ class AMPurchaseOrderModel extends Model
             $poDataQry->groupStart();
         }
 
+        if ($addCondition['po_date']) {
+            $poDataQry->where('am_purchase_orders.po_date', $addCondition['po_date']);
+        }
+
         if ($addCondition['search']) {
-            $poDataQry->like('am_purchase_orders.po_no', $addCondition['search']);
+            $poDataQry->like('am_purchase_orders.po_no', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
+                ->orLike('am_purchase_orders.note', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('am_purchase_order_details.qty', $addCondition['search'])
+                ->orLike('satuans.kode_satuan', $addCondition['search'])
+                ->orLike('am_purchase_order_details.price', $addCondition['search']);
         }
 
         if ($addCondition['search']) {

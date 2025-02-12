@@ -72,7 +72,7 @@
                     </div>
                 </div>
                 <div class="col mb-2">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik No SPP" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data" value="" />
                 </div>
             </div>
             <div class="row">

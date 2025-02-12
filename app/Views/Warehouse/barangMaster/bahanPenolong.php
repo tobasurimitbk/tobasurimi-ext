@@ -254,8 +254,12 @@
                         <?php if (can('Pembelian', 'PO Lokal BP', 'r')) : ?>
                             <div class="row justify-content-end">
                                 <div class="col-md-3">
-                                    <input autocomplete="one-time-code" style="height: 40px;" placeholder="Cari Nomor PO" value="" type="text" class="form-control form-control-lg search-po-lokal">
+                                    <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Tanggal PO" class="form-control form-control-lg po-date-lokal">
                                 </div>
+                                <div class="col-md-3">
+                                    <input autocomplete="one-time-code" style="height: 40px;" placeholder="Cari Data" value="" type="text" class="form-control form-control-lg search-po-lokal">
+                                </div>
+
                             </div>
                             <table class="table-inside table-borderd nowrap table-hover-tobasurimi tablePoLokal" id="tablePoLokal" width="100%" cellspacing="0">
                                 <thead>
@@ -484,6 +488,13 @@
                 timeout = setTimeout(() => func.apply(this, args), delay);
             };
         }
+
+        $(".po-date-lokal").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
 
         $(".search").keyup(
             debounce(function() {
@@ -782,6 +793,7 @@
                 data: function(data) {
                     data.id = id_barang;
                     data.search = $(".search-po-lokal").val();
+                    data.po_date = $(".po-date-lokal").val();
                     data.sort = sortPoLokal;
                     data.sortType = sortTypePoLokal;
                     data.po_type = "Lokal";
@@ -914,6 +926,9 @@
             tablePoLokal.ajax.reload();
         })
 
+        $(".po-date-lokal").change(function() {
+            tablePoLokal.ajax.reload();
+        })
     });
 
     $('.btn-submit-excel').click(function() {
@@ -1530,6 +1545,7 @@
     function displayHistory(id) {
         id_barang = id;
         $('.search-po-lokal').val();
+        $('.po-date-lokal').val();
         $('.search-po-import').val();
         tablePoLokal.ajax.reload();
         tablePoImport.ajax.reload();
