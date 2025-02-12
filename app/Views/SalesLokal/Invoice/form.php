@@ -1177,72 +1177,47 @@
     const reCountTotal = () => {
         const taxStatus = $('#tax_status').is(':checked');
         const includeTax = $('#include_tax').is(':checked');
-        let taxes = parseFloat($('#taxes option:selected').data('tax_value'));
-
+        let taxes = parseFloat($('#taxes option:selected').data('tax_value')) || 0;
+        
         const itemList = table.rows().data();
-
+        
         let itemSubTotal = 0;
-        let itemSubTotalTermasukPajak = 0;
         let discTotal = 0;
-        let dummyGrandTotal = 0;
         let taxTotalHtml = 0;
-        let dummyTax = 0;
-
-        console.log(list_items);
-
-
-        list_items.map((obj) => {
-            const itemAmt = parseFloat(obj.amount.replaceAll(',', ''));
+        let grandTotal = 0;
+        
+        list_items.forEach((obj) => {
+            let itemAmt = parseFloat(obj.amount.replaceAll(',', '')) || 0;
+            let discPercent = Math.min(Math.max(parseFloat(obj.disc) || 0, 0), 100); // Validasi diskon antara 0-100%
             let taxAmt = 0;
-            discTotal += ((+obj.disc) / 100) * itemAmt;
+            
+            discTotal += (discPercent / 100) * itemAmt; // Hitung total diskon
+            
             if (taxStatus) {
                 taxAmt = itemAmt * (taxes / 100);
             } else {
                 taxAmt = itemAmt * ((+obj.tax) / 100);
             }
-
-            if (taxStatus && !includeTax) {
-                itemSubTotal += itemAmt;
-                taxTotalHtml += taxAmt;
-            } else if (taxStatus && includeTax) {
-                if (taxes == 11) {
-                    itemSubTotal += itemAmt / (1 + (taxes / 100));
-                } else if (taxes == 10) {
-                    itemSubTotal += itemAmt / (1 + (taxes / 100));
-                } else {
-                    itemSubTotal += (itemAmt - taxAmt);
-                }
-                dummyGrandTotal += itemAmt;
-                taxTotalHtml += itemAmt - itemSubTotal;
-            } else if (!taxStatus && !includeTax) {
-                itemSubTotal += itemAmt;
-                taxTotalHtml += taxAmt;
+            
+            if (taxStatus && includeTax) {
+                itemSubTotal += itemAmt / (1 + (taxes / 100));
+                taxTotalHtml += itemAmt - (itemAmt / (1 + (taxes / 100))); // Pajak dihitung dari selisih
             } else {
                 itemSubTotal += itemAmt;
                 taxTotalHtml += taxAmt;
             }
-
-
-
-
         });
-
+        
+        // Pastikan total tidak negatif
+        itemSubTotal = Math.max(0, itemSubTotal - discTotal);
+        taxTotalHtml = Math.max(0, taxTotalHtml);
+        grandTotal = itemSubTotal + (taxStatus ? taxTotalHtml : 0);
+        
+        // Update tampilan HTML
         $('#itemSubTotal').html(itemSubTotal.toLocaleString());
         $('#taxTotal').html(taxTotalHtml.toLocaleString());
         $('#taxValue').html(taxes);
-
-
-        if (taxStatus && includeTax) {
-            $('#includeTaxText').html('(Termasuk Pajak)');
-            grandTotal = itemSubTotal + taxTotalHtml;
-        } else if (taxStatus && !includeTax) {
-            $('#includeTaxText').html('');
-            grandTotal = itemSubTotal + taxTotalHtml;
-        } else {
-            $('#includeTaxText').html('');
-            grandTotal = itemSubTotal;
-        }
-
+        $('#includeTaxText').html(taxStatus && includeTax ? '(Termasuk Pajak)' : '');
         $('#grandTotal').html(grandTotal.toLocaleString());
     };
 
