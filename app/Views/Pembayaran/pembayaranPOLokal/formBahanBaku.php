@@ -263,7 +263,7 @@
                                                     <th style="text-align: center;">Barang</th>
                                                     <th style="text-align: center;">Total Order</th>
                                                     <th style="text-align: center;">Total Diterima</th>
-                                                    <th style="text-align: center;">Total Bayar</th>
+                                                    <th style="text-align: center; width: 100px">Total Bayar</th>
                                                     <!-- <th style="text-align: center;">Sisa Bayar</th>
                                                     <th style="text-align: center;">Input Harga</th> -->
 

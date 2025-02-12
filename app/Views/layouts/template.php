@@ -78,12 +78,14 @@
             rupiah += separator + ribuan.join(",");
         }
         parts[0] = rupiah;
-        if (min) {
-            return "-" + parts.join(".");
-        } else {
-            return parts.join(".");
+        
+        if (!parts[1]) {
+            parts[1] = "00";
+        } else if (parts[1].length === 1) {
+            parts[1] += "0"; // Jika hanya 1 angka desimal, tambahkan satu nol
         }
 
+        return min ? "-" + parts.join(".") : parts.join(".");
     }
 
     function destroyFormatRupiah(x) {
