@@ -269,8 +269,8 @@ class POLokalBahanBaku extends BaseController
             }
 
             // NILAI SEBELUM PPH
-            $totalBeforePph = $nilaiTotalBulanan + $nilaiTotalHarian + $nilaiTotalUmum + $totalTambahan;
-            $totalAfterPph = $nilaiTotalBulananWithPPH + $nilaiTotalHarianWithPPH + $nilaiTotalUmumWithPPH + $totalTambahanWithPPH;
+            $totalBeforePph = $nilaiTotalBulanan + $nilaiTotalHarian + $nilaiTotalUmum +  abs($totalTambahan);
+            $totalAfterPph = $nilaiTotalBulananWithPPH + $nilaiTotalHarianWithPPH + $nilaiTotalUmumWithPPH + abs($totalTambahanWithPPH);
 
             array_push($dataPOLokal, [
                 "no"            => $no++,
@@ -282,8 +282,8 @@ class POLokalBahanBaku extends BaseController
                 "supplierName"  => $data->supplierName,
                 "itemCount"     => $data->itemCount,
                 "qtyTotal"      => round($totalQty, 2),
-                "total_after_pph" => "" . number_format(formatter($totalAfterPph == 0 ? $totalBeforePph : $totalAfterPph, "STR_TO_FLOAT"), 2, '.', ','),
-                "total_before_pph" => "" . number_format(formatter($totalBeforePph, "STR_TO_FLOAT"), 2, '.', ','),
+                "total_after_pph" => "" . number_format($totalAfterPph == 0 ? $totalBeforePph : $totalAfterPph, 2, '.', ','),
+                "total_before_pph" => "" . number_format($totalBeforePph, 2, '.', ','),
                 "is_posted"     => $data->is_posted,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
                 "un_posting" => $unPostingCheck == null ? 0 : 1,
