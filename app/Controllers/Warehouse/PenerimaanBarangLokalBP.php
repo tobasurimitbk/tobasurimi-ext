@@ -23,6 +23,7 @@ use App\Models\SupplierHargaModel;
 use App\Models\ReturAmPoDetailModel;
 use App\Models\BCPurchaseOrderModel;
 use App\Models\PengembalianBarangModel;
+use App\Models\SppModel;
 use Config\Database;
 use Dompdf\Dompdf;
 use Exception;
@@ -55,6 +56,7 @@ class PenerimaanBarangLokalBP extends BaseController
     protected $dompdf;
     protected $jurnalUmumController;
     protected $pengembalianBarangModel;
+    protected $sppModel;
 
     public function __construct()
     {
@@ -82,6 +84,7 @@ class PenerimaanBarangLokalBP extends BaseController
         $this->jurnalUmumController = new JurnalUmum();
         $this->dompdf = new Dompdf();
         $this->pengembalianBarangModel = new PengembalianBarangModel();
+        $this->sppModel = new SppModel();
     }
 
     public function index()
@@ -1032,6 +1035,75 @@ class PenerimaanBarangLokalBP extends BaseController
             'data' => $result,
             'status' => true,
             'token' => csrf_hash()
+        ]);
+    }
+
+    // Load Component
+    public function loadComponent()
+    {
+        $id = $this->request->getVar('id');
+        $form = $this->request->getVar('form');
+        $dataAJU = $this->metadataModel->getBCUsed("po_lokal_bp");
+        $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
+        $dataSatuan = $this->satuanModel->asObject()->find();
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
+
+        $data = [
+            "dataSatuan" => $dataSatuan,
+            "dataWarehouse" => $dataWarehouse,
+            "dataSupplier" => [],
+            "dataAJU" => $dataAJU,
+            "dataDivisi" => $dataDivisi,
+            "dataKemasan" => $dataKemasan,
+            "dataSPP" => [],
+            "dataDivisi" => [],
+            "dataPenerimaanBarang" => null,
+            "dataSPP" => []
+        ];
+
+        if (!empty($id)) {
+            $data['dataPenerimaanBarang'] =  $this->penerimaanBarangModel->where('id', $id)->first();
+            $data['dataSPP'] = $this->amPurchaseOrderModel->getSPP(json_decode($data['dataPenerimaanBarang']['multiple_po_id']));
+            $dataSupplier = $this->supplierModel->where('id', $data['dataPenerimaanBarang']['supplier_id'])->findAll();
+            $data['dataSupplier'] = $dataSupplier;
+        }
+
+        if ($form == 'single') {
+            if (empty($id)) {
+                $dataSpp = $this->sppModel->getListSPP($this->this_company_id);
+                $data['dataSPP'] = $dataSpp;
+            }
+            $data['dataDivisi'] = $this->divisiModel->getDivisiAccess();
+
+            return view('Warehouse/penerimaanBarangLokal/bahanPenolong/formSingle', $data);
+        } else {
+            $data['dataSupplier'] = $this->supplierModel->getSupplierByType("BAHAN PENOLONG");
+            return view('Warehouse/penerimaanBarangLokal/bahanPenolong/formMultiple', $data);
+        }
+    }
+
+    public function dropdownSupplierBySPP()
+    {
+        $sppId = $this->request->getVar('spp_id');
+        $poList = $this->amPurchaseOrderModel->where('purchase_request_id', $sppId)->where('is_posted', 1)->where('status_penerimaan', 0)->where('deletedAt', null)->findAll();
+        $supplierId = [];
+
+        foreach ($poList as $p) {
+            array_push($supplierId, $p['supplier_id']);
+        }
+
+        if (count($supplierId) == 0) {
+            return response()->setJSON([
+                'status' => true,
+                'data' => []
+            ]);
+        }
+
+        $suplierData = $this->supplierModel->whereIn('id', $supplierId)->where('deletedAt', null)->findAll();
+        return response()->setJSON([
+            'status' => true,
+            'data' => $suplierData
         ]);
     }
 }
