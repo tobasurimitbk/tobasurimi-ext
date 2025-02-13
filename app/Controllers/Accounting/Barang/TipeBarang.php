@@ -170,75 +170,24 @@ class TipeBarang extends BaseController
                 $dataPemakaian = $this->Sub_AkunsModel->where('id', $data['pemakaian_id'])->first();
                 $dataNamaPemakaian = $dataPemakaian['no_sub'] ?? "-";
             }
-
-            // $parentNameParts = explode(',', str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'] . " - " . $data['spesifikasi']);
-            // $parentNameFormatted = '';
-            // $lineLimit = 4; // Batas elemen per baris
-            // foreach ($parentNameParts as $index => $part) {
-            //     $parentNameFormatted .= $part;
-            //     if (($index + 1) % $lineLimit == 0) {
-            //         $parentNameFormatted .= '<br>'; // Tambahkan baris baru setiap 4 elemen
-            //     } else {
-            //         $parentNameFormatted .= ', ';
-            //     }
-            // }
-            // $parentNameFormatted = rtrim($parentNameFormatted, ', ');
-
-            // Filter the records based on the filter conditions
-            if ($addCondition['filter_coa'] == "belum") {
-                if ($dataNamaAP == "-" || $dataAP == "-") {
-                    array_push($rdata, [
-                        "no"                    => $no++,
-                        "id"                    => $data['id'],
-                        "divisi_id"             => $data['divisi_id'],
-                        "parent_name"           => str_replace(' ', '', "(" .  $data['kode_barang']) . ")  " . $data['barang_name'] . " - " . $data['spesifikasi'],
-                        "keterangan"            => strtoupper($data['keterangan']),
-                        "divisi"                => strtoupper($data['divisi']),
-                        "ap_id"                 => $data['ap_id'],
-                        "ar_id"                 => $data['ar_id'],
-                        "pemakaian_id"          => $data['pemakaian_id'],
-                        "ap_no"                 => $dataNamaAP,
-                        "ar_no"                 => $dataNamaAR,
-                        "pemakaian_no"          => $dataNamaPemakaian,
-                    ]);
-                }
-            } elseif ($addCondition['filter_coa'] == "sudah") {
-                if ($dataNamaAP != "-" && $dataAP != "-") {
-                    array_push($rdata, [
-                        "no"                    => $no++,
-                        "id"                    => $data['id'],
-                        "divisi_id"             => $data['divisi_id'],
-                        "parent_name"           => str_replace(' ', '', "(" .  $data['kode_barang']) . ")  " . $data['barang_name'] . " - " . $data['spesifikasi'],
-                        "keterangan"            => strtoupper($data['keterangan']),
-                        "divisi"                => strtoupper($data['divisi']),
-                        "ap_id"                 => $data['ap_id'],
-                        "ar_id"                 => $data['ar_id'],
-                        "pemakaian_id"          => $data['pemakaian_id'],
-                        "ap_no"                 => $dataNamaAP,
-                        "ar_no"                 => $dataNamaAR,
-                        "pemakaian_no"          => $dataNamaPemakaian,
-                    ]);
-                }
-            } else {
-                array_push($rdata, [
-                    "no"                    => $no++,
-                    "id"                    => $data['id'],
-                    "divisi_id"             => $data['divisi_id'],
-                    "parent_name"           => str_replace(' ', '', "(" .  $data['kode_barang']) . ")  " . $data['barang_name'] . " - " . $data['spesifikasi'],
-                    "keterangan"            => strtoupper($data['keterangan']),
-                    "divisi"                => strtoupper($data['divisi']),
-                    "ap_id"                 => isset($data['ap_id']) ? $data['ap_id'] : "-",
-                    "ar_id"                 => isset($data['ar_id']) ? $data['ar_id'] : "-",
-                    "pemakaian_id"          => isset($data['pemakaian_id']) ? $data['pemakaian_id'] : "-",
-                    "ap_no"                 => $dataNamaAP,
-                    "ar_no"                 => $dataNamaAR,
-                    "pemakaian_no"          => $dataNamaPemakaian,
-                ]);
-            }
+            array_push($rdata, [
+                "no"                    => $no++,
+                "id"                    => $data['id'],
+                "divisi_id"             => $data['divisi_id'],
+                "parent_name"           => str_replace(' ', '', "(" .  $data['kode_barang']) . ")  " . $data['barang_name'] . " - " . $data['spesifikasi'],
+                "keterangan"            => strtoupper($data['keterangan']),
+                "divisi"                => strtoupper($data['divisi']),
+                "ap_id"                 => isset($data['ap_id']) ? $data['ap_id'] : "-",
+                "ar_id"                 => isset($data['ar_id']) ? $data['ar_id'] : "-",
+                "pemakaian_id"          => isset($data['pemakaian_id']) ? $data['pemakaian_id'] : "-",
+                "ap_no"                 => $dataNamaAP,
+                "ar_no"                 => $dataNamaAR,
+                "pemakaian_no"          => $dataNamaPemakaian,
+            ]);
         }
 
         // Calculate the total records and filtered records based on rdata
-        $recordsFiltered = count($rdata); // Filtered data count
+        $recordsFiltered = $res['totalFilteredData']; // Filtered data count
         $recordsTotal = $res['totalData']; // Total unfiltered records
 
         $data = [
