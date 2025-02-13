@@ -75,10 +75,12 @@ class AccountBarangModel extends Model
         $selectQry = "barang_master.kode_barang,
                   barang_master.barang_name,
                   account_barang.id,
+                  account_barang.divisi_id,
                   account_barang.ap_id,
                   account_barang.ar_id,
                   account_barang.pemakaian_id,
                   account_barang.kategori_id,
+                  account_barang.keterangan,
                   divisis.divisi,
                   barang_master_spesifikasi.spesifikasi";
 
