@@ -531,7 +531,8 @@ class Barang extends BaseController
         $addCondition = [
             'search' => $this->request->getGet('search'),
             "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType")
+            "sortType" => $this->request->getGet("sortType"),
+            "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : ""
         ];
 
         $limit = $this->request->getGet("length");
@@ -548,6 +549,10 @@ class Barang extends BaseController
                 "po_date"               => date('d/m/Y', strtotime($data['po_date'])),
                 "nama_supplier"         => $data['nama_supplier'],
                 "nama_barang"           => $data['nama_barang'],
+                'divisi'                => $data['divisi'],
+                'note'                  => $data['note'],
+                'qty'                   => floatval($data['qty']),
+                'kode_satuan'           => $data['kode_satuan'],
                 "price"                 => number_format($data['price'], 2, ',', '.'),
             ]);
         }
@@ -578,9 +583,8 @@ class Barang extends BaseController
             $dataBarang[$i]['id'] = encrypt($dataBarang[$i]['id']);
             $dataBarang[$i]['parent_type_id'] = encrypt($dataBarang[$i]['parent_type_id']);
             $dataBarang[$i]['barang_master_spesifikasi_id'] = encrypt($dataBarang[$i]['barang_master_spesifikasi_id']);
-            $dataBarang[$i]['barang_name'] = 
-                str_replace(['"'], "'", $dataBarang[$i]['barang_name_master'] . ' ' . $dataBarang[$i]['spesifikasi'])
-            ;
+            $dataBarang[$i]['barang_name'] =
+                str_replace(['"'], "'", $dataBarang[$i]['barang_name_master'] . ' ' . $dataBarang[$i]['spesifikasi']);
         }
 
         $data = [

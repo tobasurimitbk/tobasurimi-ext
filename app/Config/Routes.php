@@ -454,7 +454,7 @@ $routes->post('/pembayaran-po-lokal/create', 'Pembayaran\PembayaranPOLokal::save
 $routes->post('/pembayaran-po-lokal/update', 'Pembayaran\PembayaranPOLokal::updatePembayaranPOLokal', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal/delete', 'Pembayaran\PembayaranPOLokal::deletePembayaranPOLokal', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal/print/(:num)', 'Pembayaran\PembayaranPOLokal::print/$1', ['filter' => 'Auth']);
-$routes->post('/pembayaran-po-lokal-bb/generate-no-pembayaran', 'Pembayaran\PembayaranPOLokal::generatePaymentNoLokalBB', ['filter' => 'Auth']);
+$routes->get('pembayaran-po-lokal-bb/generate-no-pembayaran', 'Pembayaran\PembayaranPOLokal::generatePaymentNoLokalBB', ['filter' => 'Auth']);
 
 // PEMBAYARAN PO IMPORT
 $routes->get('/pembayaran-po-import', 'Pembayaran\PembayaranPOImport::pembayaranPOImport', ['filter' => 'Auth']);

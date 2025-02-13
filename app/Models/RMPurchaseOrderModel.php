@@ -252,31 +252,34 @@ class RMPurchaseOrderModel extends Model
         return $generatedPoNo;
     }
 
-    public function get_new_no_po($bln, $thn, $last_day, $companyId)
+    public function get_new_no_po($bln, $thn, $companyId)
     {
         $head = "PO/LBB-" . $bln . $thn . '/';
+
+        $first_day = "$thn-$bln-01";
+        $last_day = date("Y-m-t", strtotime($first_day));
+
         $lastPO = $this->select('po_no')
             ->like('po_no', "PO/LBB-")
-            ->where('rm_purchase_orders.createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
-            ->where('rm_purchase_orders.createdAt <=', $last_day . " 23:59:59")
+            ->where('rm_purchase_orders.po_date >=', $first_day)
+            ->where('rm_purchase_orders.po_date <=', $last_day)
             ->where('rm_purchase_orders.company_id', $companyId)
             ->orderBy('po_no', "DESC")
             ->first();
 
         $counterFirst = '000001';
-        if ($lastPO == null) {
-            return $head . '' . $counterFirst;
-        } else {
-            try {
-                $last = explode('/', $lastPO['po_no']);
-                $poLastDigit = $last[2];
-                $counterFirst = str_pad((int) $poLastDigit + 1, strlen($counterFirst), '0', STR_PAD_LEFT);
-                return $head . '' . $counterFirst;
-            } catch (Exception $e) {
-                return 'ERROR GENERATE NUMBER ' . date('Y-m-d');
+
+        if ($lastPO) {
+            $last = explode('/', $lastPO['po_no']);
+            if (isset($last[2]) && is_numeric($last[2])) {
+                $poLastDigit = (int) $last[2];
+                $counterFirst = str_pad($poLastDigit + 1, 6, '0', STR_PAD_LEFT);
             }
         }
+
+        return $head . $counterFirst;
     }
+
 
     public function getPoBBLokalForSupplierReport($startDate, $finishDate, $supplier, $bahanBaku, $warehouse)
     {

@@ -180,7 +180,7 @@
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ?  date('d/m/Y', strtotime($dataPenerimaanBarang['tanggal'])) : ""; ?>" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
+                                <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ?  date('d/m/Y', strtotime($dataPenerimaanBarang['tanggal'])) : ""; ?>" onchange="changeStatus()" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
                                 <label for="floatingInput">Tanggal Barang Diterima</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
@@ -438,22 +438,7 @@
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
-        if (value) {
-            $.ajax({
-                url: `<?= base_url("penerimaan-barang-lokal-bp/generate-po-no"); ?>`,
-                method: "GET",
-                data: {
-                    warehouseID: $(this).val()
-                },
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        $(".no_penerimaan_barang").val(res.data);
-                    }
-                }
-            })
-        }
+        changeStatus();
     });
 
 
@@ -1045,13 +1030,18 @@
 
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
+        let tanggal = $('#tanggal_penerimaan_lpb').val();
         if (value) {
             $(".no_penerimaan_barang").attr("readonly", true);
             $.ajax({
                 url: `<?= base_url("penerimaan-barang-lokal-bp/generate-po-no"); ?>`,
                 method: "GET",
                 data: {
-                    warehouseID: $('#warehouse_id').val()
+                    warehouseID: $('#warehouse_id').val(),
+                    tanggal: $('#tanggal_penerimaan_lpb').val(),
+                    status_penerimaan: "LOKAL",
+                    tipe_bahan: "PENOLONG",
+                    prefix: "LPB"
                 },
                 dataType: "json",
                 success: function(res) {

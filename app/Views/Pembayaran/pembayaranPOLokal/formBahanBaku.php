@@ -58,8 +58,15 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? 'value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
-                            <label for="floatingInput">No. Pembayaran</label>
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" <?= !empty($detail) ? ($detail->is_posted == '1' ? 'disabled=true' : '')   : ''; ?> type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. PO" value="<?= !empty($detail) ? $detail['pembayaranDetail']['payment_no']: ""; ?>">
+                                    <label for="floatingInput">No. Pembayaran</label>
+                                </div>
+                                <div style="<?= !empty($detail) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input  <?= empty($detail) ? "checked" : "" ?>  autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -152,14 +159,14 @@
                                             <option selected value="<?= $d; ?>"><?= $d; ?> </option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <label for="floatingInput" style="z-index: 1;">No Dokumen LPB</label>
+                                    <label for="floatingInput" style="z-index: 1;">No PO</label>
                                 </div>
                             <?php else : ?>
                                 <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                                     <select class="form-select" name="lpb[]" id="lpb">
                                         <option disabled selected value=""></option>
                                     </select>
-                                    <label for="floatingInput" style="z-index: 1;">No Dokumen LPB</label>
+                                    <label for="floatingInput" style="z-index: 1;">No PO</label>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -170,7 +177,7 @@
                             <select <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> class="form-select " name="payment_method" id="payment_method">
                                 <option disabled selected value="">Pilih Metode Pembayaran</option>
                                 <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Cash" ? 'selected' : '') : '' ?> value="Cash">Cash</option>
-                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Debit" ? 'selected' : '') : '' ?> value="Debit">Debit</option>
+                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['payment_method'] == "Bank" ? 'selected' : '') : '' ?> value="Bank">Bank</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                         </div>
@@ -256,7 +263,7 @@
                                                     <th style="text-align: center;">Barang</th>
                                                     <th style="text-align: center;">Total Order</th>
                                                     <th style="text-align: center;">Total Diterima</th>
-                                                    <th style="text-align: center;">Total Bayar</th>
+                                                    <th style="text-align: center; width: 100px">Total Bayar</th>
                                                     <!-- <th style="text-align: center;">Sisa Bayar</th>
                                                     <th style="text-align: center;">Input Harga</th> -->
 
@@ -391,6 +398,9 @@
 <?php else : ?>
     <script>
         $('.bulanan-form,.harian-form').hide();
+        $(document).ready(function() {
+            changeStatus();
+        });
     </script>
 <?php endif; ?>
 <script>
@@ -548,7 +558,7 @@
     });
 
     $('#payment_date').change(function() {
-        changeStatus();
+        // changeStatus();
     });
 
     $('#bank_id').select2({
@@ -583,6 +593,7 @@
         placeholder: "Pilih Departemen",
         theme: "bootstrap-5"
     }).change(function() {
+        changeStatus();
         generateLPBNo();
         resetTable();
     });
@@ -1074,7 +1085,7 @@
                 $("#lpb").empty();
                 $("#lpb").append(`<option value=""></option>`);
                 response.data.forEach(function(item) {
-                    $("#lpb").append(`<option  value="${item.lpbID}">${item.lpbNO}</option>`);
+                    $("#lpb").append(`<option  value="${item.lpbID}">${item.po_no}</option>`);
                 });
 
             }
@@ -1082,37 +1093,30 @@
     }
 
     function changeStatus() {
-        const csrfToken = '<?= csrf_token() ?>';
-        const csrf = $(`[name="${csrfToken}"]`);
-        var bank_id = $('#bank_id').val();
-        var payment_date = $('#payment_date').val();
-        var formData = new FormData();
-        formData.append("type", "Bahan Baku");
-        formData.append("bank_id", bank_id);
-        formData.append("payment_date", payment_date)
+        let value = document.getElementById('auto_generate').checked ? true : false;
+        let bankId = $("#bank_id option:selected").text();
+        let divisiId = $("#divisi_id option:selected").text();
 
-        $.ajax({
-            url: "<?= base_url("pembayaran-po-lokal-bb/generate-no-pembayaran"); ?>",
-            data: formData,
-            method: "POST",
-            dataType: "json",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                csrf.val(response.token);
-                $(".no_bukti_pembayaran").val(response.paymentNo);
-            },
-            onError: function(response) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Terjadi kesalahan pada sistem',
-                    confirmButtonColor: '#4e73df',
-                });
-            }
-        });
+        if (value) {
+            let url = "<?= base_url('pembayaran-po-lokal-bb/generate-no-pembayaran'); ?>";
+            url += `?divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}`;
+
+            $.ajax({
+                url: url,
+                method: "GET",
+                dataType: "json",
+                success: function (response) {
+                    console.log("Nomor pembayaran berhasil di-generate:", response);
+                    // Misalnya ingin menampilkan hasil ke input field
+                    $("#no_bukti_pembayaran").val(response.paymentNo);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Terjadi kesalahan:", error);
+                }
+            });
+        } else {
+            $("#no_bukti_pembayaran").val("");
+        }
     }
 
     function drawPaidTable(data) {

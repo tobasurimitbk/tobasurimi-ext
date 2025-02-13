@@ -383,7 +383,11 @@ class PenerimaanBarangLokalBP extends BaseController
             ]);
         }
 
-        $first = $this->penerimaanBarangModel->where('company_id', $this->this_company_id)->where('no_penerimaan_barang', $this->request->getVar('no_penerimaan_barang'))->first();
+        $first = $this->penerimaanBarangModel->where('company_id', $this->this_company_id)
+            ->where('no_penerimaan_barang', $this->request->getVar('no_penerimaan_barang'))
+            ->where('status_penerimaan', "LOKAL")
+            ->where('tipe_bahan', "PENOLONG")
+            ->first();
         if ($first != null) {
             return response()->setJSON([
                 'token' => csrf_hash(),
@@ -966,14 +970,35 @@ class PenerimaanBarangLokalBP extends BaseController
 
     public function generatePONo()
     {
-        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
         $warehouseID = $this->request->getVar('warehouseID');
+        $tanggal = date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))));
+        $statusPenerimaan = $this->request->getVar('status_penerimaan');
+        $tipeBahan = $this->request->getVar('tipe_bahan');
+        $prefix = $this->request->getVar('prefix');
 
-        if (empty($warehouseID)) {
-            $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day, "", $warehouseID);
+        $tanggalExplode = explode('-', $tanggal);
+        $year = $tanggalExplode[0];
+        $month = $tanggalExplode[1];
+
+        if (empty($warehouseID) || empty($this->request->getVar('tanggal'))) {
+            $no = $this->penerimaanBarangModel->get_no(
+                date('m'),
+                date('y'),
+                "",
+                $statusPenerimaan,
+                $tipeBahan,
+                $prefix
+            );
         } else {
             $warehouse = $this->warehouseModel->where('id', $warehouseID)->first();
-            $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day, $warehouse['code_warehouse'], $warehouseID);
+            $no = $this->penerimaanBarangModel->get_no(
+                $month,
+                $year,
+                $warehouse['code_warehouse'],
+                $statusPenerimaan,
+                $tipeBahan,
+                $prefix
+            );
         }
         return response()->setJSON([
             'status' => true,

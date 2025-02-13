@@ -346,7 +346,13 @@ class PenerimaanBarangImportBB extends BaseController
             ]);
         }
 
-        $first = $this->penerimaanBarangModel->where('company_id', $this->this_company_id)->where('no_penerimaan_barang', $this->request->getVar('no_penerimaan_barang'))->first();
+        $first = $this->penerimaanBarangModel
+            ->where('company_id', $this->this_company_id)
+            ->where('no_penerimaan_barang', $this->request->getVar('no_penerimaan_barang'))
+            ->where('status_penerimaan', "IMPORT")
+            ->where('tipe_bahan', "BAKU")
+            ->first();
+
         if ($first != null) {
             return response()->setJSON([
                 'token' => csrf_hash(),
