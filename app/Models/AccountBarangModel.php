@@ -74,7 +74,10 @@ class AccountBarangModel extends Model
 
         $selectQry = "barang_master.kode_barang,
                   barang_master.barang_name,
-                  account_barang.*,
+                  account_barang.ap_id,
+                  account_barang.ar_id,
+                  account_barang.pemakaian_id,
+                  account_barang.kategori_id,
                   divisis.divisi,
                   barang_master_spesifikasi.spesifikasi";
 
@@ -85,12 +88,12 @@ class AccountBarangModel extends Model
             ->join('barang_master', 'barang_master.id = account_barang.barang_master_id', 'left')
             ->join('divisis', 'divisis.id = account_barang.divisi_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = account_barang.barang_master_spesifikasi_id', 'left')
-            ->groupBy('account_barang.id') // Pastikan hasil spesifik untuk setiap account_barang
+            // ->groupBy('account_barang.id') // Pastikan hasil spesifik untuk setiap account_barang
             ->orderBy($sort, $sortType);
 
         $totalData = $barangDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['filter_divisi']) {
+        if ($addCondition['search'] || $addCondition['filter_divisi'] || $addCondition['filter_coa']) {
             $barangDataQry->groupStart();
         }
 
@@ -99,14 +102,25 @@ class AccountBarangModel extends Model
         }
 
         if ($addCondition['search'] && $addCondition['search'] != "") {
-            $barangDataQry->like('barang_master.barang_name', $addCondition['search']);
+            $barangDataQry->like('barang_master.barang_name', $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search']);
         }
 
-        if ($addCondition['search'] && $addCondition['search'] != "") {
-            $barangDataQry->orLike('barang_master.kode_barang', $addCondition['search']);
+        if ($addCondition['filter_coa'] && $addCondition['filter_coa'] == "belum") {
+            $barangDataQry->where('account_barang.ap_id', null)
+                ->where('account_barang.ar_id', null);
         }
 
-        if ($addCondition['search'] || $addCondition['filter_divisi']) {
+        if ($addCondition['filter_coa'] && $addCondition['filter_coa'] == "sudah") {
+            $barangDataQry->where('account_barang.ap_id IS NOT NULL', null, false)
+                ->where('account_barang.ar_id IS NOT NULL', null, false);
+        }
+
+        // if ($addCondition['search'] && $addCondition['search'] != "") {
+        //     $barangDataQry->orLike('barang_master.kode_barang', $addCondition['search']);
+        // }
+
+        if ($addCondition['search'] || $addCondition['filter_divisi'] || $addCondition['filter_coa']) {
             $barangDataQry->groupEnd();
         }
 

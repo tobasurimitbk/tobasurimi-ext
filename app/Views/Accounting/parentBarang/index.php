@@ -279,7 +279,11 @@
         });
 
         $(".search").keyup(function() {
-            table.ajax.reload();
+            if ($(this).val().length >= 3) {
+                table.ajax.reload();
+            } else if ($(this).val().length == 0) {
+                table.ajax.reload();
+            }
         });
         $(".filter_coa").change(function() {
             table.ajax.reload();
