@@ -263,7 +263,7 @@
                                                     <th style="text-align: center;">Barang</th>
                                                     <th style="text-align: center;">Total Order</th>
                                                     <th style="text-align: center;">Total Diterima</th>
-                                                    <th style="text-align: center; width: 100px">Total Bayar</th>
+                                                    <th style="text-align: center; !important;">Total Bayar</th>
                                                     <!-- <th style="text-align: center;">Sisa Bayar</th>
                                                     <th style="text-align: center;">Input Harga</th> -->
 
@@ -1144,7 +1144,7 @@
             newRow.append($('<td style="text-align:center;">').text(v.total_diterima));
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_tagihan)));
             // newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.sisa_pembayaran)));
-            newRow.append($('<td class="hidden" style="display:none;">').html(
+            newRow.append($('<td class="hidden" style="display:none; width:150px !important;">').html(
                 `
                         <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> oninput="limitInputBayar(this, ${v.total_number + v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="${greatFormatRupiah (v.total_tagihan)}" name = "pembayaran" style="height:40px">
                                 `
@@ -1216,8 +1216,8 @@
         newRow.append($('<td style="text-align:center;"><b>' + data.total_diterima + '</b></td>'));
         // newRow.append($('<td style="text-align:center;"><b>' + greatFormatRupiahPayment(data.total_tagihan) + '</b></td>'));
         // newRow.append(($('<td </td>')));
-        newRow.append($('<td style="text-align:center;"><b>' +
-            '<input autocomplete="one-time-code" data-id=""  class="form-control grand-total" type="text" value="' + greatFormatRupiahPayment(data.total_akhir) + '" name = "grand_total"  readonly>' +
+        newRow.append($('<td style="text-align:center; min-width: 200px; width: 200px; max-width: 250px;"><b>' +
+            '<input autocomplete="one-time-code" data-id="" class="form-control grand-total" type="text" value="' + greatFormatRupiahPayment(data.total_akhir) + '" name="grand_total" readonly>' +
             '</b></td>'));
 
         table.find('tbody').append(newRow);
