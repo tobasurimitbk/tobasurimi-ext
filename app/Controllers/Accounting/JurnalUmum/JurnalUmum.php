@@ -1661,6 +1661,8 @@ class JurnalUmum extends BaseController
                     'kredit' => repairDouble($POimport->payment_amt),
                     'valas' => $POimport->currency,
                     'kurs' => $POimport->current_exchange_rate,
+                    'company_id' => $POimport->company_id,
+                    'divisi_id' => $POimport->divisi_id,
                     'keterangan' => "Pembayaran PO " . $dataPO,
                     'id_inputer' => session()->get("login")->user_id
                 );
@@ -1672,6 +1674,8 @@ class JurnalUmum extends BaseController
                     'kredit' => 0,
                     'valas' => $POimport->currency,
                     'kurs' => $POimport->current_exchange_rate,
+                    'company_id' => $POimport->company_id,
+                    'divisi_id' => $POimport->divisi_id,
                     'keterangan' => "Pembayaran PO " . $dataPO,
                     'id_inputer' => session()->get("login")->user_id
                 );
@@ -1683,7 +1687,8 @@ class JurnalUmum extends BaseController
                 $totalPO = 0;
                 $kursData = 1;
                 $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'PEMBAYARAN')->first();
-                if ($otherPayment->valas != "20") {
+                $dataMetadataValuta = $this->MetadataModel->asArray()->where('name', 'Valuta')->where('id', $otherPayment->valas)->first();
+                if ($dataMetadataValuta['value'] != "IDR") {
                     $kursData = $this->kursModel->getKursCurrent($otherPayment->valas, $otherPayment->tanggal)['nilai_kurs'];
                     if (!$kursData) {
                         return response()->setJSON([
@@ -1725,6 +1730,8 @@ class JurnalUmum extends BaseController
                     'kredit' => repairDouble($otherPayment->nominal),
                     'valas' => $otherPayment->valas,
                     'kurs' => $kursData,
+                    'company_id' => $otherPayment->company_id,
+                    'divisi_id' => $otherPayment->divisi_id,
                     'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " " . $otherPayment->keterangan,
                     'id_inputer' => session()->get("login")->user_id
                 );
@@ -1736,6 +1743,8 @@ class JurnalUmum extends BaseController
                     'kredit' => 0,
                     'valas' => $otherPayment->valas,
                     'kurs' => $kursData,
+                    'company_id' => $otherPayment->company_id,
+                    'divisi_id' => $otherPayment->divisi_id,
                     'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " " . $otherPayment->keterangan,
                     'id_inputer' => session()->get("login")->user_id
                 );
