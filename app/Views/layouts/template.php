@@ -100,6 +100,57 @@
         return parseFloat(withoutDecimal) || 0; // Default ke 0 jika hasilnya NaN
     }
 
+    function greatFormatRupiahPayment(x) {
+        var min = false;
+
+        // Pastikan x memiliki nilai yang valid sebelum memanggil toString
+        if (x === null || x === undefined) {
+            x = "";
+        }
+
+        x = x.toString();
+        if (x.includes("-")) {
+            min = true;
+        }
+        x = x.replace(/-/g, ""); // Hilangkan tanda minus sementara
+
+        var parts = x.split(".");
+        parts[0] = parts[0].replace(/,/g, "");
+        var bilangan = parts[0];
+
+        var number_string = bilangan.toString(),
+            sisa = number_string.length % 3,
+            rupiah = number_string.substr(0, sisa),
+            ribuan = number_string.substr(sisa).match(/\d{3}/g);
+
+        if (ribuan) {
+            var separator = sisa ? "," : ""; // Ganti separator jadi koma
+            rupiah += separator + ribuan.join(",");
+        }
+        parts[0] = rupiah;
+
+        // Tambahkan ".00" hanya untuk tampilan (bukan bagian angka asli)
+        if (!parts[1]) {
+            parts.push("00");
+        }
+
+        return (min ? "-" : "") + parts.join(".");
+    }
+
+    function destroyFormatRupiahPayment(x) {
+        if (typeof x !== "string") {
+            return 0;
+        }
+
+        // Hilangkan semua koma (pemformatan ribuan)
+        let number = x.replace(/,/g, ""); // Hapus koma
+
+        // Jika berakhiran ".00", hapus bagian tersebut
+        number = number.replace(/\.00$/, ""); // Hapus ".00" hanya di akhir angka
+
+        return parseFloat(number);
+    }
+
 
 
 </script>
