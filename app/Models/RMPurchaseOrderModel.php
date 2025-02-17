@@ -172,6 +172,74 @@ class RMPurchaseOrderModel extends Model
         ];
     }
 
+
+    public function getTotalPPH($id)
+    {
+        // Ambil data PO berdasarkan ID
+        $data = $this->asObject()
+            ->select("rm_purchase_orders.*, suppliers.no_npwp AS supplierNPWP")
+            ->join('suppliers', 'rm_purchase_orders.supplier_id = suppliers.id', 'left')
+            ->where('rm_purchase_orders.id', $id)
+            ->first();
+
+        if (!$data) {
+            return null;
+        }
+
+        $detailPurchase = $this->db->table('rm_purchase_order_details')
+            ->where('rm_purchase_order_id', $id)
+            ->where('deletedAt', null)
+            ->get()
+            ->getResultArray();
+
+        $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
+        $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.005;
+
+        $totalQty = 0;
+        $nilaiTotalBulanan = 0;
+        $nilaiTotalUmum = 0;
+        $nilaiTotalHarian = 0;
+        $totalTambahan = 0;
+
+        foreach ($detailPurchase as $d) {
+            if ($data->pph === "None" || $data->pph === "Supplier") {
+                $nilaiTotalHarian += ($d['daily_price'] * $d['qty']);
+                $nilaiTotalUmum += ($d['general_price'] * $d['qty']);
+                $nilaiTotalBulanan += ($d['monthly_price'] * $d['qty']);
+            } else {
+                // Company
+                $nilaiTotalHarian += (($d['daily_price'] / $nilaiPph) * $d['qty']);
+                $nilaiTotalUmum += (($d['general_price'] / $nilaiPph) * $d['qty']);
+                $nilaiTotalBulanan += (($d['monthly_price'] / $nilaiPph) * $d['qty']);
+            }
+            $totalQty += $d['qty'];
+        }
+
+        if ($data->pph === "Supplier" || $data->pph === "Company") {
+            $nilaiTotalBulananWithPPH = $nilaiTotalBulanan - ($nilaiTotalBulanan * $nilaiPph2);
+            $nilaiTotalUmumWithPPH = $nilaiTotalUmum - ($nilaiTotalUmum * $nilaiPph2);
+            $nilaiTotalHarianWithPPH = $nilaiTotalHarian - ($nilaiTotalHarian * $nilaiPph2);
+        }
+
+        if ($data->pph == "Company") {
+            $selisih = ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung) / $nilaiPph;
+            $totalTambahan = $selisih;
+            $totalTambahanWithPPH = $totalTambahan - ($totalTambahan * $nilaiPph2);
+        } else {
+            $selisih = ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung);
+            $totalTambahan = ($selisih * $totalQty);
+            $totalTambahanWithPPH = $totalTambahan - ($totalTambahan * $nilaiPph2);
+        }
+
+        $totalBeforePph = $nilaiTotalBulanan + $nilaiTotalHarian + $nilaiTotalUmum + abs($totalTambahan);
+        $totalAfterPph = $nilaiTotalBulananWithPPH + $nilaiTotalHarianWithPPH + $nilaiTotalUmumWithPPH + abs($totalTambahanWithPPH);
+
+        return [
+            'total_before_pph' => round($totalBeforePph, 2),
+            'total_after_pph'  => round($totalAfterPph == 0 ? $totalBeforePph : $totalAfterPph, 2)
+        ];
+    }
+
     public function getPoBBLokalById($id)
     {
         $selectQry = "rm_purchase_orders.*,
