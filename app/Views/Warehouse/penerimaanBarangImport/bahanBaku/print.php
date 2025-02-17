@@ -11,12 +11,6 @@
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
-        @page {
-            size: 8.27in 5.50in landscape;
-            margin: 25px;
-            padding: 25px;
-        }
-
         .header {
             display: flex;
             justify-content: space-between;

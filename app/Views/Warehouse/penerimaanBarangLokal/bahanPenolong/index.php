@@ -22,11 +22,11 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end mb-3 row-col-spp">
+            <div class="row justify-content-end row-col-spp">
                 <div class="col">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal" disabled value="01<?= date('/m/Y') ?>">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart mt-2" id="dateStart" name="dateStart" placeholder="Tanggal" disabled value="01<?= date('/m/Y') ?>">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -34,23 +34,33 @@
                 </div>
                 <div class="col">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal" disabled>
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd mt-2" id="dateEnd" name="dateEnd" placeholder="Tanggal" disabled>
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
                     </div>
                 </div>
                 <div class="col">
-                    <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
+                    <select class="form-select status mt-2" name="status" id="status" aria-label="Floating label select example">
                         <option value="waiting">STATUS LPB:WAITING</option>
                         <option value="finish">STATUS LPB:FINISH</option>
                     </select>
                 </div>
                 <div class="col">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data LPB" value="" />
+                    <input autocomplete="one-time-code" id="search" class="form-control search form-out-search mt-2" placeholder="Cari Data LPB" value="" />
                 </div>
             </div>
-            <div class="row">
+            <?php if (session()->get('login')->this_role_name === "ACCOUNTING"): ?>
+                <div class="row justify-content-start mb-3 row-col-spp">
+                    <div class="col-sm-3">
+                        <input autocomplete="one-time-code" class="form-control search nama_barang form-out-search mt-2" placeholder="Cari Kode / Nama Barang " value="" />
+                    </div>
+                    <div class="col-sm-3">
+                        <input autocomplete="one-time-code" class="form-control search note form-out-search mt-2" placeholder="Cari Keterangan" value="" />
+                    </div>
+                </div>
+            <?php endif; ?>
+            <div class="row mt-3">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
@@ -90,7 +100,7 @@
         "stateSave": true,
         "stateDuration": -1,
         "stateSaveCallback": function(settings, data) {
-            data.searchValue = $(".search").val();
+            // data.searchValue = $(".search").val();
             // data.dateStart = $(".dateStart").val();
             // data.dateEnd = $(".dateEnd").val();
             // data.status = $(".status").val();
@@ -99,7 +109,7 @@
         "stateLoadCallback": function(settings) {
             const data = JSON.parse(localStorage.getItem('DataTables_' + settings.sInstance));
             if (data) {
-                $(".search").val(data.searchValue);
+                // $("#search").val(data.searchValue);
                 // $(".dateStart").val(data.dateStart);
                 // $(".dateEnd").val(data.dateEnd);
                 // $(".status").val(data.status);
@@ -119,10 +129,12 @@
             url: "<?= base_url("penerimaan-barang-lokal-bp/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.search = $(".search").val();
+                data.search = $("#search").val();
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
                 data.status = $(".status").val();
+                data.nama_barang = $(".nama_barang").val();
+                data.note = $(".note").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -287,7 +299,7 @@
 
         $(".dataTable_info").addClass("pt-0");
 
-        $(".search").keyup(function() {
+        $("#search,.note,.nama_barang").keyup(function() {
             table.ajax.reload();
         })
 

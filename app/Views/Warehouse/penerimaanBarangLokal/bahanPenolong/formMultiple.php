@@ -859,7 +859,7 @@
         $('.satuan_order').val(item.satuan);
         $('.jml_order').val(item.jml_order);
         $('.keterangan').val(item.keterangan);
-        $('.jml_diterima_lpb').val(item.jml_diterima_lpb);
+        $('.jml_diterima_lpb').val(item.jml_diterima_lpb == 0 ? '' : item.jml_diterima_lpb);
         $('.jml_diterima_total').val(parseFloat(item.jml_diterima_total));
         $('.sisa_total').val(parseFloat(item.sisa_total));
         $('.nama_barang_dokumen').val(item.nama_barang_master);
