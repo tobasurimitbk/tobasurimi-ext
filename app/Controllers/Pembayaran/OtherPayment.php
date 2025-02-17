@@ -36,6 +36,7 @@ class OtherPayment extends BaseController
             "dataValuta" => $this->metaDataModel->get_by_name('Valuta'),
             'subsAkuns' =>  $this->subAkunsModel->asObject()
                 ->where('deletedAt', null)
+                ->where('company_id', $this->this_company_id)
                 ->findAll()
         ];
 
