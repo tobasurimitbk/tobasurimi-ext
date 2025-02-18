@@ -54,7 +54,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-group mb-3">
-                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Nama Barang" value="" style="height: 50px;" />
+                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Kode/Nama/Keterangan Barang" value="" style="height: 50px;" />
                     </div>
                 </div>
             </div>

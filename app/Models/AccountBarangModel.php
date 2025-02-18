@@ -106,7 +106,8 @@ class AccountBarangModel extends Model
 
         if ($addCondition['search'] && $addCondition['search'] != "") {
             $barangDataQry->like('barang_master.barang_name', $addCondition['search'])
-                ->orLike('barang_master.kode_barang', $addCondition['search']);
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('barang_master.keterangan', $addCondition['search']);
         }
 
         if ($addCondition['filter_coa'] && $addCondition['filter_coa'] == "belum") {
