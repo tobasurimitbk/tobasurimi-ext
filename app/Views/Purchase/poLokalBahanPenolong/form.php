@@ -217,7 +217,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <input type="hidden" name="barang_update_id" id="barang_update_id" class="barang_update_id">
+                        <input type="hidden" name="id_detail" id="id_detail" class="id_detail">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" readonly type="text" class="form-control nama_barang" id="nama_barang" name="nama_barang">
                             <label for="floatingInput">Nama Barang</label>
@@ -649,11 +649,11 @@
 
     $('.btn-submit-detail').click(function() {
         if ($('.detail-form').valid()) {
-            var barang_update_id = $('#barang_update_id').val();
+            var id = $('#id_detail').val();
             var spesifikasiID = $('#barang_id').find("option:selected").data("spesifikasi_id");
             var barang_id = $('#barang_id').find("option:selected").data("barang_id");
 
-            if (barang_update_id != "") {
+            if (id != "") {
                 // UPDATE
                 if (spesifikasiID == '') {
                     Swal.fire({
@@ -667,13 +667,14 @@
                 } else {
                     var indexToUpdate = -1;
                     for (var i = 0; i < listBarang.length; i++) {
-                        if (listBarang[i].spesifikasi_id == barang_update_id) {
+                        if (listBarang[i].id == id) {
                             indexToUpdate = i;
                             break;
                         }
                     }
 
                     listBarang[indexToUpdate] = {
+                        id: id,
                         barang_id: $('#barang_id').find("option:selected").data("barang_id"),
                         spesifikasi_id: $('#barang_id').val(),
                         kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
@@ -901,6 +902,7 @@
 
     function insertList() {
         listBarang.push({
+            id: getID(),
             barang_id: $('#barang_id').find("option:selected").data("barang_id"),
             spesifikasi_id: $('#barang_id').val(),
             kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
@@ -945,11 +947,11 @@
                 <?php if (!$poDetail['is_posted']) : ?>
                     newRow.append($('<td>').html(
                         `
-                            <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.spesifikasi_id}')">
+                            <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.id}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                             </button>
                             <?php if ($checkLpb == null) : ?>
-                            <button class="btn btn-danger" onclick="deleteRow('${v.spesifikasi_id}')">
+                            <button class="btn btn-danger" onclick="deleteRow('${v.id}')">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                             <?php endif ?>
@@ -961,9 +963,9 @@
             <?php else : ?>
                 newRow.append($('<td>').html(
                     `
-                        <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.spesifikasi_id}')">
+                        <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.id}')">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                        </button><button class="btn btn-danger" onclick="deleteRow('${v.spesifikasi_id}')">
+                        </button><button class="btn btn-danger" onclick="deleteRow('${v.id}')">
                             <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                         </button>
                     `
@@ -1015,7 +1017,7 @@
 
         var indexToRemove = -1;
         for (var i = 0; i < listBarang.length; i++) {
-            if (listBarang[i].spesifikasi_id == id) {
+            if (listBarang[i].id == id) {
                 indexToRemove = i;
                 break;
             }
@@ -1031,11 +1033,12 @@
     function detailRow(id) {
         var item = null;
         for (var i = 0; i < listBarang.length; i++) {
-            if (listBarang[i].spesifikasi_id == id) {
+            if (listBarang[i].id == id) {
                 item = listBarang[i];
                 break;
             }
         }
+        $('#id_detail').val(item.id);
         $('#barang_id, #barang_update_id').val(item.spesifikasi_id).change();
         $('#harga_satuan').val(item.harga_satuan == 0 ? '' : greatFormatRupiah(item.harga_satuan));
         $('#qty').val(parseFloat(item.qty));
@@ -1133,6 +1136,7 @@
                 success: function(response) {
                     $.each(response.data, function(i, v) {
                         listBarang.push({
+                            id: getID(),
                             barang_id: v.barang_id,
                             spesifikasi_id: v.spesifikasi_id,
                             kode_barang: v.kode_barang,
@@ -1182,6 +1186,17 @@
             listBarang[i].ppn = ppn;
         }
     }
+
+    function getID() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let randomString = '';
+
+        for (let i = 0; i < 10; i++) {
+            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
+        return randomString;
+    };
 </script>
 <!-- Edit Script -->
 <?php if (!empty($poDetail)) : ?>
@@ -1190,6 +1205,7 @@
         $('#supplier_id').val("<?= $poDetail['supplier_id'] ?>").change();
         <?php foreach ($listBarang as $l) : ?>
             listBarang.push({
+                id: getID(),
                 barang_id: "<?= $l['barang_id'] ?>",
                 spesifikasi_id: "<?= $l['spesifikasi_id'] ?>",
                 kode_barang: "<?= $l['kode_barang'] ?>",

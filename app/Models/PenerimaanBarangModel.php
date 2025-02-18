@@ -110,12 +110,6 @@ class PenerimaanBarangModel extends Model
             $penerimaanBarangDataQry->join('rm_import_po_details', 'rm_import_po_details.id = penerimaan_barang_detail.purchase_order_details_id', 'left');
         }
 
-        $penerimaanBarangDataQry->groupBy(('penerimaan_barang.id'))
-            ->where($condition)
-            ->orderBy($sort, $sortType);
-
-        $totalData = $penerimaanBarangDataQry->countAllResults(false);
-
 
         if (isset($addCondition['status'])) {
             $penerimaanBarangDataQry->where('penerimaan_barang.status_post', $addCondition['status']);
@@ -174,6 +168,14 @@ class PenerimaanBarangModel extends Model
         if ($addCondition['startdate'] || $addCondition['lastdate']) {
             $penerimaanBarangDataQry->groupEnd();
         }
+
+
+        $penerimaanBarangDataQry->groupBy(('penerimaan_barang.id'))
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $penerimaanBarangDataQry->countAllResults(false);
+
 
         $totalFilteredData = $penerimaanBarangDataQry->countAllResults(false);
         $data = $penerimaanBarangDataQry->findAll($limit, $offset);
