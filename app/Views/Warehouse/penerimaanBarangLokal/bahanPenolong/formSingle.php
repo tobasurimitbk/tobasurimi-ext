@@ -429,49 +429,49 @@
         .css('z-index', '1');
 
     // Validator Detail
-    var validator_detail = $(".detail-form").validate({
-        rules: {
-            jml_diterima_lpb: {
-                required: true,
-                number: true,
-                min: 0
-            },
-            sisa_total: {
-                number: true,
-                min: 0
-            }
-        },
-        messages: {
-            jml_diterima_lpb: {
-                required: "Jumlah diterima wajib diisi",
-                number: "Masukkan hanya angka",
-                min: "Tidak boleh minus"
-            },
-            sisa_total: {
-                min: "Sisa total tidak boleh minus"
-            }
-        },
-        errorElement: 'span',
-        errorClass: 'text-danger',
-        errorPlacement: function(error, element) {
-            var elem = $(element);
-            if (elem.hasClass("select2-hidden-accessible")) {
-                element = $("#select2-" + elem.attr("id") + "-container").parent();
-                error.insertAfter(element);
-            } else {
-                error.insertAfter(element);
-            }
-        },
-        highlight: function(element) {
-            $(element).closest('.form-group').addClass('has-error');
-            $(element).addClass('select-class');
+    // var validator_detail = $(".detail-form").validate({
+    //     rules: {
+    //         jml_diterima_lpb: {
+    //             required: true,
+    //             number: true,
+    //             min: -1
+    //         },
+    //         sisa_total: {
+    //             number: true,
+    //             min: -1
+    //         }
+    //     },
+    //     messages: {
+    //         jml_diterima_lpb: {
+    //             required: "Jumlah diterima wajib diisi",
+    //             number: "Masukkan hanya angka",
+    //             min: "Tidak boleh minus"
+    //         },
+    //         sisa_total: {
+    //             min: "Sisa total tidak boleh minus"
+    //         }
+    //     },
+    //     errorElement: 'span',
+    //     errorClass: 'text-danger',
+    //     errorPlacement: function(error, element) {
+    //         var elem = $(element);
+    //         if (elem.hasClass("select2-hidden-accessible")) {
+    //             element = $("#select2-" + elem.attr("id") + "-container").parent();
+    //             error.insertAfter(element);
+    //         } else {
+    //             error.insertAfter(element);
+    //         }
+    //     },
+    //     highlight: function(element) {
+    //         $(element).closest('.form-group').addClass('has-error');
+    //         $(element).addClass('select-class');
 
-        },
-        unhighlight: function(element) {
-            $(element).closest('.form-group').removeClass('has-error');
-            $(element).removeClass('select-class');
-        },
-    });
+    //     },
+    //     unhighlight: function(element) {
+    //         $(element).closest('.form-group').removeClass('has-error');
+    //         $(element).removeClass('select-class');
+    //     },
+    // });
 
     // Validator Parent
     var validator = $(".create-form").validate({
@@ -670,8 +670,31 @@
 
     $('.btn-submit-detail').click(function(e) {
         e.preventDefault();
-        if ($(".detail-form").valid()) {
-            var indexToRemove = -1;
+        var indexToRemove = -1;
+        var jmlDiterimaLpb = Number(destroyFormatRupiah($('.jml_diterima_lpb').val()));
+        var jmlDiterimaTotal = Number(destroyFormatRupiah($('.jml_diterima_total').val()));
+        var sisaTotal = Number(destroyFormatRupiah($('.sisa_total').val()));
+
+        if (jmlDiterimaLpb < 0) {
+            Swal.fire({
+                icon: 'error',
+                title: "Qty Diterima Saat Ini Tidak Boleh Minus",
+                confirmButtonColor: '#4e73df',
+            })
+
+        } else if (jmlDiterimaTotal < 0) {
+            Swal.fire({
+                icon: 'error',
+                title: "Qty Diterima Total Tidak Boleh Minus",
+                confirmButtonColor: '#4e73df',
+            })
+        } else if (sisaTotal < 0) {
+            Swal.fire({
+                icon: 'error',
+                title: "Qty Sisa Tidak Boleh Minus",
+                confirmButtonColor: '#4e73df',
+            })
+        } else {
             for (var i = 0; i < listData.result.length; i++) {
                 if (Number(listData.result[i].am_purchase_order_details_id) == Number($('.am_purchase_order_details_id').val()) && Number(listData.result[i].am_purchase_order_id) == Number($('.am_purchase_order_id').val())) {
                     var jml_diterima_lpb = Number(destroyFormatRupiah($('.jml_diterima_lpb').val()));

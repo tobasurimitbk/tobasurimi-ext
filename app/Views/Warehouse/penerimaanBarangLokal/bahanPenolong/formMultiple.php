@@ -671,8 +671,31 @@
 
     $('.btn-submit-detail').click(function(e) {
         e.preventDefault();
-        if ($(".detail-form").valid()) {
-            var indexToRemove = -1;
+        var indexToRemove = -1;
+        var jmlDiterimaLpb = Number(destroyFormatRupiah($('.jml_diterima_lpb').val()));
+        var jmlDiterimaTotal = Number(destroyFormatRupiah($('.jml_diterima_total').val()));
+        var sisaTotal = Number(destroyFormatRupiah($('.sisa_total').val()));
+
+        if (jmlDiterimaLpb < 0) {
+            Swal.fire({
+                icon: 'error',
+                title: "Qty Diterima Saat Ini Tidak Boleh Minus",
+                confirmButtonColor: '#4e73df',
+            })
+
+        } else if (jmlDiterimaTotal < 0) {
+            Swal.fire({
+                icon: 'error',
+                title: "Qty Diterima Total Tidak Boleh Minus",
+                confirmButtonColor: '#4e73df',
+            })
+        } else if (sisaTotal < 0) {
+            Swal.fire({
+                icon: 'error',
+                title: "Qty Sisa Tidak Boleh Minus",
+                confirmButtonColor: '#4e73df',
+            })
+        } else {
             for (var i = 0; i < listData.result.length; i++) {
                 if (Number(listData.result[i].am_purchase_order_details_id) == Number($('.am_purchase_order_details_id').val()) && Number(listData.result[i].am_purchase_order_id) == Number($('.am_purchase_order_id').val())) {
                     var jml_diterima_lpb = Number(destroyFormatRupiah($('.jml_diterima_lpb').val()));

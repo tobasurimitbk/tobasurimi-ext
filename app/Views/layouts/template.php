@@ -48,7 +48,7 @@
 <script>
     function greatFormatRupiah(x) {
         var min = false;
-         // Pastikan x memiliki nilai yang valid sebelum memanggil toString
+        // Pastikan x memiliki nilai yang valid sebelum memanggil toString
         if (x === null || x === undefined) {
             x = ""; // Berikan nilai default jika x null atau undefined
         }
@@ -87,18 +87,30 @@
     }
 
     function destroyFormatRupiah(x) {
+        let isNegative = x.includes("-");
         if (typeof x === "number") return x; // Jika input sudah berupa angka, langsung kembalikan
         if (!x) return 0; // Jika input null, undefined, atau kosong, kembalikan 0
-        
+
         // Hapus "Rp" dan karakter selain angka dan titik
         const cleaned = x.replace(/[^\d.]/g, "");
-        
+
         // Hapus ".00" di akhir string jika ada
         const withoutDecimal = cleaned.replace(/\.00$/, "");
-        
+        console.log(parseFloat(withoutDecimal));
         // Konversi string menjadi angka
-        return parseFloat(withoutDecimal) || 0; // Default ke 0 jika hasilnya NaN
+        return isNegative ? -parseFloat(withoutDecimal) || 0 : parseFloat(withoutDecimal) || 0; // Default ke 0 jika hasilnya NaN
     }
+
+    // function destroyFormatRupiah(x) {
+    //     if (typeof x === "number") return x; // Jika input sudah angka, langsung kembalikan
+    //     if (!x) return 0; // Jika kosong/null/undefined, kembalikan 0
+
+    //     let isNegative = x.includes("-"); // Cek apakah angka negatif
+    //     let cleaned = x.replace(/,/g, ""); // Hapus semua koma (karena koma adalah pemisah ribuan)
+
+    //     let result = parseFloat(cleaned) || 0; // Konversi ke angka
+    //     return isNegative ? -result : result; // Kembalikan angka dengan tanda negatif jika ada
+    // }
 
     function greatFormatRupiahPayment(x) {
         var min = false;
@@ -150,9 +162,6 @@
 
         return parseFloat(number);
     }
-
-
-
 </script>
 
 
