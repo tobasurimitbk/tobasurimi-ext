@@ -61,6 +61,7 @@ class BC40Model extends Model
             bc_purchase_order.po_type,
             bc_purchase_order.status_posting,
             bc_purchase_order.no_daftar,
+            bc_purchase_order.createdAt as tanggal_dokumen,
             suppliers.name AS supplier_name";
 
         $bcDataQry = $this->asObject()
@@ -115,12 +116,12 @@ class BC40Model extends Model
             $searchTerm = $addCondition['search'];
             $bcDataQry->groupStart();
             $bcDataQry->like('suppliers.name', $searchTerm)
-                    ->orLike('bc_23.no_aju', $searchTerm)
-                    ->orLike('bc_purchase_order.multiple_lpb_no', $searchTerm)
-                    ->orLike('bc_purchase_order.no_daftar', $searchTerm);
+                ->orLike('bc_23.no_aju', $searchTerm)
+                ->orLike('bc_purchase_order.multiple_lpb_no', $searchTerm)
+                ->orLike('bc_purchase_order.no_daftar', $searchTerm);
             $bcDataQry->groupEnd();
         }
-        
+
         if ($addCondition['mulaiTanggalBC40'] && $addCondition['selesaiTanggalBC40']) {
             $bcDataQry->groupStart();
             $mulaiTanggalBC40Timestamp = date_format(date_create_from_format("d/m/Y", $addCondition['mulaiTanggalBC40']), "Y-m-d");
