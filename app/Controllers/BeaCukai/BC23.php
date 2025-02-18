@@ -208,7 +208,7 @@ class BC23 extends BaseController
             array_push($dataBeaCukai, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->bc_purchase_order_id),
-                "tanggal_bc_23"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
+                "tanggal_bc_23"         => $data->tanggal_dokumen == null ? '-' : date('d/m/Y', strtotime($data->tanggal_dokumen)),
                 "no_aju"                => ($data->no_aju == "" ? "-" : $data->no_aju) . " / " . ($data->no_daftar == "" ? "-" : $data->no_daftar),
                 "po_type"               => $data->po_type,
                 "lpb_no"                => str_replace(['"', ']', '['], " ",  $data->multiple_lpb_no),

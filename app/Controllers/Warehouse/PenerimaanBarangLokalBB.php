@@ -116,6 +116,8 @@ class PenerimaanBarangLokalBB extends BaseController
             "status" => $this->request->getVar("status"),
             "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "note" => strtolower($this->request->getVar('note')),
+            "nama_barang" => strtolower($this->request->getVar('nama_barang'))
         ];
 
         $limit = $this->request->getVar("length");
@@ -146,6 +148,7 @@ class PenerimaanBarangLokalBB extends BaseController
                 "bc_type"               => $data->bc_type,
                 "in_bc"                 => $bc_purchase_order_detail_list != null ? 'in' : 'out',
                 "retur_status"          => ($pengembalianBarang != null) ? ($pengembalianBarang['status_post'] == "WAITING" ? 0 : 1) : null,
+                "bc_type_name"          => $data->bc_type_name == null ? "NON PABEAN" : $data->bc_type_name
             ]);
         }
 

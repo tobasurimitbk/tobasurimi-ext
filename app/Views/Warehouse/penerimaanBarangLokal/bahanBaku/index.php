@@ -26,7 +26,7 @@
                 <div class="col">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart mt-2" id="dateStart" name="dateStart" placeholder="Tanggal" disabled value="01<?= date('/m/Y') ?>">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -34,22 +34,32 @@
                 </div>
                 <div class="col">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd mt-2" id="dateEnd" name="dateEnd" placeholder="Tanggal" disabled>
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
                     </div>
                 </div>
                 <div class="col">
-                    <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
+                    <select class="form-select status mt-2" name="status" id="status" aria-label="Floating label select example">
                         <option value="waiting">STATUS LPB:WAITING</option>
                         <option value="finish">STATUS LPB:FINISH</option>
                     </select>
                 </div>
                 <div class="col">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data LPB" value="" />
+                    <input autocomplete="one-time-code" id="search" class="form-control search form-out-search mt-2" placeholder="Cari Data LPB" value="" />
                 </div>
             </div>
+            <?php if (session()->get('login')->this_role_name === "ACCOUNTING"): ?>
+                <div class="row justify-content-start mb-3 row-col-spp">
+                    <div class="col-sm-3">
+                        <input autocomplete="one-time-code" class="form-control search nama_barang form-out-search mt-2" placeholder="Cari Kode / Nama Barang " value="" />
+                    </div>
+                    <div class="col-sm-3">
+                        <input autocomplete="one-time-code" class="form-control search note form-out-search mt-2" placeholder="Cari Keterangan" value="" />
+                    </div>
+                </div>
+            <?php endif; ?>
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
@@ -62,6 +72,7 @@
                                 <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
                                 <th onclick="changeSort('createdAt')">Tanggal</th>
                                 <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
+                                <th onclick="changeSort('metadata.value')" class="sort">Dokumen</th>
                                 <th>Jumlah Item</th>
                                 <th>Actions</th>
                             </tr>
@@ -73,6 +84,8 @@
                 </div>
             </div>
         </div>
+
+    </div>
     </div>
 </section>
 
@@ -97,19 +110,19 @@
         "stateSave": true,
         "stateDuration": -1,
         "stateSaveCallback": function(settings, data) {
-            data.searchValue = $(".search").val();
-            data.dateStart = $(".dateStart").val();
-            data.dateEnd = $(".dateEnd").val();
-            data.status = $(".status").val();
+            // data.searchValue = $("#search").val();
+            // data.dateStart = $(".dateStart").val();
+            // data.dateEnd = $(".dateEnd").val();
+            // data.status = $(".status").val();
             localStorage.setItem('DataTables_' + settings.sInstance, JSON.stringify(data));
         },
         "stateLoadCallback": function(settings) {
             const data = JSON.parse(localStorage.getItem('DataTables_' + settings.sInstance));
             if (data) {
-                $(".search").val(data.searchValue);
-                $(".dateStart").val(data.dateStart);
-                $(".dateEnd").val(data.dateEnd);
-                $(".status").val(data.status);
+                // $(".search").val(data.searchValue);
+                // $(".dateStart").val(data.dateStart);
+                // $(".dateEnd").val(data.dateEnd);
+                // $(".status").val(data.status);
             }
             return data;
         },
@@ -118,10 +131,12 @@
             url: "<?= base_url("penerimaan-barang-lokal-bb/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.search = $(".search").val();
+                data.search = $("#search").val();
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
                 data.status = $(".status").val();
+                data.nama_barang = $(".nama_barang").val();
+                data.note = $(".note").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -162,6 +177,10 @@
             },
             {
                 data: "supplier_name",
+                className: "text-center"
+            },
+            {
+                data: "bc_type_name",
                 className: "text-center"
             },
             {
@@ -276,13 +295,25 @@
 
         $(".dataTable_info").addClass("pt-0");
 
-        $(".search").keyup(function() {
+        $("#search,.note,.nama_barang").keyup(function() {
             table.ajax.reload();
         })
 
         $(".dateStart, .dateEnd, .status").change(function() {
             table.ajax.reload();
         })
+
+        $(".status").change(function() {
+            var status = $(this).val();
+            if (status == "finish") {
+                // Ubah Status Disbled StartDate dan EndDate menjadi false
+                $(".dateStart, .dateEnd").attr('disabled', false);
+            } else {
+                // Ubah Status Disbled StartDate dan EndDate menjadi false
+                $(".dateStart, .dateEnd").attr('disabled', true);
+
+            }
+        });
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();

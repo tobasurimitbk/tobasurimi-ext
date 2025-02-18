@@ -92,23 +92,49 @@ class PenerimaanBarangModel extends Model
             ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'right')
             ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
-            ->join('metadata', 'metadata.id = penerimaan_barang.bc_type', 'left');
+            ->join('metadata', 'metadata.id = penerimaan_barang.bc_type', 'left')
+            ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left');
 
-        if ($condition['penerimaan_barang.status_penerimaan'] == "LOKAL" && $condition['tipe_bahan'] == "PENOLONG") {
-            // KHSUSUS LPB BP
+
+        if (in_array($condition['penerimaan_barang.status_penerimaan'], ['LOKAL', 'IMPORT']) && $condition['tipe_bahan'] == "PENOLONG") {
+            // KHSUSUS LPB LOKAL BP & LOKAL BB
             $penerimaanBarangDataQry->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left');
             $penerimaanBarangDataQry->join('purchase_requests', 'am_purchase_orders.purchase_request_id = purchase_requests.id', 'left');
+            $penerimaanBarangDataQry->join('am_purchase_order_details', 'am_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id', 'left');
+        } elseif ($condition['penerimaan_barang.status_penerimaan'] == "LOKAL" && $condition['tipe_bahan'] == "BAKU") {
+            // KHUSUS LPB LOKAL BB
+            $penerimaanBarangDataQry->join('rm_purchase_order_details', 'rm_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id', 'left');
+        } elseif ($condition['penerimaan_barang.status_penerimaan'] == "IMPOR" && $condition['tipe_bahan'] == "BAKU") {
+            // KHUSUS LPB IMPORT BB
+            $penerimaanBarangDataQry->join('rm_import_po_details', 'rm_import_po_details.id = penerimaan_barang_detail.purchase_order_details_id', 'left');
         }
-
-        $penerimaanBarangDataQry->groupBy(('penerimaan_barang.id'))
-            ->where($condition)
-            ->orderBy($sort, $sortType);
-
-        $totalData = $penerimaanBarangDataQry->countAllResults(false);
 
 
         if (isset($addCondition['status'])) {
             $penerimaanBarangDataQry->where('penerimaan_barang.status_post', $addCondition['status']);
+        }
+
+        if ($addCondition['nama_barang']) {
+            $penerimaanBarangDataQry->groupStart();
+            $penerimaanBarangDataQry->like('LOWER(CONCAT(barang_master.barang_name," ",barang_master_spesifikasi.spesifikasi))', $addCondition['nama_barang'])
+                ->orLike('LOWER(barang_master.kode_barang)', $addCondition['nama_barang']);
+            $penerimaanBarangDataQry->groupEnd();
+        }
+
+        if ($addCondition['note']) {
+            $penerimaanBarangDataQry->groupStart();
+            if (in_array($condition['penerimaan_barang.status_penerimaan'], ['LOKAL', 'IMPORT']) && $condition['tipe_bahan'] == "PENOLONG") {
+                // KHSUSUS LPB LOKAL BP & LOKAL BB
+                $penerimaanBarangDataQry->like('LOWER(am_purchase_order_details.note)', $addCondition['note']);
+            } elseif ($condition['penerimaan_barang.status_penerimaan'] == "LOKAL" && $condition['tipe_bahan'] == "BAKU") {
+                // KHSUSUS LPB LOKAL LOKAL BB
+                $penerimaanBarangDataQry->like('LOWER(rm_purchase_order_details.note)', $addCondition['note']);
+            } elseif ($condition['penerimaan_barang.status_penerimaan'] == "IMPOR" && $condition['tipe_bahan'] == "BAKU") {
+                // KHUSUS LPB IMPORT BB
+                $penerimaanBarangDataQry->like('LOWER(rm_import_po_details.note)', $addCondition['note']);
+            }
+            $penerimaanBarangDataQry->groupEnd();
         }
 
         if ($addCondition['search']) {
@@ -142,6 +168,14 @@ class PenerimaanBarangModel extends Model
         if ($addCondition['startdate'] || $addCondition['lastdate']) {
             $penerimaanBarangDataQry->groupEnd();
         }
+
+
+        $penerimaanBarangDataQry->groupBy(('penerimaan_barang.id'))
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $penerimaanBarangDataQry->countAllResults(false);
+
 
         $totalFilteredData = $penerimaanBarangDataQry->countAllResults(false);
         $data = $penerimaanBarangDataQry->findAll($limit, $offset);
