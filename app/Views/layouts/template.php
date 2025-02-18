@@ -87,18 +87,20 @@
     }
 
     function destroyFormatRupiah(x) {
-        let isNegative = x.includes("-");
-        if (typeof x === "number") return x; // Jika input sudah berupa angka, langsung kembalikan
-        if (!x) return 0; // Jika input null, undefined, atau kosong, kembalikan 0
+        if (typeof x === "number") return x; // Jika sudah angka, langsung kembalikan
+        if (!x) return 0; // Jika null, undefined, atau kosong, kembalikan 0
 
-        // Hapus "Rp" dan karakter selain angka dan titik
-        const cleaned = x.replace(/[^\d.]/g, "");
+        let strValue = String(x); // Pastikan `x` jadi string agar aman saat `.includes()`
+        let isNegative = strValue.includes("-"); // Cek apakah ada tanda negatif
+
+        // Hapus semua karakter selain angka dan titik
+        let cleaned = strValue.replace(/[^\d.]/g, "");
 
         // Hapus ".00" di akhir string jika ada
-        const withoutDecimal = cleaned.replace(/\.00$/, "");
-        console.log(parseFloat(withoutDecimal));
-        // Konversi string menjadi angka
-        return isNegative ? -parseFloat(withoutDecimal) || 0 : parseFloat(withoutDecimal) || 0; // Default ke 0 jika hasilnya NaN
+        let withoutDecimal = cleaned.replace(/\.00$/, "");
+
+        let result = parseFloat(withoutDecimal) || 0; // Konversi string ke angka
+        return isNegative ? -result : result; // Kembalikan negatif jika awalnya ada "-"
     }
 
     // function destroyFormatRupiah(x) {
