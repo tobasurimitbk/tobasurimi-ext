@@ -196,15 +196,14 @@
                                 <label>Kode Kantor</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12 mt-1">
+                        <div class="col-sm-6 mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input id="no_pengajuan" value="<?= $noAju ?>" name="no_pengajuan" type="text" readonly class="no_pengajuan form-control" placeholder="">
                                 <label>Preview Nomor Pengajuan</label>
                             </div>
                         </div>
                     </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Kembali</button>
