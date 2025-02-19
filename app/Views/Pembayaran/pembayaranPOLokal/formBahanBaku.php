@@ -60,7 +60,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($detail) ? ($detail->is_posted == '1' ? 'disabled=true' : '')   : ''; ?> type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. PO" value="<?= !empty($detail) ? $detail['pembayaranDetail']['payment_no']: ""; ?>">
+                                    <input autocomplete="one-time-code" <?= !empty($detail) ? (!empty($detail) ? 'disabled=true' : '')   : ''; ?> type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. PO" value="<?= !empty($detail) ? $detail['pembayaranDetail']['payment_no']: ""; ?>">
                                     <label for="floatingInput">No. Pembayaran</label>
                                 </div>
                                 <div style="<?= !empty($detail) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -154,23 +154,24 @@
                         <div class="harian-form">
                             <?php if (!empty($detail)) : ?>
                                 <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                    <select class="form-select" name="lpb[]" id="lpb" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> multiple>
-                                        <?php foreach ($detail['pembayaranDetail']['multiple_lpb_no'] as $d) :  ?>
-                                            <option selected value="<?= $d; ?>"><?= $d; ?> </option>
-                                        <?php endforeach; ?>
+                                    <select class="form-select" name="lpb[]" id="lpb" multiple>
+                                        <?php if (!empty($detail['dataMultiplePOPaid']['penerimaan_barang']) && is_array($detail['dataMultiplePOPaid']['penerimaan_barang'])) : ?>
+                                            <?php foreach ($detail['dataMultiplePOPaid']['penerimaan_barang'] as $item) : ?>
+                                                <option value="<?= $item['lpb_id']; ?>"><?= $item['po_no']; ?></option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </select>
                                     <label for="floatingInput" style="z-index: 1;">No PO</label>
                                 </div>
                             <?php else : ?>
                                 <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                                     <select class="form-select" name="lpb[]" id="lpb">
-                                        <option disabled selected value=""></option>
+                                        <option disabled selected value="">Pilih No PO</option>
                                     </select>
                                     <label for="floatingInput" style="z-index: 1;">No PO</label>
                                 </div>
                             <?php endif; ?>
                         </div>
-
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -409,6 +410,9 @@
     const table = $('#dataTable');
     var listPoNo = [];
     var listPoID = [];
+    var listPoDetailID = [];
+    var listPenerimaanDetailID = [];
+    var listPenerimaanDetailHarga = [];
     var listPanjar = [];
     var listPanjarTB = [];
     var listPinjaman = [];
@@ -436,6 +440,7 @@
                 listPanjarTB = response.data.panjar_tb
 
                 csrf.val(response.token);
+                generateLPBNo();
                 drawPaidPanjarTable(listPanjar);
                 drawPaidPinjamanTable(listPinjaman);
                 drawPaidPanjarTBTable(listPanjarTB);
@@ -550,7 +555,7 @@
         },
     });
 
-    $("#payment_date,#jatuh_tempo").datepicker({
+    $("#payment_date,#jatuh_tempo, #payment_panjar_date").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -623,7 +628,7 @@
 
                 listPembayaran = [];
                 listPembayaran = response.data;
-
+                console.log(listPembayaran);
 
                 csrf.val(response.token);
                 drawTable(listPembayaran);
@@ -657,7 +662,7 @@
             success: function(response) {
                 listPembayaran = [];
                 listPembayaran = response.data;
-
+                console.log(listPembayaran);
                 csrf.val(response.token);
                 drawTable(listPembayaran);
                 $('#nominal_pembayaran').val(response.data.sisaNumber);
@@ -756,6 +761,9 @@
 
                         // Append formatted lists to formData
                         formData.append("poIDList", JSON.stringify(listPoID));
+                        formData.append("poDetailIDList", JSON.stringify(listPoDetailID));
+                        formData.append("penerimaanDetailIDList", JSON.stringify(listPenerimaanDetailID));
+                        formData.append("penerimaanDetailHargaList", JSON.stringify(listPenerimaanDetailHarga));
                         formData.append("poNoList", JSON.stringify(listPoNo));
                         formData.append("panjarList", JSON.stringify(formattedPanjarList));
                         formData.append("pinjamanList", JSON.stringify(formattedPinjamanList));
@@ -836,6 +844,7 @@
                             formData.set('total_pembayaran_panjar', totalPembayaranPanjar);
                             formData.set('total_pembayaran_panjar_tb', totalPembayaranPanjarTB);
                             formData.set('total_pembayaran_pinjaman', totalPembayaranPinjaman);
+
                             const formatList = (list) => {
                                 if (!Array.isArray(list)) return []; // Pastikan `list` adalah array
                                 return list.map(item => {
@@ -853,17 +862,20 @@
                             let formattedPembayaranList = Array.isArray(listPembayaran)
                                 ? listPembayaran
                                 : Object.values(listPembayaran);
+                            console.log(formattedPembayaranList);
+                            console.log(listPembayaran);
+                           
+                            // // Format item dalam pembayaranList
+                            // formattedPembayaranList = formattedPembayaranList.map(item => {
+                            //     Object.keys(item).forEach(key => {
+                            //         if (typeof item[key] === 'string' && item[key].includes(',')) {
+                            //             item[key] = destroyFormatRupiahPayment(item[key]);
+                            //         }
+                            //     });
+                            //     return item;
+                            // });
 
-                            // Format item dalam pembayaranList
-                            formattedPembayaranList = formattedPembayaranList.map(item => {
-                                Object.keys(item).forEach(key => {
-                                    if (typeof item[key] === 'string' && item[key].includes(',')) {
-                                        item[key] = destroyFormatRupiahPayment(item[key]);
-                                    }
-                                });
-                                return item;
-                            });
-
+                            console.log(formattedPembayaranList);
                             // Append formatted pembayaranList to formData
                             formData.append("pembayaranList", JSON.stringify(formattedPembayaranList));
 
@@ -876,6 +888,9 @@
                             formData.append("no_bukti_pembayaran", $('#no_bukti_pembayaran').val());
                             formData.append("poIDList", JSON.stringify(listPoID));
                             formData.append("poNoList", JSON.stringify(listPoNo));
+                            formData.append("poDetailIDList", JSON.stringify(listPoDetailID));
+                            formData.append("penerimaanDetailIDList", JSON.stringify(listPenerimaanDetailID));
+                            formData.append("penerimaanDetailHargaList", JSON.stringify(listPenerimaanDetailHarga));
                             formData.append("panjarList", JSON.stringify(formattedPanjarList));
                             formData.append("pinjamanList", JSON.stringify(formattedPinjamanList));
                             formData.append("panjarTBList", JSON.stringify(formattedPanjarTBList));
@@ -1070,8 +1085,12 @@
         formData.append("supplierID", $('#supplier_id').val());
         formData.append("divisiID", $('#divisi_id').val());
 
+        // Ambil data selectedLPB untuk dikirim ke server
+        let selectedLPB = <?= json_encode($detail['dataMultiplePOPaid']['penerimaan_barang'] ?? []) ?>;
+        formData.append("selectedLPB", JSON.stringify(selectedLPB)); // Mengirim selectedLPB ke server
+
         $.ajax({
-            url: "<?= base_url("pembayaran-po-lokal-bb/get-lpb-not-paid"); ?>",
+            url: "<?= base_url('pembayaran-po-lokal-bb/get-lpb-not-paid'); ?>",
             data: formData,
             method: "POST",
             dataType: "json",
@@ -1084,10 +1103,16 @@
                 csrf.val(response.token);
                 $("#lpb").empty();
                 $("#lpb").append(`<option value=""></option>`);
+
+                // Ambil data LPB yang belum dibayar dari response
                 response.data.forEach(function(item) {
-                    $("#lpb").append(`<option  value="${item.lpbID}">${item.po_no}</option>`);
+                    // Cek apakah LPB sudah dipilih sebelumnya
+                    let isSelected = selectedLPB.some(lpb => lpb.lpb_id == item.lpbID) ? "selected" : "";
+                    $("#lpb").append(`<option value="${item.lpbID}" ${isSelected}>${item.po_no}</option>`);
                 });
 
+                // Refresh select2 jika digunakan
+                $("#lpb").trigger("change");
             }
         });
     }
@@ -1132,7 +1157,15 @@
             listPoNo.push({
                 poNo: v.no_penerimaan_barang
             });
-            console.log(greatFormatRupiahPayment(v.total_tagihan), v.total_tagihan)
+            listPoDetailID.push({
+                poDetailId: v.purchase_order_detail_ids
+            });
+            listPenerimaanDetailHarga.push({
+                penerimaanDetailHarga: v.penerimaan_barang_detail_harga
+            });
+            listPenerimaanDetailID.push({
+                penerimaanDetailId: v.penerimaan_barang_detail_ids
+            });
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align:center;">').text(no++));
             newRow.append($('<td style="text-align:center;">').text(v.tanggal_LPB));
@@ -1237,6 +1270,8 @@
         // clear res
         listPoID.length = 0;
         listPoNo.length = 0;
+        listPoDetailID.length = 0;
+        listPenerimaanDetailID.length = 0;
         $.each(data, function(i, v) {
             // push po id
             listPoID.push({
@@ -1245,6 +1280,15 @@
             // push po no
             listPoNo.push({
                 poNo: v.no_penerimaan_barang
+            });
+            listPoDetailID.push({
+                poDetailId: v.purchase_order_detail_ids
+            });
+            listPenerimaanDetailHarga.push({
+                penerimaanDetailHarga: v.penerimaan_barang_detail_harga
+            });
+            listPenerimaanDetailID.push({
+                penerimaanDetailId: v.penerimaan_barang_detail_ids
             });
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align:center;">').text(no++));
@@ -1729,7 +1773,6 @@
         var maxPotongan = totalPembayaran - totalBayarPanjar;
         limitInputBayar(this, maxPotongan);
 
-        console.log(total);
         updateGrandTotal(); 
     });
 

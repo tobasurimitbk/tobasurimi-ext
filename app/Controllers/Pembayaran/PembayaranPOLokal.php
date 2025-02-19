@@ -541,24 +541,40 @@ class PembayaranPOLokal extends BaseController
                 }
             }
 
-
             foreach ($pembayaranList as $l) {
-                if (
-                    isset($l['pembayaran_user_input']) &&
-                    intval($l['pembayaran_user_input']) != 0 &&
-                    isset($l['penerimaan_barang_id'], $l['penerimaan_barang_detail_id'], $l['rm_purchase_orders_id'], $l['rm_purchase_order_details_id'])
-                ) {
-                    $localPOPaymentDetailModel->insert([
-                        "local_po_payment_id"           => $id,
-                        "penerimaan_barang_id"          => intval($l['penerimaan_barang_id']),
-                        "penerimaan_barang_detail_id"   => intval($l['penerimaan_barang_detail_id']),
-                        "rm_purchase_order_id"          => intval($l['rm_purchase_orders_id']),
-                        "rm_purchase_order_details_id"  => intval($l['rm_purchase_order_details_id']),
-                        "total"                         => repairDouble($l['pembayaran_user_input'])
-                    ]);
+                // Pastikan penerimaan_barang_detail_ids dan penerimaan_barang_detail_harga tidak kosong
+                if (!empty($l['penerimaan_barang_detail_ids']) && !empty($l['penerimaan_barang_detail_harga']) && !empty($l['purchase_order_detail_ids'])) {
+                    // Pecah penerimaan_barang_detail_ids, penerimaan_barang_detail_harga, dan purchase_order_detail_ids menjadi array
+                    $detailIds = explode(',', $l['penerimaan_barang_detail_ids']);
+                    $hargaIds = explode(',', $l['penerimaan_barang_detail_harga']); // Pecah harga
+                    $poDetailIds = explode(',', $l['purchase_order_detail_ids']); // Pecah PO detail IDs
+            
+                    // Pastikan jumlahnya sama
+                    if (count($detailIds) == count($hargaIds) && count($poDetailIds) == count($detailIds)) {
+                        // Loop melalui array detailIds
+                        foreach ($detailIds as $index => $detailId) {
+                            // Cek apakah data yang dibutuhkan ada
+                            if (
+                                isset($l['total_tagihan_number']) && 
+                                intval($l['total_tagihan_number']) != 0 && 
+                                isset($l['penerimaan_barang_id'], $l['rm_purchase_order_id'])
+                            ) {
+                                // Insert data ke database
+                                $localPOPaymentDetailModel->insert([
+                                    "local_po_payment_id"          => $id,
+                                    "penerimaan_barang_id"         => intval($l['penerimaan_barang_id']),
+                                    "penerimaan_barang_detail_id"  => intval($detailId), // Gunakan penerimaan barang detail ID
+                                    "rm_purchase_order_id"         => intval($l['rm_purchase_order_id']),
+                                    "rm_purchase_order_details_id" => isset($poDetailIds[$index]) ? intval($poDetailIds[$index]) : 0, // Gunakan purchase order detail ID berdasarkan index
+                                    "total"                        => repairDouble($hargaIds[$index]), // Gunakan harga berdasarkan index
+                                ]);
+                            }
+                        }
+                    }
                 }
             }
 
+            
             return response()->setJSON([
                 'message' => "Kwitansi pembayaran lokal bahan baku berhasil dibuat",
                 'status' => true,
@@ -1103,9 +1119,9 @@ class PembayaranPOLokal extends BaseController
             "bankList" => $bankList,
             "divisi" => $divisiList,
             "panjar" => $dataPembayaranPanjar,
-        ];
-
-
+        ];  
+        // var_dump($data['detail']['dataMultiplePOPaid']);
+        // die;
         return view('Pembayaran/pembayaranPOLokal/formBahanBaku', $data);
     }
     // PRINT PEMBAYARAN PO BP
@@ -1243,11 +1259,12 @@ class PembayaranPOLokal extends BaseController
 
     public function getListDokumenLPBNotPaidBB()
     {
+        $lpbSelected = $this->request->getVar("selectedLPB");
         $supplierID = $this->request->getVar('supplierID');
         $divisiID = $this->request->getVar('divisiID');
         $localPOPaymentModel = new LocalPOPaymentModel();
         if (!empty($supplierID) && !empty($divisiID)) {
-            $res = $localPOPaymentModel->getListLPBNotPaid($supplierID, $divisiID, $this->this_company_id);
+            $res = $localPOPaymentModel->getListLPBNotPaid($lpbSelected, $supplierID, $divisiID, $this->this_company_id);
         } else {
             $res = [];
         }

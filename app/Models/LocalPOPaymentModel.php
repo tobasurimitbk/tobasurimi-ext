@@ -316,6 +316,43 @@ class LocalPOPaymentModel extends Model
             ->first();
 
 
+       // Ambil multiple_lpb_id dari local_po_payments
+        $dataMultiplePOPaid = $localPOPaymentModel
+        ->select('id, multiple_lpb_id')
+        ->where('id', $pembayaranId)
+        ->first();
+
+        if ($dataMultiplePOPaid) {
+        // Decode multiple_lpb_id (karena masih string JSON)
+        $lpbIDs = json_decode($dataMultiplePOPaid['multiple_lpb_id'], true);
+
+        // Ambil data dari penerimaan_barang dengan whereIn()
+        $penerimaanBarang = [];
+        if (!empty($lpbIDs) && is_array($lpbIDs)) {
+            $penerimaanBarang = $penerimaanBarangModel
+                ->whereIn('id', $lpbIDs)
+                ->select('id as lpb_id, multiple_po_id, multiple_po_no')
+                ->findAll();
+
+            // Ubah format data supaya multiple_po_no bisa di-loop dengan value dari lpb_id
+            $formattedData = [];
+                foreach ($penerimaanBarang as $penerimaan) {
+                    $multiplePoIDs = json_decode($penerimaan['multiple_po_id'], true);
+                    $multiplePoNos = json_decode($penerimaan['multiple_po_no'], true);
+
+                    if (is_array($multiplePoNos)) {
+                        foreach ($multiplePoNos as $poNo) {
+                            $formattedData[] = [
+                                'lpb_id' => $penerimaan['lpb_id'], // Value untuk option
+                                'po_no'  => $poNo, // Label untuk option
+                            ];
+                        }
+                    }
+                }
+            $dataMultiplePOPaid['penerimaan_barang'] = $formattedData;
+            }
+        }
+
         $selectQry = "penerimaan_barang_detail.id AS penerimaan_barang_detail_id,penerimaan_barang.id AS penerimaan_barang_id, 
         penerimaan_barang.tanggal AS tanggal_LPB, 
         penerimaan_barang.no_penerimaan_barang,
@@ -339,14 +376,11 @@ class LocalPOPaymentModel extends Model
             ->findAll();
 
 
-
         $result['company'] = $companyModel->select('companies.company')
             ->where('id', $companyId)
             ->first();
         $result['pembayaranDetail'] = $resultPaymentBB;
         $result['supplierDetail'] = $supplierModel->where('id', $result['pembayaranDetail']['supplier_id'])->first();
-
-
 
         $result['pembayaranDetail']['multiple_lpb_no'] = json_decode(
             $result['pembayaranDetail']['multiple_lpb_no'],
@@ -437,6 +471,7 @@ class LocalPOPaymentModel extends Model
 
         $result['itemList'] = $itemList;
         $result['panjar'] = $panjarList;
+        $result['dataMultiplePOPaid'] = $dataMultiplePOPaid;
 
         return $result;
     }
@@ -906,21 +941,25 @@ class LocalPOPaymentModel extends Model
         $purchaseOrderModel = new RMPurchaseOrderModel();
     
         $selectQry = "penerimaan_barang.no_penerimaan_barang, 
-              penerimaan_barang.tanggal AS tanggal_LPB,
-              rm_purchase_orders.po_date AS tanggal_PO,
-              rm_purchase_orders.id AS rm_purchase_order_id,
-              barang_master.barang_name AS barang, 
-              SUM(penerimaan_barang_detail.qty) AS total_order, 
-              SUM(penerimaan_barang_detail.jml_masuk) AS total_diterima,
-              SUM(penerimaan_barang_detail.harga) AS total_tagihan_number";
-    
+            penerimaan_barang.id as penerimaan_barang_id, 
+            penerimaan_barang.tanggal AS tanggal_LPB,
+            rm_purchase_orders.po_date AS tanggal_PO,
+            rm_purchase_orders.id AS rm_purchase_order_id,
+            barang_master.barang_name AS barang, 
+            GROUP_CONCAT(DISTINCT rm_purchase_order_details.id ORDER BY rm_purchase_order_details.id ASC) AS purchase_order_detail_ids,
+            GROUP_CONCAT(DISTINCT penerimaan_barang_detail.id ORDER BY penerimaan_barang_detail.id ASC) AS penerimaan_barang_detail_ids,
+            GROUP_CONCAT(DISTINCT penerimaan_barang_detail.harga ORDER BY penerimaan_barang_detail.harga ASC) AS penerimaan_barang_detail_harga,
+            SUM(penerimaan_barang_detail.qty) AS total_order, 
+            SUM(penerimaan_barang_detail.jml_masuk) AS total_diterima,
+            SUM(penerimaan_barang_detail.harga) AS total_tagihan_number";
+
         $condition = [
             'penerimaan_barang.supplier_id' => $supplierID,
             'penerimaan_barang_detail.deletedAt' => null,
             'penerimaan_barang.status_penerimaan' => 'LOKAL',
-            'tipe_bahan'    => 'BAKU'
+            'tipe_bahan' => 'BAKU'
         ];
-    
+
         $penerimaanAll = $penerimaanBarangDetailModel
             ->select($selectQry)
             ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
@@ -984,11 +1023,11 @@ class LocalPOPaymentModel extends Model
         return $result;
     }
 
-
-    public function getListLPBNotPaid($supplierID, $divisiID, $companyID)
+    public function getListLPBNotPaid($lpbSelected, $supplierID, $divisiID, $companyID)
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $resLPB = [];
+        $addedLPB = []; // Track LPB yang sudah masuk
 
         $conditionPenerimaanBarang = [
             'penerimaan_barang.deletedAt' => null,
@@ -1007,39 +1046,48 @@ class LocalPOPaymentModel extends Model
             ->where($conditionPenerimaanBarang)
             ->findAll();
 
-
         $poPayed = static::summaryArrPOIsPayed($supplierID, $divisiID, "Bahan Baku");
-        $poPayedId = [];
-        foreach ($poPayed as $p) {
-            array_push($poPayedId, $p['penerimaan_barang_detail_id']);
-        }
+        $poPayedId = array_column($poPayed, 'penerimaan_barang_detail_id');
 
+        $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
+
+        // Konversi $lpbSelected menjadi array jika tidak kosong
+        $lpbSelectedArray = json_decode($lpbSelected, true) ?: [];
+        $lpbSelectedIds = array_column($lpbSelectedArray, 'lpb_id'); // Ambil ID saja untuk perbandingan cepat
 
         foreach ($lpbList as $l) {
-            if (in_array($l['id'], $poPayedId)) {
-                foreach ($poPayed as $p) {
-                    if ($l['id'] == $p['penerimaan_barang_detail_id']) {
-                        if ($p['dibayar'] < ($l['harga'] + $l['harga_harian']) * $l['jml_masuk']) {
-                            $resLPB[] = $l;
-                        }
+            // Cek apakah LPB ini sudah dibayar di local_po_payment_detail
+            $checkPayPo = $localPOPaymentDetailModel->where('penerimaan_barang_id', $l['lpbID'])->first();
+        
+            // Jika sudah dibayar dan tidak ada di $lpbSelected, maka skip LPB ini
+            if ($checkPayPo && !in_array($l['lpbID'], $lpbSelectedIds)) {
+                continue;
+            }
+
+            // Jika LPB sudah ada di hasil, skip (biar tidak duplicate)
+            if (in_array($l['lpbID'], $addedLPB)) {
+                continue;
+            }
+
+            // Jika LPB ini termasuk dalam selected, langsung tambahkan ke hasil
+            if (in_array($l['lpbID'], $lpbSelectedIds) || !in_array($l['id'], $poPayedId)) {
+                $resLPB[] = $l;
+                $addedLPB[] = $l['lpbID']; // Tandai sebagai sudah dimasukkan
+                continue;
+            }
+
+            // Jika LPB ini belum dibayar, cek apakah sudah masuk ke pembayaran
+            foreach ($poPayed as $p) {
+                if ($l['id'] == $p['penerimaan_barang_detail_id']) {
+                    if ($p['dibayar'] < ($l['harga'] + $l['harga_harian']) * $l['jml_masuk']) {
+                        $resLPB[] = $l;
+                        $addedLPB[] = $l['lpbID']; // Tandai sebagai sudah dimasukkan
                     }
                 }
-            } else {
-                $resLPB[] = $l;
             }
         }
 
-
-        $uniqueData = array();
-        foreach ($resLPB as $entry) {
-            $uniqueData[$entry['lpbID']] = $entry;
-        }
-
-        // Reset the array keys to be sequential
-        $uniqueData = array_values($uniqueData);
-
-
-        return $uniqueData;
+        return array_values($resLPB);
     }
 
     static function summaryArrPOIsPayed($supplierID, $divisiID)
