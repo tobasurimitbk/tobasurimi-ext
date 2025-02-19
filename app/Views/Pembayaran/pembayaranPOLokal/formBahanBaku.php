@@ -614,27 +614,30 @@
         formData.append("bulan", $(this).val());
         formData.append("tipeBayar", $('#tipe_pembayaran').val());
 
-        $.ajax({
-            url: "<?= base_url("pembayaran-po-lokal-bb/get-list-po-no-paid"); ?>",
-            data: formData,
-            method: "POST",
-            dataType: "json",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            processData: false,
-            contentType: false,
-            success: function(response) {
+        
+        if (lpbID != "[]") {
+            $.ajax({
+                url: "<?= base_url("pembayaran-po-lokal-bb/get-list-po-no-paid"); ?>",
+                data: formData,
+                method: "POST",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
 
-                listPembayaran = [];
-                listPembayaran = response.data;
-                console.log(listPembayaran);
+                    listPembayaran = [];
+                    listPembayaran = response.data;
+                    console.log(listPembayaran);
 
-                csrf.val(response.token);
-                drawTable(listPembayaran);
-                $('#nominal_pembayaran').val(response.data.sisaNumber);
-            }
-        });
+                    csrf.val(response.token);
+                    drawTable(listPembayaran);
+                    $('#nominal_pembayaran').val(response.data.sisaNumber);
+                }
+            });
+        }
     });
 
     $('#lpb').change(function() {
@@ -649,25 +652,30 @@
         formData.append("lpbID", lpbID);
         formData.append("tipeBayar", $('#tipe_pembayaran').val());
 
-        $.ajax({
-            url: "<?= base_url("pembayaran-po-lokal-bb/get-list-po-no-paid"); ?>",
-            data: formData,
-            method: "POST",
-            dataType: "json",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                listPembayaran = [];
-                listPembayaran = response.data;
-                console.log(listPembayaran);
-                csrf.val(response.token);
-                drawTable(listPembayaran);
-                $('#nominal_pembayaran').val(response.data.sisaNumber);
-            }
-        });
+        
+        if (lpbID != "[]") {
+            alert(lpbID)
+            $.ajax({
+                url: "<?= base_url("pembayaran-po-lokal-bb/get-list-po-no-paid"); ?>",
+                data: formData,
+                method: "POST",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    listPembayaran = [];
+                    listPembayaran = response.data;
+                    console.log(listPembayaran);
+                    csrf.val(response.token);
+                    drawTable(listPembayaran);
+                    $('#nominal_pembayaran').val(response.data.sisaNumber);
+                }
+            });
+        }
+       
     });
 
     $(".btn-submit-form").click(function() {
