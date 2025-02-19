@@ -192,9 +192,14 @@ class TandaTerimaSupBB extends BaseController
     public function createAction()
     {
         $fakturNo = $this->request->getVar('no_tanda_terima_faktur');
-        $check = $this->tandaTerimaFakturModel->where('faktur_no', $fakturNo)->first();
+
+        $checkFakturNo = $this->tandaTerimaFakturModel
+            ->where('faktur_no', $fakturNo)
+            ->where('company_id', $this->this_company_id)
+            ->first();
+
         $dataListPenerimaanBarang = json_decode($_POST['listPenerimaanBarang']);
-        if ($check != null) {
+        if ($checkFakturNo != null) {
             return response()->setJSON([
                 'token' => csrf_hash(),
                 'message' => "Nomor faktur sudah ada",
@@ -245,7 +250,7 @@ class TandaTerimaSupBB extends BaseController
                 'tax_inv_date' => $l->tax_inv_date ? date_format(date_create_from_format("d/m/Y", $l->tax_inv_date), "Y-m-d") : "",
                 'tax_inv_no' => $l->tax_inv_no,
                 'tax_type' => $l->tax_type,
-                'tax_amt' => repairDouble($l->tax_amt),
+                'tax_amt' => $l->tax_amt,
                 'tax_status' => $l->tax_status,
                 'tax_note' => $l->tax_note,
 
@@ -263,6 +268,21 @@ class TandaTerimaSupBB extends BaseController
     public function updateAction()
     {
         $id = decrypt($this->request->getVar('id'));
+        $fakturNo = $this->request->getVar('no_tanda_terima_faktur');
+        $checkFakturNo = $this->tandaTerimaFakturModel
+            ->where('faktur_no', $fakturNo)
+            ->where('company_id', $this->this_company_id)
+            ->where('id <>', $id)
+            ->first();
+
+        if ($checkFakturNo != null) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "Nomor faktur sudah ada",
+                'status' => false
+            ]);
+        }
+
         $dataListPenerimaanBarang = json_decode($_POST['listPenerimaanBarang']);
 
         $this->tandaTerimaFakturModel->update($id, [
@@ -309,7 +329,7 @@ class TandaTerimaSupBB extends BaseController
                 'tax_inv_date' => $l->tax_inv_date ? date_format(date_create_from_format("d/m/Y", $l->tax_inv_date), "Y-m-d") : "",
                 'tax_inv_no' => $l->tax_inv_no,
                 'tax_type' => $l->tax_type,
-                'tax_amt' => repairDouble($l->tax_amt),
+                'tax_amt' => $l->tax_amt,
                 'tax_status' => $l->tax_status,
                 'tax_note' => $l->tax_note,
 

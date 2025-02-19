@@ -17,7 +17,7 @@
             <div class="row justify-content-end row-col-spp">
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Mulai">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" value="01<?= date('/m/Y') ?>" placeholder="Tanggal Mulai">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -71,7 +71,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="historiModalLabel">Histori Pembayaran Bahan Penolong</h5>
+                <h5 class="modal-title" id="historiModalLabel">Histori Pembayaran Tanda Terima Supplier</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -84,7 +84,7 @@
                                 <td style="width: 10px;text-align: center;color:#E7323A;font-weight:bold;">No</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;">Nomor Pembayaran</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;">Tanggal Pembayaran</td>
-                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Jumlah</td>
+                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Nilai Dibayar</td>
 
                             </tr>
                         </thead>
@@ -163,7 +163,7 @@
             {
                 data: "nominal_faktur",
                 className: "text-center",
-                render: function (data, type, row) {
+                render: function(data, type, row) {
                     return data ? greatFormatRupiah(data) : '-';
                 }
             },
