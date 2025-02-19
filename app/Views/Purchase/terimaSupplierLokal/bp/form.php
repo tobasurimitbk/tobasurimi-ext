@@ -980,7 +980,8 @@
                 confirmButtonText: 'Ok'
             });
             return;
-        } else if (cekQtySisa < 0) {
+        } else if (cekQtySisa < 0 && qtySisa != 0) {
+            console.log(cekQtySisa);
             Swal.fire({
                 icon: 'error',
                 title: 'Qty yang akan diterima tidak boleh lebih dari ' + qtySisa,
@@ -1421,7 +1422,8 @@
                 url: `<?= base_url("tanda-terima-faktur-lokal-bp/generate-tanda-terima-no"); ?>`,
                 method: "GET",
                 data: {
-                    warehouseID: $('#warehouse_id').val()
+                    warehouseID: $('#warehouse_id').val(),
+                    tanggal_terima: $('#tanggal_terima').val()
                 },
                 dataType: "json",
                 success: function(res) {
@@ -1454,7 +1456,8 @@
                 url: `<?= base_url("tanda-terima-faktur-lokal-bp/generate-tanda-keluar-no"); ?>`,
                 method: "GET",
                 data: {
-                    warehouseID: $('#warehouse_id').val()
+                    warehouseID: $('#warehouse_id').val(),
+                    tanggal_terima: $('#tanggal_terima').val()
                 },
                 dataType: "json",
                 success: function(res) {
@@ -1621,6 +1624,10 @@
     </script>
 <?php else : ?>
     <script>
+        $('#tanggal_terima').change(function() {
+            changeStatus();
+            changeStatusKeluar();
+        });
         changeStatus();
         changeStatusKeluar();
     </script>

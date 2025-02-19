@@ -62,7 +62,6 @@ class TandaTerimaFakturModel extends Model
 
     public function getInvoiceList($condition, $addCondition, $limit = 10, $offset = 0)
     {
-        $localPOPaymentBPModel = new LocalPOPaymentBPModel();
 
         $availableSort = [
             'receive_date'  => 'tanda_terima_faktur.receive_date',
@@ -78,16 +77,22 @@ class TandaTerimaFakturModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "tanda_terima_faktur.*, 
-                      suppliers.name AS supplierName,
-                      users.name AS userName,
-                      divisis.divisi";
+        suppliers.name AS supplierName,
+        users.name AS userName,
+        divisis.divisi,
+        SUM(local_po_payment_bp.amount) AS total_dibayar,
+        COUNT(tanda_terima_faktur_detail.id) AS jumlah_item";
 
         $tandaTerimaQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id', 'left')
             ->join('users', 'users.id = tanda_terima_faktur.user_id', 'left')
-            ->join('divisis', 'divisis.id = tanda_terima_faktur.divisi_id', 'left');
+            ->join('divisis', 'divisis.id = tanda_terima_faktur.divisi_id', 'left')
+            ->join('local_po_payment_bp', 'local_po_payment_bp.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left')
+            ->join('tanda_terima_faktur_detail', 'tanda_terima_faktur_detail.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left')
+            ->groupBy('tanda_terima_faktur.id');
+
 
         if ($addCondition['search']) {
             $tandaTerimaQry->groupStart();
@@ -96,6 +101,18 @@ class TandaTerimaFakturModel extends Model
                 ->orLike('suppliers.name', $addCondition['search'])
                 ->orLike('divisis.divisi', $addCondition['search']);
             $tandaTerimaQry->groupEnd();
+        }
+
+        if ($addCondition['divisi_id']) {
+            $tandaTerimaQry->where('tanda_terima_faktur.divisi_id', $addCondition['divisi_id']);
+        }
+
+        if (!empty($addCondition['status_lunas'])) {
+            if ($addCondition['status_lunas'] === "LUNAS") {
+                $tandaTerimaQry->having('SUM(local_po_payment_bp.amount) >= tanda_terima_faktur.nominal_faktur');
+            } else {
+                $tandaTerimaQry->having('SUM(local_po_payment_bp.amount) < tanda_terima_faktur.nominal_faktur');
+            }
         }
 
         if ($addCondition['start'] || $addCondition['finish'] && $addCondition['search'] != "") {
@@ -112,7 +129,7 @@ class TandaTerimaFakturModel extends Model
             $tandaTerimaQry->groupEnd();
         }
 
-
+        $tandaTerimaQry->groupBy('tanda_terima_faktur.id');
 
         $totalData = $tandaTerimaQry->countAllResults(false);
         $totalFilteredData = $tandaTerimaQry->countAllResults(false);

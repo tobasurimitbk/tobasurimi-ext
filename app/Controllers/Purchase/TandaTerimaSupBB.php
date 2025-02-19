@@ -44,7 +44,12 @@ class TandaTerimaSupBB extends BaseController
 
     public function index()
     {
-        return view('Purchase/terimaSupplierLokal/bp/index');
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $data = [
+            "dataDivisi"  => $dataDivisi,
+        ];
+
+        return view('Purchase/terimaSupplierLokal/bp/index', $data);
     }
 
     public function all()
@@ -63,7 +68,9 @@ class TandaTerimaSupBB extends BaseController
         $condition = [
             "tanda_terima_faktur.company_id"  => $this->this_company_id,
             "faktur_type"           => "LOKAL",
-            "tipe_bahan"            => "PENOLONG"
+            "tipe_bahan"            => "PENOLONG",
+            "tanda_terima_faktur.deletedAt" => null,
+            "tanda_terima_faktur_detail.deletedAt" => null
         ];
 
         $addCondition = [
@@ -72,8 +79,14 @@ class TandaTerimaSupBB extends BaseController
             "finish"     => $this->request->getGet('dateEnd') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('dateEnd')), "Y-m-d") : "",
             "sort"      => $this->request->getGet("sort"),
             "sortType"  => $this->request->getGet("sortType"),
-            'status_lunas' => $this->request->getGet("status_lunas")
+            'status_lunas' => $this->request->getGet("status_lunas"),
+            'divisi_id' => $this->request->getGet('divisi_id')
         ];
+
+        if ($addCondition['status_lunas'] == "BELUM LUNAS") {
+            $addCondition['start'] = "";
+            $addCondition['finish'] = "";
+        }
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
@@ -84,63 +97,21 @@ class TandaTerimaSupBB extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($supplierData['data'] as $data) {
-            $jumlahItem = $this->tandaTerimaFakturDetailModel->where('deletedAt', null)->where('tanda_terima_faktur_id', $data->id)->findAll();
-            $pembayaranBP = $this->localPOPaymentBPModel
-                ->select("sum(amount) as amount, tanda_terima_faktur_id")
-                ->where('local_po_payment_bp.tanda_terima_faktur_id', $data->id)
-                ->groupBy('local_po_payment_bp.tanda_terima_faktur_id')
-                ->first();
-
-
-            if (empty($addCondition['status_lunas'])) {
-                array_push($dataSupplier, [
-                    "no"             => $no++,
-                    "id"             => encrypt($data->id),
-                    "faktur_no"      => $data->faktur_no,
-                    "divisi"         => $data->divisi,
-                    "supplier_name"  => strtoupper($data->supplierName),
-                    "nominal_faktur" => $data->nominal_faktur,
-                    "jumlah_item"    => count($jumlahItem),
-                    "invoice_date"   => $data->invoice_date,
-                    "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
-                    "recipient"      => $data->recipient,
-                    'is_used' => $this->tandaTerimaFakturModel->getTandaTerimaFakturInPembayaran($data->id) == null ? false : true,
-                ]);
-            } else {
-                if (isset($pembayaranBP) && $addCondition['status_lunas'] == "LUNAS" && $pembayaranBP['amount'] != NULL) {
-                    if ($data->nominal_faktur <= $pembayaranBP['amount']) {
-                        array_push($dataSupplier, [
-                            "no"             => $no++,
-                            "id"             => encrypt($data->id),
-                            "faktur_no"      => $data->faktur_no,
-                            "divisi"         => $data->divisi,
-                            "supplier_name"  => strtoupper($data->supplierName),
-                            "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur, 0, ',', '.')),
-                            "jumlah_item"    => count($jumlahItem),
-                            "invoice_date"   => $data->invoice_date,
-                            "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
-                            "recipient"      => $data->recipient,
-                            'is_used' => $this->tandaTerimaFakturModel->getTandaTerimaFakturInPembayaran($data->id) == null ? false : true,
-                        ]);
-                    }
-                } elseif ($addCondition['status_lunas'] == "BELUM LUNAS") {
-                    if (empty($pembayaranBP) || (isset($pembayaranBP['amount']) && $data->nominal_faktur > $pembayaranBP['amount'])) {
-                        array_push($dataSupplier, [
-                            "no"             => $no++,
-                            "id"             => encrypt($data->id),
-                            "faktur_no"      => $data->faktur_no,
-                            "divisi"         => $data->divisi,
-                            "supplier_name"  => strtoupper($data->supplierName),
-                            "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur, 0, ',', '.')),
-                            "jumlah_item"    => count($jumlahItem),
-                            "invoice_date"   => $data->invoice_date,
-                            "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
-                            "recipient"      => $data->recipient,
-                            'is_used' => $this->tandaTerimaFakturModel->getTandaTerimaFakturInPembayaran($data->id) == null ? false : true,
-                        ]);
-                    }
-                }
-            }
+            // \var_dump($data);
+            // die;
+            array_push($dataSupplier, [
+                "no"             => $no++,
+                "id"             => encrypt($data->id),
+                "faktur_no"      => $data->faktur_no,
+                "divisi"         => $data->divisi,
+                "supplier_name"  => strtoupper($data->supplierName),
+                "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur, 0, ',', '.')),
+                "jumlah_item"    => $data->jumlah_item,
+                "invoice_date"   => $data->invoice_date,
+                "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
+                "recipient"      => $data->recipient,
+                'is_used'        => $data->total_dibayar  == 0 ? false : true,
+            ]);
         }
 
         $data = [
@@ -482,9 +453,17 @@ class TandaTerimaSupBB extends BaseController
     public function generateTandaTerimaFakturNumber()
     {
         $tandaTerimaFakturModel = new TandaTerimaFakturModel();
+        $tanggalTerima = $this->request->getVar('tanggal_terima');
+        if (empty($tanggalTerima)) {
+            return response()->setJSON([
+                'data' => '',
+                'status' => true
+            ]);
+        }
+        $tanggalTerimaExplode = explode('/', $tanggalTerima);
 
-        $month = idate('m');
-        $year = date('y');
+        $month = $tanggalTerimaExplode[1];
+        $year = $tanggalTerimaExplode[2];
         $romanMonth = romanMonthNumber($month);
         $numberTemplate = "/TT/$romanMonth/$year";
 
@@ -514,8 +493,17 @@ class TandaTerimaSupBB extends BaseController
     {
         $tandaTerimaFakturModel = new TandaTerimaFakturModel();
 
-        $month = idate('m');
-        $year = date('y');
+        $tanggalTerima = $this->request->getVar('tanggal_terima');
+        if (empty($tanggalTerima)) {
+            return response()->setJSON([
+                'data' => '',
+                'status' => true
+            ]);
+        }
+        $tanggalTerimaExplode = explode('/', $tanggalTerima);
+
+        $month = $tanggalTerimaExplode[1];
+        $year = $tanggalTerimaExplode[2];
         $romanMonth = romanMonthNumber($month);
         $numberTemplate = "/TT/$romanMonth/$year";
 
