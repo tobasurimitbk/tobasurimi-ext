@@ -17,7 +17,7 @@
             <div class="row justify-content-end row-col-spp">
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input disabled autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" value="01<?= date('/m/Y') ?>" placeholder="Tanggal Mulai">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" value="01<?= date('/m/Y') ?>" placeholder="Tanggal Mulai">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -25,7 +25,7 @@
                 </div>
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input disabled autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Selesai">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Selesai">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
@@ -245,16 +245,16 @@
         location.replace(`<?= base_url("tanda-terima-faktur-lokal-bp/id/"); ?>${data.id}`);
     })
 
-    $(".status_lunas").change(function() {
-        var status_lunas = $(this).val();
-        if (status_lunas == "LUNAS") {
-            // Ubah Status Disbled StartDate dan EndDate menjadi false
-            $(".dateStart, .dateEnd").attr('disabled', false);
-        } else {
-            // Ubah Status Disbled StartDate dan EndDate menjadi false
-            $(".dateStart, .dateEnd").attr('disabled', true);
-        }
-    });
+    // $(".status_lunas").change(function() {
+    //     var status_lunas = $(this).val();
+    //     if (status_lunas == "LUNAS") {
+    //         // Ubah Status Disbled StartDate dan EndDate menjadi false
+    //         $(".dateStart, .dateEnd").attr('disabled', false);
+    //     } else {
+    //         // Ubah Status Disbled StartDate dan EndDate menjadi false
+    //         $(".dateStart, .dateEnd").attr('disabled', true);
+    //     }
+    // });
 
 
     $(".search").keyup(function() {

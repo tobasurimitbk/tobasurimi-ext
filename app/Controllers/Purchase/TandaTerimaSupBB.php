@@ -83,10 +83,10 @@ class TandaTerimaSupBB extends BaseController
             'divisi_id' => $this->request->getGet('divisi_id')
         ];
 
-        if ($addCondition['status_lunas'] == "BELUM LUNAS") {
-            $addCondition['start'] = "";
-            $addCondition['finish'] = "";
-        }
+        // if ($addCondition['status_lunas'] == "BELUM LUNAS") {
+        //     $addCondition['start'] = "";
+        //     $addCondition['finish'] = "";
+        // }
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");

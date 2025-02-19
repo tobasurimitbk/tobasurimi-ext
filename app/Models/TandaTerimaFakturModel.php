@@ -62,14 +62,13 @@ class TandaTerimaFakturModel extends Model
 
     public function getInvoiceList($condition, $addCondition, $limit = 10, $offset = 0)
     {
-
         $availableSort = [
             'receive_date'  => 'tanda_terima_faktur.receive_date',
-            'divisi_id' => 'tanda_terima_faktur.divisi_id',
+            'divisi_id'     => 'tanda_terima_faktur.divisi_id',
             'faktur_no'     => 'tanda_terima_faktur.faktur_no',
             'suppliers.name' => 'suppliers.name',
             'nominal_faktur' => 'nominal_faktur',
-            'recipient'      => 'recipient',
+            'recipient'     => 'recipient',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -77,11 +76,11 @@ class TandaTerimaFakturModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "tanda_terima_faktur.*, 
-        suppliers.name AS supplierName,
-        users.name AS userName,
-        divisis.divisi,
-        SUM(local_po_payment_bp.amount) AS total_dibayar,
-        COUNT(tanda_terima_faktur_detail.id) AS jumlah_item";
+                      suppliers.name AS supplierName,
+                      users.name AS userName,
+                      divisis.divisi AS divisi,  -- ✅ Pastikan alias ini ada
+                      COALESCE(SUM(local_po_payment_bp.amount), 0) AS total_dibayar,
+                      COUNT(tanda_terima_faktur_detail.id) AS jumlah_item";
 
         $tandaTerimaQry = $this->asObject()
             ->select($selectQry)
@@ -90,40 +89,41 @@ class TandaTerimaFakturModel extends Model
             ->join('users', 'users.id = tanda_terima_faktur.user_id', 'left')
             ->join('divisis', 'divisis.id = tanda_terima_faktur.divisi_id', 'left')
             ->join('local_po_payment_bp', 'local_po_payment_bp.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left')
-            ->join('tanda_terima_faktur_detail', 'tanda_terima_faktur_detail.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left')
-            ->groupBy('tanda_terima_faktur.id');
+            ->join('tanda_terima_faktur_detail', 'tanda_terima_faktur_detail.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left');
 
-
-        if ($addCondition['search']) {
-            $tandaTerimaQry->groupStart();
-            $tandaTerimaQry->like('faktur_no', $addCondition['search'])
-                ->orLike('divisi', $addCondition['search'])
+        // ✅ Pencarian berdasarkan input `search`
+        if (!empty($addCondition['search'])) {
+            $tandaTerimaQry->groupStart()
+                ->like('tanda_terima_faktur.faktur_no', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
                 ->orLike('suppliers.name', $addCondition['search'])
-                ->orLike('divisis.divisi', $addCondition['search']);
-            $tandaTerimaQry->groupEnd();
+                ->groupEnd();
         }
 
-        if ($addCondition['divisi_id']) {
+        // ✅ Filter berdasarkan divisi_id
+        if (!empty($addCondition['divisi_id'])) {
             $tandaTerimaQry->where('tanda_terima_faktur.divisi_id', $addCondition['divisi_id']);
         }
 
+        // ✅ Filter status lunas menggunakan HAVING
         if (!empty($addCondition['status_lunas'])) {
             if ($addCondition['status_lunas'] === "LUNAS") {
-                $tandaTerimaQry->having('SUM(local_po_payment_bp.amount) >= tanda_terima_faktur.nominal_faktur');
+                $tandaTerimaQry->having('total_dibayar >= tanda_terima_faktur.nominal_faktur');
             } else {
-                $tandaTerimaQry->having('SUM(local_po_payment_bp.amount) < tanda_terima_faktur.nominal_faktur');
+                $tandaTerimaQry->having('total_dibayar < tanda_terima_faktur.nominal_faktur');
             }
         }
 
-        if ($addCondition['start'] || $addCondition['finish'] && $addCondition['search'] != "") {
+        // ✅ Filter berdasarkan tanggal
+        if (!empty($addCondition['start']) || !empty($addCondition['finish'])) {
             $tandaTerimaQry->groupStart();
 
-            if ($addCondition['start']) {
-                $tandaTerimaQry->where('receive_date >=', $addCondition['start']);
+            if (!empty($addCondition['start'])) {
+                $tandaTerimaQry->where('tanda_terima_faktur.invoice_date >=', $addCondition['start']);
             }
 
-            if ($addCondition['finish']) {
-                $tandaTerimaQry->where('receive_date <=', $addCondition['finish']);
+            if (!empty($addCondition['finish'])) {
+                $tandaTerimaQry->where('tanda_terima_faktur.invoice_date <=', $addCondition['finish']);
             }
 
             $tandaTerimaQry->groupEnd();
@@ -131,6 +131,7 @@ class TandaTerimaFakturModel extends Model
 
         $tandaTerimaQry->groupBy('tanda_terima_faktur.id');
 
+        // ✅ Hitung total data
         $totalData = $tandaTerimaQry->countAllResults(false);
         $totalFilteredData = $tandaTerimaQry->countAllResults(false);
         $data = $tandaTerimaQry->orderBy($sort, $sortType)->findAll($limit, $offset);
@@ -141,6 +142,7 @@ class TandaTerimaFakturModel extends Model
             'totalFilteredData' => $totalFilteredData
         ];
     }
+
 
     public function getListTandaTerimaFakturNotProcessed($supplierID, $divisiID)
     {
