@@ -1044,6 +1044,7 @@ class LocalPOPaymentModel extends Model
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id')
             ->join('rm_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
             ->where($conditionPenerimaanBarang)
+            ->groupBy('penerimaan_barang.id') // <<<< Tambahkan ini biar tidak dobel
             ->findAll();
 
         $poPayed = static::summaryArrPOIsPayed($supplierID, $divisiID, "Bahan Baku");
