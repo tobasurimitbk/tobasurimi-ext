@@ -151,7 +151,7 @@
             <div class="detail-form-layout">
                 <div class="row">
                     <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Data Barang</label>
+                        <label class="form-label font-weight-bold lable-title">Data Barang Dari Pembelian</label>
                     </div>
                 </div>
                 <form class="detail-form">
@@ -171,6 +171,17 @@
                                     <?php endforeach; ?>
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($supplier as $s): ?>
+                                        <option value="<?= $s['id'] ?>"><?= $s['name']  ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Supplier</label>
                             </div>
                         </div>
 
@@ -205,10 +216,10 @@
                                     <tr>
                                         <th style="text-align: center;">#</th>
                                         <th style="text-align: center;">Asal Barang</th>
-                                        <th style="text-align: center;">No Dokumen</th>
+                                        <th style="text-align: center;">No PO</th>
                                         <th style="text-align: center;">Supplier</th>
                                         <th style="text-align: center;">Dokumen Pabean</th>
-                                        <th style="text-align: center;">No Aju</th>
+                                        <!-- <th style="text-align: center;">No Aju</th> -->
                                         <th style="text-align: center;">Tanggal Penerimaan</th>
                                         <th style="text-align: center;">Barang - Spesifikasi</th>
                                         <th style="text-align: center;">Satuan</th>
@@ -236,9 +247,9 @@
                                 <tr>
                                     <th style="text-align: center;">#</th>
                                     <th style="text-align: center;">Asal Barang</th>
-                                    <th style="text-align: center;">No Dokumen</th>
+                                    <th style="text-align: center;">No PO</th>
                                     <th style="text-align: center;">Supplier</th>
-                                    <th style="text-align: center;">Dokumen Pabean</th>
+                                    <!-- <th style="text-align: center;">Dokumen Pabean</th> -->
                                     <th style="text-align: center;">Tanggal Penerimaan</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Satuan</th>
@@ -361,14 +372,14 @@
                 stock_detail_id: "<?= $m['stock_detail_id'] ?>",
                 no_aju: "<?= $m['no_aju'] ?>",
                 stock_id: "<?= $m['stock_id'] ?>",
-                stok_total: "<?= $m['stok_total'] ?>",
+                stok_total: "<?= floatval($m['stok_total']) ?>",
                 bc_type: "<?= $m['bc_type'] ?>",
                 satuan: "<?= $m['satuan'] ?>",
                 barang: "<?= $m['barang'] ?>",
                 type_barang: "<?= $m['type_barang'] ?>",
                 type_barang_text: "<?= $m['type_barang_text'] ?>",
                 stock_date: "<?= $m['stock_date'] ?>",
-                qty: "<?= $m['qty'] ?>",
+                qty: "<?= floatval($m['qty']) ?>",
             });
         <?php endforeach; ?>
         drawTableSelectedItem(listStockSelected);
@@ -447,6 +458,16 @@
         // LIST DOKUMEN PABEAN
         getListDokumenPabean();
     });
+
+    $('#supplier_id').select2({
+        placeholder: "Pilih Supplier",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        // LIST DOKUMEN PABEAN
+        getListDokumenPabean();
+    });
+
 
     // VALIDATOR
     var validator = $(".create-form").validate({
@@ -537,6 +558,7 @@
         drawTableSelectedItem(listStockSelected);
         // reset barang kirim ke vendor dan list bc nya
         $('#spesifikasi_id').val(null).change();
+        $('#supplier_id').val(null).change();
         drawTableAsalBarang([]);
     }
 
@@ -732,7 +754,7 @@
     });
 
 
-    $("#vendor_id,#warehouse_id,#divisi_id,#type_barang,#spesifikasi_id,#type_pengambilan_stock")
+    $("#vendor_id,#warehouse_id,#divisi_id,#type_barang,#spesifikasi_id,#type_pengambilan_stock,#supplier_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -814,6 +836,7 @@
             },
             data: {
                 stock_id: $(".spesifikasi_id option:selected").data('stock_id'),
+                supplier_id: $(".supplier_id option:selected").val()
             },
             dataType: "json",
             success: function(res) {
@@ -854,7 +877,7 @@
             newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
             newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
             newRow.append($('<td style="text-align:center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align:center;">').text(v.no_aju));
+            // newRow.append($('<td style="text-align:center;">').text(v.no_aju));
             newRow.append($('<td style="text-align:center;">').text(v.stock_date));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
             newRow.append($('<td style="text-align:center;">').text(v.satuan));
@@ -904,7 +927,7 @@
             var newRow = '';
             newRow += `
                     <tr>
-                        <td colspan="11" style="text-align: center;">
+                        <td colspan="10" style="text-align: center;">
                             Tidak Ada Barang
                         </td>
                     </tr>
@@ -922,7 +945,7 @@
                 newRow.append($('<td style="text-align: center;">').text(v.sumber));
                 newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
                 newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
-                newRow.append($('<td style="text-align: center;">').text(v.bc_type + '/' + v.no_aju));
+                // newRow.append($('<td style="text-align: center;">').text(v.bc_type + '/' + v.no_aju));
                 newRow.append($('<td style="text-align: center;">').text(v.stock_date));
                 newRow.append($('<td style="text-align: center;">').text(v.barang));
                 newRow.append($('<td style="text-align: center;">').text(v.satuan));
@@ -948,8 +971,8 @@
             });
 
             var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-            newRow.append($('<td style="text-align: right;" colspan="9">').html("<b>GRAND TOTAL</b>"));
-            newRow.append($('<td>').text(totalQtyKeluar.toFixed(3)));
+            newRow.append($('<td style="text-align: right;" colspan="8">').html("<b>GRAND TOTAL</b>"));
+            newRow.append($('<td>').text(totalQtyKeluar.toFixed(2)));
             newRow.append($('<td>').text(''));
             table.find('tbody').append(newRow);
 

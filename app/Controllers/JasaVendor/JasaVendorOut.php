@@ -66,7 +66,7 @@ class JasaVendorOut extends BaseController
     public function index()
     {
         $data = [
-            'dataDivisi' => $this->divisiModel->getDivisiAccess()
+            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
         ];
         return view('jasaVendor/out/index', $data);
     }
@@ -148,6 +148,7 @@ class JasaVendorOut extends BaseController
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
+            'supplier' => $this->supplierModel->getSupplierByType("BAHAN BAKU")
 
         ];
         return view('jasaVendor/out/form', $data);
@@ -168,7 +169,8 @@ class JasaVendorOut extends BaseController
             'divisi' => $this->divisiModel->getDivisiAccess(),
             'jasaVendorOut' => $jasaVendorOut,
             'warehouse' => $this->warehouseModel->where('deletedAt', null)->where('divisi_id', $jasaVendorOut['divisi_id'])->orderBy('warehouse_name', "ASC")->findAll(),
-            'jasaVendorOutDetail' => $this->jasaVendorOutDetailModel->getJasaVendorOutDetail($id)
+            'jasaVendorOutDetail' => $this->jasaVendorOutDetailModel->getJasaVendorOutDetail($id),
+            'supplier' => $this->supplierModel->getSupplierByType("BAHAN BAKU")
 
         ];
 
@@ -469,9 +471,14 @@ class JasaVendorOut extends BaseController
 
     public function getListStockByStockID()
     {
-        if (!empty($this->request->getVar('stock_id'))) {
-            $dataResult = $this->stockDetail2Model->getStockListWithBCDoc(
+        if (!empty($this->request->getVar('stock_id')) && !empty($this->request->getVar('supplier_id'))) {
+            $condition = [
+                'stock_details2.supplier_id' => $this->request->getVar('supplier_id'),
+                'stock_details.sumber' => "LPB"
+            ];
+            $dataResult = $this->stockDetail2Model->getStockListWithAddCondition(
                 $this->request->getVar('stock_id'),
+                $condition
             );
             $stock = $this->stockModel->find($this->request->getVar('stock_id'));
             if ($stock['kemasan_id'] == 0) {
