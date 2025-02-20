@@ -463,7 +463,7 @@ class TandaTerimaSupBB extends BaseController
         $tanggalTerimaExplode = explode('/', $tanggalTerima);
 
         $month = $tanggalTerimaExplode[1];
-        $year = $tanggalTerimaExplode[2];
+        $year = substr($tanggalTerimaExplode[2], -2);
         $romanMonth = romanMonthNumber($month);
         $numberTemplate = "/TT/$romanMonth/$year";
 
@@ -503,7 +503,7 @@ class TandaTerimaSupBB extends BaseController
         $tanggalTerimaExplode = explode('/', $tanggalTerima);
 
         $month = $tanggalTerimaExplode[1];
-        $year = $tanggalTerimaExplode[2];
+        $year = substr($tanggalTerimaExplode[2], -2);
         $romanMonth = romanMonthNumber($month);
         $numberTemplate = "/TT/$romanMonth/$year";
 
