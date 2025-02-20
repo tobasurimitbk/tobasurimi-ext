@@ -505,7 +505,7 @@ class JasaVendorOut extends BaseController
                 $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
                 $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
                 $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-                $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
+                $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
 
                 if ($dataResult[$i]['stok_total'] > 0) {
                     array_push($resultArr, $dataResult[$i]);
