@@ -63,6 +63,7 @@ class TandaTerimaFakturModel extends Model
     public function getInvoiceList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
+            'tanda_terima_faktur.id'  => 'tanda_terima_faktur.id',
             'receive_date'  => 'tanda_terima_faktur.receive_date',
             'divisi_id'     => 'tanda_terima_faktur.divisi_id',
             'faktur_no'     => 'tanda_terima_faktur.faktur_no',
@@ -72,7 +73,7 @@ class TandaTerimaFakturModel extends Model
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'tanda_terima_faktur.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'tanda_terima_faktur.id';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "tanda_terima_faktur.*, 

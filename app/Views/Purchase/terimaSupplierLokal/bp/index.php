@@ -112,7 +112,7 @@
     </div>
 </div>
 <script>
-    let sort = "receive_date";
+    let sort = "tanda_terima_faktur.id";
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
