@@ -137,9 +137,11 @@
                 <td>
                     <div><span class="txt-bold">Dokumen : <?= ($dataPenerimaanBarang->bc_type == null) ? "Non Pabean" : $dataPenerimaanBarang->bc_type ?></span></div>
                 </td>
-                <!-- <td>
-                    <div><span class="txt-bold">Ket. Kemasan : <?= $dataPenerimaanBarang->kemasan; ?></span></div>
-                </td> -->
+                <?php if ($dataPenerimaanBarang->ongkos_kirim != 0): ?>
+                    <td>
+                        <div><span class="txt-bold">Ongkos Kirim : <?= number_format($dataPenerimaanBarang->ongkos_kirim); ?></span></div>
+                    </td>
+                <?php endif; ?>
             </tr>
         </table>
         <table class="item-table mt-050">

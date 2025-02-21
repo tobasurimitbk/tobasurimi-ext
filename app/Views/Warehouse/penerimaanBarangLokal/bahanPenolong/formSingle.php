@@ -154,7 +154,7 @@
         </div>
         <div class="col-md-4">
             <div class="form-floating mb-3" style="height: 50px;">
-                <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['ongkos_kirim'] : ""; ?>" class="form-control ongkos_kirim" type="number" id="ongkos_kirim" name="ongkos_kirim" placeholder="Ongkos Kirim">
+                <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['ongkos_kirim'] == 0 ? "" : number_format($dataPenerimaanBarang['ongkos_kirim'])) : ""; ?>" class="form-control ongkos_kirim" type="text" oninput="this.value=greatFormatRupiah(this.value)" id="ongkos_kirim" name="ongkos_kirim" placeholder="Ongkos Kirim">
                 <label for="floatingInput">Ongkos Kirim (Opsional)</label>
             </div>
         </div>
@@ -493,10 +493,6 @@
                 number: true,
                 min: 0
             },
-            ongkos_kirim: {
-                number: true,
-                min: 0
-            },
             divisi_id: {
                 required: true
             },
@@ -519,10 +515,6 @@
             },
             jumlah_kemasan: {
                 required: "Jumlah kemasan wajib diisi",
-                number: "Masukkan hanya angka",
-                min: "Tidak boleh minus"
-            },
-            ongkos_kirim: {
                 number: "Masukkan hanya angka",
                 min: "Tidak boleh minus"
             },
@@ -582,6 +574,7 @@
                         var po_no = $('.multiple_po_id').select2('data').map(function(elem) {
                             return elem.text;
                         });
+                        var ongkosKirim = destroyFormatRupiah($('#ongkos_kirim').val() || 0);
 
                         var formData = new FormData(document.querySelector(".create-form"));
                         formData.append("acceptance_type", po_no.length > 1 ? "MULTIPLE ORDER" : "SINGLE ORDER");
@@ -589,6 +582,7 @@
                         formData.append("multiple_po_no", JSON.stringify(po_no));
                         formData.append("divisi_id", divisiId);
                         formData.append("barangs", JSON.stringify(listData.result));
+                        formData.set("ongkos_kirim", ongkosKirim);
 
                         if (id) {
                             formData.append("id", id);
