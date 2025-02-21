@@ -133,16 +133,7 @@
                     <div><span class="txt-bold">Gudang: <?= $dataPenerimaanBarang->warehouse_name; ?></span></div>
                 </td>
             </tr>
-            <tr>
-                <td>
-                    <div><span class="txt-bold">Dokumen : <?= ($dataPenerimaanBarang->bc_type == null) ? "Non Pabean" : $dataPenerimaanBarang->bc_type ?></span></div>
-                </td>
-                <?php if ($dataPenerimaanBarang->ongkos_kirim != 0): ?>
-                    <td>
-                        <div><span class="txt-bold">Ongkos Kirim : <?= number_format($dataPenerimaanBarang->ongkos_kirim); ?></span></div>
-                    </td>
-                <?php endif; ?>
-            </tr>
+
         </table>
         <table class="item-table mt-050">
             <tr>
@@ -177,10 +168,20 @@
                 </tr>
             <?php endforeach; ?>
             <tr>
-                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>TOTAL</b></td>
+                <td class="txt-left" style="padding-left: 5px" colspan="5"><b></b></td>
                 <td class="txt-right" style="text-align:center;"><?= number_format($jml_sub_total, 2, '.', ','); ?></td>
-                <td></td>
-                <td></td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>ONGKOS KIRIM</b></td>
+                <td class="txt-right" style="text-align:center;"><?= number_format($dataPenerimaanBarang->ongkos_kirim, 2, '.', ','); ?></td>
+                <td colspan="2"></td>
+
+            </tr>
+            <tr>
+                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>TOTAL</b></td>
+                <td class="txt-right" style="text-align:center;"><?= number_format($jml_sub_total + $dataPenerimaanBarang->ongkos_kirim, 2, '.', ','); ?></td>
+                <td colspan="2"></td>
             </tr>
         </table>
         <div class="header mt-050">
