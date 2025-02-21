@@ -25,8 +25,8 @@
 
         .table-border {
             border: 1px solid black;
-            padding-left: 3px;
-            padding-right: 3px;
+            /* padding-left: 3px; */
+            /* padding-right: 3px; */
         }
 
         table {
