@@ -282,6 +282,7 @@ $routes->post('/spp/delete', 'Purchase\SPP::deleteSPP', ['filter' => 'Auth']);
 $routes->post('/spp/delete-detail', 'Purchase\SPP::deleteSPPDetail', ['filter' => 'Auth']);
 $routes->get('/spp/print-table', 'Purchase\SPP::printTable', ['filter' => 'Auth']);
 $routes->get('/spp/print/(:segment)', 'Purchase\SPP::print/$1', ['filter' => 'Auth']);
+$routes->post('/spp/close-spp', 'Purchase\SPP::closeSPP', ['filter' => 'Auth']);
 
 
 // BAHAN BAKU PO LOKAL

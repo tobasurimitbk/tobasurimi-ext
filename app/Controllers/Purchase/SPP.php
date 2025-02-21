@@ -167,13 +167,13 @@ class SPP extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($sppData['data'] as $data) {
-            if ($data->spp_type == "Lokal BB") {
-                $status = $this->RmPurchaseOrderModel->where('purchase_request_id', $data->id)->first();
-            } elseif ($data->spp_type == "Import BB") {
-                $status = $this->RmImportPoModel->where('purchase_request_id', $data->id)->first();
-            } else {
-                $status = $this->AmPurchaseOrderModel->where('purchase_request_id', $data->id)->first();
-            }
+            // if ($data->spp_type == "Lokal BB") {
+            //     $status = $this->RmPurchaseOrderModel->where('purchase_request_id', $data->id)->first();
+            // } elseif ($data->spp_type == "Import BB") {
+            //     $status = $this->RmImportPoModel->where('purchase_request_id', $data->id)->first();
+            // } else {
+            //     $status = $this->AmPurchaseOrderModel->where('purchase_request_id', $data->id)->first();
+            // }
 
             array_push($dataSPP, [
                 "no"            => $no++,
@@ -187,7 +187,7 @@ class SPP extends BaseController
                 "is_posted"     => $data->is_posted,
                 "itemCount"     => $data->itemCount,
                 "createdAt"     => date('d/m/Y', strtotime($data->createdAt)),
-                "status" => $status == null || $data->request_status != "finished" ? "OPEN" : "CLOSED"
+                "status" =>  $data->request_status != "finished" ? "OPEN" : "CLOSED",
             ]);
         }
 
@@ -312,6 +312,21 @@ class SPP extends BaseController
         return response()->setJSON([
             "status" => true,
             "message" => "Status Posting Berhasil Diupdate",
+            "token" => csrf_hash()
+        ]);
+    }
+
+    public function closeSPP()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->SppModel->update($id, [
+            'request_status' => 'finished',
+            'is_posted' => 1,
+        ]);
+
+        return response()->setJSON([
+            "status" => true,
+            "message" => "SPP berhasil Di Close",
             "token" => csrf_hash()
         ]);
     }
