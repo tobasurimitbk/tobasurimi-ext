@@ -1047,7 +1047,7 @@ class PenerimaanBarangLokalBP extends BaseController
         $id = $this->request->getVar('id');
         $form = $this->request->getVar('form');
         $dataAJU = $this->metadataModel->getBCUsed("po_lokal_bp");
-        $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
+        $dataWarehouse = [];
         $dataSatuan = $this->satuanModel->asObject()->find();
         $dataDivisi = $this->divisiModel->getDivisiAccess();
         $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
@@ -1070,6 +1070,7 @@ class PenerimaanBarangLokalBP extends BaseController
             $data['dataSPP'] = $this->amPurchaseOrderModel->getSPP(json_decode($data['dataPenerimaanBarang']['multiple_po_id']));
             $dataSupplier = $this->supplierModel->where('id', $data['dataPenerimaanBarang']['supplier_id'])->findAll();
             $data['dataSupplier'] = $dataSupplier;
+            $data['dataWarehouse'] =  $this->warehousesModel->where('divisi_id', $data['dataPenerimaanBarang']['divisi_id'])->where('deletedAt', null)->findAll();
         }
 
         if ($form == 'single') {
