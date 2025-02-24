@@ -439,8 +439,8 @@ $routes->get('/pembayaran-po-lokal/get-panjar-amount', 'Pembayaran\PembayaranPOL
 $routes->get('/pembayaran-po-lokal-bb', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBB', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bb/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBB', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bb/get-lpb-not-paid', 'Pembayaran\PembayaranPOLokal::getListDokumenLPBNotPaidBB', ['filter' => 'Auth']);
-$routes->post('/pembayaran-po-lokal-bb/get-list-po-no-paid', 'Pembayaran\PembayaranPOLokal::getListBarangLPBNotPaidBB', ['filter' => 'Auth']);
-$routes->get('/pembayaran-po-lokal-bb/get-list-po-paid', 'Pembayaran\PembayaranPOLokal::getListBarangLPBPaidBB', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-lokal-bb/get-po-not-paid', 'Pembayaran\PembayaranPOLokal::getListDokumenPoNotPaidBB', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-lokal-bb/get-list-po-no-paid', 'Pembayaran\PembayaranPOLokal::getListBarangPoNotPaidBB', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bb/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBBAction', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bb/update', 'Pembayaran\PembayaranPOLokal::updatePembayaranPOLokalBBAction', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bb/delete', 'Pembayaran\PembayaranPOLokal::deleteBB', ['filter' => 'Auth']);
