@@ -437,7 +437,7 @@ class PenerimaanBarangLokalBB extends BaseController
         $dataPenerimaanBarang =  $this->penerimaanBarangModel->where('id', $id)->first();
         $dataAJU = $this->metadataModel->getBCUsed('po_lokal_bb');
         $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN BAKU');
-        $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
+        $dataWarehouse = $this->warehousesModel->where('divisi_id', $dataPenerimaanBarang['divisi_id'])->where('deletedAt', null)->findAll();
         $dataSatuan = $this->satuanModel->asObject()->find();
         $dataDivisi = $this->divisiModel->where('id', $dataPenerimaanBarang['divisi_id'])->findAll();
         $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();

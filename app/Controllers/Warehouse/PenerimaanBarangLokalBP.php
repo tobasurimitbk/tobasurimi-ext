@@ -469,9 +469,10 @@ class PenerimaanBarangLokalBP extends BaseController
             return redirect()->to('penerimaan-barang-lokal-bp');
         }
 
+        $dataPenerimaanBarang =  $this->penerimaanBarangModel->where('id', $id)->first();
         $dataAJU = $this->metadataModel->getBCUsed("po_lokal_bp");
         $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN PENOLONG');
-        $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
+        $dataWarehouse = $this->warehousesModel->where('divisi_id', $dataPenerimaanBarang['divisi_id'])->where('deletedAt', null)->findAll();
         $dataSatuan = $this->satuanModel->asObject()->find();
         $dataDivisi = $this->divisiModel->getDivisiAccess();
         $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
@@ -481,7 +482,7 @@ class PenerimaanBarangLokalBP extends BaseController
             "dataWarehouse" => $dataWarehouse,
             "dataSupplier" => $dataSupplier,
             "dataAJU" => $dataAJU,
-            "dataPenerimaanBarang" => $this->penerimaanBarangModel->where('id', $id)->first(),
+            "dataPenerimaanBarang" => $dataPenerimaanBarang,
             "dataKemasan"   => $dataKemasan,
             "dataDivisi" => $dataDivisi,
             "dataSPP" => []

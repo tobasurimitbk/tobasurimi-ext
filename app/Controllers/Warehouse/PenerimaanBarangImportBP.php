@@ -436,10 +436,11 @@ class PenerimaanBarangImportBP extends BaseController
         if ($this->penerimaanBarangModel->find($id) == null) {
             return redirect()->to('penerimaan-barang-import-bp');
         }
+        $dataPenerimaanBarang =  $this->penerimaanBarangModel->where('id', $id)->first();
 
         $dataAJU = $this->metadataModel->getBCUsed("po_import_bp");
         $dataSupplier = $this->supplierModel->getSupplierByType('INTERNASIONAL');
-        $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
+        $dataWarehouse = $this->warehousesModel->where('divisi_id', $dataPenerimaanBarang['divisi_id'])->where('deletedAt', null)->findAll();
         $dataSatuan = $this->satuanModel->asObject()->find();
         $dataDivisi = $this->divisiModel->getDivisiAccess();
         $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
@@ -449,7 +450,7 @@ class PenerimaanBarangImportBP extends BaseController
             "dataWarehouse" => $dataWarehouse,
             "dataSupplier" => $dataSupplier,
             "dataAJU" => $dataAJU,
-            "dataPenerimaanBarang" => $this->penerimaanBarangModel->where('id', $id)->first(),
+            "dataPenerimaanBarang" => $dataPenerimaanBarang,
             "dataKemasan"   => $dataKemasan,
             "dataDivisi" => $dataDivisi,
         ];
