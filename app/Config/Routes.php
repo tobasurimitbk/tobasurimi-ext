@@ -929,7 +929,7 @@ $routes->get('/proses-rebus/create', 'JasaVendor\ProsesRebus::create', ['filter'
 $routes->get('/proses-rebus/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/list-barang-stock-init', 'JasaVendor\ProsesRebus::dropdownListBarangIsInit', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/list-barang-rebus', 'JasaVendor\ProsesRebus::dropdownListHasilRebus', ['filter' => 'Auth']);
-$routes->get('/proses-rebus/list-stock-dokumen-bc', 'Inventori\StokAdjusment::getListStockByStockID', ['filter' => 'Auth']);
+$routes->get('/proses-rebus/list-stock-dokumen-bc', 'JasaVendor\JasaVendorOut::getListStockByStockID', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/all',  'JasaVendor\ProsesRebus::all', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/id/(:segment)',  'JasaVendor\ProsesRebus::detail/$1', ['filter' => 'Auth']);
 $routes->post('/proses-rebus/save',  'JasaVendor\ProsesRebus::createAction', ['filter' => 'Auth']);
