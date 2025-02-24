@@ -853,4 +853,20 @@ class POLokalBahanPenolong extends BaseController
 
         return json_encode($noPoNew);
     }
+
+    public function dropdownBarang()
+    {
+        $barang = $this->barangMasterModel->getBarangByTypeWithSpec([
+            'barang_master.type_barang'  => 'bahan_penolong',
+            'barang_master.company_id' => $this->this_company_id,
+            'barang_master.deletedAt' => null,
+            'barang_master_spesifikasi.deletedAt' => null
+        ]);
+
+        return response()->setJSON([
+            'data' => $barang,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
 }
