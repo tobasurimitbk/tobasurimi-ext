@@ -15,7 +15,7 @@
                         <div class="col-md-6">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" readonly="true" type="text" class="form-control kode" id="kode" name="kode" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
+                                    <input autocomplete="one-time-code" type="text" class="form-control kode" id="kode" name="kode" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
                                     <label for="floatingInput">Kode Supplier</label>
                                 </div>
                                 <div style="<?= !empty($biayaKepiting) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -147,6 +147,9 @@
     let sort = "kode";
     let sortType = "desc";
     let trigger = true;
+
+    // Init changeStatus
+    changeStatus();
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -318,7 +321,7 @@
                         $(".phone").val(res.data.phone);
                         $(".contact_person").val(res.data.contact_person);
                         $('#auto_generate').css('display', 'none');
-                        $("#kode").prop("readonly", true);
+                        $("#kode").prop("readonly", false);
                         $('.modal').on('hidden.bs.modal', function() {
                             $('#auto_generate').css('display', '');
 

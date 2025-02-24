@@ -206,6 +206,9 @@
     let sortType = "desc";
     let trigger = true;
 
+    // Init changeStatus
+    changeStatus();
+
     $('.province_parent_id').select2({
         placeholder: "",
         theme: "bootstrap-5",
@@ -445,7 +448,7 @@
                         $(".province_parent_id").val(res.data.province_id).change();
                         $(".country_code").val(res.data.country_code).change();
                         $('#auto_generate').css('display', 'none');
-                        $("#kode").prop("readonly", true);
+                        $("#kode").prop("readonly", false);
                         $('.modal').on('hidden.bs.modal', function() {
                             $('#auto_generate').css('display', '');
 

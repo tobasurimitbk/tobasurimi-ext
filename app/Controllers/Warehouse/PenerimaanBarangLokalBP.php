@@ -125,7 +125,7 @@ class PenerimaanBarangLokalBP extends BaseController
             "nama_barang" => strtolower($this->request->getVar('nama_barang'))
         ];
 
-        if ($addCondition['status'] == "BELUM POSTING") {
+        if ($addCondition['status'] == "waiting") {
             // Jika Belum Posting Matikan Filter Start Date End Date
             $addCondition['startdate'] = "";
             $addCondition['lastdate'] = "";
