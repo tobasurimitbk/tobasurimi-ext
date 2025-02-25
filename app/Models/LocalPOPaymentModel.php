@@ -1103,50 +1103,52 @@ class LocalPOPaymentModel extends Model
     {
         $purchaseOrderModel = new RMPurchaseOrderModel();
         $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
-    
-        // Ambil data PO dengan LEFT JOIN ke barang_master
+
+        // Ambil data PO dengan LEFT JOIN ke barang_master & rm_purchase_order_detail
         $purchaseOrders = $purchaseOrderModel
             ->select("rm_purchase_orders.po_date AS tanggal_PO,
                     rm_purchase_orders.po_no AS no_po,
                     rm_purchase_orders.id AS rm_purchase_order_id,
                     rm_purchase_orders.total AS total_tagihan_number,
-                    barang_master.barang_name AS barang")
+                    barang_master.barang_name AS barang,
+                    COALESCE(SUM(rm_purchase_order_details.qty_diterima), 0) AS total_qty_diterima")
             ->join('barang_master', 'barang_master.id = rm_purchase_orders.barang_id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
             ->whereIn('rm_purchase_orders.id', $poIdArr)
             ->where([
                 'rm_purchase_orders.supplier_id' => $supplierID,
                 'rm_purchase_orders.deletedAt' => null
             ])
+            ->groupBy('rm_purchase_orders.id') // SUM qty_diterima per PO
             ->findAll();
-    
+
         // Ambil semua pembayaran yang terkait dengan PO yang dipilih
         $payments = $localPOPaymentDetailModel
             ->select('rm_purchase_order_id, SUM(total) as total_paid')
             ->whereIn('rm_purchase_order_id', $poIdArr)
             ->groupBy('rm_purchase_order_id')
             ->findAll();
-    
+
         // Konversi hasil pembayaran ke dalam array dengan ID PO sebagai key
         $paymentsMap = [];
         foreach ($payments as $pay) {
             $paymentsMap[$pay['rm_purchase_order_id']] = $pay['total_paid'];
         }
-    
+
         foreach ($purchaseOrders as &$p) {
             $totalPaid = $paymentsMap[$p['rm_purchase_order_id']] ?? 0;
             $totalPPH = $purchaseOrderModel->getTotalwithPPH($p['rm_purchase_order_id']);
             $remainingTotal = $totalPPH['total_after_pph'] - $totalPaid;
-    
+
             // Format tanggal & update data PO
             $p['tanggal_PO'] = date('d/m/Y', strtotime($p['tanggal_PO']));
             $p['total_tagihan'] = $remainingTotal;
             $p['total_tagihan_number'] = $remainingTotal;
             $p['total_paid'] = $totalPaid;
         }
-    
+
         return $purchaseOrders;
     }
-    
 
     
     public function getListLPBNotPaid($lpbSelected, $supplierID, $divisiID, $companyID)

@@ -247,6 +247,7 @@
                                                     <th style="text-align: center;">Tanggal PO</th>
                                                     <th style="text-align: center;">No PO</th>
                                                     <th style="text-align: center;">Barang</th>
+                                                    <th style="text-align: center;">Qty</th>
                                                     <th style="text-align: center; !important;">Total</th>
                                                     <th style="text-align: center; !important;">Total Di bayar</th>
                                                     <!-- <th style="text-align: center;">Sisa Bayar</th> -->
@@ -650,7 +651,6 @@
                 success: function(response) {
                     listPembayaran = [];
                     listPembayaran = response.data;
-                    console.log(listPembayaran);
                     csrf.val(response.token);
                     drawTable(listPembayaran);
                     $('#nominal_pembayaran').val(response.data.sisaNumber);
@@ -1075,8 +1075,6 @@
             contentType: false,
             success: function(response) {
 
-                console.log(response.data);
-
                 csrf.val(response.token);
                 
                 // Kosongkan dan tambahkan opsi default
@@ -1142,6 +1140,7 @@
             newRow.append($('<td style="text-align:center;">').text(v.tanggal_PO));
             newRow.append($('<td style="text-align:center;">').text(v.no_po));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
+            newRow.append($('<td style="text-align:center;">').text(v.total_qty_diterima));
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_tagihan)));
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_paid)));
             // newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.sisa_pembayaran)));
@@ -1160,21 +1159,21 @@
             table.find('tbody').append(newRow);
         });
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN  </b></td>'));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN  </b></td>'));
         newRow.append($('<td style="text-align:right;" ><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="' + greatFormatRupiahPayment(data.total_pembayaran) + '" name = "total_pembayaran"  readonly>' +
             '</b></td>'));
         table.find('tbody').append(newRow);
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>POTONGAN/DISKON</b></td>'));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>POTONGAN/DISKON</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
             '  <input <?= !empty($detail) ? 'disabled' : '' ?> oninput="preventNegativeInput(this)" onkeyup="this.value = greatFormatRupiahPayment(this.value);" name="potongan" id="potongan" autocomplete="one-time-code" value="<?= !empty($detail) ? number_format($detail['pembayaranDetail']['potongan_harga'], 2) : '0' ?>" type="text" class="form-control trigger-input" placeholder="Nominal Pembayaran">' +
             '</b></td>'));
 
         table.find('tbody').append(newRow);
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN PANJAR</b></td>'));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PANJAR</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value="' + greatFormatRupiahPayment(data.total_bayar_panjar) + ' " name = "total_pembayaran_panjar" readonly>' +
             '</b></td>'));
@@ -1182,7 +1181,7 @@
         table.find('tbody').append(newRow);
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN PANJAR TB</b></td>'));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PANJAR TB</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar-tb trigger-input" type="text" value="' + greatFormatRupiahPayment(data.total_bayar_panjar_tb) + ' " name = "total_pembayaran_panjar_tb" readonly>' +
             '</b></td>'));
@@ -1191,7 +1190,7 @@
 
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN PINJAMAN</b></td>'));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PINJAMAN</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-pinjaman trigger-input" type="text" value="' + greatFormatRupiahPayment(data.total_bayar_pinjaman) + ' " name = "total_pembayaran_pinjaman" readonly>' +
             '</b></td>'));
@@ -1199,7 +1198,7 @@
         table.find('tbody').append(newRow);
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>GRAND TOTAL</b></td>'));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>GRAND TOTAL</b></td>'));
         // newRow.append($('<td style="text-align:center;"><b>' + greatFormatRupiahPayment(data.total_tagihan) + '</b></td>'));
         newRow.append($('<td style="text-align:center; min-width: 200px; width: 200px; max-width: 250px;"><b>' +
             '<input autocomplete="one-time-code" data-id="" class="form-control grand-total" type="text" value="' + greatFormatRupiahPayment(data.total_akhir) + '" name="grand_total" readonly>' +
@@ -1238,6 +1237,7 @@
             newRow.append($('<td style="text-align:center;">').text(v.tanggal_PO));
             newRow.append($('<td style="text-align:center;">').text(v.no_po));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
+            newRow.append($('<td style="text-align:center;">').text(v.total_qty_diterima));
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_tagihan)));
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_paid)));
             // newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.sisa_pembayaran)));
@@ -1262,14 +1262,14 @@
         });
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN  </b></td>'));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN  </b></td>'));
         newRow.append($('<td style="text-align:right;" ><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="'+ greatFormatRupiahPayment(TotalHarga) +'" name = "total_pembayaran"  readonly>' +
             '</b></td>'));
         table.find('tbody').append(newRow);
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>POTONGAN/DISKON</b></td>'));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>POTONGAN/DISKON</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
             '  <input <?= !empty($detail) ? 'disabled' : '' ?> onchange="this.value = greatFormatRupiahPayment(this.value)" oninput="preventNegativeInput(this)" name="potongan" id="potongan" autocomplete="one-time-code" value="<?= !empty($detail) ? number_format($detail['pembayaranDetail']['potongan_harga'], 2) : '0' ?>" type="text" class="form-control trigger-input" placeholder="Nominal Pembayaran">' +
             '</b></td>'));
@@ -1277,7 +1277,7 @@
         table.find('tbody').append(newRow);
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN PANJAR</b></td>'));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PANJAR</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value="" name = "total_pembayaran_panjar" readonly>' +
             '</b></td>'));
@@ -1286,7 +1286,7 @@
 
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN PANJAR TB</b></td>'));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PANJAR TB</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar-tb trigger-input" type="text" value="" name = "total_pembayaran_panjar_tb" readonly>' +
             '</b></td>'));
@@ -1295,7 +1295,7 @@
 
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN PINJAMAN</b></td>'));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PINJAMAN</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-pinjaman trigger-input" type="text" value="" name = "total_pembayaran_pinjaman" readonly>' +
             '</b></td>'));
@@ -1303,7 +1303,7 @@
         table.find('tbody').append(newRow);
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>GRAND TOTAL</b></td>'));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>GRAND TOTAL</b></td>'));
         // newRow.append($('<td style="text-align:center;"></td>'));
         // newRow.append($('<td style="text-align:center;"><b>' + greatFormatRupiahPayment(TotalHarga) + '</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
