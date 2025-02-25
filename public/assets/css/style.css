@@ -808,8 +808,8 @@ select.form-control:not([size]):not([multiple]) {
   width: 160px;
 }
 
-.card-dashboard-text{
-    color: black;
+.card-dashboard-text {
+  color: black;
 }
 
 .card .card-header,
@@ -2167,13 +2167,7 @@ h6 .badge {
   left: 0;
   width: 100%;
   height: 115px;
-  background: rgb(221, 39, 51);
-  background: linear-gradient(
-    45deg,
-    rgba(221, 39, 51, 1) 0%,
-    rgba(231, 50, 58, 1) 35%,
-    rgba(221, 39, 51, 1) 100%
-  );
+  background: #b8522a;
   z-index: -1;
 }
 

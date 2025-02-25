@@ -864,7 +864,7 @@ tr:first-child > td > .fc-day-grid-event {
   -webkit-user-select: none;
   outline: none;
   background-color: #343a40;
-  border-color: #fff;
+  border-color: #6c757d;
 }
 
 .select2-dropdown {
@@ -873,16 +873,16 @@ tr:first-child > td > .fc-day-grid-event {
 
 .select2-container.select2-container--open .select2-selection--multiple {
   background-color: #343a40;
-  border-color: #fff;
+  border-color: #6c757d;
 }
 .select2-container.select2-container--focus .select2-selection--multiple,
 .select2-container.select2-container--focus .select2-selection--single {
   background-color: #343a40;
-  border-color: #fff;
+  border-color: #6c757d;
 }
 .select2-container.select2-container--open .select2-selection--single {
   background-color: #343a40;
-  border-color: #fff;
+  border-color: #6c757d;
 }
 
 .select2-results__option {
