@@ -1301,7 +1301,7 @@ select.form-control:not([size]):not([multiple]) {
 }
 .table:not(.table-sm) thead th {
   border-bottom: none;
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: #6c757d;
   color: #666;
   padding-top: 15px;
   padding-bottom: 15px;
@@ -1312,7 +1312,7 @@ select.form-control:not([size]):not([multiple]) {
 }
 .table.table-bordered td,
 .table.table-bordered th {
-  border-color: #f6f6f6;
+  border-color: #6c757d;
   vertical-align: middle;
 }
 
@@ -1333,6 +1333,7 @@ table tr:hover .table-links {
 
 .table-striped tbody tr:nth-of-type(odd) {
   background-color: rgba(0, 0, 0, 0.02);
+  border: 1px solid #6c757d;
 }
 
 @media (max-width: 575.98px) {
@@ -3266,7 +3267,7 @@ pre {
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   background-size: 16px 12px;
-  border: 1px solid #6C757D;
+  border: 1px solid #6c757d;
   background-color: #343a40;
   border-radius: 0.375rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -5755,7 +5756,7 @@ table.dataTable td .label-finish {
   background-color: #353a3f;
 }
 .table-responsive > .table-bordered {
-  border: 1px solid white;
+  border: 1px solid #6c757d;
 }
 .modal
   .modal-dialog
