@@ -1145,6 +1145,7 @@ class LocalPOPaymentModel extends Model
             $p['total_tagihan'] = $remainingTotal;
             $p['total_tagihan_number'] = $remainingTotal;
             $p['total_paid'] = $totalPaid;
+            $p['total_qty_diterima'] = floatval($p['total_qty_diterima']); // Convert ke float
         }
 
         return $purchaseOrders;
