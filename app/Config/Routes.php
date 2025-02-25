@@ -46,6 +46,7 @@ $routes->get('/403', function () {
 // DASHBOARD
 $routes->get('/dashboard', 'Dashboard\Dashboard::dashboard', ['filter' => 'Auth']);
 $routes->get('/dashboard/toggle', 'Dashboard\Dashboard::toggleSidebar', ['filter' => 'Auth']);
+$routes->get('/dashboard/change-theme', 'Dashboard\Dashboard::darkLightMode', ['filter' => 'Auth']);
 $routes->get('/dashboard/get-number-bc', 'Dashboard\Dashboard::getNumberBC', ['filter' => 'Auth']);
 $routes->get('/dashboard/list-dokumen-bc23/', 'Dashboard\RekapBeaCukai::rekapBC23', ['filter' => 'Auth']);
 $routes->get('/dashboard/list-dokumen-bc23/all', 'Dashboard\RekapBeaCukai::rekapBC23all', ['filter' => 'Auth']);

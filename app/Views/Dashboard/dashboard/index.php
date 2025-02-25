@@ -39,7 +39,7 @@
         <h1>Dashboard</h1>
     </div>
     <div class="card">
-        <div class="card-header text-black text-bold">
+        <div class="card-header card-dashboard-text">
             <b>MENU CEPAT</b>
         </div>
         <div class="card-body">
@@ -47,7 +47,7 @@
 
                 <div class="col-sm-1 mr-4 ml-4 mt-3">
                     <div class="btn-group dropend">
-                        <button class="btn dropdown-toggle p-3" style="background-color: #E02B35; color: white; width:160px; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn dropdown-toggle p-3 card-dashboard" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-store"></i> <span>Purchase</span>
                             <?php if (!empty($jumlah_pembayaran)) : ?>
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
@@ -76,7 +76,7 @@
                 </div>
                 <div class="col-sm-1 mr-4 ml-4 mt-3">
                     <div class="btn-group dropend">
-                        <button class="btn dropdown-toggle p-3" style="background-color: #E02B35; color: white; width:160px; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn dropdown-toggle p-3 card-dashboard" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-barcode"></i> Sales
                             <?php if (!empty($jumlah_sales_bulan_ini)) : ?>
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
@@ -100,8 +100,8 @@
 
                 <?php if (can('Laporan', 'Warehouse', 'r')) : ?>
                     <div class="col-sm-1 mr-4 ml-4 mt-3">
-                        <div class="btn-group">
-                            <a href="<?= base_url("laporan-warehouse"); ?>" class="btn p-3" style="background-color: #E02B35; color: white; width:160px">
+                        <div class="btn-group card-dashboard">
+                            <a href="<?= base_url("laporan-warehouse"); ?>" class="btn p-3 card-dashboard">
                                 <i class="fas fa-truck"></i> Material Req.
                                 <?php if (!empty($jumlah_warehouse_bulan_ini)) : ?>
                                     <span class=" position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
@@ -115,8 +115,8 @@
 
                 <?php if (can('Produksi', 'Work Order', 'r')) : ?>
                     <div class="col-sm-1 mr-4 ml-4 mt-3">
-                        <div class="btn-group">
-                            <a href="<?= base_url("work-order"); ?>" class="btn p-3" style="background-color: #E02B35; color: white; width:160px">
+                        <div class="btn-group card-dashboard">
+                            <a href="<?= base_url("work-order"); ?>" class="btn p-3 card-dashboard">
                                 <i class="fas fa-play"></i> Production
                                 <?php if (!empty($jumlah_work_orders)) : ?>
                                     <span class=" position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
@@ -130,7 +130,7 @@
 
                 <div class="col-sm-1 mr-4 ml-4 mt-3">
                     <div class="btn-group dropend">
-                        <button class="btn dropdown-toggle p-3" style="background-color: #E02B35; color: white; width:160px; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn dropdown-toggle p-3 card-dashboard" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-truck"></i> Jasa Vendor
 
                         </button>
@@ -160,8 +160,8 @@
                 </div>
                 <?php if (can('Master Data', 'Kurs', 'r')) : ?>
                     <div class="col-sm-1 mr-4 ml-4 mt-3">
-                        <div class="btn-group">
-                            <a href="<?= base_url("kurs"); ?>" class="btn p-3" style="background-color: #E02B35; color: white; width:160px">
+                        <div class="btn-group card-dashboard">
+                            <a href="<?= base_url("kurs"); ?>" class="btn p-3 card-dashboard">
                                 <div class="text-center">
                                     <i class="fa-solid fa-dollar-sign fa-lg"></i>
                                     KURS
@@ -178,8 +178,8 @@
                 <?php endif; ?>
                 <?php if (can('Settings', 'Manajemen User', 'r')) : ?>
                     <div class="col-sm-1 mr-4 ml-4 mt-3">
-                        <div class="btn-group">
-                            <a href="<?= base_url("user");  ?>" class="btn p-3" style="background-color: #E02B35; color: white; width:160px">
+                        <div class="btn-group card-dashboard">
+                            <a href="<?= base_url("user");  ?>" class="btn p-3 card-dashboard">
                                 <i class="fas fa-users"></i> Users
                                 <?php if (!empty($jumlah_users)) : ?>
                                     <span class=" position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
@@ -193,7 +193,7 @@
 
                 <div class="col-sm-1 mr-4 ml-4 mt-3">
                     <div class="btn-group dropend">
-                        <button class="btn dropdown-toggle p-3" style="background-color: #E02B35; color: white; width:160px; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn dropdown-toggle p-3 card-dashboard" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-barcode"></i> Products
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
@@ -224,8 +224,8 @@
 
                 <?php if (can('Master Data', 'Customer Global', 'r')) : ?>
                     <div class="col-sm-1 mr-4 ml-4 mt-3">
-                        <div class="btn-group">
-                            <a href="<?= base_url("customer");  ?>" class="btn p-3" style="background-color: #E02B35; color: white; width:160px">
+                        <div class="btn-group card-dashboard">
+                            <a href="<?= base_url("customer");  ?>" class="btn p-3 card-dashboard">
                                 <i class="fas fa-address-book"></i> Customer
                                 <?php if (!empty($jumlah_customer)) : ?>
                                     <span class=" position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
@@ -243,10 +243,11 @@
         </div>
         <div class="row p-3">
             <div class="col-sm-8">
-                <div class="card-header bg-danger text-white text-bold">
+                <div class="card-header card-dashboard-text text-bold">
                     <b>WORK IN PROGRESS</b>
                 </div>
-                <div class="card-body bg-danger" style="margin-top: -20px; margin-bottom: -20px;">
+                <div class="card-body" style="margin-top: -20px; margin-bottom: -20px;">
+                    <br>
                     <div class="row">
                         <div class="col-sm">
                             <div class="input-group input-group-password align-items-center">
@@ -291,10 +292,11 @@
                 </div>
             </div>
             <div class="col-sm-4">
-                <div class="card-header bg-danger text-white text-bold">
+                <div class="card-header card-dashboard-text text-bold">
                     <b>DATA DOKUMEN BEA CUKAI</b>
                 </div>
-                <div class="card-body bg-danger" style="margin-top: -20px; margin-bottom: -20px;">
+                <div class="card-body" style="margin-top: -20px; margin-bottom: -20px;">
+                    <br>
                     <div class="input-group input-group-password align-items-center" id="dateBCPicker">
                         <input autocomplete="one-time-code" class="form-control input-picker p-4 dateBC" id="dateBC" name="dateBC" placeholder="Pilih Bulan" value="">
                         <div class="input-group-prepend group-prepend-password align-items-center">

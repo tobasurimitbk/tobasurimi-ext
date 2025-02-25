@@ -133,6 +133,20 @@ class Dashboard extends BaseController
         }
     }
 
+    public function darkLightMode()
+    {
+        $session = session();
+        $themeUsed = $this->request->getVar('theme');
+        if ($themeUsed == "dark") {
+            $session->set('theme', "dark");
+        } else {
+            $session->set('theme', "light");
+        }
+
+        return response()->setJSON(['success' => true]);
+    }
+
+
     public function getNumberBC()
     {
         $date = $this->request->getVar("dateBC");

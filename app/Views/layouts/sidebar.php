@@ -1,17 +1,23 @@
 <?php
 $currentUriSegment = "/" . service('uri')->getSegment(1);
 helper(['custom_helper']);
-
+// dd($_SESSION);
+// die;
 ?>
 <!-- Sidebar -->
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
 
         <div class="sidebar-brand">
-            <img src="<?= base_url("assets/img/logo.png"); ?>">
+            <?php if (session()->get('theme') == 'dark'): ?>
+                <img src="<?= base_url("assets/img/logo_dark.jpg"); ?>">
+            <?php else: ?>
+                <img src="<?= base_url("assets/img/logo.png"); ?>">
+            <?php endif; ?>
         </div>
 
         <div class="sidebar-brand sidebar-brand-sm">
+
             <img src="<?= base_url("assets/img/favicon.png"); ?>" width="35" height="35">
         </div>
 
