@@ -232,4 +232,20 @@ class SppModel extends Model
 
         return $sppResult;
     }
+
+    public function getListSPPLPB($company_id)
+    {
+        $dataSpp = $this->asArray()
+            ->select('purchase_requests.*')
+            ->join('am_purchase_orders', 'am_purchase_orders.purchase_request_id = purchase_requests.id', 'left')
+            ->join('am_purchase_order_details', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
+            ->where('purchase_requests.company_id', $company_id)
+            ->where('am_purchase_orders.is_posted', 1)
+            ->where('purchase_requests.deletedAt', null)
+            ->groupBy('purchase_requests.id')
+            ->having('SUM(am_purchase_order_details.remaining_qty) > 0') // Langsung filter yang masih ada sisa qty
+            ->findAll();
+
+        return $dataSpp;
+    }
 }

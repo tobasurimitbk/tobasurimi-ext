@@ -1075,8 +1075,8 @@ class PenerimaanBarangLokalBP extends BaseController
 
         if ($form == 'single') {
             if (empty($id)) {
-                $dataSpp = $this->sppModel->getListSPP($this->this_company_id);
-                $data['dataSPP'] = $dataSpp;
+                // ambil data spp yang sudah dibuatkan PO dan sudah diposting
+                $data['dataSPP'] = $this->sppModel->getListSPPLPB($this->this_company_id);
             }
             $data['dataDivisi'] = $this->divisiModel->getDivisiAccess();
 
