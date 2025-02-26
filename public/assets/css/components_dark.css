@@ -841,6 +841,10 @@ tr:first-child > td > .fc-day-grid-event {
     border-top: 1px solid #f2f2f2;
   }
 }
+
+thead {
+  border-bottom: 3px solid #5e656b !important; /* Ganti dengan warna yang diinginkan */
+}
 /* 1.18 Select2 */
 .select2 {
   width: 100% !important;
