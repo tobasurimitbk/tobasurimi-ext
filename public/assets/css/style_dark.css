@@ -5258,6 +5258,9 @@ input:checked + .slider:before {
   background-color: #343a40;
   opacity: 1;
 }
+.table-bordered {
+  border: 1px solid #53595f;
+}
 
 .card .card-body .form-label.lable-title {
   margin-bottom: 0;
