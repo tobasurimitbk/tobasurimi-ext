@@ -405,7 +405,7 @@
 
 /* 1.8 DataTables */
 table.dataTable {
-  border-collapse: collapse;
+  border-collapse: collapse !important;
 }
 table.dataTable thead th,
 table.dataTable thead td {
