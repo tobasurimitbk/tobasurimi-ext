@@ -5235,8 +5235,12 @@ input:checked + .slider:before {
   color: white;
   cursor: not-allowed;
   background-color: #343a40;
-  border-color: #ced4da;
+  border-color: #646a71;
   box-shadow: none;
+}
+
+.nav-tabs {
+  border-bottom: 1px solid #646a71;
 }
 
 .modal

@@ -405,14 +405,14 @@
 
 /* 1.8 DataTables */
 table.dataTable {
-  border-collapse: collapse !important;
+  border-collapse: collapse;
 }
 table.dataTable thead th,
 table.dataTable thead td {
-  border-bottom: 1px solid #ddd !important;
+  border-bottom: 1px solid #585e63 !important;
 }
 table.dataTable.no-footer {
-  border-bottom: 1px solid #ddd !important;
+  border-bottom: 1px solid #585e63 !important;
 }
 
 .dataTables_wrapper {
