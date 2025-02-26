@@ -803,13 +803,16 @@ select.form-control:not([size]):not([multiple]) {
   margin-bottom: 30px;
 }
 .card-dashboard {
-  background-color: #e02b35;
+  background-color: #b8522a;
   color: white;
   width: 160px;
 }
 
 .card-dashboard-text {
-  color: black;
+  color: white;
+}
+#card-dashboard-text {
+  background-color: #b8522a;
 }
 
 .card .card-header,

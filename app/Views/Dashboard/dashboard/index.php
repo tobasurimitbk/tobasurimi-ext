@@ -241,11 +241,13 @@
 
             </div>
         </div>
+        <hr>
         <div class="row p-3">
             <div class="col-sm-8">
-                <div class="card-header card-dashboard-text text-bold">
+                <div class="card-header card-dashboard-text text-bold" id="card-dashboard-text">
                     <b>WORK IN PROGRESS</b>
                 </div>
+                <hr>
                 <div class="card-body" style="margin-top: -20px; margin-bottom: -20px;">
                     <br>
                     <div class="row">
@@ -292,9 +294,10 @@
                 </div>
             </div>
             <div class="col-sm-4">
-                <div class="card-header card-dashboard-text text-bold">
+                <div class="card-header card-dashboard-text text-bold" id="card-dashboard-text">
                     <b>DATA DOKUMEN BEA CUKAI</b>
                 </div>
+
                 <div class="card-body" style="margin-top: -20px; margin-bottom: -20px;">
                     <br>
                     <div class="input-group input-group-password align-items-center" id="dateBCPicker">

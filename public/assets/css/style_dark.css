@@ -852,7 +852,7 @@ select.form-control:not([size]):not([multiple]) {
   font-weight: 500;
 }
 .card .card-header {
-  border-bottom-color: #f9f9f9;
+  border-bottom-color: #646b71;
   line-height: 30px;
   -ms-grid-row-align: center;
   align-self: center;
@@ -862,6 +862,20 @@ select.form-control:not([size]):not([multiple]) {
   display: flex;
   align-items: center;
 }
+.border {
+  border: #646b71 !important;
+}
+tbody,
+td,
+tfoot,
+th,
+thead,
+tr {
+  border-color: #646b71 !important;
+  /* border-style:solid; */
+  /* border-width:0; */
+}
+
 .card .card-header .btn {
   margin-top: 1px;
   padding: 2px 15px;
@@ -4699,7 +4713,7 @@ footer.main-footer .footer-right a {
 }
 
 .modal .modal-dialog .modal-content .modal-body .col-subtitle-modal {
-  border-bottom: 1px #a5ae9d solid;
+  border-bottom: 1px #6e757c solid;
   padding-bottom: 15px;
   margin-bottom: 25px;
 }
@@ -5261,7 +5275,7 @@ input:checked + .slider:before {
 }
 
 .col-subtitle-modal {
-  border-bottom: 1px #a5ae9d solid;
+  border-bottom: 1px #8e9489 solid;
   padding-bottom: 15px;
   margin-bottom: 25px;
 }
