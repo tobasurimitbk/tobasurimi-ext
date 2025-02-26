@@ -181,7 +181,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> type="number" value="<?= !empty($dataPOImport) ? $dataPOImport->potongan_harga : "0"; ?>" class="form-control potongan_harga" name="potongan_harga" id="potongan_harga" placeholder="Termin (Opsional)">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOImport) ? number_format($dataPOImport->potongan_harga) : "0"; ?>" class="form-control potongan_harga" name="potongan_harga" id="potongan_harga" oninput="this.value = greatFormatRupiah(this.value)" placeholder="Potongan Harga (Opsional)">
                             <label for="floatingInput">Potongan Harga</label>
                         </div>
                     </div>
@@ -580,7 +580,7 @@
         $('.detail-modal').modal('hide');
     });
     // HARGA SATUAN DAN QTY CHANE
-    $('#harga_satuan,#qty,#biaya_tambahan,#diskon').change(function() {
+    $('#harga_satuan,#qty,#biaya_tambahan,#diskon').keyup(function() {
         var hargaSatuan = destroyFormatRupiah($('#harga_satuan').val()) || 0;
         var qty = parseFloat($('#qty').val()) || 1;
         var biayaTambahan = destroyFormatRupiah($('#biaya_tambahan').val()) || 0;
@@ -588,11 +588,11 @@
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
-        $('#total').val(greatFormatRupiah(total));
+        $('#total').val(greatFormatRupiah(total.toFixed(2)));
     });
 
 
-    $('#total').change(function() {
+    $('#total').keyup(function() {
         var qty = parseFloat($('#qty').val()) || 0;
         if (qty === "" || qty === 0) {
             qty = 1;
@@ -601,7 +601,7 @@
         var harga_satuan;
         var total = destroyFormatRupiah($('#total').val()) || 0;
         harga_satuan = total / qty;
-        $('#harga_satuan').val(greatFormatRupiah(harga_satuan));
+        $('#harga_satuan').val(greatFormatRupiah(harga_satuan.toFixed(2)));
     });
 
     // VALIDATOR DETAIL
@@ -706,11 +706,7 @@
             attn: {
                 required: true
             },
-            potongan_harga: {
-                required: true,
-                number: true,
-                min: 0
-            },
+
             direktur: {
                 required: true
             }
@@ -751,11 +747,6 @@
             },
             attn: {
                 required: "ATTN wajib diisi"
-            },
-            potongan_harga: {
-                required: "Isikan angka 0 jika tidak ada potongan",
-                number: "Isikan hanya angka",
-                min: "Masukkan minimal 0"
             },
             direktur: {
                 required: "Direktur wajib diisi"
@@ -836,7 +827,7 @@
                             formData.append("id", id);
                             formData.append("poDate", poDate);
                             formData.append("spp_id", spp_id);
-                            formData.append("potongan_harga", potongan);
+                            formData.append("potongan_harga", destroyFormatRupiah(potongan));
                             formData.append("poNo", poNo);
                             formData.append("divisionID", divisionID);
                             formData.append("supplierID", supplierID);
@@ -929,12 +920,13 @@
                             var consigne = $('#consigne').val();
                             var locationTransaction = $('#location_transaction').val();
                             var note = $('#note').val();
+                            var direktur = $('#direktur').val();
                             // append
                             var formData = new FormData();
                             formData.append("poDate", poDate);
                             formData.append("poNo", poNo);
                             formData.append("spp_id", spp_id);
-                            formData.append("potongan_harga", potongan);
+                            formData.append("potongan_harga", destroyFormatRupiah(potongan));
                             formData.append("divisionID", divisionID);
                             formData.append("supplierID", supplierID);
                             formData.append("paymentDate", paymentDate);
