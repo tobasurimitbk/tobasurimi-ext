@@ -1087,6 +1087,7 @@ class PenerimaanBarangLokalBP extends BaseController
             return view('Warehouse/penerimaanBarangLokal/bahanPenolong/formSingle', $data);
         } else {
             $data['dataSupplier'] = $this->supplierModel->getSupplierByType("BAHAN PENOLONG");
+            $data['dataDivisi'] = $this->divisiModel->getDivisiAccess();
             return view('Warehouse/penerimaanBarangLokal/bahanPenolong/formMultiple', $data);
         }
     }
