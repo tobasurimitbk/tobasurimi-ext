@@ -221,8 +221,7 @@ class CustomerModel extends Model
         $query = $this->asArray()
             ->select('customers.*, customers.sales_id AS salesName')
             ->where('customers.deletedAt', null)
-            ->where('customers.tipe_customer', 'LOKAL')
-            ->where('employees.deletedAt', null);
+            ->where('customers.tipe_customer', 'LOKAL');
     
         if (!$is_admin) {
             $query->where('customers.user_id', $user_id);
