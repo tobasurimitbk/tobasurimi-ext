@@ -467,6 +467,7 @@ class StockDetail2Model extends Model
 
         $selectQry = '
             suppliers.name AS supplier_name,
+            stock.company_id,
             stock.barang1_id,
             stock.barang2_id,
             stock.kemasan_id,

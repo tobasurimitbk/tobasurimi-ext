@@ -1665,56 +1665,55 @@ class BC40 extends BaseController
         return $kodeDokumenbc40Static['value'] . '-' . $kodeKantorStatic . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan;
     }
 
-    public function dropdownSupplier()
-    {
-        $poType = $this->request->getVar('po_type');
+    // public function dropdownSupplier()
+    // {
+    //     $poType = $this->request->getVar('po_type');
 
-        $supplierResult = [];
+    //     $supplierResult = [];
 
-        if (empty($this->request->getVar('po_type'))) {
-            return response()->setJSON([
-                'data' => $supplierResult,
-                'token' => csrf_hash(),
-                'status' => true
-            ]);
-        }
+    //     if (empty($this->request->getVar('po_type'))) {
+    //         return response()->setJSON([
+    //             'data' => $supplierResult,
+    //             'token' => csrf_hash(),
+    //             'status' => true
+    //         ]);
+    //     }
 
+    //     if (!empty($poType)) {
+    //         $poType = str_replace('LOKAL', 'BAHAN', $poType);
+    //         $supplier = $this->supplierModel
+    //             ->where('deletedAt', null)
+    //             ->where('type', $poType)
+    //             ->orderBy('name', "ASC")
+    //             ->findAll();
 
+    //         foreach ($supplier as $s) {
+    //             $result = $this->getListDataPurchaseOrderExport(
+    //                 $this->request->getVar('po_type'),
+    //                 $s['id'],
+    //             );
 
+    //             if (count($result) != 0) {
+    //                 array_push($supplierResult, $s);
+    //             }
+    //         }
 
-        if (!empty($poType)) {
-            $poType = str_replace('LOKAL', 'BAHAN', $poType);
-            $supplier = $this->supplierModel
-                ->where('deletedAt', null)
-                ->where('type', $poType)
-                ->orderBy('name', "ASC")
-                ->findAll();
-
-            foreach ($supplier as $s) {
-                $result = $this->getListDataPurchaseOrderExport(
-                    $this->request->getVar('po_type'),
-                    $s['id'],
-                );
-
-                if (count($result) != 0) {
-                    array_push($supplierResult, $s);
-                }
-            }
-
-            return response()->setJSON([
-                'data' => $supplierResult,
-                'token' => csrf_hash(),
-                'status' => true
-            ]);
-        }
-    }
+    //         return response()->setJSON([
+    //             'data' => $supplierResult,
+    //             'token' => csrf_hash(),
+    //             'status' => true
+    //         ]);
+    //     }
+    // }
 
     public function dropdownPO()
     {
         $supplierId = $this->request->getVar('supplier_id');
         $poType = $this->request->getVar('po_type');
+        $startDate = $this->request->getVar('start_date');
+        $endDate = $this->request->getVar('end_date');
 
-        if (empty($supplierId) || empty($poType)) {
+        if (empty($endDate) || empty($poType)) {
             return response()->setJSON([
                 'data' => [],
                 'token' => csrf_hash(),
@@ -1722,7 +1721,12 @@ class BC40 extends BaseController
             ]);
         }
 
-        $result = $this->getListDataPurchaseOrderExport($poType, $supplierId);
+        if (!empty($startDate)) {
+            $startDate = formatDMYtoYMD($this->request->getVar('start_date'));
+        }
+        $endDate =  formatDMYtoYMD($this->request->getVar('end_date'));
+
+        $result = $this->getListDataPurchaseOrderExport($poType, $supplierId, $startDate, $endDate);
 
         return response()->setJSON([
             'data' => $result,
@@ -1763,7 +1767,7 @@ class BC40 extends BaseController
         $supplierId = $this->request->getVar('supplier_id');
         $poType = $this->request->getVar('po_type');
 
-        $result = $this->getListDataPurchaseOrderExport($poType, $supplierId);
+        $result = $this->getListDataPurchaseOrderExport($poType, $supplierId, '', '');
 
         $data = [
             'result' => $result,
@@ -1784,7 +1788,7 @@ class BC40 extends BaseController
     {
         $supplierId = $this->request->getVar('supplier_id');
         $poType = $this->request->getVar('po_type');
-        $result = $this->getListDataPurchaseOrderExport($poType, $supplierId);
+        $result = $this->getListDataPurchaseOrderExport($poType, $supplierId, '', '');
 
         $filename = "List Purchase Order";
 
@@ -1859,10 +1863,14 @@ class BC40 extends BaseController
         exit();
     }
 
-    public function getListDataPurchaseOrderExport($poType, $supplierId, $isAll = false)
+    public function getListDataPurchaseOrderExport($poType, $supplierId, $startDate, $endDate, $isAll = false)
     {
         // GET PO YANG SUDAH DIGUNAKAN & POSTING
-        $lpbUsed = $this->bcPurchaseOrderModel->where('supplier_id', $supplierId)->where('po_type', $poType)->where('deletedAt', null)->findAll();
+        $lpbUsed = $this->bcPurchaseOrderModel
+            ->where('supplier_id', $supplierId)
+            ->where('po_type', $poType)
+            ->where('deletedAt', null)
+            ->findAll();
         $lpbUsedArr = [];
 
         foreach ($lpbUsed as $p) {
@@ -1876,12 +1884,13 @@ class BC40 extends BaseController
 
         if ($poType == "LOKAL BAKU") {
             // PO LOKAL BAHAN BAKU
-            $po = $this->penerimaanBarangModel
+            $poQry = $this->penerimaanBarangModel
                 ->select('
                     penerimaan_barang.id,
                     penerimaan_barang.tanggal AS lpb_date,
                     penerimaan_barang.no_penerimaan_barang,
                     penerimaan_barang_detail.purchase_order_id,
+                    suppliers.name as supplier_name,
                     SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
                     SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                     SUM(penerimaan_barang_detail.qty) AS qty_po,
@@ -1894,26 +1903,41 @@ class BC40 extends BaseController
                 ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('rm_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
+                ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "LOKAL")
                 ->where('penerimaan_barang.tipe_bahan', "BAKU")
-                ->where('penerimaan_barang.supplier_id', $supplierId)
                 ->where('penerimaan_barang.bc_type', '53')
                 ->where('penerimaan_barang.deletedAt', null)
                 ->where('penerimaan_barang_detail.deletedAt', null)
-                ->where('penerimaan_barang.company_id', $this->this_company_id)
-                ->orderBy('penerimaan_barang.createdAt', "DESC")
+                ->where('penerimaan_barang.company_id', $this->this_company_id);
+
+            if (!empty($supplierId) || $supplierId != "") {
+                $poQry->where('penerimaan_barang.supplier_id', $supplierId);
+            }
+
+            $poQry->orderBy('rm_purchase_orders.po_date', "DESC")
                 ->groupBy('barang_id')
-                ->groupBy('id')
-                ->findAll();
+                ->groupBy('id');
+
+            if (!empty($startDate) || $startDate != '') {
+                $poQry->having('rm_purchase_orders.po_date >=', $startDate);
+            }
+
+            if (!empty($endDate) || $endDate != '') {
+                $poQry->having('rm_purchase_orders.po_date <=', $endDate);
+            }
+
+            $po = $poQry->findAll();
         } else if ($poType == "LOKAL PENOLONG") {
             // PO LOKAL BAHAN PENOLONG
-            $po = $this->penerimaanBarangModel
+            $poQry = $this->penerimaanBarangModel
                 ->select('
                 penerimaan_barang.id,
                 penerimaan_barang.tanggal AS lpb_date,
                 penerimaan_barang.no_penerimaan_barang,
                 penerimaan_barang_detail.purchase_order_id,
+                suppliers.name as supplier_name,
                 SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
                 SUM(penerimaan_barang_detail.qty) AS qty_po,
                 SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
@@ -1926,26 +1950,41 @@ class BC40 extends BaseController
             ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
+                ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "LOKAL")
                 ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
-                ->where('penerimaan_barang.supplier_id', $supplierId)
                 ->where('penerimaan_barang.bc_type', '53')
                 ->where('penerimaan_barang.deletedAt', null)
                 ->where('penerimaan_barang_detail.deletedAt', null)
-                ->where('penerimaan_barang.company_id', $this->this_company_id)
-                ->orderBy('penerimaan_barang.createdAt', "DESC")
+                ->where('penerimaan_barang.company_id', $this->this_company_id);
+
+            if (!empty($supplierId) || $supplierId != "") {
+                $poQry->where('penerimaan_barang.supplier_id', $supplierId);
+            }
+
+            $poQry->orderBy('am_purchase_orders.po_date', "DESC")
                 ->groupBy('barang_id')
-                ->groupBy('id')
-                ->findAll();
+                ->groupBy('id');
+
+            if (!empty($startDate) || $startDate != '') {
+                $poQry->having('am_purchase_orders.po_date >=', $startDate);
+            }
+
+            if (!empty($endDate) || $endDate != '') {
+                $poQry->having('am_purchase_orders.po_date <=', $endDate);
+            }
+
+            $po = $poQry->findAll();
         } elseif ($poType == "IMPORT BAKU") {
             // PO IMPORT BAHAN BAKU
-            $po = $this->penerimaanBarangModel
+            $poQry = $this->penerimaanBarangModel
                 ->select('
                     penerimaan_barang.id,
                     penerimaan_barang.tanggal AS lpb_date,
                     penerimaan_barang.no_penerimaan_barang,
                     penerimaan_barang_detail.purchase_order_id,
+                    suppliers.name as supplier_name,
                     SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
                     SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                     SUM(penerimaan_barang_detail.qty) AS qty_po,
@@ -1958,26 +1997,41 @@ class BC40 extends BaseController
                 ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('rm_import_pos', 'penerimaan_barang_detail.purchase_order_id = rm_import_pos.id', 'left')
+                ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "IMPORT")
                 ->where('penerimaan_barang.tipe_bahan', "BAKU")
-                ->where('penerimaan_barang.supplier_id', $supplierId)
                 ->where('penerimaan_barang.bc_type', '48')
                 ->where('penerimaan_barang.deletedAt', null)
                 ->where('penerimaan_barang_detail.deletedAt', null)
-                ->where('penerimaan_barang.company_id', $this->this_company_id)
-                ->orderBy('penerimaan_barang.createdAt', "DESC")
+                ->where('penerimaan_barang.company_id', $this->this_company_id);
+
+            if (!empty($supplierId) || $supplierId != "") {
+                $poQry->where('penerimaan_barang.supplier_id', $supplierId);
+            }
+
+            $poQry->orderBy('rm_import_pos.po_date', "DESC")
                 ->groupBy('barang_id')
-                ->groupBy('id')
-                ->findAll();
+                ->groupBy('id');
+
+            if (!empty($startDate) || $startDate != '') {
+                $poQry->having('rm_import_pos.po_date >=', $startDate);
+            }
+
+            if (!empty($endDate) || $endDate != '') {
+                $poQry->having('rm_import_pos.po_date <=', $endDate);
+            }
+
+            $po = $poQry->findAll();
         } elseif ($poType == "IMPORT PENOLONG") {
             // PO IMPORT BAHAN PENOLONG
-            $po = $this->penerimaanBarangModel
+            $poQry = $this->penerimaanBarangModel
                 ->select('
                 penerimaan_barang.id,
                 penerimaan_barang.tanggal AS lpb_date,
                 penerimaan_barang.no_penerimaan_barang,
                 penerimaan_barang_detail.purchase_order_id,
+                suppliers.name as supplier_name,
                 SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
                 SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                 SUM(penerimaan_barang_detail.qty) AS qty_po,
@@ -1990,18 +2044,32 @@ class BC40 extends BaseController
             ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
+                ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "IMPORT")
                 ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
-                ->where('penerimaan_barang.supplier_id', $supplierId)
                 ->where('penerimaan_barang.bc_type', '48')
                 ->where('penerimaan_barang.deletedAt', null)
                 ->where('penerimaan_barang_detail.deletedAt', null)
-                ->where('penerimaan_barang.company_id', $this->this_company_id)
-                ->orderBy('penerimaan_barang.createdAt', "DESC")
+                ->where('penerimaan_barang.company_id', $this->this_company_id);
+
+            if (!empty($supplierId) || $supplierId != "") {
+                $poQry->where('penerimaan_barang.supplier_id', $supplierId);
+            }
+
+            $poQry->orderBy('am_purchase_orders.po_date', "DESC")
                 ->groupBy('barang_id')
-                ->groupBy('id')
-                ->findAll();
+                ->groupBy('id');
+
+            if (!empty($startDate) || $startDate != '') {
+                $poQry->having('am_purchase_orders.po_date >=', $startDate);
+            }
+
+            if (!empty($endDate) || $endDate != '') {
+                $poQry->having('am_purchase_orders.po_date <=', $endDate);
+            }
+
+            $po = $poQry->findAll();
         }
 
         foreach ($po as $p) {
@@ -2019,7 +2087,8 @@ class BC40 extends BaseController
                     'barang_name' => $p['barang_name'],
                     'kode_barang' => $p['kode_barang'],
                     'harga' => number_format($p['sub_total'], 2),
-                    'harga_number' => $p['sub_total']
+                    'harga_number' => $p['sub_total'],
+                    'supplier_name' => $p['supplier_name']
                 ];
             } else {
                 if (!in_array($p['id'], $lpbUsedArr)) {
@@ -2036,7 +2105,8 @@ class BC40 extends BaseController
                         'barang_name' => $p['barang_name'],
                         'kode_barang' => $p['kode_barang'],
                         'harga' => number_format($p['sub_total'], 2),
-                        'harga_number' => $p['sub_total']
+                        'harga_number' => $p['sub_total'],
+                        'supplier_name' => $p['supplier_name']
                     ];
                 }
             }
@@ -2463,5 +2533,31 @@ class BC40 extends BaseController
                 'token' => csrf_hash()
             ]);
         }
+    }
+
+    public function dropdownSupplier()
+    {
+        $poType = $this->request->getVar('po_type');
+        if (empty($poType)) {
+            return response()->setJSON([
+                'token' => csrf_token(),
+                'data' => [],
+                'status' => true
+            ]);
+        }
+
+        if ($poType == "LOKAL BAKU") {
+            // Supplier Lokal Bahan Baku
+            $supplierData = $this->supplierModel->getSupplierByType("BAHAN BAKU");
+        } else {
+            // Supplier Lokal Bahan Penolong
+            $supplierData = $this->supplierModel->getSupplierByType("BAHAN PENOLONG");
+        }
+
+        return response()->setJSON([
+            'token' => csrf_token(),
+            'data' => $supplierData,
+            'status' => true,
+        ]);
     }
 }

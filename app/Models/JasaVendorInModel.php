@@ -124,6 +124,7 @@ class JasaVendorInModel extends Model
         $metaDataModel = new MetadataModel();
         $stockDetail2Model = new StockDetail2Model();
         $supplierModel = new SupplierModel();
+        $rmPurchaseOrderModel = new RMPurchaseOrderModel();
 
         $jasaVendorOutData = $jasaVendorOutDetailModel->whereIn('jasa_vendor_out_id', $jasaVendorOutArr)->where('deletedAt', null)->findAll();
         $result = array();
@@ -153,13 +154,17 @@ class JasaVendorInModel extends Model
                 ->where('penerimaan_barang.no_penerimaan_barang', $noLpb)
                 ->first();
 
+            $rmPurchaseOrder = $rmPurchaseOrderModel->where('po_no', $j['stock_dokumen'])
+                ->where('company_id', $stockListOutDetail['company_id'])
+                ->first();
+
             if ($jasaVendorInID == null) {
                 $result[] = [
                     'jasa_vendor_out_detail_id' => $j['id'],
                     'jasa_vendor_out_id' => $j['jasa_vendor_out_id'],
                     'barang1_id' => $stockListOutDetail != null ? $stockListOutDetail['barang1_id'] : 0,
                     'stock_out_id' => $j['stock_out_id'],
-                    'stock_date' => $stockListOutDetail != null ? date('d/m/Y', strtotime($stockListOutDetail['stock_date'])) : "-",
+                    'stock_date' => $rmPurchaseOrder != null ? date('d/m/Y', strtotime($rmPurchaseOrder['po_date'])) : "-",
                     'tipe_barang' => $stockBarangOut != null ? strtoupper(str_replace('_', ' ', $stockBarangOut['tipe_barang'])) : "",
                     'supplier_name' => $supplier != null ? strtoupper($supplier['name']) : '-',
                     'bc_name' => $bc != null ? $bc['value'] : 'NON PABEAN',
@@ -180,7 +185,7 @@ class JasaVendorInModel extends Model
                         'jasa_vendor_out_id' => $j['jasa_vendor_out_id'],
                         'barang1_id' => $stockListOutDetail != null ? $stockListOutDetail['barang1_id'] : 0,
                         'stock_out_id' => (string)$j['stock_out_id'],
-                        'stock_date' => $stockListOutDetail != null ? date('d/m/Y', strtotime($stockListOutDetail['stock_date'])) : "-",
+                        'stock_date' => $rmPurchaseOrder != null ? date('d/m/Y', strtotime($rmPurchaseOrder['po_date'])) : "-",
                         'tipe_barang' => $stockBarangOut != null ? strtoupper(str_replace('_', ' ', $stockBarangOut['tipe_barang'])) : "",
                         'supplier_name' => $supplier != null ? strtoupper($supplier['name']) : '-',
                         'bc_name' => $bc != null ? $bc['value'] : 'NON PABEAN',

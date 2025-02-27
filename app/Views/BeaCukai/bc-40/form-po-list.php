@@ -26,7 +26,7 @@
     </div>
 
     <div class="card">
-        <div class="card-header" style="font-weight: bold; color:black;">
+        <div class="card-header" style="font-weight: bold;  <?= session()->get('theme') == 'dark' ? 'color:white;' : 'color:black;' ?>">
             DATA BARANG UNTUK PEMBUATAN DOKUMEN BEA CUKAI 4.0
         </div>
         <div class="card-body">
@@ -94,6 +94,34 @@
                 <div class="row mt-3">
                     <div class="col mb-3">
                         <label class="form-label font-weight-bold lable-title">Daftar Purchase Order yang Belum Dibuat Dokumen Bea Cukai</label>
+                        <div class="row mt-3">
+                            <div class="col-sm-3">
+                                <div class="form-floating mb-2 mt-1" style="height: 50px;">
+                                    <div class="input-group input-group-password">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input autocomplete="one-time-code" class="form-control input-picker start_date" id="start_date" name="start_date" placeholder="Tanggal Mulai PO" value="">
+                                            <label for="floatingInput">Filter Tanggal Mulai PO</label>
+                                        </div>
+                                        <div class="input-group-prepend group-prepend-password align-items-center">
+                                            <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-floating mt-1" style="height: 50px;">
+                                    <div class="input-group input-group-password">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input autocomplete="one-time-code" class="form-control input-picker end_date" id="end_date" name="end_date" placeholder="Tanggal Selesai PO" value="<?= date('d/m/Y') ?>">
+                                            <label for="floatingInput">Filter Tanggal Selesai PO</label>
+                                        </div>
+                                        <div class="input-group-prepend group-prepend-password align-items-center">
+                                            <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-12 col-table-button-tts">
                         <div class="table-responsive">
@@ -257,6 +285,18 @@
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
     }).change(function() {});
+
+    $(".start_date,.end_date").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    $('#start_date,#end_date').change(function() {
+        getListPurchaseOrderNotUsed();
+
+    })
 
     var dataTable1 = $('#dataTable1').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -528,6 +568,8 @@
             data: {
                 po_type: "<?= $bcPo['po_type'] ?>",
                 supplier_id: "<?= $bcPo['supplier_id'] ?>",
+                start_date: $(".start_date").val(),
+                end_date: $('#end_date').val()
             },
             dataType: "json",
             success: function(res) {

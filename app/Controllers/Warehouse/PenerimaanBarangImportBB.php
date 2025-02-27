@@ -117,6 +117,8 @@ class PenerimaanBarangImportBB extends BaseController
             "status" => $this->request->getVar("status"),
             "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "note" => strtolower($this->request->getVar('note')),
+            "nama_barang" => strtolower($this->request->getVar('nama_barang'))
         ];
 
         $limit = $this->request->getVar("length");
@@ -182,6 +184,8 @@ class PenerimaanBarangImportBB extends BaseController
             "status" => $this->request->getVar("status"),
             "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "note" => strtolower($this->request->getVar('note')),
+            "nama_barang" => strtolower($this->request->getVar('nama_barang'))
         ];
 
         $penerimaanBarangData = $this->penerimaanBarangModel->getPenerimaanBarangList($condition, $addCondition, 100000000, 0);
@@ -236,6 +240,8 @@ class PenerimaanBarangImportBB extends BaseController
             "status" => $this->request->getVar("status"),
             "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "note" => strtolower($this->request->getVar('note')),
+            "nama_barang" => strtolower($this->request->getVar('nama_barang'))
         ];
 
         $penerimaanBarangData = $this->penerimaanBarangModel->getPenerimaanBarangList($condition, $addCondition, 100000000, 0);

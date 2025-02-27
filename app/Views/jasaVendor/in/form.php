@@ -182,7 +182,7 @@
                                     <th style="text-align: center;">Asal Barang</th>
                                     <th style="text-align: center;">No Dokumen</th>
                                     <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">Tgl Penerimaan</th>
+                                    <th style="text-align: center;">Tgl PO</th>
                                     <th style="text-align: center;">Supplier</th>
 
 

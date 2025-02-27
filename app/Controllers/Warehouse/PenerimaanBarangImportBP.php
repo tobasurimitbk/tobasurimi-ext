@@ -127,6 +127,8 @@ class PenerimaanBarangImportBP extends BaseController
             "status" => $this->request->getVar("status"),
             "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "note" => strtolower($this->request->getVar('note')),
+            "nama_barang" => strtolower($this->request->getVar('nama_barang'))
         ];
 
         $limit = $this->request->getVar("length");
@@ -192,6 +194,8 @@ class PenerimaanBarangImportBP extends BaseController
             "status" => $this->request->getVar("status"),
             "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "note" => strtolower($this->request->getVar('note')),
+            "nama_barang" => strtolower($this->request->getVar('nama_barang'))
         ];
 
         $penerimaanBarangData = $this->penerimaanBarangModel->getPenerimaanBarangList($condition, $addCondition, 100000000, 0);
@@ -236,7 +240,9 @@ class PenerimaanBarangImportBP extends BaseController
             "penerimaan_barang.status_penerimaan" => "IMPORT",
             "penerimaan_barang.deletedAt" => null,
             "penerimaan_barang_detail.deletedAt" => null,
-            "tipe_bahan" => "PENOLONG"
+            "tipe_bahan" => "PENOLONG",
+            "note" => strtolower($this->request->getVar('note')),
+            "nama_barang" => strtolower($this->request->getVar('nama_barang'))
         ];
 
         $addCondition = [

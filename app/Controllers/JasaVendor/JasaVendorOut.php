@@ -11,6 +11,7 @@ use App\Models\JasaVendorOutModel;
 use App\Models\KemasanModel;
 use App\Models\MetadataModel;
 use App\Models\ProsesRebusModel;
+use App\Models\RMPurchaseOrderModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
@@ -39,6 +40,7 @@ class JasaVendorOut extends BaseController
     protected $satuanModel;
     protected $supplierModel;
     protected $prosesRebusModel;
+    protected $rmPurchaseOrderModel;
     protected $dompdf;
 
     public function __construct()
@@ -60,6 +62,7 @@ class JasaVendorOut extends BaseController
         $this->satuanModel = new SatuansModel();
         $this->supplierModel = new SupplierModel();
         $this->prosesRebusModel = new ProsesRebusModel();
+        $this->rmPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -496,12 +499,16 @@ class JasaVendorOut extends BaseController
             for ($i = 0; $i < count($dataResult); $i++) {
                 $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
 
+                $rmPurchaseOrder = $this->rmPurchaseOrderModel->where('po_no', $dataResult[$i]['stock_dokumen'])
+                    ->where('company_id', $stock['company_id'])
+                    ->first();
+
                 $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
                 $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
                 $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
                 $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
                 $dataResult[$i]['barang'] = strtoupper($barangName);
-                $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+                $dataResult[$i]['stock_date'] = $rmPurchaseOrder == null ? "-" : date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
                 $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
                 $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
                 $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));

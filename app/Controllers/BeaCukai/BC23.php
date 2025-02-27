@@ -1937,40 +1937,58 @@ class BC23 extends BaseController
         return $kodeDokumenBC23Static['value'] . '-' . $kodeKantorStatic . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan;
     }
 
+    // public function dropdownSupplier()
+    // {
+    //     $poType = "INTERNASIONAL";
+    //     $supplier = $this->supplierModel
+    //         ->where('deletedAt', null)
+    //         ->where('type', $poType)
+    //         ->orderBy('name', "ASC")
+    //         ->findAll();
+
+    //     $supplierResult = [];
+
+    //     if (empty($this->request->getVar('po_type'))) {
+    //         return response()->setJSON([
+    //             'data' => $supplierResult,
+    //             'token' => csrf_hash(),
+    //             'status' => true
+    //         ]);
+    //     }
+
+    //     foreach ($supplier as $s) {
+    //         $result = $this->bc40Controller->getListDataPurchaseOrderExport(
+    //             $this->request->getVar('po_type'),
+    //             $s['id'],
+    //         );
+
+    //         if (count($result) != 0) {
+    //             array_push($supplierResult, $s);
+    //         }
+    //     }
+
+    //     return response()->setJSON([
+    //         'data' => $supplierResult,
+    //         'token' => csrf_hash(),
+    //         'status' => true
+    //     ]);
+    // }
+
     public function dropdownSupplier()
     {
-        $poType = "INTERNASIONAL";
-        $supplier = $this->supplierModel
-            ->where('deletedAt', null)
-            ->where('type', $poType)
-            ->orderBy('name', "ASC")
-            ->findAll();
-
-        $supplierResult = [];
-
-        if (empty($this->request->getVar('po_type'))) {
+        $poType = $this->request->getVar('po_type');
+        if (empty($poType)) {
             return response()->setJSON([
-                'data' => $supplierResult,
-                'token' => csrf_hash(),
+                'token' => csrf_token(),
+                'data' => [],
                 'status' => true
             ]);
         }
-
-        foreach ($supplier as $s) {
-            $result = $this->bc40Controller->getListDataPurchaseOrderExport(
-                $this->request->getVar('po_type'),
-                $s['id'],
-            );
-
-            if (count($result) != 0) {
-                array_push($supplierResult, $s);
-            }
-        }
-
+        $supplierData = $this->supplierModel->getSupplierByType("INTERNASIONAL");
         return response()->setJSON([
-            'data' => $supplierResult,
-            'token' => csrf_hash(),
-            'status' => true
+            'token' => csrf_token(),
+            'data' => $supplierData,
+            'status' => true,
         ]);
     }
 
@@ -1979,7 +1997,7 @@ class BC23 extends BaseController
         $supplierId = $this->request->getVar('supplier_id');
         $poType = $this->request->getVar('po_type');
 
-        $result = $this->bc40Controller->getListDataPurchaseOrderExport($poType, $supplierId);
+        $result = $this->bc40Controller->getListDataPurchaseOrderExport($poType, $supplierId, '', '');
 
         $data = [
             'result' => $result,

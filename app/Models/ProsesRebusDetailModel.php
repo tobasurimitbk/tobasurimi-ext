@@ -50,6 +50,7 @@ class ProsesRebusDetailModel extends Model
         $kemasanModel = new KemasanModel();
         $metaDataModel = new MetadataModel();
         $supplierModel = new SupplierModel();
+        $rmPurchaseOrderModel = new RMPurchaseOrderModel();
 
         $result = array();
         $prosesRebusDetail = $this->asArray()->where('proses_rebus_id', $prosesRebusID)->findAll();
@@ -94,6 +95,8 @@ class ProsesRebusDetailModel extends Model
                 ->where('penerimaan_barang.no_penerimaan_barang', $stockList['no_dokumen_1'])
                 ->first();
 
+            $rmPurchaseOrder = $rmPurchaseOrderModel->where('po_no', $m['stock_dokumen'])->where('company_id', $stockList['company_id'])->first();
+
             $stockList['qty'] = $m['qty_rebus'];
             $bcType = $metaDataModel->find($stockList['bc_id']);
             $stockList['no_aju'] =  $stockList['no_aju'] == "-" ? "-" : $stockList['no_aju'];
@@ -104,7 +107,7 @@ class ProsesRebusDetailModel extends Model
             $stockList['type_barang'] = $stock['tipe_barang'];
             $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
             $stockList['stok_total'] = ($stockList['stok_total']);
-            $stockList['stock_date'] = date('d/m/Y', strtotime($stockList['stock_date']));
+            $stockList['stock_date'] = $rmPurchaseOrder == null ? "" :  date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
             $stockList['supplier_name'] = $supplier != null ? strtoupper($supplier['name']) : "-";
             $stockList['output'] = [
                 'barang' => $barangNameOutput,
