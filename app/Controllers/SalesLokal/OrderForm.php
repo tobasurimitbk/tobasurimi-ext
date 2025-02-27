@@ -94,7 +94,7 @@ class OrderForm extends BaseController
         $dataBanks = $this->BanksModel->search_list(array(), 'name');
         $dataSatuan = $this->satuanModel->findAll();
         //Get Customers
-        $customers = $this->CustomerModel->getCustomerLokal($this->userId);
+        $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->is_admin);
         $condition = [
             'jabatan_name' => "SALES LOKAL"
         ];
@@ -1053,7 +1053,7 @@ class OrderForm extends BaseController
 
     public function dropdownCustomer()
     {
-        $dataCustomer = $this->CustomerModel->getCustomerLokal($this->userId);
+        $dataCustomer = $this->CustomerModel->getCustomerLokal($this->userId, $this->is_admin);
         return response()->setJSON([
             'data' => $dataCustomer,
             'token' => csrf_hash(),
