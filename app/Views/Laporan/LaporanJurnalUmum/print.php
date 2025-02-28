@@ -56,10 +56,15 @@
       style=" margin-top: -20px;">
     <thead>
       <tr>
-        <th colspan="2">Tanggal</th>
-        <th colspan="2">Desc</th>
-        <th>Debit</th>
-        <th>Kredit</th>
+        <th data-sortable="false" width="10%">Tanggal</th>
+        <th data-sortable="false">Department</th>
+        <th data-sortable="false" colspan="2">Desc</th>
+        <th data-sortable="false">Reference</th>
+        <th data-sortable="false">Supplier</th>
+        <th data-sortable="false">Currency</th>
+        <th data-sortable="false">Exchange Rate</th>
+        <th data-sortable="false">Debit</th>
+        <th data-sortable="false">Kredit</th>
       </tr>
     </thead>
     <tbody>
@@ -72,17 +77,8 @@
       $flag = 0;
       foreach ($dataMetadataTipeTransaksi as $Tipe) :
         foreach ($dataTransaksiJurnal as $transaksiJurnalData) :
-          foreach ($dataJurnalUmumWithGroup as $jurnalUmumWithGroupData) :
-            if ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
       ?>
-              <tr data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>">
-                <td colspan="2"><?= date('d-m-Y', strtotime($jurnalUmumWithGroupData->tanggal_jurnal)); ?></td>
-                <td colspan="4"><?= $jurnalUmumWithGroupData->no_transaksi . " " . $jurnalUmumWithGroupData->value; ?></td>
-              </tr>
-            <?php
-            endif;
-          endforeach;
-          // kategori
+          <?php
           $total_debit  = 0;
           $total_kredit = 0;
           foreach ($dataJurnalUmum as $jurnalUmumData) :
@@ -90,10 +86,15 @@
             $total_debit  += $jurnalUmumData->debit;
             $total_kredit += $jurnalUmumData->kredit;
             if ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
-            ?>
-              <tr data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>">
-                <td colspan="2"></td>
+          ?>
+              <tr data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>">
+                <td><?= date('d-m-Y', strtotime($jurnalUmumData->tanggal_jurnal)); ?></td>
+                <td><?= $jurnalUmumData->nama_divisi; ?></td>
                 <td colspan="2"><?= $jurnalUmumData->no_sub . " - " . $jurnalUmumData->nama_sub; ?></td>
+                <td></td>
+                <td></td>
+                <td><?= format_ribuan($jurnalUmumData->debit + $jurnalUmumData->kredit) . $jurnalUmumData->valas; ?></td>
+                <td><?= $jurnalUmumData->exchange_rate; ?></td>
                 <td class="yy"><?= format_ribuan($jurnalUmumData->debit); ?></td>
                 <td class="xx"><?= format_ribuan($jurnalUmumData->kredit); ?></td>
               </tr>
@@ -107,9 +108,9 @@
     </tbody>
     <tfoot>
       <tr>
-        <td colspan="4"><strong>Total Transaksi</strong></td>
-        <td id="jumlahDebet"><?= ($flag != 0) ? format_ribuan($total_debit) :  format_ribuan(0); ?></td>
-        <td id="jumlahKredit"><?= ($flag != 0) ? format_ribuan($total_kredit) : format_ribuan(0); ?></td>
+        <td colspan="8"><strong>Total Transaksi</strong></td>
+        <td id="jumlahDebet"><strong><?= ($flag != 0) ? format_ribuan($total_debit) :  format_ribuan(0); ?></strong></td>
+        <td id="jumlahKredit"><strong><?= ($flag != 0) ? format_ribuan($total_kredit) : format_ribuan(0); ?></strong></td>
       </tr>
     </tfoot>
   </table>
