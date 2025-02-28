@@ -953,12 +953,6 @@
                         title: "Jenis kemasan wajib diisi",
                         confirmButtonColor: '#4e73df',
                     })
-                } else if (!jumlah_kemasan) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: "Jumlah kemasan wajib diisi",
-                        confirmButtonColor: '#4e73df',
-                    })
                 } else if (validate_item) {
                     Swal.fire({
                         icon: 'error',
