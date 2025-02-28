@@ -94,10 +94,15 @@ class JurnalUmum extends BaseController
         }
         $dataJurnalUmum = $this->jurnalUmumModel
             ->asObject()
-            ->select('*, sub_akuns.header_id as id_header')
+            ->select('*, sub_akuns.header_id as id_header, 
+                CASE 
+                    WHEN jurnal_umum.divisi_id = 0 THEN "ALL" 
+                    ELSE COALESCE(divisis.divisi, "ALL") 
+                END as nama_divisi')
             ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
+            ->join('divisis', 'jurnal_umum.divisi_id = divisis.id', 'left')
             ->where($condition)
             ->findAll();
         $dataJurnalUmumWithGroup = $this->jurnalUmumModel
@@ -197,27 +202,22 @@ class JurnalUmum extends BaseController
         }
         $dataJurnalUmum = $this->jurnalUmumModel
             ->asObject()
-            ->select('*, sub_akuns.header_id as id_header')
+            ->select('*, sub_akuns.header_id as id_header, 
+                CASE 
+                    WHEN jurnal_umum.divisi_id = 0 THEN "ALL" 
+                    ELSE COALESCE(divisis.divisi, "ALL") 
+                END as nama_divisi')
             ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
+            ->join('divisis', 'jurnal_umum.divisi_id = divisis.id', 'left')
             ->where($condition)
-            ->findAll();
-        $dataJurnalUmumWithGroup = $this->jurnalUmumModel
-            ->asObject()
-            ->select('*, sub_akuns.header_id as id_header, jurnal_umum.id_transaksi as trans_id, transaksi_jurnal.valas as valas, transaksi_jurnal.exchange_rate as exchange_rate')
-            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
-            ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
-            ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
-            ->where($condition)
-            ->groupBy('trans_id')
             ->findAll();
         // var_dump($dataJurnalUmumWithGroup);
 
         $data = [
             "dataTransaksiJurnal" => $dataTransaksiJurnal,
             "dataJurnalUmum" => $dataJurnalUmum,
-            "dataJurnalUmumWithGroup" => $dataJurnalUmumWithGroup,
             "dataMetadataTipeTransaksi" => $dataMetadataTipeTransaksi,
             "dateStart" => $dateStart ? date("d/m/Y", strtotime($dateStart)) : date('d/m/Y'),
             "dateEnd" => $dateEnd ? date("d/m/Y", strtotime($dateEnd)) : date('d/m/Y'),
@@ -282,10 +282,14 @@ class JurnalUmum extends BaseController
 
         $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue('A1', 'Tanggal')
+            ->setCellValue('B1', 'Department')
             ->setCellValue('C1', 'Description')
-            ->setCellValue('E1', 'Debit')
-            ->setCellValue('F1', 'Kredit');
-        $spreadsheet->getActiveSheet()->mergeCells('A1:B1');
+            ->setCellValue('E1', 'Reference')
+            ->setCellValue('F1', 'Supplier')
+            ->setCellValue('G1', 'Currency')
+            ->setCellValue('H1', 'Exchange Rate')
+            ->setCellValue('I1', 'Debit')
+            ->setCellValue('J1', 'Kredit');
         $spreadsheet->getActiveSheet()->mergeCells('C1:D1');
 
         $dataMetadataTipeTransaksi = $this->MetadataModel
@@ -298,20 +302,16 @@ class JurnalUmum extends BaseController
             ->findAll();
         $dataJurnalUmum = $this->jurnalUmumModel
             ->asObject()
-            ->select('*, sub_akuns.header_id as id_header')
+            ->select('*, sub_akuns.header_id as id_header, 
+                    CASE 
+                        WHEN jurnal_umum.divisi_id = 0 THEN "ALL" 
+                        ELSE COALESCE(divisis.divisi, "ALL") 
+                    END as nama_divisi')
             ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
+            ->join('divisis', 'jurnal_umum.divisi_id = divisis.id', 'left')
             ->where($condition)
-            ->findAll();
-        $dataJurnalUmumWithGroup = $this->jurnalUmumModel
-            ->asObject()
-            ->select('*, sub_akuns.header_id as id_header, jurnal_umum.id_transaksi as trans_id, transaksi_jurnal.valas as valas, transaksi_jurnal.exchange_rate as exchange_rate')
-            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
-            ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
-            ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
-            ->where($condition)
-            ->groupBy('trans_id')
             ->findAll();
 
         function format_ribuan($nilai)
@@ -323,17 +323,6 @@ class JurnalUmum extends BaseController
         $column = 2;
         foreach ($dataMetadataTipeTransaksi as $Tipe) :
             foreach ($dataTransaksiJurnal as $transaksiJurnalData) :
-                foreach ($dataJurnalUmumWithGroup as $jurnalUmumWithGroupData) :
-                    if ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
-                        $spreadsheet->setActiveSheetIndex(0)
-                            ->setCellValue('A' . $column, date('d-m-Y', strtotime($jurnalUmumWithGroupData->tanggal_jurnal)))
-                            ->setCellValue('C' . $column, $jurnalUmumWithGroupData->no_transaksi . " " . $jurnalUmumWithGroupData->value);
-                        $spreadsheet->getActiveSheet()->mergeCells('A' . $column . ':B' . $column);
-                        $spreadsheet->getActiveSheet()->mergeCells('C' . $column . ':F' . $column);
-                        $column++;
-                    endif;
-                endforeach;
-                // kategori
                 $total_debit  = 0;
                 $total_kredit = 0;
                 foreach ($dataJurnalUmum as $jurnalUmumData) :
@@ -342,11 +331,15 @@ class JurnalUmum extends BaseController
                     $total_kredit += $jurnalUmumData->kredit;
                     if ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
                         $spreadsheet->setActiveSheetIndex(0)
-                            ->setCellValue('A' . $column, '')
+                            ->setCellValue('A' . $column, $jurnalUmumData->tanggal_jurnal)
+                            ->setCellValue('B' . $column, $jurnalUmumData->nama_divisi)
                             ->setCellValue('C' . $column, $jurnalUmumData->no_sub . " - " . $jurnalUmumData->nama_sub)
-                            ->setCellValue('E' . $column, format_ribuan($jurnalUmumData->debit))
-                            ->setCellValue('F' . $column, format_ribuan($jurnalUmumData->kredit));
-                        $spreadsheet->getActiveSheet()->mergeCells('A' . $column . ':B' . $column);
+                            ->setCellValue('E' . $column, '')
+                            ->setCellValue('F' . $column, '')
+                            ->setCellValue('G' . $column, format_ribuan($jurnalUmumData->debit + $jurnalUmumData->kredit))
+                            ->setCellValue('H' . $column, $jurnalUmumData->exchange_rate)
+                            ->setCellValue('I' . $column, format_ribuan($jurnalUmumData->debit))
+                            ->setCellValue('J' . $column, format_ribuan($jurnalUmumData->kredit));
                         $spreadsheet->getActiveSheet()->mergeCells('C' . $column . ':D' . $column);
                         $column++;
                     endif;

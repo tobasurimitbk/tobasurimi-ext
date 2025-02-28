@@ -101,8 +101,13 @@
                     <table class="table table-hover" id="myTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
-                                <th data-sortable="false" colspan="2">Tanggal</th>
+                                <th data-sortable="false" width="10%">Tanggal</th>
+                                <th data-sortable="false">Department</th>
                                 <th data-sortable="false" colspan="2">Desc</th>
+                                <th data-sortable="false">Reference</th>
+                                <th data-sortable="false">Supplier</th>
+                                <th data-sortable="false">Currency</th>
+                                <th data-sortable="false">Exchange Rate</th>
                                 <th data-sortable="false">Debit</th>
                                 <th data-sortable="false">Kredit</th>
                             </tr>
@@ -123,17 +128,8 @@
                                             <!-- <tr onclick="updateJurnal('<?= ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->id_transaksi_hex : 0; ?>')" data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>"> -->
                                             <tr data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>">
                                                 <td colspan="2"><?= date('d-m-Y', strtotime($jurnalUmumWithGroupData->tanggal_jurnal)); ?></td>
-                                                <td colspan="4">
-                                                    <span class="badge badge-primary">
-                                                        <?= $jurnalUmumWithGroupData->no_bukti ?>
-                                                    </span>
-                                                    <span class="badge badge-warning">
-                                                        <?= $jurnalUmumWithGroupData->keterangan; ?>
-                                                    </span>
-                                                    <span class="badge badge-info">
-                                                        <?= $jurnalUmumWithGroupData->valas . '(' . $jurnalUmumWithGroupData->exchange_rate . ')'; ?>
-                                                    </span>
-                                                </td>
+                                                <!-- <td></td> -->
+                                                <td colspan="8"> <?= $jurnalUmumWithGroupData->no_bukti . ' - ' . $jurnalUmumWithGroupData->keterangan; ?></td>
                                             </tr>
                                         <?php
                                         endif;
@@ -149,8 +145,13 @@
                                         ?>
                                             <!-- <tr onclick="updateJurnal('<?= ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->id_transaksi_hex : 0; ?>')" data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>"> -->
                                             <tr data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>">
-                                                <td colspan="2"></td>
+                                                <td></td>
+                                                <td><?= $jurnalUmumData->nama_divisi; ?></td>
                                                 <td colspan="2"><?= $jurnalUmumData->no_sub . " - " . $jurnalUmumData->nama_sub; ?></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td><?= format_ribuan($jurnalUmumData->debit + $jurnalUmumData->kredit) . $jurnalUmumData->valas; ?></td>
+                                                <td><?= $jurnalUmumWithGroupData->exchange_rate; ?></td>
                                                 <td class="yy"><?= format_ribuan($jurnalUmumData->debit); ?></td>
                                                 <td class="xx"><?= format_ribuan($jurnalUmumData->kredit); ?></td>
                                             </tr>
@@ -164,7 +165,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="4"><strong>Total Transaksi</strong></td>
+                                <td colspan="8"><strong>Total Transaksi</strong></td>
                                 <td id="jumlahDebet"><strong><?= ($flag != 0) ? format_ribuan($total_debit) :  format_ribuan(0); ?></strong></td>
                                 <td id="jumlahKredit"><strong><?= ($flag != 0) ? format_ribuan($total_kredit) : format_ribuan(0); ?></strong></td>
                             </tr>

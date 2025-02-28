@@ -2025,7 +2025,8 @@ $routes->get('/laporan-accounting/bukubesar/printExcel/(:segment)/(:segment)/(:s
 $routes->get('/laporan-accounting/bukubesar/dropdown-account', 'Laporan\Accounting\BukuBesar::dropdownAccount', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/jurnalumum', 'Laporan\Accounting\JurnalUmum::index', ['filter' => 'Auth']);
-$routes->post('/laporan-accounting/jurnalumum/getAll', 'Laporan\Accounting\JurnalUmum::getAll', ['filter' => 'Auth']);
+$routes->post('/laporan-accounting/jurnalumum', 'Laporan\Accounting\JurnalUmum::index', ['filter' => 'Auth']);
+// $routes->post('/laporan-accounting/jurnalumum/getAll', 'Laporan\Accounting\JurnalUmum::getAll', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/jurnalumum/import', 'Laporan\Accounting\JurnalUmum::import', ['filter' => 'Auth']);
 $routes->post('/laporan-accounting/jurnalumum/import', 'Laporan\Accounting\JurnalUmum::import', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/jurnalumum/printPDF/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\JurnalUmum::exportPDF/$1/$2/$3', ['filter' => 'Auth']);
