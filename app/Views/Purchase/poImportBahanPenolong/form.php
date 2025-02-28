@@ -506,7 +506,7 @@
     });
 
     $('#barang_id').select2({
-        placeholder: "Pilih Bahan Baku",
+        placeholder: "Pilih Bahan Penolong",
         theme: "bootstrap-5",
         allowClear: true,
         dropdownParent: $('.detail-modal')
