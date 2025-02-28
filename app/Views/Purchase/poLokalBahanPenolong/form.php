@@ -192,6 +192,7 @@
                 </div>
             </div>
             <form class="detail-form" role="form" method="POST" enctype="multipart/form-data" style="<?= !empty($poDetail) ? ($poDetail['is_posted'] ? "display: none;" : "") : ""; ?>">
+                <input type="hidden" name="id_detail" id="id_detail" class="id_detail">
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -216,22 +217,18 @@
                             <label for="floatingInput" style="z-index: 1;">Pilih Kode Barang</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <input type="hidden" name="id_detail" id="id_detail" class="id_detail">
+                    <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" readonly type="text" class="form-control nama_barang" id="nama_barang" name="nama_barang">
                             <label for="floatingInput">Nama Barang</label>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" readonly type="text" class="form-control nama_kategori" id="nama_kategori" name="nama_kategori">
                             <label for="floatingInput">Kategori Barang</label>
                         </div>
                     </div>
-
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating" style="height: 50px;">
                             <select class="form-select satuan_id" name="satuan_id" id="satuan_id" aria-label="Floating label select example">
@@ -274,9 +271,6 @@
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>
-
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" min="0" max="100" type="number" class="form-control diskon" required value="0" name="diskon" id="diskon" placeholder="Discount (%)">
@@ -295,8 +289,6 @@
                             <label for="floatingInput">Total</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
@@ -318,6 +310,7 @@
                         </div>
                     </div>
                 </div>
+
             </form>
             <div class="col-subtitle-modal" style="<?= !empty($poDetail) ? ($poDetail['is_posted'] ? "display: none;" : "") : ""; ?>">
                 <div class="row mt-3">
@@ -447,18 +440,17 @@
             selected.data('satuan_3')
         );
 
-        console.log($('#barang_id option:selected').data("parent_name"));
         $('#nama_kategori').val($(this).find("option:selected").data("parent_name"));
 
-        try {
-            const match = selectedNamaBarang.match(/\(\s*(.*?)\s*\)/);
-            if (!match) {
-                $('#nama_barang').val($(this).find("option:selected").data("nama_barang") + " - " + $(this).find("option:selected").data("spesifikasi_name"));
-            }
-            $('#nama_barang').val(match[1]);
-        } catch (error) {
-            $('#nama_barang').val($(this).find("option:selected").data("nama_barang") + " - " + $(this).find("option:selected").data("spesifikasi_name"));
-        }
+        // try {
+        //     const match = selectedNamaBarang.match(/\(\s*(.*?)\s*\)/);
+        //     if (!match) {
+        //         $('#nama_barang').val($(this).find("option:selected").data("nama_barang") + " - " + $(this).find("option:selected").data("spesifikasi_name"));
+        //     }
+        //     $('#nama_barang').val(match[1]);
+        // } catch (error) {
+        //     $('#nama_barang').val($(this).find("option:selected").data("nama_barang") + " - " + $(this).find("option:selected").data("spesifikasi_name"));
+        // }
     });
 
     $('.form-select')
@@ -512,9 +504,9 @@
             barang_id: {
                 required: true
             },
-            nama_barang: {
-                required: true
-            },
+            // nama_barang: {
+            //     required: true
+            // },
             satuan_id: {
                 required: true
             },
@@ -535,9 +527,9 @@
             barang_id: {
                 required: "Pilih Kode Barang"
             },
-            nama_barang: {
-                required: "Nama barang wajib diisi"
-            },
+            // nama_barang: {
+            //     required: "Nama barang wajib diisi"
+            // },
             satuan_id: {
                 required: "Satuan wajib diisi"
             },
@@ -679,7 +671,7 @@
                         barang_id: $('#barang_id').find("option:selected").data("barang_id"),
                         spesifikasi_id: $('#barang_id').val(),
                         kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
-                        nama_barang: $('#nama_barang').val(),
+                        nama_barang: $('#barang_id').find("option:selected").data("nama_barang") + " " + $('#barang_id').find("option:selected").data("spesifikasi_name"),
                         satuan_id: $('#satuan_id').val(),
                         nama_satuan: $('#satuan_id').find("option:selected").data("kode_satuan"),
                         qty: parseFloat($('#qty').val()),
@@ -691,6 +683,8 @@
                         ppn: $('#ppn').val(),
                         pph: $('#pph').val()
                     };
+
+                    console.log(listBarang);
                     drawTabel(listBarang);
                     resetForm();
                 }
@@ -907,7 +901,7 @@
             barang_id: $('#barang_id').find("option:selected").data("barang_id"),
             spesifikasi_id: $('#barang_id').val(),
             kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
-            nama_barang: $('#nama_barang').val(),
+            nama_barang: $('#barang_id').find("option:selected").data("nama_barang") + " " + $('#barang_id').find("option:selected").data("spesifikasi_name"),
             satuan_id: $('#satuan_id').val(),
             nama_satuan: $('#satuan_id').find("option:selected").data("kode_satuan"),
             qty: parseFloat($('#qty').val()),
@@ -1147,7 +1141,7 @@
                         .attr("data-barang_id", data.id)
                         .attr("data-parent_name", data.parent_name)
                         .attr("data-spesifikasi_id", data.spesifikasi_id)
-                        .attr("data-spesifikasi_name", data.spesifikasi_name)
+                        .attr("data-spesifikasi_name", data.spesifikasi)
                         .attr("data-satuan_id", data.satuan_id)
                         .attr("data-satuan_2", data.satuan_2)
                         .attr("data-satuan_3", data.satuan_3)
