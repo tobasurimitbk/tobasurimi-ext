@@ -1377,4 +1377,19 @@ class Account extends BaseController
         echo json_encode($data);
         return;
     }
+
+    public function getSubAkun() { 
+        $Sub_AkunsModel = new Sub_AkunsModel();
+        $search = trim($this->request->getGet('search')); // Ambil & bersihkan input pencarian
+    
+        $subAkun = $Sub_AkunsModel
+            ->select('id, nama_sub')
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->like('nama_sub', $search)
+            ->findAll(10); // Batasi hasil max 10 biar efisien
+
+        return $this->response->setJSON($subAkun);
+    }    
+	
 }

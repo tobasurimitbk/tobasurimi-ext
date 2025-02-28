@@ -492,6 +492,7 @@ $routes->get('/penerimaan-penjualan-lokal/create', 'Penerimaan\SalesOrderPayment
 
 // PEMBAYARAN PANJAR SUPPLIER
 $routes->get('/panjar-supplier', 'Pembayaran\PanjarSupplier::index', ['filter' => 'Auth']);
+$routes->get('/panjar-supplier/list-akunCoa', 'Pembayaran\PanjarSupplier::getSubAkun', ['filter' => 'Auth']);
 $routes->get('/panjar-supplier/list-supplier', 'Pembayaran\PanjarSupplier::dropdownSupplierByType', ['filter' => 'Auth']);
 $routes->post('/panjar-supplier/save', 'Pembayaran\PanjarSupplier::savePanjarSupplier', ['filter' => 'Auth']);
 $routes->get('/panjar-supplier/all', 'Pembayaran\PanjarSupplier::allPanjarSupplier', ['filter' => 'Auth']);
@@ -881,6 +882,7 @@ $routes->get('/barang/dropdown/type-nospecwo', 'Warehouse\Barang::dropdownBarang
 $routes->get('/kategori-account/dropdown', 'Master\Account::dropdownKategoriAccount', ['filter' => 'Auth']);
 $routes->get('/header-account/dropdown', 'Master\Account::dropdownHeaderAccount', ['filter' => 'Auth']);
 $routes->get('/sub-account/dropdown', 'Master\Account::dropdownSubAccount', ['filter' => 'Auth']);
+$routes->get('/sub-account/dropdownData', 'Master\Account::getSubAkun', ['filter' => 'Auth']);
 $routes->get('/ap-ar/dropdown', 'Master\Account::dropdownAPAR', ['filter' => 'Auth']);
 
 // Master Barang
