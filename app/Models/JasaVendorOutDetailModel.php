@@ -49,6 +49,7 @@ class JasaVendorOutDetailModel extends Model
         $satuanModel = new SatuansModel();
         $kemasanModel = new KemasanModel();
         $metaDataModel = new MetadataModel();
+        $rmPurchaseOrderModel = new RMPurchaseOrderModel();
 
         $result = array();
         $jasaVendorOutDetail = $this->asArray()->where('jasa_vendor_out_id', $jasaVendorOutID)->findAll();
@@ -73,6 +74,9 @@ class JasaVendorOutDetailModel extends Model
                 $barangName = $kemasan['name'];
             }
 
+            $rmPurchaseOrder = $rmPurchaseOrderModel->where('po_no', $m['stock_dokumen'])->where('company_id', $stockList['company_id'])->first();
+
+
             $stockList['qty'] = $m['qty'];
             $bcType = $metaDataModel->find($stockList['bc_id']);
             $stockList['no_aju'] =  $stockList['no_aju'] == "-" ? "-" : $stockList['no_aju'];
@@ -83,7 +87,7 @@ class JasaVendorOutDetailModel extends Model
             $stockList['type_barang'] = $stock['tipe_barang'];
             $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
             $stockList['stok_total'] = ($stockList['stok_total']);
-            $stockList['stock_date'] = date('d/m/Y', strtotime($stockList['stock_date']));
+            $stockList['stock_date'] = $rmPurchaseOrder == null ? "" :  date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
 
             array_push($result, $stockList);
         }

@@ -12,6 +12,7 @@ use App\Models\ProsesRebusModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 
 class ProsesRebus extends BaseController
@@ -27,6 +28,7 @@ class ProsesRebus extends BaseController
     protected $prosesRebusDetailModel;
     protected $jasaVendorOutDetailModel;
     protected $warehouseModel;
+    protected $supplierModel;
 
     public function __construct()
     {
@@ -41,6 +43,7 @@ class ProsesRebus extends BaseController
         $this->prosesRebusDetailModel = new ProsesRebusDetailModel();
         $this->jasaVendorOutDetailModel = new JasaVendorOutDetailModel();
         $this->warehouseModel = new WarehousesModel();
+        $this->supplierModel = new SupplierModel();
     }
 
     public function index()
@@ -130,6 +133,7 @@ class ProsesRebus extends BaseController
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             'tanggal' => date('Y-m-d'),
             'divisi' => $this->divisiModel->getDivisiAccess(),
+            'supplier' => $this->supplierModel->getSupplierByType("BAHAN BAKU")
         ];
 
         return view('jasaVendor/prosesRebus/form', $data);
@@ -148,7 +152,8 @@ class ProsesRebus extends BaseController
             'prosesRebus' => $prosesRebus,
             'prosesRebusDetail' => $this->prosesRebusDetailModel->getProsesRebusDetail($id),
             'divisi' => $this->divisiModel->where('id', $prosesRebus['divisi_id'])->findAll(),
-            'warehouse' => $this->warehouseModel->where('id', $prosesRebus['warehouse_id'])->findAll()
+            'warehouse' => $this->warehouseModel->where('id', $prosesRebus['warehouse_id'])->findAll(),
+            'supplier' => $this->supplierModel->getSupplierByType("BAHAN BAKU")
         ];
 
         return view('jasaVendor/prosesRebus/form', $data);

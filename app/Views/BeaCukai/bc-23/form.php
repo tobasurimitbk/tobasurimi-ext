@@ -25,14 +25,14 @@
         </div>
     </div>
     <div class="card">
-        <div class="card-header" style="font-weight: bold; color:black;">
+        <div class="card-header" style="font-weight: bold;  <?= session()->get('theme') == 'dark' ? 'color:white;' : 'color:black;' ?>">
             PILIH NOMOR PURCHASE ORDER
         </div>
         <div class="card-body">
             <form class="create-form">
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-3">
                         <div class="form-floating mb-3 mt-1" style="height: 50px;">
                             <select class="form-select po_type" id="po_type" name="po_type" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -43,14 +43,39 @@
                             <label style="z-index: 1;">Tipe Purchase Order</label>
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-3">
+                        <div class="form-floating mb-3 mt-1" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" class="form-control input-picker start_date" id="start_date" name="start_date" placeholder="Tanggal Mulai PO" value="">
+                                    <label for="floatingInput">Tanggal Mulai PO</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-floating mb-3 mt-1" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" class="form-control input-picker end_date" id="end_date" name="end_date" placeholder="Tanggal Selesai PO" value="<?= date('d/m/Y') ?>">
+                                    <label for="floatingInput">Tanggal Selesai PO</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
                         <div class="form-floating mt-1" style="height: 50px;">
                             <select class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                                 <option value=""></option>
                             </select>
                             <label style="z-index: 1;">Supplier</label>
                         </div>
-                        <small class="mb-3"><i>Hanya menampilkan data supplier yang LPB nya belum dibuatkan dokumen Bea Cukai</i></small>
                     </div>
                 </div>
             </form>
@@ -61,6 +86,7 @@
                         <tr>
                             <th style="text-align: center; width:5px;">No</th>
                             <th style="text-align: center; width:5px;">#</th>
+                            <th style="text-align: center;">Supplier</th>
                             <th style="text-align: center;">Tgl PO</th>
                             <th style="text-align: center;">Tgl LPB</th>
                             <th style="text-align: center;">No LPB</th>
@@ -112,11 +138,21 @@
         }
     });
 
+    $(".start_date,.end_date").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
     $('#po_type').select2({
         placeholder: "Pilih Tipe Purchase Order",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
+        // Fetch PO
+        getListPurchaseOrder();
+        // Fetch Supplier By PO
         getListSupplier();
     });
 
@@ -137,7 +173,13 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
+    $('#start_date,#end_date').change(function() {
+        getListPurchaseOrder();
+
+    });
+
     $('.btn-submit-parent').click(function(e) {
+        var supplierId = $('#supplier_id option:selected').val();
         var checkedCheckboxes = $(".child:checked");
         var dataIds = checkedCheckboxes.map(function() {
             return $(this).data("penerimaan_barang_id");
@@ -162,7 +204,16 @@
                 icon: 'error',
                 title: "Pilih data purchase order yang akan dibuat dokumen bea cukai",
                 confirmButtonColor: '#4e73df',
-            })
+            });
+            return;
+        } else if (supplierId == '' || supplierId == undefined) {
+            // Pengecekan Supplier
+            Swal.fire({
+                icon: 'error',
+                title: "Pilih Supplier Dahulu",
+                confirmButtonColor: '#4e73df',
+            });
+            return;
         } else {
             Swal.fire({
                 icon: 'question',
@@ -259,7 +310,9 @@
             },
             data: {
                 po_type: $(".po_type option:selected").val(),
-                supplier_id: $(".supplier_id option:selected").val()
+                supplier_id: $(".supplier_id option:selected").val(),
+                start_date: $(".start_date").val(),
+                end_date: $('#end_date').val()
             },
             dataType: "json",
             success: function(res) {
@@ -289,8 +342,7 @@
                                 </div>
                             `
                     ));
-
-
+                    newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
                     newRow.append($('<td style="text-align:center;">').text(v.po_date));
                     newRow.append($('<td style="text-align:center;">').text(v.lpb_date));
                     newRow.append($('<td style="text-align:center;">').text(v.lpb_no));

@@ -15,7 +15,7 @@
                         <div class="col-md-6">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" type="text" class="form-control kode" id="kode" name="kode" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
+                                    <input autocomplete="one-time-code" type="text" class="form-control kode" id="kode" name="kode" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
                                     <label for="floatingInput">Kode Supplier</label>
                                 </div>
                                 <div style="<?= !empty($dataSPP) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -598,6 +598,9 @@
     let trigger = true;
     let id_supplier = "";
 
+    // Init changeStatus
+    changeStatus();
+
     $(document).ready(function() {
         $("#laporan_id").change(function() {
             let selectedOption = $(this).val();
@@ -1006,7 +1009,7 @@
                         $(".province_parent_id").val(res.data.province_id).change();
                         $(".country_code").val(res.data.country_code).change();
                         $('#auto_generate').css('display', 'none');
-                        $("#kode").prop("readonly", true);
+                        $("#kode").prop("readonly", false);
                         // $(".account_receivable").val(res.data.account_receivable);
                         // $(".account_payable").val(res.data.account_payable);
                         $('.modal').on('hidden.bs.modal', function() {

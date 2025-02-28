@@ -61,12 +61,19 @@
         </div>
     </form>
     <ul class="navbar-nav navbar-right">
+        <li class="nav-item dropdown">
+            <a style="color: white;" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-circle-half-stroke fa-lg"></i> </a>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" onclick="changeTheme('light')" href="#">LIGHT</a>
+                <a class="dropdown-item" onclick="changeTheme('dark')" href="#">DARK</a>
+            </div>
+        </li>
         <li class="dropdown"><a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
                 <img alt="image" src="<?= base_url() ?>/assets/img/avatar/avatar-1.png" class="rounded-circle mr-1">
                 <label class="form-label font-weight-bold"><?= session()->get("login")->name; ?></label>
             </a>
             <div class="dropdown-menu dropdown-menu-right">
-                <!-- <div class="dropdown-divider"></div> -->
                 <a onclick="showLogoutForm()" href="#" class="dropdown-item has-icon">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
@@ -120,6 +127,21 @@
             }
         })
     }
+
+    const changeTheme = function(theme) {
+        $.ajax({
+            url: "<?= base_url("dashboard/change-theme"); ?>",
+            data: {
+                theme: theme
+            },
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                window.location.reload();
+            }
+        })
+    }
+
 
     $('a[data-toggle="sidebar"]').on('click', function() {
 

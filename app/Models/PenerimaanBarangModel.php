@@ -365,6 +365,7 @@ class PenerimaanBarangModel extends Model
         $builder->where('tanggal >=', $first_day);
         $builder->where('tanggal <=', $last_day);
         $builder->where('penerimaan_barang.deletedAt', null);
+        $builder->where('deletedAt', null);
         $builder->like('no_penerimaan_barang', $lastStr);
         $query = $builder->get();
 
@@ -402,10 +403,14 @@ class PenerimaanBarangModel extends Model
             $lastPenerimaan = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
         }
 
+        // \var_dump($lastPenerimaan);
+        // die;
+
         // Format nomor dengan dua digit
         $formattedLastPenerimaan = sprintf("%02d", $lastPenerimaan);
         $generatedNo = $kode . '/' . $formattedLastPenerimaan . '/' . $lastStr;
-
+        // \var_dump($generatedNo);
+        // die;
         return $generatedNo;
     }
 

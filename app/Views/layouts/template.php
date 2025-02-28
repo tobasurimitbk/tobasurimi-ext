@@ -25,8 +25,14 @@
     <link rel="stylesheet" href="<?= base_url() ?>assets/css/select2-bootstrap-5-theme.min.css?v=<?= time(); ?>" />
 
     <!-- Template CSS -->
-    <link rel="stylesheet" href="<?= base_url() ?>assets/css/style.css?v=<?= time(); ?>">
-    <link rel="stylesheet" href="<?= base_url() ?>assets/css/components.css?v=<?= time(); ?>">
+    <?php if (session()->get('theme') == 'dark'): ?>
+        <link rel="stylesheet" href="<?= base_url() ?>assets/css/style_dark.css?v=<?= time(); ?>">
+        <link rel="stylesheet" href="<?= base_url() ?>assets/css/components_dark.css?v=<?= time(); ?>">
+    <?php else: ?>
+        <link rel="stylesheet" href="<?= base_url() ?>assets/css/style.css?v=<?= time(); ?>">
+        <link rel="stylesheet" href="<?= base_url() ?>assets/css/components.css?v=<?= time(); ?>">
+    <?php endif; ?>
+
     <link href="<?= base_url() ?>assets/css/select2.min.css?v=<?= time(); ?>" rel="stylesheet" />
     <link rel="stylesheet" href="<?= base_url() ?>assets/css/bootstrap-datepicker.standalone.min.css?v=<?= time(); ?>">
 

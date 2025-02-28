@@ -249,6 +249,22 @@ class Supplier extends BaseController
                 "account_payable" => $this->request->getPost("account_payable"),
                 "type"              => "BAHAN BAKU"
             ];
+
+            // Validasi Kode Supplier
+            $supplier = $this->supplierModel->where('company_id', $this->this_company_id)
+                ->where('kode', $insertData['kode'])
+                ->where('type', "BAHAN BAKU")
+                ->where('deletedAt', null)
+                ->first();
+
+            if ($supplier != null) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Kode supplier sudah digunakan",
+                    'token' => csrf_hash()
+                ]);
+            }
+
             $insert = $this->supplierModel->insert($insertData);
 
             if (!$insert) {
@@ -285,6 +301,9 @@ class Supplier extends BaseController
     {
         try {
             $rules = [
+                "kode" => [
+                    "rules" => "required"
+                ],
                 "name" => [
                     "rules" => "required"
                 ],
@@ -339,6 +358,7 @@ class Supplier extends BaseController
 
                 $payload = [
                     "company_id" => $this->this_company_id,
+                    "kode" => $this->request->getPost("kode"),
                     "name" => strtoupper($this->request->getVar("name")),
                     "address" => strtoupper($this->request->getVar("address")),
                     "no_npwp" => str_replace(['.', '-'], '',  $this->request->getPost("no_npwp")),
@@ -352,6 +372,21 @@ class Supplier extends BaseController
                     "account_receivable" => $this->request->getPost("account_receivable"),
                     "account_payable" => $this->request->getPost("account_payable"),
                 ];
+                // Validasi Kode Supplier
+                $supplier = $this->supplierModel->where('company_id', $this->this_company_id)
+                    ->where('kode', $payload['kode'])
+                    ->where('type', "BAHAN BAKU")
+                    ->where('id <>', $id)
+                    ->where('deletedAt', null)
+                    ->first();
+
+                if ($supplier != null) {
+                    return response()->setJSON([
+                        'status' => false,
+                        'message' => "Kode supplier sudah digunakan",
+                        'token' => csrf_hash()
+                    ]);
+                }
             }
 
             if ($payload) {
@@ -528,6 +563,21 @@ class Supplier extends BaseController
                 "type"              => "BAHAN PENOLONG"
             ];
 
+            // Validasi Kode Supplier
+            $supplier = $this->supplierModel->where('company_id', $this->this_company_id)
+                ->where('kode', $insertData['kode'])
+                ->where('type', "BAHAN PENOLONG")
+                ->where('deletedAt', null)
+                ->first();
+
+            if ($supplier != null) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Kode supplier sudah digunakan",
+                    'token' => csrf_hash()
+                ]);
+            }
+
             $insert = $this->supplierModel->insert($insertData);
 
             if (!$insert) {
@@ -611,6 +661,7 @@ class Supplier extends BaseController
                 $id = $this->request->getPost("id");
 
                 $payload = [
+                    "kode" => $this->request->getPost("kode"),
                     "company_id" => $this->this_company_id,
                     "name" => strtoupper($this->request->getVar("name")),
                     "address" => strtoupper($this->request->getVar("address")),
@@ -623,6 +674,22 @@ class Supplier extends BaseController
                     "postal_code" => $this->request->getPost("postal_code"),
                     "country_code"      => $this->request->getPost("country_code")
                 ];
+
+                // Validasi Kode Supplier
+                $supplier = $this->supplierModel->where('company_id', $this->this_company_id)
+                    ->where('kode', $payload['kode'])
+                    ->where('type', "BAHAN PENOLONG")
+                    ->where('id <>', $id)
+                    ->where('deletedAt', null)
+                    ->first();
+
+                if ($supplier != null) {
+                    return response()->setJSON([
+                        'status' => false,
+                        'message' => "Kode supplier sudah digunakan",
+                        'token' => csrf_hash()
+                    ]);
+                }
             }
 
             if ($payload) {
@@ -769,6 +836,20 @@ class Supplier extends BaseController
                 "contact_person" => $this->request->getPost("contact_person"),
                 "type"              => "INTERNASIONAL"
             ];
+            // Validasi Kode Supplier
+            $supplier = $this->supplierModel->where('company_id', $this->this_company_id)
+                ->where('kode', $insertData['kode'])
+                ->where('type', "INTERNASIONAL")
+                ->where('deletedAt', null)
+                ->first();
+
+            if ($supplier != null) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Kode supplier sudah digunakan",
+                    'token'     => csrf_hash()
+                ]);
+            }
 
             $insert = $this->supplierModel->insert($insertData);
 
@@ -844,7 +925,24 @@ class Supplier extends BaseController
                     "fax" => $this->request->getPost("fax"),
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),
+                    "kode" => $this->request->getPost("kode"),
                 ];
+
+                // Validasi Kode Supplier
+                $supplier = $this->supplierModel->where('company_id', $this->this_company_id)
+                    ->where('kode', $payload['kode'])
+                    ->where('type', "INTERNASIONAL")
+                    ->where('id <>', $id)
+                    ->where('deletedAt', null)
+                    ->first();
+
+                if ($supplier != null) {
+                    return response()->setJSON([
+                        'status' => false,
+                        'message' => "Kode supplier sudah digunakan",
+                        'token'     => csrf_hash()
+                    ]);
+                }
             }
 
             if ($payload) {

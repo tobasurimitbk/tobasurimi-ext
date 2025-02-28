@@ -69,7 +69,14 @@ class TandaTerimaFakturDetailModel extends Model
             'tanda_terima_faktur_detail.deletedAt' => null
         ];
         $tandaTerimaFakturDetailModel = new TandaTerimaFakturDetailModel();
+        $tandaTerimaFakturModel = new TandaTerimaFakturModel();
+
         $data = $tandaTerimaFakturDetailModel->where($condition)->findAll();
+        $dataTandaTerimaFaktur = $tandaTerimaFakturModel->select('tanda_terima_faktur.*, suppliers.name as supplier_name')
+            ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id', 'left')
+            ->where('tanda_terima_faktur.id', $tandaTerimaFakturID)
+            ->first();
+
         $result = [];
 
         foreach ($data as $d) {
@@ -84,7 +91,10 @@ class TandaTerimaFakturDetailModel extends Model
                 'qty_telah_diterima' => 0,
                 'qty_akan_diterima' => $d['qty'],
                 'kode_satuan' => $d['unit'],
-                'harga' => $d['price_single']
+                'supplier_name' => $dataTandaTerimaFaktur == null ? '' : $dataTandaTerimaFaktur['supplier_name'],
+                'harga' => $d['price_single'],
+                'divisi_id' =>  $dataTandaTerimaFaktur == null ? '' : $dataTandaTerimaFaktur['divisi_id'],
+                'supplier_id' =>  $dataTandaTerimaFaktur == null ? '' : $dataTandaTerimaFaktur['supplier_id'],
             ];
         }
 

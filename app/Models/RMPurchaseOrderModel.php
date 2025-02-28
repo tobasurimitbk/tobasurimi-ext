@@ -173,7 +173,7 @@ class RMPurchaseOrderModel extends Model
     }
 
 
-    public function getTotalPPH($id)
+    public function getTotalWithPPH($id)
     {
         // Ambil data PO berdasarkan ID
         $data = $this->asObject()
@@ -192,8 +192,17 @@ class RMPurchaseOrderModel extends Model
             ->get()
             ->getResultArray();
 
-        $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
-        $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.005;
+        // Default PPH jika tidak ada
+        $nilaiPph = 1.00;
+        $nilaiPph2 = 0.00;
+
+        if (!empty($data->supplierNPWP)) {
+            $nilaiPph = 1.00 - 0.0025;
+            $nilaiPph2 = 0.0025;
+        } elseif ($data->supplierNPWP === null) {
+            $nilaiPph = 1.00 - 0.005;
+            $nilaiPph2 = 0.005;
+        }
 
         $totalQty = 0;
         $nilaiTotalBulanan = 0;
@@ -202,12 +211,12 @@ class RMPurchaseOrderModel extends Model
         $totalTambahan = 0;
 
         foreach ($detailPurchase as $d) {
-            if ($data->pph === "None" || $data->pph === "Supplier") {
+            if (empty($data->pph) || $data->pph === "None" || $data->pph === "Supplier") {
                 $nilaiTotalHarian += ($d['daily_price'] * $d['qty']);
                 $nilaiTotalUmum += ($d['general_price'] * $d['qty']);
                 $nilaiTotalBulanan += ($d['monthly_price'] * $d['qty']);
             } else {
-                // Company
+                // Jika ada PPH (Company)
                 $nilaiTotalHarian += (($d['daily_price'] / $nilaiPph) * $d['qty']);
                 $nilaiTotalUmum += (($d['general_price'] / $nilaiPph) * $d['qty']);
                 $nilaiTotalBulanan += (($d['monthly_price'] / $nilaiPph) * $d['qty']);
@@ -215,11 +224,18 @@ class RMPurchaseOrderModel extends Model
             $totalQty += $d['qty'];
         }
 
+        // Pastikan variabel ini tidak menyebabkan error jika PPH kosong
+        $nilaiTotalBulananWithPPH = $nilaiTotalBulanan;
+        $nilaiTotalUmumWithPPH = $nilaiTotalUmum;
+        $nilaiTotalHarianWithPPH = $nilaiTotalHarian;
+
         if ($data->pph === "Supplier" || $data->pph === "Company") {
-            $nilaiTotalBulananWithPPH = $nilaiTotalBulanan - ($nilaiTotalBulanan * $nilaiPph2);
-            $nilaiTotalUmumWithPPH = $nilaiTotalUmum - ($nilaiTotalUmum * $nilaiPph2);
-            $nilaiTotalHarianWithPPH = $nilaiTotalHarian - ($nilaiTotalHarian * $nilaiPph2);
+            $nilaiTotalBulananWithPPH -= ($nilaiTotalBulanan * $nilaiPph2);
+            $nilaiTotalUmumWithPPH -= ($nilaiTotalUmum * $nilaiPph2);
+            $nilaiTotalHarianWithPPH -= ($nilaiTotalHarian * $nilaiPph2);
         }
+
+        $totalTambahanWithPPH = 0;
 
         if ($data->pph == "Company") {
             $selisih = ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung) / $nilaiPph;

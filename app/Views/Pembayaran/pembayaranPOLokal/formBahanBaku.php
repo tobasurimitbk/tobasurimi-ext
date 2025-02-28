@@ -60,7 +60,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($detail) ? ($detail->is_posted == '1' ? 'disabled=true' : '')   : ''; ?> type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. PO" value="<?= !empty($detail) ? $detail['pembayaranDetail']['payment_no']: ""; ?>">
+                                    <input autocomplete="one-time-code" <?= !empty($detail) ? (!empty($detail) ? 'disabled=true' : '')   : ''; ?> type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. PO" value="<?= !empty($detail) ? $detail['pembayaranDetail']['payment_no']: ""; ?>">
                                     <label for="floatingInput">No. Pembayaran</label>
                                 </div>
                                 <div style="<?= !empty($detail) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -152,25 +152,13 @@
 
                         </div>
                         <div class="harian-form">
-                            <?php if (!empty($detail)) : ?>
                                 <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                    <select class="form-select" name="lpb[]" id="lpb" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> multiple>
-                                        <?php foreach ($detail['pembayaranDetail']['multiple_lpb_no'] as $d) :  ?>
-                                            <option selected value="<?= $d; ?>"><?= $d; ?> </option>
-                                        <?php endforeach; ?>
+                                    <select class="form-select" name="po[]" id="po">
+                                        <option disabled selected value="">Pilih No PO</option>
                                     </select>
                                     <label for="floatingInput" style="z-index: 1;">No PO</label>
                                 </div>
-                            <?php else : ?>
-                                <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                    <select class="form-select" name="lpb[]" id="lpb">
-                                        <option disabled selected value=""></option>
-                                    </select>
-                                    <label for="floatingInput" style="z-index: 1;">No PO</label>
-                                </div>
-                            <?php endif; ?>
                         </div>
-
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -256,16 +244,14 @@
                                             <thead class="thead-dark">
                                                 <tr>
                                                     <th style="text-align: center;">No</th>
-                                                    <th style="text-align: center;">Tanggal LPB</th>
-                                                    <th style="text-align: center;">No LPB</th>
                                                     <th style="text-align: center;">Tanggal PO</th>
                                                     <th style="text-align: center;">No PO</th>
                                                     <th style="text-align: center;">Barang</th>
-                                                    <th style="text-align: center;">Total Order</th>
-                                                    <th style="text-align: center;">Total Diterima</th>
-                                                    <th style="text-align: center; !important;">Total Bayar</th>
-                                                    <!-- <th style="text-align: center;">Sisa Bayar</th>
-                                                    <th style="text-align: center;">Input Harga</th> -->
+                                                    <th style="text-align: center;">Qty</th>
+                                                    <th style="text-align: center; !important;">Total</th>
+                                                    <th style="text-align: center; !important;">Total Di bayar</th>
+                                                    <!-- <th style="text-align: center;">Sisa Bayar</th> -->
+                                                    <th style="text-align: center;">Input Harga</th>
 
                                                 </tr>
                                             </thead>
@@ -409,6 +395,9 @@
     const table = $('#dataTable');
     var listPoNo = [];
     var listPoID = [];
+    var listPoDetailID = [];
+    var listPenerimaanDetailID = [];
+    var listPenerimaanDetailHarga = [];
     var listPanjar = [];
     var listPanjarTB = [];
     var listPinjaman = [];
@@ -436,6 +425,7 @@
                 listPanjarTB = response.data.panjar_tb
 
                 csrf.val(response.token);
+                generateLPBNo();
                 drawPaidPanjarTable(listPanjar);
                 drawPaidPinjamanTable(listPinjaman);
                 drawPaidPanjarTBTable(listPanjarTB);
@@ -550,7 +540,7 @@
         },
     });
 
-    $("#payment_date,#jatuh_tempo").datepicker({
+    $("#payment_date,#jatuh_tempo, #payment_panjar_date").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -568,7 +558,7 @@
         changeStatus();
     });
 
-    $('#lpb').select2({
+    $('#po').select2({
         placeholder: "Pilih No Penerimaan Barang",
         theme: "bootstrap-5",
         multiple: true
@@ -602,67 +592,72 @@
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
 
-        var lpbID = $(this).val();
+        var poID = $(this).val();
         var supplierID = $('#supplier_id').val();
         var formData = new FormData();
         formData.append("supplierID", $('#supplier_id').val());
         formData.append("bulan", $(this).val());
         formData.append("tipeBayar", $('#tipe_pembayaran').val());
 
-        $.ajax({
-            url: "<?= base_url("pembayaran-po-lokal-bb/get-list-po-no-paid"); ?>",
-            data: formData,
-            method: "POST",
-            dataType: "json",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            processData: false,
-            contentType: false,
-            success: function(response) {
 
-                listPembayaran = [];
-                listPembayaran = response.data;
+        if (poID != "[]") {
+            $.ajax({
+                url: "<?= base_url("pembayaran-po-lokal-bb/get-list-po-no-paid"); ?>",
+                data: formData,
+                method: "POST",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
 
+                    listPembayaran = [];
+                    listPembayaran = response.data;
 
-                csrf.val(response.token);
-                drawTable(listPembayaran);
-                $('#nominal_pembayaran').val(response.data.sisaNumber);
-            }
-        });
+                    csrf.val(response.token);
+                    drawTable(listPembayaran);
+                    $('#nominal_pembayaran').val(response.data.sisaNumber);
+                }
+            });
+        }
     });
 
-    $('#lpb').change(function() {
+    $('#po').change(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
 
-        var lpbID = JSON.stringify($(this).val());
+        var poID = JSON.stringify($(this).val());
         var supplierID = $('#supplier_id').val();
         var formData = new FormData();
 
         formData.append("supplierID", $('#supplier_id').val());
-        formData.append("lpbID", lpbID);
+        formData.append("poID", poID);
         formData.append("tipeBayar", $('#tipe_pembayaran').val());
 
-        $.ajax({
-            url: "<?= base_url("pembayaran-po-lokal-bb/get-list-po-no-paid"); ?>",
-            data: formData,
-            method: "POST",
-            dataType: "json",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                listPembayaran = [];
-                listPembayaran = response.data;
-
-                csrf.val(response.token);
-                drawTable(listPembayaran);
-                $('#nominal_pembayaran').val(response.data.sisaNumber);
-            }
-        });
+        
+        if (poID != "[]") {
+            $.ajax({
+                url: "<?= base_url("pembayaran-po-lokal-bb/get-list-po-no-paid"); ?>",
+                data: formData,
+                method: "POST",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    listPembayaran = [];
+                    listPembayaran = response.data;
+                    csrf.val(response.token);
+                    drawTable(listPembayaran);
+                    $('#nominal_pembayaran').val(response.data.sisaNumber);
+                }
+            });
+        }
+       
     });
 
     $(".btn-submit-form").click(function() {
@@ -692,12 +687,12 @@
             listPinjaman[i].bayar_pinjaman = input_user;
         });
 
-        //appemd pembayanran tp listPembayaran
+        
         $.each(listPembayaran, function(i, v) {
-            var element = $('input[data-id="' + v.penerimaan_barang_detail_id + '"].pembayaran');
-            var input_user = (element.val());
+            var element = $('input[data-id="' + v.rm_purchase_order_id + '"].total_po_dibayar'); 
+            var input_user = destroyFormatRupiahPayment(element.val()); 
 
-            listPembayaran[i].pembayaran_user_input = input_user;
+            listPembayaran[i].total_paid = parseInt(input_user) || 0; 
         });
 
 
@@ -756,6 +751,9 @@
 
                         // Append formatted lists to formData
                         formData.append("poIDList", JSON.stringify(listPoID));
+                        formData.append("poDetailIDList", JSON.stringify(listPoDetailID));
+                        formData.append("penerimaanDetailIDList", JSON.stringify(listPenerimaanDetailID));
+                        formData.append("penerimaanDetailHargaList", JSON.stringify(listPenerimaanDetailHarga));
                         formData.append("poNoList", JSON.stringify(listPoNo));
                         formData.append("panjarList", JSON.stringify(formattedPanjarList));
                         formData.append("pinjamanList", JSON.stringify(formattedPinjamanList));
@@ -836,6 +834,7 @@
                             formData.set('total_pembayaran_panjar', totalPembayaranPanjar);
                             formData.set('total_pembayaran_panjar_tb', totalPembayaranPanjarTB);
                             formData.set('total_pembayaran_pinjaman', totalPembayaranPinjaman);
+
                             const formatList = (list) => {
                                 if (!Array.isArray(list)) return []; // Pastikan `list` adalah array
                                 return list.map(item => {
@@ -853,19 +852,8 @@
                             let formattedPembayaranList = Array.isArray(listPembayaran)
                                 ? listPembayaran
                                 : Object.values(listPembayaran);
-
-                            // Format item dalam pembayaranList
-                            formattedPembayaranList = formattedPembayaranList.map(item => {
-                                Object.keys(item).forEach(key => {
-                                    if (typeof item[key] === 'string' && item[key].includes(',')) {
-                                        item[key] = destroyFormatRupiahPayment(item[key]);
-                                    }
-                                });
-                                return item;
-                            });
-
-                            // Append formatted pembayaranList to formData
-                            formData.append("pembayaranList", JSON.stringify(formattedPembayaranList));
+                                
+                          
 
                             // Format semua list
                             let formattedPanjarList = formatList(listPanjar);
@@ -876,9 +864,14 @@
                             formData.append("no_bukti_pembayaran", $('#no_bukti_pembayaran').val());
                             formData.append("poIDList", JSON.stringify(listPoID));
                             formData.append("poNoList", JSON.stringify(listPoNo));
+                            formData.append("poDetailIDList", JSON.stringify(listPoDetailID));
+                            formData.append("penerimaanDetailIDList", JSON.stringify(listPenerimaanDetailID));
+                            formData.append("penerimaanDetailHargaList", JSON.stringify(listPenerimaanDetailHarga));
                             formData.append("panjarList", JSON.stringify(formattedPanjarList));
                             formData.append("pinjamanList", JSON.stringify(formattedPinjamanList));
                             formData.append("panjarTBList", JSON.stringify(formattedPanjarTBList));
+                            formData.append("pembayaranList", JSON.stringify(formattedPembayaranList));
+
                             $.ajax({
                                 url: "<?= base_url("pembayaran-po-lokal-bb/create"); ?>",
                                 data: formData,
@@ -965,10 +958,6 @@
         const table = $('#dataTable');
         table.find('tbody').empty();
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>Total</b></td>'));
-        newRow.append($('<td style="text-align:center;"><b>0</b></td>'));
-        newRow.append($('<td style="text-align:center;"><b>0</b></td>'));
-        newRow.append($('<td style="text-align:center;"><b>0.0</b></td>'));
         table.find('tbody').append(newRow);
     }
 
@@ -1070,8 +1059,12 @@
         formData.append("supplierID", $('#supplier_id').val());
         formData.append("divisiID", $('#divisi_id').val());
 
+        // Ambil data multiple_po_id dari BE untuk auto-select
+        let selectedPo = <?= json_encode($detail['pembayaranDetail']['multiple_po_id'] ?? []) ?>;
+        formData.append("selectedPo", JSON.stringify(selectedPo));
+
         $.ajax({
-            url: "<?= base_url("pembayaran-po-lokal-bb/get-lpb-not-paid"); ?>",
+            url: "<?= base_url('pembayaran-po-lokal-bb/get-po-not-paid'); ?>",
             data: formData,
             method: "POST",
             dataType: "json",
@@ -1081,16 +1074,25 @@
             processData: false,
             contentType: false,
             success: function(response) {
+
                 csrf.val(response.token);
-                $("#lpb").empty();
-                $("#lpb").append(`<option value=""></option>`);
+                
+                // Kosongkan dan tambahkan opsi default
+                $("#po").empty().append(`<option value=""></option>`);
+
+                // Iterasi data PO yang belum dibayar
                 response.data.forEach(function(item) {
-                    $("#lpb").append(`<option  value="${item.lpbID}">${item.po_no}</option>`);
+                    let itemPoID = Number(item.poID); // Pastikan item.poID jadi angka
+                    let isSelected = selectedPo.includes(itemPoID) ? "selected" : ""; 
+                    $("#po").append(`<option value="${itemPoID}" ${isSelected}>${item.po_no}</option>`);
                 });
 
+                // Refresh select2 jika dipakai
+                $("#po").trigger("change");
             }
         });
     }
+
 
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
@@ -1126,59 +1128,52 @@
 
         $.each(data.detail, function(i, v) {
             listPoID.push({
-                poID: v.penerimaan_barang_id
+                poID: v.rm_purchase_order_id
             });
-            // push po no
+
             listPoNo.push({
-                poNo: v.no_penerimaan_barang
+                poNo: v.no_po
             });
-            console.log(greatFormatRupiahPayment(v.total_tagihan), v.total_tagihan)
+
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align:center;">').text(no++));
-            newRow.append($('<td style="text-align:center;">').text(v.tanggal_LPB));
-            newRow.append($('<td style="text-align:center;">').text(v.no_penerimaan_barang));
             newRow.append($('<td style="text-align:center;">').text(v.tanggal_PO));
-            newRow.append($('<td style="text-align:center;">').text(v.po_no));
+            newRow.append($('<td style="text-align:center;">').text(v.no_po));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
-            newRow.append($('<td style="text-align:center;">').text(v.total_order));
-            newRow.append($('<td style="text-align:center;">').text(v.total_diterima));
+            newRow.append($('<td style="text-align:center;">').text(v.total_qty_diterima));
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_tagihan)));
+            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_paid)));
             // newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.sisa_pembayaran)));
             newRow.append($('<td class="hidden" style="display:none; width:150px !important;">').html(
                 `
                         <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> oninput="limitInputBayar(this, ${v.total_number + v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="${greatFormatRupiah (v.total_tagihan)}" name = "pembayaran" style="height:40px">
                                 `
             ));
+
+            newRow.append($('<td style="text-align:center;">').html(
+                `
+                        <input  oninput="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan})" autocomplete="one-time-code" data-id="${v.rm_purchase_order_id}"  class="form-control total_po_dibayar" type="text" value="${greatFormatRupiahPayment(v.total_tagihan)}" name = "total_po_dibayar" style="height:40px">
+                                `
+            ));
+
             table.find('tbody').append(newRow);
         });
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN  </b></td>'));
-        newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN  </b></td>'));
         newRow.append($('<td style="text-align:right;" ><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="' + greatFormatRupiahPayment(data.total_pembayaran) + '" name = "total_pembayaran"  readonly>' +
             '</b></td>'));
         table.find('tbody').append(newRow);
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>POTONGAN/DISKON</b></td>'));
-        newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>POTONGAN/DISKON</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
             '  <input <?= !empty($detail) ? 'disabled' : '' ?> oninput="preventNegativeInput(this)" onkeyup="this.value = greatFormatRupiahPayment(this.value);" name="potongan" id="potongan" autocomplete="one-time-code" value="<?= !empty($detail) ? number_format($detail['pembayaranDetail']['potongan_harga'], 2) : '0' ?>" type="text" class="form-control trigger-input" placeholder="Nominal Pembayaran">' +
             '</b></td>'));
 
         table.find('tbody').append(newRow);
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN PANJAR</b></td>'));
-        newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PANJAR</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value="' + greatFormatRupiahPayment(data.total_bayar_panjar) + ' " name = "total_pembayaran_panjar" readonly>' +
             '</b></td>'));
@@ -1186,11 +1181,7 @@
         table.find('tbody').append(newRow);
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN PANJAR TB</b></td>'));
-        newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PANJAR TB</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar-tb trigger-input" type="text" value="' + greatFormatRupiahPayment(data.total_bayar_panjar_tb) + ' " name = "total_pembayaran_panjar_tb" readonly>' +
             '</b></td>'));
@@ -1199,11 +1190,7 @@
 
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>TOTAL PEMBAYARAN PINJAMAN</b></td>'));
-        newRow.append(($('<td </td>')));
-        newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PINJAMAN</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-pinjaman trigger-input" type="text" value="' + greatFormatRupiahPayment(data.total_bayar_pinjaman) + ' " name = "total_pembayaran_pinjaman" readonly>' +
             '</b></td>'));
@@ -1211,11 +1198,8 @@
         table.find('tbody').append(newRow);
 
         var newRow = $('<tr>');
-        newRow.append($('<td style="text-align:right;" colspan="6"><b>GRAND TOTAL</b></td>'));
-        newRow.append($('<td style="text-align:center;"><b>' + data.total_order + '</b></td>'));
-        newRow.append($('<td style="text-align:center;"><b>' + data.total_diterima + '</b></td>'));
+        newRow.append($('<td style="text-align:right;" colspan="7"><b>GRAND TOTAL</b></td>'));
         // newRow.append($('<td style="text-align:center;"><b>' + greatFormatRupiahPayment(data.total_tagihan) + '</b></td>'));
-        // newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:center; min-width: 200px; width: 200px; max-width: 250px;"><b>' +
             '<input autocomplete="one-time-code" data-id="" class="form-control grand-total" type="text" value="' + greatFormatRupiahPayment(data.total_akhir) + '" name="grand_total" readonly>' +
             '</b></td>'));
@@ -1237,31 +1221,38 @@
         // clear res
         listPoID.length = 0;
         listPoNo.length = 0;
+        listPoDetailID.length = 0;
+        listPenerimaanDetailID.length = 0;
+        
         $.each(data, function(i, v) {
-            // push po id
             listPoID.push({
-                poID: v.penerimaan_barang_id
+                poID: v.rm_purchase_order_id
             });
-            // push po no
+
             listPoNo.push({
-                poNo: v.no_penerimaan_barang
+                poNo: v.no_po
             });
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align:center;">').text(no++));
-            newRow.append($('<td style="text-align:center;">').text(v.tanggal_LPB));
-            newRow.append($('<td style="text-align:center;">').text(v.no_penerimaan_barang));
             newRow.append($('<td style="text-align:center;">').text(v.tanggal_PO));
-            newRow.append($('<td style="text-align:center;">').text(v.po_no));
+            newRow.append($('<td style="text-align:center;">').text(v.no_po));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
-            newRow.append($('<td style="text-align:center;">').text(v.total_order));
-            newRow.append($('<td style="text-align:center;">').text(v.total_diterima));
+            newRow.append($('<td style="text-align:center;">').text(v.total_qty_diterima));
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_tagihan)));
+            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_paid)));
             // newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.sisa_pembayaran)));
             newRow.append($('<td class="hidden" style="display:none;">').html(
                 `
                         <input  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="${v.total_tagihan}" name = "pembayaran" style="height:40px">
                                 `
             ));
+
+            newRow.append($('<td style="text-align:center;">').html(
+                `
+                        <input  oninput="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan})" autocomplete="one-time-code" data-id="${v.rm_purchase_order_id}"  class="form-control total_po_dibayar" type="text" value="${greatFormatRupiahPayment(v.total_tagihan)}" name = "total_po_dibayar" style="height:40px">
+                                `
+            ));
+
             table.find('tbody').append(newRow);
 
             TotalOrder += parseFloat(v.total_order);
@@ -1272,8 +1263,6 @@
 
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN  </b></td>'));
-        newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:right;" ><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="'+ greatFormatRupiahPayment(TotalHarga) +'" name = "total_pembayaran"  readonly>' +
             '</b></td>'));
@@ -1281,8 +1270,6 @@
 
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>POTONGAN/DISKON</b></td>'));
-        newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:center;"><b>' +
             '  <input <?= !empty($detail) ? 'disabled' : '' ?> onchange="this.value = greatFormatRupiahPayment(this.value)" oninput="preventNegativeInput(this)" name="potongan" id="potongan" autocomplete="one-time-code" value="<?= !empty($detail) ? number_format($detail['pembayaranDetail']['potongan_harga'], 2) : '0' ?>" type="text" class="form-control trigger-input" placeholder="Nominal Pembayaran">' +
             '</b></td>'));
@@ -1291,9 +1278,6 @@
 
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PANJAR</b></td>'));
-        newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value="" name = "total_pembayaran_panjar" readonly>' +
             '</b></td>'));
@@ -1303,9 +1287,6 @@
 
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PANJAR TB</b></td>'));
-        newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar-tb trigger-input" type="text" value="" name = "total_pembayaran_panjar_tb" readonly>' +
             '</b></td>'));
@@ -1315,9 +1296,6 @@
 
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PINJAMAN</b></td>'));
-        newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
-        // newRow.append(($('<td </td>')));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-pinjaman trigger-input" type="text" value="" name = "total_pembayaran_pinjaman" readonly>' +
             '</b></td>'));
@@ -1326,11 +1304,10 @@
 
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>GRAND TOTAL</b></td>'));
-        newRow.append($('<td style="text-align:center;"><b>' + TotalOrder + '</b></td>'));
-        // newRow.append($('<td style="text-align:center;"><b>' + TotalDiterima + '</b></td>'));
+        // newRow.append($('<td style="text-align:center;"></td>'));
         // newRow.append($('<td style="text-align:center;"><b>' + greatFormatRupiahPayment(TotalHarga) + '</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
-            '<input autocomplete="one-time-code" data-id=""  class="form-control grand-total" type="text" value="" name = "grand_total"  readonly>' +
+            '<input autocomplete="one-time-code" data-id=""  class="form-control grand-total" type="text" value="" name = "grand_total" readonly>' +
             '</b></td>'));
 
         table.find('tbody').append(newRow);
@@ -1683,9 +1660,9 @@
     }
 
 
-    $(document).on("input", ".pembayaran", function() {
+    $(document).on("input", ".total_po_dibayar", function() {
         var sum = 0;
-        $(".pembayaran").each(function() {
+        $(".total_po_dibayar").each(function() {
             sum += destroyFormatRupiahPayment($(this).val());
         });
         $(".total-pembayaran").val(greatFormatRupiahPayment(sum));
@@ -1729,7 +1706,6 @@
         var maxPotongan = totalPembayaran - totalBayarPanjar;
         limitInputBayar(this, maxPotongan);
 
-        console.log(total);
         updateGrandTotal(); 
     });
 

@@ -127,6 +127,8 @@ class PenerimaanBarangImportBP extends BaseController
             "status" => $this->request->getVar("status"),
             "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "note" => strtolower($this->request->getVar('note')),
+            "nama_barang" => strtolower($this->request->getVar('nama_barang'))
         ];
 
         $limit = $this->request->getVar("length");
@@ -192,6 +194,8 @@ class PenerimaanBarangImportBP extends BaseController
             "status" => $this->request->getVar("status"),
             "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "note" => strtolower($this->request->getVar('note')),
+            "nama_barang" => strtolower($this->request->getVar('nama_barang'))
         ];
 
         $penerimaanBarangData = $this->penerimaanBarangModel->getPenerimaanBarangList($condition, $addCondition, 100000000, 0);
@@ -236,7 +240,9 @@ class PenerimaanBarangImportBP extends BaseController
             "penerimaan_barang.status_penerimaan" => "IMPORT",
             "penerimaan_barang.deletedAt" => null,
             "penerimaan_barang_detail.deletedAt" => null,
-            "tipe_bahan" => "PENOLONG"
+            "tipe_bahan" => "PENOLONG",
+            "note" => strtolower($this->request->getVar('note')),
+            "nama_barang" => strtolower($this->request->getVar('nama_barang'))
         ];
 
         $addCondition = [
@@ -436,10 +442,11 @@ class PenerimaanBarangImportBP extends BaseController
         if ($this->penerimaanBarangModel->find($id) == null) {
             return redirect()->to('penerimaan-barang-import-bp');
         }
+        $dataPenerimaanBarang =  $this->penerimaanBarangModel->where('id', $id)->first();
 
         $dataAJU = $this->metadataModel->getBCUsed("po_import_bp");
         $dataSupplier = $this->supplierModel->getSupplierByType('INTERNASIONAL');
-        $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
+        $dataWarehouse = $this->warehousesModel->where('divisi_id', $dataPenerimaanBarang['divisi_id'])->where('deletedAt', null)->findAll();
         $dataSatuan = $this->satuanModel->asObject()->find();
         $dataDivisi = $this->divisiModel->getDivisiAccess();
         $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
@@ -449,7 +456,7 @@ class PenerimaanBarangImportBP extends BaseController
             "dataWarehouse" => $dataWarehouse,
             "dataSupplier" => $dataSupplier,
             "dataAJU" => $dataAJU,
-            "dataPenerimaanBarang" => $this->penerimaanBarangModel->where('id', $id)->first(),
+            "dataPenerimaanBarang" => $dataPenerimaanBarang,
             "dataKemasan"   => $dataKemasan,
             "dataDivisi" => $dataDivisi,
         ];

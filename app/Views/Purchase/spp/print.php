@@ -17,16 +17,16 @@
             text-align: center;
         }
 
-        @page {
+        /* @page {
             size: 8.27in 5.50in landscape;
             margin: 25px;
             padding: 25px;
-        }
+        } */
 
         .table-border {
             border: 1px solid black;
-            padding-left: 3px;
-            padding-right: 3px;
+            /* padding-left: 3px; */
+            /* padding-right: 3px; */
         }
 
         table {
@@ -72,12 +72,12 @@
             text-align: center;
         }
 
-        .footer {
+        /* .footer {
             position: absolute;
             bottom: 0;
             width: 100%;
             height: 90px;
-        }
+        } */
 
         tbody {
             font-size: 12px;

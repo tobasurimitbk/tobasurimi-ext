@@ -11,6 +11,7 @@ use App\Models\JasaVendorOutModel;
 use App\Models\KemasanModel;
 use App\Models\MetadataModel;
 use App\Models\ProsesRebusModel;
+use App\Models\RMPurchaseOrderModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
@@ -39,6 +40,7 @@ class JasaVendorOut extends BaseController
     protected $satuanModel;
     protected $supplierModel;
     protected $prosesRebusModel;
+    protected $rmPurchaseOrderModel;
     protected $dompdf;
 
     public function __construct()
@@ -60,13 +62,14 @@ class JasaVendorOut extends BaseController
         $this->satuanModel = new SatuansModel();
         $this->supplierModel = new SupplierModel();
         $this->prosesRebusModel = new ProsesRebusModel();
+        $this->rmPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->dompdf = new Dompdf();
     }
 
     public function index()
     {
         $data = [
-            'dataDivisi' => $this->divisiModel->getDivisiAccess()
+            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
         ];
         return view('jasaVendor/out/index', $data);
     }
@@ -148,6 +151,7 @@ class JasaVendorOut extends BaseController
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
+            'supplier' => $this->supplierModel->getSupplierByType("BAHAN BAKU")
 
         ];
         return view('jasaVendor/out/form', $data);
@@ -168,7 +172,8 @@ class JasaVendorOut extends BaseController
             'divisi' => $this->divisiModel->getDivisiAccess(),
             'jasaVendorOut' => $jasaVendorOut,
             'warehouse' => $this->warehouseModel->where('deletedAt', null)->where('divisi_id', $jasaVendorOut['divisi_id'])->orderBy('warehouse_name', "ASC")->findAll(),
-            'jasaVendorOutDetail' => $this->jasaVendorOutDetailModel->getJasaVendorOutDetail($id)
+            'jasaVendorOutDetail' => $this->jasaVendorOutDetailModel->getJasaVendorOutDetail($id),
+            'supplier' => $this->supplierModel->getSupplierByType("BAHAN BAKU")
 
         ];
 
@@ -469,9 +474,14 @@ class JasaVendorOut extends BaseController
 
     public function getListStockByStockID()
     {
-        if (!empty($this->request->getVar('stock_id'))) {
-            $dataResult = $this->stockDetail2Model->getStockListWithBCDoc(
+        if (!empty($this->request->getVar('stock_id')) && !empty($this->request->getVar('supplier_id'))) {
+            $condition = [
+                'stock_details2.supplier_id' => $this->request->getVar('supplier_id'),
+                'stock_details.sumber' => "LPB"
+            ];
+            $dataResult = $this->stockDetail2Model->getStockListWithAddCondition(
                 $this->request->getVar('stock_id'),
+                $condition
             );
             $stock = $this->stockModel->find($this->request->getVar('stock_id'));
             if ($stock['kemasan_id'] == 0) {
@@ -489,16 +499,20 @@ class JasaVendorOut extends BaseController
             for ($i = 0; $i < count($dataResult); $i++) {
                 $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
 
+                $rmPurchaseOrder = $this->rmPurchaseOrderModel->where('po_no', $dataResult[$i]['stock_dokumen'])
+                    ->where('company_id', $stock['company_id'])
+                    ->first();
+
                 $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
                 $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
                 $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
                 $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
                 $dataResult[$i]['barang'] = strtoupper($barangName);
-                $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+                $dataResult[$i]['stock_date'] = $rmPurchaseOrder == null ? "-" : date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
                 $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
                 $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
                 $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-                $dataResult[$i]['stok_total'] = ($dataResult[$i]['stok_total']);
+                $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
 
                 if ($dataResult[$i]['stok_total'] > 0) {
                     array_push($resultArr, $dataResult[$i]);

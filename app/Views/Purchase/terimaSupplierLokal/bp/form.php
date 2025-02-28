@@ -14,11 +14,7 @@
             </a>
             <?php if (!empty($dataTandaTerimaFaktur)) : ?>
                 <?php if (!$isUsed) : ?>
-                    <?php if (can('T. Terima Supplier', 'P. Lokal Bahan Penolong', 'u')) : ?>
-                        <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                            Simpan
-                        </button>
-                    <?php endif; ?>
+
                     <?php if (can('T. Terima Supplier', 'P. Lokal Bahan Penolong', 'd')) : ?>
                         <button onclick="remove('<?= encrypt($dataTandaTerimaFaktur['id']) ?>')" class="btn btn-hapus delete-parent float-right">
                             Hapus
@@ -29,16 +25,22 @@
                             Print
                         </button>
                     <?php endif; ?>
+                    <?php if (can('T. Terima Supplier', 'P. Lokal Bahan Penolong', 'u')) : ?>
+                        <button id="btn-submit-form" class="btn btn-show-form btn-save float-right btn-submit-form">
+                            Simpan
+                        </button>
+                    <?php endif; ?>
                 <?php else : ?>
                     <?php if (can('T. Terima Supplier', 'P. Lokal Bahan Penolong', 'p')) : ?>
                         <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/" . encrypt($dataTandaTerimaFaktur['id'])) ?>')">
                             Print
                         </button>
                     <?php endif; ?>
+
                 <?php endif; ?>
             <?php else : ?>
                 <?php if (can('T. Terima Supplier', 'P. Lokal Bahan Penolong', 'c')) : ?>
-                    <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                    <button id="btn-submit-form" class="btn btn-show-form btn-save float-right btn-submit-form">
                         Simpan
                     </button>
                 <?php endif; ?>
@@ -67,7 +69,7 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <div class="input-group input-group-password">
                                         <div class="form-floating mb-3" style="height: 50px;">
-                                            <input readonly autocomplete="one-time-code" <?= !empty($dataTandaTerimaFaktur) ? 'readonly' : '' ?> type="text" class="form-control no_tanda_terima_faktur" id="no_tanda_terima_faktur" name="no_tanda_terima_faktur" placeholder="No Tanda Terima Faktur" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['faktur_no'] : $noTandaTerima ?>">
+                                            <input autocomplete="one-time-code" <?= !empty($dataTandaTerimaFaktur) ? ($isUsed ? 'readonly' : '') : '' ?> type="text" class="form-control no_tanda_terima_faktur" id="no_tanda_terima_faktur" name="no_tanda_terima_faktur" placeholder="No Tanda Terima Faktur" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['faktur_no'] : $noTandaTerima ?>">
                                             <label for="floatingInput">No Terima Faktur</label>
                                         </div>
                                         <div class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -80,11 +82,11 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <div class="input-group input-group-password">
                                         <div class="form-floating mb-3" style="height: 50px;">
-                                            <input readonly autocomplete="one-time-code" <?= !empty($dataTandaTerimaFaktur) ? 'readonly' : '' ?> type="text" class="form-control no_tanda_keluar_faktur" id="no_tanda_keluar_faktur" name="no_tanda_keluar_faktur" placeholder="No Tanda Keluar Faktur" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['faktur_keluar_no'] : $noTandaKeluar ?>">
+                                            <input autocomplete="one-time-code" <?= !empty($dataTandaTerimaFaktur) ? ($isUsed ? 'readonly' : '') : '' ?> type="text" class="form-control no_tanda_keluar_faktur" id="no_tanda_keluar_faktur" name="no_tanda_keluar_faktur" placeholder="No Tanda Keluar Faktur" value="<?= !empty($dataTandaTerimaFaktur) ? $dataTandaTerimaFaktur['faktur_keluar_no'] : $noTandaKeluar ?>">
                                             <label for="floatingInput">No Keluar Faktur</label>
                                         </div>
                                         <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                            <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px; <?= !empty($dataTandaTerimaFaktur) ? 'display:none' : '' ?> " class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatusKeluar()">
+                                            <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px; <?= !empty($dataTandaTerimaFaktur) ? 'display:none' : '' ?> " class="auto_generate" id="auto_generate2" name="auto_generate2" type="checkbox" onchange="changeStatusKeluar()">
                                         </div>
                                     </div>
                                 </div>
@@ -107,7 +109,7 @@
                                     <input autocomplete="one-time-code" name="supplier_id" value="<?= $dataTandaTerimaFaktur['supplier_id'] ?>" type="hidden" class="form-control ">
                                 <?php endif; ?>
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select supplier_id" name="supplier_id" id="supplier_id">
+                                    <select <?= $isUsed ? 'disabled' : '' ?> class="form-select supplier_id" name="supplier_id" id="supplier_id">
                                         <option value=""></option>
                                         <option value="all">All</option>
                                         <?php foreach ($dataSupplier as $supplier) : ?>
@@ -140,7 +142,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select divisi_id" name="divisi_id" id="divisi_id">
+                                    <select <?= $isUsed ? 'disabled' : '' ?> class="form-select divisi_id" name="divisi_id" id="divisi_id">
                                         <option value=""></option>
                                         <option value="all">All</option>
                                         <?php foreach ($divisi as $d) : ?>
@@ -161,6 +163,7 @@
                                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-form-tts" id="dataTable" width="100%" cellspacing="0">
                                         <thead class="thead-dark">
                                             <tr>
+                                                <th style="text-align: center;">No</th>
                                                 <th style="text-align: center;"><input type="checkbox" id="parent"></th>
                                                 <th style="text-align: center;" class="sort">No PO</th>
                                                 <th style="text-align: center;" class="sort">Tgl LPB</th>
@@ -191,12 +194,14 @@
                                     <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTable" width="100%" cellspacing="0">
                                         <thead class="thead-dark">
                                             <tr>
+                                                <th style="text-align: center;">No</th>
                                                 <th style="text-align: center;">No PO</th>
                                                 <th style="text-align: center;">Tgl LPB</th>
                                                 <th style="text-align: center;">No LPB</th>
+                                                <th style="text-align: center;">Supplier</th>
                                                 <th style="text-align: center;">Nama Barang</th>
                                                 <th style="text-align: center;">Qty</th>
-                                                <th style="text-align: center;">satuan</th>
+                                                <th style="text-align: center;">Satuan</th>
                                                 <th style="text-align: center;">Total</th>
                                                 <th style="text-align: center;">Action</th>
                                             </tr>
@@ -216,7 +221,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-floating mb-3">
-                                    <input <?= $isUsed ? 'disabled' : '' ?> onkeyup="this.value = greatFormatRupiah(this.value); hitungPotonganTambahan();"autocomplete="one-time-code" type="text" class="form-control tambahan" name="tambahan" id="tambahan" value="<?= !empty($dataTandaTerimaFaktur) ? number_format($dataTandaTerimaFaktur['tambahan']) : '' ?> " placeholder="Keterangan">
+                                    <input <?= $isUsed ? 'disabled' : '' ?> onkeyup="this.value = greatFormatRupiah(this.value); hitungPotonganTambahan();" autocomplete="one-time-code" type="text" class="form-control tambahan" name="tambahan" id="tambahan" value="<?= !empty($dataTandaTerimaFaktur) ? number_format($dataTandaTerimaFaktur['tambahan']) : '' ?> " placeholder="Keterangan">
                                     <label for="floatingInput">Penambahan (Opsional)</label>
                                 </div>
                             </div>
@@ -253,7 +258,7 @@
                 </div>
                 <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                     <form id="pajak-form" class="pajak-form">
-
+                        <input type="hidden" name="tax_id" class="tax_id" id="tax_id">
                         <?php if (!$isUsed) : ?>
                             <div class="row">
                                 <div class="col-md-6">
@@ -346,7 +351,76 @@
             </div>
         </div>
     </div>
+
 </section>
+<div class="modal detail-barang-modal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Update Data Barang</h5>
+            </div>
+            <div class="modal-body">
+                <form class="detail-barang-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input autocomplete="one-time-code" type="hidden" class="penerimaan_barang_detail_id" name="penerimaan_barang_detail_id" id="penerimaan_barang_detail_id" />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control nama_barang_dok" id="nama_barang_dok" name="nama_barang_dok" placeholder="Nama Barang">
+                                <label for="floatingInput">Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control po_no" id="po_no" name="po_no" placeholder="Nomor PO">
+                                <label for="floatingInput">Nomor PO</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Lpb">
+                                <label for="floatingInput">Tanggal LPB</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control supplier_name" id="supplier_name" name="supplier_name" placeholder="Nama Supplier">
+                                <label for="floatingInput">Supplier</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No Penerimaan Barang">
+                                <label for="floatingInput">No LPB</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="number" min="0" class="form-control qty_akan_diterima" id="qty_akan_diterima" name="qty_akan_diterima" placeholder="Qty Akan Diterima">
+                                <label for="floatingInput">Qty Akan Diterima</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control kode_satuan" id="kode_satuan" name="kode_satuan" placeholder="Kode Satuan">
+                                <label for="floatingInput">Satuan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" data-harga_satuan="0" readonly="true" class="form-control total_harga" id="total_harga" name="total_harga" placeholder="Total Harga">
+                                <label for="floatingInput">Total Harga</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-detail btn-discard mr-2">Kembali</button>
+                <button type="submit" id="btn-submit-detail-barang" class="btn btn-submit-form btn-submit-detail-barang">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
@@ -368,6 +442,11 @@
         },
         display: "stripe",
         searching: true,
+        pageLength: 50,
+        lengthMenu: [
+            [50, 100, 200, -1],
+            [50, 100, 200, "All"]
+        ],
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -392,6 +471,11 @@
         },
         display: "stripe",
         searching: false,
+        pageLength: 50,
+        lengthMenu: [
+            [50, 100, 200, -1],
+            [50, 100, 200, "All"]
+        ],
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -418,6 +502,11 @@
         },
         display: "stripe",
         searching: false,
+        pageLength: 50,
+        lengthMenu: [
+            [50, 100, 200, -1],
+            [50, 100, 200, "All"]
+        ],
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -471,7 +560,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('#select-item-btn').click(function () {
+    $('#select-item-btn').click(function() {
         // Jangan reset langsung list_penerimaan_selected
         var selectedSupplierId = null;
 
@@ -481,10 +570,11 @@
         }
 
         var checkedCheckboxes = $(".child:checked"); // Ambil checkbox yang dipilih
-        var dataIds = checkedCheckboxes.map(function () {
+        var dataIds = checkedCheckboxes.map(function() {
             return $(this).data("id");
         }).get();
 
+        // PenerimaanBarangId
         if (dataIds.length === 0) {
             Swal.fire({
                 icon: 'error',
@@ -495,13 +585,13 @@
             return;
         }
 
-        // Validasi supplier names
-        var supplierIds = checkedCheckboxes.map(function () {
-            return $(this).closest('tr').find('td:nth-child(5)').data("supplier-id"); // Ambil supplier_id dari atribut data
+        // Get Semua SupplierId yang di checklist
+        var supplierIds = checkedCheckboxes.map(function() {
+            return $(this).data("supplier_id"); // Ambil supplier_id dari atribut data
         }).get();
 
-        var uniqueSuppliers = [...new Set(supplierIds)];
-        if (uniqueSuppliers.length > 1 || (selectedSupplierId && uniqueSuppliers[0] !== selectedSupplierId)) {
+        // Cek Validasi Supplier Saat Checklist
+        if (supplierIds.every(val => val == supplierIds[0]) == false) {
             Swal.fire({
                 icon: 'error',
                 title: 'Semua data penerimaan harus dari supplier yang sama!',
@@ -509,11 +599,22 @@
                 confirmButtonText: 'Ok'
             });
             return;
+        } else if (list_penerimaan_selected.length > 0) {
+
+            if (supplierIds.every(val => val == selectedSupplierId) == false) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Semua data penerimaan harus dari supplier yang sama!',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+                return;
+            }
         }
 
         // Proses data berdasarkan input yang dipilih
         var updatedList = []; // Array untuk menyimpan data yang masih ada
-        $.each(list_penerimaan_barang, function (i, v) {
+        $.each(list_penerimaan_barang, function(i, v) {
             if (v) { // Pastikan elemen valid
                 if ($.inArray(Number(v.penerimaan_barang_detail_id), dataIds) !== -1) {
                     var targetInputElement = $('input[data-id_input_diterima="' + v.penerimaan_barang_detail_id + '"]');
@@ -697,7 +798,7 @@
         },
     });
 
-    $('.btn-submit-form').click(function() {
+    $('#btn-submit-form').click(function() {
         if ($('.create-form').valid()) {
             if (list_penerimaan_selected.length == 0) {
                 Swal.fire({
@@ -727,12 +828,12 @@
                         data.set('potongan', potonganForm)
                         data.set('tambahan', tambahanForm)
                         const cleanListPajak = list_pajak.map(item => ({
-                                ...item,
-                                tax_amt: destroyFormatRupiah(item.tax_amt),
-                            }));
+                            ...item,
+                            tax_amt: destroyFormatRupiah(item.tax_amt),
+                        }));
                         data.append("listPajak", JSON.stringify(cleanListPajak));
                         data.append("listPenerimaanBarang", JSON.stringify(list_penerimaan_selected));
-                        
+
                         if (id) {
                             // UPDATE
                             $.ajax({
@@ -802,16 +903,39 @@
 
     $('#add-tax-btn').click(function() {
         if ($('.pajak-form').valid()) {
-            list_pajak.push({
-                tax_inv_date: $('#tax_inv_date').val(),
-                tax_inv_no: $('#tax_inv_no').val(),
-                tax_type: $('#tax_type').val(),
-                tax_amt: $('#tax_amt').val(),
-                tax_status: $('#tax_status').val(),
-                tax_note: $('#tax_note').val()
-            });
+            var taxId = $('#tax_id').val();
+            if (taxId == '' || taxId == null) {
+                // Create
+                list_pajak.push({
+                    id: getID(),
+                    tax_inv_date: $('#tax_inv_date').val(),
+                    tax_inv_no: $('#tax_inv_no').val(),
+                    tax_type: $('#tax_type').val(),
+                    tax_amt: destroyFormatRupiah($('#tax_amt').val()),
+                    tax_status: $('#tax_status').val(),
+                    tax_note: $('#tax_note').val()
+                });
+            } else {
+                // Update
+                var indexSelected = -1;
+                for (var i = 0; i < list_pajak.length; i++) {
+                    if (list_pajak[i].id == taxId) {
+                        indexSelected = i;
+                        break;
+                    }
+                }
+
+                list_pajak[indexSelected].tax_inv_date = $('#tax_inv_date').val();
+                list_pajak[indexSelected].tax_inv_no = $('#tax_inv_no').val();
+                list_pajak[indexSelected].tax_type = $('#tax_type').val();
+                list_pajak[indexSelected].tax_amt = destroyFormatRupiah($('#tax_amt').val());
+                list_pajak[indexSelected].tax_status = $('#tax_status').val();
+                list_pajak[indexSelected].tax_note = $('#tax_note').val();
+
+            }
             drawTablePengenaanPajak(list_pajak);
             // reset
+            $('#tax_id').val(null);
             $('#tax_inv_date').val(null);
             $('#tax_inv_no').val(null);
             $('#tax_type').val(null).change();
@@ -821,8 +945,58 @@
         }
     });
 
+    $('.btn-hide-detail').click(function() {
+        $('.detail-barang-modal').modal('hide');
+    });
+
+    $('#qty_akan_diterima').keyup(function() {
+        var qty = $(this).val();
+        var hargaSatuan = $('#total_harga').attr('harga_satuan');
+        $('#total_harga').val(greatFormatRupiah(qty * hargaSatuan));
+    });
+
+    $('#btn-submit-detail-barang').click(function() {
+        var qtyAkanDiterima = $('#qty_akan_diterima').val();
+        var id = $('#penerimaan_barang_detail_id').val();
+        var indexSelected = 0;
+        var itemSelected = null;
+        // Cari item yang dihapus dari list_penerimaan_selected
+        for (var i = 0; i < list_penerimaan_selected.length; i++) {
+            if (list_penerimaan_selected[i].penerimaan_barang_detail_id === id) {
+                itemSelected = list_penerimaan_selected[i];
+                indexSelected = i;
+                break;
+            }
+        }
+
+        var qtySisa = Number(itemSelected.qty_lpb) - Number(itemSelected.qty_telah_diterima);
+        var cekQtySisa = qtySisa - qtyAkanDiterima; // jika hasilnya minus maka invalid
+
+        if (qtyAkanDiterima <= 0 || qtyAkanDiterima == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Qty yang akan diterima tidak boleh kosong',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        } else if (cekQtySisa < 0 && qtySisa != 0) {
+            console.log(cekQtySisa);
+            Swal.fire({
+                icon: 'error',
+                title: 'Qty yang akan diterima tidak boleh lebih dari ' + qtySisa,
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        } else {
+            list_penerimaan_selected[indexSelected].qty_akan_diterima = qtyAkanDiterima;
+            drawTableSelected(list_penerimaan_selected);
+            $('.detail-barang-modal').modal('hide');
+        }
+    })
+
     function hitungPotonganTambahan() {
-        console.log(potongan, tambahan)
         var potongan = Number(destroyFormatRupiah($('.potongan').val()) || 0);
         var tambahan = Number(destroyFormatRupiah($('.tambahan').val()) || 0);
         var harga = 0;
@@ -834,6 +1008,44 @@
         $('.total_tambahan_potongan').val(greatFormatRupiah(total));
 
     }
+
+    // UPDATE
+    function editDetailRow(id) {
+        event.preventDefault();
+        var itemSelected = null;
+        // Cari item yang dihapus dari list_penerimaan_selected
+        for (var i = 0; i < list_penerimaan_selected.length; i++) {
+            if (list_penerimaan_selected[i].penerimaan_barang_detail_id === id) {
+                itemSelected = list_penerimaan_selected[i];
+                break;
+            }
+        }
+        var hargaTotal = itemSelected.harga * itemSelected.qty_akan_diterima;
+
+        $('#penerimaan_barang_detail_id').val(id);
+        $('#nama_barang_dok').val(itemSelected.nama_barang_dok);
+        $('#po_no').val(itemSelected.po_no);
+        $('#tanggal').val(itemSelected.tanggal);
+        $('#supplier_name').val(itemSelected.supplier_name);
+        $('#no_penerimaan_barang').val(itemSelected.no_penerimaan_barang);
+        $('#qty_akan_diterima').val(itemSelected.qty_akan_diterima);
+        $('#kode_satuan').val(itemSelected.kode_satuan);
+        $('#total_harga').val(greatFormatRupiah(hargaTotal));
+        $('#total_harga').attr('harga_satuan', itemSelected.harga); // Harga Satuan
+        $('.detail-barang-modal').modal('show');
+    }
+
+    function getID() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let randomString = '';
+
+        for (let i = 0; i < 10; i++) {
+            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
+        return randomString;
+    };
+
 
     <?php if (empty($dataTandaTerimaFaktur)) : ?>
         // CREATE
@@ -893,9 +1105,11 @@
             drawTableSelected(list_penerimaan_selected); // Perbarui tabel selected
             drawTableDaftarPenerimaanBarang(list_penerimaan_barang); // Perbarui tabel utama
         }
+
     <?php else : ?>
         // UPDATE (Jika update langsung delete ke server)
         function deleteDetailRow(id) {
+            event.preventDefault();
             Swal.fire({
                 icon: 'question',
                 title: 'Hapus Daftar Penerimaan Barang ?',
@@ -921,7 +1135,7 @@
                         processData: false,
                         contentType: false,
                         success: function(response) {
-                            window.location.href = "<?= base_url('tanda-terima-faktur-lokal-bp') ?>"
+                            location.reload()
                         },
                     });
                 }
@@ -929,32 +1143,39 @@
         }
     <?php endif; ?>
 
-    function deletePajak(tax_no) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Pajak ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Kembali',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var indexToRemove = -1;
-                for (var i = 0; i < list_pajak.length; i++) {
-                    if (list_pajak[i].tax_inv_no === tax_no) {
-                        indexToRemove = i;
-                        break;
-                    }
-                }
-                if (indexToRemove !== -1) {
-                    list_pajak.splice(indexToRemove, 1);
-                }
-                drawTablePengenaanPajak(list_pajak);
+    function deletePajak(id) {
+        var indexToRemove = -1;
+        for (var i = 0; i < list_pajak.length; i++) {
+            if (list_pajak[i].id == id) {
+                indexToRemove = i;
+                break;
             }
-        })
+        }
+        if (indexToRemove !== -1) {
+            list_pajak.splice(indexToRemove, 1);
+        }
+        drawTablePengenaanPajak(list_pajak);
 
+    }
+
+    function editPajak(id) {
+        event.preventDefault();
+        var indexSelected = -1;
+        var taxSelected = null;
+        for (var i = 0; i < list_pajak.length; i++) {
+            if (list_pajak[i].id == id) {
+                indexSelected = i;
+                taxSelected = list_pajak[i];
+                break;
+            }
+        }
+        $('#tax_id').val(taxSelected.id);
+        $('#tax_inv_date').val(taxSelected.tax_inv_date);
+        $('#tax_inv_no').val(taxSelected.tax_inv_no);
+        $('#tax_type').val(taxSelected.tax_type).change();
+        $('#tax_amt').val(greatFormatRupiah(taxSelected.tax_amt));
+        $('#tax_status').val(taxSelected.tax_status).change();
+        $('#tax_note').val(taxSelected.tax_note);
     }
 
     function drawTablePengenaanPajak(data) {
@@ -985,7 +1206,12 @@
             <?php else : ?>
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <button type="button" class="btn btn-danger" onclick="deletePajak('${v.tax_inv_no}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                     <button class="btn btn-warning mr-1" onclick="editPajak('${v.id}')">
+                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                    </button>
+                    <button class="btn btn-default mr-1" onclick="deletePajak('${v.id}')" style="background-color:red;">
+                        <i class="fa fa-trash fa-sm text-white" aria-hidden="true"></i>                    
+                    </button>
                 `
                 ));
             <?php endif; ?>
@@ -1006,6 +1232,11 @@
             },
             display: "stripe",
             searching: false,
+            pageLength: 50,
+            lengthMenu: [
+                [50, 100, 200, -1],
+                [50, 100, 200, "All"]
+            ],
             language: {
                 emptyTable: "Tidak Ada Data",
                 lengthMenu: "Show _MENU_ entries",
@@ -1021,7 +1252,6 @@
     }
 
     function drawTableSelected(data) {
-        console.log(data);
         if ($.fn.DataTable.isDataTable('#selectedItemTable')) {
             $('#selectedItemTable').DataTable().clear().draw();
             selectedItemTable.destroy();
@@ -1029,12 +1259,15 @@
 
         const table = $('#selectedItemTable');
         const tbody = table.find('tbody');
+        var no = 1;
         $.each(data, function(i, v) {
             var harga = (Number(v.qty_akan_diterima) * Number(v.harga));
             var newRow = $('<tr>');
+            newRow.append($('<td style="text-align: center;">').text(no++));
             newRow.append($('<td style="text-align: center;">').text(v.po_no));
             newRow.append($('<td style="text-align: center;">').text(v.tanggal));
             newRow.append($('<td style="text-align: center;">').text(v.no_penerimaan_barang));
+            newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
             newRow.append($('<td style="text-align: center;">').text(v.nama_barang_dok));
             newRow.append($('<td style="text-align: center;">').text(v.qty_akan_diterima));
             newRow.append($('<td style="text-align: center;">').text(v.kode_satuan));
@@ -1048,9 +1281,13 @@
             <?php else : ?>
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <button type="button" class="btn btn-danger" onclick="deleteDetailRow('${v.penerimaan_barang_detail_id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-                    <button type="button" class="btn btn-primary" onclick="editDetailRow('${v.penerimaan_barang_detail_id}')" ><i class="fa fa-pencil fa-sm" aria-hidden="true"></i></button>
-                `   
+                    <button class="btn btn-warning mr-1" onclick="editDetailRow('${v.penerimaan_barang_detail_id}')">
+                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                    </button>
+                    <button class="btn btn-default mr-1" onclick="deleteDetailRow('${v.penerimaan_barang_detail_id}')" style="background-color:red;">
+                        <i class="fa fa-trash fa-sm text-white" aria-hidden="true"></i>                    
+                    </button>
+                `
                 ));
             <?php endif; ?>
 
@@ -1071,6 +1308,11 @@
             },
             display: "stripe",
             searching: false,
+            pageLength: 50,
+            lengthMenu: [
+                [50, 100, 200, -1],
+                [50, 100, 200, "All"]
+            ],
             language: {
                 emptyTable: "Tidak Ada Data",
                 lengthMenu: "Show _MENU_ entries",
@@ -1091,15 +1333,17 @@
             dataTable.destroy();
         }
         const table = $('#dataTable');
+        var no = 1;
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align: center;">').html(
                 `
                     <div class="form-check">
-                        <input data-id="${v.penerimaan_barang_detail_id}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
+                        <input data-supplier_id="${v.supplier_id}" data-id="${v.penerimaan_barang_detail_id}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
                     </div>
                 `
             ));
+            newRow.append($('<td style="text-align: center;">').text(no++));
             newRow.append($('<td style="text-align: center;">').text(v.po_no));
             newRow.append($('<td style="text-align: center;">').text(v.tanggal));
             newRow.append($('<td style="text-align: center;">').text(v.no_penerimaan_barang));
@@ -1117,7 +1361,7 @@
             <?php else : ?>
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <input autocomplete="one-time-code" data-id_input_diterima="${v.penerimaan_barang_detail_id}" class="form-control" oninput="preventNegativeInput(this)" type="text" value="${v.qty_akan_diterima}">
+                    <input autocomplete="one-time-code" data-id_input_diterima="${v.penerimaan_barang_detail_id}" class="form-control" type="number" min="0" value="${v.qty_akan_diterima}">
                 `
                 ));
             <?php endif ?>
@@ -1140,6 +1384,11 @@
             },
             display: "stripe",
             searching: true,
+            pageLength: 50,
+            lengthMenu: [
+                [50, 100, 200, -1],
+                [50, 100, 200, "All"]
+            ],
             language: {
                 emptyTable: "Tidak Ada Data",
                 lengthMenu: "Show _MENU_ entries",
@@ -1173,7 +1422,8 @@
                 url: `<?= base_url("tanda-terima-faktur-lokal-bp/generate-tanda-terima-no"); ?>`,
                 method: "GET",
                 data: {
-                    warehouseID: $('#warehouse_id').val()
+                    warehouseID: $('#warehouse_id').val(),
+                    tanggal_terima: $('#tanggal_terima').val()
                 },
                 dataType: "json",
                 success: function(res) {
@@ -1199,14 +1449,15 @@
 
 
     function changeStatusKeluar() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
+        let value = document.getElementById('auto_generate2').checked ? true : false;
         if (value) {
             $(".no_tanda_keluar_faktur").attr("readonly", true);
             $.ajax({
                 url: `<?= base_url("tanda-terima-faktur-lokal-bp/generate-tanda-keluar-no"); ?>`,
                 method: "GET",
                 data: {
-                    warehouseID: $('#warehouse_id').val()
+                    warehouseID: $('#warehouse_id').val(),
+                    tanggal_terima: $('#tanggal_terima').val()
                 },
                 dataType: "json",
                 success: function(res) {
@@ -1219,7 +1470,7 @@
                             confirmButtonColor: '#4e73df',
                         })
                         $(".no_tanda_keluar_faktur").attr("readonly", false);
-                        $("#auto_generate").prop("checked", false);
+                        $("#auto_generate2").prop("checked", false);
                         $(".no_tanda_keluar_faktur").val("");
                     }
                 }
@@ -1278,6 +1529,7 @@
         function daftarPenerimaanFromDB() {
             <?php foreach ($dataDetailTandaTerimaFaktur as $d) : ?>
                 list_penerimaan_selected.push({
+                    divisi_id: "<?= $d['divisi_id'] ?>",
                     penerimaan_barang_detail_id: "<?= $d['penerimaan_barang_detail_id'] ?>",
                     po_no: "<?= $d['po_no'] ?>",
                     tanggal: "<?= $d['tanggal'] ?>",
@@ -1288,6 +1540,8 @@
                     qty_telah_diterima: "<?= $d['qty_telah_diterima'] ?>",
                     qty_akan_diterima: "<?= $d['qty_akan_diterima'] ?>",
                     kode_satuan: "<?= $d['kode_satuan'] ?>",
+                    supplier_name: "<?= $d['supplier_name'] ?>",
+                    supplier_id: "<?= $d['supplier_id'] ?>",
                     harga: "<?= $d['harga'] ?>"
                 });
             <?php endforeach; ?>
@@ -1308,6 +1562,7 @@
                 qty_telah_diterima: "<?= $d['qty_telah_diterima'] ?>",
                 qty_akan_diterima: "<?= $d['qty_akan_diterima'] ?>",
                 kode_satuan: "<?= $d['kode_satuan'] ?>",
+                supplier_id: "<?= $d['supplier_id'] ?>",
                 harga: "<?= $d['harga'] ?>"
             });
         <?php endforeach; ?>
@@ -1315,6 +1570,7 @@
 
         <?php foreach ($dataPajak as $d) : ?>
             list_pajak.push({
+                id: getID(),
                 tax_inv_date: "<?= date('d/m/Y', strtotime($d['tax_inv_date']))  ?>",
                 tax_inv_no: "<?= $d['tax_inv_no'] ?>",
                 tax_type: "<?= $d['tax_type'] ?>",
@@ -1367,5 +1623,13 @@
         }
     </script>
 <?php else : ?>
+    <script>
+        $('#tanggal_terima').change(function() {
+            changeStatus();
+            changeStatusKeluar();
+        });
+        changeStatus();
+        changeStatusKeluar();
+    </script>
 <?php endif; ?>
 <?= $this->endSection(); ?>

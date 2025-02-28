@@ -276,7 +276,7 @@ class POImportBahanPenolong extends BaseController
                 'remaining_qty' => $b->qty,
                 'total' => repairDouble2($b->total),
             ]);
-            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, '');
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id,  $this->request->getVar('note'));
         }
 
         $this->sppModel->update($this->request->getVar('spp_id'), [
@@ -385,7 +385,7 @@ class POImportBahanPenolong extends BaseController
                     'total' => repairDouble2($b->total),
                 ]);
                 array_push($id_detail_all, $check['id']);
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, $b->note);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id,  $this->request->getVar('note'));
             } else {
                 // NEW BARANG
                 // DELETE
@@ -409,7 +409,7 @@ class POImportBahanPenolong extends BaseController
                     'total' => repairDouble2($b->total),
                 ]);
                 array_push($id_detail_all, $id_detail_new);
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, '');
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id,  $this->request->getVar('note'));
             }
         }
 

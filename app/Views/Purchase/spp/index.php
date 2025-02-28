@@ -192,6 +192,7 @@
                     let spp_type = row.spp_type;
                     let status = row.status;
 
+
                     if (is_posted === "0") {
                         return `
                             <div class="mt-0">
@@ -217,15 +218,8 @@
                     }
                     if (is_posted === "1") {
                         var res = '';
-                        res += `
-                            <?php if (can('Pembelian', 'SPP', 'p')) : ?>
-                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("spp/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
-                            <?php endif; ?>
-                        `;
 
-                        if (status != "CLOSED") {
+                        if (status == "OPEN") {
                             res += `
                                 <?php if (can('Pembelian', 'SPP', 'ua')) : ?>
                                     <button data-toggle="tooltip" title="Un-Posting" onclick="updateStatus('${id}', 0)" class="btn btn-danger posting-spp">
@@ -234,6 +228,24 @@
                                 <?php endif; ?>
                             `;
                         }
+                        res += `
+                            <?php if (can('Pembelian', 'SPP', 'p')) : ?>
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("spp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                        `;
+
+                        if (status == "OPEN" && is_posted == "1") {
+                            res += `
+                                <?php if (can('Pembelian', 'SPP', 'a')) : ?>
+                                    <button data-toggle="tooltip" title="Close SPP" onclick="closeSPP('${id}')" class="btn btn-danger posting-spp">
+                                        <i class="fa fa-xmark fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                <?php endif; ?>
+                            `;
+                        }
+
 
                         return `
                             <div class="mt-0">
@@ -408,6 +420,66 @@
             }
         })
     }
+
+    const closeSPP = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan Close SPP?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Close',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("spp/close-spp"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading()
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal Close SPP, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
+    }
+
 
     const print = function(url) {
         window.open(url, "_blank");

@@ -144,7 +144,7 @@
                     <input type="hidden" name="id_detail" class="id_detail" id="id_detail">
                     <div class="row">
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select type_barang" disabled id="type_barang" name="type_barang" aria-label="Floating label select example">
                                     <option value=""></option>
@@ -159,8 +159,19 @@
                                 <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
                             </div>
                         </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($supplier as $s): ?>
+                                        <option value="<?= $s['id'] ?>"><?= $s['name']  ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Supplier</label>
+                            </div>
+                        </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select spesifikasi_rebus_id" id="spesifikasi_rebus_id" name="spesifikasi_rebus_id" aria-label="Floating label select example">
                                     <option value=""></option>
@@ -170,7 +181,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select spesifikasi_hasil_rebus_id" id="spesifikasi_hasil_rebus_id" name="spesifikasi_hasil_rebus_id" aria-label="Floating label select example">
                                     <option value=""></option>
@@ -179,13 +190,13 @@
                                 <label for="floatingInput" style="z-index: 1;">Barang - Spesifikasi (Hasil Rebus)</label>
                             </div>
                         </div>
-                        <div class="col-md-4 form-fifo">
+                        <div class="col-md-3 form-fifo">
                             <div class="form-floating" style="height: 50px;">
                                 <input placeholder="Qty" oninput="preventNegativeInput(this)" class="form-control qty_rebus_fifo" id="qty_rebus_fifo" name="qty_rebus_fifo" aria-label="Floating label select example" />
                                 <label for="floatingInput" style="z-index: 1;">Qty Akan Di Rebus</label>
                             </div>
                         </div>
-                        <div class="col-md-4 form-fifo">
+                        <div class="col-md-3 form-fifo">
                             <div class="form-floating" style="height: 50px;">
                                 <input placeholder="Qty" oninput="preventNegativeInput(this)" class="form-control qty_hasil_rebus_fifo" id="qty_hasil_rebus_fifo" name="qty_hasil_rebus_fifo" aria-label="Floating label select example" />
                                 <label for="floatingInput" style="z-index: 1;">Qty Hasil Rebus</label>
@@ -206,11 +217,11 @@
                                     <tr>
                                         <th style="text-align: center;">#</th>
                                         <th style="text-align: center;">Asal Barang</th>
-                                        <th style="text-align: center;">No Dokumen</th>
+                                        <th style="text-align: center;">No PO</th>
                                         <th style="text-align: center;">Supplier</th>
                                         <th style="text-align: center;">Dokumen Pabean</th>
-                                        <th style="text-align: center;">No Aju</th>
-                                        <th style="text-align: center;">Tanggal Penerimaan</th>
+                                        <!-- <th style="text-align: center;">No Aju</th> -->
+                                        <th style="text-align: center;">Tgl PO</th>
                                         <th style="text-align: center;">Barang - Spesifikasi</th>
                                         <th style="text-align: center;">Satuan</th>
                                         <th style="text-align: center;">Qty</th>
@@ -235,17 +246,17 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="selectedItemTable" width="100%" border="1" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="text-align: center;" colspan="6">Detail Dokumen Pabean</th>
+                                    <th style="text-align: center;" colspan="5">Detail PO & LPB</th>
                                     <th style="text-align: center;" colspan="4">Daftar Barang Rebus</th>
-                                    <th style="text-align: center;" colspan="4">Daftar Barang Hasil Rebus</th>
+                                    <th style="text-align: center;" colspan="5">Daftar Barang Hasil Rebus</th>
                                 </tr>
                                 <tr>
                                     <th style="text-align: center;">No</th>
                                     <th style="text-align: center;">Asal Barang</th>
                                     <th style="text-align: center;">No Dokumen</th>
                                     <th style="text-align: center;">Supplier</th>
-                                    <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">Tgl Penerimaan</th>
+                                    <!-- <th style="text-align: center;">Dokumen Pabean</th> -->
+                                    <th style="text-align: center;">Tgl PO</th>
 
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
@@ -459,6 +470,17 @@
     }).change(function() {
 
     });
+
+
+    $('#supplier_id').select2({
+        placeholder: "Pilih Supplier",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        // LIST DOKUMEN PABEAN
+        getListDokumenPabean();
+    });
+
 
     // VALIDATOR
     var validator = $(".create-form").validate({
@@ -822,7 +844,7 @@
     });
 
 
-    $("#vendor_id,#warehouse_id,#divisi_id,#type_barang,#spesifikasi_rebus_id,#spesifikasi_hasil_rebus_id,#type_pengambilan_stock")
+    $("#vendor_id,#warehouse_id,#divisi_id,#type_barang,#spesifikasi_rebus_id,#spesifikasi_hasil_rebus_id,#type_pengambilan_stock,#supplier_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -904,6 +926,7 @@
             },
             data: {
                 stock_id: $(".spesifikasi_rebus_id option:selected").data('stock_id'),
+                supplier_id: $(".supplier_id option:selected").val()
             },
             dataType: "json",
             success: function(res) {
@@ -973,7 +996,7 @@
             newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
             newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
             newRow.append($('<td style="text-align:center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align:center;">').text(v.no_aju));
+            // newRow.append($('<td style="text-align:center;">').text(v.no_aju));
             newRow.append($('<td style="text-align:center;">').text(v.stock_date));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
             newRow.append($('<td style="text-align:center;">').text(v.satuan));
@@ -1037,7 +1060,7 @@
                 newRow.append($('<td style="text-align: center;">').text(v.sumber));
                 newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
                 newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
-                newRow.append($('<td style="text-align: center;">').text(v.bc_type + '/' + v.no_aju));
+                // newRow.append($('<td style="text-align: center;">').text(v.bc_type + '/' + v.no_aju));
                 newRow.append($('<td style="text-align: center;">').text(v.stock_date));
                 newRow.append($('<td style="text-align: center;">').text(v.barang));
                 newRow.append($('<td style="text-align: center;">').text(v.stok_total));
@@ -1083,10 +1106,10 @@
 
             var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
             newRow.append($('<td style="text-align: right;" colspan="8">').html("<b>GRAND TOTAL</b>"));
-            newRow.append($('<td style="text-align: center;">').text(totalQtyRebus.toFixed(4)));
-            newRow.append($('<td colspan ="2">').text(''));
-            newRow.append($('<td style="text-align: center;">').text(totalQtyHasilRebus.toFixed(4)));
-            newRow.append($('<td colspan ="2">').text(''));
+            newRow.append($('<td style="text-align: center;">').text(totalQtyRebus.toFixed(2)));
+            newRow.append($('<td colspan ="1">').text(''));
+            newRow.append($('<td style="text-align: center;">').text(totalQtyHasilRebus.toFixed(2)));
+            newRow.append($('<td colspan ="3">').text(''));
             table.find('tbody').append(newRow);
         }
 

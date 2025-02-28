@@ -91,7 +91,7 @@
                     });
                 } else {
                     var newRow = $('<tr style="border: none">');
-                    newRow.append($('<td colspan ="10"  style="text-align:center;">').text("Tidak ada Dokumen Bea Cukai"));
+                    newRow.append($('<td colspan ="12"  style="text-align:center;">').text("Tidak ada Dokumen Bea Cukai"));
                     table.find('tbody').append(newRow);
                 }
 

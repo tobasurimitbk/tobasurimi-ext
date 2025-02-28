@@ -46,6 +46,7 @@ $routes->get('/403', function () {
 // DASHBOARD
 $routes->get('/dashboard', 'Dashboard\Dashboard::dashboard', ['filter' => 'Auth']);
 $routes->get('/dashboard/toggle', 'Dashboard\Dashboard::toggleSidebar', ['filter' => 'Auth']);
+$routes->get('/dashboard/change-theme', 'Dashboard\Dashboard::darkLightMode', ['filter' => 'Auth']);
 $routes->get('/dashboard/get-number-bc', 'Dashboard\Dashboard::getNumberBC', ['filter' => 'Auth']);
 $routes->get('/dashboard/list-dokumen-bc23/', 'Dashboard\RekapBeaCukai::rekapBC23', ['filter' => 'Auth']);
 $routes->get('/dashboard/list-dokumen-bc23/all', 'Dashboard\RekapBeaCukai::rekapBC23all', ['filter' => 'Auth']);
@@ -282,6 +283,7 @@ $routes->post('/spp/delete', 'Purchase\SPP::deleteSPP', ['filter' => 'Auth']);
 $routes->post('/spp/delete-detail', 'Purchase\SPP::deleteSPPDetail', ['filter' => 'Auth']);
 $routes->get('/spp/print-table', 'Purchase\SPP::printTable', ['filter' => 'Auth']);
 $routes->get('/spp/print/(:segment)', 'Purchase\SPP::print/$1', ['filter' => 'Auth']);
+$routes->post('/spp/close-spp', 'Purchase\SPP::closeSPP', ['filter' => 'Auth']);
 
 
 // BAHAN BAKU PO LOKAL
@@ -319,6 +321,7 @@ $routes->get('/po-lokal-bahan-penolong/histori-lpb', 'Purchase\POLokalBahanPenol
 $routes->get('/po-lokal-bahan-penolong/histori-harga', 'Purchase\POLokalBahanPenolong::getHistoriHarga', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/dropdown/get-spp', 'Purchase\POLokalBahanBaku::dropdownGetSpp', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/dropdown/get-detail-barang-spp', 'Purchase\POLokalBahanPenolong::dropdownGetSppDetail', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-penolong/dropdown/get-barang', 'Purchase\POLokalBahanPenolong::dropdownBarang', ['filter' => 'Auth']);
 
 // BAHAN BAKU PO IMPORT
 $routes->get('/po-import-bahan-baku', 'Purchase\POImportBahanBaku::poImportBahanBaku', ['filter' => 'Auth']);
@@ -437,8 +440,9 @@ $routes->get('/pembayaran-po-lokal/get-panjar-amount', 'Pembayaran\PembayaranPOL
 $routes->get('/pembayaran-po-lokal-bb', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBB', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bb/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBB', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bb/get-lpb-not-paid', 'Pembayaran\PembayaranPOLokal::getListDokumenLPBNotPaidBB', ['filter' => 'Auth']);
-$routes->post('/pembayaran-po-lokal-bb/get-list-po-no-paid', 'Pembayaran\PembayaranPOLokal::getListBarangLPBNotPaidBB', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-lokal-bb/get-po-not-paid', 'Pembayaran\PembayaranPOLokal::getListDokumenPoNotPaidBB', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bb/get-list-po-paid', 'Pembayaran\PembayaranPOLokal::getListBarangLPBPaidBB', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-lokal-bb/get-list-po-no-paid', 'Pembayaran\PembayaranPOLokal::getListBarangPoNotPaidBB', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bb/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBBAction', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bb/update', 'Pembayaran\PembayaranPOLokal::updatePembayaranPOLokalBBAction', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bb/delete', 'Pembayaran\PembayaranPOLokal::deleteBB', ['filter' => 'Auth']);
@@ -927,7 +931,7 @@ $routes->get('/proses-rebus/create', 'JasaVendor\ProsesRebus::create', ['filter'
 $routes->get('/proses-rebus/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/list-barang-stock-init', 'JasaVendor\ProsesRebus::dropdownListBarangIsInit', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/list-barang-rebus', 'JasaVendor\ProsesRebus::dropdownListHasilRebus', ['filter' => 'Auth']);
-$routes->get('/proses-rebus/list-stock-dokumen-bc', 'Inventori\StokAdjusment::getListStockByStockID', ['filter' => 'Auth']);
+$routes->get('/proses-rebus/list-stock-dokumen-bc', 'JasaVendor\JasaVendorOut::getListStockByStockID', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/all',  'JasaVendor\ProsesRebus::all', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/id/(:segment)',  'JasaVendor\ProsesRebus::detail/$1', ['filter' => 'Auth']);
 $routes->post('/proses-rebus/save',  'JasaVendor\ProsesRebus::createAction', ['filter' => 'Auth']);
