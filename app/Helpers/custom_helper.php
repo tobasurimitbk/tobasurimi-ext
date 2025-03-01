@@ -282,6 +282,11 @@ function getLastDay()
    return date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
 }
 
+function getLastDayByDate($date)
+{
+   return date("Y-m-t", strtotime($date));
+}
+
 function formatYMDtoDMY($date)
 {
    $dateObj = DateTime::createFromFormat('Y-m-d', $date);

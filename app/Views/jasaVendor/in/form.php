@@ -173,7 +173,7 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" border="1" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="text-align: center;" colspan="6">Detail Dokumen Pabean</th>
+                                    <th style="text-align: center;" colspan="6">Detail Barang Keluar</th>
                                     <th style="text-align: center;" colspan="10">Daftar Barang Keluar</th>
                                 </tr>
                                 <tr>
@@ -794,10 +794,10 @@
             var element_qty_kotor = $('input[data-spesifikasi_in_id="' + v.spesifikasi_in_id + '"].qty_kotor');
             var element_qty_bersih = $('input[data-spesifikasi_in_id="' + v.spesifikasi_in_id + '"].qty_bersih');
 
-            var input_qty_kotor = parseFloat(element_qty_kotor.val());
-            var input_qty_bersih = parseFloat(element_qty_bersih.val());
+            var input_qty_kotor = parseFloat(element_qty_kotor.val() || 0);
+            var input_qty_bersih = parseFloat(element_qty_bersih.val() || 0);
 
-            if (isNaN(input_qty_kotor) || input_qty_kotor == undefined || input_qty_kotor == 0) {
+            if (input_qty_kotor == undefined) {
                 isValidKotor = false;
                 barangError = v;
             } else {
@@ -805,7 +805,7 @@
                 listBarangGroup[index].list_barang_masuk[i].qty_bersih = input_qty_bersih;
             }
 
-            if (isNaN(input_qty_bersih) || input_qty_bersih == undefined || input_qty_bersih == 0) {
+            if (input_qty_bersih == undefined) {
                 isValidBersih = false;
                 barangError = v;
             } else {

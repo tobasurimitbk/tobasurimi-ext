@@ -115,7 +115,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-4" style="display: none;">
                         <div class="form-floating" style="height: 50px;">
                             <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-select spp_id" id="spp_id" name="spp_id" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -153,24 +153,15 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
-                        <div class="input-group">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($dataValuta as $valuta) : ?>
-                                        <option <?= !empty($dataPOImport) ? (($dataPOImport->currency ? formatter($dataPOImport->currency, "STR_TO_INT") : 0) == formatter($valuta["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
-                                    <?php endforeach ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Valas</label>
-                            </div>
-                            <div class="input-group-append" style="height:50px;">
-                                <a class="btn btn-success" href="<?= site_url('kurs'); ?>" type="button">
-                                    <i class="fas fa-plus" style="margin-top: 10px;"></i>
-                                </a>
-                            </div>
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataValuta as $valuta) : ?>
+                                    <option <?= !empty($dataPOImport) ? (($dataPOImport->currency ? formatter($dataPOImport->currency, "STR_TO_INT") : 0) == formatter($valuta["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Valas</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -300,9 +291,10 @@
                                 <th>No</th>
                                 <th>Kode</th>
                                 <th>Barang</th>
-                                <th>Satuan</th>
+                                <th>Note</th>
                                 <th>Harga</th>
                                 <th>QTY</th>
+                                <th>Satuan</th>
                                 <th>Tambahan</th>
                                 <th>Total</th>
                                 <th>Action</th>
@@ -313,10 +305,10 @@
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td colspan="3"></td>
+                                <td colspan="4"></td>
                                 <td><b>TOTAL</b></td>
                                 <td><b>0.00</b></td>
-                                <td><b>0</b></td>
+                                <td></td>
                                 <td><b>0.00</b></td>
                                 <td><b>0.00</b></td>
                                 <td></td>
@@ -345,7 +337,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="hidden" name="barang_update_id" id="barang_update_id" class="barang_update_id">
+                                <input type="hidden" name="id_detail" id="id_detail" class="id_detail">
                                 <select class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
                                     <option data-barang_id="" data-satuan_id="" data-nama_barang="" data-kode_barang="" data-spesifikasi_id="" value=""></option>
                                     <?php foreach ($barang as $s) : ?>
@@ -425,6 +417,12 @@
                                 <label for="floatingInput">Total</label>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Catatan (Opsional)">
+                                <label for="floatingInput">Catatan (Opsional)</label>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -440,6 +438,9 @@
     <script>
         $(document).ready(function() {
             changeStatus();
+            $('#po_date').change(function() {
+                changeStatus();
+            })
         });
     </script>
 <?php endif; ?>
@@ -512,8 +513,8 @@
         dropdownParent: $('.detail-modal')
     }).change(function() {
         var selected = $('#barang_id option:selected');
-        var barang_update_id = $('#barang_update_id').val();
-        if (barang_update_id == '') {
+        var id_detail = $('#id_detail').val();
+        if (id_detail == '') {
             // INSERT
             $('#satuan_id').val(selected.data('satuan_id')).change();
         }
@@ -526,7 +527,7 @@
     });
 
 
-    $("#payment_date,#latest_shipment_date").datepicker({
+    $("#payment_date,#latest_shipment_date,#po_date").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -547,6 +548,9 @@
                 url: `<?= base_url("/po-import-bahan-penolong/generate-no-po"); ?>`,
                 method: "GET",
                 dataType: "json",
+                data: {
+                    po_date: $('#po_date').val()
+                },
                 success: function(res) {
                     if (res) {
                         $(".po_no").val(res);
@@ -991,9 +995,10 @@
 
     $('.btn-submit-detail').click(function() {
         if ($('.detail-form').valid()) {
-            var barang_update_id = $('#barang_update_id').val();
+            var id_detail = $('#id_detail').val();
             var spesifikasi_id = $('#barang_id').find("option:selected").data("spesifikasi_id");
             var barang_id = $('#barang_id').find("option:selected").data("barang_id");
+            var note = $('#keterangan').val();
 
             if (spesifikasi_id == "") {
                 Swal.fire({
@@ -1005,27 +1010,43 @@
                     confirmButtonText: 'Oke',
                 })
             } else {
-                if (barang_update_id != "") {
+                if (id_detail != "") {
                     // UPDATE
-                    var indexToRemove = -1;
+                    var indexToUpdate = -1;
                     for (var i = 0; i < listBarang.length; i++) {
-                        if (listBarang[i].spesifikasi_id == barang_update_id) {
-                            indexToRemove = i;
+                        if (listBarang[i].id == id_detail) {
+                            indexToUpdate = i;
                             break;
                         }
                     }
-                    if (indexToRemove !== -1) {
-                        listBarang.splice(indexToRemove, 1);
-                        insertList();
-                        resetForm();
-                        $('.detail-modal').modal('hide');
-                    }
+
+                    listBarang[indexToUpdate] = {
+                        id: id_detail,
+                        barang_id: $('#barang_id').find("option:selected").data("barang_id"),
+                        spesifikasi_id: $('#barang_id').val(),
+                        kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
+                        nama_barang: $('#barang_id').find("option:selected").data("nama_barang"),
+                        satuan_id: $('#satuan_id').val(),
+                        nama_satuan: $('#satuan_id').find("option:selected").data("kode_satuan"),
+                        qty: $('#qty').val(),
+                        diskon: $('#diskon').val() || 0,
+                        harga_satuan: destroyFormatRupiah($('#harga_satuan').val()) || 0,
+                        biaya_tambahan: destroyFormatRupiah($('#biaya_tambahan').val()) || 0,
+                        total: $('#total').val() || 0,
+                        note: $('#keterangan').val(),
+                    };
+
+                    drawTabel(listBarang);
+                    resetForm();
+
+                    // Close modal
+                    $('.detail-modal').modal('hide');
 
                 } else {
                     // TAMBAH
                     var isAdd = false;
                     for (var i = 0; i < listBarang.length; i++) {
-                        if (listBarang[i].barang_id == barang_id && listBarang[i].spesifikasi_id == spesifikasi_id) {
+                        if (listBarang[i].spesifikasi_id == spesifikasi_id && listBarang[i].note == note) {
                             indexToRemove = i;
                             isAdd = true;
                             break;
@@ -1034,7 +1055,7 @@
                     if (isAdd) {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Barang Sudah Ada',
+                            title: 'Barang & Keterangan Sudah Ada',
                             confirmButtonColor: '#4e73df',
                             cancelButtonColor: '#d33',
                             reverseButtons: true,
@@ -1042,15 +1063,18 @@
                         })
                     } else {
                         insertList();
+                        // Close modal
                         $('.detail-modal').modal('hide');
                     }
                 }
             }
+
         }
     });
 
     function insertList() {
         listBarang.push({
+            id: getID(),
             barang_id: $('#barang_id').find("option:selected").data("barang_id"),
             spesifikasi_id: $('#barang_id').val(),
             kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
@@ -1062,13 +1086,15 @@
             harga_satuan: destroyFormatRupiah($('#harga_satuan').val()) || 0,
             biaya_tambahan: destroyFormatRupiah($('#biaya_tambahan').val()) || 0,
             total: $('#total').val() || 0,
+            note: $('#keterangan').val(),
         });
         $(".detail-form input, .detail-form select").val("");
         $(".barang_id").val("").change();
         $('#satuan_id').val(null).change();
         $(".diskon").val('0');
+        $("#note").val(null);
         // reset update flag
-        $('#barang_update_id').val("")
+        $('#id_detail').val("")
         drawTabel(listBarang);
     }
 
@@ -1088,9 +1114,10 @@
             newRow.append($('<td>').text(no++));
             newRow.append($('<td>').text(v.kode_barang));
             newRow.append($('<td>').text(v.nama_barang));
-            newRow.append($('<td>').text(v.nama_satuan));
+            newRow.append($('<td>').text(v.note));
             newRow.append($('<td>').text(greatFormatRupiah(v.harga_satuan)));
             newRow.append($('<td>').text(greatFormatRupiah(v.qty)));
+            newRow.append($('<td>').text(v.nama_satuan));
             newRow.append($('<td>').text(greatFormatRupiah(v.biaya_tambahan)));
             newRow.append($('<td>').text(v.total));
             <?php if (!empty($dataPOImport)) : ?>
@@ -1103,9 +1130,9 @@
                 <?php else : ?>
                     newRow.append($('<td>').html(
                         `
-                        <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.spesifikasi_id}')">
+                        <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.id}')">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                        </button><button class="btn btn-danger" onclick="deleteRow('${v.spesifikasi_id}')">
+                        </button><button class="btn btn-danger" onclick="deleteRow('${v.id}')">
                             <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                         </button>
                     `
@@ -1114,9 +1141,9 @@
             <?php else : ?>
                 newRow.append($('<td>').html(
                     `
-                        <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.spesifikasi_id}')">
+                        <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.id}')">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                        </button><button class="btn btn-danger" onclick="deleteRow('${v.spesifikasi_id}')">
+                        </button><button class="btn btn-danger" onclick="deleteRow('${v.id}')">
                             <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                         </button>
                     `
@@ -1133,7 +1160,8 @@
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="4"><b>TOTAL</b></td>'));
         newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalHargaSatuan) + '</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + totalQty + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalQty) + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"></td>'));
         newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalTambahan) + '</b></td>'));
         newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalHarga) + '</b></td>'));
         newRow.append($('<td></td>'));
@@ -1144,7 +1172,7 @@
     function deleteRow(id) {
         var indexToRemove = -1;
         for (var i = 0; i < listBarang.length; i++) {
-            if (listBarang[i].spesifikasi_id == id) {
+            if (listBarang[i].id == id) {
                 indexToRemove = i;
                 break;
             }
@@ -1160,12 +1188,13 @@
     function detailRow(id) {
         var item = null;
         for (var i = 0; i < listBarang.length; i++) {
-            if (listBarang[i].spesifikasi_id == id) {
+            if (listBarang[i].id == id) {
                 item = listBarang[i];
                 break;
             }
         }
-        $('#barang_id, #barang_update_id')
+        $('#id_detail').val(id);
+        $('#barang_id')
             .val(item.spesifikasi_id)
             .data("barang_id", item.barang_id)
             .trigger('change');
@@ -1176,9 +1205,10 @@
         $('#biaya_tambahan').val((item.biaya_tambahan == 0) ? "" : item.biaya_tambahan).val();
         $('#biaya_tambahan').change();
         $('#total').val(item.total);
-        $('#barang_id').attr('disabled', true);
+        // $('#barang_id').attr('disabled', true);
         $('#keterangan').val(item.keterangan);
         $('#satuan_id').val(item.satuan_id).change();
+        $('#keterangan').val(item.note);
 
         $('.title-detail-name').text('Update ');
         $('.detail-modal').modal('show');
@@ -1186,6 +1216,7 @@
     }
 
     function resetForm() {
+        $('#id_detail').val('');
         $('#barang_id').attr('disabled', false);
         $(".detail-form input, .detail-form select").val("");
         $(".barang_id").val("").change();
@@ -1313,11 +1344,23 @@
 
         }
     });
+
+    function getID() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let randomString = '';
+
+        for (let i = 0; i < 10; i++) {
+            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
+        return randomString;
+    };
 </script>
 <?php if (!empty($dataPOImport)) : ?>
     <script>
         <?php foreach ($dataPOImportDetail as $d) : ?>
             listBarang.push({
+                id: getID(),
                 barang_id: "<?= $d['barang_id'] ?>",
                 spesifikasi_id: "<?= $d['spesifikasi_id'] ?>",
                 kode_barang: "<?= $d['kode_barang'] ?>",
@@ -1328,6 +1371,7 @@
                 diskon: <?= $d['disc'] ?>,
                 harga_satuan: <?= $d['price'] ?>,
                 biaya_tambahan: <?= $d['additional_cost'] ?>,
+                note: "<?= $d['note'] ?>",
                 total: greatFormatRupiah("<?= (($d['price'] * $d['qty']) - (($d['disc'] / 100) * ($d['price'] * $d['qty']))) + $d['additional_cost'] ?>"),
             });
         <?php endforeach; ?>
