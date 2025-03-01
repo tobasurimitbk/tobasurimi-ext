@@ -33,6 +33,21 @@
                         </div>
 
                         <div class="col-md-6">
+                            <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                <select class="form-select"  name="akun_kas" id="akun_kas">
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Debit (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                <select class="form-select" name="akun_selisih" id="akun_selisih">
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Kredit</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select tipe_supplier" name="tipe_supplier" id="tipe_supplier">
                                     <option value="" selected></option>
@@ -141,6 +156,8 @@
                                 <th onclick="changeSort('no_pinjaman')">No. Pinjaman</th>
                                 <th onclick="changeSort('supplier_id')">Supplier</th>
                                 <th onclick="changeSort('payment_date')">Payment Date</th>
+                                <th >Akun Kas</th>
+                                <th >Akun Selisih</th>
                                 <th onclick="changeSort('payment_amount')">Total Pinjaman</th>
                                 <th onclick="changeSort('payment_amt_left')">Sisa Pinjaman</th>
                                 <th>Action</th>
@@ -275,6 +292,14 @@
             },
             {
                 data: "total_pinjaman",
+                className: "text-center"
+            },
+            {
+                data: "akun_kas_nama",
+                className: "text-center"
+            },
+            {
+                data: "akun_selisih_nama",
                 className: "text-center"
             },
             {
@@ -583,6 +608,16 @@
                         //     $(".delete-form").css('display', 'none');
                         // }
 
+                        if (res.data.akun_kas) {
+                            let akunKas = new Option(res.data.akun_kas_name || "", res.data.akun_kas, true, true);
+                            $("#akun_kas").append(akunKas).trigger('change');
+                        }
+
+                        if (res.data.akun_selisih) {
+                            let akunSelisih = new Option(res.data.akun_selisih_name || "", res.data.akun_selisih, true, true);
+                            $("#akun_selisih").append(akunSelisih).trigger('change');
+                        }
+
                         $('.modal').on('hidden.bs.modal', function() {
                             enableFields();
                         });
@@ -612,6 +647,42 @@
         })
 
     })
+
+
+
+
+    $(document).ready(function() {
+        $("#akun_kas, #akun_selisih").select2({
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content"),
+            placeholder: "Pilih Akun",
+            allowClear: true,
+            ajax: {
+                url: "<?= base_url('panjar-supplier/list-akunCoa'); ?>",
+                dataType: "json",
+                delay: 250, // Hindari spam request
+                data: function(params) {
+                    return {
+                        search: params.term // Kirim kata kunci pencarian
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: $.map(data, function(item) {
+                            return {
+                                id: item.id,
+                                text: item.nama_sub
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 3 
+        });
+    });
+
+
 
     // GET SUPPLIER BY TYPE
     $('#tipe_supplier').change(function() {

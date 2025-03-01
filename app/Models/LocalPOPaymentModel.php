@@ -1103,6 +1103,8 @@ class LocalPOPaymentModel extends Model
     {
         $purchaseOrderModel = new RMPurchaseOrderModel();
         $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
+        $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
+        $localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
 
         // Ambil data PO dengan LEFT JOIN ke barang_master & rm_purchase_order_detail
         $purchaseOrders = $purchaseOrderModel
@@ -1124,7 +1126,7 @@ class LocalPOPaymentModel extends Model
 
         // Ambil semua pembayaran yang terkait dengan PO yang dipilih
         $payments = $localPOPaymentDetailModel
-            ->select('rm_purchase_order_id, SUM(total) as total_paid')
+            ->select('id, rm_purchase_order_id, SUM(total) as total_paid')
             ->whereIn('rm_purchase_order_id', $poIdArr)
             ->groupBy('rm_purchase_order_id')
             ->findAll();
@@ -1132,7 +1134,12 @@ class LocalPOPaymentModel extends Model
         // Konversi hasil pembayaran ke dalam array dengan ID PO sebagai key
         $paymentsMap = [];
         foreach ($payments as $pay) {
-            $paymentsMap[$pay['rm_purchase_order_id']] = $pay['total_paid'];
+            $paymentsMap[$pay['rm_purchase_order_id']] = $pay['total_paid']; 
+            // $totalPanjar = $localPOPaymentPanjarModel
+            //                 ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
+            //                 ->where('local_po_payment_id', $pay['id'])
+            //                 ->where('panjar_supplier.panjar', $pay['id'])
+
         }
 
         foreach ($purchaseOrders as &$p) {

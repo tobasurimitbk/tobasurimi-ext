@@ -22,7 +22,10 @@ class LocalPOPaymentPanjarModel extends Model
         'local_po_payment_id',
         'type',
         'panjar_id',
-        'bayar_panjar'
+        'bayar_panjar',
+        'akun_kas',
+        'akun_selisih',
+        'keterangan',
     ];
     // Dates
     protected $useTimestamps = true;

@@ -21,7 +21,8 @@ class PinjamanSupplierModel extends Model
         'supplier_id',
         'payment_date',
         'total_pinjaman',
-
+        'akun_kas',
+        'akun_selisih',
         'sisa_pinjaman',
         'is_posted'
     ];
@@ -65,10 +66,12 @@ class PinjamanSupplierModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'pinjaman_supplier.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "pinjaman_supplier.*,name";
+        $selectQry = "pinjaman_supplier.*,name, akun_kas.id as akun_kas, akun_kas.nama_sub as akun_kas_name, akun_selisih.id as akun_selisih, akun_selisih.nama_sub as akun_selisih_name";
         $supplierDataQry = $this->asObject()
             ->select($selectQry)
             ->join('suppliers', 'pinjaman_supplier.supplier_id = suppliers.id', 'left')
+            ->join('sub_akuns AS akun_kas', 'pinjaman_supplier.akun_kas = akun_kas.id', 'left')
+            ->join('sub_akuns AS akun_selisih', 'pinjaman_supplier.akun_selisih = akun_selisih.id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
         $totalData = $supplierDataQry->countAllResults(false);
@@ -135,9 +138,11 @@ class PinjamanSupplierModel extends Model
     //get panjar id not use array
     public function getPinjamanSupplierbyID($id)
     {
-        $selectQry = "pinjaman_supplier.*,type,name";
+        $selectQry = "pinjaman_supplier.*,type,name, akun_kas.id as akun_kas, akun_kas.nama_sub as akun_kas_name, akun_selisih.id as akun_selisih, akun_selisih.nama_sub as akun_selisih_name";
         $panjarSupplierData = $this->asObject()
             ->select($selectQry)
+            ->join('sub_akuns AS akun_kas', 'panjar_supplier.akun_kas = akun_kas.id', 'left')
+            ->join('sub_akuns AS akun_selisih', 'panjar_supplier.akun_selisih = akun_selisih.id', 'left')
             ->join('suppliers', 'pinjaman_supplier.supplier_id = suppliers.id', 'left')
             ->find($id);
         return $panjarSupplierData;
@@ -195,7 +200,7 @@ class PinjamanSupplierModel extends Model
 
         if ($builder != null) {
             $explode = explode('/', $builder['no_pinjaman']); // CONVERT TO ARRAY BY (/)
-            $number = intval($explode[3]); // CARI DIGIT ANGKA
+            $number = intval($explode[2]); // CARI DIGIT ANGKA
             if ($number > $lastNumber) {
                 $lastNumber = $number;
             }
