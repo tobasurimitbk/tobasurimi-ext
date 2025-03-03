@@ -131,9 +131,9 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "id";
     let sortType = "desc";
+    var previousRequest;
 
     const table = $('.dataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
         ordering: true,
@@ -146,15 +146,34 @@
         pageLength: 25,
         ajax: {
             url: "<?= base_url("po-lokal-bahan-baku/all"); ?>",
-            dataSrc: "data",
-            data: function(data) {
-                data.search = $(".search").val();
-                data.dateStart = $(".dateStart").val();
-                data.dateEnd = $(".dateEnd").val();
-                data.status = $(".status").val();
-                data.is_posted = $('.is_posted').val();
-                data.sort = sort;
-                data.sortType = sortType;
+            type: "GET",
+
+            data: function(d) {
+                d.search = $(".search").val();
+                d.dateStart = $(".dateStart").val();
+                d.dateEnd = $(".dateEnd").val();
+                d.status = $(".status").val();
+                d.is_posted = $('.is_posted').val();
+                d.sort = sort;
+                d.sortType = sortType;
+            },
+            beforeSend: function(jqXHR) {
+                if (previousRequest) {
+                    previousRequest.abort();
+                }
+                previousRequest = jqXHR; // Simpan request yang baru dibuat
+
+            },
+            dataSrc: function(response) {
+                return response.data || [];
+            },
+            complete: function() {
+                previousRequest = null; // Reset previousRequest setelah request selesai
+            },
+            error: function(jqXHR, textStatus) {
+                if (textStatus !== "abort") {
+                    console.error("AJAX Error:", textStatus);
+                }
             }
         },
         // scrollX: true,
@@ -321,7 +340,7 @@
     });
 
     $('.dataTable2').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: false,
         serverSide: false,
         ordering: true,

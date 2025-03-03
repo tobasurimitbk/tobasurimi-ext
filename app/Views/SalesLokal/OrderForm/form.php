@@ -183,7 +183,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating ff-ket mb-3" style="height: 80px;">
-                            <textarea autocomplete="one-time-code"  class="form-control parent_keterangan text-area-all" style="height: 100%" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
+                            <textarea autocomplete="one-time-code" class="form-control parent_keterangan text-area-all" style="height: 100%" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
                             <label for="floatingInput">Keterangan (Opsional)</label>
                         </div>
                     </div>
@@ -535,7 +535,7 @@
                                 </select>
                                 <label for="floatingInput">Nama Sales</label>
                             </div>
-                        </div> 
+                        </div>
                     </div>
                 </form>
             </div>
@@ -642,7 +642,7 @@
     let no = 0;
 
     const table = $('.dataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         info: false,
         paging: false,
@@ -881,7 +881,7 @@
             placeholder: "Pilih Satuan",
             theme: "bootstrap-5",
         });
-        
+
         $('#company_id').select2({
             placeholder: "Pilih Company",
             theme: "bootstrap-5",
@@ -941,7 +941,7 @@
             allowClear: true,
             theme: "bootstrap-5",
         }).change(function() {});
-        
+
         $('.id_sales').select2({
             placeholder: "Pilih Nama Sales",
             allowClear: true,
@@ -1010,8 +1010,8 @@
             allowClear: true
         })
 
-          //SALES
-          $('.sales_id').select2({
+        //SALES
+        $('.sales_id').select2({
             placeholder: "Pilih Sales (Opsional)",
             theme: "bootstrap-5",
             allowClear: true,

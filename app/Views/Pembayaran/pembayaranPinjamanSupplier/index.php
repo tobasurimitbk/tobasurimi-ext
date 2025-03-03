@@ -34,7 +34,7 @@
 
                         <div class="col-md-6">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <select class="form-select"  name="akun_kas" id="akun_kas">
+                                <select class="form-select" name="akun_kas" id="akun_kas">
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Debit (Opsional)</label>
                             </div>
@@ -156,8 +156,8 @@
                                 <th onclick="changeSort('no_pinjaman')">No. Pinjaman</th>
                                 <th onclick="changeSort('supplier_id')">Supplier</th>
                                 <th onclick="changeSort('payment_date')">Payment Date</th>
-                                <th >Akun Kas</th>
-                                <th >Akun Selisih</th>
+                                <th>Akun Kas</th>
+                                <th>Akun Selisih</th>
                                 <th onclick="changeSort('payment_amount')">Total Pinjaman</th>
                                 <th onclick="changeSort('payment_amt_left')">Sisa Pinjaman</th>
                                 <th>Action</th>
@@ -236,7 +236,7 @@
     let trigger = true;
 
     const table = $('.dataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: true,
@@ -678,7 +678,7 @@
                 },
                 cache: true
             },
-            minimumInputLength: 3 
+            minimumInputLength: 3
         });
     });
 

@@ -1035,7 +1035,7 @@
         });
 
         dataTable = $('#dataTable').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
             processing: false,
             serverSide: false,
             ordering: true,
@@ -1228,7 +1228,7 @@
         });
 
         selectedItemTableBahan = $('#selectedItemTableBahan').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
             processing: false,
             serverSide: false,
             ordering: true,

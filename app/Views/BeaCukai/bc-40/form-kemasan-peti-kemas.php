@@ -250,7 +250,7 @@
         .css('margin-top', '22px').css('margin-left', '-7px');
 
     const tableListInformasiKemasan = $('.table-list-informasi-kemasan').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: false,
@@ -339,7 +339,7 @@
 
 
     const tableListInformasiPetiKemas = $('.table-list-informasi-peti-kemas').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: false,
