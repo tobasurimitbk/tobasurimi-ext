@@ -112,7 +112,7 @@ class RMPurchaseOrderModel extends Model
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'rm_purchase_orders.po_date'] ?? 'rm_purchase_orders.po_date';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "rm_purchase_orders.*, 

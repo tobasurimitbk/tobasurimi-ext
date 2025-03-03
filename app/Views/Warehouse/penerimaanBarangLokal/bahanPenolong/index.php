@@ -66,7 +66,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('divisi')" class="sort">Departemen</th>
+                                <!-- <th onclick="changeSort('divisi')" class="sort">Departemen</th> -->
                                 <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
                                 <th>No SPP</th>
                                 <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
@@ -151,10 +151,10 @@
                 className: "text-center",
                 orderable: false
             },
-            {
-                data: "divisi",
-                className: "text-center"
-            },
+            // {
+            //     data: "divisi",
+            //     className: "text-center"
+            // },
             {
                 data: "no_penerimaan_barang",
                 className: "text-center"

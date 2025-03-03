@@ -557,11 +557,13 @@ class PenerimaanBarangModel extends Model
 
         // no lpb
         $warehouseModel = new WarehousesModel();
+        $divisiModel = new DivisisModel();
         $warehouse = $warehouseModel->where('id', $warehouseID)->first();
+        $divisi = $divisiModel->where('id', $warehouse['divisi_id'])->first();
         $tanggalExplode = explode('-', $rmDetail['po_date']);
         $year = $tanggalExplode[0];
         $month = $tanggalExplode[1];
-        $no = $penerimaanBarangModel->get_no($month, $year, $warehouse['code_warehouse'], "LOKAL", "BAKU", "LPB-LBB");
+        $no = $penerimaanBarangModel->get_no($month, $year, $divisi['divisi'], "LOKAL", "BAKU", "LPB-LBB");
 
         $payloadPenerimaanBarang = [
             "company_id" => $rmDetail['company_id'],
