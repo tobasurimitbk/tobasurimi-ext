@@ -920,8 +920,11 @@ class PembayaranPOLokal extends BaseController
     
             $total_bayar_panjar = 0;
     
-            foreach ($bayar_panjar as $b) {
-                $total_bayar_panjar += $b['bayar_panjar'];
+            // Hanya hitung total_bayar_panjar jika pembayaran_id ada
+            if (!empty($pembayaranId)) {
+                foreach ($bayar_panjar as $b) {
+                    $total_bayar_panjar += $b['bayar_panjar'];
+                }
             }
     
             $panjarList[$p->id] = [
@@ -952,7 +955,7 @@ class PembayaranPOLokal extends BaseController
             ->findAll();
     
         foreach ($panjarListWithPayment as $p) {
-
+    
             // Jika ada pembayaran, pastikan data awal dengan panjar_id ini dihapus
             unset($panjarList[$p['panjar_id']]);
     
@@ -986,8 +989,11 @@ class PembayaranPOLokal extends BaseController
     
             $total_bayar_panjar = 0;
     
-            foreach ($bayar_panjar as $b) {
-                $total_bayar_panjar += $b['bayar_panjar'];
+            // Hanya hitung total_bayar_panjar jika pembayaran_id ada
+            if (!empty($pembayaranId)) {
+                foreach ($bayar_panjar as $b) {
+                    $total_bayar_panjar += $b['bayar_panjar'];
+                }
             }
     
             $panjarTBList[$p->id] = [
@@ -1018,10 +1024,10 @@ class PembayaranPOLokal extends BaseController
                 ->findAll();
     
             foreach ($panjarTBListWithPayment as $p) {
-
+    
                 // Jika ada pembayaran, pastikan data awal dengan panjar_id ini dihapus
                 unset($panjarTBList[$p['panjar_id']]);
-
+    
                 $panjarTBList[$p['panjar_id']] = [
                     'id'                  => $p['id'],
                     'panjar_id'           => $p['panjar_id'],
@@ -1050,8 +1056,11 @@ class PembayaranPOLokal extends BaseController
     
             $total_bayar_pinjaman = 0;
     
-            foreach ($bayar_pinjaman as $b) {
-                $total_bayar_pinjaman += $b['bayar_pinjaman'];
+            // Hanya hitung total_bayar_pinjaman jika pembayaran_id ada
+            if (!empty($pembayaranId)) {
+                foreach ($bayar_pinjaman as $b) {
+                    $total_bayar_pinjaman += $b['bayar_pinjaman'];
+                }
             }
     
             $pinjamanList[$p->id] = [
@@ -1083,7 +1092,7 @@ class PembayaranPOLokal extends BaseController
                 
                 // Jika ada pembayaran, pastikan data awal dengan panjar_id ini dihapus
                 unset($pinjamanList[$p['pinjaman_id']]);
-
+    
                 $pinjamanList[$p['pinjaman_id']] = [
                     'id'                  => $p['id'],
                     'pinjaman_id'                  => $p['pinjaman_id'],

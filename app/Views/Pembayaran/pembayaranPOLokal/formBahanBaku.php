@@ -1113,6 +1113,7 @@
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5"
     }).change(function(e) {
+        getPanjarSupplier();
         if ($('#tipe_pembayaran').val() == "HARIAN") {
             generateLPBNo();
         } else {
