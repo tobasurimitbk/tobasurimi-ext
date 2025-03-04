@@ -89,40 +89,33 @@ class LocalPOPaymentModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "local_po_payments.id AS id,
-                      local_po_payments.status_posting,
-                      local_po_payments.multiple_po_no,
-                      local_po_payments.payment_no AS payment_no, 
-                      local_po_payments.type_bayar,
-                      DATE_FORMAT(local_po_payments.payment_date, '%d/%m/%Y') AS payment_date, 
-                      local_po_payments.amount AS amount,
-                      local_po_payments.payment_method AS payment_method,
-                      suppliers.name AS supplierName,
-                      ";
-        //   tanda_terima_faktur.faktur_no
-        //   DATE_FORMAT(local_po_payments.due_date, '%d/%m/%Y') AS due_date, 
+                local_po_payments.status_posting,
+                local_po_payments.multiple_po_no,
+                local_po_payments.payment_no AS payment_no, 
+                local_po_payments.type_bayar,
+                DATE_FORMAT(local_po_payments.payment_date, '%d/%m/%Y') AS payment_date, 
+                local_po_payments.amount AS amount,
+                local_po_payments.payment_method AS payment_method,
+                suppliers.name AS supplierName,
+                COALESCE(SUM(local_po_payment_pinjaman.bayar_pinjaman), 0) AS total_pinjaman,
+                COALESCE(SUM(local_po_payment_panjar.bayar_panjar), 0) AS total_panjar,
+                (local_po_payments.amount - 
+                COALESCE(SUM(local_po_payment_pinjaman.bayar_pinjaman), 0) - 
+                COALESCE(SUM(local_po_payment_panjar.bayar_panjar), 0)) AS sisa_pembayaran,
+                SUM(local_po_payments.amount) - 
+                COALESCE(SUM(local_po_payment_pinjaman.bayar_pinjaman), 0) - 
+                COALESCE(SUM(local_po_payment_panjar.bayar_panjar), 0) AS total_sum_amount";
 
-        // if ($condition['local_po_payments.type_po'] == "Bahan Baku") {
-        //     $supplierDataQry = $this->asObject()
-        //         ->select($selectQry)
-        //         ->where($condition)
-        //         ->whereIn('type_bayar', $addCondition['typeBayar'])
-        //         ->join('suppliers', 'suppliers.id = local_po_payments.supplier_id')
-        //         ->join('tanda_terima_faktur', 'tanda_terima_faktur.id = local_po_payments.tanda_terima_faktur_id', 'left')
-        //         ->orderBy($sort, $sortType);
-        // } else {
         $supplierDataQry = $this->asObject()
-            ->select($selectQry)
-            ->where($condition)
-            ->join('suppliers', 'suppliers.id = local_po_payments.supplier_id')
-            // ->join('tanda_terima_faktur', 'tanda_terima_faktur.id = local_po_payments.tanda_terima_faktur_id', 'left')
-            ->orderBy($sort, $sortType);
-        // }
-
-
+        ->select($selectQry)
+        ->where($condition)
+        ->join('suppliers', 'suppliers.id = local_po_payments.supplier_id')
+        ->join('local_po_payment_pinjaman', 'local_po_payment_pinjaman.local_po_payment_id = local_po_payments.id', 'left')
+        ->join('local_po_payment_panjar', 'local_po_payment_panjar.local_po_payment_id = local_po_payments.id', 'left')
+        ->groupBy('local_po_payments.id')
+        ->orderBy($sort, $sortType);
 
         $totalData = $supplierDataQry->countAllResults(false);
-
-
         if ($addCondition['search'] != "" || $addCondition['paymentDate'] != "" || $addCondition['startDate'] != "") {
             $supplierDataQry->groupStart();
         }
@@ -1126,36 +1119,45 @@ class LocalPOPaymentModel extends Model
 
         // Ambil semua pembayaran yang terkait dengan PO yang dipilih
         $payments = $localPOPaymentDetailModel
-            ->select('id, rm_purchase_order_id, SUM(total) as total_paid')
+            ->select('local_po_payment_details.id, local_po_payment_details.local_po_payment_id as po_payment_id, local_po_payment_details.rm_purchase_order_id, SUM(local_po_payment_details.total) as total_paid, SUM(local_po_payment_panjar.bayar_panjar) as total_panjar,  SUM(local_po_payment_pinjaman.bayar_pinjaman) as total_pinjaman, local_po_payment_panjar.id as panjar_payment_id')
             ->whereIn('rm_purchase_order_id', $poIdArr)
             ->groupBy('rm_purchase_order_id')
+            ->join("local_po_payment_panjar", 'local_po_payment_panjar.local_po_payment_id = local_po_payment_details.local_po_payment_id', 'left')
+            ->join("local_po_payment_pinjaman", 'local_po_payment_pinjaman.local_po_payment_id = local_po_payment_details.local_po_payment_id', 'left')
             ->findAll();
 
         // Konversi hasil pembayaran ke dalam array dengan ID PO sebagai key
         $paymentsMap = [];
         foreach ($payments as $pay) {
-            $paymentsMap[$pay['rm_purchase_order_id']] = $pay['total_paid']; 
-            // $totalPanjar = $localPOPaymentPanjarModel
-            //                 ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
-            //                 ->where('local_po_payment_id', $pay['id'])
-            //                 ->where('panjar_supplier.panjar', $pay['id'])
-
+            $paymentsMap[$pay['rm_purchase_order_id']] = [
+                'total_paid'    => (float) ($pay['total_paid'] ?? 0),
+                'total_panjar'  => (float) ($pay['total_panjar'] ?? 0),
+                'total_pinjaman'=> (float) ($pay['total_pinjaman'] ?? 0)
+            ];
         }
 
         foreach ($purchaseOrders as &$p) {
-            $totalPaid = $paymentsMap[$p['rm_purchase_order_id']] ?? 0;
-            $totalPPH = $purchaseOrderModel->getTotalwithPPH($p['rm_purchase_order_id']);
-            $remainingTotal = $totalPPH['total_after_pph'] - $totalPaid;
+            $totalWithPPH = $purchaseOrderModel->getTotalwithPPH($p['rm_purchase_order_id']);
+
+            // Ambil data pembayaran, panjar, dan pinjaman dengan casting ke float
+            $totalPaid    = (float) ($paymentsMap[$p['rm_purchase_order_id']]['total_paid'] ?? 0);
+            $totalPanjar  = (float) ($paymentsMap[$p['rm_purchase_order_id']]['total_panjar'] ?? 0);
+            $totalPinjaman = (float) ($paymentsMap[$p['rm_purchase_order_id']]['total_pinjaman'] ?? 0);
+
+            // Hitung total tagihan
+            $remainingTotal = (float) $totalPaid - ( $totalPanjar + $totalPinjaman);
 
             // Format tanggal & update data PO
             $p['tanggal_PO'] = date('d/m/Y', strtotime($p['tanggal_PO']));
-            $p['total_tagihan'] = $remainingTotal;
-            $p['total_tagihan_number'] = $remainingTotal;
-            $p['total_paid'] = $totalPaid;
-            $p['total_qty_diterima'] = floatval($p['total_qty_diterima']); // Convert ke float
+            $p['total_tagihan'] = number_format($totalWithPPH['total_after_pph'], 2, '.', '');
+            $p['total_tagihan_number'] = number_format($remainingTotal, 2, '.', '');
+            $p['total_paid'] = number_format($totalWithPPH['total_after_pph'] - $remainingTotal, 2, '.', '');
+            $p['sisa_tagihan'] = number_format($remainingTotal, 2, '.', '');
+            $p['total_qty_diterima'] = number_format($p['total_qty_diterima'], 2, '.', '');
         }
 
         return $purchaseOrders;
+ 
     }
 
     

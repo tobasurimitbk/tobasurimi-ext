@@ -586,9 +586,6 @@ class PembayaranPOLokal extends BaseController
     public function updatePembayaranPOLokalBBAction()
     {
 
-        var_dump(json_decode($this->request->getVar('panjarList')));
-        die;
-
         try {
             $localPOPaymentModel = new LocalPOPaymentModel();
             $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
@@ -780,6 +777,7 @@ class PembayaranPOLokal extends BaseController
                 "payment_date"      => $data->payment_date,
                 "payment_method"    => strtoupper($data->payment_method),
                 "amount"            => number_format($data->amount ?? 0, 0, ',', '.'),
+                "total_sum_amount"            => number_format($data->total_sum_amount ?? 0, 0, ',', '.'),
                 "tipe_bayar"        => strtoupper($data->type_bayar),
                 'status_posting'    => $data->status_posting
             ]);
