@@ -193,7 +193,10 @@ class PembayaranPOLokal extends BaseController
                             "local_po_payment_id" => $id,
                             "jenis_panjar" => "PANJAR",
                             "type" => "BP",
-                            "panjar_id" => $p->id,
+                            "akun_kas" =>  $p->akun_kas,
+                            "akun_selisih" =>  $p->akun_selisih,
+                            "keterangan" =>  $p->keterangan,
+                            "panjar_id" => $p->panjar_id,
                             "bayar_panjar" => repairDouble($p->bayar_panjar)
 
                         ]);
@@ -211,7 +214,10 @@ class PembayaranPOLokal extends BaseController
                             "local_po_payment_id" => $id,
                             "jenis_panjar" => "PANJAR_TB",
                             "type" => "BP",
-                            "panjar_id" => $p->id,
+                            "akun_kas" =>  $p->akun_kas,
+                            "akun_selisih" =>  $p->akun_selisih,
+                            "keterangan" =>  $p->keterangan,
+                            "panjar_id" => $p->panjar_id,
                             "bayar_panjar" => repairDouble($p->bayar_panjar)
                         ]);
                     }
@@ -227,7 +233,10 @@ class PembayaranPOLokal extends BaseController
                             "company_id" => $this->this_company_id,
                             "local_po_payment_id" => $id,
                             "type" => "BP",
-                            "pinjaman_id" => $p->id,
+                            "akun_kas" =>  $p->akun_kas,
+                            "akun_selisih" =>  $p->akun_selisih,
+                            "keterangan" =>  $p->keterangan,
+                            "pinjaman_id" => $p->pinjaman_id,
                             "bayar_pinjaman" => repairDouble($p->bayar_pinjaman)
                         ]);
                     }
