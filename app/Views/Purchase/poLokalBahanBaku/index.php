@@ -55,8 +55,8 @@
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                                 <th onclick="changeSort('supplier')" class="sort">Supplier</th>
-                                <th onclick="changeSort('total')" class="sort">Total Sebelum PPH</th>
-                                <th onclick="changeSort('total')" class="sort">Total Setelah PPH</th>
+                                <th onclick="changeSort('total_before_pph')" class="sort">Total Sebelum PPH</th>
+                                <th onclick="changeSort('total_after_pph')" class="sort">Total Setelah PPH</th>
                                 <th>Item Order</th>
                                 <th>Qty</th>
                                 <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
