@@ -530,30 +530,6 @@
     <?php if (!empty($detail)) : ?>
         getPanjarSupplier();
         generateLPBNo();
-        // $.ajax({
-        //     url: "<?= base_url("/pembayaran-po-lokal-bb/get-list-po-paid"); ?>",
-        //     data: {
-        //         pembayaran_id: $("#id").val(),
-        //     },
-        //     method: "GET",
-        //     beforeSend: function(xhr) {
-        //         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-        //     },
-        //     success: function(response) {
-        //         listPembayaran = [];
-        //         listPembayaran = response.data;
-        //         listPanjar = [];
-        //         listPinjaman = [];
-        //         listPanjarTB = [];
-        //         listPanjar = response.data.panjar
-        //         listPinjaman = response.data.pinjaman
-        //         listPanjarTB = response.data.panjar_tb
-
-        //         csrf.val(response.token);
-        //         generateLPBNo();
-        //         drawPaidTable(listPembayaran);
-        //     }
-        // });
     <?php endif; ?>
 
 
@@ -1437,7 +1413,7 @@
 
             newRow.append($('<td style="text-align:center;">').html(
                 `
-                        <input  oninput="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan})" autocomplete="one-time-code" data-id="${v.rm_purchase_order_id}"  class="form-control total_po_dibayar" type="text" value="${greatFormatRupiahPayment(v.total_tagihan)}" name = "total_po_dibayar" style="height:40px">
+                        <input  oninput="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan})" autocomplete="one-time-code" data-id="${v.rm_purchase_order_id}"  class="form-control total_po_dibayar" type="text" value="${greatFormatRupiahPayment(v.sisa_tagihan)}" name = "total_po_dibayar" style="height:40px">
                                 `
             ));
 
@@ -1501,7 +1477,7 @@
         table.find('tbody').append(newRow);
         
         if (TotalHarga > 0) {
-            updateGrandTotal()
+            updateGrandTotal(TotalPanjarTB, TotalPinjaman, TotalPanjar)
         }
     }
 
@@ -1906,19 +1882,20 @@
         updateGrandTotal(); 
     });
 
-    function updateGrandTotal() {
+    function updateGrandTotal(TotalPanjarTB, TotalPinjaman, TotalPanjar) {
         var totalBayarPanjar = 0;
         var totalBayarPinjaman = 0;
         var totalBayarPanjarTB = 0;
-        if ($(".total-bayar-panjar").length) {
+
+        if ($(".total-bayar-panjar").length && TotalPanjar > 0) {
             totalBayarPanjar = destroyFormatRupiahPayment($(".total-bayar-panjar").val()) || 0;
         }
 
-        if ($(".total-bayar-pinjaman").length) {
+        if ($(".total-bayar-pinjaman").length && TotalPinjaman > 0) {
             totalBayarPinjaman = destroyFormatRupiahPayment($(".total-bayar-pinjaman").val()) || 0;
         }
         
-        if ($(".total-bayar-panjar-tb").length) {
+        if ($(".total-bayar-panjar-tb").length && TotalPanjarTB > 0) {
             totalBayarPanjarTB = destroyFormatRupiahPayment($(".total-bayar-panjar-tb").val()) || 0;
         }
 
@@ -1927,7 +1904,7 @@
 
         var total = totalPembayaran - totalBayarPanjar - totalBayarPinjaman - totalBayarPanjarTB - potongan;
 
-        $(".grand-total").val(greatFormatRupiahPayment(total)); // Setting the total with 2 decimal places
+        $(".grand-total").val(greatFormatRupiahPayment(total)); 
     }
 </script>
 

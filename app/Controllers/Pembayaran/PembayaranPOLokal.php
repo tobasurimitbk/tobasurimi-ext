@@ -193,7 +193,10 @@ class PembayaranPOLokal extends BaseController
                             "local_po_payment_id" => $id,
                             "jenis_panjar" => "PANJAR",
                             "type" => "BP",
-                            "panjar_id" => $p->id,
+                            "akun_kas" =>  $p->akun_kas,
+                            "akun_selisih" =>  $p->akun_selisih,
+                            "keterangan" =>  $p->keterangan,
+                            "panjar_id" => $p->panjar_id,
                             "bayar_panjar" => repairDouble($p->bayar_panjar)
 
                         ]);
@@ -211,7 +214,10 @@ class PembayaranPOLokal extends BaseController
                             "local_po_payment_id" => $id,
                             "jenis_panjar" => "PANJAR_TB",
                             "type" => "BP",
-                            "panjar_id" => $p->id,
+                            "akun_kas" =>  $p->akun_kas,
+                            "akun_selisih" =>  $p->akun_selisih,
+                            "keterangan" =>  $p->keterangan,
+                            "panjar_id" => $p->panjar_id,
                             "bayar_panjar" => repairDouble($p->bayar_panjar)
                         ]);
                     }
@@ -227,7 +233,10 @@ class PembayaranPOLokal extends BaseController
                             "company_id" => $this->this_company_id,
                             "local_po_payment_id" => $id,
                             "type" => "BP",
-                            "pinjaman_id" => $p->id,
+                            "akun_kas" =>  $p->akun_kas,
+                            "akun_selisih" =>  $p->akun_selisih,
+                            "keterangan" =>  $p->keterangan,
+                            "pinjaman_id" => $p->pinjaman_id,
                             "bayar_pinjaman" => repairDouble($p->bayar_pinjaman)
                         ]);
                     }
@@ -577,9 +586,6 @@ class PembayaranPOLokal extends BaseController
     public function updatePembayaranPOLokalBBAction()
     {
 
-        var_dump(json_decode($this->request->getVar('panjarList')));
-        die;
-
         try {
             $localPOPaymentModel = new LocalPOPaymentModel();
             $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
@@ -771,6 +777,7 @@ class PembayaranPOLokal extends BaseController
                 "payment_date"      => $data->payment_date,
                 "payment_method"    => strtoupper($data->payment_method),
                 "amount"            => number_format($data->amount ?? 0, 0, ',', '.'),
+                "total_sum_amount"            => number_format($data->total_sum_amount ?? 0, 0, ',', '.'),
                 "tipe_bayar"        => strtoupper($data->type_bayar),
                 'status_posting'    => $data->status_posting
             ]);
@@ -921,12 +928,11 @@ class PembayaranPOLokal extends BaseController
             $total_bayar_panjar = 0;
     
             // Hanya hitung total_bayar_panjar jika pembayaran_id ada
-            if (!empty($pembayaranId)) {
-                foreach ($bayar_panjar as $b) {
-                    $total_bayar_panjar += $b['bayar_panjar'];
-                }
-            }
     
+            foreach ($bayar_panjar as $b) {
+                $total_bayar_panjar += $b['bayar_panjar'];
+            }
+
             $panjarList[$p->id] = [
                 'panjar_id'            => $p->id,
                 'bayar_panjar'  => $total_bayar_panjar,
