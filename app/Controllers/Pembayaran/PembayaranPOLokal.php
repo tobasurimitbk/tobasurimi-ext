@@ -928,12 +928,11 @@ class PembayaranPOLokal extends BaseController
             $total_bayar_panjar = 0;
     
             // Hanya hitung total_bayar_panjar jika pembayaran_id ada
-            if (!empty($pembayaranId)) {
-                foreach ($bayar_panjar as $b) {
-                    $total_bayar_panjar += $b['bayar_panjar'];
-                }
-            }
     
+            foreach ($bayar_panjar as $b) {
+                $total_bayar_panjar += $b['bayar_panjar'];
+            }
+
             $panjarList[$p->id] = [
                 'panjar_id'            => $p->id,
                 'bayar_panjar'  => $total_bayar_panjar,
