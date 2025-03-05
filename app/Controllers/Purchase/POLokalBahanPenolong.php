@@ -868,8 +868,8 @@ class POLokalBahanPenolong extends BaseController
                     'biaya_tambahan' => $s['additional_cost'],
                     'total' => $s['total'],
                     'keterangan' => $s['note'],
-                    'ppn' => $s['ppn'],
-                    'pph' => $s['pph']
+                    'ppn' => $s['ppn'] == null ? '' : $s['ppn'],
+                    'pph' => $s['pph'] == null ? '' : $s['pph']
                 ];
             }
         }
