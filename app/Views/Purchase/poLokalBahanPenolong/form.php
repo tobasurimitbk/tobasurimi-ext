@@ -529,12 +529,12 @@
     $('#total').keyup(function() {
         var total = parseFloat(destroyFormatRupiah($('#total').val())) || 0;
         var qty = parseFloat($('#qty').val()) || 1;
-        var biayaTambahan = parseFloat(destroyFormatRupiah($('#biaya_tambahan').val())) || 0;
+        // var biayaTambahan = parseFloat(destroyFormatRupiah($('#biaya_tambahan').val())) || 0;
         var diskon = parseFloat($('#diskon').val()) || 0;
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var hargaSatuan = (((total / qty)));
-        $('#additional_cost_type').change();
+        // $('#additional_cost_type').change();
         $('#harga_satuan').val(hargaSatuan == 0 ? '' : greatFormatRupiah(hargaSatuan.toFixed(2)));
     });
 
