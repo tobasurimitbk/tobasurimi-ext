@@ -1702,7 +1702,7 @@
                     tablePanjar.find('tbody').append(newRow);
                 }
 
-                if (v.bayar_panjar) {
+                if (v.bayar_panjar && v.pembayaran_id !=  "NULL") {
                     $("#coa-panjar-section").show();
 
                     $("#id_panjar").val(v.panjar_id); 

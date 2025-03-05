@@ -928,13 +928,14 @@ class PembayaranPOLokal extends BaseController
             $total_bayar_panjar = 0;
     
             // Hanya hitung total_bayar_panjar jika pembayaran_id ada
-    
+        
             foreach ($bayar_panjar as $b) {
                 $total_bayar_panjar += $b['bayar_panjar'];
             }
-
+    
             $panjarList[$p->id] = [
-                'panjar_id'            => $p->id,
+                'pembayaran_id'  => "NULL",
+                'panjar_id'     => $p->id,
                 'bayar_panjar'  => $total_bayar_panjar,
                 'no_panjar'     => $p->no_panjar,
                 'payment_date'  => date('d/m/Y', strtotime($p->payment_date)),
@@ -966,6 +967,7 @@ class PembayaranPOLokal extends BaseController
             unset($panjarList[$p['panjar_id']]);
     
             $panjarList[$p['panjar_id']] = [
+                'pembayaran_id'       => $pembayaranId,
                 'id'                  => $p['id'],
                 'panjar_id'           => $p['panjar_id'],
                 'bayar_panjar'        => intval($p['bayar_panjar']),
