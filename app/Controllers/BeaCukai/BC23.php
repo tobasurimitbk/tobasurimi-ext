@@ -184,13 +184,11 @@ class BC23 extends BaseController
         $addCondition = [
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "statusBC" => $this->request->getGet("statusBC"),
+            "searchData" => $this->request->getGet('searchData'),
+            "statusPosting" => $this->request->getGet('statusPosting'),
             "statusLPB" => $this->request->getGet("statusLPB"),
-            "supplierName" => $this->request->getGet("supplierName"),
             "mulaiTanggalBC23" => $this->request->getGet("mulaiTanggalBC23"),
             "selesaiTanggalBC23" => $this->request->getGet('selesaiTanggalBC23'),
-            "noPenerimaanBarang" => $this->request->getGet('noPenerimaanBarang'),
-            "noAju" => $this->request->getGet('noAju')
         ];
 
         $limit = $this->request->getGet("length");
@@ -204,6 +202,7 @@ class BC23 extends BaseController
 
         foreach ($beaCukaiData['data'] as $data) {
             $bc23 = $this->bc23Model->where('bc_purchase_order_id', $data->bc_purchase_order_id)->first();
+            $totalBarang = $this->bcPurchaseOrderModel->findDetailBarang($data->bc_purchase_order_id);
 
             array_push($dataBeaCukai, [
                 "no"                    => $no++,
@@ -215,6 +214,7 @@ class BC23 extends BaseController
                 "po_no"                 => str_replace(['"', ']', '['], " ",  $data->multiple_po_no),
                 "supplier_name"         => strtoupper($data->supplier_name),
                 "status"                => strtoupper($bc23 == null ? "BELUM DIBUAT" : $data->status_dokumen),
+                "total_barang"          => count($totalBarang),
                 "status_posting"        => $data->status_posting,
                 "is_update_no_aju"      => $bc23 == null ? false : ($data->status_posting === "1" ? false : true),
             ]);
@@ -264,6 +264,34 @@ class BC23 extends BaseController
         ];
 
         return view('BeaCukai/bc-23/form-po-list', $data);
+    }
+
+
+    public function detailBarang($bcPurchaseOrderID)
+    {
+        $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
+        $bc23 = $this->bc23Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
+        $bcPo = $this->bcPurchaseOrderModel
+            ->select('bc_purchase_order.*, suppliers.name AS supplier_name')
+            ->join('suppliers', 'suppliers.id = bc_purchase_order.supplier_id', 'left')
+            ->where('bc_purchase_order.id', $bcPurchaseOrderID)
+            ->first();
+        if ($bcPo == null) {
+            return redirect()->to('bea-cukai-bc-23');
+        }
+        if ($bc23 != null) {
+            if ($bc23['no_aju'] != null) {
+                $noAju = $bc23['no_aju'];
+            }
+        } else {
+            $noAju = "";
+        }
+        $data = [
+            'daftarPoUsed' => $this->bcPurchaseOrderModel->findDetailBarang($bcPurchaseOrderID),
+            'bcPo' => $bcPo,
+            'noAju' => $noAju
+        ];
+        return view('BeaCukai/bc-23/detail-barang', $data);
     }
 
     public function createHeaderView($bcPurchaseOrderID)

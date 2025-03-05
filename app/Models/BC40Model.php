@@ -42,6 +42,7 @@ class BC40Model extends Model
 
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
+        // $db = \Config\Database::connect();
         $availableSort = [
             'bc_40.createdAt'                        => 'bc_40.createdAt',
             'bc_40.no_aju'                           => 'bc_40.no_aju',
@@ -51,7 +52,7 @@ class BC40Model extends Model
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'bc_purchase_order.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'bc_purchase_order.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "bc_40.*,
@@ -74,41 +75,38 @@ class BC40Model extends Model
 
         $totalData = $bcDataQry->countAllResults(false);
 
-        if ($addCondition['statusBC'] || $addCondition['statusLPB'] || $addCondition['supplierName'] || $addCondition['noPenerimaanBarang'] || $addCondition['noAju'] && (empty($addCondition['mulaiTanggalBC40']) && empty($addCondition['selesaiTanggalBC40']))) {
-            $bcDataQry->groupStart();
-        }
-
-        if ($addCondition['statusBC']) {
-            if ($addCondition['statusBC'] == "Belum Lengkap") {
-                $bcDataQry->where('bc_40.status_dokumen', "Belum Lengkap");
-            } elseif ($addCondition['statusBC'] == "Siap Kirim") {
-                $bcDataQry->where('bc_40.status_dokumen', "Siap Kirim");
-            } else if ($addCondition['statusBC'] == "Sudah Kirim") {
-                $bcDataQry->where('bc_40.status_dokumen', "Sudah Kirim");
-            }
-        }
-
         if ($addCondition['statusLPB']) {
+            $bcDataQry->groupStart();
             if ($addCondition['statusLPB'] != "SEMUA") {
                 $bcDataQry->where('bc_purchase_order.po_type', $addCondition['statusLPB']);
             } else {
                 $bcDataQry->whereIn('bc_purchase_order.po_type', ["LOKAL BAKU", "LOKAL PENOLONG"]);
             }
+            $bcDataQry->groupEnd();
         }
 
-        if ($addCondition['supplierName']) {
-            $bcDataQry->like('suppliers.name', $addCondition['supplierName']);
+        if ($addCondition['statusPosting'] && $addCondition['statusPosting'] != "SEMUA") {
+            $bcDataQry->groupStart();
+            if ($addCondition['statusPosting'] == "SUDAH POSTING") {
+                $bcDataQry->where('bc_purchase_order.status_posting', '1');
+            } else {
+                $bcDataQry->where('bc_purchase_order.status_posting', '0');
+            }
+            $bcDataQry->groupEnd();
         }
 
-        if ($addCondition['noPenerimaanBarang']) {
-            $bcDataQry->like('multiple_lpb_no', $addCondition['noPenerimaanBarang']);
+        if ($addCondition['searchData']) {
+            $bcDataQry->groupStart();
         }
 
-        if ($addCondition['noAju']) {
-            $bcDataQry->like('no_aju', $addCondition['noAju'])->orLike('bc_purchase_order.no_daftar', $addCondition['noAju']);
+        if ($addCondition['searchData']) {
+            $bcDataQry->like('suppliers.name', $addCondition['searchData'])
+                ->orLike('multiple_lpb_no', $addCondition['searchData'])
+                ->orLike('no_aju', $addCondition['searchData'])
+                ->orLike('bc_purchase_order.no_daftar', $addCondition['searchData']);
         }
 
-        if ($addCondition['statusBC'] || $addCondition['statusLPB'] || $addCondition['supplierName'] || $addCondition['noPenerimaanBarang'] || $addCondition['noAju'] && (empty($addCondition['mulaiTanggalBC40']) && empty($addCondition['selesaiTanggalBC40']))) {
+        if ($addCondition['searchData']) {
             $bcDataQry->groupEnd();
         }
 
@@ -122,25 +120,26 @@ class BC40Model extends Model
             $bcDataQry->groupEnd();
         }
 
-        if ($addCondition['mulaiTanggalBC40'] && $addCondition['selesaiTanggalBC40']) {
+        if ($addCondition['mulaiTanggalBC40'] || $addCondition['selesaiTanggalBC40']) {
             $bcDataQry->groupStart();
-            $mulaiTanggalBC40Timestamp = date_format(date_create_from_format("d/m/Y", $addCondition['mulaiTanggalBC40']), "Y-m-d");
-            $selesaiTanggalBC40Timestamp = date_format(date_create_from_format("d/m/Y", $addCondition['selesaiTanggalBC40']), "Y-m-d");
 
             if ($addCondition['mulaiTanggalBC40']) {
-                $bcDataQry->where('bc_40.createdAt >=', $mulaiTanggalBC40Timestamp);
+                $bcDataQry->where('date(bc_purchase_order.createdAt) >=', $addCondition['mulaiTanggalBC40']);
             }
 
             if ($addCondition['selesaiTanggalBC40']) {
-                $bcDataQry->where('bc_40.createdAt <=', $selesaiTanggalBC40Timestamp);
+                $bcDataQry->where('date(bc_purchase_order.createdAt) <=',  $addCondition['selesaiTanggalBC40']);
             }
 
             $bcDataQry->groupEnd();
         }
 
+
+
         $totalFilteredData = $bcDataQry->countAllResults(false);
         $data = $bcDataQry->findAll($limit, $offset);
-
+        // var_dump($db->getLastQuery());
+        // die;
         return [
             'data'              => $data,
             'totalData'         => $totalData,

@@ -43,6 +43,8 @@ $routes->get('/403', function () {
     return view('errors/html/error_403');
 });
 
+$routes->get('/pph-generate', 'Warehouse\Penomoran::repairPPhPoBahanBaku');
+
 // DASHBOARD
 $routes->get('/dashboard', 'Dashboard\Dashboard::dashboard', ['filter' => 'Auth']);
 $routes->get('/dashboard/toggle', 'Dashboard\Dashboard::toggleSidebar', ['filter' => 'Auth']);
@@ -1287,6 +1289,7 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->post('po/update', 'BeaCukai\BC40::updatePurchaseOrderAction/$1');
     $routes->post('posting', 'BeaCukai\BC23::posting');
     $routes->post('unposting', 'BeaCukai\BC40::unPosting');
+    $routes->get('detail-barang/(:segment)', 'BeaCukai\BC23::detailBarang/$1');
 
     // OUTSTANDING
     $routes->get('bc-23-outstanding-all', 'BeaCukai\BC23::allOutstanding');
@@ -1365,6 +1368,7 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->post('po/update', 'BeaCukai\BC40::updatePurchaseOrderAction/$1');
     $routes->post('posting', 'BeaCukai\BC40::posting');
     $routes->post('unposting', 'BeaCukai\BC40::unPosting');
+    $routes->get('detail-barang/(:segment)', 'BeaCukai\BC40::detailBarang/$1');
 
     // OUTSTANDING
     $routes->get('bc-40-outstanding-all', 'BeaCukai\BC40::allOutstanding');
