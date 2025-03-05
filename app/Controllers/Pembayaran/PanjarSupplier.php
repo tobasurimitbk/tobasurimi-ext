@@ -320,6 +320,7 @@ class PanjarSupplier extends BaseController
             foreach ($bayar_panjar as $b) {
                 $total_bayar_panjar += $b['bayar_panjar'];
             }
+            
             array_push($dataSupplier, [
                 "no"            => $no++,
                 "id"            => encrypt($data->id),

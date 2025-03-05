@@ -194,7 +194,6 @@
                                 <td style="width: 10px;text-align: center;color:#E7323A;font-weight:bold;">No</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;" class="nomor">Nomor PO</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;">Total Panjar</td>
-                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Bayar Panjar</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;">Payment Date</td>
                             </tr>
                         </thead>
@@ -869,12 +868,13 @@
                 table.find('tbody').empty();
                 if (response.data.length > 0) {
 
+                    console.log(response.data)
+
                     $.each(response.data, function(i, v) {
                         var newRow = $('<tr>');
                         newRow.append($('<td style="text-align:center;">').text(no++));
-                        newRow.append($('<td style="text-align:center;">').text(v.multiple_lpb_no));
+                        newRow.append($('<td style="text-align:center;">').text(v.po_no));
                         newRow.append($('<td style="text-align:center;">').text(v.total_panjar));
-                        newRow.append($('<td style="text-align:center;">').text(v.bayar_panjar));
                         newRow.append($('<td style="text-align:center;">').text(v.payment_date));
                         table.find('tbody').append(newRow);
                     });

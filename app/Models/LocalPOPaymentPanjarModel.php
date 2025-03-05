@@ -97,16 +97,17 @@ class LocalPOPaymentPanjarModel extends Model
 
         if (!empty($panjarType)) {
             if ($panjarType['type'] == "BB") {
-                $selectQry = "no_panjar,total_panjar, bayar_panjar, panjar_supplier.supplier_id, multiple_lpb_no, name, local_po_payments.payment_date";
+                $selectQry = "no_panjar,total_panjar, bayar_panjar, panjar_supplier.supplier_id, panjar_supplier.jenis_panjar, name, local_po_payments.payment_date, rm_purchase_orders.po_no";
                 $list = $this->asObject()
                     ->select($selectQry)
                     ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id', 'inner')
                     ->join('suppliers', 'panjar_supplier.supplier_id = suppliers.id', 'inner')
                     ->join('local_po_payments', 'local_po_payment_panjar.local_po_payment_id = local_po_payments.id', 'inner')
+                    ->join('local_po_payment_details', 'local_po_payments.id = local_po_payment_details.local_po_payment_id', 'left')
+                    ->join('rm_purchase_orders', 'local_po_payment_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
                     ->where($condition)
                     ->findAll();
                 foreach ($list as $l) {
-                    $l->multiple_lpb_no = json_decode($l->multiple_lpb_no);
                     $l->total_panjar = number_format($l->total_panjar, 2);
                     $l->bayar_panjar = number_format($l->bayar_panjar, 2);
                     $l->payment_date = date('d/m/Y', strtotime($l->payment_date));
