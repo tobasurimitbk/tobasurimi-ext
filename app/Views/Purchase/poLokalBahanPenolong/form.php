@@ -1289,7 +1289,10 @@
                             ppn: v.ppn,
                             pph: v.pph
                         });
+
+                        console.log(v.ppn);
                     });
+                    console.log(listBarang);
                     drawTabel(listBarang);
                     // Set Global Ppn
                     setGlobalPpn();
@@ -1320,7 +1323,7 @@
         // PPN untuk semua list barang hasilnya sama
         var ppn = $('#ppn option:selected').val();
         for (let i = 0; i < listBarang.length; i++) {
-            listBarang[i].ppn = ppn;
+            listBarang[i].ppn = ppn == undefined || ppn == '' ? 0 : ppn;
         }
     }
 
