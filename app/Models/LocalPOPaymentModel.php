@@ -1134,25 +1134,27 @@ class LocalPOPaymentModel extends Model
                 'total_panjar'  => (float) ($pay['total_panjar'] ?? 0),
                 'total_pinjaman'=> (float) ($pay['total_pinjaman'] ?? 0)
             ];
-        }
+        }   
+
+       
 
         foreach ($purchaseOrders as &$p) {
             $totalWithPPH = $purchaseOrderModel->getTotalwithPPH($p['rm_purchase_order_id']);
 
             // Ambil data pembayaran, panjar, dan pinjaman dengan casting ke float
-            $totalPaid    = (float) ($paymentsMap[$p['rm_purchase_order_id']]['total_paid'] ?? 0);
-            $totalPanjar  = (float) ($paymentsMap[$p['rm_purchase_order_id']]['total_panjar'] ?? 0);
-            $totalPinjaman = (float) ($paymentsMap[$p['rm_purchase_order_id']]['total_pinjaman'] ?? 0);
+            $totalPaid    = floatval($paymentsMap[$p['rm_purchase_order_id']]['total_paid'] ?? 0);
+            $totalPanjar  = floatval($paymentsMap[$p['rm_purchase_order_id']]['total_panjar'] ?? 0);
+            $totalPinjaman = floatval($paymentsMap[$p['rm_purchase_order_id']]['total_pinjaman'] ?? 0);
 
             // Hitung total tagihan
-            $remainingTotal = (float) $totalPaid - ( $totalPanjar + $totalPinjaman);
+            $remainingTotal = floatval($totalPaid - ( $totalPanjar + $totalPinjaman));
 
             // Format tanggal & update data PO
             $p['tanggal_PO'] = date('d/m/Y', strtotime($p['tanggal_PO']));
             $p['total_tagihan'] = number_format($totalWithPPH['total_after_pph'], 2, '.', '');
-            $p['total_tagihan_number'] = number_format($remainingTotal, 2, '.', '');
-            $p['total_paid'] = number_format($totalWithPPH['total_after_pph'] - $remainingTotal, 2, '.', '');
-            $p['sisa_tagihan'] = number_format($remainingTotal, 2, '.', '');
+            $p['total_tagihan_number'] = number_format($totalWithPPH['total_after_pph'], 2, '.', '');
+            $p['total_paid'] = number_format($totalPaid, 2, '.', '');
+            $p['sisa_tagihan'] = number_format($totalWithPPH['total_after_pph'] - $totalPaid, 2, '.', '');
             $p['total_qty_diterima'] = number_format($p['total_qty_diterima'], 2, '.', '');
         }
 

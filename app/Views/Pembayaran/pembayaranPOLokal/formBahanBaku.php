@@ -530,30 +530,6 @@
     <?php if (!empty($detail)) : ?>
         getPanjarSupplier();
         generateLPBNo();
-        // $.ajax({
-        //     url: "<?= base_url("/pembayaran-po-lokal-bb/get-list-po-paid"); ?>",
-        //     data: {
-        //         pembayaran_id: $("#id").val(),
-        //     },
-        //     method: "GET",
-        //     beforeSend: function(xhr) {
-        //         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-        //     },
-        //     success: function(response) {
-        //         listPembayaran = [];
-        //         listPembayaran = response.data;
-        //         listPanjar = [];
-        //         listPinjaman = [];
-        //         listPanjarTB = [];
-        //         listPanjar = response.data.panjar
-        //         listPinjaman = response.data.pinjaman
-        //         listPanjarTB = response.data.panjar_tb
-
-        //         csrf.val(response.token);
-        //         generateLPBNo();
-        //         drawPaidTable(listPembayaran);
-        //     }
-        // });
     <?php endif; ?>
 
 
@@ -1911,15 +1887,15 @@
         var totalBayarPinjaman = 0;
         var totalBayarPanjarTB = 0;
 
-        if ($(".total-bayar-panjar").length && TotalPanjar < 0) {
+        if ($(".total-bayar-panjar").length && TotalPanjar > 0) {
             totalBayarPanjar = destroyFormatRupiahPayment($(".total-bayar-panjar").val()) || 0;
         }
 
-        if ($(".total-bayar-pinjaman").length && TotalPinjaman < 0) {
+        if ($(".total-bayar-pinjaman").length && TotalPinjaman > 0) {
             totalBayarPinjaman = destroyFormatRupiahPayment($(".total-bayar-pinjaman").val()) || 0;
         }
         
-        if ($(".total-bayar-panjar-tb").length && TotalPanjarTB < 0) {
+        if ($(".total-bayar-panjar-tb").length && TotalPanjarTB > 0) {
             totalBayarPanjarTB = destroyFormatRupiahPayment($(".total-bayar-panjar-tb").val()) || 0;
         }
 
@@ -1928,7 +1904,7 @@
 
         var total = totalPembayaran - totalBayarPanjar - totalBayarPinjaman - totalBayarPanjarTB - potongan;
 
-        $(".grand-total").val(greatFormatRupiahPayment(total)); // Setting the total with 2 decimal places
+        $(".grand-total").val(greatFormatRupiahPayment(total)); 
     }
 </script>
 
