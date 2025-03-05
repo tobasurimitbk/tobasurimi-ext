@@ -91,7 +91,22 @@ class SppModel extends Model
             }
         }
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['divisi_id']) {
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $purchaseRequestsDataQry->groupStart();
+        }
+
+        if ($addCondition['dateStart']) {
+            $purchaseRequestsDataQry->where('purchase_requests.request_date >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $purchaseRequestsDataQry->where('purchase_requests.request_date <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $purchaseRequestsDataQry->groupEnd();
+        }
+
+        if ($addCondition['search'] || $addCondition['divisi_id'] || $addCondition['spp_type']) {
             $purchaseRequestsDataQry->groupStart();
         }
         if ($addCondition['divisi_id']) {
@@ -108,15 +123,7 @@ class SppModel extends Model
                 ->like('spp_type', $addCondition['spp_type']);
         }
 
-        if ($addCondition['dateStart']) {
-            $purchaseRequestsDataQry->where('purchase_requests.request_date >=',  $addCondition['dateStart']);
-        }
-        if ($addCondition['dateEnd']) {
-            $purchaseRequestsDataQry->where('purchase_requests.request_date <=', $addCondition['dateEnd']);
-        }
-
-
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['divisi_id']) {
+        if ($addCondition['search'] || $addCondition['divisi_id'] || $addCondition['spp_type']) {
             $purchaseRequestsDataQry->groupEnd();
         }
 
