@@ -166,7 +166,7 @@ class SppModel extends Model
         return $query->getResultArray();
     }
 
-    public function generateNoSpp($divisi, $companyId)
+    public function generateNoSpp($divisi, $companyId, $month, $year)
     {
         $romanNumb = [
             'I',
@@ -183,22 +183,18 @@ class SppModel extends Model
             'XII',
         ];
 
-        $today = Time::today('America/Chicago', 'en_US');
-
-        $year = $today->getYear();
-        $month = $today->getMonth() - 1;
-
         $divisi = str_replace(' ', '', $divisi);
 
-        $lastStr =  $divisi . '/' . $romanNumb[$month] . '/' . $year;
+        $lastStrQry =   $romanNumb[intval($month) - 1] . '/' . substr($year, -2);
 
         $builder = $this->db->table('purchase_requests');
         $builder->select('spp_no');
         $builder->orderBy('spp_no', 'desc');
         $builder->where('company_id', $companyId);
-        $builder->like('spp_no', $lastStr);
+        $builder->like('spp_no', $lastStrQry);
         $query = $builder->get();
 
+        $lastStr =  $divisi . '/' . $romanNumb[intval($month) - 1] . '/' . substr($year, -2);
         $increment = '01';
 
         if ($query->getResultArray()) {

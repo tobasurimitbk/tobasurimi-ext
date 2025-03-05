@@ -1303,6 +1303,10 @@
         }
     }
 
+    $('#request_date,#divisi_id').change(function() {
+        changeStatus();
+    })
+
     const changeStatus = function() {
         let value = document.getElementById('auto_generate').checked ? true : false;
 
@@ -1314,7 +1318,8 @@
                 method: "GET",
                 dataType: "json",
                 data: {
-                    divisi_name: $(".divisi_id option:selected").text()
+                    divisi_name: $(".divisi_id option:selected").text(),
+                    request_date: $('#request_date').val()
                 },
                 success: function(res) {
                     $(".spp_no").val(res.data);
