@@ -1606,6 +1606,15 @@ class BC40 extends BaseController
             ]);
         }
 
+        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
+        if ($bcPurchaseOrder['no_daftar'] == null) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => "Gagal Posting, No Daftar Belum Ada",
+            ]);
+        }
+
         $status = $this->insertInventori($bcPurchaseOrderID);
 
         if (!$status) {
