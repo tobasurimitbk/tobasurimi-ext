@@ -229,8 +229,8 @@ class RMImportPOModel extends Model
         $head = "PO/IBB-" . $bln . $thn . '/';
         $lastPO = $this->select('po_no')
             ->like('po_no', "PO/IBB-")
-            ->where('rm_import_pos.createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
-            ->where('rm_import_pos.createdAt <=', $last_day . " 23:59:59")
+            ->where('rm_import_pos.po_date >=', $thn . "-" . $bln . "-01")
+            ->where('rm_import_pos.po_date <=', $last_day)
             ->where('rm_import_pos.company_id', $companyID)
             ->orderBy('po_no', "DESC")
             ->first();

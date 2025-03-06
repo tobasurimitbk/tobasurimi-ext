@@ -66,7 +66,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('divisi')" class="sort">Departemen</th>
+                                <!-- <th onclick="changeSort('divisi')" class="sort">Departemen</th> -->
                                 <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
                                 <th>No SPP</th>
                                 <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
@@ -93,7 +93,6 @@
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
         ordering: true,
@@ -151,10 +150,10 @@
                 className: "text-center",
                 orderable: false
             },
-            {
-                data: "divisi",
-                className: "text-center"
-            },
+            // {
+            //     data: "divisi",
+            //     className: "text-center"
+            // },
             {
                 data: "no_penerimaan_barang",
                 className: "text-center"

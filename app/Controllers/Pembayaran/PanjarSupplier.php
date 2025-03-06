@@ -6,8 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\PanjarSupplierModel;
 use App\Models\SupplierModel;
 use App\Models\LocalPOPaymentPanjarModel;
-
-
+use App\Models\Sub_AkunsModel;
 
 class PanjarSupplier extends BaseController
 {
@@ -94,14 +93,14 @@ class PanjarSupplier extends BaseController
             }
 
             $insertData = [
-
                 "company_id"    => $this->this_company_id,
                 "supplier_id"   => $this->request->getVar('supplier_id'),
                 "jenis_panjar"   => $this->request->getVar('jenis_panjar'),
                 "no_panjar"     => $this->request->getPost("no_panjar"),
                 "payment_date"  => $this->request->getVar("payment_date"),
                 "total_panjar"  => repairDouble($this->request->getVar("total_panjar")),
-
+                "akun_kas"  => repairDouble($this->request->getVar("akun_kas")),
+                "akun_selisih"  => repairDouble($this->request->getVar("akun_selisih")),
             ];
 
             $insert = $this->panjarSupplierModel->insert($insertData);
@@ -166,7 +165,14 @@ class PanjarSupplier extends BaseController
                 echo json_encode($data);
                 return;
             }
-            $check = $this->panjarSupplierModel->where('company_id', $this->this_company_id)->where('no_panjar', $this->request->getPost("no_panjar"))->first();
+
+            $id = decrypt($this->request->getPost("id"));
+
+            $check = $this->panjarSupplierModel
+                        ->where('company_id', $this->this_company_id)
+                        ->where('no_panjar', $this->request->getPost("no_panjar"))
+                        ->where('id !=', $id)
+                        ->first();
             if ($check != null) {
                 return response()->setJSON([
                     'token' => csrf_hash(),
@@ -176,13 +182,14 @@ class PanjarSupplier extends BaseController
             }
 
             if ($this->validate($rules)) {
-                $id = decrypt($this->request->getPost("id"));
                 $payload = [
 
                     "company_id" => $this->this_company_id,
                     "supplier_id"   => $this->request->getVar('supplier_id'),
                     "no_panjar"     => $this->request->getPost("no_panjar"),
                     "payment_date"  => $this->request->getVar("payment_date"),
+                    "akun_kas"  => $this->request->getVar("akun_kas"),
+                    "akun_selisih"  => $this->request->getVar("akun_selisih"),
                     "total_panjar"  => repairDouble($this->request->getVar("total_panjar")),
                 ];
             }
@@ -313,12 +320,17 @@ class PanjarSupplier extends BaseController
             foreach ($bayar_panjar as $b) {
                 $total_bayar_panjar += $b['bayar_panjar'];
             }
+            
             array_push($dataSupplier, [
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
                 "no_panjar"     => $data->no_panjar,
                 "jenis_panjar"     => str_replace('_', ' ', $data->jenis_panjar),
                 "supplier"      => $data->name,
+                "akun_kas"      => $data->akun_kas,
+                "akun_selisih"  => $data->akun_selisih,
+                "akun_selisih_nama"  => $data->akun_selisih_name,
+                "akun_kas_nama"  => $data->akun_kas_name,
                 "payment_date"  => date('d/m/Y', strtotime($data->payment_date)),
                 "total_panjar"  => number_format($data->total_panjar, 2),
                 "sisa_panjar"   => number_format(($data->total_panjar) - $total_bayar_panjar, 2),
@@ -394,4 +406,18 @@ class PanjarSupplier extends BaseController
         $noPanjar = $this->panjarSupplierModel->getNumber($this->this_company_id);
         return json_encode($noPanjar);
     }
+
+    public function getSubAkun() { 
+        $Sub_AkunsModel = new Sub_AkunsModel();
+        $search = trim($this->request->getGet('search')); // Ambil & bersihkan input pencarian
+    
+        $subAkun = $Sub_AkunsModel
+            ->select('id, nama_sub')
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->like('nama_sub', $search)
+            ->findAll(10); // Batasi hasil max 10 biar efisien
+
+        return $this->response->setJSON($subAkun);
+    }     
 }

@@ -46,8 +46,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select tipe_supplier" name="tipe_supplier" id="tipe_supplier">
-                                    <option value="" selected></option>
-                                    <option value="INTERNASIONAL">INTERNASIONAL</option>
+                                    <option value="INTERNASIONAL" selected>INTERNASIONAL</option>
                                     <option value="BAHAN PENOLONG">BAHAN PENOLONG</option>
                                     <option value="BAHAN BAKU">BAHAN BAKU</option>
                                 </select>
@@ -66,14 +65,29 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select tipe_panjar" name="tipe_panjar" id="tipe_panjar">
-                                    <option value="" selected></option>
-                                    <option value="MERAH">Merah</option>
+                                    <option value="MERAH" selected>Merah</option>
                                     <option value="PUTIH">Putih</option>
 
                                 </select>
                                 <label for="floatingInput">Tipe Panjar</label>
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                <select class="form-select" name="akun_kas" id="akun_kas">
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Debit (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                <select class="form-select" name="akun_selisih" id="akun_selisih">
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Kredit</label>
+                            </div>
+                        </div>
+
 
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -152,6 +166,8 @@
                                 <th onclick="changeSort('no_panjar')">No. Panjar</th>
                                 <th onclick="changeSort('jenis_panjar')">Jenis Panjar</th>
                                 <th onclick="changeSort('supplier_id')">Supplier</th>
+                                <th>Akun Kas</th>
+                                <th>Akun Selisih</th>
                                 <th onclick="changeSort('payment_date')">Payment Date</th>
                                 <th onclick="changeSort('payment_amount')">Total Panjar</th>
                                 <th onclick="changeSort('payment_amt_left')">Sisa Panjar</th>
@@ -207,7 +223,6 @@
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;" class="nomor">Nomor PO</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;">Jenis Panjar</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;">Total Panjar</td>
-                                <td style="text-align: center;color:#E7323A;font-weight:bold;">Bayar Panjar</td>
                                 <td style="text-align: center;color:#E7323A;font-weight:bold;">Payment Date</td>
                             </tr>
                         </thead>
@@ -232,7 +247,7 @@
     let trigger = true;
 
     const table = $('.dataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: true,
@@ -284,6 +299,14 @@
             },
             {
                 data: "supplier",
+                className: "text-center"
+            },
+            {
+                data: "akun_kas_nama",
+                className: "text-center"
+            },
+            {
+                data: "akun_selisih_nama",
                 className: "text-center"
             },
             {
@@ -570,7 +593,7 @@
     });
 
 
-       $("#tipe_supplier, #supplier_id")
+    $("#tipe_supplier, #supplier_id")
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -622,6 +645,18 @@
                         //     $("#total_panjar").prop("disabled", true);
                         //     $(".delete-form").css('display', 'none');
                         // }
+
+                        // SET SELECT2 VALUE FOR EDIT
+
+                        if (res.data.akun_kas) {
+                            let akunKas = new Option(res.data.akun_kas_name || "", res.data.akun_kas, true, true);
+                            $("#akun_kas").append(akunKas).trigger('change');
+                        }
+
+                        if (res.data.akun_selisih) {
+                            let akunSelisih = new Option(res.data.akun_selisih_name || "", res.data.akun_selisih, true, true);
+                            $("#akun_selisih").append(akunSelisih).trigger('change');
+                        }
 
                         $('.modal').on('hidden.bs.modal', function() {
                             enableFields();
@@ -676,6 +711,43 @@
         });
     });
 
+
+    $(document).ready(function() {
+        $("#akun_kas, #akun_selisih").select2({
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content"),
+            placeholder: "Pilih Akun",
+            allowClear: true,
+            ajax: {
+                url: "<?= base_url('panjar-supplier/list-akunCoa'); ?>",
+                dataType: "json",
+                delay: 250, // Hindari spam request
+                data: function(params) {
+                    return {
+                        search: params.term // Kirim kata kunci pencarian
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: $.map(data, function(item) {
+                            return {
+                                id: item.id,
+                                text: item.nama_sub
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 3
+        });
+    });
+
+
+
+
+
+
     // APPEND DATA SUPPLIER BY TYPE
     function appendDropdownSupplier(data) {
         // $(".supplier_id").empty()
@@ -695,21 +767,21 @@
                 success: function(res) {
                     if (res) {
                         $("#no_panjar").val(res);
-                       
+
                     } else {
                         Swal.fire({
                             icon: 'error',
                             title: res.message,
                             confirmButtonColor: '#4e73df',
                         })
-                      
+
                         $("#auto_generate").prop("checked", false);
                         $("#no_panjar").val("");
                     }
                 }
             })
         } else {
-         
+
             $("#no_panjar").val("");
         }
 
@@ -912,9 +984,9 @@
                     $.each(response.data, function(i, v) {
                         var newRow = $('<tr>');
                         newRow.append($('<td style="text-align:center;">').text(no++));
-                        newRow.append($('<td style="text-align:center;">').text(v.multiple_lpb_no));
+                        newRow.append($('<td style="text-align:center;">').text(v.po_no));
+                        newRow.append($('<td style="text-align:center;">').text(v.jenis_panjar));
                         newRow.append($('<td style="text-align:center;">').text(v.total_panjar));
-                        newRow.append($('<td style="text-align:center;">').text(v.bayar_panjar));
                         newRow.append($('<td style="text-align:center;">').text(v.payment_date));
                         table.find('tbody').append(newRow);
                     });

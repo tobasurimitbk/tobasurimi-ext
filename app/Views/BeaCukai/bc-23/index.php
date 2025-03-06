@@ -29,7 +29,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-start row-col-spp">
-                <div class="col-md-3 mb-3">
+                <div class="col-md-2 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC23" id="mulaiTanggalBC23" name="mulaiTanggalBC23" placeholder="Mulai Tanggal">
@@ -38,7 +38,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
+                <div class="col-md-2 mb-3">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC23" id="selesaiTanggalBC23" name="selesaiTanggalBC23" placeholder="Sampai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -46,22 +46,34 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
+                <!-- <div class="col-md-3 mb-3">
                     <select name="statusBC" class="form-select statusBC" id="statusBC">
                         <option value="ALL">STATUS BC : ALL</option>
                         <option value="Belum Lengkap">STATUS BC : BELUM LENGKAP</option>
                         <option value="Siap Kirim">STATUS BC : SIAP KIRIM CEISA 4.0</option>
                         <option value="Sudah Kirim">STATUS BC : SUDAH KIRIM CEISA 4.0</option>
                     </select>
-                </div>
-                <div class="col-md-3 mb-3">
+                </div> -->
+                <div class="col-md-2 mb-3">
                     <select name="statusLPB" class="form-select statusLPB" id="statusLPB">
                         <option value="SEMUA">JENIS LPB : SEMUA</option>
                         <option value="IMPORT BAKU">JENIS LPB : IMPORT BB</option>
                         <option value="IMPORT PENOLONG">JENIS LPB : IMPORT BP</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3">
+                <div class="col-md-2 mb-3">
+                    <select name="statusLPB" class="form-select statusPosting" id="statusPosting">
+                        <option value="SEMUA">STATUS POSTING : SEMUA</option>
+                        <option value="SUDAH POSTING">SUDAH POSTING</option>
+                        <option value="BELUM POSTING">BELUM POSTING</option>
+                        <!-- <option value="IMPORT BAKU">JENIS LPB : IMPORT BB</option>
+                        <option value="IMPORT PENOLONG">JENIS LPB : IMPORT BP</option> -->
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <input autocomplete="one-time-code" class="form-control searchData search form-out-search" placeholder="Cari Data" value="" />
+                </div>
+                <!-- <div class="col-md-3 mb-3">
                     <input autocomplete="one-time-code" class="form-control supplierName search form-out-search" placeholder="Cari Nama Supplier" value="" />
                 </div>
                 <div class="col-md-3 mb-3">
@@ -72,7 +84,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju / No Daftar" value="" />
-                </div>
+                </div> -->
             </div>
             <?php if ($akunCeisa == null) : ?>
                 <div class="alert alert-danger mt-3 mb-3" role="alert">
@@ -95,8 +107,9 @@
                                 <th onclick="changeSort('bc_23.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
                                 <th onclick="changeSort('bc_23.no_aju')" class="sort" style="text-align: center;">No Aju / No Daftar</th>
                                 <th onclick="changeSort('bc_purchase_order.po_type')" style="text-align: center;">Jenis PO</th>
-                                <th onclick="changeSort('bc_purchase_order.multiple_lpb_id')" class="sort" style="text-align: center;">No LPB</th>
-                                <th onclick="changeSort('bc_purchase_order.multiple_po_id')" class="sort" style="text-align: center;">No PO</th>
+                                <!-- <th onclick="changeSort('bc_purchase_order.multiple_lpb_id')" class="sort" style="text-align: center;">No LPB</th>
+                                <th onclick="changeSort('bc_purchase_order.multiple_po_id')" class="sort" style="text-align: center;">No PO</th> -->
+                                <th style="text-align: center;">Total Barang</th>
                                 <th style="text-align: center;">Status Posting</th>
                                 <th style="text-align: center;">Status Kirim</th>
                                 <th style="text-align: center;">Action</th>
@@ -114,7 +127,7 @@
 
 </section>
 
-<div class="modal fade" id="modalUpdateNoAju" tabindex="-1">
+<!-- <div class="modal fade" id="modalUpdateNoAju" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -159,7 +172,7 @@
 
         </div>
     </div>
-</div>
+</div> -->
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -168,7 +181,7 @@
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: true,
@@ -187,11 +200,13 @@
             data: function(data) {
                 data.mulaiTanggalBC23 = $('.mulaiTanggalBC23').val();
                 data.selesaiTanggalBC23 = $('.selesaiTanggalBC23').val();
-                data.supplierName = $('.supplierName').val();
+                // data.supplierName = $('.supplierName').val();
                 data.statusLPB = $('.statusLPB').val();
-                data.statusBC = $('.statusBC').val();
-                data.noPenerimaanBarang = $('.noPenerimaanBarang').val();
-                data.noAju = $('.noAju').val();
+                data.searchData = $('.searchData').val();
+                data.statusPosting = $('.statusPosting').val();
+                // data.statusBC = $('.statusBC').val();
+                // data.noPenerimaanBarang = $('.noPenerimaanBarang').val();
+                // data.noAju = $('.noAju').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -226,13 +241,19 @@
                 className: "text-center",
             },
             {
-                data: "lpb_no",
-                className: "text-center"
+                data: "total_barang",
+                searchable: false,
+                sortable: false,
+                className: "text-center",
             },
-            {
-                data: "po_no",
-                className: "text-center"
-            },
+            // {
+            //     data: "lpb_no",
+            //     className: "text-center"
+            // },
+            // {
+            //     data: "po_no",
+            //     className: "text-center"
+            // },
             {
                 data: "status_posting",
                 className: "text-center",
@@ -296,14 +317,18 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let htmlRes = '';
-
+                    htmlRes += `
+                            <a href="javascript:void(0)" onclick="detailBarang('${row.id}')" data-toggle="tooltip" title="Detail Barang" class="btn btn-warning posting-spp actions">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        `;
                     if (row.status_posting === "0") {
                         if (row.no_aju != null) {
-                            htmlRes += `
-                                <button data-toggle="tooltip" title="Update No Aju" onclick="noAjuShowModal('${row.id}', '${row.no_aju}')" class="btn btn-warning posting-spp">
-                                    <i class="fas fa-edit fa-sm"></i>
-                                </button>
-                                `;
+                            // htmlRes += `
+                            //     <button data-toggle="tooltip" title="Update No Aju" onclick="noAjuShowModal('${row.id}', '${row.no_aju}')" class="btn btn-warning posting-spp">
+                            //         <i class="fas fa-edit fa-sm"></i>
+                            //     </button>
+                            //     `;
                         }
 
                         htmlRes += `
@@ -373,11 +398,11 @@
         table.ajax.reload();
     });
 
-    $('.supplierName, .noPenerimaanBarang, .noAju').keyup(function() {
+    $('.searchData').keyup(function() {
         table.ajax.reload();
     });
 
-    $('.statusBC, .statusLPB').change(function() {
+    $('.statusPosting, .statusLPB').change(function() {
         table.ajax.reload();
     });
 
@@ -388,145 +413,145 @@
         autoclose: true
     });
 
-    var validator = $("#form-update").validate({
-        rules: {
-            tanggal_pengajuan: {
-                required: true
-            },
-            no_urut_dokumen: {
-                required: true,
-                digits: true,
-                minlength: 6,
-            },
-        },
-        messages: {
-            tanggal_pengajuan: {
-                required: "Tanggal wajib diisi"
-            },
-            no_urut_dokumen: {
-                required: "Nomor urut wajib diisi",
-                digits: "Nomor urut harus berupa angka",
-                minlength: "Nomor urut harus terdiri dari 6 digit",
-            },
-        },
-        errorElement: 'span',
-        errorClass: 'text-danger',
-        errorPlacement: function(error, element) {
-            var elem = $(element);
-            if (elem.hasClass("select2-hidden-accessible")) {
-                element = $("#select2-" + elem.attr("id") + "-container").parent();
-                error.insertAfter(element);
-            } else {
-                error.insertAfter(element);
-            }
-        },
-        highlight: function(element) {
-            $(element).closest('.form-group').addClass('has-error');
-            $(element).addClass('select-class');
+    // var validator = $("#form-update").validate({
+    //     rules: {
+    //         tanggal_pengajuan: {
+    //             required: true
+    //         },
+    //         no_urut_dokumen: {
+    //             required: true,
+    //             digits: true,
+    //             minlength: 6,
+    //         },
+    //     },
+    //     messages: {
+    //         tanggal_pengajuan: {
+    //             required: "Tanggal wajib diisi"
+    //         },
+    //         no_urut_dokumen: {
+    //             required: "Nomor urut wajib diisi",
+    //             digits: "Nomor urut harus berupa angka",
+    //             minlength: "Nomor urut harus terdiri dari 6 digit",
+    //         },
+    //     },
+    //     errorElement: 'span',
+    //     errorClass: 'text-danger',
+    //     errorPlacement: function(error, element) {
+    //         var elem = $(element);
+    //         if (elem.hasClass("select2-hidden-accessible")) {
+    //             element = $("#select2-" + elem.attr("id") + "-container").parent();
+    //             error.insertAfter(element);
+    //         } else {
+    //             error.insertAfter(element);
+    //         }
+    //     },
+    //     highlight: function(element) {
+    //         $(element).closest('.form-group').addClass('has-error');
+    //         $(element).addClass('select-class');
 
-        },
-        unhighlight: function(element) {
-            $(element).closest('.form-group').removeClass('has-error');
-            $(element).removeClass('select-class');
-        },
-    });
+    //     },
+    //     unhighlight: function(element) {
+    //         $(element).closest('.form-group').removeClass('has-error');
+    //         $(element).removeClass('select-class');
+    //     },
+    // });
 
-    $('#ubahNoAjuButton').click(function(e) {
-        e.preventDefault();
-        if ($('#form-update').valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Ubah Nomor Aju ?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var formData = new FormData(document.querySelector("#form-update"));
-                    $.ajax({
-                        url: `<?= base_url("bea-cukai-bc-23/id/update-no-aju"); ?>`,
-                        method: "POST",
-                        data: formData,
-                        beforeSend: function(xhr) {
-                            setLoading();
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(res) {
-                            csrf.val(res.token);
-                            if (res.status) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: res.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    table.ajax.reload();
-                                });
-                                $('#modalUpdateNoAju').modal('hide');
+    // $('#ubahNoAjuButton').click(function(e) {
+    //     e.preventDefault();
+    //     if ($('#form-update').valid()) {
+    //         Swal.fire({
+    //             icon: 'question',
+    //             title: 'Ubah Nomor Aju ?',
+    //             confirmButtonColor: '#4e73df',
+    //             cancelButtonColor: '#d33',
+    //             showCancelButton: true,
+    //             reverseButtons: true,
+    //             confirmButtonText: 'Ya',
+    //             cancelButtonText: 'Kembali',
+    //         }).then((result) => {
+    //             if (result.isConfirmed) {
+    //                 var formData = new FormData(document.querySelector("#form-update"));
+    //                 $.ajax({
+    //                     url: `<?= base_url("bea-cukai-bc-23/id/update-no-aju"); ?>`,
+    //                     method: "POST",
+    //                     data: formData,
+    //                     beforeSend: function(xhr) {
+    //                         setLoading();
+    //                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+    //                     },
+    //                     complete: function() {
+    //                         stopLoading();
+    //                     },
+    //                     method: "POST",
+    //                     dataType: "json",
+    //                     processData: false,
+    //                     contentType: false,
+    //                     success: function(res) {
+    //                         csrf.val(res.token);
+    //                         if (res.status) {
+    //                             Swal.fire({
+    //                                 icon: 'success',
+    //                                 title: res.message,
+    //                                 confirmButtonColor: '#4e73df',
+    //                                 confirmButtonText: 'Ok'
+    //                             }).then((result) => {
+    //                                 table.ajax.reload();
+    //                             });
+    //                             $('#modalUpdateNoAju').modal('hide');
 
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: res.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    table.ajax.reload();
-                                });
-                            }
-                        }
-                    })
-                }
-            })
-        }
-    });
+    //                         } else {
+    //                             Swal.fire({
+    //                                 icon: 'error',
+    //                                 title: res.message,
+    //                                 confirmButtonColor: '#4e73df',
+    //                                 confirmButtonText: 'Ok'
+    //                             }).then((result) => {
+    //                                 table.ajax.reload();
+    //                             });
+    //                         }
+    //                     }
+    //                 })
+    //             }
+    //         })
+    //     }
+    // });
 
 
-    $('#no_urut_dokumen').keyup(function() {
-        var noAju = $('#no_pengajuan').val();
-        var splitValues = noAju.split("-");
-        splitValues[3] = $(this).val();
-        $('#no_pengajuan').val(splitValues[0] + '-' + splitValues[1] + '-' + splitValues[2] + '-' + splitValues[3]);
-    });
+    // $('#no_urut_dokumen').keyup(function() {
+    //     var noAju = $('#no_pengajuan').val();
+    //     var splitValues = noAju.split("-");
+    //     splitValues[3] = $(this).val();
+    //     $('#no_pengajuan').val(splitValues[0] + '-' + splitValues[1] + '-' + splitValues[2] + '-' + splitValues[3]);
+    // });
 
-    $("#tanggal_pengajuan").datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true
-    }).change(function() {
-        var tanggalPengajuan = $(this).val();
-        var noAju = $('#no_pengajuan').val();
-        var tanggalPengajuanSplit = tanggalPengajuan.split("/");
-        var noPengajuanSplit = noAju.split("-");
-        $('#no_pengajuan').val(noPengajuanSplit[0] + '-' + noPengajuanSplit[1] + '-' + tanggalPengajuanSplit[2] + '' + tanggalPengajuanSplit[1] + '' + tanggalPengajuanSplit[0] + '-' + noPengajuanSplit[3]);
-    });
+    // $("#tanggal_pengajuan").datepicker({
+    //     todayHighlight: true,
+    //     format: "dd/mm/yyyy",
+    //     orientation: "bottom auto",
+    //     autoclose: true
+    // }).change(function() {
+    //     var tanggalPengajuan = $(this).val();
+    //     var noAju = $('#no_pengajuan').val();
+    //     var tanggalPengajuanSplit = tanggalPengajuan.split("/");
+    //     var noPengajuanSplit = noAju.split("-");
+    //     $('#no_pengajuan').val(noPengajuanSplit[0] + '-' + noPengajuanSplit[1] + '-' + tanggalPengajuanSplit[2] + '' + tanggalPengajuanSplit[1] + '' + tanggalPengajuanSplit[0] + '-' + noPengajuanSplit[3]);
+    // });
 
-    function noAjuShowModal(id, noAju) {
-        var splitValues = noAju.split("-");
+    // function noAjuShowModal(id, noAju) {
+    //     var splitValues = noAju.split("-");
 
-        var year = splitValues[2].substring(0, 4);
-        var month = splitValues[2].substring(4, 6);
-        var day = splitValues[2].substring(6, 8);
+    //     var year = splitValues[2].substring(0, 4);
+    //     var month = splitValues[2].substring(4, 6);
+    //     var day = splitValues[2].substring(6, 8);
 
-        var formattedDate = day + '/' + month + '/' + year;
+    //     var formattedDate = day + '/' + month + '/' + year;
 
-        $('#tanggal_pengajuan').val(formattedDate);
-        $('#no_pengajuan').val(noAju);
-        $('#no_urut_dokumen').val(splitValues[3]);
-        $('#modalUpdateNoAju').modal('show');
-        $('#bc_purchase_order_id').val(id);
-    }
+    //     $('#tanggal_pengajuan').val(formattedDate);
+    //     $('#no_pengajuan').val(noAju);
+    //     $('#no_urut_dokumen').val(splitValues[3]);
+    //     $('#modalUpdateNoAju').modal('show');
+    //     $('#bc_purchase_order_id').val(id);
+    // }
 
     function changeSort(val) {
         if (sort !== val) {
@@ -535,6 +560,21 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+    }
+
+
+    function detailBarang(id) {
+        const width = 800;
+        const height = 600;
+        const left = window.innerWidth / 2 - width / 2;
+        const top = window.innerHeight / 2 - height / 2;
+
+        window.open(
+            "<?= base_url('bea-cukai-bc-23/detail-barang/') ?>" + id,
+            "_blank",
+            `width=${width},height=${height},top=${top},left=${left},resizable=yes`
+        );
+
     }
 
     function deleteAction(id) {

@@ -80,7 +80,7 @@ class POImportBahanBaku extends BaseController
                 'barang_master_spesifikasi.deletedAt' => null
             ]),
             "satuan" => $this->satuanModel->getSatuanAll(),
-            "dataValuta" => $this->metadataModel->get_by_name_valuta('Valuta'),
+            "dataValuta" => $this->metadataModel->get_by_name('Valuta'),
             "dataShipment" => $this->metadataModel->get_by_name('Shipment')
         ];
 
@@ -272,10 +272,10 @@ class POImportBahanBaku extends BaseController
                 'disc' => $b->diskon,
                 'additional_cost' => $b->biaya_tambahan,
                 'remaining_qty' => $b->qty,
-                'note' => $b->keterangan,
-                'total' => repairDouble2($b->total),
+                'note' => $b->note,
+                'total' => $b->total,
             ]);
-            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, $b->keterangan);
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, $b->note);
         }
 
         $this->sppModel->update($this->request->getVar('spp_id'), [
@@ -378,11 +378,11 @@ class POImportBahanBaku extends BaseController
                     'disc' => $b->diskon,
                     'additional_cost' => $b->biaya_tambahan,
                     'remaining_qty' => $b->qty,
-                    'note' => trim($b->keterangan),
+                    'note' => trim($b->note),
                     'total' => $b->total,
                 ]);
                 array_push($id_detail_all, $check['id']);
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, $b->keterangan);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, $b->note);
             } else {
                 // NEW BARANG
                 // DELETE
@@ -403,11 +403,11 @@ class POImportBahanBaku extends BaseController
                     'disc' => $b->diskon,
                     'additional_cost' => $b->biaya_tambahan,
                     'remaining_qty' => $b->qty,
-                    'note' => trim($b->keterangan),
-                    'total' => repairDouble2($b->total),
+                    'note' => trim($b->note),
+                    'total' => $b->total,
                 ]);
                 array_push($id_detail_all, $id_detail_new);
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, $b->keterangan);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, $b->note);
             }
         }
 
@@ -665,12 +665,20 @@ class POImportBahanBaku extends BaseController
 
     public function generateNoPo()
     {
-        $noPoNew =  $this->rmImportPOModel->get_new_no_po(
-            date('m'),
-            date('Y'),
-            getLastDay(),
-            $this->this_company_id
-        );
-        return json_encode($noPoNew);
+        $poDate = $this->request->getVar('po_date');
+        if (!empty($poDate)) {
+            $poDate = date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("po_date"))));
+            $tanggalExplode = explode('-', $poDate);
+            $year = $tanggalExplode[0];
+            $month = $tanggalExplode[1];
+
+            $noPoNew =  $this->rmImportPOModel->get_new_no_po(
+                $month,
+                $year,
+                getLastDayByDate($poDate),
+                $this->this_company_id
+            );
+            return json_encode($noPoNew);
+        }
     }
 }

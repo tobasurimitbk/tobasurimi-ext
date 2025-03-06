@@ -43,6 +43,8 @@ $routes->get('/403', function () {
     return view('errors/html/error_403');
 });
 
+$routes->get('/pph-generate', 'Warehouse\Penomoran::repairPPhPoBahanBaku');
+
 // DASHBOARD
 $routes->get('/dashboard', 'Dashboard\Dashboard::dashboard', ['filter' => 'Auth']);
 $routes->get('/dashboard/toggle', 'Dashboard\Dashboard::toggleSidebar', ['filter' => 'Auth']);
@@ -492,6 +494,7 @@ $routes->get('/penerimaan-penjualan-lokal/create', 'Penerimaan\SalesOrderPayment
 
 // PEMBAYARAN PANJAR SUPPLIER
 $routes->get('/panjar-supplier', 'Pembayaran\PanjarSupplier::index', ['filter' => 'Auth']);
+$routes->get('/panjar-supplier/list-akunCoa', 'Pembayaran\PanjarSupplier::getSubAkun', ['filter' => 'Auth']);
 $routes->get('/panjar-supplier/list-supplier', 'Pembayaran\PanjarSupplier::dropdownSupplierByType', ['filter' => 'Auth']);
 $routes->post('/panjar-supplier/save', 'Pembayaran\PanjarSupplier::savePanjarSupplier', ['filter' => 'Auth']);
 $routes->get('/panjar-supplier/all', 'Pembayaran\PanjarSupplier::allPanjarSupplier', ['filter' => 'Auth']);
@@ -881,6 +884,7 @@ $routes->get('/barang/dropdown/type-nospecwo', 'Warehouse\Barang::dropdownBarang
 $routes->get('/kategori-account/dropdown', 'Master\Account::dropdownKategoriAccount', ['filter' => 'Auth']);
 $routes->get('/header-account/dropdown', 'Master\Account::dropdownHeaderAccount', ['filter' => 'Auth']);
 $routes->get('/sub-account/dropdown', 'Master\Account::dropdownSubAccount', ['filter' => 'Auth']);
+$routes->get('/sub-account/dropdownData', 'Master\Account::getSubAkun', ['filter' => 'Auth']);
 $routes->get('/ap-ar/dropdown', 'Master\Account::dropdownAPAR', ['filter' => 'Auth']);
 
 // Master Barang
@@ -1285,6 +1289,7 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->post('po/update', 'BeaCukai\BC40::updatePurchaseOrderAction/$1');
     $routes->post('posting', 'BeaCukai\BC23::posting');
     $routes->post('unposting', 'BeaCukai\BC40::unPosting');
+    $routes->get('detail-barang/(:segment)', 'BeaCukai\BC23::detailBarang/$1');
 
     // OUTSTANDING
     $routes->get('bc-23-outstanding-all', 'BeaCukai\BC23::allOutstanding');
@@ -1363,6 +1368,7 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->post('po/update', 'BeaCukai\BC40::updatePurchaseOrderAction/$1');
     $routes->post('posting', 'BeaCukai\BC40::posting');
     $routes->post('unposting', 'BeaCukai\BC40::unPosting');
+    $routes->get('detail-barang/(:segment)', 'BeaCukai\BC40::detailBarang/$1');
 
     // OUTSTANDING
     $routes->get('bc-40-outstanding-all', 'BeaCukai\BC40::allOutstanding');

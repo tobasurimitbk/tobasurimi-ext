@@ -39,6 +39,8 @@ class RMPurchaseOrderModel extends Model
         'is_posted',
         'createdBy',
         'status_penerimaan',
+        'total_before_pph',
+        'total_after_pph'
     ];
 
     // Dates
@@ -108,19 +110,32 @@ class RMPurchaseOrderModel extends Model
             'supplier'          => 'suppliers.name',
             'createdAt'         => 'rm_purchase_orders.createdAt',
             'statusPenerimaan'  => 'rm_purchase_orders.status_penerimaan',
-            'total'             => 'rm_purchase_orders.total'
+            'total'             => 'rm_purchase_orders.total',
+            'total_before_pph' => 'rm_purchase_orders.total_before_pph',
+            'total_after_pph' => 'rm_purchase_orders.total_after_pph'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'rm_purchase_orders.po_date'] ?? 'rm_purchase_orders.po_date';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "rm_purchase_orders.*, 
+        $selectQry = "rm_purchase_orders.id,
+            rm_purchase_orders.po_date,
+            rm_purchase_orders.po_no,
+            rm_purchase_orders.pph,
+            rm_purchase_orders.cong_batasan,
+            rm_purchase_orders.cong_sebenarnya,
+            rm_purchase_orders.subsidi_langsung,
+            rm_purchase_orders.is_posted,
+            rm_purchase_orders.status_penerimaan,
+            rm_purchase_orders.total_after_pph,
+            rm_purchase_orders.total_before_pph,
             suppliers.name AS supplierName,
             suppliers.no_npwp as supplierNPWP,
             companies.company AS companyName,
             divisis.divisi,
-            COUNT(rm_purchase_order_details.id) AS itemCount";
+            COUNT(rm_purchase_order_details.id) AS itemCount,
+            SUM(rm_purchase_order_details.qty) AS totalQty";
 
         $bbLokalDataQry = $this->asObject()
             ->select($selectQry)
@@ -1097,6 +1112,110 @@ class RMPurchaseOrderModel extends Model
         return [
             'pphTotal' => $pphTotal,
             'dibayarkan' => $dibayarkan
+        ];
+    }
+
+    public function generateTotalBeforeAndAfterPph($id)
+    {
+        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+
+        $selectQry = "rm_purchase_orders.id,
+            rm_purchase_orders.po_date,
+            rm_purchase_orders.po_no,
+            rm_purchase_orders.pph,
+            rm_purchase_orders.cong_batasan,
+            rm_purchase_orders.cong_sebenarnya,
+            rm_purchase_orders.subsidi_langsung,
+            rm_purchase_orders.is_posted,
+            rm_purchase_orders.status_penerimaan,
+            suppliers.name AS supplierName,
+            suppliers.no_npwp as supplierNPWP,
+            companies.company AS companyName,
+            divisis.divisi,
+            COUNT(rm_purchase_order_details.id) AS itemCount";
+
+        $data = $this->asObject()
+            ->select($selectQry)
+            ->join('suppliers', 'rm_purchase_orders.supplier_id = suppliers.id', 'left')
+            ->join('companies', 'rm_purchase_orders.company_id = companies.id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
+            ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
+            ->where('rm_purchase_orders.id', $id)
+            ->first();
+
+        $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
+        $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.005;
+        $detailPurchase = $rmPurchaseOrderDetailModel->where('rm_purchase_order_id', $data->id)->where('deletedAt', null)->findAll();
+
+        // PUNYA NPWP 0.25
+        // GK PUNYA 0.5
+        // 314.54 RUPIAH 
+        // sebelum pph 2,635
+        // 2,642,105.26 SEBELUM PPH
+        // 26,35.500 SESUDAH PPH
+        // 325 KTP 
+
+        $totalQty = 0;
+        // Tanpa PPH
+        $nilaiTotalBulanan = 0;
+        $nilaiTotalUmum = 0;
+        $nilaiTotalHarian = 0;
+        // Dengan PPH
+        $nilaiTotalBulananWithPPH = 0;
+        $nilaiTotalUmumWithPPH = 0;
+        $nilaiTotalHarianWithPPH = 0;
+        // Total Tambahan
+        $totalTambahan = 0;
+        $totalTambahanWithPPH = 0;
+
+        // Nilai PPH
+        // $nilaiPPHBulanan = 0;
+        // $nilaiPPHumum = 0;
+        // $nilaiPPHHarian = 0;
+
+        foreach ($detailPurchase as $d) {
+
+            if ($data->pph === "None" || $data->pph === "Supplier") {
+                $nilaiTotalHarian +=  ($d['daily_price'] * $d['qty']);
+                $nilaiTotalUmum +=  ($d['general_price'] * $d['qty']);
+                $nilaiTotalBulanan += ($d['monthly_price'] * $d['qty']);
+            } else {
+                // COMPANY
+                $nilaiTotalHarian +=  (($d['daily_price'] / $nilaiPph) * $d['qty']);
+                $nilaiTotalUmum +=  (($d['general_price'] / $nilaiPph) * $d['qty']);
+                $nilaiTotalBulanan += (($d['monthly_price'] / $nilaiPph) * $d['qty']);
+            }
+
+            $totalQty += $d['qty'];
+        }
+
+        if ($data->pph === "Supplier" || $data->pph === "Company") {
+            $nilaiTotalBulananWithPPH = $nilaiTotalBulanan - ($nilaiTotalBulanan * $nilaiPph2);
+            $nilaiTotalUmumWithPPH = $nilaiTotalUmum - ($nilaiTotalUmum * $nilaiPph2);
+            $nilaiTotalHarianWithPPH = $nilaiTotalHarian - ($nilaiTotalHarian * $nilaiPph2);
+        }
+
+        if ($data->pph == "Company") {
+            $selisih = ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung) / $nilaiPph;
+            $totalTambahan = $selisih;
+            $totalTambahanWithPPH = $totalTambahan - ($totalTambahan * $nilaiPph2);
+        } else {
+            $selisih =  ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung);
+            $totalTambahan = ($selisih * $totalQty);
+            $totalTambahanWithPPH = $totalTambahan - ($totalTambahan * $nilaiPph2);
+        }
+
+        // NILAI SEBELUM PPH
+        $totalBeforePph = $nilaiTotalBulanan + $nilaiTotalHarian + $nilaiTotalUmum +  abs($totalTambahan);
+        $totalAfterPph = $nilaiTotalBulananWithPPH + $nilaiTotalHarianWithPPH + $nilaiTotalUmumWithPPH + abs($totalTambahanWithPPH);
+
+        if ($totalAfterPph == 0) {
+            $totalAfterPph = $totalBeforePph;
+        }
+
+        return [
+            'total_before_pph' => (float) number_format($totalBeforePph, 2, '.', ''),
+            'total_after_pph' => (float) number_format($totalAfterPph, 2, '.', ''),
         ];
     }
 }

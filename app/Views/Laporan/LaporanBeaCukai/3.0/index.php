@@ -22,7 +22,7 @@
     <div class="card">
         <div class="card-body">
 
-        <div class="row justify-content-start row-col-spp">
+            <div class="row justify-content-start row-col-spp">
                 <div class="col-md-3 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
@@ -50,9 +50,9 @@
                 <div class="col-md-3 mb-3">
                     <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Nomor Aju / No Daftar" value="" />
                 </div>
-        </div>
+            </div>
 
-        <div class="row">
+            <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
@@ -91,7 +91,7 @@
                 </div>
             </div>
 
-    </div>
+        </div>
 </section>
 
 <script>
@@ -100,7 +100,7 @@
     let sortType = "desc";
 
     var table = $('.dataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         serverSide: true,
         ordering: true,
         searching: false, // Menghilangkan fitur pencarian
@@ -126,27 +126,114 @@
                 data.sortType = sortType;
             }
         },
-        columns: [
-            { data: null, className: "text-center", sortable: false }, // Nomor urut
-            { data: "tanggal_bc_30", className: "text-center" },
-            { data: "no_aju", className: "text-center" },
-            { data: "no_daftar", className: "text-center" },
-            { data: "no_stuffing", className: "text-center" },
-            
-            { data: "dataBCTarif.PPN.di_bebaskan", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPN.di_bayar", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPN.di_lunasi", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPN.di_tanggung_pemerintah", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
+        columns: [{
+                data: null,
+                className: "text-center",
+                sortable: false
+            }, // Nomor urut
+            {
+                data: "tanggal_bc_30",
+                className: "text-center"
+            },
+            {
+                data: "no_aju",
+                className: "text-center"
+            },
+            {
+                data: "no_daftar",
+                className: "text-center"
+            },
+            {
+                data: "no_stuffing",
+                className: "text-center"
+            },
 
-            { data: "dataBCTarif.PPH.di_bebaskan", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPH.di_bayar", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPH.di_lunasi", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPH.di_tanggung_pemerintah", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
+            {
+                data: "dataBCTarif.PPN.di_bebaskan",
+                className: "text-center",
+                render: function(data) {
+                    return formatRupiah(data > 0 ? data : '0');
+                }
+            },
+            {
+                data: "dataBCTarif.PPN.di_bayar",
+                className: "text-center",
+                render: function(data) {
+                    return formatRupiah(data > 0 ? data : '0');
+                }
+            },
+            {
+                data: "dataBCTarif.PPN.di_lunasi",
+                className: "text-center",
+                render: function(data) {
+                    return formatRupiah(data > 0 ? data : '0');
+                }
+            },
+            {
+                data: "dataBCTarif.PPN.di_tanggung_pemerintah",
+                className: "text-center",
+                render: function(data) {
+                    return formatRupiah(data > 0 ? data : '0');
+                }
+            },
 
-            { data: "dataBCTarif.BM.di_bebaskan", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.BM.di_bayar", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.BM.di_lunasi", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.BM.di_tanggung_pemerintah", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
+            {
+                data: "dataBCTarif.PPH.di_bebaskan",
+                className: "text-center",
+                render: function(data) {
+                    return formatRupiah(data > 0 ? data : '0');
+                }
+            },
+            {
+                data: "dataBCTarif.PPH.di_bayar",
+                className: "text-center",
+                render: function(data) {
+                    return formatRupiah(data > 0 ? data : '0');
+                }
+            },
+            {
+                data: "dataBCTarif.PPH.di_lunasi",
+                className: "text-center",
+                render: function(data) {
+                    return formatRupiah(data > 0 ? data : '0');
+                }
+            },
+            {
+                data: "dataBCTarif.PPH.di_tanggung_pemerintah",
+                className: "text-center",
+                render: function(data) {
+                    return formatRupiah(data > 0 ? data : '0');
+                }
+            },
+
+            {
+                data: "dataBCTarif.BM.di_bebaskan",
+                className: "text-center",
+                render: function(data) {
+                    return formatRupiah(data > 0 ? data : '0');
+                }
+            },
+            {
+                data: "dataBCTarif.BM.di_bayar",
+                className: "text-center",
+                render: function(data) {
+                    return formatRupiah(data > 0 ? data : '0');
+                }
+            },
+            {
+                data: "dataBCTarif.BM.di_lunasi",
+                className: "text-center",
+                render: function(data) {
+                    return formatRupiah(data > 0 ? data : '0');
+                }
+            },
+            {
+                data: "dataBCTarif.BM.di_tanggung_pemerintah",
+                className: "text-center",
+                render: function(data) {
+                    return formatRupiah(data > 0 ? data : '0');
+                }
+            },
         ],
         "initComplete": function(settings, json) {
             $('.dataTables_length').empty();
@@ -161,7 +248,9 @@
         drawCallback: function(settings) {
             var api = this.api();
             var pageInfo = api.page.info();
-            api.column(0, { page: 'current' }).nodes().each(function(cell, i) {
+            api.column(0, {
+                page: 'current'
+            }).nodes().each(function(cell, i) {
                 cell.innerHTML = pageInfo.start + i + 1;
             });
         },
@@ -179,7 +268,7 @@
         }
     });
 
-                                 
+
     $('.mulaiTanggalBC30, .selesaiTanggalBC30, .tipeSalesOrder').change(function() {
         table.ajax.reload();
     });
@@ -201,7 +290,7 @@
     }
 
     const pdfExcel = function(url) {
-       
+
         let date_start = $(".dateStart").val();
         let date_end = $(".dateEnd").val();
         // let sort = "stock_details2.createdAt";

@@ -22,7 +22,7 @@
     <div class="card">
         <div class="card-body">
 
-        <div class="row justify-content-start row-col-spp">
+            <div class="row justify-content-start row-col-spp">
                 <div class="col-md-4 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
@@ -56,7 +56,7 @@
                                 <th onclick="changeSort('bc_41.daftar')" class="sort" style="text-align: center;">No Daftar</th>
                                 <th style="text-align: center;">No Bukti Bayar</th>
                                 <th style="text-align: center;">Tanggal Bukti Bayar</th>
-                            </tr>                           
+                            </tr>
                         </thead>
 
                         <tbody class="body-table" id="body-table">
@@ -74,7 +74,7 @@
     let sortType = "desc";
 
     var table = $('.dataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         serverSide: true,
         ordering: true,
         searching: false, // Menghilangkan fitur pencarian
@@ -98,8 +98,11 @@
                 data.sortType = sortType;
             }
         },
-        columns: [
-            { data: null, className: "text-center", sortable: false }, // Nomor urut
+        columns: [{
+                data: null,
+                className: "text-center",
+                sortable: false
+            }, // Nomor urut
             {
                 data: "date",
                 className: "text-center",
@@ -134,7 +137,9 @@
         drawCallback: function(settings) {
             var api = this.api();
             var pageInfo = api.page.info();
-            api.column(0, { page: 'current' }).nodes().each(function(cell, i) {
+            api.column(0, {
+                page: 'current'
+            }).nodes().each(function(cell, i) {
                 cell.innerHTML = pageInfo.start + i + 1;
             });
         },
@@ -152,7 +157,7 @@
         }
     });
 
-                                 
+
     $('.mulaiTanggalBC41, .selesaiTanggalBC41').change(function() {
         table.ajax.reload();
     });
@@ -178,7 +183,7 @@
     }
 
     const pdfExcel = function(url) {
-       
+
         let date_start = $(".dateStart").val();
         let date_end = $(".dateEnd").val();
         // let sort = "stock_details2.createdAt";

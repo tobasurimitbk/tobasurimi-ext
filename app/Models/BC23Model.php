@@ -74,20 +74,6 @@ class BC23Model extends Model
 
         $totalData = $bcDataQry->countAllResults(false);
 
-        if ($addCondition['statusBC'] || $addCondition['statusLPB'] || $addCondition['supplierName'] || $addCondition['noPenerimaanBarang'] || $addCondition['noAju'] && (empty($addCondition['mulaiTanggalBC23']) && empty($addCondition['selesaiTanggalBC23']))) {
-            $bcDataQry->groupStart();
-        }
-
-        if ($addCondition['statusBC']) {
-            if ($addCondition['statusBC'] == "Belum Lengkap") {
-                $bcDataQry->where('bc_23.status_dokumen', "Belum Lengkap");
-            } elseif ($addCondition['statusBC'] == "Siap Kirim") {
-                $bcDataQry->where('bc_23.status_dokumen', "Siap Kirim");
-            } else if ($addCondition['statusBC'] == "Sudah Kirim") {
-                $bcDataQry->where('bc_23.status_dokumen', "Sudah Kirim");
-            }
-        }
-
         if ($addCondition['statusLPB']) {
             if ($addCondition['statusLPB'] != "SEMUA") {
                 $bcDataQry->where('bc_purchase_order.po_type', $addCondition['statusLPB']);
@@ -96,45 +82,40 @@ class BC23Model extends Model
             }
         }
 
-        if ($addCondition['supplierName']) {
-            $bcDataQry->like('suppliers.name', $addCondition['supplierName']);
-        }
-
-        if ($addCondition['noPenerimaanBarang']) {
-            $bcDataQry->like('multiple_lpb_no', $addCondition['noPenerimaanBarang']);
-        }
-
-        if ($addCondition['noAju']) {
-            $bcDataQry->like('no_aju', $addCondition['noAju'])->orLike('no_daftar', $addCondition['noAju']);
-        }
-
-        if ($addCondition['statusBC'] || $addCondition['statusLPB'] || $addCondition['supplierName'] || $addCondition['noPenerimaanBarang'] || $addCondition['noAju'] && (empty($addCondition['mulaiTanggalBC23']) && empty($addCondition['selesaiTanggalBC23']))) {
+        if ($addCondition['statusPosting'] && $addCondition['statusPosting'] != "SEMUA") {
+            $bcDataQry->groupStart();
+            if ($addCondition['statusPosting'] == "SUDAH POSTING") {
+                $bcDataQry->where('bc_purchase_order.status_posting', '1');
+            } else {
+                $bcDataQry->where('bc_purchase_order.status_posting', '0');
+            }
             $bcDataQry->groupEnd();
         }
 
-        // Inside your existing getList method
-        if (!empty($addCondition['search'])) {
-            $searchTerm = $addCondition['search'];
+        if ($addCondition['searchData']) {
             $bcDataQry->groupStart();
-            $bcDataQry->like('suppliers.name', $searchTerm)
-                ->orLike('bc_23.no_aju', $searchTerm)
-                ->orLike('bc_purchase_order.multiple_lpb_no', $searchTerm)
-                ->orLike('bc_purchase_order.no_daftar', $searchTerm);
+        }
+
+        if ($addCondition['searchData']) {
+            $bcDataQry->like('suppliers.name', $addCondition['searchData'])
+                ->orLike('multiple_lpb_no', $addCondition['searchData'])
+                ->orLike('no_aju', $addCondition['searchData'])
+                ->orLike('bc_purchase_order.no_daftar', $addCondition['searchData']);
+        }
+
+        if ($addCondition['searchData']) {
             $bcDataQry->groupEnd();
         }
 
-
-        if ($addCondition['mulaiTanggalBC23'] && $addCondition['selesaiTanggalBC23']) {
+        if ($addCondition['mulaiTanggalBC23'] || $addCondition['mulaiTanggalBC23']) {
             $bcDataQry->groupStart();
-            $mulaiTanggalBC23Timestamp = date_format(date_create_from_format("d/m/Y", $addCondition['mulaiTanggalBC23']), "Y-m-d");
-            $selesaiTanggalBC23Timestamp = date_format(date_create_from_format("d/m/Y", $addCondition['selesaiTanggalBC23']), "Y-m-d");
 
-            if ($addCondition['mulaiTanggalBC23']) {
-                $bcDataQry->where('bc_23.createdAt >=', $mulaiTanggalBC23Timestamp);
+            if ($addCondition['mulaiTanggalBC40']) {
+                $bcDataQry->where('date(bc_purchase_order.createdAt) >=', $addCondition['mulaiTanggalBC23']);
             }
 
-            if ($addCondition['selesaiTanggalBC23']) {
-                $bcDataQry->where('bc_23.createdAt <=', $selesaiTanggalBC23Timestamp);
+            if ($addCondition['selesaiTanggalBC40']) {
+                $bcDataQry->where('date(bc_purchase_order.createdAt) <=',  $addCondition['mulaiTanggalBC23']);
             }
 
             $bcDataQry->groupEnd();

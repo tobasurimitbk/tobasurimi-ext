@@ -386,8 +386,8 @@ class AMPurchaseOrderModel extends Model
         $head = "PO/IBP-" . $bln . $thn . '/';
         $lastPO = $this->select('po_no')
             ->like('po_no', "PO/IBP-")
-            ->where('am_purchase_orders.createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
-            ->where('am_purchase_orders.createdAt <=', $last_day . " 23:59:59")
+            ->where('am_purchase_orders.po_date >=', $thn . "-" . $bln . "-01")
+            ->where('am_purchase_orders.po_date <=', $last_day)
             ->where('am_purchase_orders.company_id', $companyID)
             ->orderBy('po_no', "DESC")
             ->first();

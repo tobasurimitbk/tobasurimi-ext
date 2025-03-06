@@ -48,23 +48,23 @@
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-dark">
-                    <tr>
-                        <th rowspan="2">No</th>
-                        <th rowspan="2" onclick="changeSort('bc_purchase_order.supplier_id')" class="sort" style="text-align: center;" >Nama Supplier</th>
-                        <th rowspan="2" onclick="changeSort('bc_40.createdAt')" class="sort" style="text-align: center;" >Tanggal</th>
-                        <th rowspan="2" onclick="changeSort('bc_40.no_aju')" class="sort" style="text-align: center;" >No Aju</th>
-                        <th rowspan="2" onclick="changeSort('bc_purchase_order.no_daftar')" style="text-align: center;">No Daftar</th>
-                        <th rowspan="2" onclick="changeSort('bc_purchase_order.po_type')" style="text-align: center;" >Tipe PO</th>
-                        
-                        <th colspan="3" class="text-center">PPN</th>
-                    </tr>
-                    <tr>
-                        <th class="text-center">Tidak Dipungut</th>
-                        <th class="text-center">Di Bebaskan</th>
-                        <th class="text-center">Di Tangguhkan</th>
-                    </tr>
-                    </thead>
+                        <thead class="thead-dark">
+                            <tr>
+                                <th rowspan="2">No</th>
+                                <th rowspan="2" onclick="changeSort('bc_purchase_order.supplier_id')" class="sort" style="text-align: center;">Nama Supplier</th>
+                                <th rowspan="2" onclick="changeSort('bc_40.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
+                                <th rowspan="2" onclick="changeSort('bc_40.no_aju')" class="sort" style="text-align: center;">No Aju</th>
+                                <th rowspan="2" onclick="changeSort('bc_purchase_order.no_daftar')" style="text-align: center;">No Daftar</th>
+                                <th rowspan="2" onclick="changeSort('bc_purchase_order.po_type')" style="text-align: center;">Tipe PO</th>
+
+                                <th colspan="3" class="text-center">PPN</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center">Tidak Dipungut</th>
+                                <th class="text-center">Di Bebaskan</th>
+                                <th class="text-center">Di Tangguhkan</th>
+                            </tr>
+                        </thead>
 
                         <tbody class="body-table" id="body-table">
                         </tbody>
@@ -81,7 +81,7 @@
     let sortType = "desc";
 
     var table = $('.dataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         searching: false, // Menghilangkan fitur pencarian
         serverSide: true,
         ordering: true,
@@ -110,16 +110,52 @@
                 data.sortType = sortType;
             }
         },
-        columns: [
-            { data: null, className: "text-center", sortable: false }, // Nomor urut
-            { data: "supplier_name", className: "text-center" },
-            { data: "date", className: "text-center" },
-            { data: "no_aju", className: "text-center" },
-            { data: "no_daftar", className: "text-center" },
-            { data: "po_type", className: "text-center" },
-            { data: "dataBCTarif.PPN.tidak_dipungut", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPN.di_bebaskan", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
-            { data: "dataBCTarif.PPN.di_tangguhkan", className: "text-center", render: function(data) { return formatRupiah(data > 0 ? data : '0'); }},
+        columns: [{
+                data: null,
+                className: "text-center",
+                sortable: false
+            }, // Nomor urut
+            {
+                data: "supplier_name",
+                className: "text-center"
+            },
+            {
+                data: "date",
+                className: "text-center"
+            },
+            {
+                data: "no_aju",
+                className: "text-center"
+            },
+            {
+                data: "no_daftar",
+                className: "text-center"
+            },
+            {
+                data: "po_type",
+                className: "text-center"
+            },
+            {
+                data: "dataBCTarif.PPN.tidak_dipungut",
+                className: "text-center",
+                render: function(data) {
+                    return formatRupiah(data > 0 ? data : '0');
+                }
+            },
+            {
+                data: "dataBCTarif.PPN.di_bebaskan",
+                className: "text-center",
+                render: function(data) {
+                    return formatRupiah(data > 0 ? data : '0');
+                }
+            },
+            {
+                data: "dataBCTarif.PPN.di_tangguhkan",
+                className: "text-center",
+                render: function(data) {
+                    return formatRupiah(data > 0 ? data : '0');
+                }
+            },
         ],
         "initComplete": function(settings, json) {
             $('.dataTables_length').empty();
@@ -134,7 +170,9 @@
         drawCallback: function(settings) {
             var api = this.api();
             var pageInfo = api.page.info();
-            api.column(0, { page: 'current' }).nodes().each(function(cell, i) {
+            api.column(0, {
+                page: 'current'
+            }).nodes().each(function(cell, i) {
                 cell.innerHTML = pageInfo.start + i + 1;
             });
         },
@@ -152,7 +190,7 @@
         }
     });
 
-                                 
+
     $('.mulaiTanggalBC40, .selesaiTanggalBC40').change(function() {
         table.ajax.reload();
     });
@@ -178,7 +216,7 @@
     }
 
     const pdfExcel = function(url) {
-       
+
         let date_start = $(".dateStart").val();
         let date_end = $(".dateEnd").val();
         // let sort = "stock_details2.createdAt";

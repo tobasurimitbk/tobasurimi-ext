@@ -212,10 +212,10 @@
                 <tr>
                     <td style="text-align: center; border:0px;"><?= $no++; ?></td>
                     <td style="text-align: center;border:0px;">
-                        <?= strtoupper($detail["kode_barang"]) . ' ' . strtoupper($detail["nama_barang"]) ?>
+                        <?= $detail["nama_barang"] . " ( " . $detail['note'] . " )" ?>
                     </td>
                     <td style="text-align: center;border:0px;">
-                        <?= $detail["qty"] . " " . $detail["kode_satuan"] ?>
+                        <?= number_format($detail["qty"]) . " " . $detail["kode_satuan"] ?>
                     </td>
                     <td style="text-align: center;border:0px;">
                         <?= number_format(formatter($detail["price"], "STR_TO_INT"), 2, '.', ',') ?>

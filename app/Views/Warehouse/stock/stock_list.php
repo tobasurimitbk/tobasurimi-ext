@@ -139,7 +139,7 @@
     const csrf = $(`[name="${csrfToken}"]`);
 
     const table = $('.dataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: true,
@@ -165,20 +165,7 @@
                 data.sort = sort;
                 data.sortType = sortType;
             },
-            beforeSend: function() {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
-            complete: function() {
-                $.LoadingOverlay("hide", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            }
+
         },
         "initComplete": function(settings, json) {
             $('.dataTables_length').empty();

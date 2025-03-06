@@ -209,7 +209,7 @@
                                         data-nama_barang="<?= $s['barang_name_master'] ?>"
                                         data-kode_barang="<?= $s['kode_barang'] ?>"
                                         value="<?= $s['barang_master_spesifikasi_id'] ?>">
-                                        <?= $s['kode_barang'] . " ( " . $s['barang_name_master'] . " - " . $s['spesifikasi'] . " )" ?>
+                                        <?= $s['kode_barang'] . " { " . $s['barang_name_master'] . " - " . $s['spesifikasi'] . " }" ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -284,9 +284,21 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control biaya_tambahan" name="biaya_tambahan" id="biaya_tambahan" placeholder="Biaya Tambahan" onkeyup="this.value = greatFormatRupiah(this.value)">
-                            <label for="floatingInput">Biaya Tambahan (Opsional)</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select name="additional_cost_type" class="form-select additional_cost_type" id="additional_cost_type">
+                                        <option value=""></option>
+                                        <option value="PLUS">(+)</option>
+                                        <option value="MINUS">(-)</option>
+                                    </select>
+                                    <label for="floatingInput">Pilih</label>
+                                </div>
+                            </div>
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control biaya_tambahan" name="biaya_tambahan" id="biaya_tambahan" placeholder="Biaya Tambahan" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <label for="floatingInput">Biaya Tambahan / Pengurang (Opsional)</label>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -295,8 +307,6 @@
                             <label for="floatingInput">Total</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
@@ -346,7 +356,7 @@
                                 <th style="text-align: center;">Harga Satuan</th>
                                 <th style="text-align: center;">Qty</th>
                                 <th style="text-align: center;">Diskon (%)</th>
-                                <th style="text-align: center;">Biaya Tambahan</th>
+                                <th style="text-align: center;">Tambahan</th>
                                 <th style="text-align: center;">Total</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
@@ -447,11 +457,10 @@
             selected.data('satuan_3')
         );
 
-        console.log($('#barang_id option:selected').data("parent_name"));
         $('#nama_kategori').val($(this).find("option:selected").data("parent_name"));
 
         try {
-            const match = selectedNamaBarang.match(/\(\s*(.*?)\s*\)/);
+            const match = selectedNamaBarang.match(/\{([^}]*)\}/);
             if (!match) {
                 $('#nama_barang').val($(this).find("option:selected").data("nama_barang") + " - " + $(this).find("option:selected").data("spesifikasi_name"));
             }
@@ -483,20 +492,49 @@
         var biayaTambahan = parseFloat(destroyFormatRupiah($('#biaya_tambahan').val())) || 0;
         var diskon = parseFloat($('#diskon').val()) || 0;
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
+        var additionalCostType = $('#additional_cost_type option:selected').val();
+
+        if (additionalCostType == '') {
+            biayaTambahan = 0;
+        } else if (additionalCostType == "MINUS") {
+            biayaTambahan = biayaTambahan * -1;
+        }
 
         var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
         $('#total').val(total == 0 ? '' : greatFormatRupiah(total.toFixed(2)));
+    });
+
+    $('#additional_cost_type').change(function() {
+        var additionalCostType = $('#additional_cost_type option:selected').val();
+        var biayaTambahan = parseFloat(destroyFormatRupiah($('#biaya_tambahan').val())) || 0;
+        if (additionalCostType == '') {
+            $('#biaya_tambahan').val('');
+            $('#biaya_tambahan').keyup();
+        } else {
+            if (additionalCostType == "MINUS") {
+                biayaTambahan = biayaTambahan * -1;
+            }
+            // Hitung Total
+            var hargaSatuan = parseFloat(destroyFormatRupiah($('#harga_satuan').val())) || 0;
+            var qty = parseFloat($('#qty').val()) || 1;
+            var diskon = parseFloat($('#diskon').val()) || 0;
+            var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
+
+            var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
+            $('#total').val(total == 0 ? '' : greatFormatRupiah(total.toFixed(2)));
+        }
     });
 
     // CHANGE TOTAL
     $('#total').keyup(function() {
         var total = parseFloat(destroyFormatRupiah($('#total').val())) || 0;
         var qty = parseFloat($('#qty').val()) || 1;
-        var biayaTambahan = parseFloat(destroyFormatRupiah($('#biaya_tambahan').val())) || 0;
+        // var biayaTambahan = parseFloat(destroyFormatRupiah($('#biaya_tambahan').val())) || 0;
         var diskon = parseFloat($('#diskon').val()) || 0;
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
         var hargaSatuan = (((total / qty)));
+        // $('#additional_cost_type').change();
         $('#harga_satuan').val(hargaSatuan == 0 ? '' : greatFormatRupiah(hargaSatuan.toFixed(2)));
     });
 
@@ -653,82 +691,111 @@
             var id = $('#id_detail').val();
             var spesifikasiID = $('#barang_id').find("option:selected").data("spesifikasi_id");
             var barang_id = $('#barang_id').find("option:selected").data("barang_id");
+            var total = $('#total').val();
+            var biayaTambahan = parseFloat(destroyFormatRupiah($('#biaya_tambahan').val())) || 0;
+            var additionalCostType = $('#additional_cost_type option:selected').val();
 
-            if (id != "") {
-                // UPDATE
-                if (spesifikasiID == '') {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Spesifikasi barang tidak ada',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        reverseButtons: true,
-                        confirmButtonText: 'Oke',
-                    })
+            if (biayaTambahan != 0 && biayaTambahan != isNaN && additionalCostType == '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Pilih Tipe Biaya Tambahan (Plus atau Minus) terlebih dahulu',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    reverseButtons: true,
+                    confirmButtonText: 'Oke',
+                });
+                return;
+            } else {
+                if (additionalCostType == "MINUS") {
+                    biayaTambahan = destroyFormatRupiah($('#biaya_tambahan').val() || 0) * -1;
+                }
+            }
+
+            if (parseFloat(total) < 0 || parseFloat(total) == isNaN) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Nilai Total Tidak Boleh Negatif',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    reverseButtons: true,
+                    confirmButtonText: 'Oke',
+                })
+            } else {
+                if (id != "") {
+                    // UPDATE
+                    if (spesifikasiID == '') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Spesifikasi barang tidak ada',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            reverseButtons: true,
+                            confirmButtonText: 'Oke',
+                        })
+                    } else {
+                        var indexToUpdate = -1;
+                        for (var i = 0; i < listBarang.length; i++) {
+                            if (listBarang[i].id == id) {
+                                indexToUpdate = i;
+                                break;
+                            }
+                        }
+
+                        listBarang[indexToUpdate] = {
+                            id: id,
+                            barang_id: $('#barang_id').find("option:selected").data("barang_id"),
+                            spesifikasi_id: $('#barang_id').val(),
+                            kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
+                            nama_barang: $('#nama_barang').val(),
+                            satuan_id: $('#satuan_id').val(),
+                            nama_satuan: $('#satuan_id').find("option:selected").data("kode_satuan"),
+                            qty: parseFloat($('#qty').val()),
+                            diskon: parseFloat($('#diskon').val()),
+                            harga_satuan: destroyFormatRupiah($('#harga_satuan').val() || 0),
+                            biaya_tambahan: biayaTambahan,
+                            total: destroyFormatRupiah($('#total').val()),
+                            keterangan: $('#keterangan').val(),
+                            ppn: $('#ppn').val(),
+                            pph: $('#pph').val()
+                        };
+                        drawTabel(listBarang);
+                        resetForm();
+                    }
+
                 } else {
-                    var indexToUpdate = -1;
+                    // TAMBAH
+                    var isAdd = false;
                     for (var i = 0; i < listBarang.length; i++) {
-                        if (listBarang[i].id == id) {
-                            indexToUpdate = i;
+                        if (listBarang[i].barang_id == barang_id && listBarang[i].spesifikasi_id == spesifikasiID) {
+                            indexToRemove = i;
+                            isAdd = true;
                             break;
                         }
                     }
-
-                    listBarang[indexToUpdate] = {
-                        id: id,
-                        barang_id: $('#barang_id').find("option:selected").data("barang_id"),
-                        spesifikasi_id: $('#barang_id').val(),
-                        kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
-                        nama_barang: $('#nama_barang').val(),
-                        satuan_id: $('#satuan_id').val(),
-                        nama_satuan: $('#satuan_id').find("option:selected").data("kode_satuan"),
-                        qty: parseFloat($('#qty').val()),
-                        diskon: parseFloat($('#diskon').val()),
-                        harga_satuan: destroyFormatRupiah($('#harga_satuan').val() || 0),
-                        biaya_tambahan: destroyFormatRupiah($('#biaya_tambahan').val() || 0),
-                        total: destroyFormatRupiah($('#total').val()),
-                        keterangan: $('#keterangan').val(),
-                        ppn: $('#ppn').val(),
-                        pph: $('#pph').val()
-                    };
-                    drawTabel(listBarang);
-                    resetForm();
-                }
-
-            } else {
-                // TAMBAH
-                var isAdd = false;
-                for (var i = 0; i < listBarang.length; i++) {
-                    if (listBarang[i].barang_id == barang_id && listBarang[i].spesifikasi_id == spesifikasiID) {
-                        indexToRemove = i;
-                        isAdd = true;
-                        break;
+                    if (isAdd) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Barang Sudah Ada',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            reverseButtons: true,
+                            confirmButtonText: 'Oke',
+                        })
+                    } else if (spesifikasiID == '') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Spesifikasi barang tidak ada',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            reverseButtons: true,
+                            confirmButtonText: 'Oke',
+                        })
+                    } else {
+                        insertList();
                     }
-                }
-                if (isAdd) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Barang Sudah Ada',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        reverseButtons: true,
-                        confirmButtonText: 'Oke',
-                    })
-                } else if (spesifikasiID == '') {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Spesifikasi barang tidak ada',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        reverseButtons: true,
-                        confirmButtonText: 'Oke',
-                    })
-                } else {
-                    insertList();
-                }
 
+                }
             }
-
         }
     });
 
@@ -915,6 +982,7 @@
             harga_satuan: destroyFormatRupiah($('#harga_satuan').val() || 0),
             biaya_tambahan: destroyFormatRupiah($('#biaya_tambahan').val() || 0),
             total: destroyFormatRupiah($('#total').val()),
+            additional_cost_type: $('#additional_cost_type option:selected').val(),
             keterangan: $('#keterangan').val(),
             ppn: $('#ppn').val(),
             pph: $('#pph').val()
@@ -1039,12 +1107,24 @@
                 break;
             }
         }
+        var additionalCostType = "";
+        var biayaTambahan = item.biaya_tambahan;
+        if (biayaTambahan != 0 && biayaTambahan != '' && biayaTambahan != NaN) {
+            if (biayaTambahan > 0) {
+                additionalCostType = 'PLUS';
+            } else {
+                additionalCostType = 'MINUS';
+                item.biaya_tambahan = item.biaya_tambahan * -1;
+            }
+        }
+
         $('#id_detail').val(item.id);
         $('#barang_id, #barang_update_id').val(item.spesifikasi_id).change();
         $('#harga_satuan').val(item.harga_satuan == 0 ? '' : greatFormatRupiah(item.harga_satuan));
         $('#qty').val(parseFloat(item.qty));
         $('#diskon').val(parseFloat(item.diskon));
-        $('#biaya_tambahan').val((item.biaya_tambahan == 0) ? greatFormatRupiah(0) : greatFormatRupiah(item.biaya_tambahan));
+        $('#biaya_tambahan').val((item.biaya_tambahan == 0) ? '' : greatFormatRupiah(item.biaya_tambahan));
+        $('#additional_cost_type').val(additionalCostType).change();
         $('#keterangan').val(item.keterangan);
         $('#ppn').val(item.ppn);
         $('#pph').val(item.pph);
@@ -1142,7 +1222,6 @@
                     .text("Pilih Barang");
                 barangSelect.append(emptyOption);
                 $.each(response.data, function(index, data) {
-                    console.log(data.parent_name);
                     var option = $("<option></option>")
                         .attr("data-barang_id", data.id)
                         .attr("data-parent_name", data.parent_name)
@@ -1154,7 +1233,7 @@
                         .attr("data-nama_barang", data.barang_name_master)
                         .attr("data-kode_barang", data.kode_barang)
                         .attr("value", data.barang_master_spesifikasi_id)
-                        .text(data.kode_barang + " ( " + data.barang_name_master + " - " + data.spesifikasi + " )");
+                        .text(data.kode_barang + " { " + data.barang_name_master + " - " + data.spesifikasi + " }");
                     barangSelect.append(option);
                 });
 
@@ -1173,6 +1252,7 @@
             $.ajax({
                 url: "<?= base_url("po-lokal-bahan-penolong/dropdown/get-detail-barang-spp"); ?>",
                 data: {
+                    po_id: $('#id').val(),
                     spp_id: spp_id,
                 },
                 method: "GET",
@@ -1209,7 +1289,10 @@
                             ppn: v.ppn,
                             pph: v.pph
                         });
+
+                        console.log(v.ppn);
                     });
+                    console.log(listBarang);
                     drawTabel(listBarang);
                     // Set Global Ppn
                     setGlobalPpn();
@@ -1240,7 +1323,7 @@
         // PPN untuk semua list barang hasilnya sama
         var ppn = $('#ppn option:selected').val();
         for (let i = 0; i < listBarang.length; i++) {
-            listBarang[i].ppn = ppn;
+            listBarang[i].ppn = ppn == undefined || ppn == '' ? 0 : ppn;
         }
     }
 

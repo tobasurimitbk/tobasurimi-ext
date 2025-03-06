@@ -193,7 +193,10 @@ class PembayaranPOLokal extends BaseController
                             "local_po_payment_id" => $id,
                             "jenis_panjar" => "PANJAR",
                             "type" => "BP",
-                            "panjar_id" => $p->id,
+                            "akun_kas" =>  $p->akun_kas,
+                            "akun_selisih" =>  $p->akun_selisih,
+                            "keterangan" =>  $p->keterangan,
+                            "panjar_id" => $p->panjar_id,
                             "bayar_panjar" => repairDouble($p->bayar_panjar)
 
                         ]);
@@ -211,7 +214,10 @@ class PembayaranPOLokal extends BaseController
                             "local_po_payment_id" => $id,
                             "jenis_panjar" => "PANJAR_TB",
                             "type" => "BP",
-                            "panjar_id" => $p->id,
+                            "akun_kas" =>  $p->akun_kas,
+                            "akun_selisih" =>  $p->akun_selisih,
+                            "keterangan" =>  $p->keterangan,
+                            "panjar_id" => $p->panjar_id,
                             "bayar_panjar" => repairDouble($p->bayar_panjar)
                         ]);
                     }
@@ -227,7 +233,10 @@ class PembayaranPOLokal extends BaseController
                             "company_id" => $this->this_company_id,
                             "local_po_payment_id" => $id,
                             "type" => "BP",
-                            "pinjaman_id" => $p->id,
+                            "akun_kas" =>  $p->akun_kas,
+                            "akun_selisih" =>  $p->akun_selisih,
+                            "keterangan" =>  $p->keterangan,
+                            "pinjaman_id" => $p->pinjaman_id,
                             "bayar_pinjaman" => repairDouble($p->bayar_pinjaman)
                         ]);
                     }
@@ -503,6 +512,9 @@ class PembayaranPOLokal extends BaseController
                         "local_po_payment_id" => $id,
                         "type"  => "BB",
                         "panjar_id" => $p->id,
+                        "akun_kas" => $p->akun_kas_panjar,
+                        "akun_selisih" => $p->akun_selisih_panjar,
+                        "keterangan" => $p->keterangan_panjar,
                         "bayar_panjar" => $p->bayar_panjar,
                     ]);
                 }
@@ -519,7 +531,10 @@ class PembayaranPOLokal extends BaseController
                             "jenis_panjar" => "PANJAR_TB",
                             "type" => "BB",
                             "panjar_id" => $p->id,
-                            "bayar_panjar" => $p->bayar_panjar,
+                            "akun_kas" => $p->akun_kas_panjar_tb,
+                            "akun_selisih" => $p->akun_selisih_panjar_tb,
+                            "keterangan" => $p->keterangan_panjar_tb,
+                            "bayar_panjar" => $p->bayar_panjar_tb,
                         ]);
                     }
                 }
@@ -535,6 +550,9 @@ class PembayaranPOLokal extends BaseController
                             "local_po_payment_id" => $id,
                             "type" => "BB",
                             "pinjaman_id" => $p->id,
+                            "akun_kas" => $p->akun_kas_pinjaman,
+                            "akun_selisih" => $p->akun_selisih_pinjaman,
+                            "keterangan" => $p->keterangan_pinjaman,
                             "bayar_pinjaman" => $p->bayar_pinjaman,
                         ]);
                     }
@@ -565,14 +583,16 @@ class PembayaranPOLokal extends BaseController
         }
     }
 
-    public function updatePembayaranPOLokalBBAction($id)
+    public function updatePembayaranPOLokalBBAction()
     {
+
         try {
             $localPOPaymentModel = new LocalPOPaymentModel();
             $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
             $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
             $localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
-    
+            
+            $id = $this->request->getVar('id');
             $panjarList = json_decode($this->request->getVar('panjarList'));
             $pinjamanList = json_decode($this->request->getVar('pinjamanList'));
             $panjarTBList = json_decode($this->request->getVar('panjarTBList'));
@@ -648,6 +668,7 @@ class PembayaranPOLokal extends BaseController
                         "local_po_payment_id" => $id,
                         "type" => "BB",
                         "panjar_id" => $p->id,
+                        "akun_kas" => $p->akun_kas,
                         "bayar_panjar" => $p->bayar_panjar,
                     ]);
                 }
@@ -756,6 +777,7 @@ class PembayaranPOLokal extends BaseController
                 "payment_date"      => $data->payment_date,
                 "payment_method"    => strtoupper($data->payment_method),
                 "amount"            => number_format($data->amount ?? 0, 0, ',', '.'),
+                "total_sum_amount"            => number_format($data->total_sum_amount ?? 0, 0, ',', '.'),
                 "tipe_bayar"        => strtoupper($data->type_bayar),
                 'status_posting'    => $data->status_posting
             ]);
@@ -883,101 +905,236 @@ class PembayaranPOLokal extends BaseController
         return view('Pembayaran/pembayaranPOLokal/formBahanPenolong', $data);
     }
 
+
     public function getPanjarSupplier()
     {
         $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
         $localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
-
+    
         $supplierId = $this->request->getVar('supplier_id');
+        $pembayaranId = decrypt($this->request->getVar('pembayaran_id')); // Ambil pembayaran_id dari request
+    
         $panjarTBResult = $this->panjarSupplierModel->getPanjarTBSupplierbySupplierId($supplierId, $this->this_company_id);
         $pinjamanResult = $this->pinjamanSupplierModel->getPinjamanSupplierbySupplierId($supplierId, $this->this_company_id);
         $panjarResult = $this->panjarSupplierModel->getPanjarSupplierbySupplierId($supplierId, $this->this_company_id);
-
+    
+        // Inisialisasi array untuk menyimpan data panjar
         $panjarList = [];
         foreach ($panjarResult as $p) {
             $bayar_panjar = $localPOPaymentPanjarModel
                 ->where('panjar_id', $p->id)
                 ->findAll();
-
+    
             $total_bayar_panjar = 0;
-
+    
+            // Hanya hitung total_bayar_panjar jika pembayaran_id ada
+        
             foreach ($bayar_panjar as $b) {
                 $total_bayar_panjar += $b['bayar_panjar'];
             }
-
-            array_push($panjarList, [
-                'id'            => $p->id,
-                'bayar_panjar'  => $total_bayar_panjar,
+    
+            $panjarList[$p->id] = [
+                'pembayaran_id'  => "NULL",
+                'panjar_id'     => $p->id,
+                'bayar_panjar'  => 0,
                 'no_panjar'     => $p->no_panjar,
                 'payment_date'  => date('d/m/Y', strtotime($p->payment_date)),
                 'total_panjar_number'  => $p->total_panjar,
                 'total_panjar'         => number_format($p->total_panjar, 2),
                 'sisa_panjar_number'   => $p->total_panjar - $total_bayar_panjar,
                 'sisa_panjar'          => number_format($p->total_panjar - $total_bayar_panjar, 2)
-            ]);
+            ];
         }
-
-
+    
+        // Jika ada pembayaranId, tambahkan data yang sudah ada pembayaran
+        if (!empty($pembayaranId)) {
+            $panjarListWithPayment = $localPOPaymentPanjarModel
+            ->select('local_po_payment_panjar.*, panjar_supplier.id as panjar_id, panjar_supplier.payment_date, panjar_supplier.no_panjar, panjar_supplier.total_panjar, local_po_payments.potongan_harga, 
+                kas_akun.nama_sub AS akun_kas_name, selisih_akun.nama_sub AS akun_selisih_name,  kas_akun.id AS akun_kas_id,  selisih_akun.id AS akun_selisih_id')
+            ->join("local_po_payments", 'local_po_payment_panjar.local_po_payment_id = local_po_payments.id')
+            ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
+            ->join('sub_akuns AS kas_akun', 'local_po_payments.akun_kas = kas_akun.id', 'left')
+            ->join('sub_akuns AS selisih_akun', 'local_po_payments.akun_selisih = selisih_akun.id', 'left')
+            ->where('panjar_supplier.jenis_panjar', "PANJAR")
+            ->where('local_po_payments.deletedAt', null)
+            ->where('local_po_payments.id', $pembayaranId)
+            ->where('type', 'BB')
+            ->findAll();
+    
+        foreach ($panjarListWithPayment as $p) {
+    
+            // Jika ada pembayaran, pastikan data awal dengan panjar_id ini dihapus
+            unset($panjarList[$p['panjar_id']]);
+    
+            $panjarList[$p['panjar_id']] = [
+                'pembayaran_id'       => $pembayaranId,
+                'id'                  => $p['id'],
+                'panjar_id'           => $p['panjar_id'],
+                'bayar_panjar'        => intval($p['bayar_panjar']),
+                'no_panjar'           => $p['no_panjar'],
+                'payment_date'        => date('d/m/Y', strtotime($p['payment_date'])),
+                'total_panjar_number' => intval($p['total_panjar']),
+                'total_panjar'        => number_format($p['total_panjar'], 2),
+                'sisa_panjar_number'  => intval($p['total_panjar']) - $localPOPaymentPanjarModel->getTotalPembayaranPanjar($p['panjar_id'], "BB")['total_bayar_panjar'],
+                'sisa_panjar'         => number_format(intval($p['total_panjar']) - $localPOPaymentPanjarModel->getTotalPembayaranPanjar($p['panjar_id'], "BB")['total_bayar_panjar'], 2),
+                'akun_kas_name'       => $p['akun_kas_name'],
+                'akun_selisih_name'   => $p['akun_selisih_name'],
+                'akun_kas_id'       => $p['akun_kas_id'],
+                'akun_selisih_id'       => $p['akun_selisih_id']
+            ];
+        }
+        }
+    
+        // Konversi kembali ke array index numerik
+        $panjarList = array_values($panjarList);
+    
+        // Proses yang sama untuk panjar TB dan pinjaman
         $panjarTBList = [];
         foreach ($panjarTBResult as $p) {
             $bayar_panjar = $localPOPaymentPanjarModel
                 ->where('panjar_id', $p->id)
                 ->findAll();
-
+    
             $total_bayar_panjar = 0;
-
-            foreach ($bayar_panjar as $b) {
-                $total_bayar_panjar += $b['bayar_panjar'];
-            }
-
-            array_push($panjarTBList, [
-                'id'            => $p->id,
-                'bayar_panjar'  => $total_bayar_panjar,
+    
+            // Hanya hitung total_bayar_panjar jika pembayaran_id ada
+                foreach ($bayar_panjar as $b) {
+                    $total_bayar_panjar += $b['bayar_panjar'];
+                }
+            
+    
+            $panjarTBList[$p->id] = [
+                'pembayaran_id'  => "NULL",
+                'panjar_id'            => $p->id,
+                'bayar_panjar'  => 0,
                 'no_panjar'     => $p->no_panjar,
                 'payment_date'  => date('d/m/Y', strtotime($p->payment_date)),
                 'total_panjar_number'  => $p->total_panjar,
                 'total_panjar'         => number_format($p->total_panjar, 2),
                 'sisa_panjar_number'   => $p->total_panjar - $total_bayar_panjar,
                 'sisa_panjar'          => number_format($p->total_panjar - $total_bayar_panjar, 2)
-            ]);
+            ];
         }
-
-
+    
+        if (!empty($pembayaranId)) {
+          
+            $panjarTBListWithPayment = $localPOPaymentPanjarModel
+                ->select('local_po_payment_panjar.*, panjar_supplier.id as panjar_id, panjar_supplier.no_panjar, panjar_supplier.payment_date, panjar_supplier.total_panjar, local_po_payments.potongan_harga, 
+                    kas_akun.nama_sub AS akun_kas_name, selisih_akun.nama_sub AS akun_selisih_name, kas_akun.id AS akun_kas_id,  selisih_akun.id AS akun_selisih_id')
+                ->join("local_po_payments", 'local_po_payment_panjar.local_po_payment_id = local_po_payments.id')
+                ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
+                ->join('sub_akuns AS kas_akun', 'local_po_payments.akun_kas = kas_akun.id', 'left')
+                ->join('sub_akuns AS selisih_akun', 'local_po_payments.akun_selisih = selisih_akun.id', 'left')
+                ->where('panjar_supplier.jenis_panjar', "PANJAR_TB")
+                ->where('local_po_payments.deletedAt', null)
+                ->where('local_po_payments.id', $pembayaranId)
+                ->where('type', 'BB')
+                ->findAll();
+    
+            foreach ($panjarTBListWithPayment as $p) {
+    
+                // Jika ada pembayaran, pastikan data awal dengan panjar_id ini dihapus
+                unset($panjarTBList[$p['panjar_id']]);
+    
+                $panjarTBList[$p['panjar_id']] = [
+                    'pembayaran_id' => $pembayaranId,
+                    'id'                  => $p['id'],
+                    'panjar_id'           => $p['panjar_id'],
+                    'bayar_panjar'        => intval($p['bayar_panjar']),
+                    'no_panjar'           => $p['no_panjar'],
+                    'payment_date'        => date('d/m/Y', strtotime($p['payment_date'])),
+                    'total_panjar_number' => intval($p['total_panjar']),
+                    'total_panjar'        => number_format($p['total_panjar'], 2),
+                    'sisa_panjar_number'  => intval($p['total_panjar']) - $localPOPaymentPanjarModel->getTotalPembayaranPanjar($p['panjar_id'], "BB")['total_bayar_panjar'],
+                    'sisa_panjar'         => number_format(intval($p['total_panjar']) - $localPOPaymentPanjarModel->getTotalPembayaranPanjar($p['panjar_id'], "BB")['total_bayar_panjar'], 2),
+                    'akun_kas_name'       => $p['akun_kas_name'],
+                    'akun_selisih_name'   => $p['akun_selisih_name'],
+                    'akun_kas_id'       => $p['akun_kas_id'],
+                    'akun_selisih_id'       => $p['akun_selisih_id']
+                ];
+            }
+        }
+    
+        $panjarTBList = array_values($panjarTBList);
+    
         $pinjamanList = [];
         foreach ($pinjamanResult as $p) {
             $bayar_pinjaman = $localPOPaymentPinjamanModel
                 ->where('pinjaman_id', $p->id)
                 ->findAll();
-
+    
             $total_bayar_pinjaman = 0;
-
+    
+            // Hanya hitung total_bayar_pinjaman jika pembayaran_id ada
+            
             foreach ($bayar_pinjaman as $b) {
                 $total_bayar_pinjaman += $b['bayar_pinjaman'];
             }
-
-            array_push($pinjamanList, [
-                'id'            => $p->id,
-                'bayar_pinjaman'  => $total_bayar_pinjaman,
+    
+            $pinjamanList[$p->id] = [
+                'pembayaran_id'   => "NULL",
+                'pinjaman_id'     => $p->id,
+                'bayar_pinjaman'  => 0,
                 'no_pinjaman'     => $p->no_pinjaman,
                 'payment_date'  => date('d/m/Y', strtotime($p->payment_date)),
                 'total_pinjaman_number'  => $p->total_pinjaman,
                 'total_pinjaman'         => number_format($p->total_pinjaman, 2),
                 'sisa_pinjaman_number'   => $p->total_pinjaman - $total_bayar_pinjaman,
                 'sisa_pinjaman'          => number_format($p->total_pinjaman - $total_bayar_pinjaman, 2)
-            ]);
+            ];
         }
-
+    
+        if (!empty($pembayaranId)) {
+            $pinjamanListWithPayment = $localPOPaymentPinjamanModel
+                ->select('local_po_payment_pinjaman.*, pinjaman_supplier.id as pinjaman_id, pinjaman_supplier.payment_date, pinjaman_supplier.no_pinjaman, pinjaman_supplier.total_pinjaman, local_po_payments.potongan_harga, 
+                    kas_akun.nama_sub AS akun_kas_name, selisih_akun.nama_sub AS akun_selisih_name, kas_akun.id AS akun_kas_id,  selisih_akun.id AS akun_selisih_id')
+                ->join("local_po_payments", 'local_po_payment_pinjaman.local_po_payment_id = local_po_payments.id')
+                ->join('pinjaman_supplier', 'local_po_payment_pinjaman.pinjaman_id = pinjaman_supplier.id')
+                ->join('sub_akuns AS kas_akun', 'local_po_payments.akun_kas = kas_akun.id', 'left')
+                ->join('sub_akuns AS selisih_akun', 'local_po_payments.akun_selisih = selisih_akun.id', 'left')
+                ->where('local_po_payments.deletedAt', null)
+                ->where('local_po_payments.id', $pembayaranId)
+                ->where('type', 'BB')
+                ->findAll();
+    
+            foreach ($pinjamanListWithPayment as $p) {
+                
+                // Jika ada pembayaran, pastikan data awal dengan panjar_id ini dihapus
+                unset($pinjamanList[$p['pinjaman_id']]);
+    
+                $pinjamanList[$p['pinjaman_id']] = [
+                    'pembayaran_id'  => $pembayaranId,
+                    'id'                  => $p['id'],
+                    'pinjaman_id'                  => $p['pinjaman_id'],
+                    'bayar_pinjaman'      => intval($p['bayar_pinjaman']),
+                    'no_pinjaman'         => $p['no_pinjaman'],
+                    'payment_date'        => date('d/m/Y', strtotime($p['payment_date'])),
+                    'total_pinjaman_number' => intval($p['total_pinjaman']),
+                    'total_pinjaman'      => number_format($p['total_pinjaman'], 2),
+                    'sisa_pinjaman_number' => intval($p['total_pinjaman']) - $localPOPaymentPinjamanModel->getTotalPembayaranPinjaman($p['pinjaman_id'], "BB")['total_bayar_pinjaman'],
+                    'sisa_pinjaman'       => number_format(intval($p['total_pinjaman']) - $localPOPaymentPinjamanModel->getTotalPembayaranPinjaman($p['pinjaman_id'], "BB")['total_bayar_pinjaman'], 2),
+                    'akun_kas_name'       => $p['akun_kas_name'],
+                    'akun_selisih_name'   => $p['akun_selisih_name'],
+                    'akun_kas_id'       => $p['akun_kas_id'],
+                    'akun_selisih_id'       => $p['akun_selisih_id']
+                ];
+            }
+        }
+    
+        $pinjamanList = array_values($pinjamanList);
+    
         $data = [
             "panjarList" =>  $panjarList,
             "pinjamList" => $pinjamanList,
             "panjarTBList" => $panjarTBList
         ];
-
+    
         return response()->setJSON([
             'data' => $data,
             'status' => true
         ]);
     }
+    
 
     public function getPembayaranPOLokalBB($id)
     {

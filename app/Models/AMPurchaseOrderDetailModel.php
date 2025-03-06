@@ -26,6 +26,7 @@ class AMPurchaseOrderDetailModel extends Model
         'price',
         'disc',
         'additional_cost',
+        'additional_cost_type',
         'ppn',
         'pph',
         'remaining_qty',

@@ -191,13 +191,11 @@ class BC40 extends BaseController
         $addCondition = [
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "statusBC" => $this->request->getGet("statusBC"),
+            "searchData" => $this->request->getGet('searchData'),
+            "statusPosting" => $this->request->getGet('statusPosting'),
             "statusLPB" => $this->request->getGet("statusLPB"),
-            "supplierName" => $this->request->getGet("supplierName"),
-            "mulaiTanggalBC40" => $this->request->getGet("mulaiTanggalBC40"),
-            "selesaiTanggalBC40" => $this->request->getGet('selesaiTanggalBC40'),
-            "noPenerimaanBarang" => $this->request->getGet('noPenerimaanBarang'),
-            "noAju" => $this->request->getGet('noAju')
+            "mulaiTanggalBC40" =>  $this->request->getVar("mulaiTanggalBC40") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("mulaiTanggalBC40")))) : "",
+            "selesaiTanggalBC40" => $this->request->getVar("selesaiTanggalBC40") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("selesaiTanggalBC40")))) : "",
         ];
 
         $limit = $this->request->getGet("length");
@@ -211,6 +209,8 @@ class BC40 extends BaseController
 
         foreach ($beaCukaiData['data'] as $data) {
             $bc40 = $this->bc40Model->where('bc_purchase_order_id', $data->bc_purchase_order_id)->first();
+            $totalBarang = $this->bcPurchaseOrderModel->findDetailBarang($data->bc_purchase_order_id);
+
             array_push($dataBeaCukai, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->bc_purchase_order_id),
@@ -221,6 +221,7 @@ class BC40 extends BaseController
                 "po_no"                 => str_replace(['"', ']', '['], " ",  $data->multiple_po_no),
                 "supplier_name"         => strtoupper($data->supplier_name),
                 "status"                => strtoupper($bc40 == null ? "BELUM DIBUAT" : $data->status_dokumen),
+                "total_barang"          => count($totalBarang),
                 "status_posting"        => $data->status_posting,
                 "is_update_no_aju"      => $bc40 == null ? false : ($data->status_posting === "1" ? false : true),
             ]);
@@ -301,6 +302,33 @@ class BC40 extends BaseController
         ];
 
         return view('BeaCukai/bc-40/form-po-list', $data);
+    }
+
+    public function detailBarang($bcPurchaseOrderID)
+    {
+        $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);
+        $bc40 = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
+        $bcPo = $this->bcPurchaseOrderModel
+            ->select('bc_purchase_order.*, suppliers.name AS supplier_name')
+            ->join('suppliers', 'suppliers.id = bc_purchase_order.supplier_id', 'left')
+            ->where('bc_purchase_order.id', $bcPurchaseOrderID)
+            ->first();
+        if ($bcPo == null) {
+            return redirect()->to('bea-cukai-bc-40');
+        }
+        if ($bc40 != null) {
+            if ($bc40['no_aju'] != null) {
+                $noAju = $bc40['no_aju'];
+            }
+        } else {
+            $noAju = "";
+        }
+        $data = [
+            'daftarPoUsed' => $this->bcPurchaseOrderModel->findDetailBarang($bcPurchaseOrderID),
+            'bcPo' => $bcPo,
+            'noAju' => $noAju
+        ];
+        return view('BeaCukai/bc-40/detail-barang', $data);
     }
 
     public function updatePurchaseOrderAction()

@@ -334,7 +334,22 @@ class SPP extends BaseController
     public function generateSPP()
     {
         $divisi_name = $this->request->getVar("divisi_name");
-        $response = $this->SppModel->generateNoSpp($divisi_name, $this->this_company_id);
+        $request_date =  $this->request->getVar("request_date");
+
+        if (empty($request_date) || empty($divisi_name)) {
+            $data = [
+                "status"  => true,
+                "data"  => '',
+            ];
+            echo json_encode($data);
+        }
+
+        $request_date = date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("request_date"))));
+        $tanggalExplode = explode('-', $request_date);
+        $year = $tanggalExplode[0];
+        $month = $tanggalExplode[1];
+        $response = $this->SppModel->generateNoSpp($divisi_name, $this->this_company_id, $month, $year);
+
         if ($response) {
             $data = [
                 "status"  => true,

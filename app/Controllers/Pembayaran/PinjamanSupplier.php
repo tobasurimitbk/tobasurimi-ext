@@ -96,6 +96,10 @@ class PinjamanSupplier extends BaseController
                 "supplier"      => $data->name,
                 "payment_date"  => date('d/m/Y', strtotime($data->payment_date)),
                 "total_pinjaman"  => number_format($data->total_pinjaman, 2),
+                "akun_kas"      => $data->akun_kas,
+                "akun_selisih"  => $data->akun_selisih,
+                "akun_selisih_nama"  => $data->akun_selisih_name,
+                "akun_kas_nama"  => $data->akun_kas_name,
                 // "sisa_pinjaman"   => number_format(($data->total_pinjaman) - $total_bayar_pinjaman, 2),
                 "is_posted"     => $data->is_posted
             ]);
@@ -166,7 +170,8 @@ class PinjamanSupplier extends BaseController
                 "no_pinjaman"     => $this->request->getPost("no_pinjaman"),
                 "payment_date"  => $this->request->getVar("payment_date"),
                 "total_pinjaman"  => repairDouble($this->request->getVar("total_pinjaman")),
-
+                "akun_kas"  => repairDouble($this->request->getVar("akun_kas")),
+                "akun_selisih"  => repairDouble($this->request->getVar("akun_selisih")),
             ];
 
             $insert = $this->pinjamanSupplierModel->insert($insertData);
@@ -229,7 +234,15 @@ class PinjamanSupplier extends BaseController
                 echo json_encode($data);
                 return;
             }
-            $check = $this->pinjamanSupplierModel->where('company_id', $this->this_company_id)->where('no_pinjaman', $this->request->getPost("no_pinjaman"))->first();
+
+            $id = decrypt($this->request->getPost("id"));
+
+            $check = $this->pinjamanSupplierModel
+                            ->where('company_id', $this->this_company_id)
+                            ->where('no_pinjaman', $this->request
+                            ->where('id !=', $id)
+                            ->getPost("no_pinjaman"))
+                            ->first();
             if ($check != null) {
                 return response()->setJSON([
                     'token' => csrf_hash(),
@@ -239,12 +252,13 @@ class PinjamanSupplier extends BaseController
             }
 
             if ($this->validate($rules)) {
-                $id = decrypt($this->request->getPost("id"));
                 $payload = [
 
                     "company_id" => $this->this_company_id,
                     "supplier_id"   => $this->request->getVar('supplier_id'),
                     // "no_pinjaman"     => $this->request->getPost("no_pinjaman"),
+                    "akun_kas"  => $this->request->getVar("akun_kas"),
+                    "akun_selisih"  => $this->request->getVar("akun_selisih"),
                     "payment_date"  => $this->request->getVar("payment_date"),
                     "total_pinjaman"  => repairDouble($this->request->getVar("total_pinjaman")),
                 ];

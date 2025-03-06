@@ -124,8 +124,8 @@
         var min = false;
 
         // Pastikan x memiliki nilai yang valid sebelum memanggil toString
-        if (x === null || x === undefined) {
-            x = "";
+        if (x === null || x === undefined || x === "") {
+            return ""; // Kembalikan string kosong jika input tidak valid atau kosong
         }
 
         x = x.toString();
@@ -137,6 +137,11 @@
         var parts = x.split(".");
         parts[0] = parts[0].replace(/,/g, "");
         var bilangan = parts[0];
+
+        // Jika bilangan kosong setelah menghapus koma, kembalikan string kosong
+        if (bilangan === "") {
+            return "";
+        }
 
         var number_string = bilangan.toString(),
             sisa = number_string.length % 3,

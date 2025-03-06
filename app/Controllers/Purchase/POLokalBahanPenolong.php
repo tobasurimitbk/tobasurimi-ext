@@ -420,6 +420,7 @@ class POLokalBahanPenolong extends BaseController
                 ->where('am_purchase_order_details.am_purchase_order_id', $id)
                 ->where('spesifikasi_id', $d->spesifikasi_id)
                 ->where('barang_id', $d->barang_id)
+                ->where('note', $d->keterangan)
                 ->first();
 
             if ($check != null) {
@@ -763,6 +764,7 @@ class POLokalBahanPenolong extends BaseController
     public function dropdownGetSppDetail()
     {
         $id = $this->request->getVar('spp_id');
+        $poId = decrypt($this->request->getVar('po_id'));
         $spp = $this->sppModel->find($id);
 
         if ($spp == null) {
@@ -803,6 +805,7 @@ class POLokalBahanPenolong extends BaseController
                 ->where('am_purchase_orders.purchase_request_id', $id)
                 ->where('barang_id', $s['barang1_id'])
                 ->where('spesifikasi_id', $s['barang2_id'])
+                ->where('am_purchase_order_details.note', $s['note'])
                 ->first();
 
             $totalQtyPO = ($totalQtyPO == null) ? 0 : $totalQtyPO['qty_po'];
@@ -825,8 +828,8 @@ class POLokalBahanPenolong extends BaseController
                     'nama_satuan' => $s['kode_satuan'],
                     'harga_satuan' => round($hargaTerakhir['hargaTerakhirNumber'], 2),
                     'qty' => $totalQtySisa,
-                    'diskon' => '0',
-                    'biaya_tambahan' => '0',
+                    'diskon' => 0,
+                    'biaya_tambahan' => 0,
                     'total' => (round($hargaTerakhir['hargaTerakhirNumber'], 2) * $totalQtySisa),
                     'keterangan' => $s['note'],
                     'ppn' => '',
@@ -834,6 +837,43 @@ class POLokalBahanPenolong extends BaseController
                 ];
             }
         }
+
+        if (!empty($poId)) {
+            $poDetail = $this->aMPurchaseOrderDetailModel
+                ->select('
+                am_purchase_order_details.*,
+                barang_master.barang_name,
+                barang_master.kode_barang,
+                barang_master_spesifikasi.spesifikasi,
+                satuans.kode_satuan
+            ')
+                ->join('barang_master', 'am_purchase_order_details.barang_id = barang_master.id', 'left')
+                ->join('barang_master_spesifikasi', 'am_purchase_order_details.spesifikasi_id=barang_master_spesifikasi.id', 'left')
+                ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+                ->where('am_purchase_order_details.deletedAt', null)
+                ->where('am_purchase_order_id', $poId)
+                ->findAll();
+
+            foreach ($poDetail as $s) {
+                $result[] = [
+                    'barang_id' => $s['barang_id'],
+                    'spesifikasi_id' => $s['spesifikasi_id'],
+                    'kode_barang' => $s['kode_barang'],
+                    'nama_barang' => $s['barang_name'] . " " . $s['spesifikasi'],
+                    'satuan_id' => $s['unit'],
+                    'nama_satuan' => $s['kode_satuan'],
+                    'harga_satuan' => $s['price'],
+                    'qty' => $s['qty'],
+                    'diskon' => $s['disc'],
+                    'biaya_tambahan' => $s['additional_cost'],
+                    'total' => $s['total'],
+                    'keterangan' => $s['note'],
+                    'ppn' => $s['ppn'] == null ? '' : $s['ppn'],
+                    'pph' => $s['pph'] == null ? '' : $s['pph']
+                ];
+            }
+        }
+
 
         return response()->setJSON([
             'data' => $result,

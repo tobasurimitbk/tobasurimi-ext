@@ -22,6 +22,8 @@ class PanjarSupplierModel extends Model
         'payment_date',
         'total_panjar',
         'jenis_panjar',
+        'akun_kas',
+        'akun_selisih',
         'tipe_panjar',
         'sisa_panjar',
         'is_posted'
@@ -66,10 +68,12 @@ class PanjarSupplierModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'panjar_supplier.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "panjar_supplier.*,name";
+        $selectQry = "panjar_supplier.*,name, akun_kas.id as akun_kas, akun_kas.nama_sub as akun_kas_name, akun_selisih.id as akun_selisih, akun_selisih.nama_sub as akun_selisih_name";
         $supplierDataQry = $this->asObject()
             ->select($selectQry)
             ->join('suppliers', 'panjar_supplier.supplier_id = suppliers.id', 'left')
+            ->join('sub_akuns AS akun_kas', 'panjar_supplier.akun_kas = akun_kas.id', 'left')
+            ->join('sub_akuns AS akun_selisih', 'panjar_supplier.akun_selisih = akun_selisih.id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
         $totalData = $supplierDataQry->countAllResults(false);
@@ -128,6 +132,8 @@ class PanjarSupplierModel extends Model
         $panjarSupplierData = $this->asObject()
             ->select($selectQry)
             ->join('suppliers', 'panjar_supplier.supplier_id = suppliers.id', 'left')
+            ->join('sub_akuns AS akun_kas', 'panjar_supplier.akun_kas = akun_kas.id', 'left')
+            ->join('sub_akuns AS akun_selisih', 'panjar_supplier.akun_selisih = akun_selisih.id', 'left')
             ->whereIn('panjar_supplier.id', $id)
             ->findAll();
         return $panjarSupplierData;
@@ -136,10 +142,12 @@ class PanjarSupplierModel extends Model
     //get panjar id not use array
     public function getPanjarSupplierbyID($id)
     {
-        $selectQry = "panjar_supplier.*,type,name";
+        $selectQry = "panjar_supplier.*,type,name, akun_kas.id as akun_kas, akun_kas.nama_sub as akun_kas_name, akun_selisih.id as akun_selisih, akun_selisih.nama_sub as akun_selisih_name";
         $panjarSupplierData = $this->asObject()
             ->select($selectQry)
             ->join('suppliers', 'panjar_supplier.supplier_id = suppliers.id', 'left')
+            ->join('sub_akuns AS akun_kas', 'panjar_supplier.akun_kas = akun_kas.id', 'left')
+            ->join('sub_akuns AS akun_selisih', 'panjar_supplier.akun_selisih = akun_selisih.id', 'left')
             ->find($id);
         return $panjarSupplierData;
     }
@@ -217,7 +225,7 @@ class PanjarSupplierModel extends Model
 
         if ($builder != null) {
             $explode = explode('/', $builder['no_panjar']); // CONVERT TO ARRAY BY (/)
-            $number = intval($explode[3]); // CARI DIGIT ANGKA
+            $number = intval($explode[2]); // CARI DIGIT ANGKA
             if ($number > $lastNumber) {
                 $lastNumber = $number;
             }

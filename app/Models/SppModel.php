@@ -91,7 +91,22 @@ class SppModel extends Model
             }
         }
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['divisi_id']) {
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $purchaseRequestsDataQry->groupStart();
+        }
+
+        if ($addCondition['dateStart']) {
+            $purchaseRequestsDataQry->where('purchase_requests.request_date >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $purchaseRequestsDataQry->where('purchase_requests.request_date <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $purchaseRequestsDataQry->groupEnd();
+        }
+
+        if ($addCondition['search'] || $addCondition['divisi_id'] || $addCondition['spp_type']) {
             $purchaseRequestsDataQry->groupStart();
         }
         if ($addCondition['divisi_id']) {
@@ -108,15 +123,7 @@ class SppModel extends Model
                 ->like('spp_type', $addCondition['spp_type']);
         }
 
-        if ($addCondition['dateStart']) {
-            $purchaseRequestsDataQry->where('purchase_requests.request_date >=',  $addCondition['dateStart']);
-        }
-        if ($addCondition['dateEnd']) {
-            $purchaseRequestsDataQry->where('purchase_requests.request_date <=', $addCondition['dateEnd']);
-        }
-
-
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['divisi_id']) {
+        if ($addCondition['search'] || $addCondition['divisi_id'] || $addCondition['spp_type']) {
             $purchaseRequestsDataQry->groupEnd();
         }
 
@@ -166,7 +173,7 @@ class SppModel extends Model
         return $query->getResultArray();
     }
 
-    public function generateNoSpp($divisi, $companyId)
+    public function generateNoSpp($divisi, $companyId, $month, $year)
     {
         $romanNumb = [
             'I',
@@ -183,22 +190,18 @@ class SppModel extends Model
             'XII',
         ];
 
-        $today = Time::today('America/Chicago', 'en_US');
-
-        $year = $today->getYear();
-        $month = $today->getMonth() - 1;
-
         $divisi = str_replace(' ', '', $divisi);
 
-        $lastStr =  $divisi . '/' . $romanNumb[$month] . '/' . $year;
+        $lastStrQry =   $romanNumb[intval($month) - 1] . '/' . substr($year, -2);
 
         $builder = $this->db->table('purchase_requests');
         $builder->select('spp_no');
         $builder->orderBy('spp_no', 'desc');
         $builder->where('company_id', $companyId);
-        $builder->like('spp_no', $lastStr);
+        $builder->like('spp_no', $lastStrQry);
         $query = $builder->get();
 
+        $lastStr =  $divisi . '/' . $romanNumb[intval($month) - 1] . '/' . substr($year, -2);
         $increment = '01';
 
         if ($query->getResultArray()) {

@@ -1001,10 +1001,11 @@ class PenerimaanBarangLokalBP extends BaseController
             );
         } else {
             $warehouse = $this->warehouseModel->where('id', $warehouseID)->first();
+            $divisi = $this->divisiModel->where('id', $warehouse['divisi_id'])->first();
             $no = $this->penerimaanBarangModel->get_no(
                 $month,
                 $year,
-                $warehouse['code_warehouse'],
+                $divisi['divisi'],
                 $statusPenerimaan,
                 $tipeBahan,
                 $prefix

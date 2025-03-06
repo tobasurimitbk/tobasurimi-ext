@@ -933,7 +933,7 @@
     let sortTypePenjualan = "DESC";
 
     const stokTableDokumenBC = $('.stok-dokumen-bc-table').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: true,
@@ -956,20 +956,6 @@
                 data.sort = sortStokPerDokumen;
                 data.sortType = sortTypeStokPerDokumen;
             },
-            beforeSend: function() {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
-            complete: function() {
-                $.LoadingOverlay("hide", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            }
         },
         "initComplete": function(settings, json) {
             $('.dataTables_length').empty();
@@ -1024,7 +1010,7 @@
         }
     });
     const stokTableDokumenSupplier = $('.stok-dokumen-supplier-table').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: true,
@@ -1047,20 +1033,6 @@
                 data.sort = sortStokPerSupplier;
                 data.sortType = sortTypeStokPerSupplier;
             },
-            beforeSend: function() {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
-            complete: function() {
-                $.LoadingOverlay("hide", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            }
         },
         "initComplete": function(settings, json) {
             $('.dataTables_length').empty();
@@ -1136,7 +1108,7 @@
     });
 
     const stokTableInisiasi = $('.stok-inisasi-table').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: true,
@@ -1163,20 +1135,6 @@
                 data.sort = sortStokInisasi;
                 data.sortType = sortTypeInisasi;
             },
-            beforeSend: function() {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
-            complete: function() {
-                $.LoadingOverlay("hide", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            }
         },
         "initComplete": function(settings, json) {
             $('.dataTables_length').empty();
@@ -1235,7 +1193,7 @@
     });
 
     const stokTablePemasukkanBarang = $('.stok-pemasukkan-barang-table').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: true,
@@ -1261,20 +1219,6 @@
 
                 data.sort = sortStokPemasukkanBarang;
                 data.sortType = sortTypePemasukkanBarang;
-            },
-            beforeSend: function() {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
-            complete: function() {
-                $.LoadingOverlay("hide", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
             },
         },
 
@@ -1349,7 +1293,7 @@
     });
 
     const stokTableAdjusment = $('.stok-adjusment').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: true,
@@ -1376,20 +1320,6 @@
 
                 data.sort = sortStokAdjusment;
                 data.sortType = sortTypeAdjusment;
-            },
-            beforeSend: function() {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
-            complete: function() {
-                $.LoadingOverlay("hide", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
             },
         },
 
@@ -1461,7 +1391,7 @@
     });
 
     const stokTableMutasi = $('.stok-mutasi').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: true,
@@ -1488,20 +1418,7 @@
                 data.sort = sortStokMutasi
                 data.sortType = sortTypeMutasi;
             },
-            beforeSend: function() {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
-            complete: function() {
-                $.LoadingOverlay("hide", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
+
         },
 
         "initComplete": function(settings, json) {
@@ -1580,7 +1497,7 @@
     });
 
     const stokTableJasaVendor = $('.stok-jasa-vendor').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: true,
@@ -1606,20 +1523,6 @@
 
                 data.sort = sortStokJasaVendor
                 data.sortType = sortTypeJasaVendor;
-            },
-            beforeSend: function() {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
-            complete: function() {
-                $.LoadingOverlay("hide", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
             },
         },
 
@@ -1693,7 +1596,7 @@
     });
 
     const stokTableProduksiOut = $('.stok-out-produksi').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: true,
@@ -1720,20 +1623,6 @@
 
                 data.sort = sortStokProduksiOut
                 data.sortType = sortTypeProduksiOut;
-            },
-            beforeSend: function() {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
-            complete: function() {
-                $.LoadingOverlay("hide", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
             },
         },
 
@@ -1794,7 +1683,7 @@
     });
 
     const stokTableProduksiIn = $('.stok-in-produksi').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: true,
@@ -1821,20 +1710,6 @@
 
                 data.sort = sortStokProduksiIn
                 data.sortType = sortTypeProduksiIn;
-            },
-            beforeSend: function() {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
-            complete: function() {
-                $.LoadingOverlay("hide", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
             },
         },
 
@@ -1896,7 +1771,7 @@
 
 
     const stokTableRebus = $('.stok-rebus').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: true,
@@ -1922,20 +1797,6 @@
 
                 data.sort = sortStokRebus
                 data.sortType = sortTypeRebus;
-            },
-            beforeSend: function() {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
-            complete: function() {
-                $.LoadingOverlay("hide", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
             },
         },
 
@@ -2004,7 +1865,7 @@
     });
 
     const stokTablePenjualan = $('.stok-penjualan').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         serverSide: true,
         ordering: true,
@@ -2029,20 +1890,6 @@
 
                 data.sort = sortStokPenjualan
                 data.sortType = sortTypePenjualan;
-            },
-            beforeSend: function() {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
-            complete: function() {
-                $.LoadingOverlay("hide", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
             },
         },
 

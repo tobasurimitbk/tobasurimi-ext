@@ -205,72 +205,72 @@ class POLokalBahanBaku extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($poData['data'] as $data) {
-            $detailPurchase = $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $data->id)->where('deletedAt', null)->findAll();
+            // $detailPurchase = $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $data->id)->where('deletedAt', null)->findAll();
             $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "BAKU")->where('status_penerimaan', "LOKAL")->like('multiple_po_id', $data->id)->first();
-            $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
-            $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.005;
+            // $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
+            // $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.005;
 
-            // PUNYA NPWP 0.25
-            // GK PUNYA 0.5
-            // 314.54 RUPIAH 
-            // sebelum pph 2,635
-            // 2,642,105.26 SEBELUM PPH
-            // 26,35.500 SESUDAH PPH
-            // 325 KTP 
+            // // PUNYA NPWP 0.25
+            // // GK PUNYA 0.5
+            // // 314.54 RUPIAH 
+            // // sebelum pph 2,635
+            // // 2,642,105.26 SEBELUM PPH
+            // // 26,35.500 SESUDAH PPH
+            // // 325 KTP 
 
-            $totalQty = 0;
-            // Tanpa PPH
-            $nilaiTotalBulanan = 0;
-            $nilaiTotalUmum = 0;
-            $nilaiTotalHarian = 0;
-            // Dengan PPH
-            $nilaiTotalBulananWithPPH = 0;
-            $nilaiTotalUmumWithPPH = 0;
-            $nilaiTotalHarianWithPPH = 0;
-            // Total Tambahan
-            $totalTambahan = 0;
-            $totalTambahanWithPPH = 0;
+            // $totalQty = 0;
+            // // Tanpa PPH
+            // $nilaiTotalBulanan = 0;
+            // $nilaiTotalUmum = 0;
+            // $nilaiTotalHarian = 0;
+            // // Dengan PPH
+            // $nilaiTotalBulananWithPPH = 0;
+            // $nilaiTotalUmumWithPPH = 0;
+            // $nilaiTotalHarianWithPPH = 0;
+            // // Total Tambahan
+            // $totalTambahan = 0;
+            // $totalTambahanWithPPH = 0;
 
-            // Nilai PPH
-            // $nilaiPPHBulanan = 0;
-            // $nilaiPPHumum = 0;
-            // $nilaiPPHHarian = 0;
+            // // Nilai PPH
+            // // $nilaiPPHBulanan = 0;
+            // // $nilaiPPHumum = 0;
+            // // $nilaiPPHHarian = 0;
 
-            foreach ($detailPurchase as $d) {
+            // foreach ($detailPurchase as $d) {
 
-                if ($data->pph === "None" || $data->pph === "Supplier") {
-                    $nilaiTotalHarian +=  ($d['daily_price'] * $d['qty']);
-                    $nilaiTotalUmum +=  ($d['general_price'] * $d['qty']);
-                    $nilaiTotalBulanan += ($d['monthly_price'] * $d['qty']);
-                } else {
-                    // COMPANY
-                    $nilaiTotalHarian +=  (($d['daily_price'] / $nilaiPph) * $d['qty']);
-                    $nilaiTotalUmum +=  (($d['general_price'] / $nilaiPph) * $d['qty']);
-                    $nilaiTotalBulanan += (($d['monthly_price'] / $nilaiPph) * $d['qty']);
-                }
+            //     if ($data->pph === "None" || $data->pph === "Supplier") {
+            //         $nilaiTotalHarian +=  ($d['daily_price'] * $d['qty']);
+            //         $nilaiTotalUmum +=  ($d['general_price'] * $d['qty']);
+            //         $nilaiTotalBulanan += ($d['monthly_price'] * $d['qty']);
+            //     } else {
+            //         // COMPANY
+            //         $nilaiTotalHarian +=  (($d['daily_price'] / $nilaiPph) * $d['qty']);
+            //         $nilaiTotalUmum +=  (($d['general_price'] / $nilaiPph) * $d['qty']);
+            //         $nilaiTotalBulanan += (($d['monthly_price'] / $nilaiPph) * $d['qty']);
+            //     }
 
-                $totalQty += $d['qty'];
-            }
+            //     $totalQty += $d['qty'];
+            // }
 
-            if ($data->pph === "Supplier" || $data->pph === "Company") {
-                $nilaiTotalBulananWithPPH = $nilaiTotalBulanan - ($nilaiTotalBulanan * $nilaiPph2);
-                $nilaiTotalUmumWithPPH = $nilaiTotalUmum - ($nilaiTotalUmum * $nilaiPph2);
-                $nilaiTotalHarianWithPPH = $nilaiTotalHarian - ($nilaiTotalHarian * $nilaiPph2);
-            }
+            // if ($data->pph === "Supplier" || $data->pph === "Company") {
+            //     $nilaiTotalBulananWithPPH = $nilaiTotalBulanan - ($nilaiTotalBulanan * $nilaiPph2);
+            //     $nilaiTotalUmumWithPPH = $nilaiTotalUmum - ($nilaiTotalUmum * $nilaiPph2);
+            //     $nilaiTotalHarianWithPPH = $nilaiTotalHarian - ($nilaiTotalHarian * $nilaiPph2);
+            // }
 
-            if ($data->pph == "Company") {
-                $selisih = ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung) / $nilaiPph;
-                $totalTambahan = $selisih;
-                $totalTambahanWithPPH = $totalTambahan - ($totalTambahan * $nilaiPph2);
-            } else {
-                $selisih =  ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung);
-                $totalTambahan = ($selisih * $totalQty);
-                $totalTambahanWithPPH = $totalTambahan - ($totalTambahan * $nilaiPph2);
-            }
+            // if ($data->pph == "Company") {
+            //     $selisih = ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung) / $nilaiPph;
+            //     $totalTambahan = $selisih;
+            //     $totalTambahanWithPPH = $totalTambahan - ($totalTambahan * $nilaiPph2);
+            // } else {
+            //     $selisih =  ($data->cong_batasan - $data->cong_sebenarnya + $data->subsidi_langsung);
+            //     $totalTambahan = ($selisih * $totalQty);
+            //     $totalTambahanWithPPH = $totalTambahan - ($totalTambahan * $nilaiPph2);
+            // }
 
-            // NILAI SEBELUM PPH
-            $totalBeforePph = $nilaiTotalBulanan + $nilaiTotalHarian + $nilaiTotalUmum +  abs($totalTambahan);
-            $totalAfterPph = $nilaiTotalBulananWithPPH + $nilaiTotalHarianWithPPH + $nilaiTotalUmumWithPPH + abs($totalTambahanWithPPH);
+            // // NILAI SEBELUM PPH
+            // $totalBeforePph = $nilaiTotalBulanan + $nilaiTotalHarian + $nilaiTotalUmum +  abs($totalTambahan);
+            // $totalAfterPph = $nilaiTotalBulananWithPPH + $nilaiTotalHarianWithPPH + $nilaiTotalUmumWithPPH + abs($totalTambahanWithPPH);
 
             array_push($dataPOLokal, [
                 "no"            => $no++,
@@ -281,9 +281,9 @@ class POLokalBahanBaku extends BaseController
                 "companyName"   => $data->companyName,
                 "supplierName"  => $data->supplierName,
                 "itemCount"     => $data->itemCount,
-                "qtyTotal"      => round($totalQty, 2),
-                "total_after_pph" => "" . number_format($totalAfterPph == 0 ? $totalBeforePph : $totalAfterPph, 2, '.', ','),
-                "total_before_pph" => "" . number_format($totalBeforePph, 2, '.', ','),
+                "qtyTotal"      => round($data->totalQty, 2),
+                "total_after_pph" => number_format($data->total_after_pph, 2),
+                "total_before_pph" => number_format($data->total_before_pph, 2),
                 "is_posted"     => $data->is_posted,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
                 "un_posting" => $unPostingCheck == null ? 0 : 1,
@@ -370,10 +370,13 @@ class POLokalBahanBaku extends BaseController
             $totalHarga += ($d['general_price'] + $d['daily_price'] + $d['monthly_price']) * $d['qty'];
         }
 
-        $this->RMPurchaseOrderModel->update($id, [
-            'total' => $totalHarga  + $this->request->getVar("subsidi_langsung")
-        ]);
+        $totalFinal = $this->RMPurchaseOrderModel->generateTotalBeforeAndAfterPph($id);
 
+        $this->RMPurchaseOrderModel->update($id, [
+            'total' => $totalHarga  + $this->request->getVar("subsidi_langsung"),
+            'total_before_pph'  => $totalFinal['total_before_pph'],
+            'total_after_pph' => $totalFinal['total_after_pph']
+        ]);
 
         return response()->setJSON([
             'message' => "PO Lokal Bahan Baku Berhasil Disimpan",
@@ -505,6 +508,13 @@ class POLokalBahanBaku extends BaseController
             ->where('rm_purchase_order_id', $id)
             ->whereNotIn('id', $id_detail_all)
             ->delete();
+
+        $totalFinal = $this->RMPurchaseOrderModel->generateTotalBeforeAndAfterPph($id);
+
+        $this->RMPurchaseOrderModel->update($id, [
+            'total_before_pph'  => $totalFinal['total_before_pph'],
+            'total_after_pph' => $totalFinal['total_after_pph']
+        ]);
 
 
         return response()->setJSON([

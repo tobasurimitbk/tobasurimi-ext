@@ -126,7 +126,7 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control" id="customerAddress" value="<?= $documentData->customerAddress ?? '' ?>" >
+                            <input type="text" class="form-control" id="customerAddress" value="<?= $documentData->customerAddress ?? '' ?>">
                             <label for="floatingInput">Alamat Konsumen</label>
                         </div>
                     </div>
@@ -423,7 +423,7 @@
     var tanggalFaktur = moment(currentDate).format("YYYY-MM-DD")
 
     const table = $('.dataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         processing: true,
         info: false,
         paging: false,
@@ -688,7 +688,7 @@
                 $(".qty-awal").val("");
                 $(".qty-sekarang").val("");
             }
-        }); 
+        });
 
         $('#company_id').select2({
             placeholder: "Pilih Company",
@@ -1178,27 +1178,27 @@
         const taxStatus = $('#tax_status').is(':checked');
         const includeTax = $('#include_tax').is(':checked');
         let taxes = parseFloat($('#taxes option:selected').data('tax_value')) || 0;
-        
+
         const itemList = table.rows().data();
-        
+
         let itemSubTotal = 0;
         let discTotal = 0;
         let taxTotalHtml = 0;
         let grandTotal = 0;
-        
+
         list_items.forEach((obj) => {
             let itemAmt = parseFloat(obj.amount.replaceAll(',', '')) || 0;
             let discPercent = Math.min(Math.max(parseFloat(obj.disc) || 0, 0), 100); // Validasi diskon antara 0-100%
             let taxAmt = 0;
-            
+
             discTotal += (discPercent / 100) * itemAmt; // Hitung total diskon
-            
+
             if (taxStatus) {
                 taxAmt = itemAmt * (taxes / 100);
             } else {
                 taxAmt = itemAmt * ((+obj.tax) / 100);
             }
-            
+
             if (taxStatus && includeTax) {
                 itemSubTotal += itemAmt / (1 + (taxes / 100));
                 taxTotalHtml += itemAmt - (itemAmt / (1 + (taxes / 100))); // Pajak dihitung dari selisih
@@ -1207,12 +1207,12 @@
                 taxTotalHtml += taxAmt;
             }
         });
-        
+
         // Pastikan total tidak negatif
         itemSubTotal = Math.max(0, itemSubTotal - discTotal);
         taxTotalHtml = Math.max(0, taxTotalHtml);
         grandTotal = itemSubTotal + (taxStatus ? taxTotalHtml : 0);
-        
+
         // Update tampilan HTML
         $('#itemSubTotal').html(itemSubTotal.toLocaleString());
         $('#taxTotal').html(taxTotalHtml.toLocaleString());

@@ -22,7 +22,7 @@
     <div class="card">
         <div class="card-body">
 
-        <div class="row justify-content-start row-col-spp">
+            <div class="row justify-content-start row-col-spp">
                 <div class="col-md-4 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
@@ -98,7 +98,7 @@
                 </div>
             </div>
 
-    </div>
+        </div>
 </section>
 
 <script>
@@ -107,7 +107,7 @@
     let sortType = "desc";
 
     var table = $('.dataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
         serverSide: true,
         ordering: true,
         searching: false, // Menghilangkan fitur pencarian
@@ -133,38 +133,133 @@
                 data.sortType = sortType;
             }
         },
-        "columns": [
-            { data: "no", className: "text-center" },
-            { data: "tanggal_bc_27", className: "text-center" },
-            { data: "no_aju", className: "text-center" },
-            { data: "no_daftar", className: "text-center" },
-            
+        "columns": [{
+                data: "no",
+                className: "text-center"
+            },
+            {
+                data: "tanggal_bc_27",
+                className: "text-center"
+            },
+            {
+                data: "no_aju",
+                className: "text-center"
+            },
+            {
+                data: "no_daftar",
+                className: "text-center"
+            },
+
             // Kolom PPN
-            { data: "pungutan.PPN.di_bebaskan", className: "text-center", render: formatRupiah },
-            { data: "pungutan.PPN.di_bayar", className: "text-center", render: formatRupiah },
-            { data: "pungutan.PPN.di_lunasi", className: "text-center", render: formatRupiah },
-            { data: "pungutan.PPN.di_tanggung_pemerintah", className: "text-center", render: formatRupiah },
-            { data: "pungutan.PPN.tidak_dipungut", className: "text-center", render: formatRupiah },
-            { data: "pungutan.PPN.di_tunda", className: "text-center", render: formatRupiah },
-            { data: "pungutan.PPN.di_tangguhkan", className: "text-center", render: formatRupiah },
+            {
+                data: "pungutan.PPN.di_bebaskan",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.PPN.di_bayar",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.PPN.di_lunasi",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.PPN.di_tanggung_pemerintah",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.PPN.tidak_dipungut",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.PPN.di_tunda",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.PPN.di_tangguhkan",
+                className: "text-center",
+                render: formatRupiah
+            },
 
             // Kolom PPH
-            { data: "pungutan.PPH.di_bebaskan", className: "text-center", render: formatRupiah },
-            { data: "pungutan.PPH.di_bayar", className: "text-center", render: formatRupiah },
-            { data: "pungutan.PPH.di_lunasi", className: "text-center", render: formatRupiah },
-            { data: "pungutan.PPH.di_tanggung_pemerintah", className: "text-center", render: formatRupiah },
-            { data: "pungutan.PPH.tidak_dipungut", className: "text-center", render: formatRupiah },
-            { data: "pungutan.PPH.di_tunda", className: "text-center", render: formatRupiah },
-            { data: "pungutan.PPH.di_tangguhkan", className: "text-center", render: formatRupiah },
+            {
+                data: "pungutan.PPH.di_bebaskan",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.PPH.di_bayar",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.PPH.di_lunasi",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.PPH.di_tanggung_pemerintah",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.PPH.tidak_dipungut",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.PPH.di_tunda",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.PPH.di_tangguhkan",
+                className: "text-center",
+                render: formatRupiah
+            },
 
             // Kolom BM
-            { data: "pungutan.BM.di_bebaskan", className: "text-center", render: formatRupiah },
-            { data: "pungutan.BM.di_bayar", className: "text-center", render: formatRupiah },
-            { data: "pungutan.BM.di_lunasi", className: "text-center", render: formatRupiah },
-            { data: "pungutan.BM.di_tanggung_pemerintah", className: "text-center", render: formatRupiah },
-            { data: "pungutan.BM.tidak_dipungut", className: "text-center", render: formatRupiah },
-            { data: "pungutan.BM.di_tunda", className: "text-center", render: formatRupiah },
-            { data: "pungutan.BM.di_tangguhkan", className: "text-center", render: formatRupiah }
+            {
+                data: "pungutan.BM.di_bebaskan",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.BM.di_bayar",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.BM.di_lunasi",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.BM.di_tanggung_pemerintah",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.BM.tidak_dipungut",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.BM.di_tunda",
+                className: "text-center",
+                render: formatRupiah
+            },
+            {
+                data: "pungutan.BM.di_tangguhkan",
+                className: "text-center",
+                render: formatRupiah
+            }
         ],
         "initComplete": function(settings, json) {
             $('.dataTables_length').empty();
@@ -179,7 +274,9 @@
         drawCallback: function(settings) {
             var api = this.api();
             var pageInfo = api.page.info();
-            api.column(0, { page: 'current' }).nodes().each(function(cell, i) {
+            api.column(0, {
+                page: 'current'
+            }).nodes().each(function(cell, i) {
                 cell.innerHTML = pageInfo.start + i + 1;
             });
         },
@@ -225,7 +322,7 @@
     }
 
     const pdfExcel = function(url) {
-       
+
         let date_start = $(".dateStart").val();
         let date_end = $(".dateEnd").val();
         // let sort = "stock_details2.createdAt";

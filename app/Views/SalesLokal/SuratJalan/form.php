@@ -177,7 +177,7 @@
     $(document).ready(function() {
 
         const table = $('.dataTable').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+
             processing: true,
             info: false,
             paging: false,
@@ -477,7 +477,7 @@
 
                     console.log(data.entries());
                     console.log(id)
-                    
+
                     if (id) {
                         $.ajax({
                             url: "<?= base_url("surat-jalan/update"); ?>",
@@ -490,37 +490,37 @@
                             processData: false,
                             contentType: false,
                             success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading();
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            showCancelButton: true,
-                                            showDenyButton: true,
-                                            confirmButtonText: 'Cetak',
-                                            denyButtonText: 'Baru',
-                                            cancelButtonText: 'Tutup',
-                                            confirmButtonColor: '#4e73df', // Biru
-                                            denyButtonColor: '#28a745', // Hijau
-                                            cancelButtonColor: '#dc3545', // Merah
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                // Cetak
-                                                window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
-                                            } else if (result.isDenied) {
-                                                // Buat baru
-                                                window.location.reload();
-                                            }
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        });
-                                        stopLoading();
-                                    }
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading();
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        showCancelButton: true,
+                                        showDenyButton: true,
+                                        confirmButtonText: 'Cetak',
+                                        denyButtonText: 'Baru',
+                                        cancelButtonText: 'Tutup',
+                                        confirmButtonColor: '#4e73df', // Biru
+                                        denyButtonColor: '#28a745', // Hijau
+                                        cancelButtonColor: '#dc3545', // Merah
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            // Cetak
+                                            window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
+                                        } else if (result.isDenied) {
+                                            // Buat baru
+                                            window.location.reload();
+                                        }
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    });
+                                    stopLoading();
+                                }
                             },
                             onError: function(response) {
                                 csrf.val(response.token);
@@ -546,37 +546,37 @@
                             processData: false,
                             contentType: false,
                             success: function(response) {
+                                stopLoading();
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        showCancelButton: true,
+                                        showDenyButton: true,
+                                        confirmButtonText: 'Cetak',
+                                        denyButtonText: 'Baru',
+                                        cancelButtonText: 'Tutup',
+                                        confirmButtonColor: '#4e73df', // Biru
+                                        denyButtonColor: '#28a745', // Hijau
+                                        cancelButtonColor: '#dc3545', // Merah
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            // Cetak
+                                            window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
+                                        } else if (result.isDenied) {
+                                            // Buat baru
+                                            window.location.reload();
+                                        }
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    });
                                     stopLoading();
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            showCancelButton: true,
-                                            showDenyButton: true,
-                                            confirmButtonText: 'Cetak',
-                                            denyButtonText: 'Baru',
-                                            cancelButtonText: 'Tutup',
-                                            confirmButtonColor: '#4e73df', // Biru
-                                            denyButtonColor: '#28a745', // Hijau
-                                            cancelButtonColor: '#dc3545', // Merah
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                // Cetak
-                                                window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
-                                            } else if (result.isDenied) {
-                                                // Buat baru
-                                                window.location.reload();
-                                            }
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        });
-                                        stopLoading();
-                                    }
+                                }
                             },
                             onError: function(response) {
                                 csrf.val(response.token);

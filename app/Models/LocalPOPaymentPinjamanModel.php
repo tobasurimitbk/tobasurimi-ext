@@ -21,7 +21,10 @@ class LocalPOPaymentPinjamanModel extends Model
         'local_po_payment_id',
         'type',
         'pinjaman_id',
-        'bayar_pinjaman'
+        'bayar_pinjaman',
+        'akun_kas',
+        'akun_selisih',
+        'keterangan',
     ];
     // Dates
     protected $useTimestamps = true;
