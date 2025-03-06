@@ -936,7 +936,7 @@ class PembayaranPOLokal extends BaseController
             $panjarList[$p->id] = [
                 'pembayaran_id'  => "NULL",
                 'panjar_id'     => $p->id,
-                'bayar_panjar'  => $total_bayar_panjar,
+                'bayar_panjar'  => 0,
                 'no_panjar'     => $p->no_panjar,
                 'payment_date'  => date('d/m/Y', strtotime($p->payment_date)),
                 'total_panjar_number'  => $p->total_panjar,
@@ -1006,7 +1006,7 @@ class PembayaranPOLokal extends BaseController
             $panjarTBList[$p->id] = [
                 'pembayaran_id'  => "NULL",
                 'panjar_id'            => $p->id,
-                'bayar_panjar'  => $total_bayar_panjar,
+                'bayar_panjar'  => 0,
                 'no_panjar'     => $p->no_panjar,
                 'payment_date'  => date('d/m/Y', strtotime($p->payment_date)),
                 'total_panjar_number'  => $p->total_panjar,
@@ -1072,9 +1072,9 @@ class PembayaranPOLokal extends BaseController
             }
     
             $pinjamanList[$p->id] = [
-                'pembayaran_id'  => "NULL",
-                'pinjaman_id'            => $p->id,
-                'bayar_pinjaman'  => $total_bayar_pinjaman,
+                'pembayaran_id'   => "NULL",
+                'pinjaman_id'     => $p->id,
+                'bayar_pinjaman'  => 0,
                 'no_pinjaman'     => $p->no_pinjaman,
                 'payment_date'  => date('d/m/Y', strtotime($p->payment_date)),
                 'total_pinjaman_number'  => $p->total_pinjaman,
