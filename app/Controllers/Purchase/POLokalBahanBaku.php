@@ -602,6 +602,18 @@ class POLokalBahanBaku extends BaseController
                 //     }
                 // } else {
                 if ($payload['is_posted']) {
+                    // Cek apakah PO sudah diposting
+                    $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "BAKU")->where('status_penerimaan', "LOKAL")->like('multiple_po_id', $id)->first();
+                    if ($unPostingCheck) {
+                        return response()->setJSON([
+                            "status"    => false,
+                            "message"   => "PO Sudah Diposting User Lain, Silahkan Reload Halaman",
+                            "payload"   => "",
+                            'token'     => csrf_hash()
+                        ]);
+                        return;
+                    }
+
                     $detail = $this->RMPurchaseOrderModel->where('id', $id)->first();
                     // cek if warehouse_id != null
                     if ($detail['warehouse_id'] != null && $detail['warehouse_id'] != 0) {
