@@ -358,14 +358,24 @@ class RMPurchaseOrderModel extends Model
         $first_day = "$thn-$bln-01";
         $last_day = date("Y-m-t", strtotime($first_day));
 
-        $lastPO = $this->select('po_no')
-            ->like('po_no', "PO/LBB-")
-            ->where('rm_purchase_orders.po_date >=', $first_day)
-            ->where('rm_purchase_orders.po_date <=', $last_day)
-            ->where('rm_purchase_orders.company_id', $companyId)
-            ->orderBy('po_no', "DESC")
-            ->first();
-
+        if ($companyId == 16) {
+            $lastPO = $this->select('po_no')
+                ->like('po_no', "PO/LBB-")
+                ->where('rm_purchase_orders.po_date >=', $first_day)
+                ->where('rm_purchase_orders.po_date <=', $last_day)
+                ->where('rm_purchase_orders.company_id', $companyId)
+                ->orderBy('po_no', "DESC")
+                ->first();
+        } else {
+            // Kim
+            $lastPO = $this->select('po_no')
+                ->like('po_no', "PO/LBB-")
+                ->where('rm_purchase_orders.po_date >=', $first_day)
+                ->where('rm_purchase_orders.po_date <=', $last_day)
+                ->where('rm_purchase_orders.company_id !=', 16)
+                ->orderBy('po_no', "DESC")
+                ->first();
+        }
         $counterFirst = '000001';
 
         if ($lastPO) {

@@ -305,15 +305,28 @@ class POLokalBahanBaku extends BaseController
     public function savePOLokalBahanBaku()
     {
 
-        $first = $this->RMPurchaseOrderModel
-            ->where('po_no', $this->request->getVar("po_no"))
-            ->where('company_id', $this->this_company_id)
-            ->first();
+        if ($this->this_company_id == 16) {
+            // Untuk Ocs
+            $first = $this->RMPurchaseOrderModel
+                ->select('rm_purchase_orders.*,companies.company')
+                ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
+                ->where('po_no', $this->request->getVar("po_no"))
+                ->where('company_id', $this->this_company_id)
+                ->first();
+        } else {
+            // Kim 1 2 Global Gabung Nomornya
+            $first = $this->RMPurchaseOrderModel
+                ->select('rm_purchase_orders.*,companies.company')
+                ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
+                ->where('po_no', $this->request->getVar("po_no"))
+                ->where('company_id !=', 16)
+                ->first();
+        }
 
         if ($first != null) {
             return response()->setJSON([
                 'token' => csrf_hash(),
-                'message' => "No Purchase Order Sudah Ada" . $first['po_no'] . " COMPANY ID" . $this->this_company_id,
+                'message' => "No Purchase Order " . $first['po_no'] . ". Sudah dipakai di Company " . $first['company'],
                 'status' => false
             ]);
         }
