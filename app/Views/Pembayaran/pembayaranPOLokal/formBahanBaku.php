@@ -1556,7 +1556,7 @@
                     tablePanjar.find('tbody').append(newRow);
                 }
 
-                if (v.bayar_panjar) {
+                if (v.bayar_panjar && v.pembayaran_id != "NULL") {
                     $("#coa-panjar-tb-section").show();
 
                     $("#id_panjar").val(v.panjar_id); 
@@ -1628,7 +1628,7 @@
                     tablePinjaman.find('tbody').append(newRow);
                 }
 
-                if (v.bayar_pinjaman) {
+                if (v.bayar_panjar && v.pembayaran_id != "NULL") {
                     $("#coa-pinjaman-section").show();
 
                     $("#id_pinjaman").val(v.pinjaman_id); 
@@ -1702,7 +1702,7 @@
                     tablePanjar.find('tbody').append(newRow);
                 }
 
-                if (v.bayar_panjar && v.pembayaran_id !=  "NULL") {
+                if (v.bayar_panjar && v.pembayaran_id != "NULL") {
                     $("#coa-panjar-section").show();
 
                     $("#id_panjar").val(v.panjar_id); 
