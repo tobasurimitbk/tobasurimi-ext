@@ -1934,7 +1934,7 @@ class BC40 extends BaseController
                     penerimaan_barang_detail.barang_id,
                     rm_purchase_orders.po_no,
                     rm_purchase_orders.po_date,
-                    SUM(rm_purchase_orders.total_after_pph) as sub_total,
+                    rm_purchase_orders.total_after_pph as sub_total,
                     barang_master.barang_name,
                     barang_master.kode_barang
                 ')
