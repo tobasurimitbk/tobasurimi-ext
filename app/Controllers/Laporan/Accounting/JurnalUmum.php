@@ -17,6 +17,7 @@ class JurnalUmum extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $this_role_id;
     protected $Sub_AkunsModel;
     protected $jurnalUmumModel;
     protected $KategoriAkunsModel;
@@ -29,6 +30,7 @@ class JurnalUmum extends BaseController
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_role_id = session()->get("login")->this_role_id;
         $this->Sub_AkunsModel = new Sub_AkunsModel();
         $this->KategoriAkunsModel = new KategoriAkunsModel();
         $this->HeaderAkunsModel = new HeaderAkunsModel();
@@ -39,6 +41,8 @@ class JurnalUmum extends BaseController
     }
     public function index()
     {
+        // var_dump(session()->get("login"));
+        // exit;
         $dateStart = $this->request->getPost('dateStart');
         $dateEnd = $this->request->getPost('dateEnd');
 
@@ -64,6 +68,13 @@ class JurnalUmum extends BaseController
             ];
         }
 
+        if ($this->this_role_id != '7') {
+            $condition['jurnal_umum.id_transaksi !='] = '1404';
+            $condition['transaksi_jurnal.type_transaksi !='] = '1404';
+            $condition2['transaksi_jurnal.type_transaksi !='] = '1404';
+            $condition3 = '1404';
+        }
+
         $dataMetadata = $this->MetadataModel
             ->asObject()
             ->where('name', 'Kelompok Akun')
@@ -80,6 +91,7 @@ class JurnalUmum extends BaseController
         $dataMetadataTipeTransaksi = $this->MetadataModel
             ->asObject()
             ->where('name', 'tipe_transaksi')
+            ->where('id !=', $condition3 ?? '')
             ->findAll();
         foreach ($dataMetadataTipeTransaksi as $val) {
             $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
