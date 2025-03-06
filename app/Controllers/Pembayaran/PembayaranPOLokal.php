@@ -998,13 +998,13 @@ class PembayaranPOLokal extends BaseController
             $total_bayar_panjar = 0;
     
             // Hanya hitung total_bayar_panjar jika pembayaran_id ada
-            if (!empty($pembayaranId)) {
                 foreach ($bayar_panjar as $b) {
                     $total_bayar_panjar += $b['bayar_panjar'];
                 }
-            }
+            
     
             $panjarTBList[$p->id] = [
+                'pembayaran_id'  => "NULL",
                 'panjar_id'            => $p->id,
                 'bayar_panjar'  => $total_bayar_panjar,
                 'no_panjar'     => $p->no_panjar,
@@ -1037,6 +1037,7 @@ class PembayaranPOLokal extends BaseController
                 unset($panjarTBList[$p['panjar_id']]);
     
                 $panjarTBList[$p['panjar_id']] = [
+                    'pembayaran_id' => $pembayaranId,
                     'id'                  => $p['id'],
                     'panjar_id'           => $p['panjar_id'],
                     'bayar_panjar'        => intval($p['bayar_panjar']),
@@ -1065,13 +1066,13 @@ class PembayaranPOLokal extends BaseController
             $total_bayar_pinjaman = 0;
     
             // Hanya hitung total_bayar_pinjaman jika pembayaran_id ada
-            if (!empty($pembayaranId)) {
-                foreach ($bayar_pinjaman as $b) {
-                    $total_bayar_pinjaman += $b['bayar_pinjaman'];
-                }
+            
+            foreach ($bayar_pinjaman as $b) {
+                $total_bayar_pinjaman += $b['bayar_pinjaman'];
             }
     
             $pinjamanList[$p->id] = [
+                'pembayaran_id'  => "NULL",
                 'pinjaman_id'            => $p->id,
                 'bayar_pinjaman'  => $total_bayar_pinjaman,
                 'no_pinjaman'     => $p->no_pinjaman,
@@ -1102,6 +1103,7 @@ class PembayaranPOLokal extends BaseController
                 unset($pinjamanList[$p['pinjaman_id']]);
     
                 $pinjamanList[$p['pinjaman_id']] = [
+                    'pembayaran_id'  => $pembayaranId,
                     'id'                  => $p['id'],
                     'pinjaman_id'                  => $p['pinjaman_id'],
                     'bayar_pinjaman'      => intval($p['bayar_pinjaman']),
