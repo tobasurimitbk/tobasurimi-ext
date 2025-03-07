@@ -7,6 +7,7 @@ use App\Models\PanjarSupplierModel;
 use App\Models\SupplierModel;
 use App\Models\LocalPOPaymentPanjarModel;
 use App\Models\Sub_AkunsModel;
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 
 class PanjarSupplier extends BaseController
 {
@@ -15,7 +16,7 @@ class PanjarSupplier extends BaseController
     protected $this_company_id;
 
     protected $panjarSupplierModel;
-
+    protected $jurnalController;
     protected $supplierModel;
 
     protected $localPOPaymentPanjarModel;
@@ -25,6 +26,7 @@ class PanjarSupplier extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->panjarSupplierModel = new PanjarSupplierModel();
         $this->supplierModel = new SupplierModel();
+        $this->jurnalController = new JurnalUmum();
         $this->localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
     }
 
@@ -226,6 +228,8 @@ class PanjarSupplier extends BaseController
             'is_posted' => $status
         ]);
 
+        $this->jurnalController->insertDataPanjar($id, "PANJAR");
+
         return response()->setJSON([
             "status" => true,
             "message" => "Status Posting Berhasil Diudpdate",
@@ -320,7 +324,7 @@ class PanjarSupplier extends BaseController
             foreach ($bayar_panjar as $b) {
                 $total_bayar_panjar += $b['bayar_panjar'];
             }
-            
+
             array_push($dataSupplier, [
                 "no"            => $no++,
                 "id"            => encrypt($data->id),

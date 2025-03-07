@@ -1382,6 +1382,7 @@
         table.find('tbody').append(newRow7);
 
         $(document).on("input", ".bayar_panjar", function() {
+            console.log(totalBayarPanjar)
             var totalBayarPanjar = updateTotalBayarPanjar();
             var newSubtotal = subTotal - totalBayarPanjar;
             subCountTotal = newSubtotal;
