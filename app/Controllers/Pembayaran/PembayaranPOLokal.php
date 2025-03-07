@@ -1533,12 +1533,27 @@ class PembayaranPOLokal extends BaseController
 
     public function posting()
     {
-        $localPOPaymentModel = new LocalPOPaymentModel();
+        $localPOPaymentModel = new LocalPOPaymentModel();   
+        $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
+        $localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
 
         $id = decrypt($this->request->getVar('id'));
         $localPOPaymentModel->update($id, ['status_posting' => '1']);
+
+        $dataPayPanjar = $localPOPaymentPanjarModel->where('local_po_payment_id', $id)->select('id')->findAll();
+        $dataPayPinjaman = $localPOPaymentPinjamanModel->where('local_po_payment_id', $id)->select('id')->findAll();
+
+        foreach ($dataPayPanjar as $payPanjar) {
+            $this->jurnalController->inserDataPembayaranPanjar($payPanjar['id'], "PANJAR");
+        }
+
+        foreach ($dataPayPinjaman as $payPinjaman) {
+            $this->jurnalController->inserDataPembayaranPinjaman($payPinjaman['id'], "PINJAMAN");
+        }
+
         $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL");
-        // exit;
+
+      
 
         return response()->setJSON([
             'token' => csrf_hash(),

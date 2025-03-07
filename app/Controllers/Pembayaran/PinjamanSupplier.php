@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\PinjamanSupplierModel;
 use App\Models\SupplierModel;
 use App\Models\LocalPOPaymentPinjamanModel;
+use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 
 
 
@@ -16,7 +17,7 @@ class PinjamanSupplier extends BaseController
     protected $this_company_id;
 
     protected $pinjamanSupplierModel;
-
+    protected $jurnalController;
     protected $supplierModel;
 
     protected $localPOPaymentPinjamanModel;
@@ -26,6 +27,7 @@ class PinjamanSupplier extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->pinjamanSupplierModel = new PinjamanSupplierModel();
         $this->supplierModel = new SupplierModel();
+        $this->jurnalController = new JurnalUmum();
         // $this->localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
     }
 
@@ -295,6 +297,8 @@ class PinjamanSupplier extends BaseController
         $this->pinjamanSupplierModel->update($id, [
             'is_posted' => $status
         ]);
+
+        $this->jurnalController->insertDataPinjaman($id, "PINJAMAN");
 
         return response()->setJSON([
             "status" => true,

@@ -40,7 +40,11 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
-
+use App\Models\LocalPOPaymentPanjarModel;
+use App\Models\LocalPOPaymentPinjamanModel;
+use App\Models\PanjarSupplierModel;
+use App\Models\PinjamanSupplierModel;
+use Carbon\Carbon;
 
 class JurnalUmum extends BaseController
 {
@@ -73,6 +77,10 @@ class JurnalUmum extends BaseController
     protected $metadataModel;
     protected $kursModel;
     protected $tutupBukuModel;
+    protected $localPOPaymentPanjarModel;
+    protected $localPOPaymentPinjamanModel;
+    protected $PanjarSupplierModel;
+    protected $PinjamanSupplierModel;
 
     protected $salesOrderLainModel;
     protected $salesOrderLainDetailModel;
@@ -112,6 +120,10 @@ class JurnalUmum extends BaseController
         $this->metadataModel = new MetadataModel();
         $this->kursModel = new KursModel();
         $this->tutupBukuModel = new TutupBukuModel();
+        $this->localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
+        $this->localPOPaymentPinjamanModel = new LocalPOPaymentPanjarModel();
+        $this->PinjamanSupplierModel = new LocalPOPaymentPanjarModel();
+        $this->PanjarSupplierModel = new LocalPOPaymentPinjamanModel();
 
         $this->salesOrderLainModel = new SalesOrderLainModel();
         $this->salesOrderLainDetailModel = new SalesOrderLainDetailModel();
@@ -1540,27 +1552,25 @@ class JurnalUmum extends BaseController
 
                 // ambil id dari transaksi jurnal untuk jurnal umum
                 $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
+                
                 //untuk insert ke jurnal umum
+                $multiplePoIds = str_replace(['[', ']'], '', $POlocal->multiple_po_id); // Remove brackets
+                $PoIdsArray = explode(',', $multiplePoIds); // Split the string into an array by comma
 
-                $multipleLpbIds = str_replace(['[', ']'], '', $POlocal->multiple_lpb_id); // Remove brackets
-                $lpbIdsArray = explode(',', $multipleLpbIds); // Split the string into an array by comma
-
-                foreach ($lpbIdsArray as $lpbId) {
+                foreach ($PoIdsArray as $poId) {
+                    
                     $sumValue = 0;
-                    $dataPenerimaan = $this->penerimaanBarangModel->asObject()
-                        ->select('penerimaan_barang.*, penerimaan_barang_detail.*, local_po_payment_details.*')
-                        ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', 'left')
-                        ->join('local_po_payment_details', 'local_po_payment_details.penerimaan_barang_id = penerimaan_barang.id', 'left')
-                        ->where('penerimaan_barang.id', $lpbId)
-                        ->where('penerimaan_barang.deletedAt', null)
-                        ->where('penerimaan_barang_detail.deletedAt', null)
+                    $dataPO = $this->localPOPaymentModel->asObject()
+                        ->select('local_po_payments.*, local_po_payment_details.*')
+                        ->join('local_po_payment_details', 'local_po_payment_details.local_po_payment_id = local_po_payments.id', 'left')
+                        ->where('local_po_payments.id', $payID)
+                        ->where('local_po_payments.deletedAt', null)
                         ->where('local_po_payment_details.deletedAt', null)
-                        ->where('local_po_payment_details.local_po_payment_id', $payID)
-                        ->groupBy('local_po_payment_details.penerimaan_barang_id, local_po_payment_details.penerimaan_barang_detail_id')
+                        ->where('local_po_payment_details.rm_purchase_order_id', $poId)
+                        ->groupBy('local_po_payment_details.local_po_payment_id')
                         ->findAll();
 
-                    // var_dump($dataPenerimaan);
-                    foreach ($dataPenerimaan as $value) {
+                    foreach ($dataPO as $value) {
                         $dataPO = str_replace(['[', ']', '"', "\\"], '', $value->multiple_po_no);
                         $sumValue = $value->total;
                         $result[] = array(
@@ -1752,6 +1762,330 @@ class JurnalUmum extends BaseController
             }
         }
     }
+
+
+    public function insertDataPanjar($payID, $module) {
+        $KasAP = "";
+        $KasAR = "";
+        $UtangAP = "";
+        $UtangAR = "";
+        $barangAP = "";
+        $barangAR = "";
+        $dataPO = "";
+
+        if ($module == "PANJAR") {
+            $result = array();
+            $dataPanjar = $this->PanjarSupplierModel->asObject()->find($payID);
+
+
+            if ($dataPanjar) {
+                $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
+                $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
+                $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'PANJAR')->findAll();
+
+                // start inisialisasi kode transaksi
+                foreach ($dataMetadataTipeTransaksi as $val) {
+                    $kodeTransaksi = $val->description;
+                    $idTransaksi = $val->id;
+                }
+                // end inisialisasi kode transaksi
+
+                // input ke transaksi jurnal
+                $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
+
+                $resultTransaksiJurnal = array(
+                    'no_transaksi' => $no_transaksi_jurnal,
+                    'tanggal_transaksi' => Carbon::parse($dataPanjar->createdAt)->format('Y-m-d'),
+                    'total_debit' => $dataPanjar->total_panjar,
+                    'total_kredit' => $dataPanjar->total_panjar,
+                    'metode_input' => 'system',
+                    'type_transaksi' => $idTransaksi,
+                    'no_bukti' => $no_transaksi_jurnal,
+                    'valas' => '20',
+                    'exchange_rate' => 1,
+                );
+
+
+                // ambil id dari transaksi jurnal untuk jurnal umum
+                $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
+                
+                        $result[] = array(
+                            'id_transaksi'      => $id_transaksi_jurnal,
+                            'id_coa'            => $dataPanjar->akun_kas == 0 || $dataPanjar->akun_kas == NULL ? $UtangAR : $dataPanjar->akun_kas,
+                            'company_id'        => $dataPanjar->company_id,
+                            // 'divisi_id'            => $this->divisi,
+                            'tanggal_jurnal' => Carbon::parse($dataPanjar->createdAt)->format('Y-m-d'),
+                            'debit'             => $dataPanjar->total_panjar,
+                            'kredit'            => 0,
+                            'valas'             => '20',
+                            'kurs'              => 1,
+                            'keterangan'        => "Pembuatan Panjar " . $dataPanjar->no_panjar,
+                            'id_inputer'        => session()->get("login")->user_id
+                        );
+                        $result[] = array(
+                            'id_transaksi'      => $id_transaksi_jurnal,
+                            'id_coa'            => $dataPanjar->akun_selisih,
+                            'company_id'        => $dataPanjar->company_id,
+                            // 'divisi_id'            => $this->divisi,
+                            'tanggal_jurnal'    => Carbon::parse($dataPanjar->createdAt)->format('Y-m-d'),
+                            'debit'             => 0,
+                            'kredit'            => $dataPanjar->total_panjar,
+                            'valas'             => '20',
+                            'kurs'              => 1,
+                            'keterangan'        => "Pembuatan Panjar " . $dataPanjar->no_panjar,
+                            'id_inputer'        => session()->get("login")->user_id
+                        );
+
+                $this->jurnalUmumModel->insertJurnalBatch($result);
+            }
+        }
+
+    }   
+
+
+    public function insertDataPinjaman($payID, $module) {
+        $KasAP = "";
+        $KasAR = "";
+        $UtangAP = "";
+        $UtangAR = "";
+        $barangAP = "";
+        $barangAR = "";
+        $dataPO = "";
+
+        if ($module == "PINJAMAN") {
+            $result = array();
+            $dataPinjaman = $this->PinjamanSupplierModel->asObject()->find($payID);
+
+
+            if ($dataPinjaman) {
+                $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
+                $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
+                $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'PANJAR')->findAll();
+
+                // start inisialisasi kode transaksi
+                foreach ($dataMetadataTipeTransaksi as $val) {
+                    $kodeTransaksi = $val->description;
+                    $idTransaksi = $val->id;
+                }
+                // end inisialisasi kode transaksi
+
+                // input ke transaksi jurnal
+                $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
+
+                $resultTransaksiJurnal = array(
+                    'no_transaksi' => $no_transaksi_jurnal,
+                    'tanggal_transaksi' => Carbon::parse($dataPinjaman->createdAt)->format('Y-m-d'),
+                    'total_debit' => $dataPinjaman->total_pinjaman,
+                    'total_kredit' => $dataPinjaman->total_pinjaman,
+                    'metode_input' => 'system',
+                    'type_transaksi' => $idTransaksi,
+                    'no_bukti' => $no_transaksi_jurnal,
+                    'valas' => '20',
+                    'exchange_rate' => 1,
+                );
+
+
+                // ambil id dari transaksi jurnal untuk jurnal umum
+                $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
+                
+                        $result[] = array(
+                            'id_transaksi'      => $id_transaksi_jurnal,
+                            'id_coa'            => $dataPinjaman->akun_kas == 0 || $dataPinjaman->akun_kas == NULL ? $UtangAR : $dataPinjaman->akun_kas,
+                            'company_id'        => $dataPinjaman->company_id,
+                            // 'divisi_id'            => $this->divisi,
+                            'tanggal_jurnal' => Carbon::parse($dataPinjaman->createdAt)->format('Y-m-d'),
+                            'debit'             => $dataPinjaman->total_pinjaman,
+                            'kredit'            => 0,
+                            'valas'             => '20',
+                            'kurs'              => 1,
+                            'keterangan'        => "Pembuatan Pinjaman" . $dataPinjaman->no_panjar,
+                            'id_inputer'        => session()->get("login")->user_id
+                        );
+                        $result[] = array(
+                            'id_transaksi'      => $id_transaksi_jurnal,
+                            'id_coa'            => $dataPinjaman->akun_selisih,
+                            'company_id'        => $dataPinjaman->company_id,
+                            // 'divisi_id'            => $this->divisi,
+                            'tanggal_jurnal'    => Carbon::parse($dataPinjaman->createdAt)->format('Y-m-d'),
+                            'debit'             => 0,
+                            'kredit'            => $dataPinjaman->total_pinjaman,
+                            'valas'             => '20',
+                            'kurs'              => 1,
+                            'keterangan'        => "Pembuatan Pinjaman" . $dataPinjaman->no_panjar,
+                            'id_inputer'        => session()->get("login")->user_id
+                        );
+
+                $this->jurnalUmumModel->insertJurnalBatch($result);
+            }
+        }
+
+    }   
+
+
+    public function inserDataPembayaranPanjar($payID, $module) {
+        $KasAP = "";
+        $KasAR = "";
+        $UtangAP = "";
+        $UtangAR = "";
+        $barangAP = "";
+        $barangAR = "";
+        $dataPO = "";
+
+        if ($module == "PANJAR") {
+            $result = array();
+            $dataPanjar = $this->localPOPaymentPanjarModel->where('local_po_payment_panjar.id', $payID)
+                            ->join('panjar_supplier', 'panjar_supplier.id = local_po_payment_panjar.panjar_id', 'left')
+                            ->asObject()
+                            ->select('local_po_payment_panjar.*, panjar_supplier.no_panjar')
+                            ->first();
+        
+
+            if ($dataPanjar) {
+                $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
+                $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
+                $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'PANJAR')->findAll();
+
+                // start inisialisasi kode transaksi
+                foreach ($dataMetadataTipeTransaksi as $val) {
+                    $kodeTransaksi = $val->description;
+                    $idTransaksi = $val->id;
+                }
+                // end inisialisasi kode transaksi
+
+                // input ke transaksi jurnal
+                $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
+
+                $resultTransaksiJurnal = array(
+                    'no_transaksi' => $no_transaksi_jurnal,
+                    'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $dataPanjar->createdAt))),
+                    'total_debit' => $dataPanjar->bayar_panjar,
+                    'total_kredit' => $dataPanjar->bayar_panjar,
+                    'metode_input' => 'system',
+                    'type_transaksi' => $idTransaksi,
+                    'no_bukti' => $no_transaksi_jurnal,
+                    'valas' => '20',
+                    'exchange_rate' => 1,
+                );
+
+
+                // ambil id dari transaksi jurnal untuk jurnal umum
+                $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
+
+                        $result[] = array(
+                            'id_transaksi'      => $id_transaksi_jurnal,
+                            'id_coa'            => $dataPanjar->akun_kas == 0 || $dataPanjar->akun_kas == NULL ? $UtangAR : $dataPanjar->akun_kas,
+                            'company_id'            => $dataPanjar->company_id,
+                            // 'divisi_id'            => $this->divisi,
+                           'tanggal_jurnal' => Carbon::parse($dataPanjar->createdAt)->format('Y-m-d'),
+                            'debit'             => $dataPanjar->bayar_panjar,
+                            'kredit'            => 0,
+                            'valas'             => '20',
+                            'kurs'              => 1,
+                            'keterangan'        => "Pembayaran Panjar " . $dataPanjar->no_panjar,
+                            'id_inputer'        => session()->get("login")->user_id
+                        );
+                        $result[] = array(
+                            'id_transaksi'      => $id_transaksi_jurnal,
+                            'id_coa'            => $dataPanjar->akun_selisih,
+                            'company_id'            => $dataPanjar->company_id,
+                            // 'divisi_id'            => $this->divisi,
+                           'tanggal_jurnal' => Carbon::parse($dataPanjar->createdAt)->format('Y-m-d'),
+                            'debit'             => 0,
+                            'kredit'            => $dataPanjar->bayar_panjar,
+                            'valas'             => '20',
+                            'kurs'              => 1,
+                            'keterangan'        => "Pembayaran Panjar " . $dataPanjar->no_panjar,
+                            'id_inputer'        => session()->get("login")->user_id
+                        );
+
+                $this->jurnalUmumModel->insertJurnalBatch($result);
+            }
+        }
+
+    }   
+
+
+
+    public function inserDataPembayaranPinjaman($payID, $module) {
+        $KasAP = "";
+        $KasAR = "";
+        $UtangAP = "";
+        $UtangAR = "";
+        $barangAP = "";
+        $barangAR = "";
+        $dataPO = "";
+
+        if ($module == "PINJAMAN") {
+            $result = array();
+            $payPinjaman = $this->localPOPaymentPinjamanModel->where('local_po_payment_pinjaman.id', $payID)
+                            ->join('pinjaman_supplier', 'pinjaman_supplier.id = local_po_payment_pinjaman.panjar_id', 'left')
+                            ->asObject()
+                            ->select('local_po_payment_pinjaman.*, pinjaman_supplier.no_pinjaman')
+                            ->first();
+
+            if ($payPinjaman) {
+                $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
+                $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
+                $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'PINJAMAN')->findAll();
+
+                // start inisialisasi kode transaksi
+                foreach ($dataMetadataTipeTransaksi as $val) {
+                    $kodeTransaksi = $val->description;
+                    $idTransaksi = $val->id;
+                }
+                // end inisialisasi kode transaksi
+
+                // input ke transaksi jurnal
+                $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
+
+                $resultTransaksiJurnal = array(
+                    'no_transaksi' => $no_transaksi_jurnal,
+                    'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $payPinjaman->createdAt))),
+                    'total_debit' => $payPinjaman->bayar_panjar,
+                    'total_kredit' => $payPinjaman->bayar_panjar,
+                    'metode_input' => 'system',
+                    'type_transaksi' => $idTransaksi,
+                    'no_bukti' => $no_transaksi_jurnal,
+                    'valas' => '20',
+                    'exchange_rate' => 1,
+                );
+
+
+                // ambil id dari transaksi jurnal untuk jurnal umum
+                $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
+
+                
+                
+                        $result[] = array(
+                            'id_transaksi'      => $id_transaksi_jurnal,
+                            'id_coa'            => $payPinjaman->akun_kas == 0 || $payPinjaman->akun_kas == NULL ? $UtangAR : $payPinjaman->akun_kas,
+                            'company_id'            => $payPinjaman->company_id,
+                            'tanggal_jurnal' => Carbon::parse($payPinjaman->createdAt)->format('Y-m-d'),
+                            'debit'             => $payPinjaman->bayar_panjar,
+                            'kredit'            => 0,
+                            'valas'             => '20',
+                            'kurs'              => 1,
+                            'keterangan'        => "Pembayaran Pinjaman " . $payPinjaman->no_panjar,
+                            'id_inputer'        => session()->get("login")->user_id
+                        );
+                        $result[] = array(
+                            'id_transaksi'      => $id_transaksi_jurnal,
+                            'id_coa'            => $payPinjaman->akun_selisih,
+                            'company_id'            => $payPinjaman->company_id,
+                            'tanggal_jurnal' => Carbon::parse($payPinjaman->createdAt)->format('Y-m-d'),
+                            'debit'             => 0,
+                            'kredit'            => $payPinjaman->bayar_panjar,
+                            'valas'             => '20',
+                            'kurs'              => 1,
+                            'keterangan'        => "Pembayaran Pinjaman" . $payPinjaman->no_panjar,
+                            'id_inputer'        => session()->get("login")->user_id
+                        );
+
+                $this->jurnalUmumModel->insertJurnalBatch($result);
+            }
+        }
+
+    }   
 
     public function TransaksiJurnalStockBarang($companyID, $divisiID, $barang1ID, $barang2ID, $typeBarang, $noPO, $operasi)
     {
