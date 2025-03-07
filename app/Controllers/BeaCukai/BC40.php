@@ -298,7 +298,7 @@ class BC40 extends BaseController
         $data = [
             'noAju' => $noAju,
             'bcPo' => $bcPo,
-            'daftarPoUsed' => $this->bcPurchaseOrderModel->findDetailBarang($bcPurchaseOrderID),
+            'daftarPoUsed' => $this->bcPurchaseOrderModel->findDetailBarangWithSpek($bcPurchaseOrderID),
         ];
 
         return view('BeaCukai/bc-40/form-po-list', $data);
@@ -324,7 +324,7 @@ class BC40 extends BaseController
             $noAju = "";
         }
         $data = [
-            'daftarPoUsed' => $this->bcPurchaseOrderModel->findDetailBarang($bcPurchaseOrderID),
+            'daftarPoUsed' => $this->bcPurchaseOrderModel->findDetailBarangWithSpek($bcPurchaseOrderID),
             'bcPo' => $bcPo,
             'noAju' => $noAju
         ];
@@ -1606,6 +1606,15 @@ class BC40 extends BaseController
             ]);
         }
 
+        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
+        if ($bcPurchaseOrder['no_daftar'] == null) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => "Gagal Posting, No Daftar Belum Ada",
+            ]);
+        }
+
         $status = $this->insertInventori($bcPurchaseOrderID);
 
         if (!$status) {
@@ -1922,17 +1931,19 @@ class BC40 extends BaseController
                     SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
                     SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                     SUM(penerimaan_barang_detail.qty) AS qty_po,
-                    SUM(penerimaan_barang_detail.sub_total) AS sub_total,
                     penerimaan_barang_detail.barang_id,
                     rm_purchase_orders.po_no,
                     rm_purchase_orders.po_date,
+                    rm_purchase_orders.total_before_pph as sub_total,
                     barang_master.barang_name,
-                    barang_master.kode_barang
+                    barang_master.kode_barang,
+                    barang_master_spesifikasi.spesifikasi
                 ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('rm_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
                 ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "LOKAL")
                 ->where('penerimaan_barang.tipe_bahan', "BAKU")
                 ->where('penerimaan_barang.bc_type', '53')
@@ -1944,9 +1955,8 @@ class BC40 extends BaseController
                 $poQry->where('penerimaan_barang.supplier_id', $supplierId);
             }
 
-            $poQry->orderBy('rm_purchase_orders.po_date', "DESC")
-                ->groupBy('barang_id')
-                ->groupBy('id');
+            $poQry->groupBy('penerimaan_barang.id');
+            $poQry->orderBy('rm_purchase_orders.po_date', "DESC");
 
             if (!empty($startDate) || $startDate != '') {
                 $poQry->having('rm_purchase_orders.po_date >=', $startDate);
@@ -1974,12 +1984,14 @@ class BC40 extends BaseController
                 am_purchase_orders.po_no,
                 am_purchase_orders.po_date,
                 barang_master.barang_name,
-                barang_master.kode_barang
+                barang_master.kode_barang,
+                barang_master_spesifikasi.spesifikasi
             ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
                 ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "LOKAL")
                 ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
                 ->where('penerimaan_barang.bc_type', '53')
@@ -1991,9 +2003,8 @@ class BC40 extends BaseController
                 $poQry->where('penerimaan_barang.supplier_id', $supplierId);
             }
 
-            $poQry->orderBy('am_purchase_orders.po_date', "DESC")
-                ->groupBy('barang_id')
-                ->groupBy('id');
+            $poQry->groupBy('penerimaan_barang.id');
+            $poQry->orderBy('am_purchase_orders.po_date', "DESC");
 
             if (!empty($startDate) || $startDate != '') {
                 $poQry->having('am_purchase_orders.po_date >=', $startDate);
@@ -2021,12 +2032,14 @@ class BC40 extends BaseController
                     rm_import_pos.po_no,
                     rm_import_pos.po_date,
                     barang_master.barang_name,
-                    barang_master.kode_barang
+                    barang_master.kode_barang,
+                    barang_master_spesifikasi.spesifikasi
                 ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('rm_import_pos', 'penerimaan_barang_detail.purchase_order_id = rm_import_pos.id', 'left')
                 ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "IMPORT")
                 ->where('penerimaan_barang.tipe_bahan', "BAKU")
                 ->where('penerimaan_barang.bc_type', '48')
@@ -2038,9 +2051,8 @@ class BC40 extends BaseController
                 $poQry->where('penerimaan_barang.supplier_id', $supplierId);
             }
 
-            $poQry->orderBy('rm_import_pos.po_date', "DESC")
-                ->groupBy('barang_id')
-                ->groupBy('id');
+            $poQry->groupBy('penerimaan_barang.id');
+            $poQry->orderBy('rm_import_pos.po_date', "DESC");
 
             if (!empty($startDate) || $startDate != '') {
                 $poQry->having('rm_import_pos.po_date >=', $startDate);
@@ -2068,12 +2080,14 @@ class BC40 extends BaseController
                 am_purchase_orders.po_no,
                 am_purchase_orders.po_date,
                 barang_master.barang_name,
-                barang_master.kode_barang
+                barang_master.kode_barang,
+                barang_master_spesifikasi.spesifikasi
             ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
                 ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "IMPORT")
                 ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
                 ->where('penerimaan_barang.bc_type', '48')
@@ -2085,9 +2099,8 @@ class BC40 extends BaseController
                 $poQry->where('penerimaan_barang.supplier_id', $supplierId);
             }
 
-            $poQry->orderBy('am_purchase_orders.po_date', "DESC")
-                ->groupBy('barang_id')
-                ->groupBy('id');
+            $poQry->groupBy('penerimaan_barang.id');
+            $poQry->orderBy('am_purchase_orders.po_date', "DESC");
 
             if (!empty($startDate) || $startDate != '') {
                 $poQry->having('am_purchase_orders.po_date >=', $startDate);
@@ -2107,12 +2120,13 @@ class BC40 extends BaseController
                     'lpb_date' => date('d/m/Y', strtotime($p['lpb_date'])),
                     'lpb_no' => $p['no_penerimaan_barang'],
                     'purchase_order_id' => $p['purchase_order_id'],
+                    'qty_lpb_konversi' => round($p['qty_lpb_konversi'], 2),
                     'qty_lpb' => round($p['qty_lpb'], 2),
                     'qty_po' => round($p['qty_po'], 2),
                     'barang_id' => $p['barang_id'],
                     'po_no' => $p['po_no'],
                     'po_date' => date('d/m/Y', strtotime($p['po_date'])),
-                    'barang_name' => $p['barang_name'],
+                    'barang_name' => $p['barang_name'] . " " . $p['spesifikasi'],
                     'kode_barang' => $p['kode_barang'],
                     'harga' => number_format($p['sub_total'], 2),
                     'harga_number' => $p['sub_total'],
@@ -2125,12 +2139,13 @@ class BC40 extends BaseController
                         'lpb_date' => date('d/m/Y', strtotime($p['lpb_date'])),
                         'lpb_no' => $p['no_penerimaan_barang'],
                         'purchase_order_id' => $p['purchase_order_id'],
+                        'qty_lpb_konversi' => round($p['qty_lpb_konversi'], 2),
                         'qty_lpb' => round($p['qty_lpb'], 2),
                         'qty_po' => round($p['qty_po'], 2),
                         'barang_id' => $p['barang_id'],
                         'po_no' => $p['po_no'],
                         'po_date' => date('d/m/Y', strtotime($p['po_date'])),
-                        'barang_name' => $p['barang_name'],
+                        'barang_name' => $p['barang_name'] . " " . $p['spesifikasi'],
                         'kode_barang' => $p['kode_barang'],
                         'harga' => number_format($p['sub_total'], 2),
                         'harga_number' => $p['sub_total'],

@@ -83,6 +83,174 @@ class BCPurchaseOrderModel extends Model
         return $data;
     }
 
+    public function findDetailBarangWithSpek($bcPurchaseOrderID)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+
+        $first = $this->find($bcPurchaseOrderID);
+        $bcPenerimaanBarangIDArr = json_decode($first['multiple_lpb_id']);
+        $bcPurchaseOrderIDArr = json_decode($first['multiple_po_id']);
+
+        if ($first['po_type'] == "LOKAL BAKU") {
+            // PO LOKAL BAHAN BAKU
+            $po = $penerimaanBarangModel
+                ->select('
+                    penerimaan_barang.tanggal AS lpb_date,
+                    penerimaan_barang.no_penerimaan_barang,
+                    penerimaan_barang_detail.penerimaan_barang_id,
+                    penerimaan_barang_detail.purchase_order_id,
+                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
+                    SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
+                    SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
+                    SUM(penerimaan_barang_detail.qty) AS qty_po,
+                    SUM(penerimaan_barang_detail.sub_total) AS sub_total,
+                    penerimaan_barang_detail.barang_id,
+                    rm_purchase_orders.po_no,
+                    rm_purchase_orders.po_date,
+                    CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang_name,
+                    barang_master.kode_barang
+                ')
+                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+                ->join('rm_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
+                ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+                ->where('penerimaan_barang.status_penerimaan', "LOKAL")
+                ->where('penerimaan_barang.tipe_bahan', "BAKU")
+                ->where('penerimaan_barang.supplier_id', $first['supplier_id'])
+                ->where('penerimaan_barang.bc_type', '53')
+                ->where('penerimaan_barang.deletedAt', null)
+                ->where('penerimaan_barang_detail.deletedAt', null)
+                ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
+                ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
+                ->groupBy('penerimaan_barang_id')
+                ->findAll();
+        } else if ($first['po_type'] == "LOKAL PENOLONG") {
+            // PO LOKAL BAHAN PENOLONG
+            $po = $penerimaanBarangModel
+                ->select('
+                penerimaan_barang.tanggal AS lpb_date,
+                penerimaan_barang.no_penerimaan_barang,
+                penerimaan_barang_detail.penerimaan_barang_id,
+                penerimaan_barang_detail.purchase_order_id,
+                penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
+                SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
+                SUM(penerimaan_barang_detail.qty) AS qty_po,
+                SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
+                SUM(penerimaan_barang_detail.sub_total) AS sub_total,
+                penerimaan_barang_detail.barang_id,
+                am_purchase_orders.po_no,
+                am_purchase_orders.po_date,
+                CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang_name,
+                barang_master.kode_barang
+            ')
+                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+                ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
+                ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+                ->where('penerimaan_barang.status_penerimaan', "LOKAL")
+                ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
+                ->where('penerimaan_barang.supplier_id', $first['supplier_id'])
+                ->where('penerimaan_barang.bc_type', '53')
+                ->where('penerimaan_barang.deletedAt', null)
+                ->where('penerimaan_barang_detail.deletedAt', null)
+                ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
+                ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
+                ->groupBy('penerimaan_barang_id')
+                ->findAll();
+        } elseif ($first['po_type'] == "IMPORT BAKU") {
+            // PO IMPORT BAHAN BAKU
+            $po = $penerimaanBarangModel
+                ->select('
+                penerimaan_barang.tanggal AS lpb_date,
+                penerimaan_barang.no_penerimaan_barang,
+                penerimaan_barang_detail.penerimaan_barang_id,
+                penerimaan_barang_detail.purchase_order_id,
+                penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
+                SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
+                SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
+                SUM(penerimaan_barang_detail.qty) AS qty_po,
+                SUM(penerimaan_barang_detail.sub_total) AS sub_total,
+                penerimaan_barang_detail.barang_id,
+                rm_import_pos.po_no,
+                rm_import_pos.po_date,
+                CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang_name,
+                barang_master.kode_barang
+            ')
+                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+                ->join('rm_import_pos', 'penerimaan_barang_detail.purchase_order_id = rm_import_pos.id', 'left')
+                ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+                ->where('penerimaan_barang.status_penerimaan', "IMPORT")
+                ->where('penerimaan_barang.tipe_bahan', "BAKU")
+                ->where('penerimaan_barang.supplier_id', $first['supplier_id'])
+                ->where('penerimaan_barang.bc_type', '48')
+                ->where('penerimaan_barang.deletedAt', null)
+                ->where('penerimaan_barang_detail.deletedAt', null)
+                ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
+                ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
+                ->groupBy('penerimaan_barang_id')
+                ->findAll();
+        } elseif ($first['po_type'] == "IMPORT PENOLONG") {
+            // PO IMPORT BAHAN PENOLONG
+            $po = $penerimaanBarangModel
+                ->select('
+                penerimaan_barang.tanggal AS lpb_date,
+                penerimaan_barang.no_penerimaan_barang,
+                penerimaan_barang_detail.penerimaan_barang_id,
+                penerimaan_barang_detail.purchase_order_id,
+                penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
+                SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
+                SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
+                SUM(penerimaan_barang_detail.qty) AS qty_po,
+                SUM(penerimaan_barang_detail.sub_total) AS sub_total,
+                penerimaan_barang_detail.barang_id,
+                am_purchase_orders.po_no,
+                am_purchase_orders.po_date,
+                CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang_name,
+                barang_master.kode_barang
+            ')
+                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+                ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
+                ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+                ->where('penerimaan_barang.status_penerimaan', "IMPORT")
+                ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
+                ->where('penerimaan_barang.supplier_id', $first['supplier_id'])
+                ->where('penerimaan_barang.bc_type', '48')
+                ->where('penerimaan_barang.deletedAt', null)
+                ->where('penerimaan_barang_detail.deletedAt', null)
+                ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
+                ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
+                ->groupBy('penerimaan_barang_id')
+                ->findAll();
+        }
+
+        $result = array();
+
+        foreach ($po as $p) {
+            $result[] = [
+                'penerimaan_barang_id' => $p['penerimaan_barang_id'],
+                'penerimaan_barang_detail_id' => $p['penerimaan_barang_detail_id'],
+                'barang1_id' => $p['barang_id'],
+                'lpb_date' => date('d/m/Y', strtotime($p['lpb_date'])),
+                'lpb_no' => $p['no_penerimaan_barang'],
+                'purchase_order_id' => $p['purchase_order_id'],
+                'qty_lpb' => $p['qty_lpb'],
+                'qty_lpb_konversi' => $p['qty_lpb_konversi'],
+                'qty_po' => $p['qty_po'],
+                'barang_id' => $p['barang_id'],
+                'po_no' => $p['po_no'],
+                'po_date' => date('d/m/Y', strtotime($p['po_date'])),
+                'barang_name' => $p['barang_name'],
+                'kode_barang' => $p['kode_barang'],
+                'harga' => $p['sub_total']
+            ];
+        }
+
+        return $result;
+    }
+
+
     public function findDetailBarang($bcPurchaseOrderID)
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();

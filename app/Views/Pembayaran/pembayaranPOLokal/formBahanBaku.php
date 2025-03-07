@@ -1413,7 +1413,7 @@
 
             newRow.append($('<td style="text-align:center;">').html(
                 `
-                        <input  oninput="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan})" autocomplete="one-time-code" data-id="${v.rm_purchase_order_id}"  class="form-control total_po_dibayar" type="text" value="${greatFormatRupiahPayment(v.sisa_tagihan)}" name = "total_po_dibayar" style="height:40px">
+                        <input  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan})" autocomplete="one-time-code" data-id="${v.rm_purchase_order_id}"  class="form-control total_po_dibayar" type="text" value="${v.sisa_tagihan}" name = "total_po_dibayar" style="height:40px">
                                 `
             ));
 

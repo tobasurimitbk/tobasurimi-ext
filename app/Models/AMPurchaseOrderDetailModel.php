@@ -258,7 +258,7 @@ class AMPurchaseOrderDetailModel extends Model
                         'jml_diterima_total' => $jmlMasukAll,
                         'sisa_total' => round($sisaDiterima, 4),
                         'harga' => $harga,
-                        'sub_total' => ($inLPB * $harga),
+                        'sub_total' => round($inLPB * $harga),
                         'keterangan' => $b['note'],
                         // TAMBAHAN
                         'satuan_id' => $b['unit'],
@@ -298,7 +298,7 @@ class AMPurchaseOrderDetailModel extends Model
                         'jml_diterima_total' => $jmlMasukAll,
                         'sisa_total' => round($sisaDiterima, 4),
                         'harga' => $harga,
-                        'sub_total' => ($inLPB * $harga),
+                        'sub_total' => round($inLPB * $harga),
                         'keterangan' => $b['note'],
                         // TAMBAHAN
                         'satuan_id' => $b['unit'],

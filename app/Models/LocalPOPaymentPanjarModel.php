@@ -163,7 +163,7 @@ class LocalPOPaymentPanjarModel extends Model
 
 
         $selectQry = "local_po_payment_panjar.id, panjar_supplier.no_panjar, panjar_supplier.payment_date, panjar_supplier.total_panjar, local_po_payment_panjar.panjar_id,
-        local_po_payment_panjar.bayar_panjar, sum(local_po_payment_panjar.bayar_panjar) as total_bayar_panjar";
+        local_po_payment_panjar.bayar_panjar, sum(local_po_payment_panjar.bayar_panjar) as total_bayar_panjar, local_po_payment_panjar.akun_kas, local_po_payment_panjar.akun_selisih, local_po_payment_panjar.keterangan";
 
         $result = $this
             ->select($selectQry)
@@ -179,7 +179,7 @@ class LocalPOPaymentPanjarModel extends Model
                 $panjarSupplier = new PanjarSupplierModel();
 
                 $dataPanjar = $panjarSupplier->select("local_po_payment_panjar.id, panjar_supplier.no_panjar, panjar_supplier.payment_date, panjar_supplier.total_panjar, local_po_payment_panjar.panjar_id,
-                                        local_po_payment_panjar.bayar_panjar, sum(local_po_payment_panjar.bayar_panjar) as total_bayar_panjar")
+                                        local_po_payment_panjar.bayar_panjar, sum(local_po_payment_panjar.bayar_panjar) as total_bayar_panjar, local_po_payment_panjar.akun_kas, local_po_payment_panjar.akun_selisih, local_po_payment_panjar.keterangan")
                                         ->where('jenis_panjar', "PANJAR")
                                         ->where("local_po_payment_panjar.type", "BP")
                                         ->join('local_po_payment_panjar', 'local_po_payment_panjar.id = panjar_supplier.id', 'left')
@@ -192,7 +192,10 @@ class LocalPOPaymentPanjarModel extends Model
             foreach ($result as $i => $r) {
                 $totalPembayaranPanjar = $this->getTotalPembayaranPanjar($r['panjar_id'], "BP");
                 $result[$i]['payment_date'] = date('d/m/Y', strtotime($r['payment_date']));
-
+                // Pastikan data akun ada di response
+                $result[$i]['akun_kas'] = $r['akun_kas'];
+                $result[$i]['akun_selisih'] = $r['akun_selisih'];
+                $result[$i]['keterangan'] = $r['keterangan'];
 
                 $result[$i]['total_pembayaran'] = $totalPembayaranPanjar;
             }

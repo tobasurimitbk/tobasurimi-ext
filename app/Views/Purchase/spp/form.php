@@ -1304,7 +1304,10 @@
     }
 
     $('#request_date,#divisi_id').change(function() {
-        changeStatus();
+        let value = document.getElementById('auto_generate').checked ? true : false;
+        if (value) {
+            changeStatus();
+        }
     })
 
     const changeStatus = function() {
