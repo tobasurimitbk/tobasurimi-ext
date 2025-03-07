@@ -29,7 +29,7 @@
                         <div class="row">
                             <div class="col-md-3 mb-3">
                                 <div class="input-group">
-                                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal" readonly>
+                                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal" value="<?= $dateStart; ?>" disabled>
                                     <div class="input-group-prepend group-prepend-password align-items-center">
                                         <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                                     </div>
@@ -175,11 +175,11 @@
             orientation: "bottom auto",
             autoclose: true,
             // Atur nilai awal menjadi tanggal 1 di bulan berjalan
-            defaultViewDate: {
-                year: currentDate.getFullYear(),
-                month: currentDate.getMonth(),
-                day: 1
-            }
+            // defaultViewDate: {
+            //     year: currentDate.getFullYear(),
+            //     month: currentDate.getMonth(),
+            //     day: 1
+            // }
         });
 
         // Inisialisasi datepicker untuk dateEnd
@@ -200,6 +200,7 @@
         });
 
         // Set nilai awal dateStart pada saat dokumen siap (document ready)
+
         $(".dateStart").datepicker("setDate", new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
         // $(".dateEnd").datepicker("setDate", new Date(currentDate));
         $(".clickable").click(function(e) {
