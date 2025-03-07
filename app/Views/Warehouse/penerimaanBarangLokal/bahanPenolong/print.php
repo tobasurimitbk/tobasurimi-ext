@@ -154,7 +154,7 @@
             <?php foreach ($dataPenerimaanBarangDetail as $detail) : ?>
                 <?php
                 $jumlah = $detail['harga'] * $detail['jml_masuk'];
-                $jml_sub_total += $jumlah;
+                $jml_sub_total += round($jumlah);
                 ?>
                 <tr>
                     <td class="txt-center" style="text-align:center;"><?= $no++; ?></td>
@@ -162,14 +162,14 @@
                     <td class="txt-right" style="text-align:center;"><?= $detail["jml_masuk"]; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["kode_satuan"]; ?></td>
                     <td class="txt-right" style="text-align:center;"><?= number_format($detail['harga'], 2, '.', ',') ?></td>
-                    <td class="txt-right" style="text-align:center;"><?= number_format($jumlah, 2, '.', ','); ?></td>
+                    <td class="txt-right" style="text-align:center;"><?= number_format(round($jumlah), 2, '.', ','); ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["spp_no"]; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["keterangan"]; ?></td>
                 </tr>
             <?php endforeach; ?>
             <tr>
                 <td class="txt-left" style="padding-left: 5px" colspan="5"><b></b></td>
-                <td class="txt-right" style="text-align:center;"><?= number_format($jml_sub_total, 2, '.', ','); ?></td>
+                <td class="txt-right" style="text-align:center;"><?= number_format(round($jml_sub_total), 2, '.', ','); ?></td>
                 <td colspan="2"></td>
             </tr>
             <tr>

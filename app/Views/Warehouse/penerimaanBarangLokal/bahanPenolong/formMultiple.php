@@ -721,7 +721,7 @@
                     var sisa_total_now = Math.floor(Number(item.sisa_total + jml_diterima_lpb_last) * 1000) / 1000;
                     var sub_total = Math.floor(Number(jml_diterima_lpb) * Number(item.harga) * 1000) / 1000;
                     $('.sub_total').val('' +
-                        greatFormatRupiah(sub_total));
+                        greatFormatRupiah(Math.round(sub_total)));
                     $('.jml_diterima_total').val(greatFormatRupiah(jml_diterima_total_now));
                     $('.sisa_total').val(greatFormatRupiah(sisa_total_now));
 
@@ -739,7 +739,7 @@
                     var sub_total = Math.floor((Number(jml_diterima_lpb) * Number(item.harga)) * 1000) / 1000;
 
                     $('.sub_total').val('' +
-                        greatFormatRupiah(sub_total));
+                        greatFormatRupiah(Math.round(sub_total)));
                     $('.jml_diterima_total').val(greatFormatRupiah(jml_diterima_total_now));
                     $('.sisa_total').val(greatFormatRupiah(sisa_total_now));
                     break;
