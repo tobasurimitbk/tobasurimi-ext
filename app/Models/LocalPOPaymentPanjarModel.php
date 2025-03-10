@@ -153,99 +153,123 @@ class LocalPOPaymentPanjarModel extends Model
         return $list;
     }
 
-    public function getPembayaranPanjarDetailsbyIdandType($id, $type)
+    public function getPembayaranPanjarDetailsbyIdandType($id = null, $type)
     {
-        $condition = [
-            'local_po_payment_panjar.local_po_payment_id' => $id,
-            'local_po_payment_panjar.type'  => $type,
-            'panjar_supplier.jenis_panjar'  => "PANJAR",
-        ];
+        if ($id) {
+            $condition = [
+                'local_po_payment_panjar.local_po_payment_id' => $id,
+                'local_po_payment_panjar.type'  => $type,
+                'panjar_supplier.jenis_panjar'  => "PANJAR",
+            ];
 
+            $selectQry = "local_po_payment_panjar.id, panjar_supplier.no_panjar, panjar_supplier.payment_date, panjar_supplier.total_panjar, local_po_payment_panjar.panjar_id,
+            local_po_payment_panjar.bayar_panjar, sum(local_po_payment_panjar.bayar_panjar) as total_bayar_panjar, local_po_payment_panjar.akun_kas, local_po_payment_panjar.akun_selisih, local_po_payment_panjar.keterangan,
+            akun_kas.nama_sub as akun_kas_name,  akun_selisih.nama_sub as akun_selisih_name";
 
-        $selectQry = "local_po_payment_panjar.id, panjar_supplier.no_panjar, panjar_supplier.payment_date, panjar_supplier.total_panjar, local_po_payment_panjar.panjar_id,
-        local_po_payment_panjar.bayar_panjar, sum(local_po_payment_panjar.bayar_panjar) as total_bayar_panjar, local_po_payment_panjar.akun_kas, local_po_payment_panjar.akun_selisih, local_po_payment_panjar.keterangan";
+            $result = $this
+                ->select($selectQry)
+                ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
+                ->join('sub_akuns as akun_kas', 'local_po_payment_panjar.akun_kas = akun_kas.id', 'left')
+                ->join('sub_akuns as akun_selisih', 'local_po_payment_panjar.akun_selisih = akun_selisih.id', 'left')
+                ->groupBy('local_po_payment_panjar.panjar_id')
+                ->where('panjar_supplier.jenis_panjar', "PANJAR")
+                ->where($condition)
+                ->findAll();
+        } else {
+            // Jika $id null, ambil data hanya dari panjar_supplier tanpa join
+            $panjarSupplier = new PanjarSupplierModel();
 
-        $result = $this
-            ->select($selectQry)
-            ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
-            ->join('local_po_payment_bp', 'local_po_payment_bp.id = local_po_payment_panjar.local_po_payment_id')
-            ->groupBy('local_po_payment_panjar.panjar_id')
-            ->where('panjar_supplier.jenis_panjar', "PANJAR")
-            ->where($condition)
-            ->findAll();
+            $result = $panjarSupplier
+                ->select("id, no_panjar, payment_date, total_panjar, jenis_panjar")
+                ->where('jenis_panjar', "PANJAR")
+                ->findAll();
+        }
 
-
-            if (empty($result)) {
-                $panjarSupplier = new PanjarSupplierModel();
-
-                $dataPanjar = $panjarSupplier->select("local_po_payment_panjar.id, panjar_supplier.no_panjar, panjar_supplier.payment_date, panjar_supplier.total_panjar, local_po_payment_panjar.panjar_id,
-                                        local_po_payment_panjar.bayar_panjar, sum(local_po_payment_panjar.bayar_panjar) as total_bayar_panjar, local_po_payment_panjar.akun_kas, local_po_payment_panjar.akun_selisih, local_po_payment_panjar.keterangan")
-                                        ->where('jenis_panjar', "PANJAR")
-                                        ->where("local_po_payment_panjar.type", "BP")
-                                        ->join('local_po_payment_panjar', 'local_po_payment_panjar.id = panjar_supplier.id', 'left')
-                                        ->findAll();
-
-                $result = $dataPanjar;
-
-            }
-
-            foreach ($result as $i => $r) {
-                $totalPembayaranPanjar = $this->getTotalPembayaranPanjar($r['panjar_id'], "BP");
-                $result[$i]['payment_date'] = date('d/m/Y', strtotime($r['payment_date']));
-                // Pastikan data akun ada di response
-                $result[$i]['akun_kas'] = $r['akun_kas'];
-                $result[$i]['akun_selisih'] = $r['akun_selisih'];
-                $result[$i]['keterangan'] = $r['keterangan'];
-
-                $result[$i]['total_pembayaran'] = $totalPembayaranPanjar;
-            }
-
-
-
-        return $result;
-    }
-
-
-    public function getPembayaranPanjarTBDetailsbyIdandType($id, $type)
-    {
-        $condition = [
-            'local_po_payment_panjar.local_po_payment_id' => $id,
-            'local_po_payment_panjar.type'  => $type,
-        ];
-
-        $selectQry = "local_po_payment_panjar.id, panjar_supplier.no_panjar, panjar_supplier.payment_date, panjar_supplier.total_panjar, local_po_payment_panjar.panjar_id,
-        local_po_payment_panjar.bayar_panjar, sum(local_po_payment_panjar.bayar_panjar) as total_bayar_panjar, panjar_supplier.jenis_panjar";
-
-        $result = $this
-            ->select($selectQry)
-            ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
-            ->join('local_po_payment_bp', 'local_po_payment_bp.id = local_po_payment_panjar.local_po_payment_id')
-            ->groupBy('local_po_payment_panjar.panjar_id')
-            ->where('panjar_supplier.jenis_panjar', '=', 'PANJAR_TB')
-            ->where($condition)
-            ->findAll();
-
+        // Jika hasil query kosong, ambil data alternatif
         if (empty($result)) {
             $panjarSupplier = new PanjarSupplierModel();
 
-            $dataPanjar = $panjarSupplier->select("local_po_payment_panjar.id, panjar_supplier.no_panjar, panjar_supplier.payment_date, panjar_supplier.total_panjar, local_po_payment_panjar.panjar_id,
-            local_po_payment_panjar.bayar_panjar, sum(local_po_payment_panjar.bayar_panjar) as total_bayar_panjar")
-                        ->where('jenis_panjar', "PANJAR")
-                        ->where("local_po_payment_panjar.type", "BP")
-                        ->join('local_po_payment_panjar', 'local_po_payment_panjar.id = panjar_supplier.id', 'left')
-                        ->findAll();
-
-            $result = $dataPanjar;
+            $dataPanjar = $panjarSupplier->select("id, no_panjar, payment_date, total_panjar, jenis_panjar")
+                                        ->where('jenis_panjar', "PANJAR_TB")
+                                        ->findAll();
         }
 
+        if (empty($dataPanjar)) {
             foreach ($result as $i => $r) {
                 $totalPembayaranPanjar = $this->getTotalPembayaranPanjar($r['panjar_id'], "BP");
                 $result[$i]['payment_date'] = date('d/m/Y', strtotime($r['payment_date']));
-
-
+                $result[$i]['akun_kas'] = $r['akun_kas'];
+                $result[$i]['akun_selisih'] = $r['akun_selisih'];
+                $result[$i]['akun_kas_name'] = $r['akun_kas_name'];
+                $result[$i]['akun_selisih_name'] = $r['akun_selisih_name'];
+                $result[$i]['keterangan'] = $r['keterangan'];
                 $result[$i]['total_pembayaran'] = $totalPembayaranPanjar;
             }
+        } else {
+            $result = $dataPanjar;
+        }
 
         return $result;
-    }
+    } 
+
+
+    public function getPembayaranPanjarTBDetailsbyIdandType($id = null, $type)
+    {
+        // Jika $id ada, lakukan query dengan join ke tabel terkait
+        if ($id) {
+            $condition = [
+                'local_po_payment_panjar.local_po_payment_id' => $id,
+                'local_po_payment_panjar.type'  => $type,
+                'panjar_supplier.jenis_panjar'  => "PANJAR_TB",
+            ];
+
+            $selectQry = "local_po_payment_panjar.id, panjar_supplier.no_panjar, panjar_supplier.payment_date, panjar_supplier.total_panjar, local_po_payment_panjar.panjar_id,
+            local_po_payment_panjar.bayar_panjar, sum(local_po_payment_panjar.bayar_panjar) as total_bayar_panjar, local_po_payment_panjar.akun_kas, local_po_payment_panjar.akun_selisih, local_po_payment_panjar.keterangan,
+            akun_kas.nama_sub as akun_kas_name,  akun_selisih.nama_sub as akun_selisih_name";
+
+            $result = $this
+                ->select($selectQry)
+                ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
+                ->join('sub_akuns as akun_kas', 'local_po_payment_panjar.akun_kas = akun_kas.id', 'left')
+                ->join('sub_akuns as akun_selisih', 'local_po_payment_panjar.akun_selisih = akun_selisih.id', 'left')
+                ->groupBy('local_po_payment_panjar.panjar_id')
+                ->where('panjar_supplier.jenis_panjar', "PANJAR_TB")
+                ->where($condition)
+                ->findAll();
+        } else {
+            // Jika $id null, ambil data hanya dari panjar_supplier tanpa join
+            $panjarSupplier = new PanjarSupplierModel();
+
+            $result = $panjarSupplier
+                ->select("id, no_panjar, payment_date, total_panjar, jenis_panjar")
+                ->where('jenis_panjar', "PANJAR_TB")
+                ->findAll();
+        }
+
+        // Jika hasil query kosong, ambil data alternatif
+        if (empty($result)) {
+            $panjarSupplier = new PanjarSupplierModel();
+
+            $dataPanjar = $panjarSupplier->select("id, no_panjar, payment_date, total_panjar, jenis_panjar")
+                                        ->where('jenis_panjar', "PANJAR_TB")
+                                        ->findAll();
+        }
+
+        if (empty($dataPanjar)) {
+            foreach ($result as $i => $r) {
+                $totalPembayaranPanjar = $this->getTotalPembayaranPanjar($r['panjar_id'], "BP");
+                $result[$i]['payment_date'] = date('d/m/Y', strtotime($r['payment_date']));
+                $result[$i]['akun_kas'] = $r['akun_kas'];
+                $result[$i]['akun_selisih'] = $r['akun_selisih'];
+                $result[$i]['akun_kas_name'] = $r['akun_kas_name'];
+                $result[$i]['akun_selisih_name'] = $r['akun_selisih_name'];
+                $result[$i]['keterangan'] = $r['keterangan'];
+                $result[$i]['total_pembayaran'] = $totalPembayaranPanjar;
+            }
+        } else {
+            $result = $dataPanjar;
+        }
+
+        return $result;
+    } 
 }
