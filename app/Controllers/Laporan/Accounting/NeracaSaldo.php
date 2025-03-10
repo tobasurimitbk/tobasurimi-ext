@@ -37,17 +37,18 @@ class NeracaSaldo extends BaseController
         $dateStart = $this->request->getPost('dateStart');
         $dateEnd = $this->request->getPost('dateEnd');
 
+
         if ($this->request->getPost('cariTanggal') != "" && $dateStart != "" && $dateEnd != "") {
             $condition = [
                 'jurnal_umum.company_id' => $this->this_company_id,
-                'tanggal_jurnal >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
-                'tanggal_jurnal <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))),
+                'jurnal_umum.tanggal_jurnal >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
+                'jurnal_umum.tanggal_jurnal <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))),
             ];
         } else {
             $condition = [
                 'jurnal_umum.company_id' => $this->this_company_id,
-                'tanggal_jurnal >=' => date('Y-m-01'),
-                'tanggal_jurnal <=' => date('Y-m-d')
+                'jurnal_umum.tanggal_jurnal >=' => date('Y-m-01'),
+                'jurnal_umum.tanggal_jurnal <=' => date('Y-m-d')
             ];
         }
 
@@ -69,8 +70,8 @@ class NeracaSaldo extends BaseController
         $dataJurnalUmumWithGroup = $this->jurnalUmumModel
             ->asObject()
             ->select('*, sub_akuns.header_id as id_header')
-            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
-            ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
+            ->join('sub_akuns', 'sub_akuns.id = jurnal_umum.id_coa', 'left')
+            ->join('transaksi_jurnal', 'transaksi_jurnal.id = jurnal_umum.id_transaksi', 'left')
             ->where($condition)
             ->groupBy('kategori_id')
             ->findAll();
@@ -91,8 +92,12 @@ class NeracaSaldo extends BaseController
             "dataJurnalUmum" => $dataJurnalUmum,
             "dataJurnalUmumWithGroup" => $dataJurnalUmumWithGroup,
             "dataJurnalUmumWithGroupHeader" => $dataJurnalUmumWithGroupHeader,
+            "dateStart" => $dateStart ? $dateStart : date('01/m/Y'),
             "dateEnd" => $dateEnd ? $dateEnd : date('d/m/Y'),
         ];
+
+        // var_dump($condition, $data);
+        // exit;
         return view('Laporan/LaporanNeracaSaldo/index', $data);
     }
     public function exportPDF($tglAwal, $tglAkhir)

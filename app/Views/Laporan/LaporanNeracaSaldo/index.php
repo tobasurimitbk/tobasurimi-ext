@@ -29,7 +29,7 @@
                         <div class="row">
                             <div class="col-md-3 mb-3">
                                 <div class="input-group">
-                                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal" readonly>
+                                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal" value="<?= $dateStart; ?>">
                                     <div class="input-group-prepend group-prepend-password align-items-center">
                                         <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                                     </div>
@@ -77,7 +77,7 @@
                             function format_ribuan($nilai)
                             {
                                 $nilaiFloat = floatval($nilai);
-                                return "Rp " . number_format($nilaiFloat, 2, ',', '.');
+                                return number_format($nilaiFloat, 2, ',', '.');
                             }
                             // kategori
                             $total_debit_awal  = 0;
@@ -111,10 +111,10 @@
                                                         $saldodebit = 0;
                                                         $saldokredit = 0;
                                                         foreach ($dataJurnalUmum as $jurnalUmumData) :
-                                                            if ($jurnalUmumData->type_transaksi == 'saldoawal' && $jurnalUmumData->id_header == $headerAkunData->id) {
+                                                            if ($jurnalUmumData->type_transaksi == '1404' && $jurnalUmumData->id_header == $headerAkunData->id) {
                                                                 $saldoawaldebit  = $saldoawaldebit + $jurnalUmumData->debit;
                                                                 $saldoawalkredit = $saldoawalkredit + $jurnalUmumData->kredit;
-                                                            } elseif ($jurnalUmumData->type_transaksi != 'saldoawal' && $jurnalUmumData->id_header == $headerAkunData->id) {
+                                                            } elseif ($jurnalUmumData->type_transaksi != '1404' && $jurnalUmumData->id_header == $headerAkunData->id) {
                                                                 $saldodebit  = $saldodebit + $jurnalUmumData->debit;
                                                                 $saldokredit = $saldokredit + $jurnalUmumData->kredit;
                                                             }
@@ -195,12 +195,23 @@
             // Ambil tanggal yang dipilih pada dateEnd
             var selectedDate = e.date;
 
-            // Atur dateStart menjadi tanggal 1 di bulan yang sama
-            $(".dateStart").datepicker("setDate", new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1));
+            // <?php
+                // // Jika dateStart tidak kosong, maka atur dateStart menjadi tanggal yang dipilih pada dateEnd
+                // if ($dateStart) {
+                // 
+                ?>
+            //     $(".dateStart").datepicker("setDate", new Date(selectedDate));
+            // <?php
+                // }
+                // 
+                ?>
+            // // Atur dateStart menjadi tanggal 1 di bulan yang sama
+            // $(".dateStart").datepicker("setDate", new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1));
         });
 
         // Set nilai awal dateStart pada saat dokumen siap (document ready)
-        $(".dateStart").datepicker("setDate", new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
+
+        // $(".dateStart").datepicker("setDate", new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
         // $(".dateEnd").datepicker("setDate", new Date(currentDate));
         $(".clickable").click(function(e) {
             e.preventDefault();
