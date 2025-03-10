@@ -165,8 +165,8 @@ class LocalPOPaymentPinjamanModel extends Model
             $result = $this
                 ->select($selectQry)
                 ->join('pinjaman_supplier', 'local_po_payment_pinjaman.pinjaman_id = pinjaman_supplier.id')
-                ->join('sub_akuns as akun_kas', 'local_po_payment_panjar.akun_kas = akun_kas.id', 'left')
-                ->join('sub_akuns as akun_selisih', 'local_po_payment_panjar.akun_selisih = akun_selisih.id', 'left')
+                ->join('sub_akuns as akun_kas', 'local_po_payment_pinjaman.akun_kas = akun_kas.id', 'left')
+                ->join('sub_akuns as akun_selisih', 'local_po_payment_pinjaman.akun_selisih = akun_selisih.id', 'left')
                 ->groupBy('local_po_payment_pinjaman.pinjaman_id')
                 ->where($condition)
                 ->findAll();
