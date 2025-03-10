@@ -805,7 +805,7 @@ class POLokalBahanPenolong extends BaseController
                 ->where('am_purchase_orders.purchase_request_id', $id)
                 ->where('barang_id', $s['barang1_id'])
                 ->where('spesifikasi_id', $s['barang2_id'])
-                ->where('am_purchase_order_details.note', $s['note'])
+                ->where('am_purchase_order_details.note', trim($s['note']))
                 ->first();
 
             $totalQtyPO = ($totalQtyPO == null) ? 0 : $totalQtyPO['qty_po'];
