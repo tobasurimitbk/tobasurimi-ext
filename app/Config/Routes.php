@@ -43,7 +43,7 @@ $routes->get('/403', function () {
     return view('errors/html/error_403');
 });
 
-$routes->get('/pph-generate', 'Warehouse\Penomoran::repairPPhPoBahanBaku');
+$routes->get('/generate-country', 'Warehouse\Penomoran::generateCountry');
 
 // DASHBOARD
 $routes->get('/dashboard', 'Dashboard\Dashboard::dashboard', ['filter' => 'Auth']);
@@ -657,13 +657,15 @@ $routes->post('/order-form-internasional/generate-no-order-form', 'SalesInternas
 $routes->post('/order-form-internasional/update-remark', 'SalesInternasional\OrderForm::updateRemark', ['filter' => 'Auth']);
 
 // Master Barang Internasional
-$routes->get('master-barang-internasional', 'SalesInternasional\Barang::bahanJadiView', ['filter' => 'Auth']);
-$routes->get('master-barang-internasional/all', 'SalesInternasional\Barang::all', ['filter' => 'Auth']);
-$routes->post('master-barang-internasional/save', 'SalesInternasional\Barang::create', ['filter' => 'Auth']);
-$routes->post('master-barang-internasional/update', 'SalesInternasional\Barang::update', ['filter' => 'Auth']);
-$routes->post('master-barang-internasional/delete', 'SalesInternasional\Barang::delete', ['filter' => 'Auth']);
-$routes->post('master-barang-internasional/get', 'SalesInternasional\Barang::get', ['filter' => 'Auth']);
-$routes->post('master-barang-internasional/generate-new-code', 'SalesInternasional\Barang::generateNewCode', ['filter' => 'Auth']);
+$routes->get('/master-barang-internasional', 'SalesInternasional\Barang::bahanJadiView', ['filter' => 'Auth']);
+$routes->get('/master-barang-internasional/all', 'SalesInternasional\Barang::all', ['filter' => 'Auth']);
+$routes->post('/master-barang-internasional/save', 'SalesInternasional\Barang::create', ['filter' => 'Auth']);
+$routes->post('/master-barang-internasional/update', 'SalesInternasional\Barang::update', ['filter' => 'Auth']);
+$routes->post('/master-barang-internasional/delete', 'SalesInternasional\Barang::delete', ['filter' => 'Auth']);
+$routes->post('/master-barang-internasional/get', 'SalesInternasional\Barang::get', ['filter' => 'Auth']);
+$routes->post('/master-barang-internasional/generate-new-code', 'SalesInternasional\Barang::generateNewCode', ['filter' => 'Auth']);
+$routes->post('/master-barang-internasional/import-excel', 'SalesInternasional\Barang::importExcel', ['filter' => 'Auth']);
+$routes->get('/master-barang-internasional/export-excel', 'SalesInternasional\Barang::exportExcel', ['filter' => 'Auth']);
 
 // Customer Lokal
 $routes->get('/customer-lokal', 'SalesLokal\Customer::index', ['filter' => 'Auth']);

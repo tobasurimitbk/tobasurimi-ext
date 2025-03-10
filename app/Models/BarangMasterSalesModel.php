@@ -56,7 +56,7 @@ class BarangMasterSalesModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'barang_master_sales.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "barang_master_sales.*,satuans.kode_satuan";
+        $selectQry = "barang_master_sales.*,satuans.kode_satuan,satuans.nama_satuan";
 
         $barangDataQry = $this->asArray()
             ->select($selectQry)

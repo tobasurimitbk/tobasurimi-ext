@@ -14,7 +14,10 @@ class CountryModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = [
+        'code',
+        'country_name'
+    ];
 
     // Dates
     protected $useTimestamps = false;
