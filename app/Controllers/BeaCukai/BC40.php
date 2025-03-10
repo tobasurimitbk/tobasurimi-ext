@@ -1956,6 +1956,7 @@ class BC40 extends BaseController
             }
 
             $poQry->groupBy('penerimaan_barang.id');
+            $poQry->groupBy('penerimaan_barang_detail.spesifikasi_id');
             $poQry->orderBy('rm_purchase_orders.po_date', "DESC");
 
             if (!empty($startDate) || $startDate != '') {
@@ -2004,6 +2005,7 @@ class BC40 extends BaseController
             }
 
             $poQry->groupBy('penerimaan_barang.id');
+            $poQry->groupBy('penerimaan_barang_detail.spesifikasi_id');
             $poQry->orderBy('am_purchase_orders.po_date', "DESC");
 
             if (!empty($startDate) || $startDate != '') {
@@ -2052,6 +2054,7 @@ class BC40 extends BaseController
             }
 
             $poQry->groupBy('penerimaan_barang.id');
+            $poQry->groupBy('penerimaan_barang_detail.spesifikasi_id');
             $poQry->orderBy('rm_import_pos.po_date', "DESC");
 
             if (!empty($startDate) || $startDate != '') {
@@ -2100,6 +2103,7 @@ class BC40 extends BaseController
             }
 
             $poQry->groupBy('penerimaan_barang.id');
+            $poQry->groupBy('penerimaan_barang_detail.spesifikasi_id');
             $poQry->orderBy('am_purchase_orders.po_date', "DESC");
 
             if (!empty($startDate) || $startDate != '') {
