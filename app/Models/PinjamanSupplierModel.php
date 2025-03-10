@@ -123,29 +123,29 @@ class PinjamanSupplierModel extends Model
         ];
     }
 
-    //get panjar supplier by id array 
+    //get pinjaman supplier by id array 
     public function getPinjamanSupplierbyIDarray($id)
     {
         $selectQry = "pinjaman_supplier.*,type,name";
-        $panjarSupplierData = $this->asObject()
+        $pinjamanSupplierData = $this->asObject()
             ->select($selectQry)
             ->join('suppliers', 'pinjaman_supplier.supplier_id = suppliers.id', 'left')
             ->whereIn('pinjaman_supplier.id', $id)
             ->findAll();
-        return $panjarSupplierData;
+        return $pinjamanSupplierData;
     }
 
-    //get panjar id not use array
+    //get pinjaman id not use array
     public function getPinjamanSupplierbyID($id)
     {
         $selectQry = "pinjaman_supplier.*,type,name, akun_kas.id as akun_kas, akun_kas.nama_sub as akun_kas_name, akun_selisih.id as akun_selisih, akun_selisih.nama_sub as akun_selisih_name";
-        $panjarSupplierData = $this->asObject()
+        $pinjamanSupplierData = $this->asObject()
             ->select($selectQry)
-            ->join('sub_akuns AS akun_kas', 'panjar_supplier.akun_kas = akun_kas.id', 'left')
-            ->join('sub_akuns AS akun_selisih', 'panjar_supplier.akun_selisih = akun_selisih.id', 'left')
+            ->join('sub_akuns AS akun_kas', 'pinjaman_supplier.akun_kas = akun_kas.id', 'left')
+            ->join('sub_akuns AS akun_selisih', 'pinjaman_supplier.akun_selisih = akun_selisih.id', 'left')
             ->join('suppliers', 'pinjaman_supplier.supplier_id = suppliers.id', 'left')
             ->find($id);
-        return $panjarSupplierData;
+        return $pinjamanSupplierData;
     }
 
     // public function getSisaPembayaranbyID($id){
@@ -167,13 +167,13 @@ class PinjamanSupplierModel extends Model
         ];
 
         $selectQry = "pinjaman_supplier.*";
-        $panjarSupplierData = $this->asObject()
+        $pinjamanSupplierData = $this->asObject()
             ->select($selectQry)
-            // ->join('local_po_payment_pinjaman', 'pinjaman_supplier.id = local_po_payment_panjar.pinjaman_id', 'left')
+            // ->join('local_po_payment_pinjaman', 'pinjaman_supplier.id = local_po_payment_pinjaman.pinjaman_id', 'left')
             ->where($condition)
             ->findAll();
 
-        return $panjarSupplierData;
+        return $pinjamanSupplierData;
     }
 
 
@@ -187,7 +187,7 @@ class PinjamanSupplierModel extends Model
 
         $lastStr =  convertBulanToAngkaRomawi($month) . '/' . $year;
 
-        // AMBIL NO PANJAR TERAKHIR DI BULAN & TAHUN INI
+        // AMBIL NO pinjaman TERAKHIR DI BULAN & TAHUN INI
         $builder = $this->asArray()->select('no_pinjaman')
             ->orderBy('no_pinjaman', "DESC")
             ->where('company_id', $companyId)
@@ -213,7 +213,7 @@ class PinjamanSupplierModel extends Model
         return $generatedNo;
     }
 
-    public function getHistoryPembayaranPanjar($id)
+    public function getHistoryPembayaranpinjaman($id)
     {
 
         $condition = [
@@ -221,16 +221,16 @@ class PinjamanSupplierModel extends Model
 
         ];
 
-        $selectQry = "no_panjar, bayar_panjar, pinjaman_supplier.supplier_id, multiple_lpb_no, name, local_po_payments.payment_date";
-        $historyPembayaranPanjarData = $this->asObject()
+        $selectQry = "no_pinjaman, bayar_pinjaman, pinjaman_supplier.supplier_id, multiple_lpb_no, name, local_po_payments.payment_date";
+        $historyPembayaranpinjamanData = $this->asObject()
             ->select($selectQry)
-            ->join('local_po_payment_pinjaman', 'pinjaman_supplier.id = local_po_payment_panjar.pinjaman_id', 'inner')
-            ->join('local_po_payments', 'local_po_payments.id = local_po_payment_panjar.local_po_payment_id', 'inner')
+            ->join('local_po_payment_pinjaman', 'pinjaman_supplier.id = local_po_payment_pinjaman.pinjaman_id', 'inner')
+            ->join('local_po_payments', 'local_po_payments.id = local_po_payment_pinjaman.local_po_payment_id', 'inner')
             ->join('suppliers', 'pinjaman_supplier.supplier_id = suppliers.id', 'inner')
             ->where($condition)
             ->findAll();
 
-        return $historyPembayaranPanjarData;
+        return $historyPembayaranpinjamanData;
     }
     
 }
