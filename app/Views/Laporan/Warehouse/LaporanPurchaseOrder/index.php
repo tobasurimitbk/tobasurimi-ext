@@ -33,24 +33,56 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="input-group input-group-password">
+                    <div class="input-group">
                         <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
+                        <div class="input-group-prepend align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="input-group input-group-password">
+                    <div class="input-group">
                         <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
+                        <div class="input-group-prepend align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
                     </div>
                 </div>
-
-
-
+            </div>
+            <div class="row justify-content-end row-col-spp">
+                <div class="col-md-4">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_divisi" name="filter_divisi" id="filter_divisi">
+                            <option selected value="">Semua Divisi</option>
+                            <?php foreach ($divisis as $divisi) : ?>
+                                <option value="<?= $divisi['id']; ?>"><?= $divisi['divisi']; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Filter Divisi</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_supplier" name="filter_supplier" id="filter_supplier">
+                            <option selected value="">Semua Supplier</option>
+                            <?php foreach ($suppliers as $supplier) : ?>
+                                <option value="<?= $supplier['id']; ?>"><?= $supplier['name']; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Filter Supplier</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_barang" name="filter_barang" id="filter_barang">
+                            <option selected value="">Semua Barang</option>
+                            <?php foreach ($barangs as $barang) : ?>
+                                <option value="<?= $barang['barang_master_spesifikasi_id']; ?>"><?= $barang['barang_name_master'] . ' ' . $barang['spesifikasi']; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Filter Barang</label>
+                    </div>
+                </div>
             </div>
             <div class="row">
                 <div class="table-responsive">
@@ -111,8 +143,9 @@
                 data.filter_po_type = $(".filter_po_type").val();
                 data.sort = sort;
                 data.sortType = sortType;
-
-
+                data.filter_divisi = $(".filter_divisi").val();
+                data.filter_supplier = $(".filter_supplier").val();
+                data.filter_barang = $(".filter_barang").val();
             },
         },
         // scrollX: true,
@@ -225,23 +258,23 @@
         table.ajax.reload();
     })
 
-    $(".dateStart, .dateEnd, .filter_po_type").change(function() {
+    $(".dateStart, .dateEnd, .filter_po_type, .filter_divisi, .filter_supplier, .filter_barang").change(function() {
         table.ajax.reload();
     });
 
-    $('.filter_po_type').select2({
+    $('.filter_po_type, .filter_divisi, .filter_supplier, .filter_barang').select2({
         placeholder: "",
         theme: "bootstrap-5"
     })
 
-    $('.filter_po_type')
+    $('.filter_po_type, .filter_divisi, .filter_supplier, .filter_barang')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.filter_po_type')
+    $('.filter_po_type, .filter_divisi, .filter_supplier, .filter_barang')
         .parent('div')
         .children('span')
         .children('span')
@@ -249,7 +282,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.filter_po_type')
+    $('.filter_po_type, .filter_divisi, .filter_supplier, .filter_barang')
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -259,9 +292,12 @@
         let dateStart = $(".dateStart").val();
         let dateEnd = $(".dateEnd").val();
         let filter_po_type = $(".filter_po_type").val();
+        let filter_divisi = $(".filter_divisi").val();
+        let filter_supplier = $(".filter_supplier").val();
+        let filter_barang = $(".filter_barang").val();
 
 
-        window.open(url + `?filter_po_type=${filter_po_type}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
+        window.open(url + `?filter_po_type=${filter_po_type}&filter_divisi=${filter_divisi}&filter_supplier=${filter_supplier}&filter_barang=${filter_barang}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 

@@ -369,9 +369,6 @@ class RMPurchaseOrderDetailModel extends Model
         $availableSort = [
             'po_no'          => 'rm_purchase_orders.po_no',
             'po_date'        => 'rm_purchase_orders.po_date',
-
-
-
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 

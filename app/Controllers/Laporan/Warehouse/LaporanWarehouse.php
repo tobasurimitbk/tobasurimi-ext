@@ -49,6 +49,7 @@ use App\Models\BC27Model;
 use App\Models\BC30Model;
 use App\Models\BC40Model;
 use App\Models\BC41Model;
+use App\Models\SupplierModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -98,6 +99,7 @@ class LaporanWarehouse extends BaseController
     protected $materialRequestModel;
     protected $materialRequestPenolongModel;
     protected $divisisModel;
+    protected $supplierModel;
     protected $bc23Model;
     protected $bc25Model;
     protected $bc27Model;
@@ -149,6 +151,7 @@ class LaporanWarehouse extends BaseController
         $this->materialRequestModel = new MaterialRequestsModel();
         $this->materialRequestPenolongModel = new MaterialRequestsPenolongModel();
         $this->divisisModel = new DivisisModel();
+        $this->supplierModel = new SupplierModel();
         $this->bc23Model = new BC23Model();
         $this->bc25Model = new BC25Model();
         $this->bc27Model = new BC27Model();
@@ -162,7 +165,6 @@ class LaporanWarehouse extends BaseController
 
     public function index()
     {
-
         return view('Laporan/Warehouse/index/index');
     }
 
@@ -192,12 +194,12 @@ class LaporanWarehouse extends BaseController
 
 
         $addCondition = [
-            "dateStart"        => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd"        => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "filter_jenis_dokumen"        => $this->request->getGet("filter_jenis_dokumen"),
-            "filter_status"        => $this->request->getGet("filter_status"),
+            "dateStart"             => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"               => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "sort"                  => $this->request->getGet("sort"),
+            "sortType"              => $this->request->getGet("sortType"),
+            "filter_jenis_dokumen"  => $this->request->getGet("filter_jenis_dokumen"),
+            "filter_status"         => $this->request->getGet("filter_status"),
         ];
 
 
@@ -534,7 +536,12 @@ class LaporanWarehouse extends BaseController
 
     public function laporanPurchaseOrder()
     {
-        return view('Laporan/Warehouse/LaporanPurchaseOrder/index');
+        $data = [
+            'divisis' => $this->divisisModel->getDivisiAccess(),
+            'suppliers' => $this->supplierModel->where('company_id', $this->this_company_id)->findAll(),
+            'barangs' => $this->barangMasterModel->getBarangByTypeWithSpec(['barang_master.company_id' => $this->this_company_id]),
+        ];
+        return view('Laporan/Warehouse/LaporanPurchaseOrder/index', $data);
     }
 
     public function allLaporanPurchaseOrder()
@@ -559,7 +566,13 @@ class LaporanWarehouse extends BaseController
 
         ];
 
-        $po_type        = $this->request->getGet("filter_po_type");
+        $po_type                = $this->request->getGet("filter_po_type");
+        $filter_divisi          = $this->request->getGet("filter_divisi");
+        $filter_supplier        = $this->request->getGet("filter_supplier");
+        $filter_barang          = $this->request->getGet("filter_barang");
+
+        // var_dump($po_type, $filter_divisi, $filter_supplier, $filter_barang, $this->barangMasterSpesifikasiModel->find($filter_barang)['barang_master_id']);
+        // die();
 
         if (empty($po_type)) {
             $condition = [
@@ -569,6 +582,19 @@ class LaporanWarehouse extends BaseController
                 'rm_purchase_orders.company_id' => $this->this_company_id
             ];
 
+            if ($filter_divisi) {
+                $condition['rm_purchase_orders.divisi_id'] = $filter_divisi;
+            }
+
+            if ($filter_supplier) {
+                $condition['rm_purchase_orders.supplier_id'] = $filter_supplier;
+            }
+
+            if ($filter_barang) {
+                $condition['rm_purchase_order_details.barang1_id'] = $this->barangMasterSpesifikasiModel->find($filter_barang)['barang_master_id'];
+                $condition['rm_purchase_order_details.barang2_id'] = $filter_barang;
+            }
+
             $dataPurchaseOrder = $this->rmPurchaseOrderDetailModel->getListLPBBahanBakuReport($condition,  $addCondition, "LOKAL", "BAKU", $pageSize, $offset);
         } elseif ($po_type == "PO LOKAL BB") {
             $condition = [
@@ -577,6 +603,19 @@ class LaporanWarehouse extends BaseController
                 'rm_purchase_orders.is_posted' => '1',
                 'rm_purchase_orders.company_id' => $this->this_company_id
             ];
+
+            if ($filter_divisi) {
+                $condition['rm_purchase_orders.divisi_id'] = $filter_divisi;
+            }
+
+            if ($filter_supplier) {
+                $condition['rm_purchase_orders.supplier_id'] = $filter_supplier;
+            }
+
+            if ($filter_barang) {
+                $condition['rm_purchase_order_details.barang1_id'] = $this->barangMasterSpesifikasiModel->find($filter_barang)['barang_master_id'];
+                $condition['rm_purchase_order_details.barang2_id'] = $filter_barang;
+            }
 
             $dataPurchaseOrder = $this->rmPurchaseOrderDetailModel->getListLPBBahanBakuReport($condition,  $addCondition, "LOKAL", "BAKU", $pageSize, $offset);
         } elseif ($po_type == "PO LOKAL BP") {
@@ -588,6 +627,19 @@ class LaporanWarehouse extends BaseController
                 'am_purchase_orders.company_id' => $this->this_company_id
             ];
 
+            if ($filter_divisi) {
+                $condition['am_purchase_orders.division_id'] = $filter_divisi;
+            }
+
+            if ($filter_supplier) {
+                $condition['am_purchase_orders.supplier_id'] = $filter_supplier;
+            }
+
+            if ($filter_barang) {
+                $condition['am_purchase_order_details.barang_id'] = $this->barangMasterSpesifikasiModel->find($filter_barang)['barang_master_id'];
+                $condition['am_purchase_order_details.spesifikasi_id'] = $filter_barang;
+            }
+
             $dataPurchaseOrder = $this->amPurchaseOrderDetailModel->getListLPBBahanPenolongReport($condition,  $addCondition, "LOKAL", "PENOLONG", $pageSize, $offset);
         } elseif ($po_type == "PO IMPOR BB") {
             $condition = [
@@ -597,6 +649,18 @@ class LaporanWarehouse extends BaseController
                 'rm_import_pos.company_id' => $this->this_company_id
             ];
 
+            if ($filter_divisi) {
+                $condition['rm_import_pos.division_id'] = $filter_divisi;
+            }
+
+            if ($filter_supplier) {
+                $condition['rm_import_pos.supplier_id'] = $filter_supplier;
+            }
+
+            if ($filter_barang) {
+                $condition['rm_import_po_details.barang_id'] = $this->barangMasterSpesifikasiModel->find($filter_barang)['barang_master_id'];
+                $condition['rm_import_po_details.spesifikasi_id'] = $filter_barang;
+            }
 
             $dataPurchaseOrder = $this->rmImportPODetailModel->getListLPBBahanBakuReport($condition,  $addCondition, "IMPORT", "BAKU", $pageSize, $offset);
         } elseif ($po_type == "PO IMPOR BP") {
@@ -608,17 +672,24 @@ class LaporanWarehouse extends BaseController
                 'am_purchase_orders.company_id' => $this->this_company_id
             ];
 
+            if ($filter_divisi) {
+                $condition['am_purchase_orders.division_id'] = $filter_divisi;
+            }
+
+            if ($filter_supplier) {
+                $condition['am_purchase_orders.supplier_id'] = $filter_supplier;
+            }
+
+            if ($filter_barang) {
+                $condition['am_purchase_order_details.barang_id'] = $this->barangMasterSpesifikasiModel->find($filter_barang)['barang_master_id'];
+                $condition['am_purchase_order_details.spesifikasi_id'] = $filter_barang;
+            }
+
             $dataPurchaseOrder = $this->amPurchaseOrderDetailModel->getListLPBBahanPenolongReport($condition,  $addCondition, "IMPORT", "PENOLONG", $pageSize, $offset);
         }
 
-
-
-
-
         // var_dump($dataPurchaseOrder['result']);
         // die();
-
-
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         $dataAllPurchaseOrderInvoice = [];
@@ -645,8 +716,6 @@ class LaporanWarehouse extends BaseController
             }
         }
 
-
-
         $data = [
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $dataPurchaseOrder['totalData'],
@@ -662,9 +731,6 @@ class LaporanWarehouse extends BaseController
 
     public function exportPDFLaporanPurchaseOrder()
     {
-
-
-
         $addCondition = [
             "dateStart"        => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"        => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
@@ -673,7 +739,10 @@ class LaporanWarehouse extends BaseController
 
         ];
 
-        $po_type        = $this->request->getGet("filter_po_type");
+        $po_type                = $this->request->getGet("filter_po_type");
+        $filter_divisi          = $this->request->getGet("filter_divisi");
+        $filter_supplier        = $this->request->getGet("filter_supplier");
+        $filter_barang          = $this->request->getGet("filter_barang");
 
         if (empty($po_type)) {
             $condition = [
@@ -683,6 +752,19 @@ class LaporanWarehouse extends BaseController
                 'rm_purchase_orders.company_id' => $this->this_company_id
             ];
 
+            if ($filter_divisi) {
+                $condition['rm_purchase_orders.divisi_id'] = $filter_divisi;
+            }
+
+            if ($filter_supplier) {
+                $condition['rm_purchase_orders.supplier_id'] = $filter_supplier;
+            }
+
+            if ($filter_barang) {
+                $condition['rm_purchase_order_details.barang1_id'] = $this->barangMasterSpesifikasiModel->find($filter_barang)['barang_master_id'];
+                $condition['rm_purchase_order_details.barang2_id'] = $filter_barang;
+            }
+
             $dataPurchaseOrder = $this->rmPurchaseOrderDetailModel->getListLPBBahanBakuReportPDF($condition,  $addCondition, "LOKAL", "BAKU");
         } elseif ($po_type == "PO LOKAL BB") {
             $condition = [
@@ -691,6 +773,19 @@ class LaporanWarehouse extends BaseController
                 'rm_purchase_orders.is_posted' => '1',
                 'rm_purchase_orders.company_id' => $this->this_company_id
             ];
+
+            if ($filter_divisi) {
+                $condition['rm_purchase_orders.divisi_id'] = $filter_divisi;
+            }
+
+            if ($filter_supplier) {
+                $condition['rm_purchase_orders.supplier_id'] = $filter_supplier;
+            }
+
+            if ($filter_barang) {
+                $condition['rm_purchase_order_details.barang1_id'] = $this->barangMasterSpesifikasiModel->find($filter_barang)['barang_master_id'];
+                $condition['rm_purchase_order_details.barang2_id'] = $filter_barang;
+            }
 
             $dataPurchaseOrder = $this->rmPurchaseOrderDetailModel->getListLPBBahanBakuReportPDF($condition,  $addCondition, "LOKAL", "BAKU");
         } elseif ($po_type == "PO LOKAL BP") {
@@ -702,6 +797,19 @@ class LaporanWarehouse extends BaseController
                 'am_purchase_orders.company_id' => $this->this_company_id
             ];
 
+            if ($filter_divisi) {
+                $condition['am_purchase_orders.division_id'] = $filter_divisi;
+            }
+
+            if ($filter_supplier) {
+                $condition['am_purchase_orders.supplier_id'] = $filter_supplier;
+            }
+
+            if ($filter_barang) {
+                $condition['am_purchase_order_details.barang_id'] = $this->barangMasterSpesifikasiModel->find($filter_barang)['barang_master_id'];
+                $condition['am_purchase_order_details.spesifikasi_id'] = $filter_barang;
+            }
+
             $dataPurchaseOrder = $this->amPurchaseOrderDetailModel->getListLPBBahanPenolongReportPDF($condition,  $addCondition, "LOKAL", "PENOLONG");
         } elseif ($po_type == "PO IMPOR BB") {
             $condition = [
@@ -711,6 +819,18 @@ class LaporanWarehouse extends BaseController
                 'rm_import_pos.company_id' => $this->this_company_id
             ];
 
+            if ($filter_divisi) {
+                $condition['rm_import_pos.division_id'] = $filter_divisi;
+            }
+
+            if ($filter_supplier) {
+                $condition['rm_import_pos.supplier_id'] = $filter_supplier;
+            }
+
+            if ($filter_barang) {
+                $condition['rm_import_po_details.barang_id'] = $this->barangMasterSpesifikasiModel->find($filter_barang)['barang_master_id'];
+                $condition['rm_import_po_details.spesifikasi_id'] = $filter_barang;
+            }
 
             $dataPurchaseOrder = $this->rmImportPODetailModel->getListLPBBahanBakuReportPDF($condition,  $addCondition, "IMPORT", "BAKU");
         } elseif ($po_type == "PO IMPOR BP") {
@@ -721,6 +841,19 @@ class LaporanWarehouse extends BaseController
                 'am_purchase_orders.po_type' => 'Import',
                 'am_purchase_orders.company_id' => $this->this_company_id
             ];
+
+            if ($filter_divisi) {
+                $condition['am_purchase_orders.division_id'] = $filter_divisi;
+            }
+
+            if ($filter_supplier) {
+                $condition['am_purchase_orders.supplier_id'] = $filter_supplier;
+            }
+
+            if ($filter_barang) {
+                $condition['am_purchase_order_details.barang_id'] = $this->barangMasterSpesifikasiModel->find($filter_barang)['barang_master_id'];
+                $condition['am_purchase_order_details.spesifikasi_id'] = $filter_barang;
+            }
 
             $dataPurchaseOrder = $this->amPurchaseOrderDetailModel->getListLPBBahanPenolongReportPDF($condition,  $addCondition, "IMPORT", "PENOLONG");
         }
