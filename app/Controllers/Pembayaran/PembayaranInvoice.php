@@ -297,7 +297,6 @@ class PembayaranInvoice extends BaseController
         $this->salesOrderInvoiceModel
             ->select('sales_order_invoice.no_faktur, sales_order_invoice.id') // Pilih kolom yang dibutuhkan
             ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_id = sales_order_invoice.id', 'left') // Relasi ke pembayaran_invoice_detail
-            ->where('sales_order_invoice.id_company', $this->this_company_id)
             ->where('sales_order_invoice.id_customer', $customer_id_decrypt)
             ->where('sales_order_invoice.deletedAt', null);
 
