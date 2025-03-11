@@ -258,11 +258,11 @@ class PembayaranInvoice extends BaseController
             ->join('sales_order_invoice', 'sales_order_invoice.id_customer = customers.id', 'left') // Perbaiki kondisi join
             ->where('sales_order_invoice.deletedAt', null)
             ->where('sales_order_invoice.status_pelunasan', 'UNPAID')
-            ->where('sales_order_invoice.id_company', $this->this_company_id)
             ->where('customers.company_id', $this->this_company_id)
             ->where('customers.deletedAt', null)
             ->groupBy('customers.id')
             ->findAll();
+
         $divisi = $this->divisiModel->getDivisiAccess();
         $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel->where('deletedAt', null)->where('id_company', $this->this_company_id)->findAll();
         foreach ($salesOrderLokalInvoiceData as $s) {
