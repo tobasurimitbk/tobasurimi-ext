@@ -15,10 +15,26 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp mb-3">
+                <div class="col mb-3">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Mulai" value="01<?= date('/m/Y') ?>">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col mb-3">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-3">
                     <select class="form-select status_posting" name="status_posting" id="status_posting" aria-label="Floating label select example">
-                        <option value="0">NEW</option>
-                        <option value="1">POSTED</option>
+                        <option value="BELUM POSTING">STATUS : BELUM POSTING</option>
+                        <option value="SUDAH POSTING">STATUS : SUDAH POSTING</option>
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -32,7 +48,7 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSort('sales_contract_no')" class="sort">No. SC</th>
-                                <th onclick="changeSort('customer_po_no')" class="sort">No. PO</th>
+                                <!-- <th onclick="changeSort('customer_po_no')" class="sort">No. PO</th> -->
                                 <th onclick="changeSort('customer_name')" class="sort">Buyer</th>
                                 <th onclick="changeSort('dicharge_port')" class="sort">Tujuan Pengiriman</th>
                                 <th onclick="changeSort('shipment_date')" class="sort">Shipment Date</th>
@@ -103,6 +119,8 @@
             data: function(data) {
                 data.search = $(".search").val();
                 data.status_posting = $(".status_posting").val();
+                data.dateStart = $(".dateStart").val();
+                data.dateEnd = $(".dateEnd").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -120,9 +138,6 @@
                 orderable: false
             }, {
                 data: "sales_contract_no",
-                className: "text-center"
-            }, {
-                data: "customer_po_no",
                 className: "text-center"
             }, {
                 data: "customer_name",
@@ -150,9 +165,9 @@
                 render: function(data, type, row) {
                     let state = '0';
                     if (state == '0') {
-                        return '<i class="fa-solid fa-square text-danger"></i>';
+                        return '<i data-toggle="tooltip" title="Qty Order Form Belum Lengkap" class="fa-solid fa-square text-danger"></i>';
                     } else {
-                        return '<i class="fa-solid fa-square text-success"></i>';
+                        return '<i data-toggle="tooltip" title="Qty Order Form Sudah Lengkap" class="fa-solid fa-square text-success"></i>';
                     }
                 },
             },
@@ -186,7 +201,12 @@
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
-                        </div>
+                                <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'c')) : ?>
+                                    <button data-toggle="tooltip" title="Duplikasi" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
+                                        <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                <?php endif; ?>
+                            </div>
                         `;
                     }
 
@@ -208,16 +228,12 @@
                             <?php endif; ?>
                             `;
                         }
+                        <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'c')) : ?>
+                            res += `  <button data-toggle="tooltip" title="Duplikasi" onclick="duplicate('${id}')" class="btn text-white duplicate-btn" style="background-color:#B8522A">
+                                        <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
+                                    </button>`;
+                        <?php endif; ?>
                     }
-
-                    // Tambahkan tombol duplikasi di akhir
-                    res += `
-                    <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'c')) : ?>
-                        <button data-toggle="tooltip" title="Duplikasi" onclick="duplicate('${id}')" class="btn btn-primary duplicate-btn">
-                            <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
-                        </button>
-                    <?php endif; ?>
-                    `;
 
                     return `
                     <div class="mt-0">
@@ -227,6 +243,12 @@
                 }
             }
         ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -239,6 +261,28 @@
                 next: '<i class="fa fa-angle-right"></i>'
             }
         }
+    });
+
+    $(".dateStart").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
+    $(".dateEnd").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
+    $('.icon-dateStart').click(function() {
+        $(".dateStart").focus();
+    });
+
+    $('.icon-dateEnd').click(function() {
+        $(".dateEnd").focus();
     });
 
     const updateStatus = function(id, status) {
@@ -350,8 +394,7 @@
 
     function duplicate(id) {
         Swal.fire({
-            title: 'Apakah Anda yakin?',
-            text: "Tindakan ini akan menduplikasi data yang dipilih.",
+            title: 'Duplikasi Sales Kontrak ?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -373,7 +416,7 @@
 
     $(".dataTable_info").addClass("pt-0");
 
-    $(".status_posting").change(function() {
+    $(".status_posting, .dateStart, .dateEnd").change(function() {
         table.ajax.reload();
     })
 

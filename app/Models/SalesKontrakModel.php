@@ -76,13 +76,30 @@ class SalesKontrakModel extends Model
         }
 
         if ($addCondition['status_posting']) {
-            $salesDataQry
-                ->where('sales_contract.status_posting', $addCondition['status_posting']);
+            if ($addCondition['status_posting'] == "SUDAH POSTING") {
+                $salesDataQry
+                    ->where('sales_contract.status_posting', '1');
+            } else {
+                $salesDataQry
+                    ->where('sales_contract.status_posting', '0');
+            }
         }
 
         if ($addCondition['search'] || $addCondition['status_posting']) {
             $salesDataQry->groupEnd();
         }
+
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $salesDataQry->groupStart(); //
+            if (!empty($addCondition['dateStart'])) {
+                $salesDataQry->where('DATE(sales_contract.createdAt) >=', $addCondition['dateStart']);
+            }
+            if (!empty($addCondition['dateEnd'])) {
+                $salesDataQry->where('DATE(sales_contract.createdAt) <=', $addCondition['dateEnd']);
+            }
+            $salesDataQry->groupEnd();
+        }
+
 
         $totalFilteredData = $salesDataQry->countAllResults(false);
         $data = $salesDataQry->findAll($limit, $offset);

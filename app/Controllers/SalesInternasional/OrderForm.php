@@ -73,13 +73,11 @@ class OrderForm extends BaseController
 
             $condition = [
                 "sales_order_export.company_id"    => $this->this_company_id,
-                "status"      => $this->request->getGet("status"),
                 "sales_order_export.deletedAt" => null,
             ];
         } else {
             $condition = [
                 "sales_order_export.company_id"    => $this->this_company_id,
-                "status"      => $this->request->getGet("status"),
                 "sales_order_export.deletedAt" => null,
                 'sales_order_export.user_id' => $this->this_user_id
             ];
@@ -91,7 +89,9 @@ class OrderForm extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "status"      => $this->request->getGet("status")
+            "status"      => $this->request->getGet("status"),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $limit = $this->request->getGet("length");
@@ -141,7 +141,6 @@ class OrderForm extends BaseController
         $dataSatuan = $this->satuanModel->findAll();
         $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->orderBy('createdAt', "DESC")->findAll();
         $dataAJU = $this->metaDataModel->getBCUsed('so_internasional');
-
         $data = [
             "dataCustomer" => $dataCustomer,
             "dataCountry" => $dataCountry,
@@ -198,7 +197,9 @@ class OrderForm extends BaseController
                 "company_id"                  => $this->this_company_id,
                 "status"                      => "NEW",
                 "used"                        => "NOT USED",
-                'user_id'                     => $this->this_user_id
+                'user_id'                     => $this->this_user_id,
+                'documents_required'        => $postData['documents_required'],
+                'special_instructions' => $postData['special_instructions']
             ];
 
             // Create a new validation instance
@@ -340,33 +341,88 @@ class OrderForm extends BaseController
         ]);
     }
 
-    public function generateNomorSalesOrderInternasional()
+    public function getDetailInfoSalesKontrak()
     {
-        $code = "SI";
-        $currentYear = date('Y');
-        $currentMonth = date('m');
-        $numberTemplate = $code . "/" . $currentMonth . "/" . $currentYear . "/";
-        $lastData = $this->salesOrderExportModel->asObject()
-            ->like('sales_order_export_no', $numberTemplate)
-            ->orderBy('createdAt', 'DESC')
+        $id = $this->request->getGet("id");
+        $selectQry = "
+            sales_contract.*,
+            customers.name as customer_name,
+            metadata.value as valuta,
+            metadata.description as valuta_description
+        ";
+        $dataSalesKontak = $this->salesKontrakModel->select($selectQry)
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('metadata', 'metadata.id = sales_contract.currency')
+            ->where('sales_contract.id', $id)
             ->first();
 
-        if (!empty($lastData)) {
-            $asd = explode('/', $lastData->sales_order_export_no);
-            $lastIncrement = intval($asd[3]) + 1;
-            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+        if ($dataSalesKontak != null) {
+            $dataSalesKontak['potongan_harga'] = floatval($dataSalesKontak['potongan_harga']);
+            $dataSalesKontak['shipment_date'] = $dataSalesKontak['shipment_date'] != null ? date('d/m/Y', strtotime($dataSalesKontak['shipment_date'])) : "";
+            $dataSalesKontak['due_date'] = $dataSalesKontak['due_date'] != null ? date('d/m/Y', strtotime($dataSalesKontak['due_date'])) : "";
 
-            $invNumber = $numberTemplate . $paddedNumber;
+            return response()->setJSON([
+                'data' => $dataSalesKontak,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
         } else {
-            $invNumber = $numberTemplate . '001';
+            return response()->setJSON([
+                'data' => [],
+                'token' => csrf_hash(),
+                'status' => false
+            ]);
+        }
+    }
+
+    public function generateNomorSalesOrderInternasional()
+    {
+        $salesContractId = $this->request->getVar('sales_contract_id');
+
+        if (empty($salesContractId)) {
+            return response()->setJSON([
+                'data' => '',
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
         }
 
+        // Ambil semua nomor yang sudah ada untuk sales contract tertentu
+        $existingNumbers = $this->salesOrderExportModel
+            ->where('sales_contract_id', $salesContractId)
+            ->where('deletedAt', null)
+            ->orderBy('sales_order_export_no', 'ASC')
+            ->findAll();
+
+        // Simpan daftar nomor yang sudah ada dalam bentuk angka
+        $usedNumbers = [];
+
+        foreach ($existingNumbers as $row) {
+            $usedNumbers[] = (int) $row['sales_order_export_no'];
+        }
+
+        // Cari nomor yang hilang
+        $nextNumber = 1;
+        for ($i = 1; $i <= count($usedNumbers) + 1; $i++) {
+            if (!in_array($i, $usedNumbers)) {
+                $nextNumber = $i;
+                break;
+            }
+        }
+
+        // Format nomor menjadi 4 digit dengan leading zero
+        $formattedNumber = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+
+        $salesContract = $this->salesKontrakModel->where('id', $salesContractId)->first();
+        $number = $salesContract['sales_contract_no'] . " - " . $formattedNumber;
+
         return response()->setJSON([
-            'data' => $invNumber,
+            'data' => $number,
             'token' => csrf_hash(),
             'status' => true
         ]);
     }
+
 
     public function getById($id = null)
     {
@@ -378,7 +434,7 @@ class OrderForm extends BaseController
         $dataSatuan = $this->satuanModel->findAll();
         $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->orderBy('createdAt', "DESC")->findAll();
         $dataSalesExport = $this->salesOrderExportModel->asObject()
-            ->select('sales_order_export.*, sales_contract.*, customers.name AS customer_name, CONCAT(metadata.value, " - ", metadata.description) AS currencyName')
+            ->select('sales_order_export.*, sales_contract.sales_contract_no,sales_contract.due_date,sales_contract.shipment_date, customers.name AS customer_name, CONCAT(metadata.value, " - ", metadata.description) AS currencyName')
             ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
             ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
             ->join('metadata', 'metadata.id = sales_contract.currency', 'left')
@@ -437,9 +493,12 @@ class OrderForm extends BaseController
         $id = decrypt($this->request->getPost("id"));
 
         $postData = $this->request->getPost();
-        $postData["items"] = json_decode($postData["items"], true);
+        $this->salesOrderExportModel->update($id, [
+            'documents_required'        => $postData['documents_required'],
+            'special_instructions' => $postData['special_instructions']
+        ]);
 
-        //update stoknya masih error
+        $postData["items"] = json_decode($postData["items"], true);
 
         try {
 
@@ -455,6 +514,7 @@ class OrderForm extends BaseController
                     "qty_sisa"                           =>  number_format($qty_sisa, 2, '.', ''),
                     "harga_barang"                  => isset($row->hargaOrder) ? number_format($row->hargaOrder, 2, '.', '') : number_format($row->harga, 2, '.', ''),
                     "total_harga_barang"            => isset($row->totalHargaOrder) ? number_format($row->totalHargaOrder, 2, '.', '') : number_format($row->total, 2, '.', ''),
+                    "remark" => $row->remark,
                 ];
                 $this->salesOrderExportDetailModel->update($row->id_detail_sales_order, $valueBarang);
             }
@@ -535,7 +595,7 @@ class OrderForm extends BaseController
         try {
             $id = $this->request->getPost("id");
             $remark = $this->request->getPost("remark");
-           
+
 
             $payload = [
                 "remark" => $remark,
@@ -609,5 +669,19 @@ class OrderForm extends BaseController
 
             // return view('Purchase/poImportBahanPenolong/print', $data);
         }
+    }
+
+    public function destroy()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->salesOrderExportModel->update($id, [
+            'deletedAt' => date('Y-m-d H:i:s')
+        ]);
+        $this->salesOrderExportDetailModel->where('sales_order_export_id', $id)->delete();
+        return response()->setJSON([
+            'message' => "Order Form Berhasil Dihapus",
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
     }
 }

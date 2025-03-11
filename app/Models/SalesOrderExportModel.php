@@ -25,6 +25,8 @@ class SalesOrderExportModel extends Model
         'jumlah_unpost',
         'used',
         'user_id',
+        'documents_required',
+        'special_instructions',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -56,6 +58,7 @@ class SalesOrderExportModel extends Model
 
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
+        $db = \Config\Database::connect();
         $availableSort = [
             'sales_order_export_no' => 'sales_order_export.sales_order_export_no',
             'customer_name'         => 'customers.name',
@@ -91,17 +94,33 @@ class SalesOrderExportModel extends Model
         }
 
         if ($addCondition['status']) {
-            $salesDataQry
-                ->where('status', $addCondition['status']);
+            if ($addCondition['status'] == "SUDAH POSTING") {
+                $salesDataQry
+                    ->where('sales_order_export.status', 'POSTED');
+            } else {
+                $salesDataQry
+                    ->where('sales_order_export.status', 'NEW');
+            }
         }
 
         if ($addCondition['search'] || $addCondition['status']) {
             $salesDataQry->groupEnd();
         }
 
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $salesDataQry->groupStart(); //
+            if (!empty($addCondition['dateStart'])) {
+                $salesDataQry->where('DATE(sales_order_export.createdAt) >=', $addCondition['dateStart']);
+            }
+            if (!empty($addCondition['dateEnd'])) {
+                $salesDataQry->where('DATE(sales_order_export.createdAt) <=', $addCondition['dateEnd']);
+            }
+            $salesDataQry->groupEnd();
+        }
+
+
         $totalFilteredData = $salesDataQry->countAllResults(false);
         $data = $salesDataQry->findAll($limit, $offset);
-
         return [
             'data'              => $data,
             'totalData'         => $totalData,

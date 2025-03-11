@@ -204,12 +204,6 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['shipment_date_text'] : ""; ?>" type="text" class="form-control shipment_date_text" id="shipment_date_text" name="shipment_date_text" placeholder="Shipment Date Text(Opsional)">
-                            <label for="floatingInput">Shipment Date</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['keterangan'] : ""; ?>" type="text" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan (Opsional)">
                             <label for="floatingInput">Keterangan (Opsional)</label>
                         </div>
@@ -544,12 +538,6 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="this.value=greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_pokok" name="harga_pokok" id="harga_pokok" placeholder="Harga Pokok">
-                                <label for="floatingInput">Harga Pokok</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input onkeyup="this.value=greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Harga Jual">
                                 <label for="floatingInput">Harga Jual</label>
                             </div>
@@ -584,10 +572,10 @@
                 satuan_order_id: "<?= $s['satuan_order_id'] ?>",
                 satuan_order_name: "<?= $s['satuan_order_name'] ?>",
                 kemasan: "<?= $s['kemasan'] ?>",
-                qty: "<?= $s['qty'] ?>",
-                harga: "<?= $s['harga'] ?>",
+                qty: "<?= floatval($s['qty']) ?>",
+                harga: "<?= floatval($s['harga']) ?>",
                 remark: "<?= $s['remark'] ?>",
-                total: "<?= $s['total'] ?>"
+                total: <?= floatval($s['total']) ?>
             });
         <?php endforeach; ?>
         drawTable();
@@ -732,7 +720,7 @@
         var qty = parseFloat($('.qty').val()) || 0;
         var harga = destroyFormatRupiah($('.harga').val()) || 0;
         var total = qty * harga;
-        $('.total').val(greatFormatRupiah(total));
+        $('.total').val(greatFormatRupiah(total.toFixed(2)));
     });
 
     // CUSTOMER 
@@ -1384,7 +1372,7 @@
         $('.qty').val(item.qty);
         $('.harga').val(greatFormatRupiah(item.harga));
         $('.remark').val(item.remark);
-        $('.total').val(greatFormatRupiah(item.total));
+        $('.total').val(greatFormatRupiah(item.total.toFixed(2)));
         $(".detail-modal").modal("show")
     }
 
@@ -1433,9 +1421,9 @@
                 newRow.append($('<td>').text(item.satuan_order_name));
                 newRow.append($('<td>').text(item.kemasan));
                 newRow.append($('<td>').text(item.remark));
-                newRow.append($('<td>').text(item.qty));
+                newRow.append($('<td>').text(greatFormatRupiah(item.qty)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.harga)));
-                newRow.append($('<td>').text(greatFormatRupiah(item.total)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.total.toFixed(2))));
                 newRow.append($('<td>').html(
                     <?php if (!empty($dataSalesKontrak)) : ?> <?php if ($dataSalesKontrak['status_posting']) : ?> `-`
                         <?php else : ?> `
@@ -1468,9 +1456,9 @@
             var newRow = $('<tr>');
             newRow.append($('<td colspan="5"></td>'));
             newRow.append($('<td><b>TOTAL</b></td>'));
-            newRow.append($('<td><b>' + totalQty + '</b></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalHarga) + '</b></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalTotalHarga) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalQty) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalHarga.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalTotalHarga.toFixed(2)) + '</b></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
 

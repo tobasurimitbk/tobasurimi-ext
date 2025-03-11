@@ -13,10 +13,26 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
+                <div class="col mb-3">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Mulai" value="01<?= date('/m/Y') ?>">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col mb-3">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-3">
                     <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
-                        <option value="NEW">NEW</option>
-                        <option value="POSTED">POSTED</option>
+                        <option value="BELUM POSTING">STATUS : BELUM POSTING</option>
+                        <option value="SUDAH POSTING">STATUS : SUDAH POSTING</option>
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -28,7 +44,7 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th onclick="changeSort('sales_order_export_no')" class="sort">No. Sales Order Form</th>
                                 <th onclick="changeSort('customer_po_no')" class="sort">No. PO</th>
                                 <th onclick="changeSort('customer_name')" class="sort">Buyer</th>
@@ -60,7 +76,7 @@
             <div class="modal-body">
                 <input type="hidden" name="id_sales_order" class="id_sales_order" id="id_sales_order">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control keterangan_unpost" name="keterangan_unpost" id="keterangan_unpost" placeholder="Keterangan Unpost">
                             <label for="floatingInput">Keterangan Unpost</label>
@@ -102,6 +118,8 @@
             data: function(data) {
                 data.search = $(".search").val();
                 data.status = $(".status").val();
+                data.dateStart = $(".dateStart").val();
+                data.dateEnd = $(".dateEnd").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -164,7 +182,7 @@
                             </button>
                             <?php endif; ?>
                             <?php if (can('Penjualan Ekspor', 'Order Form', 'd')): ?>
-                            <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash">
+                            <button data-toggle="tooltip" title="Hapus" type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash">
                                 <i class="fa fa-trash"></i>
                             </button>
                             <?php endif; ?>
@@ -209,6 +227,12 @@
                 }
             }
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -226,13 +250,35 @@
     $(document).ready(function() {
         $(".dataTable_info").addClass("pt-0");
 
-        $(".status").change(function() {
+        $(".status,.dateStart,.dateEnd").change(function() {
             table.ajax.reload();
         })
 
         $(".search").keyup(function() {
             table.ajax.reload();
         })
+
+        $(".dateStart").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".dateEnd").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $('.icon-dateStart').click(function() {
+            $(".dateStart").focus();
+        });
+
+        $('.icon-dateEnd').click(function() {
+            $(".dateEnd").focus();
+        });
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
@@ -248,6 +294,51 @@
 
     const print = function(url) {
         window.open(url, "_blank");
+    }
+
+    const handleDelete = function(id, tipe) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan di hapus?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("order-form-internasional/delete"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        }
+                    },
+                });
+            }
+        })
     }
 
     const updateStatus = function(id, status) {

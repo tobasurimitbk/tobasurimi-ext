@@ -175,11 +175,13 @@ class SalesKontrak extends BaseController
         if ($this->is_admin == '1') {
             $condition = [
                 "sales_contract.company_id"    => $this->this_company_id,
+                "sales_contract.deletedAt" => null
             ];
         } else {
             $condition = [
                 "sales_contract.company_id"    => $this->this_company_id,
-                "createdBy" => $this->this_user_id
+                "createdBy" => $this->this_user_id,
+                "sales_contract.deletedAt" => null
             ];
         }
 
@@ -188,7 +190,9 @@ class SalesKontrak extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "status_posting"  => $this->request->getGet("status_posting")
+            "status_posting"  => $this->request->getGet("status_posting"),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $limit = $this->request->getGet("length");
@@ -259,7 +263,6 @@ class SalesKontrak extends BaseController
             'total_amount' => $this->request->getVar('total_amount'),
             'tolerance' => $this->request->getVar('tolerance'),
             'shipment_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("shipment_date")), "Y-m-d") : "",
-            'shipment_date_text' =>  $this->request->getVar("shipment_date_text"),
             'payment_term' => $this->request->getVar('payment_term'),
             'potongan_harga' => $this->request->getVar('potongan_harga'),
             'documents_required' => $this->request->getVar('documents_required'),
@@ -320,7 +323,6 @@ class SalesKontrak extends BaseController
             'total_amount' => $this->request->getVar('total_amount'),
             'tolerance' => $this->request->getVar('tolerance'),
             'shipment_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("shipment_date")), "Y-m-d") : "",
-            'shipment_date_text' =>  $this->request->getVar("shipment_date_text"),
             'payment_term' => $this->request->getVar('payment_term'),
             'potongan_harga' => $this->request->getVar('potongan_harga'),
             'documents_required' => $this->request->getVar('documents_required'),

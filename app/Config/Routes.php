@@ -650,11 +650,13 @@ $routes->get('/order-form-internasional/print/(:segment)', 'SalesInternasional\O
 $routes->get('/order-form-internasional/all', 'SalesInternasional\OrderForm::all', ['filter' => 'Auth']);
 $routes->get('/order-form-internasional/get/sales-kontrak', 'SalesInternasional\OrderForm::dropdownSalesKontrak', ['filter' => 'Auth']);
 $routes->get('/order-form-internasional/get/detail-sales-kontrak', 'SalesInternasional\OrderForm::getDetailSalesKontrak', ['filter' => 'Auth']);
+$routes->get('/order-form-internasional/get/detail-info-sales-kontrak', 'SalesInternasional\OrderForm::getDetailInfoSalesKontrak', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/save', 'SalesInternasional\OrderForm::saveOrder', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/update', 'SalesInternasional\OrderForm::update', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/update-status', 'SalesInternasional\OrderForm::updateStatus', ['filter' => 'Auth']);
-$routes->post('/order-form-internasional/generate-no-order-form', 'SalesInternasional\OrderForm::generateNomorSalesOrderInternasional', ['filter' => 'Auth']);
-$routes->post('/order-form-internasional/update-remark', 'SalesInternasional\OrderForm::updateRemark', ['filter' => 'Auth']);
+$routes->get('/order-form-internasional/generate-no-order-form', 'SalesInternasional\OrderForm::generateNomorSalesOrderInternasional', ['filter' => 'Auth']);
+// $routes->post('/order-form-internasional/update-remark', 'SalesInternasional\OrderForm::updateRemark', ['filter' => 'Auth']);
+$routes->post('/order-form-internasional/delete', 'SalesInternasional\OrderForm::destroy', ['filter' => 'Auth']);
 
 // Master Barang Internasional
 $routes->get('/master-barang-internasional', 'SalesInternasional\Barang::bahanJadiView', ['filter' => 'Auth']);

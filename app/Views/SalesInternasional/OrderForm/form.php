@@ -10,6 +10,11 @@
                 Kembali
             </a>
             <?php if (!empty($dataSalesExport)) { ?>
+                <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
+                    <button class="btn btn-warning btn-print float-right">
+                        Print
+                    </button>
+                <?php endif; ?>
                 <?php if ($dataSalesExport->status === "NEW") { ?>
                     <?php if (can('Penjualan Ekspor', 'Order Form', 'a')): ?>
                         <button class="btn btn-success posting-spp posting-so float-right">
@@ -29,11 +34,7 @@
                         </button>
                     <?php endif; ?>
                 <?php } ?>
-                <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
-                    <button class="btn btn-warning btn-print float-right">
-                        Print
-                    </button>
-                <?php endif; ?>
+
             <?php } else { ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                     Simpan
@@ -75,20 +76,6 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating" style="height: 50px;">
-                            <select <?= !empty($dataSalesExport) ? 'disabled' : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
-
-                                <?php foreach ($dataAJU as $aju) : ?>
-                                    <option selected value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">Dokumen Pabean </label>
-                        </div>
-                        <!-- <small class="mb-3"><i>Kosongkan jika non pabean</i></small> -->
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
                         <div class="input-group">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input readonly autocomplete="one-time-code" value="<?= $dataSalesExport->customer_name ?? "" ?>" type="text" class="form-control customer_name" id="customer_name" name="customer_name" placeholder="Customer Name">
@@ -102,14 +89,14 @@
                             <label for="floatingInput">No. PO (Opsional)</label>
                         </div>
                     </div>
+                    <!-- Otomatis Terisi BC 3.0 -->
+                    <input type="hidden" name="aju_document_type" id="aju_document_type" value="<?= $dataAJU[0]['id'] ?>">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input readonly autocomplete="one-time-code" value="<?= $dataSalesExport->loading_port ?? "" ?>" type="text" class="form-control loading_port" id="loading_port" name="loading_port" placeholder="Loading Port">
                             <label for="floatingInput">Loading Port</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input readonly autocomplete="one-time-code" value="<?= $dataSalesExport->dicharge_port ?? "" ?>" type="text" class="form-control dicharge_port" id="dicharge_port" name="dicharge_port" placeholder="Dicharge Port">
@@ -120,7 +107,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" value="<?= $dataSalesExport->due_date ?? "" ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Due Date">
+                                    <input readonly autocomplete="one-time-code" value="<?= !empty($dataSalesExport->due_date) ? date('d/m/Y', strtotime($dataSalesExport->due_date)) ?? "" : "" ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Due Date">
                                     <label for="floatingInput">Due Date</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -135,8 +122,6 @@
                             <label for="floatingInput">Payment Term (Opsional)</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input readonly autocomplete="one-time-code" value="<?= $dataSalesExport->tolerance ?? "" ?>" type="text" class="form-control tolerance" id="tolerance" name="tolerance" placeholder="Tolerance">
@@ -147,7 +132,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" value="<?= $dataSalesExport->shipment_date ?? "" ?>" class="form-control input-picker shipment_date" id="shipment_date" name="shipment_date" placeholder="Shipment Date">
+                                    <input readonly autocomplete="one-time-code" value="<?= !empty($dataSalesExport->shipment_date) ? date('d/m/Y', strtotime($dataSalesExport->shipment_date)) ?? "" : "" ?>" class="form-control input-picker shipment_date" id="shipment_date" name="shipment_date" placeholder="Shipment Date">
                                     <label for="floatingInput">Shipment Date</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -162,8 +147,6 @@
                             <label for="floatingInput">Currency</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input readonly oninput="preventNegativeInput(this)" value="<?= $dataSalesExport->tipe_harga ?? "" ?>" autocomplete="one-time-code" type="text" class="form-control tipe_harga" id="tipe_harga" name="tipe_harga" placeholder="Tipe Harga">
@@ -176,10 +159,31 @@
                             <label for="floatingInput">Potongan Harga (Opsional)</label>
                         </div>
                     </div>
+
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input readonly autocomplete="one-time-code" type="text" value="<?= $dataSalesExport->keterangan ?? "" ?>" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan (Opsional)">
                             <label for="floatingInput">Keterangan (Opsional)</label>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Dokumen & Special Instructions</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <textarea <?= !empty($dataSalesExport) ?  ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="full-textarea form-control documents_required" id="documents_required" name="documents_required" placeholder="Document Required"><?= $dataSalesExport->documents_required ?? "" ?></textarea>
+                            <label for="floatingInput">Document Required</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <textarea <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '')  : '' ?> autocomplete="one-time-code" class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Special Instructions"><?= $dataSalesExport->special_instructions ?? "" ?></textarea>
+                            <label for="floatingInput">Special Instructions</label>
                         </div>
                     </div>
                 </div>
@@ -196,21 +200,26 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
+                                <th style="text-align: center;" colspan="9">Detail Barang Sales Kontrak</th>
+                                <th style="text-align: center;" colspan="4">Detail Barang Order Form</th>
+                            </tr>
+                            <tr>
                                 <th width="1%">No</th>
                                 <th width="5%">Kode Barang</th>
                                 <th width="5%">Barang</th>
                                 <th width="5%">Satuan Order</th>
                                 <th width="5%">Kemasan</th>
                                 <th width="5%">Remark</th>
-                                <th width="5%">Qty</th>
+                                <th width="5%">Qty Sisa (Dari Sales Kontrak)</th>
                                 <th width="5%">Harga</th>
                                 <th width="5%">Total Harga</th>
                                 <th width="5%">Qty Order</th>
                                 <th width="5%">Harga Order</th>
                                 <th width="5%">Total Harga Order</th>
+                                <th width="5%">Update Remark</th>
                             </tr>
                         </thead>
-                        <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+                        <tbody class="body-detail-table" id="body-detail-table">
 
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
@@ -223,6 +232,7 @@
                                 <td><b>0,00</b></td>
                                 <td><b>0,00</b></td>
                                 <td><b>0,00</b></td>
+                                <td></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -231,7 +241,73 @@
         </div>
     </div>
 </section>
-
+<div class="modal detail-modal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Update Remark Order Form</h5>
+            </div>
+            <div class="modal-body">
+                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="id_detail" class="id_detail" id="id_detail">
+                    <div class="row">
+                        <div class="col mb-3">
+                            <h5 class="title-tambah-barang">Data Barang</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" type="text" class="form-control barang_name" id="barang_name" name="barang_name" placeholder="Barang" disabled>
+                                <label for="floatingInput">Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" type="text" class="form-control satuan_order_name" id="satuan_order_name" name="satuan_order_name" placeholder="Satuan Order" disabled>
+                                <label for="floatingInput">Satuan Order</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" type="text" disabled class="form-control kemasan" id="kemasan" name="kemasan" placeholder="Kemasan">
+                                <label for="floatingInput">Kemasan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control qty_order" name="qty_order" id="qty_order" placeholder="Qty Order" disabled>
+                                <label for="floatingInput">Qty Order</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" disabled class="form-control harga_order" name="harga_order" id="harga_order" placeholder="Harga Order">
+                                <label for="floatingInput">Harga</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" type="text" class="form-control remark" id="remark" name="remark" placeholder="Remark">
+                                <label for="floatingInput">Remark</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" disabled class="form-control total" name="total" id="total" placeholder="Total">
+                                <label for="floatingInput">Total</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Kembali</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     var listBarang = [];
@@ -242,20 +318,20 @@
             <?php if (!empty($dataSalesExportDetail)) { ?>
                 <?php foreach ($dataSalesExportDetail as $sales) { ?>
                     listBarang.push({
-                        barang_master_sales_id: "<?= $sales->barang_id ?>",
+                        id: "<?= $sales->barang_id ?>",
                         barang_name: "<?= $sales->barang_name ?>",
                         harga: "<?= $sales->hargaContract ?>",
                         id_detail_sales_order: "<?= $sales->sales_order_export_detail_id ?>",
                         kemasan: "<?= $sales->kemasan ?>",
                         kode_barang: "<?= $sales->barang_kode ?>",
-                        qty: "<?= $sales->qtyContract  ?>",
+                        qty: <?= floatval($sales->qtyContract)  ?>,
                         remark: "<?= $sales->remark ?>",
                         satuan_order_id: "<?= $sales->satuan_id ?>",
                         satuan_order_name: "<?= $sales->kode_satuan ?>",
-                        total: "<?= $sales->totalHargaContract ?>",
-                        qtyOrder: "<?= $sales->qty ?>",
-                        hargaOrder: "<?= $sales->harga_barang ?>",
-                        totalHargaOrder: "<?= $sales->total_harga_barang ?>",
+                        total: <?= floatval($sales->totalHargaContract) ?>,
+                        qtyOrder: <?= floatval($sales->qty) ?>,
+                        hargaOrder: <?= floatval($sales->harga_barang) ?>,
+                        totalHargaOrder: <?= floatval($sales->total_harga_barang) ?>,
                     });
                 <?php } ?>
                 drawTable();
@@ -271,37 +347,9 @@
             theme: "bootstrap-5"
         }).change(function() {
             listBarang = [];
-            let customer = $(this).find(':selected').data('customer');
-            let customerPO = $(this).find(':selected').data('customer-po-no');
-            let loadingPort = $(this).find(':selected').data('loading-port');
-            let dichargePort = $(this).find(':selected').data('dicharge-port');
-            let dueDate = $(this).find(':selected').data('due-date');
-            let paymentTerm = $(this).find(':selected').data('payment-term');
-            let tolerance = $(this).find(':selected').data('tolerance');
-            let shipmentDate = $(this).find(':selected').data('shipment-date');
-            let currency = $(this).find(':selected').data('currency');
-            let tipeHarga = $(this).find(':selected').data('tipe-harga');
-            let potonganHarga = $('#sales_kontrak').val() == "" ?
-                "" :
-                greatFormatRupiah($(this).find(':selected').data('potongan-harga'));
-            let keterangan = $(this).find(':selected').data('keterangan');
-
-            // console.log(customer);
-
-            $(".customer_name").val(customer);
-            $(".customer_po_no").val(customerPO);
-            $(".loading_port").val(loadingPort);
-            $(".dicharge_port").val(dichargePort);
-            $(".due_date").val(dueDate);
-            $(".payment_term").val(paymentTerm);
-            $(".tolerance").val(tolerance);
-            $(".shipment_date").val(shipmentDate);
-            $(".currency").val(currency);
-            $(".tipe_harga").val(tipeHarga);
-            $(".potongan_harga").val(potonganHarga);
-            $(".keterangan").val(keterangan);
-
+            getDetailInfoSalesKontrak($(this).val());
             getDetailSalesKontrak($(this).val());
+            changeStatus();
         });
         //CSS SELECT2 FLOATING LABEL
         $('.sales_kontrak')
@@ -447,6 +495,12 @@
                 },
                 sales_kontrak: {
                     required: true
+                },
+                documents_required: {
+                    required: true
+                },
+                special_instructions: {
+                    required: true
                 }
             },
             messages: {
@@ -455,6 +509,12 @@
                 },
                 sales_kontrak: {
                     required: "Sales kontrak wajib diisi"
+                },
+                documents_required: {
+                    required: "Dokumen Required Wajib Diisi"
+                },
+                special_instructions: {
+                    required: "Special Instructions Wajib Diisi"
                 }
             },
             errorElement: 'span',
@@ -483,7 +543,6 @@
             $(".detail-modal").modal("hide")
 
             if ($(".create-form").valid()) {
-                console.log(listBarang);
                 Swal.fire({
                     icon: 'question',
                     title: 'Simpan Data?',
@@ -602,13 +661,12 @@
             method: "GET",
             dataType: "json",
             success: function(res) {
-                console.log(res);
                 $(".sales_kontrak").empty();
 
                 $(".sales_kontrak").append(`<option value=""></option>`);
 
                 res.data.forEach(function(item) {
-                    $(".sales_kontrak").append(`<option data-customer="${item.customerName}" data-customer-po-no="${item.customer_po_no}" data-loading-port="${item.loading_port}" data-dicharge-port="${item.dicharge_port}" data-due-date="${item.due_date}" data-payment-term="${item.payment_term}" data-tolerance="${item.tolerance}" data-shipment-date="${item.shipment_date}" data-currency="${item.currencyName}" data-tipe-harga="${item.tipe_harga}" data-potongan-harga="${item.potongan_harga}" data-keterangan="${item.keterangan}" value="${item.id}">${item.sales_contract_no}</option>`);
+                    $(".sales_kontrak").append(`<option value="${item.id}">${item.sales_contract_no}</option>`);
                 })
 
                 $(".sales_kontrak").val("").change();
@@ -617,20 +675,128 @@
         })
     }
 
+    function detailRow(id) {
+        var item = null;
+        for (var i = 0; i < listBarang.length; i++) {
+            if (listBarang[i].id == id) {
+                item = listBarang[i];
+                break;
+            }
+        }
+        $('#id_detail').val(id);
+        $('#barang_name').val(item.barang_name);
+        $('#satuan_order_name').val(item.satuan_order_name);
+        $('#kemasan').val(item.kemasan);
+        $('#qty_order').val(greatFormatRupiah(item.qtyOrder));
+        $('#harga_order').val(greatFormatRupiah(item.hargaOrder));
+        $('#remark').val(item.remark);
+        $('#total').val(greatFormatRupiah(item.totalHargaOrder));
+
+        $('.detail-modal').modal('show');
+
+    }
+
+    $('.btn-submit-detail').click(function() {
+        var id_detail = $('#id_detail').val();
+        var remark = $('#remark').val();
+
+        if (remark == '') {
+            Swal.fire({
+                icon: 'error',
+                title: "Remark Wajib Diisi",
+                confirmButtonColor: '#4e73df',
+            })
+        } else {
+            var index = null;
+            for (var i = 0; i < listBarang.length; i++) {
+                if (listBarang[i].id == id_detail) {
+                    index = i;
+                    break;
+                }
+            }
+
+            listBarang[i].remark = remark;
+            drawTable();
+            $('.detail-modal').modal('hide');
+        }
+    });
+
+    $('.btn-hide-detail').click(function() {
+        $('.detail-modal').modal('hide');
+    });
+
+    function getDetailInfoSalesKontrak(id) {
+        $.ajax({
+            url: `<?= base_url("order-form-internasional/get/detail-info-sales-kontrak"); ?>`,
+            method: "GET",
+            dataType: "json",
+            beforeSend: () => {
+                setLoading()
+            },
+            complete: () => {
+                stopLoading();
+            },
+            data: {
+                id: id
+            }, // Memasukkan id ke dalam data yang dikirim
+            success: function(res) {
+                if (res.status) {
+                    $(".customer_name").val(res.data.customer_name);
+                    $(".customer_po_no").val(res.data.customer_po_no);
+                    $(".loading_port").val(res.data.loading_port);
+                    $(".dicharge_port").val(res.data.dicharge_port);
+                    $(".due_date").val(res.data.dicharge_port);
+                    $(".payment_term").val(res.data.payment_term);
+                    $(".tolerance").val(res.data.tolerance);
+                    $(".shipment_date").val(res.data.shipment_date);
+                    $(".currency").val(res.data.valuta + " - " + res.data.valuta_description);
+                    $(".tipe_harga").val(res.data.tipe_harga);
+                    $(".potongan_harga").val(res.data.potongan_harga);
+                    $(".keterangan").val(res.data.keterangan);
+                    $(".documents_required").val(res.data.documents_required);
+                    $(".special_instructions").val(res.data.special_instructions);
+                } else {
+                    $(".customer_name").val(null);
+                    $(".customer_po_no").val(null);
+                    $(".loading_port").val(null);
+                    $(".dicharge_port").val(null);
+                    $(".due_date").val(null);
+                    $(".payment_term").val(null);
+                    $(".tolerance").val(null);
+                    $(".shipment_date").val(null);
+                    $(".currency").val(null);
+                    $(".tipe_harga").val(null);
+                    $(".potongan_harga").val(null);
+                    $(".keterangan").val(null);
+                    $(".documents_required").val(null);
+                    $(".special_instructions").val(null);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+            }
+        });
+    }
+
     function getDetailSalesKontrak(id) {
-        setLoading();
         $.ajax({
             url: `<?= base_url("order-form-internasional/get/detail-sales-kontrak"); ?>`,
             method: "GET",
             dataType: "json",
+            beforeSend: () => {
+                setLoading()
+            },
+            complete: () => {
+                stopLoading();
+            },
             data: {
                 id: id
             }, // Memasukkan id ke dalam data yang dikirim
             success: function(res) {
                 if (res.status) {
                     res.data.forEach(function(item) {
-                        console.log(item);
                         listBarang.push({
+                            id: getID(),
                             barang_master_sales_id: item.barang_master_sales_id,
                             barang_name: item.barang_name,
                             harga: item.harga,
@@ -648,7 +814,6 @@
                             totalHargaOrder: item.total,
                         });
                     });
-                    stopLoading();
                 } else {
                     console.error("Failed to fetch data");
                 }
@@ -677,6 +842,7 @@
                 <td><b>0,00</b></td>
                 <td><b>0,00</b></td>
                 <td><b>0,00</b></td>
+                <td><b></b></td>
             </tr>
         `;
             $('.tfoot').append(row);
@@ -695,10 +861,8 @@
                 newRow.append($('<td>').text(item.barang_name));
                 newRow.append($('<td>').text(item.satuan_order_name));
                 newRow.append($('<td>').text(item.kemasan));
-                newRow.append($('<td>').html(`
-                    <input  style="height: 40px; padding-bottom: 12px;" <?= isset($dataSalesExport) && $dataSalesExport->status === "POSTED" ? "readonly" : "" ?> class="form-control remark" onkeyup="preventNegativeInput(this);updateRemark($(this))" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" data-id="${item.id_detail}" value="${item.remark}">
-                `));
-                newRow.append($('<td>').text(item.qty));
+                newRow.append($('<td>').text(item.remark));
+                newRow.append($('<td>').text(greatFormatRupiah(item.qty)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.harga)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.total)));
                 newRow.append($('<td>').html(`
@@ -706,6 +870,19 @@
                 `));
                 newRow.append($('<td>').text(greatFormatRupiah(item.hargaOrder)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.totalHargaOrder)));
+                <?php if (empty($dataSalesExport)): ?>
+                    newRow.append($('<td>').html(
+                        `
+                    <center>
+                        <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${item.id}')" >
+                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                        </button>
+                    </center>
+                    `
+                    ));
+                <?php else : ?>
+                    newRow.append($('<td>').text(''));
+                <?php endif; ?>
 
                 totalQty += parseFloat(item.qty);
                 totalHarga += parseFloat(item.harga);
@@ -722,12 +899,13 @@
             var newRow = $('<tr>');
             newRow.append($('<td colspan="5"></td>'));
             newRow.append($('<td><b>TOTAL</b></td>'));
-            newRow.append($('<td><b>' + totalQty + '</b></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalHarga.toString()) + '</b></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalTotalHarga.toString()) + '</b></td>'));
-            newRow.append($('<td><b>' + totalQtyOrder + '</b></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalHargaOrder.toString()) + '</b></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalTotalHargaOrder.toString()) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalQty.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalHarga.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalTotalHarga.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalQtyOrder.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalHargaOrder.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalTotalHargaOrder.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
 
             totalAmount = totalTotalHarga;
@@ -737,13 +915,13 @@
     function updateRemark(input) {
         const csrf = $(`[name="${csrfToken}"]`);
         const remarkId = $(input).attr("data-id") // Ambil ID input
-        const remarkValue = $(input).val();    // Ambil nilai remark
+        const remarkValue = $(input).val(); // Ambil nilai remark
 
         $.ajax({
             url: "<?= base_url("order-form-internasional/update-remark"); ?>",
             data: {
                 id: remarkId,
-                remark: remarkValue,  // Kirim nilai remark
+                remark: remarkValue, // Kirim nilai remark
                 status: "POSTED"
             },
             method: "POST",
@@ -758,13 +936,13 @@
             success: function(response) {
                 if (response.status) {
                     Swal.fire({
-                        icon: 'success',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                    })
-                    .then(() => {
-                        stopLoading()
-                    })
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        .then(() => {
+                            stopLoading()
+                        })
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -795,8 +973,8 @@
         input.val(qty);
 
         // Update Harga Order dan Total Harga Order
-        $('.dataTable tbody tr:eq(' + index + ') td:eq(10)').text(greatFormatRupiah(hargaOrder.toString()));
-        $('.dataTable tbody tr:eq(' + index + ') td:eq(11)').text(greatFormatRupiah(totalHargaOrder.toString()));
+        $('.dataTable tbody tr:eq(' + index + ') td:eq(10)').text(greatFormatRupiah(hargaOrder));
+        $('.dataTable tbody tr:eq(' + index + ') td:eq(11)').text(greatFormatRupiah(totalHargaOrder));
 
         // Recalculate Total
         var totalQty = 0;
@@ -814,8 +992,8 @@
         });
 
         $('.foot-detail-table td:eq(5)').text(totalQty);
-        $('.foot-detail-table td:eq(6)').text(greatFormatRupiah(totalHarga.toString()));
-        $('.foot-detail-table td:eq(7)').text(greatFormatRupiah(totalTotalHarga.toString()));
+        $('.foot-detail-table td:eq(6)').text(greatFormatRupiah(totalHarga));
+        $('.foot-detail-table td:eq(7)').text(greatFormatRupiah(totalTotalHarga));
     }
 
 
@@ -835,34 +1013,41 @@
         }
     }
 
+    function getID() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let randomString = '';
+
+        for (let i = 0; i < 10; i++) {
+            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
+        return randomString;
+    };
+
     function changeStatus() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
+        let isChecked = document.getElementById('auto_generate').checked;
+        let salesKontrakId = $('#sales_kontrak').val();
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
-        if (value) {
-            $.ajax({
-                url: "<?= base_url("order-form-internasional/generate-no-order-form"); ?>",
-                method: "POST",
-                dataType: "json",
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    setLoading();
-                },
-                complete: function() {
-                    stopLoading();
-                },
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    csrf.val(response.token);
-                    $(".no_sales_order").val(response.data);
-                },
+        let noSalesOrder = $(".no_sales_order");
 
-            });
-            $(".no_sales_order").attr("readonly", true);
+        if (isChecked) {
+            setLoading();
+            fetch("<?= base_url("order-form-internasional/generate-no-order-form"); ?>?sales_contract_id=" + salesKontrakId, {
+                    method: "GET",
+                    headers: {
+                        "X-CSRF-Token": csrf.val()
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    csrf.val(data.token);
+                    noSalesOrder.val(data.data).attr("readonly", true);
+                })
+                .catch(error => console.error("Error fetching data:", error))
+                .finally(() => stopLoading());
         } else {
-            $(".no_sales_order").attr("readonly", false);
-            $(".no_sales_order").val("");
+            noSalesOrder.val("").attr("readonly", false);
         }
     }
 </script>

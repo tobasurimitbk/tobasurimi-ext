@@ -111,7 +111,7 @@
                 <div class="txt-right po-customer">
                     <label class="label-header" </label>
                 </div>
-            </div>
+            </div><br>
             <div class="txt-left"><label class="label-header">SELLER: PT.TOBA SURIMI INDUSTRIES</label></div>
             <div class="mt-1 justify-content-center"><label class="label-header">THIS SALES CONTRACT
                     IS MADE BY AND BETWEEN THE BUYER AND SELLER, WHEREBY THE BUYER AGREES TO PURCHASE AND THE SELLER
