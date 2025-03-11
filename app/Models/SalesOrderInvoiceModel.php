@@ -548,14 +548,10 @@ class SalesOrderInvoiceModel extends Model
 
     public function getAllSalesOrderInvoiceReportLaporan($condition, $addCondition, $limit = 10, $offset = 0)
     {
-
-
         $availableSort = [
-            'no_faktur'          => 'sales_order_invoice.no_faktur',
-            'tanggal_faktur'          => 'sales_order_invoice.tanggal_faktur',
-            'nama_pelanggan'            => 'customers.name',
-
-
+            'no_faktur'         => 'sales_order_invoice.no_faktur',
+            'tanggal_faktur'    => 'sales_order_invoice.tanggal_faktur',
+            'nama_pelanggan'    => 'customers.name',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -573,7 +569,6 @@ class SalesOrderInvoiceModel extends Model
                       DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
                       customers.name AS nama_pelanggan,
                       customers.kode AS kode_pelanggan,
-                      
                       ";
 
         $salesOrderInvoice = $this->asObject()
@@ -590,7 +585,6 @@ class SalesOrderInvoiceModel extends Model
         if ($addCondition['filter_jenis_dokumen'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $salesOrderInvoice->groupStart();
         }
-
 
         if ($addCondition['filter_jenis_dokumen']) {
             $salesOrderInvoice->where('sales_order_invoice.document_type', $addCondition['filter_jenis_dokumen']);

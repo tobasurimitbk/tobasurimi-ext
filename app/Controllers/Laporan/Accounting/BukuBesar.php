@@ -185,7 +185,6 @@ class BukuBesar extends BaseController
             }
         }
 
-
         return $result;
     }
 
