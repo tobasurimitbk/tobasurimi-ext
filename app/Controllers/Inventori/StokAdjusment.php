@@ -17,6 +17,10 @@ use App\Models\StockModel;
 use App\Models\SupplierModel;
 use App\Models\UserModel;
 use App\Models\WarehousesModel;
+use App\Models\BC23Model;
+use App\Models\BC27Model;
+use App\Models\BC40Model;
+use App\Models\PPBKBModel;
 
 class StokAdjusment extends BaseController
 {
@@ -36,6 +40,10 @@ class StokAdjusment extends BaseController
     protected $kemasanModel;
     protected $satuanModel;
     protected $supplierModel;
+    protected $bc40Model;
+    protected $bc23Model;
+    protected $bc27Model;
+    protected $ppbkbModel;
 
     public function __construct()
     {
@@ -55,6 +63,10 @@ class StokAdjusment extends BaseController
         $this->kemasanModel = new KemasanModel();
         $this->barangMaster = new BarangMasterModel();
         $this->supplierModel = new SupplierModel();
+        $this->bc40Model = new BC40Model();
+        $this->bc27Model = new BC27Model();
+        $this->bc23Model = new BC23Model();
+        $this->ppkbModel = new PPBKBModel();
     }
 
     public function index()
@@ -429,6 +441,33 @@ class StokAdjusment extends BaseController
             for ($i = 0; $i < count($dataResult); $i++) {
                 $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
 
+                if ($bcType == "NON PABEAN") {
+                    // NON PABEAN
+                    $noDaftar = "-";
+                } elseif ($dataResult[$i]['bc_id'] == 48) {
+                    // BC 2.3
+                    $bcDetail = $this->bc23Model->select('no_daftar')
+                        ->join('bc_purchase_order', 'bc_purchase_order.id = bc_23.bc_purchase_order_id', 'left')
+                        ->where('no_aju', $dataResult[$i]['no_aju'])
+                        ->first();
+                    $noDaftar = $bcDetail != null ? $bcDetail['no_daftar'] : "-";
+                } elseif ($dataResult[$i]['bc_id'] == 52) {
+                    // BC 2.7
+                    $bcDetail = $this->bc27Model->where('no_aju', $dataResult[$i]['no_aju'])->first();
+                    $noDaftar = $bcDetail != null ? $bcDetail['no_daftar'] : "-";
+                } elseif ($dataResult[$i]['bc_id'] == 53) {
+                    // BC 4.0
+                    $bcDetail = $this->bc40Model->select('no_daftar')
+                        ->join('bc_purchase_order', 'bc_purchase_order.id = bc_40.bc_purchase_order_id', 'left')
+                        ->first();
+                    $noDaftar = $bcDetail != null ? $bcDetail['no_daftar'] : "-";
+                } elseif ($dataResult[$i]['bc_id'] == 1426) {
+                    // PPBKB
+                    $bcDetail = $this->ppbkbModel->where('no_ppbkb', $dataResult[$i]['no_aju'])->first();
+                    $noDaftar = $bcDetail != null ? $bcDetail['no_daftar'] : "-";
+                }
+
+
                 $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
                 $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
                 $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
@@ -439,6 +478,7 @@ class StokAdjusment extends BaseController
                 $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
                 $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
                 $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
+                $dataResult[$i]['no_daftar'] = $noDaftar;
             }
             return response()->setJSON([
                 'data' => $dataResult,

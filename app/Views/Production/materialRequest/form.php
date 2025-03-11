@@ -245,7 +245,7 @@
                                     <th style="text-align: center;">No Dokumen</th>
                                     <th style="text-align: center;">Supplier</th>
                                     <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">No Aju</th>
+                                    <th style="text-align: center;">No Aju / No Daftar</th>
                                     <th style="text-align: center;">Tanggal Penerimaan</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Satuan</th>
@@ -282,7 +282,7 @@
                                 <th style="text-align: center;">Warehouse</th>
                                 <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Pabean</th>
-                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">No Aju / No Daftar</th>
                                 <th style="text-align: center;">Tanggal Penerimaan</th>
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
@@ -319,7 +319,7 @@
                                 <th style="text-align: center;">Warehouse</th>
                                 <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Pabean</th>
-                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">No Aju / No Daftar</th>
                                 <th style="text-align: center;">Tanggal Penerimaan</th>
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
@@ -355,7 +355,7 @@
                                 <th style="text-align: center;">Warehouse</th>
                                 <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Pabean</th>
-                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">No Aju / No Daftar</th>
                                 <th style="text-align: center;">Tanggal Penerimaan</th>
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
@@ -391,7 +391,7 @@
                                 <th style="text-align: center;">Warehouse</th>
                                 <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Pabean</th>
-                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">No Aju / No Daftar</th>
                                 <th style="text-align: center;">Tanggal Penerimaan</th>
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
@@ -1585,13 +1585,18 @@
     // }
 
     function drawTableSelectedItemBahanBaku(data) {
+        // Hancurkan DataTable jika sudah ada
         if ($.fn.DataTable.isDataTable('#selectedItemTableBahanBaku')) {
             $('#selectedItemTableBahanBaku').DataTable().clear().draw();
-            selectedItemTableBahanBaku.destroy();
+            $('#selectedItemTableBahanBaku').DataTable().destroy();
         }
+
         const table = $('#selectedItemTableBahanBaku');
+        table.find('tbody').empty(); // Kosongkan tbody sebelum menggambar ulang
         var no = 1;
         var totalQtyRequest = 0;
+
+        // Loop melalui data dan buat baris tabel
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align: center;">').html(`${no++}`));
@@ -1599,24 +1604,38 @@
             newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju} | ${v.no_daftar}`));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
             newRow.append($('<td style="text-align: center;">').text(v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(`
-            <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-baku-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" data-index="${i}" type="text" value="${v.qty2}">
-        `));
+                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> 
+                    class="form-control qty-baku-request" 
+                    oninput="preventNegativeInput(this)" 
+                    autocomplete="one-time-code" 
+                    data-id="${v.id}" 
+                    data-stok_total="${v.stok_total}" 
+                    data-index="${i}" 
+                    type="text" 
+                    value="${v.qty2}">
+            `));
             newRow.append($('<td style="text-align: center;">').html(`
-            <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanBaku(${v.id}, ${v.id_material_request_detail})"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-        `));
+                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> 
+                        type="button" 
+                        class="btn btn-discard delete-btn btn-trash" 
+                        onclick="deleteDetailBahanBaku(${v.id}, ${v.id_material_request_detail})">
+                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                </button>
+            `));
             table.find('tbody').append(newRow);
-            parseFloat(v.qty2)
-            totalQtyRequest += parseFloat(v.qty2) || 0; // Ensure the value is a number
+
+            // Hitung total qty request
+            totalQtyRequest += parseFloat(v.qty2) || 0; // Pastikan nilai adalah angka
         });
 
+        // Inisialisasi DataTable
         selectedItemTableBahanBaku = $('#selectedItemTableBahanBaku').DataTable({
-
             processing: false,
             serverSide: false,
             ordering: true,
@@ -1639,18 +1658,31 @@
             }
         });
 
+        // Gambar ulang tabel
         selectedItemTableBahanBaku.draw();
+
+        // Update total qty request
         updateTotalQtyRequest();
 
-        // Add event listener for input changes
-        $('.qty-baku-request').on('input change', function() {
+        // Gunakan event delegation untuk input qty-baku-request
+        $(document).on('input change', '.qty-baku-request', function() {
             var index = $(this).data('index');
             var stok_max = $(this).data('stok_total');
             var input_user = $(this).val();
 
+            // Update data di listStockSelectedBahanBaku
             listStockSelectedBahanBaku[index].qty2 = input_user;
+
+            // Update total qty request
             updateTotalQtyRequest();
         });
+    }
+
+    // Fungsi untuk mencegah input negatif
+    function preventNegativeInput(input) {
+        if (input.value < 0) {
+            input.value = 0;
+        }
     }
 
     function updateTotalQtyRequest() {
@@ -1680,7 +1712,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju} | ${v.no_daftar}`));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
@@ -1766,7 +1798,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju} | ${v.no_daftar}`));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
@@ -1852,7 +1884,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju} | ${v.no_daftar}`));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
