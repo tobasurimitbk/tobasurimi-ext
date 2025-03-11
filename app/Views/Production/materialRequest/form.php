@@ -1260,7 +1260,7 @@
             newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
             newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
             newRow.append($('<td style="text-align:center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align:center;">').text(v.no_aju));
+            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju} | ${v.no_daftar}`));
             newRow.append($('<td style="text-align:center;">').text(v.stock_date));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
             newRow.append($('<td style="text-align:center;">').text(v.satuan));
