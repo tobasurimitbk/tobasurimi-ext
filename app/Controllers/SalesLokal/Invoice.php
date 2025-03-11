@@ -1335,7 +1335,7 @@ class Invoice extends BaseController
         $currentYear = date('y'); // Get last two digits of the year
         $currentMonth = date('n'); // Get numeric month without leading zeros
         $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
-        $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
+        $numberTemplate = $code . "/" . $currentYear . "/" . $romawi[$currentMonth] . "/";
 
         $lastData = $this->SalesOrderInvoiceModel->asObject()
             // ->where('id_company', $this->this_company_id)
