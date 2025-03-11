@@ -31,12 +31,14 @@ class Customer extends BaseController
     protected $soInvModel;
     protected $CompanyModel;
     protected $countryModel;
+    protected $is_admin;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->this_user_id = session()->get("login")->user_id;
+        $this->is_admin = session()->get("login")->is_admin;
         $this->ProvincesModel = new ProvincesModel();
         $this->CustomerModel = new CustomerModel();
         $this->BanksModel = new BanksModel();
@@ -540,10 +542,21 @@ class Customer extends BaseController
             "sortType" => $this->request->getVar("sortType"),
         ];
 
-        $condition = [
-            'tipe_customer' => $this->request->getVar('tipe_customer'),
-            'customers.deletedAt' => null,
-        ];
+        if ($this->is_admin == '1') {
+            $condition = [
+                'tipe_customer' => $this->request->getGet('tipe_customer'),
+                'customers.deletedAt' => null,
+            ];
+            $dataCompanyUserLogin = $this->CompanyModel->getCompaniesUserLogin();
+        } else {
+            $condition = [
+                'tipe_customer' => $this->request->getGet('tipe_customer'),
+                'customers.deletedAt' => null,
+                'customers.user_id' => session()->get('login')->user_id
+            ];
+            $dataCompanyUserLogin = [$this->this_company_id];
+        }
+
 
         $addCondition = [
             "search"        => $this->request->getGet("search") != '' ? $this->request->getGet("search") : '',
@@ -552,7 +565,6 @@ class Customer extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
         ];
 
-        $dataCompanyUserLogin = $this->CompanyModel->getCompaniesUserLogin();
         $customerData = $this->CustomerModel->getList($condition, $dataCompanyUserLogin, $addCondition, 10000000, 0);
 
         $list = [];

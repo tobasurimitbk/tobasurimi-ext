@@ -70,12 +70,11 @@ class LocalPOPaymentPinjamanModel extends Model
         return $list;
     }
 
-    public function getTotalPembayaranPinjaman($pinjamanId, $type)
+    public function getTotalPembayaranPinjaman($pinjamanId)
     {
         $condition = [
             'deletedAt' => null,
             'pinjaman_id' => $pinjamanId,
-            'type'  => $type
         ];
         $selectQry = "sum(bayar_pinjaman) as total_bayar_pinjaman";
         $totalBayarPinjaman = $this
@@ -151,46 +150,57 @@ class LocalPOPaymentPinjamanModel extends Model
         return $list;
     }
 
-    public function getPembayaranPinjamanDetailsbyIdandType($id, $type)
+    public function getPembayaranPinjamanDetailsbyIdandType($id = null, $type)
     {
-        $condition = [
-            'local_po_payment_pinjaman.local_po_payment_id' => $id,
-            'type'  => $type
-        ];
+        if ($id) {
+            $condition = [
+                'local_po_payment_pinjaman.local_po_payment_id' => $id,
+                'local_po_payment_pinjaman.type'  => $type,
+            ];
 
-        $selectQry = "local_po_payment_pinjaman.id, pinjaman_supplier.no_pinjaman, pinjaman_supplier.payment_date, pinjaman_supplier.total_pinjaman, local_po_payment_pinjaman.pinjaman_id,
-        local_po_payment_pinjaman.bayar_pinjaman, sum(local_po_payment_pinjaman.bayar_pinjaman) as total_bayar_pinjaman";
+            $selectQry = "local_po_payment_pinjaman.id, pinjaman_supplier.no_pinjaman, pinjaman_supplier.payment_date, pinjaman_supplier.total_pinjaman, local_po_payment_pinjaman.pinjaman_id,
+            local_po_payment_pinjaman.bayar_pinjaman, sum(local_po_payment_pinjaman.bayar_pinjaman) as total_bayar_pinjaman, local_po_payment_pinjaman.akun_kas, local_po_payment_pinjaman.akun_selisih, local_po_payment_pinjaman.keterangan,
+            akun_kas.nama_sub as akun_kas_name,  akun_selisih.nama_sub as akun_selisih_name";
 
-        $result = $this
-            ->select($selectQry)
-            ->join('pinjaman_supplier', 'local_po_payment_pinjaman.pinjaman_id = pinjaman_supplier.id')
-            ->join('local_po_payment_bp', 'local_po_payment_bp.id = local_po_payment_pinjaman.local_po_payment_id')
-            ->groupBy('local_po_payment_pinjaman.pinjaman_id')
-            ->where($condition)
-            ->findAll();
+            $result = $this
+                ->select($selectQry)
+                ->join('pinjaman_supplier', 'local_po_payment_pinjaman.pinjaman_id = pinjaman_supplier.id')
+                ->join('sub_akuns as akun_kas', 'local_po_payment_pinjaman.akun_kas = akun_kas.id', 'left')
+                ->join('sub_akuns as akun_selisih', 'local_po_payment_pinjaman.akun_selisih = akun_selisih.id', 'left')
+                ->groupBy('local_po_payment_pinjaman.pinjaman_id')
+                ->where($condition)
+                ->findAll();
+        } else {
+            // Jika $id null, ambil data hanya dari pinjaman_supplier tanpa join
+            $pinjamanSupplier = new PinjamanSupplierModel();
 
-            if (empty($result)) {
-                $pinjamanSupplier = new PinjamanSupplierModel();
-    
-                $dataPinjaman = $pinjamanSupplier->select("local_po_payment_pinjaman.id, pinjaman_supplier.no_pinjaman, pinjaman_supplier.payment_date, pinjaman_supplier.total_pinjaman, local_po_payment_pinjaman.pinjaman_id,
-                local_po_payment_pinjaman.bayar_pinjaman, sum(local_po_payment_pinjaman.bayar_pinjaman) as total_bayar_pinjaman")
-                            ->where("pinjaman_supplier.type_pinjaman", "BP")
-                            ->join('local_po_payment_pinjaman', 'local_po_payment_pinjaman.id = pinjaman_supplier.id', 'left')
-                            ->findAll();
-                
-                $result = $dataPinjaman;
-            }
-
-        foreach ($result as $i => $r) {
-            $totalPembayaranPinjaman = $this->getTotalPembayaranPinjaman($r['pinjaman_id'], "BP");
-            $result[$i]['payment_date'] = date('d/m/Y', strtotime($r['payment_date']));
-
-
-            $result[$i]['total_pembayaran'] = $totalPembayaranPinjaman;
+            $result = $pinjamanSupplier
+                ->select("id, no_pinjaman, payment_date, total_pinjaman")
+                ->findAll();
         }
 
+        if (empty($result)) {
+            $pinjamanSupplier = new PinjamanSupplierModel();
 
+            $dataPinjaman = $pinjamanSupplier->select("id, no_pinjaman, payment_date, total_pinjaman")
+                                        ->findAll();
+        }
+
+        if (empty($dataPinjaman)) {
+            foreach ($result as $i => $r) {
+                $totalPembayaranPinjaman = $this->getTotalPembayaranPinjaman($r['pinjaman_id']);
+                $result[$i]['payment_date'] = date('d/m/Y', strtotime($r['payment_date']));
+                $result[$i]['akun_kas'] = $r['akun_kas'];
+                $result[$i]['akun_selisih'] = $r['akun_selisih'];
+                $result[$i]['akun_kas_name'] = $r['akun_kas_name'];
+                $result[$i]['akun_selisih_name'] = $r['akun_selisih_name'];
+                $result[$i]['keterangan'] = $r['keterangan'];
+                $result[$i]['total_pembayaran'] = $totalPembayaranPinjaman;
+            }
+        } else {
+            $result = $dataPinjaman;
+        }
 
         return $result;
-    }
+    } 
 }

@@ -5,9 +5,20 @@
 <section class="section">
     <div class="section-header">
         <h1>Master Barang Sales Ekspor</h1>
-        <button class="btn btn-show-form btn-add float-right">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </button>
+        <?php if (can('Penjualan Ekspor', 'Master Barang', 'p')) : ?>
+            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 20px;">
+                Import / Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <li><button class="dropdown-item btn-upload-excel-master-barang-ekspor">Import Excel</button></li>
+                <li><button class="dropdown-item" onclick="exportExcel()">Export Excel</button></li>
+            </ul>
+        <?php endif; ?>
+        <?php if (can('Penjualan Ekspor', 'Master Barang', 'c')): ?>
+            <button class="btn btn-show-form btn-add float-right">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </button>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -116,15 +127,38 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
-                <button type="submit" class="btn btn-submit-form">Simpan</button>
-                <?php if (can('Penjualan Lokal', 'Master Barang', 'd')) : ?>
+                <button type="submit" class="btn btn-submit-form" id="btn-submit-form">Simpan</button>
+                <?php if (can('Penjualan Ekspor', 'Master Barang', 'd')) : ?>
                     <button type="button" class="btn btn-discard delete-btn">Hapus</button>
                 <?php endif; ?>
             </div>
         </div>
     </div>
 </div>
-
+<div class="modal" id="import_master_barang_ekspor" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Master Barang</h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary text-black" role="alert">
+                    UNDUH TEMPLEATE EXCEL <a href="<?= base_url('assets/import/IMPORT_MASTER_BARANG_SALES_EKSPOR.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                </div>
+                <form class="form-excel-master-barang-ekspor" method="post">
+                    <input type="hidden" name="type_barang_sales" value="EKSPOR">
+                    <div class="form-floating" style="height: 50px;">
+                        <input type="file" name="file" id="file" accept=".xlsx" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard mr-2" id="btn-discard-import-excel-master-barang-ekspor">Kembali</button>
+                <button type="submit" class="btn btn-submit-form" id="btn-submit-excel-master-barang-ekspor">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     let sort = "createdAt";
     let sortType = "desc";
@@ -214,6 +248,73 @@
         }
     });
 
+    $('.btn-upload-excel-master-barang-ekspor').click(function() {
+        $('#import_master_barang_ekspor').modal('show');
+    });
+
+    $('#btn-discard-import-excel-master-barang-ekspor').click(function() {
+        $('#import_master_barang_ekspor').modal('hide');
+    });
+
+    $('#btn-submit-excel-master-barang-ekspor').click(function() {
+        Swal.fire({
+            icon: 'question',
+            title: 'Import Excel?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let csrf = $(`[name="${csrfToken}"]`);
+                let formData = new FormData(document.querySelector(".form-excel-master-barang-ekspor"));
+                $.ajax({
+                    url: "<?= base_url("master-barang-internasional/import-excel"); ?>",
+                    data: formData,
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then(() => {
+                                table.ajax.reload();
+                                $('#import_master_barang_ekspor').modal('hide');
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            });
+                        }
+                    },
+                });
+
+            }
+        })
+    });
+
+    const exportExcel = function() {
+        var url = "<?= base_url('master-barang-internasional/export-excel') ?>";
+        window.open(url + `?sort=${sort}&sortType=${sortType}&`, "_blank");
+    }
+
+
     var validator = $(".create-form").validate({
         rules: {
             kode_barang: {
@@ -277,7 +378,7 @@
         },
     });
 
-    $('.btn-submit-form').click(function() {
+    $('#btn-submit-form').click(function() {
         if ($('.create-form').valid()) {
             let id = $('.id').val();
             let data = new FormData(document.querySelector('.create-form'));

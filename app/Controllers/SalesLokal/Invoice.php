@@ -159,10 +159,10 @@ class Invoice extends BaseController
             //     $statusPembayaranInvoice = "BELUM LUNAS";
             // }
 
-            if ($data->status_pelunasan = "PAID") {
-                $statusPembayaranInvoice = "LUNAS";
-            } else {
+            if ($data->status_pelunasan = "UNPAID") {
                 $statusPembayaranInvoice = "BELUM LUNAS";
+            } else {
+                $statusPembayaranInvoice = "LUNAS";
             }
 
             if ($data->id) {

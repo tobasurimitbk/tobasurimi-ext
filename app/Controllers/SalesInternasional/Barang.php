@@ -7,6 +7,9 @@ use App\Models\BarangMasterSalesModel;
 use App\Models\MetadataModel;
 use App\Models\SatuansModel;
 use Exception;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Barang extends BaseController
 {
@@ -60,7 +63,7 @@ class Barang extends BaseController
             'type_barang' => $this->request->getVar('type_barang'),
             'satuan_id' => $this->request->getVar('satuan_id'),
             // 'harga_pokok' => repairDouble($this->request->getVar('harga_pokok')),
-            'harga_jual' => repairDouble($this->request->getVar('harga_jual'))
+            'harga_jual' => $this->request->getVar('harga_jual')
         ]);
 
         return response()->setJSON([
@@ -97,7 +100,7 @@ class Barang extends BaseController
             'type_barang_sales' => "EKSPOR",
             'satuan_id' => $this->request->getVar('satuan_id'),
             // 'harga_pokok' => repairDouble($this->request->getVar('harga_pokok')),
-            'harga_jual' => repairDouble($this->request->getVar('harga_jual'))
+            'harga_jual' => $this->request->getVar('harga_jual')
         ]);
 
         return response()->setJSON([
@@ -169,8 +172,8 @@ class Barang extends BaseController
                 "kode_barang"       => $data['kode_barang'],
                 "barang_name"       => $data['barang_name'],
                 "type_barang_sales" => $data['type_barang_sales'],
-                'kode_satuan'       => $data['kode_satuan'],
-                "type_barang"       => strtoupper(str_replace('_', ' ', $data['type_barang'])),
+                'kode_satuan'       => $data['kode_satuan'] . " (" . $data['nama_satuan'] . ")",
+                "type_barang"       => strtoupper(str_replace('_', ' ', $data['type_barang'] == "bahan_jadi" ? "barang_jadi" : "kemasan")),
                 "harga_pokok"       => floatval($data['harga_pokok']),
                 "harga_jual"        => floatval($data['harga_jual']),
             ]);
@@ -231,5 +234,160 @@ class Barang extends BaseController
                 'token' => csrf_hash()
             ]);
         }
+    }
+
+    public function importExcel()
+    {
+        $rules = [
+            "file" => [
+                'rules' => 'uploaded[file]|ext_in[file,xlsx]',
+                'errors' => [
+                    'uploaded' => 'Tidak ada file yang di-upload.',
+                    'ext_in' => 'File yang di-upload harus berupa file Excel (.xlsx).',
+                ],
+
+            ],
+        ];
+
+
+        if ($this->validate($rules)) {
+            $file = $this->request->getFile('file');
+            $tipeBarangSales = $this->request->getVar('type_barang_sales');
+
+            $spreadsheet = IOFactory::load($file);
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $data = [];
+            $rowIterator = $worksheet->getRowIterator(2);
+            foreach ($rowIterator as $row) {
+                $cellIterator = $row->getCellIterator();
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+                $data[] = $rowData;
+            }
+
+
+            $berhasilTotal = 0;
+
+            for ($i = 0; $i < count($data); $i++) {
+
+                $kodeBarang = trim($data[$i][0]);
+                $namaBarang = trim($data[$i][1]);
+                $tipeBarang = trim($data[$i][2]);
+                $kodeSatuan = trim($data[$i][3]);
+                $hargaJual = trim($data[$i][4]);
+
+                $satuan =  $this->satuanModel->where('kode_satuan', $kodeSatuan)->first();
+                $kodeBarangCheck = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->where('kode_barang', $kodeBarang)->first();
+
+                if ($satuan != null && $kodeBarangCheck == null) {
+                    $this->barangMasterSalesModel->insert([
+                        'company_id' => $this->this_company_id,
+                        'kode_barang' => $kodeBarang,
+                        'type_barang' => $tipeBarang == "BARANG JADI" ? "bahan_jadi" : "kemasan",
+                        'barang_name' => $namaBarang,
+                        'type_barang_sales' => $tipeBarangSales,
+                        'satuan_id' => $satuan['id'],
+                        'harga_jual' => $hargaJual
+                    ]);
+
+                    $berhasilTotal++;
+                }
+            }
+
+            return response()->setJSON([
+                'message' => "Berhasil Import : $berhasilTotal Data",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } else {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash()
+            ];
+            return response()->setJSON($data);
+        }
+    }
+
+    public function exportExcel()
+    {
+        $payload = [
+            "pageSize" => 10000000,
+            "currentPage" => 1,
+            "sort" => $this->request->getVar("sort"),
+            "sortType" => $this->request->getVar("sortType"),
+        ];
+
+        $condition = [
+            "barang_master_sales.company_id"  => $this->this_company_id,
+            "barang_master_sales.type_barang_sales" => "EKSPOR",
+            "barang_master_sales.deletedAt" => NULL,
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            'type_barang'   => ''
+        ];
+
+        $dataResult = $this->barangMasterSalesModel->getList($condition, $addCondition, 10000000, 0);
+
+        $list = [];
+
+        foreach ($dataResult['data'] as $data) {
+            array_push($list, [
+                "kode_barang"       => $data['kode_barang'],
+                "barang_name"       => $data['barang_name'],
+                "type_barang_sales" => $data['type_barang_sales'],
+                'kode_satuan'       => $data['kode_satuan'],
+                "type_barang"       => strtoupper(str_replace('_', ' ', $data['type_barang'] == "bahan_jadi" ? "barang_jadi" : "kemasan")),
+                "harga_jual"        => floatval($data['harga_jual']),
+            ]);
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $column = 2;
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'KODE BARANG')
+            ->setCellValue('B1', 'NAMA BARANG')
+            ->setCellValue('C1', 'TIPE BARANG')
+            ->setCellValue('D1', 'KODE SATUAN')
+            ->setCellValue('E1', 'HARGA JUAL');
+
+        foreach ($list as $l) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $column, $l['kode_barang'])
+                ->setCellValue('B' . $column, $l['barang_name'])
+                ->setCellValue('C' . $column, $l['type_barang'])
+                ->setCellValue('D' . $column, $l['kode_satuan'])
+                ->setCellValue('E' . $column, $l['harga_jual']);
+
+            $sheet->getColumnDimension('A')->setAutoSize(true);
+            $sheet->getColumnDimension('B')->setAutoSize(true);
+            $sheet->getColumnDimension('C')->setAutoSize(true);
+            $sheet->getColumnDimension('D')->setAutoSize(true);
+            $sheet->getColumnDimension('E')->setAutoSize(true);
+
+            $column++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Export_Data_Master_Barang_Sales';
+        foreach (range('A', 'E') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
     }
 }
