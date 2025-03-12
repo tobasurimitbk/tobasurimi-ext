@@ -149,7 +149,7 @@
                                 <th style="text-align: center;">#</th>
                                 <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Pabean</th>
-                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">No Aju / No Daftar</th>
                                 <th style="text-align: center;">Tanggal Penerimaan</th>
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
@@ -185,7 +185,7 @@
                                 <th style="text-align: center;">Warehouse</th>
                                 <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Pabean</th>
-                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">No Aju / No Daftar</th>
                                 <th style="text-align: center;">Tanggal Penerimaan</th>
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
@@ -217,7 +217,7 @@
                                 <th style="text-align: center;">Warehouse</th>
                                 <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Pabean</th>
-                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">No Aju / No Daftar</th>
                                 <th style="text-align: center;">Tanggal Penerimaan</th>
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
@@ -248,7 +248,7 @@
                                 <th style="text-align: center;">Warehouse</th>
                                 <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Pabean</th>
-                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">No Aju / No Daftar</th>
                                 <th style="text-align: center;">Tanggal Penerimaan</th>
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>
@@ -280,7 +280,7 @@
                                 <th style="text-align: center;">Warehouse</th>
                                 <th style="text-align: center;">Tipe Barang</th>
                                 <th style="text-align: center;">Dokumen Pabean</th>
-                                <th style="text-align: center;">No Aju</th>
+                                <th style="text-align: center;">No Aju / No Daftar</th>
                                 <th style="text-align: center;">Tanggal Penerimaan</th>
                                 <th style="text-align: center;">Barang - Spesifikasi</th>
                                 <th style="text-align: center;">Satuan</th>

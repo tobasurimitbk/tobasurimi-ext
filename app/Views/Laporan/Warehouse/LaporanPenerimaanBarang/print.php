@@ -112,7 +112,7 @@
             <th>Jenis Doc</th>
             <th>Tanggal Doc</th>
             <th>No Daftar</th>
-            <th>No Aju</th>
+            <th style="text-align: center;">No Aju / No Daftar</th>
             <th>No Bukti</th>
             <th>Tanggal Bukti</th>
             <th>No Order</th>
