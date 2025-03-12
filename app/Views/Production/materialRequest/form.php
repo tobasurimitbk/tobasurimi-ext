@@ -1260,7 +1260,7 @@
             newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
             newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
             newRow.append($('<td style="text-align:center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju} | ${v.no_daftar}`));
+            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} | ${v.no_daftar ? v.no_daftar : '-'}`));
             newRow.append($('<td style="text-align:center;">').text(v.stock_date));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
             newRow.append($('<td style="text-align:center;">').text(v.satuan));
@@ -1604,7 +1604,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju} | ${v.no_daftar}`));
+            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} | ${v.no_daftar ? v.no_daftar : '-'}`));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
@@ -1712,7 +1712,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju} | ${v.no_daftar}`));
+            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} | ${v.no_daftar ? v.no_daftar : '-'}`));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
@@ -1798,7 +1798,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju} | ${v.no_daftar}`));
+            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} | ${v.no_daftar ? v.no_daftar : '-'}`));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
@@ -1884,7 +1884,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju} | ${v.no_daftar}`));
+            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} | ${v.no_daftar ? v.no_daftar : '-'}`));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
