@@ -5,7 +5,7 @@
 <section class="section">
     <div class="section-header">
         <?php if (isset($ids)) { ?>
-            <h1 class="title-name">Edit Material Request</h1>
+            <h1 class="title-name">Update Material Request</h1>
         <?php } else { ?>
             <h1 class="title-name">Tambah Material Request</h1>
         <?php } ?>
@@ -47,11 +47,9 @@
             <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" value="<?= !empty($ids) ? $ids : ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
-                <div class="col-subtitle-modal">
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <label class="form-label font-weight-bold modal-sub-title">Data Produksi</label>
-                        </div>
+                <div class="row mt-3">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Data Produksi</label>
                     </div>
                 </div>
                 <div class="row">
@@ -83,11 +81,9 @@
                         </div>
                     </div> -->
                 </div>
-                <div class="col-subtitle-modal">
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <label class="form-label font-weight-bold modal-sub-title">Header Request</label>
-                        </div>
+                <div class="row mt-3">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Data Header Request</label>
                     </div>
                 </div>
                 <div class="row">
@@ -118,11 +114,9 @@
                     </div>
                 </div>
             </form>
-            <div class="col-subtitle-modal">
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label class="form-label font-weight-bold modal-sub-title">Data Barang</label>
-                    </div>
+            <div class="row mt-3">
+                <div class="col mb-3">
+                    <label class="form-label font-weight-bold lable-title">Data Barang yang Dimutasikan</label>
                 </div>
             </div>
             <div class="row">
@@ -229,7 +223,7 @@
             <div class="row">
                 <div class="col-md-12 col-table-button-tts">
                     <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts dataTable" id="dataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="text-align: center;">#</th>
@@ -250,7 +244,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row mt-3">
                 <div class="col-sm-2">
                     <button class="btn btn-show-detail btn-add btn-submit-barang" data-btn="detail-modal" id="select-item-btn">
                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Barang
@@ -259,14 +253,15 @@
             </div>
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
-                    <div class="col-md-6">
+                    <div class="col mb-3">
                         <label class="form-label font-weight-bold modal-sub-title">Data Barang Penolong Request</label>
                     </div>
                 </div>
             </div>
+
             <div class="row mt-3">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTableBahan" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts dataTable" id="selectedItemTableBahan" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center;">No</th>
