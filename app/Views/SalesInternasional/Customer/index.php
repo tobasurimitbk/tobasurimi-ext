@@ -89,11 +89,11 @@
         <?php endif; ?>
         <?php if (can('Penjualan Ekspor', 'Customer', 'p')) : ?>
             <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 20px;">
-                Import / Export
+                Import
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
                 <li><button class="dropdown-item btn-upload-excel-customer-global">Import Excel</button></li>
-                <li><button class="dropdown-item" onclick="exportExcel('INTERNASIONAL')">Export Excel</button></li>
+                <!-- <li><button class="dropdown-item" onclick="exportExcel('INTERNASIONAL')">Export Excel</button></li> -->
             </ul>
         <?php endif; ?>
     </div>
