@@ -65,7 +65,7 @@
             <tr>
                 <th>No</th>
                 <th>Tanggal</th>
-                <th>No Aju</th>
+                <th style="text-align: center;">No Aju / No Daftar</th>
                 <th>No Daftar</th>
                 <th>No Bukti Bayar</th>
                 <th>Tanggal Bukti Bayar</th>

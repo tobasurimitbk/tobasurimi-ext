@@ -173,7 +173,7 @@
                                 <th>Kode</th>
                                 <th>Barang</th>
                                 <th>Dokumen Pabean</th>
-                                <th>No Aju</th>
+                                <th style="text-align: center;">No Aju / No Daftar</th>
                                 <th>QTY</th>
                                 <th>Action</th>
                             </tr>

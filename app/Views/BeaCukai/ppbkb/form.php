@@ -211,7 +211,7 @@
                                         <th style="text-align: center;">Qty Mutasi</th>
                                         <th style="text-align: center;">Satuan</th>
                                         <th style="text-align: center;">Dokumen Pemasukan</th>
-                                        <th style="text-align: center;">No Aju</th>
+                                        <th style="text-align: center;">No Aju / No Daftar</th>
                                         <th style="text-align: center;">Tanggal Masuk</th>
                                         <th style="text-align: center;">Action</th>
 

@@ -218,7 +218,7 @@
                                         <th style="text-align: center;">No Dokumen</th>
                                         <th style="text-align: center;">Supplier</th>
                                         <th style="text-align: center;">Dokumen Pabean</th>
-                                        <th style="text-align: center;">No Aju</th>
+                                        <th style="text-align: center;">No Aju / No Daftar</th>
                                         <th style="text-align: center;">Tanggal Penerimaan</th>
                                         <th style="text-align: center;">Barang - Spesifikasi</th>
                                         <th style="text-align: center;">Satuan</th>
