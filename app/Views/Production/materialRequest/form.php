@@ -5,7 +5,7 @@
 <section class="section">
     <div class="section-header">
         <?php if (isset($ids)) { ?>
-            <h1 class="title-name">Edit Material Request</h1>
+            <h1 class="title-name">Update Material Request</h1>
         <?php } else { ?>
             <h1 class="title-name">Tambah Material Request</h1>
         <?php } ?>
@@ -47,11 +47,10 @@
             <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" value="<?= !empty($ids) ? $ids : ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
-                <div class="col-subtitle-modal">
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <label class="form-label font-weight-bold modal-sub-title">Data Produksi</label>
-                        </div>
+
+                <div class="row mt-3">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Data Produksi</label>
                     </div>
                 </div>
                 <div class="row">
@@ -83,11 +82,9 @@
                         </div>
                     </div> -->
                 </div>
-                <div class="col-subtitle-modal">
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <label class="form-label font-weight-bold modal-sub-title">Header Request</label>
-                        </div>
+                <div class="row mt-3">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Header Request</label>
                     </div>
                 </div>
                 <div class="row">
@@ -118,11 +115,9 @@
                     </div>
                 </div>
             </form>
-            <div class="col-subtitle-modal">
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label class="form-label font-weight-bold modal-sub-title">Data Barang</label>
-                    </div>
+            <div class="row mt-3">
+                <div class="col mb-3">
+                    <label class="form-label font-weight-bold lable-title">Data Barang yang Dimutasikan</label>
                 </div>
             </div>
             <div class="row">
@@ -237,7 +232,7 @@
             <div class="row">
                 <div class="col-md-12 col-table-button-tts">
                     <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-form-tts" id="dataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="text-align: center;">#</th>
@@ -258,159 +253,164 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row mt-3 mb-3">
                 <div class="col-sm-2">
                     <button class="btn btn-show-detail btn-add btn-submit-barang" data-btn="detail-modal" id="select-item-btn">
                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Barang
                     </button>
                 </div>
             </div>
-            <div class="col-subtitle-modal">
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label class="form-label font-weight-bold modal-sub-title">Data Bahan Baku Request</label>
+            <ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="home-tab" data-toggle="tab" data-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">
+                        Data Bahan Baku Request
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="profile-tab" data-toggle="tab" data-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">
+                        Data Barang Scrap Request
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="contact-tab" data-toggle="tab" data-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
+                        Data Barang Setengah Jadi Request
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="contact-tab" data-toggle="tab" data-target="#contact1" type="button" role="tab" aria-controls="contact" aria-selected="false">
+                        Data Barang Jadi Request
+                    </button>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <div class="row mt-3">
+                        <div class="table-responsive">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts dataTable" id="selectedItemTableBahanBaku" width="100%" cellspacing="0">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th style="text-align: center;">No</th>
+                                        <th style="text-align: center;">Department</th>
+                                        <th style="text-align: center;">Warehouse</th>
+                                        <th style="text-align: center;">Tipe Barang</th>
+                                        <th style="text-align: center;">Dokumen Pabean</th>
+                                        <th style="text-align: center;">No Aju / No Daftar</th>
+                                        <th style="text-align: center;">Tanggal Penerimaan</th>
+                                        <th style="text-align: center;">Barang - Spesifikasi</th>
+                                        <th style="text-align: center;">Satuan</th>
+                                        <th style="text-align: center;">Qty Awal</th>
+                                        <th style="text-align: center;">Qty Direquest</th>
+                                        <!-- <th style="text-align: center;">Qty Sortir</th> -->
+                                        <th style="text-align: center;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body-table">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold total-bahan-baku-request">Total Bahan Baku Request : <span class="nilai-total-bahan-baku-request">0</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                    <div class="row mt-3">
+                        <div class="table-responsive">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts dataTable" id="selectedItemTableBahan" width="100%" cellspacing="0">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th style="text-align: center;">No</th>
+                                        <th style="text-align: center;">Department</th>
+                                        <th style="text-align: center;">Warehouse</th>
+                                        <th style="text-align: center;">Tipe Barang</th>
+                                        <th style="text-align: center;">Dokumen Pabean</th>
+                                        <th style="text-align: center;">No Aju / No Daftar</th>
+                                        <th style="text-align: center;">Tanggal Penerimaan</th>
+                                        <th style="text-align: center;">Barang - Spesifikasi</th>
+                                        <th style="text-align: center;">Satuan</th>
+                                        <th style="text-align: center;">Qty Awal</th>
+                                        <th style="text-align: center;">Qty Direquest</th>
+                                        <th style="text-align: center;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body-table">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold total-barang-scrap-request">Total Barang Scrap Request : <span class="nilai-total-barang-scrap-request">0</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                    <div class="row mt-3">
+                        <div class="table-responsive">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts dataTable" id="selectedItemTableBahanSetengahJadi" width="100%" cellspacing="0">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th style="text-align: center;">No</th>
+                                        <th style="text-align: center;">Department</th>
+                                        <th style="text-align: center;">Warehouse</th>
+                                        <th style="text-align: center;">Tipe Barang</th>
+                                        <th style="text-align: center;">Dokumen Pabean</th>
+                                        <th style="text-align: center;">No Aju / No Daftar</th>
+                                        <th style="text-align: center;">Tanggal Penerimaan</th>
+                                        <th style="text-align: center;">Barang - Spesifikasi</th>
+                                        <th style="text-align: center;">Satuan</th>
+                                        <th style="text-align: center;">Qty Awal</th>
+                                        <th style="text-align: center;">Qty Direquest</th>
+                                        <th style="text-align: center;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body-table">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold total-barang-setengah-jadi-request">Total Barang Setengah Jadi Request : <span class="nilai-total-barang-setengah-jadi-request">0</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="contact1" role="tabpanel" aria-labelledby="contact-tab">
+                    <div class="row mt-3">
+                        <div class="table-responsive">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts dataTable" id="selectedItemTableBahanJadi" width="100%" cellspacing="0">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th style="text-align: center;">No</th>
+                                        <th style="text-align: center;">Department</th>
+                                        <th style="text-align: center;">Warehouse</th>
+                                        <th style="text-align: center;">Tipe Barang</th>
+                                        <th style="text-align: center;">Dokumen Pabean</th>
+                                        <th style="text-align: center;">No Aju / No Daftar</th>
+                                        <th style="text-align: center;">Tanggal Penerimaan</th>
+                                        <th style="text-align: center;">Barang - Spesifikasi</th>
+                                        <th style="text-align: center;">Satuan</th>
+                                        <th style="text-align: center;">Qty Kaleng</th>
+                                        <th style="text-align: center;">Qty Kaleng Direquest</th>
+                                        <th style="text-align: center;">Qty Isi Direquest</th>
+                                        <th style="text-align: center;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body-table">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold total-barang-jadi-request">Total Barang Jadi Request : <span class="nilai-total-barang-jadi-request">0</span></label>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="row mt-3">
-                <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTableBahanBaku" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th style="text-align: center;">No</th>
-                                <th style="text-align: center;">Department</th>
-                                <th style="text-align: center;">Warehouse</th>
-                                <th style="text-align: center;">Tipe Barang</th>
-                                <th style="text-align: center;">Dokumen Pabean</th>
-                                <th style="text-align: center;">No Aju / No Daftar</th>
-                                <th style="text-align: center;">Tanggal Penerimaan</th>
-                                <th style="text-align: center;">Barang - Spesifikasi</th>
-                                <th style="text-align: center;">Satuan</th>
-                                <th style="text-align: center;">Qty Awal</th>
-                                <th style="text-align: center;">Qty Direquest</th>
-                                <!-- <th style="text-align: center;">Qty Sortir</th> -->
-                                <th style="text-align: center;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-table">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-md-6">
-                    <label class="form-label font-weight-bold total-bahan-baku-request">Total Bahan Baku Request : <span class="nilai-total-bahan-baku-request">0</span></label>
-                </div>
-            </div>
-            <div class="col-subtitle-modal">
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label class="form-label font-weight-bold modal-sub-title">Data Barang Scrap Request</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTableBahan" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th style="text-align: center;">No</th>
-                                <th style="text-align: center;">Department</th>
-                                <th style="text-align: center;">Warehouse</th>
-                                <th style="text-align: center;">Tipe Barang</th>
-                                <th style="text-align: center;">Dokumen Pabean</th>
-                                <th style="text-align: center;">No Aju / No Daftar</th>
-                                <th style="text-align: center;">Tanggal Penerimaan</th>
-                                <th style="text-align: center;">Barang - Spesifikasi</th>
-                                <th style="text-align: center;">Satuan</th>
-                                <th style="text-align: center;">Qty Awal</th>
-                                <th style="text-align: center;">Qty Direquest</th>
-                                <th style="text-align: center;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-table">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-md-6">
-                    <label class="form-label font-weight-bold total-barang-scrap-request">Total Barang Scrap Request : <span class="nilai-total-barang-scrap-request">0</span></label>
-                </div>
-            </div>
-            <div class="col-subtitle-modal">
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label class="form-label font-weight-bold modal-sub-title">Data Barang Setengah Jadi Request</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTableBahanSetengahJadi" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th style="text-align: center;">No</th>
-                                <th style="text-align: center;">Department</th>
-                                <th style="text-align: center;">Warehouse</th>
-                                <th style="text-align: center;">Tipe Barang</th>
-                                <th style="text-align: center;">Dokumen Pabean</th>
-                                <th style="text-align: center;">No Aju / No Daftar</th>
-                                <th style="text-align: center;">Tanggal Penerimaan</th>
-                                <th style="text-align: center;">Barang - Spesifikasi</th>
-                                <th style="text-align: center;">Satuan</th>
-                                <th style="text-align: center;">Qty Awal</th>
-                                <th style="text-align: center;">Qty Direquest</th>
-                                <th style="text-align: center;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-table">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-md-6">
-                    <label class="form-label font-weight-bold total-barang-setengah-jadi-request">Total Barang Setengah Jadi Request : <span class="nilai-total-barang-setengah-jadi-request">0</span></label>
-                </div>
-            </div>
-            <div class="col-subtitle-modal">
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label class="form-label font-weight-bold modal-sub-title">Data Barang Jadi Request</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTableBahanJadi" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th style="text-align: center;">No</th>
-                                <th style="text-align: center;">Department</th>
-                                <th style="text-align: center;">Warehouse</th>
-                                <th style="text-align: center;">Tipe Barang</th>
-                                <th style="text-align: center;">Dokumen Pabean</th>
-                                <th style="text-align: center;">No Aju / No Daftar</th>
-                                <th style="text-align: center;">Tanggal Penerimaan</th>
-                                <th style="text-align: center;">Barang - Spesifikasi</th>
-                                <th style="text-align: center;">Satuan</th>
-                                <th style="text-align: center;">Qty Kaleng</th>
-                                <th style="text-align: center;">Qty Kaleng Direquest</th>
-                                <th style="text-align: center;">Qty Isi Direquest</th>
-                                <th style="text-align: center;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-table">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-md-6">
-                    <label class="form-label font-weight-bold total-barang-jadi-request">Total Barang Jadi Request : <span class="nilai-total-barang-jadi-request">0</span></label>
-                </div>
-            </div>
+
         </div>
     </div>
 </section>
@@ -453,7 +453,8 @@
                     type_barang: '<?= $materialRequestDetails->barang_type ?>',
                     type_barang_text: '<?= $materialRequestDetails->barang_type_text ?>',
                     warehouseID: '<?= $materialRequestDetails->warehouse_id ?>',
-                    warehouseText: '<?= $materialRequestDetails->warehouse_text ?>'
+                    warehouseText: '<?= $materialRequestDetails->warehouse_text ?>',
+                    no_daftar: '<?= $materialRequestDetails->no_daftar ?>'
                 });
             <?php } else if ($materialRequestDetails->barang_type == "bahan_jadi") { ?>
                 listStockSelectedBahanJadi.push({
@@ -478,7 +479,8 @@
                     type_barang: '<?= $materialRequestDetails->barang_type ?>',
                     type_barang_text: '<?= $materialRequestDetails->barang_type_text ?>',
                     warehouseID: '<?= $materialRequestDetails->warehouse_id ?>',
-                    warehouseText: '<?= $materialRequestDetails->warehouse_text ?>'
+                    warehouseText: '<?= $materialRequestDetails->warehouse_text ?>',
+                    no_daftar: '<?= $materialRequestDetails->no_daftar ?>'
                 });
             <?php } else if ($materialRequestDetails->barang_type == "bahan_setengah_jadi") { ?>
                 listStockSelectedBahanSetengahJadi.push({
@@ -503,7 +505,8 @@
                     type_barang: '<?= $materialRequestDetails->barang_type ?>',
                     type_barang_text: '<?= $materialRequestDetails->barang_type_text ?>',
                     warehouseID: '<?= $materialRequestDetails->warehouse_id ?>',
-                    warehouseText: '<?= $materialRequestDetails->warehouse_text ?>'
+                    warehouseText: '<?= $materialRequestDetails->warehouse_text ?>',
+                    no_daftar: '<?= $materialRequestDetails->no_daftar ?>'
                 });
             <?php } else { ?>
                 listStockSelectedBahan.push({
@@ -528,7 +531,8 @@
                     type_barang: '<?= $materialRequestDetails->barang_type ?>',
                     type_barang_text: '<?= $materialRequestDetails->barang_type_text ?>',
                     warehouseID: '<?= $materialRequestDetails->warehouse_id ?>',
-                    warehouseText: '<?= $materialRequestDetails->warehouse_text ?>'
+                    warehouseText: '<?= $materialRequestDetails->warehouse_text ?>',
+                    no_daftar: '<?= $materialRequestDetails->no_daftar ?>'
                 });
             <?php } ?>
         <?php endforeach; ?>
@@ -1260,7 +1264,7 @@
             newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
             newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
             newRow.append($('<td style="text-align:center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} | ${v.no_daftar ? v.no_daftar : '-'}`));
+            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
             newRow.append($('<td style="text-align:center;">').text(v.stock_date));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
             newRow.append($('<td style="text-align:center;">').text(v.satuan));
@@ -1278,7 +1282,7 @@
             "initComplete": function(settings, json) {
                 $('.dataTables_length').empty();
                 $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+
             },
             lengthMenu: [
                 [100],
@@ -1604,7 +1608,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} | ${v.no_daftar ? v.no_daftar : '-'}`));
+            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
@@ -1644,7 +1648,7 @@
             initComplete: function(settings, json) {
                 $('.dataTables_length').empty();
                 $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+
             },
             display: "stripe",
             searching: false,
@@ -1712,7 +1716,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} | ${v.no_daftar ? v.no_daftar : '-'}`));
+            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
@@ -1742,7 +1746,7 @@
             "initComplete": function(settings, json) {
                 $('.dataTables_length').empty();
                 $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+
             },
             display: "stripe",
             searching: false,
@@ -1798,7 +1802,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} | ${v.no_daftar ? v.no_daftar : '-'}`));
+            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
@@ -1828,7 +1832,7 @@
             "initComplete": function(settings, json) {
                 $('.dataTables_length').empty();
                 $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+
             },
             display: "stripe",
             searching: false,
@@ -1884,7 +1888,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} | ${v.no_daftar ? v.no_daftar : '-'}`));
+            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
@@ -1919,7 +1923,7 @@
             "initComplete": function(settings, json) {
                 $('.dataTables_length').empty();
                 $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+
             },
             display: "stripe",
             searching: false,

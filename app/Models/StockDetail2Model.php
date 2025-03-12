@@ -976,4 +976,44 @@ class StockDetail2Model extends Model
 
         return $dataQry;
     }
+
+    public function getNomorDaftar($noAju, $bcId)
+    {
+        $bc23Model = new BC23Model();
+        $bc40Model = new BC40Model();
+        $bc27Model = new BC27Model();
+        $ppbkbModel = new PPBKBModel();
+        $metaDataModel = new MetadataModel();
+
+        $bcType = $metaDataModel->find($bcId);
+        $noDaftar = "";
+        if ($bcType == "NON PABEAN") {
+            // NON PABEAN
+            $noDaftar = "-";
+        } elseif ($bcId == 48) {
+            // BC 2.3
+            $bcDetail = $bc23Model->select('no_daftar, bc_purchase_order.createdAt as tanggal_dokumen')
+                ->join('bc_purchase_order', 'bc_purchase_order.id = bc_23.bc_purchase_order_id', 'left')
+                ->where('no_aju', $noAju)
+                ->first();
+            $noDaftar = $bcDetail != null ? $bcDetail['no_daftar'] : "-";
+        } elseif ($bcId == 52) {
+            // BC 2.7
+            $bcDetail = $bc27Model->where('no_aju', $noAju)->first();
+            $noDaftar = $bcDetail != null ? $bcDetail['no_daftar'] : "-";
+        } elseif ($bcId == 53) {
+            // BC 4.0
+            $bcDetail = $bc40Model->select('no_daftar, bc_purchase_order.createdAt as tanggal_dokumen')
+                ->join('bc_purchase_order', 'bc_purchase_order.id = bc_40.bc_purchase_order_id', 'left')
+                ->where('no_aju', $noAju)
+                ->first();
+            $noDaftar = $bcDetail != null ? $bcDetail['no_daftar'] : "-";
+        } elseif ($bcId == 1426) {
+            // PPBKB
+            $bcDetail = $ppbkbModel->where('no_ppbkb', $noAju)->first();
+            $noDaftar = $bcDetail != null ? $bcDetail['no_daftar'] : "-";
+        }
+
+        return $noDaftar;
+    }
 }
