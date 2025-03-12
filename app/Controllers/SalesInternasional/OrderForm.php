@@ -307,6 +307,13 @@ class OrderForm extends BaseController
     {
         $dataSalesKontrakFilter = [];
         $id = $this->request->getGet("id");
+        if (empty($id)) {
+            return response()->setJSON([
+                'data' => [],
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        }
         // $dataSalesKontrak = $this->salesKontrakModel->getSalesKontrak($this->this_user_id);
         $dataSalesKontrakDetail = $this->salesKontrakDetailModel->detail($id);
         // var_dump($id);
