@@ -109,7 +109,7 @@
                                 <option value=""></option>
                                 <?php if (!empty($customers)): ?>
                                     <?php foreach ($customers as $cus): ?>
-                                        <option <?= (!empty($detail)) ?  (($detail['customer_id']) == $cus['id'] ? "selected" : "") : '' ?> value="<?= encrypt($cus['id']); ?>"><?= $cus['name']; ?></option>
+                                        <option <?= !empty($detail) ?  ( encrypt($detail['customer_id']) == $cus['id'] ? "selected" : "") : '' ?> value="<?= encrypt($cus['id']); ?>"><?= $cus['name']; ?></option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>

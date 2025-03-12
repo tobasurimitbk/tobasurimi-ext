@@ -1199,8 +1199,6 @@ class PembayaranInvoice extends BaseController
                 ->select('customers.id, customers.name') // Pilih kolom yang diperlukan
                 ->join('sales_order_invoice', 'sales_order_invoice.id_customer = customers.id', 'left') // Perbaiki kondisi join
                 ->where('sales_order_invoice.deletedAt', null)
-                ->where('sales_order_invoice.status_pelunasan', 'UNPAID')
-                ->where('sales_order_invoice.id_company', $this->this_company_id)
                 ->where('customers.company_id', $this->this_company_id)
                 ->where('customers.deletedAt', null)
                 ->groupBy('customers.id')
@@ -1217,8 +1215,6 @@ class PembayaranInvoice extends BaseController
                 "dokumenList" => $dokumenList,
                 "detail" => $this->pembayaranInvoiceModel->getPembayaranInvoiceDetail($id),
             ];
-            // var_dump($data['detail']);
-            // die;
             return view('Pembayaran/pembayaranInvoice/formLokal', $data);
         } elseif ($tipe_invoice == "EKSPOR") {
             $salesOrderExportData = $this->salesOrderExportModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll();
