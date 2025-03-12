@@ -441,7 +441,7 @@ class StokAdjusment extends BaseController
             for ($i = 0; $i < count($dataResult); $i++) {
                 $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
 
-                if ($bcType != "PABEAN") {
+                if ($bcType == "NON PABEAN") {
                     // NON PABEAN
                     $noDaftar = "-";
                 } elseif ($dataResult[$i]['bc_id'] == 48) {
