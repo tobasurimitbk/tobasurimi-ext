@@ -478,7 +478,7 @@ class StokAdjusment extends BaseController
                 $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
                 $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
                 $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
-                $dataResult[$i]['no_daftar'] = $noDaftar;
+                $dataResult[$i]['no_daftar'] = $noDaftar == "-" ? "-" : $noDaftar;
             }
             return response()->setJSON([
                 'data' => $dataResult,
