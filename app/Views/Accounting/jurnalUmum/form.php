@@ -467,11 +467,14 @@
 
                 for (let i = 0; i < listJurnal.length; i++) {
                     if (listJurnal[i].jenis_transaksi == "debit") {
-                        totalDebit += listJurnal[i].jumlah_idr;
+                        totalDebit += parseFloat(listJurnal[i].jumlah_idr);
                     } else {
-                        totalKredit += listJurnal[i].jumlah_idr;
+                        totalKredit += parseFloat(listJurnal[i].jumlah_idr);
                     }
                 }
+
+                totalDebit = totalDebit.toFixed(2);
+                totalKredit = totalKredit.toFixed(2);
 
                 if (totalKredit == totalDebit) {
                     Swal.fire({
@@ -728,8 +731,8 @@
         row_detail += `
                     <tr>
                         <td colspan="7" style="text-align: right;"><b>GRAND TOTAL</b></td>
-                        <td style="text-align: center;"><b>${greatFormatRupiah(debitTotal)}</b></td>
-                        <td style="text-align: center;"><b>${greatFormatRupiah(kreditTotal)}</b></td>
+                        <td style="text-align: center;"><b>${greatFormatRupiah(debitTotal.toFixed(2))}</b></td>
+                        <td style="text-align: center;"><b>${greatFormatRupiah(kreditTotal.toFixed(2))}</b></td>
                         <td></td>
                     </tr>
                 `;

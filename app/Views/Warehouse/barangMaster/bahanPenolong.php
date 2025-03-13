@@ -500,7 +500,7 @@
             debounce(function() {
                 let query = $(this).val();
 
-                if (query.length >= 3) {
+                if (query.length >= 2) {
                     table.ajax.reload(null, false);
                 } else if (query.length === 0) {
                     table.ajax.reload(); // Reload untuk menghapus filter jika input kosong

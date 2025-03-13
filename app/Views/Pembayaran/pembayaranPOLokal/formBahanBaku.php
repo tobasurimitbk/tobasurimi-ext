@@ -1404,7 +1404,6 @@
             newRow.append($('<td style="text-align:center;">').text(v.total_qty_diterima));
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_tagihan)));
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_paid)));
-            // newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.sisa_pembayaran)));
             newRow.append($('<td class="hidden" style="display:none;">').html(
                 `
                         <input  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="${v.total_tagihan}" name = "pembayaran" style="height:40px">
@@ -1468,8 +1467,6 @@
 
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>GRAND TOTAL</b></td>'));
-        // newRow.append($('<td style="text-align:center;"></td>'));
-        // newRow.append($('<td style="text-align:center;"><b>' + greatFormatRupiahPayment(TotalHarga) + '</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
             '<input autocomplete="one-time-code" data-id=""  class="form-control grand-total" type="text"  value="" name = "grand_total" readonly>' +
             '</b></td>'));
@@ -1538,7 +1535,7 @@
             tablePanjar.find('tbody').empty();
 
             $.each(data, function(i, v) {
-                if (v.sisa_panjar_number > 0) {
+                if (v.sisa_panjar_number > 0 || v.pembayaran_id != "NULL") {
                     found = true;
 
                     var newRow = $('<tr style="color:whitesmoke;">');
@@ -1610,7 +1607,7 @@
             tablePinjaman.find('tbody').empty();
 
             $.each(data, function(i, v) {
-                if (v.sisa_pinjaman_number > 0) {
+                if (v.sisa_pinjaman_number > 0 || v.pembayaran_id != "NULL") {
                     found = true;
 
                     var newRow = $('<tr style="color:whitesmoke;">');
@@ -1684,7 +1681,7 @@
 
             $.each(data, function(i, v) {
                 
-                if (v.sisa_panjar_number > 0) {
+                if (v.sisa_panjar_number > 0 || v.pembayaran_id != "NULL") {
                     found = true;
 
                     var newRow = $('<tr style="color:whitesmoke;">');
@@ -1887,22 +1884,21 @@
         var totalBayarPinjaman = 0;
         var totalBayarPanjarTB = 0;
 
-        if ($(".total-bayar-panjar").length && TotalPanjar > 0) {
+        if ($(".total-bayar-panjar").length) {
             totalBayarPanjar = destroyFormatRupiahPayment($(".total-bayar-panjar").val()) || 0;
         }
 
-        if ($(".total-bayar-pinjaman").length && TotalPinjaman > 0) {
+        if ($(".total-bayar-pinjaman").length) {
             totalBayarPinjaman = destroyFormatRupiahPayment($(".total-bayar-pinjaman").val()) || 0;
         }
         
-        if ($(".total-bayar-panjar-tb").length && TotalPanjarTB > 0) {
+        if ($(".total-bayar-panjar-tb").length) {
             totalBayarPanjarTB = destroyFormatRupiahPayment($(".total-bayar-panjar-tb").val()) || 0;
         }
 
         var totalPembayaran = destroyFormatRupiahPayment($(".total-pembayaran").val()) || 0;
         var potongan = destroyFormatRupiahPayment($("#potongan").val()) || 0;
-
-        var total = totalPembayaran - totalBayarPanjar - totalBayarPinjaman - totalBayarPanjarTB - potongan;
+        var total = totalPembayaran - (totalBayarPanjar + totalBayarPinjaman + totalBayarPanjarTB + potongan);
 
         $(".grand-total").val(greatFormatRupiahPayment(total)); 
     }

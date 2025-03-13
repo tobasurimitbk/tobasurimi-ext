@@ -174,18 +174,20 @@ class MaterialRequest extends BaseController
                 // ->groupBy('material_request_details.barang1_id, material_request_details.barang2_id, material_request_details.stock_tujuan_id')
                 ->get()->getResult();
             foreach ($dataMaterialRequestDetails as $key => &$value) {
+                // Penambahan Nomor Daftar
+                $value->no_daftar = $this->stockDetail2Model->getNomorDaftar($value->no_aju, $value->bc_id);
                 if ($value->barang_type == "bahan_baku") {
-                    $value->barang_type_text = "Bahan Baku";
+                    $value->barang_type_text = "BAHAN BAKU";
                 } elseif ($value->barang_type == "bahan_penolong") {
-                    $value->barang_type_text = "Bahan Penolong";
+                    $value->barang_type_text = "BAHAN PENOLONG";
                 } elseif ($value->barang_type == "bahan_jadi") {
-                    $value->barang_type_text = "Bahan Jadi";
+                    $value->barang_type_text = "BARANG JADI";
                 } elseif ($value->barang_type == "bahan_scrap") {
-                    $value->barang_type_text = "Bahan Scrap";
+                    $value->barang_type_text = "BARANG SCRAP";
                 } elseif ($value->barang_type == "bahan_modal") {
-                    $value->barang_type_text = "Bahan Modal";
+                    $value->barang_type_text = "BARANG MODAL";
                 } elseif ($value->barang_type == "bahan_setengah_jadi") {
-                    $value->barang_type_text = "Bahan Setengah Jadi";
+                    $value->barang_type_text = "BARANG SETENGAH JADI";
                 }
             }
             $data["dataMaterialRequests"] = $dataMaterialRequests;

@@ -477,7 +477,6 @@ class JasaVendorOut extends BaseController
         if (!empty($this->request->getVar('stock_id')) && !empty($this->request->getVar('supplier_id'))) {
             $condition = [
                 'stock_details2.supplier_id' => $this->request->getVar('supplier_id'),
-                'stock_details.sumber' => "LPB"
             ];
             $dataResult = $this->stockDetail2Model->getStockListWithAddCondition(
                 $this->request->getVar('stock_id'),

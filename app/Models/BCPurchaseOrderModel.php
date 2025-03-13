@@ -95,21 +95,24 @@ class BCPurchaseOrderModel extends Model
             // PO LOKAL BAHAN BAKU
             $po = $penerimaanBarangModel
                 ->select('
-                    penerimaan_barang.tanggal AS lpb_date,
-                    penerimaan_barang.no_penerimaan_barang,
-                    penerimaan_barang_detail.penerimaan_barang_id,
-                    penerimaan_barang_detail.purchase_order_id,
-                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
-                    SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
-                    SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
-                    SUM(penerimaan_barang_detail.qty) AS qty_po,
-                    SUM(penerimaan_barang_detail.sub_total) AS sub_total,
-                    penerimaan_barang_detail.barang_id,
-                    rm_purchase_orders.po_no,
-                    rm_purchase_orders.po_date,
-                    CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang_name,
-                    barang_master.kode_barang
-                ')
+                penerimaan_barang.tanggal AS lpb_date,
+                penerimaan_barang.no_penerimaan_barang,
+                penerimaan_barang_detail.penerimaan_barang_id,
+                penerimaan_barang_detail.purchase_order_id,
+                penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
+                SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
+                SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
+                SUM(penerimaan_barang_detail.qty) AS qty_po,
+                SUM(penerimaan_barang_detail.sub_total) AS sub_total,
+                penerimaan_barang_detail.barang_id,
+                rm_purchase_orders.po_no,
+                rm_purchase_orders.po_date,
+                CONCAT(
+                    barang_master.barang_name, " ", 
+                    IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ", "), "")
+                ) AS barang_name, 
+                barang_master.kode_barang
+            ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('rm_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
@@ -122,8 +125,8 @@ class BCPurchaseOrderModel extends Model
                 ->where('penerimaan_barang_detail.deletedAt', null)
                 ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
                 // ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
-                ->groupBy('penerimaan_barang_id')
-                ->groupBy('penerimaan_barang_detail.spesifikasi_id')
+                ->groupBy('penerimaan_barang_detail.penerimaan_barang_id')
+                ->groupBy('penerimaan_barang_detail.barang_id')
                 ->findAll();
         } else if ($first['po_type'] == "LOKAL PENOLONG") {
             // PO LOKAL BAHAN PENOLONG

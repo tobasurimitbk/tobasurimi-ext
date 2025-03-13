@@ -1937,7 +1937,7 @@ class BC40 extends BaseController
                     rm_purchase_orders.total_before_pph as sub_total,
                     barang_master.barang_name,
                     barang_master.kode_barang,
-                    barang_master_spesifikasi.spesifikasi
+                    GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ", ") AS spesifikasi
                 ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('rm_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
@@ -1956,7 +1956,7 @@ class BC40 extends BaseController
             }
 
             $poQry->groupBy('penerimaan_barang.id');
-            $poQry->groupBy('penerimaan_barang_detail.spesifikasi_id');
+            $poQry->groupBy('penerimaan_barang_detail.barang_id');
             $poQry->orderBy('rm_purchase_orders.po_date', "DESC");
 
             if (!empty($startDate) || $startDate != '') {
@@ -2118,6 +2118,18 @@ class BC40 extends BaseController
         }
 
         foreach ($po as $p) {
+            // if ($poType == "LOKAL BAKU") {
+            //     // Khusus Bahan Baku Spek nya jadi satu dibuat koma
+            //     $penerimaanBarangDetail = $this->penerimaanBarangDetailModel->select('barang_master_spesifikasi.spesifikasi')
+            //         ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+            //         ->where('penerimaan_barang_detail.penerimaan_barang_id', $p['id'])
+            //         ->where('penerimaan_barang_detail.deletedAt', null)
+            //         ->findAll();
+            //     $p['spesifikasi'] = "";
+            //     foreach ($penerimaanBarangDetail as $d) {
+            //         $p['spesifikasi'] = $d['spesifikasi'] . ", ";
+            //     }
+            // }
             if ($isAll) {
                 $result[] = [
                     'penerimaan_barang_id' => $p['id'],
@@ -2130,7 +2142,7 @@ class BC40 extends BaseController
                     'barang_id' => $p['barang_id'],
                     'po_no' => $p['po_no'],
                     'po_date' => date('d/m/Y', strtotime($p['po_date'])),
-                    'barang_name' => $p['barang_name'] . " " . $p['spesifikasi'],
+                    'barang_name' => $p['barang_name'] . " - " . $p['spesifikasi'],
                     'kode_barang' => $p['kode_barang'],
                     'harga' => number_format($p['sub_total'], 2),
                     'harga_number' => $p['sub_total'],
@@ -2149,7 +2161,7 @@ class BC40 extends BaseController
                         'barang_id' => $p['barang_id'],
                         'po_no' => $p['po_no'],
                         'po_date' => date('d/m/Y', strtotime($p['po_date'])),
-                        'barang_name' => $p['barang_name'] . " " . $p['spesifikasi'],
+                        'barang_name' => $p['barang_name'] . " - " . $p['spesifikasi'],
                         'kode_barang' => $p['kode_barang'],
                         'harga' => number_format($p['sub_total'], 2),
                         'harga_number' => $p['sub_total'],

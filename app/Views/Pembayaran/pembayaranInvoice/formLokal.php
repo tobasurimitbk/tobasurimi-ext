@@ -69,7 +69,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? 'disabled value="' . $detail['no_pembayaran'] . '"' : '' ?>>
+                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? 'value="' . $detail['no_pembayaran'] . '"' : '' ?>>
                                     <label for="floatingInput">No. Pembayaran</label>
                                 </div>
                                 <div class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -109,7 +109,7 @@
                                 <option value=""></option>
                                 <?php if (!empty($customers)): ?>
                                     <?php foreach ($customers as $cus): ?>
-                                        <option <?= (!empty($detail)) ?  (($detail['customer_id']) == $cus['id'] ? "selected" : "") : '' ?> value="<?= encrypt($cus['id']); ?>"><?= $cus['name']; ?></option>
+                                        <option <?= !empty($detail) ?  ( encrypt($detail['customer_id']) == $cus['id'] ? "selected" : "") : '' ?> value="<?= encrypt($cus['id']); ?>"><?= $cus['name']; ?></option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
