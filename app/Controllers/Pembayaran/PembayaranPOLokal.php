@@ -405,7 +405,6 @@ class PembayaranPOLokal extends BaseController
             $panjarTBList = json_decode($this->request->getVar('panjarTBList'));
             $pembayaranList = json_decode($this->request->getVar('pembayaranList'), true);
 
-
             $poIDAmt = json_decode($this->request->getVar('poIDList'));
             $poNOAmt = json_decode($this->request->getVar('poNoList'));
             $poIDArr = [];
@@ -562,7 +561,7 @@ class PembayaranPOLokal extends BaseController
             foreach ($pembayaranList as $l) {
                  $localPOPaymentDetailModel->insert([
                     "local_po_payment_id"          => $id,
-                    "rm_purchase_order_id"         => intval($l['rm_purchase_order_id']),
+                    "rm_purchase_order_id"         => $l['rm_purchase_order_id'],
                     "total"                        => $l['total_paid']
                 ]);
             }
@@ -591,12 +590,13 @@ class PembayaranPOLokal extends BaseController
             $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
             $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
             $localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
-            
-            $id = $this->request->getVar('id');
+
+            $id = decrypt($this->request->getVar('id'));
             $panjarList = json_decode($this->request->getVar('panjarList'));
             $pinjamanList = json_decode($this->request->getVar('pinjamanList'));
             $panjarTBList = json_decode($this->request->getVar('panjarTBList'));
             $pembayaranList = json_decode($this->request->getVar('pembayaranList'), true);
+
 
             $poIDAmt = json_decode($this->request->getVar('poIDList'));
             $poNOAmt = json_decode($this->request->getVar('poNoList'));
@@ -649,13 +649,20 @@ class PembayaranPOLokal extends BaseController
             ]);
     
             // Hapus detail pembayaran lama sebelum insert baru
+            // Hapus detail pembayaran lama sebelum insert baru
             $localPOPaymentDetailModel->where('local_po_payment_id', $id)->delete();
-            foreach ($pembayaranList as $l) {
-                $localPOPaymentDetailModel->insert([
-                    "local_po_payment_id" => $id,
-                    "rm_purchase_order_id" => intval($l['rm_purchase_order_id']),
-                    "total" => $l['total_paid']
-                ]);
+            $validPembayaranList = array_filter($pembayaranList, function($item) {
+                return isset($item["rm_purchase_order_id"]);
+            });
+            
+            if (!empty($validPembayaranList)) {
+                foreach ($validPembayaranList as $l) {
+                    $localPOPaymentDetailModel->insert([
+                        "local_po_payment_id" => $id,
+                        "rm_purchase_order_id" => $l["rm_purchase_order_id"],
+                        "total" => $l["total_paid"],
+                    ]);
+                }
             }
     
             // Hapus dan update panjar
