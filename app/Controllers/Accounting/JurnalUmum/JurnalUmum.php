@@ -342,7 +342,6 @@ class JurnalUmum extends BaseController
 
         try {
             $db->transBegin();
-
             $this->transaksiJurnalModel->update($id, [
                 'no_transaksi' => $this->request->getVar('no_bukti'),
                 'tanggal_transaksi' =>  $this->request->getVar("tanggal_transaksi") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_transaksi")))) : "",
@@ -356,8 +355,8 @@ class JurnalUmum extends BaseController
                 'valas' => $valas,
                 'valas_id' => $valasId,
                 'exchange_rate' => $exchangeRate,
-                'total_debit' => $this->request->getVar('totalDebit'),
-                'total_kredit' => $this->request->getVar('totalKredit'),
+                'total_debit' => floatval($this->request->getVar('totalDebit')),
+                'total_kredit' => floatval($this->request->getVar('totalKredit')),
             ]);
 
             // Delete All
