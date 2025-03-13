@@ -66,11 +66,13 @@ class AccountSupplierController extends BaseController
         if ($this->is_admin == 1) {
             $condition = [
                 "suppliers.company_id"  => $this->this_company_id,
+                "account_supplier.company_id"  => $this->this_company_id,
                 "suppliers.deletedAt" => NULL
             ];
         } else {
             $condition = [
                 "suppliers.company_id"  => $this->this_company_id,
+                "account_supplier.company_id"  => $this->this_company_id,
                 "suppliers.deletedAt" => NULL,
                 "suppliers.user_id" => $this->this_user_id
             ];

@@ -43,8 +43,8 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data" onSubmit="return false">
-                    <input autocomplete="one-time-code" type="text" class="id" name="id" id="id" />
-                    <input autocomplete="one-time-code" type="text" class="form-control supplier_id" name="supplier_id" id="supplier_id">
+                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="one-time-code" type="hidden" class="form-control supplier_id" name="supplier_id" id="supplier_id">
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6">
