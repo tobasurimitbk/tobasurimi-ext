@@ -72,7 +72,7 @@ class AccountSupplierController extends BaseController
         } else {
             $condition = [
                 "suppliers.company_id"  => $this->this_company_id,
-                "account_supplier.company_id"  => $this->this_company_id,
+                // "account_supplier.company_id"  => $this->this_company_id,
                 "suppliers.deletedAt" => NULL,
                 "suppliers.user_id" => $this->this_user_id
             ];
