@@ -208,14 +208,14 @@
                     <div class="col-md-12">
                         <nav>
                             <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                                <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-jadi" type="button" role="tab" aria-controls="nav-barang-jadi" aria-selected="true">Barang Jadi</button>
-                                <!-- <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-setengah-jadi" type="button" role="tab" aria-controls="nav-barang-setengah-jadi" aria-selected="false">Barang Setengah Jadi</button> -->
+                                <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-material-request" type="button" role="tab" aria-controls="nav-barang-jadi" aria-selected="true">Barang Jadi</button>
                                 <button class="nav-link" id="nav-scrap-tab" data-bs-toggle="tab" data-bs-target="#nav-scrap" type="button" role="tab" aria-controls="nav-scrap" aria-selected="false">Scrap</button>
                                 <button class="nav-link" id="nav-filling-tab" data-bs-toggle="tab" data-bs-target="#nav-filling" type="button" role="tab" aria-controls="nav-filling" aria-selected="false">Sisa Produksi</button>
+                                <button class="nav-link" id="nav-barang-jadi-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-jadi" type="button" role="tab" aria-controls="nav-barang-setengah-jadi" aria-selected="false">Barang Setengah Jadi</button>
                             </div>
                         </nav>
                         <div class="tab-content mt-3" id="nav-tabContent">
-                            <div class="tab-pane fade show active" id="nav-barang-jadi" role="tabpanel" aria-labelledby="nav-home-tab">
+                            <div class="tab-pane fade show active" id="nav-barang-material-request" role="tabpanel" aria-labelledby="nav-home-tab">
                                 <div class="col-subtitle-modal">
                                     <div class="row mt-3">
                                         <div class="col-md-12 text-left">
@@ -245,43 +245,6 @@
                                                 <tbody class="body-table-barang-digunakan" id="body-table-barang-digunakan">
                                                 </tbody>
                                                 <tfoot id="tfoot-barang-digunakan">
-                                                </tfoot>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-subtitle-modal">
-                                    <div class="row mt-3">
-                                        <div class="col-md-10">
-                                            <label class="form-label font-weight-bold modal-sub-title">Daftar Barang Jadi</label>
-                                        </div>
-                                        <div class="col-md-2 text-right">
-                                            <button class="btn btn-show-detail btn-add btn-add-barang-jadi" type="button">
-                                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered nowrap table-hover-tobasurimi tableBarangJadi" id="tableBarangJadi" width="100%" cellspacing="0">
-                                                <thead class="thead-dark text-center">
-                                                    <tr>
-                                                        <th style="width: 10px;">No</th>
-                                                        <th>Kode Barang</th>
-                                                        <th>Jenis Barang</th>
-                                                        <th>Nama Barang</th>
-                                                        <th>Satuan</th>
-                                                        <th>Qty Hasil</th>
-                                                        <th>Berat Isi</th>
-                                                        <th>Qty dalam KG</th>
-                                                        <th></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody class="body-table-barang-jadi" id="body-table-barang-jadi">
-                                                </tbody>
-                                                <tfoot class="tfoot-table-barang-jadi" id="tfoot-barang-jadi">
                                                 </tfoot>
                                             </table>
                                         </div>
@@ -437,6 +400,45 @@
                                         <tfoot class="tfoot-table-barang-filling" id="tfoot-barang-filling">
                                         </tfoot>
                                     </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade show" id="nav-barang-jadi" role="tabpanel" aria-labelledby="nav-barang-jadi-tab">
+                                <div class="col-subtitle-modal">
+                                    <div class="row mt-3">
+                                        <div class="col-md-10">
+                                            <label class="form-label font-weight-bold modal-sub-title">Daftar Barang Jadi</label>
+                                        </div>
+                                        <div class="col-md-2 text-right">
+                                            <button class="btn btn-show-detail btn-add btn-add-barang-jadi" type="button">
+                                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered nowrap table-hover-tobasurimi tableBarangJadi" id="tableBarangJadi" width="100%" cellspacing="0">
+                                                <thead class="thead-dark text-center">
+                                                    <tr>
+                                                        <th style="width: 10px;">No</th>
+                                                        <th>Kode Barang</th>
+                                                        <th>Jenis Barang</th>
+                                                        <th>Nama Barang</th>
+                                                        <th>Satuan</th>
+                                                        <th>Qty Hasil</th>
+                                                        <th>Berat Isi</th>
+                                                        <th>Qty dalam KG</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="body-table-barang-jadi" id="body-table-barang-jadi">
+                                                </tbody>
+                                                <tfoot class="tfoot-table-barang-jadi" id="tfoot-barang-jadi">
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

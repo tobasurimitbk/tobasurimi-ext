@@ -16,6 +16,7 @@ class AccountSupplierModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'supplier_id',
+        'company_id',
         'ap_id',
         'ar_id',
         'deleted_at',
@@ -58,11 +59,11 @@ class AccountSupplierModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "account_supplier.*, 
-        suppliers.name AS name";
+        suppliers.name AS name, suppliers.id AS id_supplier";
         $accountSupplierDataQry = $this->asObject()
             ->select($selectQry)
-            ->where("deleted_at", NULL)
-            ->join('suppliers', 'account_supplier.supplier_id = suppliers.id', 'left')
+            ->where($condition)
+            ->join('suppliers', 'account_supplier.supplier_id = suppliers.id', 'right')
             // ->groupBy(('customers.id'))
             ->orderBy($sort, $sortType);
 

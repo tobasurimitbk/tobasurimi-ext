@@ -539,13 +539,14 @@ class MaterialRequest extends BaseController
             if (!empty($id)) {
 
                 $this->materialRequestModel->update($id, $payload);
-                
+
                 $data = [
                     "status"    => true,
+                    "id"    => $this->request->getVar('id'),
                     "message"   => "Status Posting Berhasil Diperbaharui",
                     'token'     => csrf_hash()
                 ];
-                
+
                 echo json_encode($data);
             } else {
                 $data = [

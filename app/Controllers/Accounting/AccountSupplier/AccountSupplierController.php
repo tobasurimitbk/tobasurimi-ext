@@ -97,40 +97,30 @@ class AccountSupplierController extends BaseController
 
         foreach ($res['data'] as $data) {
             // var_dump($data);
-            // exit;
-            foreach ($subAkunsModel as $datas) {
-                if ($data->ap_id == $datas->id) {
-                    $dataNamaAP = $datas->no_sub;
-                } elseif ($data->ap_id == NULL) {
-                    $dataNamaAP = "-";
-                }
-                if ($data->ar_id == $datas->id) {
-                    $dataNamaAR = $datas->no_sub;
-                } elseif ($data->ar_id == NULL) {
-                    $dataNamaAR = "-";
-                }
-            }
-
-            if ($data->name) {
-                $dataNamaSupplier = $data->name;
-            } else {
-                if ($data->type == "BAHAN BAKU") {
-                    $dataNamaSupplier = "DEFAULT BAHAN BAKU";
-                } else if ($data->type == "BAHAN PENOLONG") {
-                    $dataNamaSupplier = "DEFAULT BAHAN PENOLONG";
-                } else if ($data->type == "INTERNASIONAL") {
-                    $dataNamaSupplier = "DEFAULT INTERNASIONAL";
-                }
-            }
+            $dataNamaAP = $data->ap_id ? $this->Sub_AkunsModel->find($data->ap_id)['no_sub'] : '-';
+            $dataNamaAR = $data->ar_id ? $this->Sub_AkunsModel->find($data->ar_id)['no_sub'] : '-';
+            // foreach ($subAkunsModel as $datas) {
+            //     if ($data->ap_id == $datas->id) {
+            //     } elseif ($data->ap_id == NULL) {
+            //         $dataNamaAP = "-";
+            //     }
+            //     if ($data->ar_id == $datas->id) {
+            //         $dataNamaAR = $datas->no_sub;
+            //     } elseif ($data->ar_id == NULL) {
+            //         $dataNamaAR = "-";
+            //     }
+            // }
 
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => $data->id,
-                "customer_name"           => $dataNamaSupplier,
+                "supplier_name"         => $data->name,
+                "id_supplier"           => $data->id_supplier,
                 "ap_id"                 => $dataNamaAP,
                 "ar_id"                 => $dataNamaAR,
             ]);
         }
+        // exit;
 
         $data = [
             "draw"              => intval($this->request->getGet("draw")),
@@ -161,8 +151,8 @@ class AccountSupplierController extends BaseController
 
         $this->AccountSupplierModel->insert([
             'supplier_id' => $this->request->getVar('supplier_id'),
-            'ap_id' => $this->request->getVar('akun_ap_id'),
-            'ar_id' => $this->request->getVar('akun_ar_id')
+            'company_id' => $this->this_company_id,
+            'ap_id' => $this->request->getVar('akun_ap_id')
         ]);
 
         return response()->setJSON([
@@ -178,8 +168,8 @@ class AccountSupplierController extends BaseController
 
         $this->AccountSupplierModel->update($id, [
             'supplier_id' => $this->request->getVar('supplier_id'),
-            'ap_id' => $this->request->getVar('akun_ap_id'),
-            'ar_id' => $this->request->getVar('akun_ar_id')
+            'company_id' => $this->this_company_id,
+            'ap_id' => $this->request->getVar('akun_ap_id')
         ]);
 
         return response()->setJSON([

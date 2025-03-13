@@ -1201,6 +1201,8 @@
                     dataType: "json",
                     success: function(response) {
                         csrf.val(response.token);
+                        console.log(response);
+
                         if (response.status) {
                             Swal.fire({
                                     icon: 'success',
