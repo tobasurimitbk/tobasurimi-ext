@@ -103,10 +103,10 @@ class BCPurchaseOrderModel extends Model
                 SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
                 SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                 SUM(penerimaan_barang_detail.qty) AS qty_po,
-                SUM(penerimaan_barang_detail.sub_total) AS sub_total,
                 penerimaan_barang_detail.barang_id,
                 rm_purchase_orders.po_no,
                 rm_purchase_orders.po_date,
+                rm_purchase_orders.total_before_pph as sub_total,
                 CONCAT(
                     barang_master.barang_name, " ", 
                     IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ", "), "")

@@ -1425,6 +1425,7 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->post('id/update-no-aju', 'BeaCukai\BC40::updateNoAju');
     $routes->post('id/delete', 'BeaCukai\BC40::delete');
     $routes->get('api/kirim-dokumen/(:segment)', 'BeaCukai\BC40::kirimCeisa/$1');
+    $routes->post('id/update-no-aju-bulk', 'BeaCukai\BC40::updateNoAjuBulk');
 });
 
 // BC 2.7

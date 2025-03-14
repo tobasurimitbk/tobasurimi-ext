@@ -11,6 +11,11 @@
             <a class="btn btn-info btn-print float-right text-white" href="<?= base_url('bea-cukai-bc-40/id/header/' . encrypt($bcPo['id'])) ?>">
                 Form Ceisa
             </a>
+            <?php if ($bcPo['status_posting']): ?>
+                <button class="btn btn-show-form btn-save float-right" id="btn_update_no_aju_no_daftar">
+                    Ubah No Aju & No Daftar
+                </button>
+            <?php endif; ?>
             <?php if ($bcPo['status_posting'] === "0") : ?>
                 <button class="btn btn-hapus delete-parent float-right" onclick="deleteAction()">
                     Hapus
@@ -31,7 +36,7 @@
         </div>
         <div class="card-body">
             <form class="create-form">
-                <input type="hidden" name="bc_purchase_order_id" value="<?= $bcPo['id'] ?>">
+                <input type="hidden" id="bc_purchase_order_id" name="bc_purchase_order_id" value="<?= $bcPo['id'] ?>">
                 <input type="hidden" name="po_type" value="<?= $bcPo['po_type']; ?>">
                 <input type="hidden" name="supplier_id" value="<?= $bcPo['supplier_id']; ?>">
                 <?= csrf_field() ?>
@@ -60,11 +65,11 @@
                     <div class="col-sm-4">
                         <div class="input-group">
                             <div class="form-floating mb-3">
-                                <input value="<?= $noAju ?>" readonly type="text" class="form-control" placeholder="">
+                                <input value="<?= $noAju ?>" readonly type="text" class="form-control bg-white" id="no_pengajuan_preview" placeholder="">
                                 <label>Nomor Pengajuan</label>
                             </div>
                             <div class="input-group-append" style="height:50px;">
-                                <button <?= $bcPo['status_posting'] === "1" ? 'disabled' : '' ?> class="btn btn-success btn-customer-add" id="btn-customer-add" data-toggle="modal" type="button" onclick="noAjuShowModal()">
+                                <button class="btn btn-success btn-customer-add" id="btn-customer-add" data-toggle="modal" type="button" onclick="noAjuShowModal()">
                                     <i class="fas fa-pencil-alt"></i>
                                 </button>
                             </div>
@@ -72,14 +77,14 @@
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3">
-                            <input <?= $bcPo['status_posting'] === "1" ? 'disabled' : '' ?> value="<?= $bcPo['no_daftar'] ?>" autocomplete="one-time-code" type="number" class="form-control no_daftar" id="no_daftar" name="no_daftar" placeholder="No Daftar">
+                            <input value="<?= $bcPo['no_daftar'] ?>" autocomplete="one-time-code" type="number" class="form-control no_daftar" id="no_daftar" name="no_daftar" placeholder="No Daftar">
                             <label for="floatingInput">Nomor Daftar</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3">
-                                <input <?= !empty($bcPo) ? ($bcPo['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bcPo) ? date('d/m/Y', strtotime($bcPo['createdAt'])) : "" ?>" autocomplete="one-time-code" type="text" class="form-control tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dokumen">
+                                <input value="<?= !empty($bcPo) ? date('d/m/Y', strtotime($bcPo['createdAt'])) : "" ?>" autocomplete="one-time-code" type="text" class="form-control tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dokumen">
                                 <label for="floatingInput">Tanggal Dokumen</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
@@ -235,9 +240,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Kembali</button>
-                    <?php if ($bcPo['status_posting'] === "0") : ?>
-                        <button type="button" class="btn btn-submit-form" id="ubahNoAjuButton">Simpan</button>
-                    <?php endif; ?>
+                    <button type="button" class="btn btn-submit-form" id="ubahNoAjuButton">Simpan</button>
                 </div>
             </form>
 
@@ -263,9 +266,9 @@
             lpb_date: "<?= $d['lpb_date'] ?>",
             lpb_no: "<?= $d['lpb_no'] ?>",
             purchase_order_id: "<?= $d['purchase_order_id'] ?>",
-            qty_lpb: "<?= ($d['qty_lpb']) ?>",
-            qty_lpb_konversi: "<?= ($d['qty_lpb_konversi']) ?>",
-            qty_po: "<?= ($d['qty_po']) ?>",
+            qty_lpb: "<?= floatval($d['qty_lpb']) ?>",
+            qty_lpb_konversi: "<?= floatval($d['qty_lpb_konversi']) ?>",
+            qty_po: "<?= floatval($d['qty_po']) ?>",
             barang_id: "<?= $d['barang_id'] ?>",
             po_no: "<?= $d['po_no'] ?>",
             po_date: "<?= $d['po_date'] ?>",
@@ -488,12 +491,38 @@
         autoclose: true
     });
 
-    $('#ubahNoAjuButton').click(function(e) {
+    $('#btn_update_no_aju_no_daftar').click(function(e) {
         e.preventDefault();
-        if ($('#form-update').valid()) {
+        var noDaftar = $('#no_daftar').val();
+        var tanggalDokumen = $('#tanggal').val();
+        var noAju = $('#no_pengajuan_preview').val();
+        var bcPurchaseOrderId = $('#bc_purchase_order_id').val();
+
+        if (noDaftar == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'No Daftar Wajib Diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            })
+        } else if (tanggalDokumen == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Tanggal Dokumen Wajib Diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            })
+        } else if (noAju == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'No Aju Wajib Diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            })
+        } else {
             Swal.fire({
                 icon: 'question',
-                title: 'Ubah Nomor Aju ?',
+                title: 'Ubah Nomor Aju & No Daftar ?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
@@ -502,9 +531,14 @@
                 cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    var formData = new FormData(document.querySelector("#form-update"));
+                    var formData = new FormData();
+                    formData.append("bc_purchase_order_id", bcPurchaseOrderId);
+                    formData.append('no_pengajuan', noAju);
+                    formData.append('tanggal_dokumen', tanggalDokumen);
+                    formData.append('no_daftar', noDaftar);
+
                     $.ajax({
-                        url: `<?= base_url("bea-cukai-bc-40/id/update-no-aju"); ?>`,
+                        url: `<?= base_url("bea-cukai-bc-40/id/update-no-aju-bulk"); ?>`,
                         method: "POST",
                         data: formData,
                         beforeSend: function(xhr) {
@@ -534,6 +568,63 @@
                     })
                 }
             })
+        }
+    })
+
+    $('#ubahNoAjuButton').click(function(e) {
+        e.preventDefault();
+        if ($('#form-update').valid()) {
+            var statusPosting = "<?= $bcPo['status_posting'] ?>";
+            if (statusPosting == 1) {
+                var noAju = $('#no_pengajuan').val();
+                $('#no_pengajuan_preview').val(noAju);
+
+                $('#modalUpdateNoAju').modal('hide');
+            } else {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Ubah Nomor Aju ?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Ya',
+                    cancelButtonText: 'Kembali',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var formData = new FormData(document.querySelector("#form-update"));
+                        $.ajax({
+                            url: `<?= base_url("bea-cukai-bc-40/id/update-no-aju"); ?>`,
+                            method: "POST",
+                            data: formData,
+                            beforeSend: function(xhr) {
+                                setLoading();
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(res) {
+                                if (res.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: res.message,
+                                        confirmButtonColor: '#4e73df',
+                                        confirmButtonText: 'Ok'
+                                    }).then((result) => {
+                                        location.reload();
+                                    });
+
+                                }
+                            }
+                        })
+                    }
+                })
+            }
         }
     });
 

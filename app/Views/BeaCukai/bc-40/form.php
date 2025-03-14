@@ -243,7 +243,8 @@
                         contentType: false,
                         success: function(response) {
                             if (response.status) {
-                                window.location.replace("<?= base_url('bea-cukai-bc-40/po/') ?>" + response.id)
+                                getListPurchaseOrder();
+                                window.open("<?= base_url('bea-cukai-bc-40/po/') ?>" + response.id, "_blank");
                             } else {
                                 Swal.fire({
                                     icon: 'error',

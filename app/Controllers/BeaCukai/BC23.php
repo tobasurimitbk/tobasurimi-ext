@@ -2175,7 +2175,7 @@ class BC23 extends BaseController
                     $stok,
                     $penerimaanBarang['jumlah_kemasan'],
                     "In",
-                    date('Y-m-d'),
+                    date('Y-m-d', strtotime($bcPo['createdAt'])),
                     $this->this_user_id,
                     "LPB",
                     $penerimaanBarang['no_penerimaan_barang'],
