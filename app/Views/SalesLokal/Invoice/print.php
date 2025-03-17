@@ -7,93 +7,56 @@
     <title>Invoice Penjualan Lokal</title>
     <style>
         body {
-            font-size: 12px;
+            font-size: 10px; /* Ukuran font diperkecil */
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
         @page {
             size: 8.27in 5.50in landscape;
-            margin: 25px;
-            padding: 25px;
+            margin: 15px; /* Margin diperkecil */
+            padding: 15px; /* Padding diperkecil */
         }
 
         .company-name {
             font-weight: 700;
             border: 1px solid;
-            padding: 5px;
-            border-radius: 7px;
+            padding: 3px; /* Padding diperkecil */
+            border-radius: 5px;
             margin-bottom: 1px;
             display: inline-block;
-            min-width: 70px
+            min-width: 70px;
         }
 
         .description-container {
             border: 1px solid;
-            border-radius: 7px;
-            min-height: 65px;
-            max-height: 130;
-            margin-top: 5px;
-            width: 100%;
-            position: relative;
-            /* padding-top: 7px; */
-            padding-left: 8px;
-        }
-
-        .description-label {
-            position: absolute;
-            top: -10px;
-            background: white;
-            left: 8px;
-            padding-left: 3px;
-            padding-right: 5px;
+            border-radius: 5px;
+            min-height: 50px; /* Tinggi diperkecil */
+            margin-top: 3px; /* Margin diperkecil */
+            padding-left: 5px; /* Padding diperkecil */
         }
 
         .item-table {
             border: 1px solid;
             width: 100%;
-
+            font-size: 10px; /* Ukuran font tabel diperkecil */
             margin-top: 1px;
-            margin-bottom: 5px;
+            margin-bottom: 3px; /* Margin diperkecil */
         }
 
-        .item-table th {
-            border-right: 1px solid;
-            border-bottom: 1px solid;
-        }
-
+        .item-table th,
         .item-table td {
             border-right: 1px solid;
-        }
-
-        .payment-list {
-            margin-left: 1.3em;
-            padding-left: 0;
-            font-size: 10px
-        }
-
-        .payment-list ul {
-            list-style-type: none;
-        }
-
-        .payment-list>li {
-            margin-bottom: 0.5em;
-        }
-
-        .payment-list ul>li {
-            text-indent: -2.4em;
-        }
-
-        .payment-list ul>li::before {
-            content: '- ';
+            padding: 2px; /* Padding diperkecil */
         }
 
         .rounded-border {
             border: 1px solid;
-            border-radius: 7px;
+            border-radius: 5px;
+            padding: 3px; /* Padding diperkecil */
         }
 
         .signature-table {
-            border-spacing: 30px 0;
+            border-spacing: 15px 0; /* Spasi diperkecil */
             margin-top: 1px;
         }
 
