@@ -666,7 +666,7 @@ class PenerimaanBarangModel extends Model
                     $stok,
                     $p['jml_masuk_konversi'],
                     'In',
-                    date('Y-m-d'),
+                    $penerimaanBarang['tanggal'],
                     $rmDetail['createdBy'],
                     "LPB",
                     $penerimaanBarang['no_penerimaan_barang'],

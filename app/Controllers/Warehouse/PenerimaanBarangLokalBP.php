@@ -785,7 +785,7 @@ class PenerimaanBarangLokalBP extends BaseController
                         $stok,
                         $p['jml_masuk_konversi'],
                         'In',
-                        date('Y-m-d'),
+                        $penerimaanBarang['tanggal'],
                         $this->this_user_id,
                         "LPB",
                         $penerimaanBarang['no_penerimaan_barang'],
