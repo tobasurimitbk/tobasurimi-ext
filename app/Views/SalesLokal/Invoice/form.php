@@ -1209,7 +1209,7 @@
         });
 
         // Pastikan total tidak negatif
-        itemSubTotal = Math.max(0, itemSubTotal - discTotal);
+        itemSubTotal = Math.max(0, itemSubTotal);
         taxTotalHtml = Math.max(0, taxTotalHtml);
         grandTotal = itemSubTotal + (taxStatus ? taxTotalHtml : 0);
 
