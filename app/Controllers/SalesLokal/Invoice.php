@@ -413,7 +413,14 @@ class Invoice extends BaseController
             ->findAll();
 
         if ($dataSalesInvoiceOrder->document_type != "penjualan") {
-            $documentData = $this->getDocDataaaa($dataSalesInvoiceOrder->document_type, json_decode($dataSalesInvoiceOrder->document_id));
+            $documentIds = json_decode($dataSalesInvoiceOrder->document_id, true);
+            $documentResults = []; // Array kosong untuk menyimpan hasil query
+
+            foreach ($documentIds as $docId) {
+                $documentGetData = $this->getDocDataaaa($dataSalesInvoiceOrder->document_type, (int) $docId);
+                $documentResults[] = $documentGetData; // Simpan hasil ke dalam array
+            }
+            $documentData = $documentResults;
         } else {
             $documentData = $this->getDocDataaaa($dataSalesInvoiceOrder->document_type, $id);
         }
@@ -421,7 +428,8 @@ class Invoice extends BaseController
         // var_dump($documentData);
         // exit;
 
-        foreach ($documentData->itemList as $key => &$value) {
+       foreach ($documentData as $doc) {
+        foreach ($doc->itemList as $key => &$value) {
             foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
                 // var_dump($value);
                 // var_dump($valueDetail);
@@ -444,11 +452,13 @@ class Invoice extends BaseController
                 }
             }
         }
+       }
 
         // exit();
         //untuk yang sudah di posting
 
-        foreach ($documentData->itemListPosting as $key => &$value) {
+       foreach ($documentData as $doc) {
+        foreach ($doc->itemListPosting as $key => &$value) {
             // var_dump($value);
             foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
 
@@ -470,6 +480,7 @@ class Invoice extends BaseController
                 }
             }
         }
+       }
 
 
         $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur();
@@ -1049,7 +1060,7 @@ class Invoice extends BaseController
                 ->join('customers', 'customers.id = sales_order.id_customer', 'left')
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
-                ->whereIn('sales_order.id', $docId)
+                ->where('sales_order.id', $docId)
                 ->first();
 
             $salesName = $soData->salesName ?? "-";
@@ -1074,7 +1085,7 @@ class Invoice extends BaseController
                 ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
-                ->whereIn('surat_jalan_so.id', $docId)
+                ->where('surat_jalan_so.id', $docId)
                 ->first();
 
             $salesName = $suratJalanData->salesName ?? "-";

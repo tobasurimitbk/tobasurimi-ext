@@ -859,20 +859,27 @@
         }
 
         <?php if (!empty($documentData)) : ?>
-            var itemList = [];
-            <?php if ($data->status_posting == "0") : ?>
-                itemList = <?= json_encode($documentData->itemList) ?>;
-            <?php else : ?>
-                itemList = <?= json_encode($documentData->itemListPosting) ?>;
-            <?php endif; ?>
-            console.log(<?= json_encode($documentData) ?>);
-            table.rows.add(itemList).draw(false);
-            itemList.forEach(function(item) {
-                list_items.push(item);
-            });
-            // drawTableItem(itemList);
+            
+                var itemList = [];
 
+                <?php foreach ($documentData as $doc) : ?>
+                    var tempItems = [];
+                    <?php if ($data->status_posting == "0") : ?>
+                        tempItems = <?= json_encode($doc->itemList) ?>;
+                    <?php else : ?>
+                        tempItems = <?= json_encode($doc->itemListPosting) ?>;
+                    <?php endif; ?>
+
+                    itemList = itemList.concat(tempItems); // Gabungkan item dari setiap dokumen
+                <?php endforeach; ?>
+
+                console.log(<?= json_encode($documentData) ?>);
+                table.rows.add(itemList).draw(false);
+                itemList.forEach(function(item) {
+                    list_items.push(item);
+                });
         <?php endif; ?>
+
         $('#tax_status').on('input change paste', function() {
             if (!this.checked) {
                 $('#include_tax').prop('checked', false);
