@@ -321,6 +321,12 @@
         $('.form-fifo').hide();
     <?php endif; ?>
 
+    <?php if (empty($jasaVendorOut)): ?>
+        $('.tanggal').change(function() {
+            changeStatus();
+        })
+    <?php endif; ?>
+
     $('#type_pengambilan_stock').select2({
         placeholder: "Pilih Tipe Ambil Stok",
         theme: "bootstrap-5",
@@ -1018,7 +1024,8 @@
                 url: `<?= base_url("jasa-vendor-out/get-jasa-vendor-out-no"); ?>`,
                 method: "GET",
                 data: {
-                    warehouse_id: $('#warehouse_id option:selected').val()
+                    warehouse_id: $('#warehouse_id option:selected').val(),
+                    tanggal: $('#tanggal').val()
                 },
                 dataType: "json",
                 success: function(res) {

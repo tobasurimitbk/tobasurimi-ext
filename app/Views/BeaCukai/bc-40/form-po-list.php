@@ -65,7 +65,7 @@
                     <div class="col-sm-4">
                         <div class="input-group">
                             <div class="form-floating mb-3">
-                                <input value="<?= $noAju ?>" readonly type="text" class="form-control bg-white" id="no_pengajuan_preview" placeholder="">
+                                <input value="<?= $noAju ?>" readonly type="text" class="form-control <?= session()->get('theme') == "light" ? "bg-white" : "" ?>" id="no_pengajuan_preview" placeholder="">
                                 <label>Nomor Pengajuan</label>
                             </div>
                             <div class="input-group-append" style="height:50px;">
@@ -745,7 +745,17 @@
             table.find('tfoot').append(newRow);
         } else {
             var no = 1;
+            var totalQtyPo = 0;
+            var totalQtyDiterima = 0;
+            var totalQtyDiterimaKonversi = 0;
+            var totalHargaNumber = 0;
+
             $.each(listDataSelected, function(i, v) {
+                totalQtyPo += parseFloat(v.qty_po);
+                totalQtyDiterima += parseFloat(v.qty_lpb);
+                totalQtyDiterimaKonversi += parseFloat(v.qty_lpb_konversi);
+                totalHargaNumber += parseFloat(v.harga_number);
+
                 var newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append($('<td style="text-align: center;">').html(
                     `
@@ -770,6 +780,17 @@
                 ));
                 table.find('tbody').append(newRow);
             });
+
+            var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
+            newRow.append($('<td style="text-align: right;" colspan="7">').html("<b>GRAND TOTAL</b>"));
+            newRow.append($('<td>').text(greatFormatRupiah(totalQtyPo.toFixed(2))));
+            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(totalQtyDiterima.toFixed(2))));
+            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(totalQtyDiterimaKonversi.toFixed(2))));
+            newRow.append($('<td>').text(greatFormatRupiah(totalHargaNumber.toFixed(2))));
+            newRow.append($('<td>').text(''));
+
+            table.find('tbody').append(newRow);
+
         }
     }
 

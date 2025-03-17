@@ -540,15 +540,31 @@ class ProsesRebus extends BaseController
 
     public function getProsesRebusNo()
     {
-        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+        $tanggal = date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))));
         $warehouse_id = $this->request->getVar('warehouse_id');
 
-        if (empty($warehouse_id)) {
-            $no = $this->prosesRebusModel->get_no(date('m'), date('Y'), $last_day, "", $warehouse_id);
+
+        if (empty($tanggal) || empty($warehouse_id)) {
+            $no = $this->prosesRebusModel->get_no(
+                date('m'),
+                date('Y'),
+                ""
+            );
         } else {
+
+            $tanggalExplode = explode('-', $tanggal);
+            $year = $tanggalExplode[0];
+            $month = $tanggalExplode[1];
+
             $warehouse = $this->warehouseModel->where('id', $warehouse_id)->first();
-            $no = $this->prosesRebusModel->get_no(date('m'), date('Y'), $last_day, strtoupper($warehouse['code_warehouse']), $warehouse_id);
+            $divisi = $this->divisiModel->where('id', $warehouse['divisi_id'])->first();
+            $no = $this->prosesRebusModel->get_no(
+                $month,
+                $year,
+                $divisi['divisi']
+            );
         }
+
         return response()->setJSON([
             'status' => true,
             'data' => $no,

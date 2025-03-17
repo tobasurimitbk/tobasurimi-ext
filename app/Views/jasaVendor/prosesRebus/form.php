@@ -302,6 +302,12 @@
         autoclose: true
     })
 
+    <?php if (empty($prosesRebus)): ?>
+        $('.tanggal').change(function() {
+            changeStatus();
+        })
+    <?php endif; ?>
+
     <?php if (!empty($prosesRebus)) : ?>
         <?php if ($prosesRebus['tipe_pengambilan_stock'] == "FIFO") : ?>
             $('.form-fifo').show();
@@ -1150,7 +1156,8 @@
                 url: `<?= base_url("proses-rebus/get-no"); ?>`,
                 method: "GET",
                 data: {
-                    warehouse_id: $('#warehouse_id option:selected').val()
+                    warehouse_id: $('#warehouse_id option:selected').val(),
+                    tanggal: $('#tanggal').val()
                 },
                 dataType: "json",
                 success: function(res) {
