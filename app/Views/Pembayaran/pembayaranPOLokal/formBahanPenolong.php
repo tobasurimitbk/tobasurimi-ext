@@ -452,9 +452,9 @@
     <?php if (!empty($detail)) : ?>
 
         var id = $('#tanda_terima_supplier').val();
+        var supplierId = $('#supplier_id option:selected').val();
         $.ajax({
-
-            url: '<?= base_url('pembayaran-po-lokal-bp/get-item-list/') ?>' + id,
+            url: '<?= base_url('pembayaran-po-lokal-bp/get-item-list/') ?>' + id + '/' + supplierId,
             method: "GET",
             data: {
                 status_pph: $('#status_pph').val(),
@@ -931,8 +931,9 @@
 
     function listBarangDetail() {
         var id = $('#tanda_terima_supplier').val();
+        var supplierId = $('#supplier_id option:selected').val();
         $.ajax({
-            url: '<?= base_url('pembayaran-po-lokal-bp/get-item-list/') ?>' + id,
+            url: '<?= base_url('pembayaran-po-lokal-bp/get-item-list/') ?>' + id + '/' + supplierId,
             method: "GET",
             data: {
                 status_pph: $('#status_pph').val()

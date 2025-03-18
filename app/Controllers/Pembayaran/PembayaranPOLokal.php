@@ -92,7 +92,7 @@ class PembayaranPOLokal extends BaseController
         ]);
     }
 
-    public function getItemListByTandaTerimaFaktur($tandaTerimaFakturID)
+    public function getItemListByTandaTerimaFaktur($tandaTerimaFakturID, $supplierId)
     {
         $pembayaranId = decrypt($this->request->getVar('id'));
 
@@ -114,9 +114,9 @@ class PembayaranPOLokal extends BaseController
             'detail' => $tandaTerimaFakturModel->getByID($tandaTerimaFakturID),
             'paymentDetail' => $localPOPaymentBPModel->getPembayaranDetailByid($pembayaranId),
             'list' => $tandaTerimaFakturDetailModel->getListTandaTerimaItemFaktur($tandaTerimaFakturID),
-            'panjar_list' => $localPOPaymentPanjarModel->getPembayaranPanjarDetailsbyIdandType($pembayaranId, "BP"),
-            'panjar_tb_list' => $localPOPaymentPanjarModel->getPembayaranPanjarTBDetailsbyIdandType($pembayaranId, "BP"),
-            'pinjaman_list' => $localPOPaymentPinjamanModel->getPembayaranPinjamanDetailsbyIdandType($pembayaranId, "BP"),
+            'panjar_list' => $localPOPaymentPanjarModel->getPembayaranPanjarDetailsbyIdandType($pembayaranId, "BP", $supplierId),
+            'panjar_tb_list' => $localPOPaymentPanjarModel->getPembayaranPanjarTBDetailsbyIdandType($pembayaranId, "BP", $supplierId),
+            'pinjaman_list' => $localPOPaymentPinjamanModel->getPembayaranPinjamanDetailsbyIdandType($pembayaranId, "BP", $supplierId),
             'tax_dipungut_negara' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $tandaTerimaFakturID),
             'tax_dikembalikan_lagi' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dikembalikan lagi", $tandaTerimaFakturID),
             'pph' => $pphResult

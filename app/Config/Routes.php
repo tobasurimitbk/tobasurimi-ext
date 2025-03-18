@@ -422,7 +422,7 @@ $routes->post('/ambil-pinjaman-karyawan/check-ambil-pinjaman', 'Pembayaran\Ambil
 $routes->get('/pembayaran-po-lokal-bp', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBP', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBP', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/get-rekap-faktur/(:segment)/(:segment)', 'Pembayaran\PembayaranPOLokal::getTandaTerimaFaktur/$1/$2', ['filter' => 'Auth']);
-$routes->get('/pembayaran-po-lokal-bp/get-item-list/(:segment)', 'Pembayaran\PembayaranPOLokal::getItemListByTandaTerimaFaktur/$1', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-lokal-bp/get-item-list/(:segment)/(:segment)', 'Pembayaran\PembayaranPOLokal::getItemListByTandaTerimaFaktur/$1/$2', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bp/generate-no-pembayaran', 'Pembayaran\PembayaranPOLokal::generatePaymentNoBP', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bp/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBPAction', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bp/update', 'Pembayaran\PembayaranPOLokal::updatePembayaranPOLokalBPAction', ['filter' => 'Auth']);

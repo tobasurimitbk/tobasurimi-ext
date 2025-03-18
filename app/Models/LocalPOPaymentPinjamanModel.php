@@ -150,7 +150,7 @@ class LocalPOPaymentPinjamanModel extends Model
         return $list;
     }
 
-    public function getPembayaranPinjamanDetailsbyIdandType($id = null, $type)
+    public function getPembayaranPinjamanDetailsbyIdandType($id = null, $type, $supllierId)
     {
         if ($id) {
             $condition = [
@@ -176,6 +176,7 @@ class LocalPOPaymentPinjamanModel extends Model
 
             $result = $pinjamanSupplier
                 ->select("id, no_pinjaman, payment_date, total_pinjaman")
+                ->where('supplier_id', $supllierId)
                 ->findAll();
         }
 
@@ -183,6 +184,7 @@ class LocalPOPaymentPinjamanModel extends Model
             $pinjamanSupplier = new PinjamanSupplierModel();
 
             $dataPinjaman = $pinjamanSupplier->select("id, no_pinjaman, payment_date, total_pinjaman")
+                                        ->where('supplier_id', $supllierId)
                                         ->findAll();
         }
 
