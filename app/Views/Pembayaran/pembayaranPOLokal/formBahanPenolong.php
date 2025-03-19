@@ -430,13 +430,6 @@
                     </div>
                 </div>
 
-                <!-- <div class="col-subtitle-modal mt-3">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <label class="form-label font-weight-bold modal-sub-title">Item Tanda Terima Supplier</label>
-                        </div>
-                    </div>
-                </div> -->
             </form>
         </div>
     </div>
@@ -685,7 +678,6 @@
                 var input_user = (element.val());
                 listPanjar[i].bayar_panjar = destroyFormatRupiah(input_user);
             });
-
 
             $.each(listPinjaman, function(i, v) {
 
@@ -989,20 +981,20 @@
                 newRow3.append($('<td>').text(greatFormatRupiah(detail.nominal_faktur)));
                 table.find('tbody').append(newRow3);
 
-                var newRow4 = $('<tr>');
-                newRow4.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dipungut Negara (' + res.tax_dipungut_negara.taxType + ')'));
-                newRow4.append($('<td>').text(greatFormatRupiah(res.tax_dipungut_negara.taxAmt)));
-                table.find('tbody').append(newRow4);
+                // var newRow4 = $('<tr>');
+                // newRow4.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dipungut Negara (' + res.tax_dipungut_negara.taxType + ')'));
+                // newRow4.append($('<td>').text(greatFormatRupiah(res.tax_dipungut_negara.taxAmt)));
+                // table.find('tbody').append(newRow4);
 
-                var newRow5 = $('<tr>');
-                newRow5.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dikembalikan Lagi (' + res.tax_dikembalikan_lagi.taxType + ')'));
-                newRow5.append($('<td>').text(greatFormatRupiah(res.tax_dikembalikan_lagi.taxAmt)));
-                table.find('tbody').append(newRow5);
+                // var newRow5 = $('<tr>');
+                // newRow5.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dikembalikan Lagi (' + res.tax_dikembalikan_lagi.taxType + ')'));
+                // newRow5.append($('<td>').text(greatFormatRupiah(res.tax_dikembalikan_lagi.taxAmt)));
+                // table.find('tbody').append(newRow5);
 
-                var newRow6 = $('<tr>');
-                newRow6.append($('<td style="text-align:right;" colspan="6">').text('Pajak Penghasilan (2.5 %) (+)'));
-                newRow6.append($('<td>').text(greatFormatRupiah(res.pph.toFixed(2))));
-                table.find('tbody').append(newRow6);
+                // var newRow6 = $('<tr>');
+                // newRow6.append($('<td style="text-align:right;" colspan="6">').text('Pajak Penghasilan (2.5 %) (+)'));
+                // newRow6.append($('<td>').text(greatFormatRupiah(res.pph.toFixed(2))));
+                // table.find('tbody').append(newRow6);
 
 
                 var newRow8 = $('<tr>');
@@ -1209,7 +1201,7 @@
         } else {
             var newRow = $('<tr>');
             newRow.append($('<td colspan="8" style="text-align:center;">Tidak Ada Panjar</td>'));
-            tablePinjaman.find('tbody').append(newRow);
+            tablePanjar.find('tbody').append(newRow);
         }
 
 
@@ -1297,7 +1289,7 @@
         } else {
             var newRow = $('<tr>');
             newRow.append($('<td colspan="8" style="text-align:center;">Tidak Ada Panjar TB</td>'));
-            tablePinjaman.find('tbody').append(newRow);
+            tablePanjar.find('tbody').append(newRow);
         }
 
     }
@@ -1544,7 +1536,7 @@
         newRow11.append($('<td style="text-align:right;" colspan="6"><b>Input Pembayaran</b></td>'));
         newRow11.append($('<td>').html(
             `
-                        <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${Number(sisaPembayaran)})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="" name = "nominal_pembayaran" style="height:40px">
+                        <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${Number(subTotal)})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="" name = "nominal_pembayaran" style="height:40px">
                     `
         ));
         table.find('tbody').append(newRow11);

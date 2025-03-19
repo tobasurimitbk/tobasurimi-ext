@@ -204,9 +204,8 @@ class LocalPOPaymentPanjarModel extends Model
             $result = $dataPanjar;
         }
 
-        // Proses hasil query
         if (!empty($resultPay)) {
-            foreach ($result as $i => $r) {
+            foreach ($resultPay as $i => $r) {
                 $totalPembayaranPanjar = $this->getTotalPembayaranPanjar($r['panjar_id'], "BP");
 
                 // Simpan data yang sudah terbayar ke variabel $paidData

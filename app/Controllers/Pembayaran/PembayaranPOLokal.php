@@ -127,7 +127,6 @@ class PembayaranPOLokal extends BaseController
 
     public function createPembayaranPOLokalBPAction()
     {
-
         try {
             $localPOPaymentModel = new LocalPOPaymentModel();
             $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
@@ -139,6 +138,22 @@ class PembayaranPOLokal extends BaseController
             $panjarList = json_decode($this->request->getVar('panjarList'));
             $pinjamanList = json_decode($this->request->getVar('pinjamanList'));
             $panjarTBList = json_decode($this->request->getVar('panjarTBList'));
+
+            $paymentPanjarDate = $this->request->getVar('payment_panjar_date');
+            $paymentDate = $this->request->getVar('payment_date');
+
+            if ($paymentPanjarDate === '1/1/1970') {
+                $paymentPanjarDate = null;
+            } else {
+                $paymentPanjarDate = date('Y-m-d', strtotime(str_replace('/', '-', $paymentPanjarDate)));
+            }
+        
+            if ($paymentDate === '1/1/1970') {
+                $paymentDate = null;
+            } else {
+                $paymentDate = date('Y-m-d', strtotime(str_replace('/', '-', $paymentDate)));
+            }
+
 
             $total_bayar_panjar = 0;
             foreach ($panjarList as $p) {
@@ -173,8 +188,8 @@ class PembayaranPOLokal extends BaseController
                 'tanda_terima_faktur_id' => $this->request->getVar('tanda_terima_faktur_id'),
 
                 'amount' => repairDouble($this->request->getVar('nominal_pembayaran')),
-                'payment_panjar_date' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_panjar_date')))),
-                'payment_date' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
+                'payment_panjar_date' => $paymentPanjarDate,
+                'payment_date' =>  $paymentDate,
                 'payment_method' => $this->request->getVar('payment_method'),
 
                 'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
@@ -273,6 +288,7 @@ class PembayaranPOLokal extends BaseController
 
     public function updatePembayaranPOLokalBPAction()
     {
+        
         try {
 
             $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
@@ -280,6 +296,21 @@ class PembayaranPOLokal extends BaseController
             $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
             $localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
             $id = decrypt($this->request->getVar('id'));
+
+            $paymentPanjarDate = $this->request->getVar('payment_panjar_date');
+            $paymentDate = $this->request->getVar('payment_date');
+
+            if ($paymentPanjarDate === '1/1/1970') {
+                $paymentPanjarDate = null;
+            } else {
+                $paymentPanjarDate = date('Y-m-d', strtotime(str_replace('/', '-', $paymentPanjarDate)));
+            }
+        
+            if ($paymentDate === '1/1/1970') {
+                $paymentDate = null;
+            } else {
+                $paymentDate = date('Y-m-d', strtotime(str_replace('/', '-', $paymentDate)));
+            }
 
             $panjarList = json_decode($this->request->getVar('panjarList'));
             $panjarTBList = json_decode($this->request->getVar('panjarTBList'));
@@ -303,12 +334,6 @@ class PembayaranPOLokal extends BaseController
             }
 
 
-
-            $lastAmount = $localPOPaymentBPModel->select('amount')
-                ->where('id', $id)
-                ->first();
-
-
             $localPOPaymentBPModel->update($id, [
 
                 'company_id' => $this->this_company_id,
@@ -317,9 +342,9 @@ class PembayaranPOLokal extends BaseController
                 'supplier_id' => $this->request->getVar('supplier_id'),
                 'tanda_terima_faktur_id' => $this->request->getVar('tanda_terima_faktur_id'),
 
-                'amount' => $lastAmount["amount"] + repairDouble($this->request->getVar('nominal_pembayaran')),
-                'payment_panjar_date' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_panjar_date')))),
-                'payment_date' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
+                'amount' => repairDouble($this->request->getVar('nominal_pembayaran')),
+                'payment_panjar_date' => $paymentPanjarDate,
+                'payment_date' => $paymentDate,
                 'payment_method' => $this->request->getVar('payment_method'),
 
                 'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
