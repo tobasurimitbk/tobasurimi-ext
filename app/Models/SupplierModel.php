@@ -73,12 +73,6 @@ class SupplierModel extends Model
             'phone'             => 'suppliers.phone',
             'contact_person'    => 'suppliers.contact_person',
             'fax'               => 'suppliers.fax',
-            // 'contact_person'    => 'suppliers.contact_person',
-            // 'no_rekening'       => 'suppliers.no_rekening',
-            // 'supplier_buyer'    => 'suppliers.supplier_buyer',
-            // 'province'          => 'provinces.province_name',
-            // 'city'              => 'cities.city_name',
-            // 'postal_code'       => 'suppliers.postal_code',
             'createdAt'         => 'suppliers.createdAt',
             'updatedAt'         => 'suppliers.updatedAt',
         ];
@@ -88,28 +82,74 @@ class SupplierModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "suppliers.*";
-        //   cities.city_name AS city_name, 
-        //   provinces.province_name AS province_name";
+
         $supplierDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            // ->join('cities', 'suppliers.city_id = cities.id', 'left')
-            // ->join('provinces', 'suppliers.province_id = provinces.id', 'left')
             ->orderBy($sort, $sortType);
 
-        // $selectQry = "suppliers.*, 
-        //               cities.city_name AS city_name, 
-        //               provinces.province_name AS province_name,
-        //               ap.nama_sub AS ap_name,
-        //               ar.nama_sub AS ar_name";
-        // $supplierDataQry = $this->asObject()
-        //     ->select($selectQry)
-        //     ->where($condition)
-        //     ->join('cities', 'suppliers.city_id = cities.id', 'left')
-        //     ->join('provinces', 'suppliers.province_id = provinces.id', 'left')
-        //     ->join('sub_akuns AS ap', 'suppliers.ap_id = ap.id', 'left')
-        //     ->join('sub_akuns AS ar', 'suppliers.ar_id = ar.id', 'left')
-        //     ->orderBy($sort, $sortType);
+        $totalData = $supplierDataQry->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $supplierDataQry->groupStart()
+                ->like('name', $addCondition['search'])
+                ->orLike('kode', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $totalFilteredData = $supplierDataQry->countAllResults(false);
+        $data = $supplierDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
+
+    public function getSupplierHutangList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode'              => 'suppliers.kode',
+            'name'              => 'suppliers.name',
+            'address'           => 'suppliers.address',
+            'no_npwp'           => 'suppliers.no_npwp',
+            'phone'             => 'suppliers.phone',
+            'contact_person'    => 'suppliers.contact_person',
+            'fax'               => 'suppliers.fax',
+            'createdAt'         => 'suppliers.createdAt',
+            'updatedAt'         => 'suppliers.updatedAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'suppliers.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "suppliers.*, 
+        CASE 
+            WHEN suppliers.type = 'BAHAN BAKU' 
+            THEN SUM(rm_purchase_orders.total)
+            WHEN suppliers.type = 'INTERNASIONAL' 
+            THEN SUM(rm_import_pos.total)
+            ELSE SUM(am_purchase_orders.total)
+        END AS total, 
+        CASE 
+            WHEN suppliers.type = 'INTERNASIONAL' 
+            THEN (import_po_payments.payment_amt * import_po_payments.current_exchange_rate)
+            ELSE (local_po_payments.amount)
+        END AS remaining";
+
+        $supplierDataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('rm_purchase_orders', 'rm_purchase_orders.supplier_id = suppliers.id AND rm_purchase_orders.is_posted = 1', 'left')
+            ->join('am_purchase_orders', 'am_purchase_orders.supplier_id = suppliers.id AND am_purchase_orders.is_posted = 1', 'left')
+            ->join('rm_import_pos', 'rm_import_pos.supplier_id = suppliers.id AND rm_import_pos.is_posted = 1', 'left')
+            ->join('local_po_payments', 'local_po_payments.supplier_id = suppliers.id AND local_po_payments.status_posting = 1', 'left')
+            ->join('import_po_payments', 'import_po_payments.supplier_id = suppliers.id AND import_po_payments.status_posting = 1', 'left')
+            ->where($condition)
+            ->groupBy('suppliers.id')
+            ->having("total > 0") 
+            ->orderBy($sort, $sortType);
 
         $totalData = $supplierDataQry->countAllResults(false);
 

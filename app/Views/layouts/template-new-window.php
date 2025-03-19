@@ -110,37 +110,43 @@
     }
 
     function greatFormatRupiahPayment(x) {
+        var min = false;
+
+        // Pastikan x memiliki nilai yang valid sebelum memanggil toString
         if (x === null || x === undefined || x === "") {
-            return ""; // Jika input tidak valid, kembalikan string kosong
+            return ""; // Kembalikan string kosong jika input tidak valid atau kosong
         }
 
-        let min = false;
-        x = parseFloat(x); // Pastikan x dalam bentuk angka
-        
-        if (isNaN(x)) {
-            return ""; // Jika bukan angka valid, kembalikan string kosong
-        }
-
-        if (x < 0) {
+        x = x.toString();
+        if (x.includes("-")) {
             min = true;
-            x = Math.abs(x); // Ubah ke positif untuk pemrosesan
+        }
+        x = x.replace(/-/g, ""); // Hilangkan tanda minus sementara
+
+        var parts = x.split(".");
+        parts[0] = parts[0].replace(/,/g, "");
+        var bilangan = parts[0];
+
+        // Jika bilangan kosong setelah menghapus koma, kembalikan string kosong
+        if (bilangan === "") {
+            return "";
         }
 
-        x = x.toFixed(2); // Bulatkan ke 2 angka desimal
-        let parts = x.split("."); // Pisahkan angka desimal
-
-        let bilangan = parts[0].replace(/,/g, "");
-        let number_string = bilangan.toString();
-        let sisa = number_string.length % 3;
-        let rupiah = number_string.substr(0, sisa);
-        let ribuan = number_string.substr(sisa).match(/\d{3}/g);
+        var number_string = bilangan.toString(),
+            sisa = number_string.length % 3,
+            rupiah = number_string.substr(0, sisa),
+            ribuan = number_string.substr(sisa).match(/\d{3}/g);
 
         if (ribuan) {
-            let separator = sisa ? "," : "";
+            var separator = sisa ? "," : ""; // Ganti separator jadi koma
             rupiah += separator + ribuan.join(",");
         }
+        parts[0] = rupiah;
 
-        parts[0] = rupiah; // Update bagian sebelum desimal
+        // Tambahkan ".00" hanya untuk tampilan (bukan bagian angka asli)
+        if (!parts[1]) {
+            parts.push("00");
+        }
 
         return (min ? "-" : "") + parts.join(".");
     }
@@ -198,9 +204,6 @@
 
             <!-- Header -->
             <?= $this->include('layouts/header'); ?>
-
-            <!-- Sidebar -->
-            <?= $this->include('layouts/sidebar');  ?>
 
             <!-- Main Content -->
             <div class="main-content">

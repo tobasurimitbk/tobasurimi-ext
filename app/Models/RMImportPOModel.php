@@ -333,4 +333,76 @@ class RMImportPOModel extends Model
 
         return $poBBImportData;
     }
+
+    public function getPOByIdSupplierWithInvoice($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'poDate'            => 'rm_import_pos.po_date',
+            'poNo'              => 'rm_import_pos.po_no',
+            'divisi'            => 'divisis.divisi',
+            'supplierName'      => 'suppliers.name',
+            'total'             => 'rm_import_pos.total',
+            'currencyName'      => 'metadata.value',
+            'createdAt'         => 'rm_import_pos.createdAt',
+            'updatedAt'         => 'rm_import_pos.updatedAt',
+            'statusPenerimaan'  => 'rm_import_pos.status_penerimaan'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'rm_import_pos.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "rm_import_pos.id AS id, 
+                    rm_import_pos.po_date AS tanggal_invoice, 
+                    rm_import_pos.po_no AS no_invoice, 
+                    suppliers.id AS supplier_id, 
+                    suppliers.name AS supplier_name,
+                    divisis.divisi AS divisi,
+                    COUNT(rm_import_po_details.id) AS itemCount,
+                    rm_import_pos.total AS total, 
+                    local_po_payments.amount AS remaining";
+
+        $poDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id')
+            ->join('divisis', 'divisis.id = rm_import_pos.division_id', 'left')
+            ->join('rm_import_po_details', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
+            ->join('local_po_payments', 'FIND_IN_SET(rm_import_pos.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left') // Menyesuaikan jika multiple_po_id berbentuk JSON atau array sebagai string
+            ->groupBy('rm_import_pos.id')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $poDataQry->countAllResults(false);
+
+        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $poDataQry->groupStart();
+        }
+
+        if (!empty($addCondition['search'])) {
+            $poDataQry->like('rm_import_pos.po_no', $addCondition['search']);
+        }
+
+        if (!empty($addCondition['dateStart'])) {
+            $poDataQry->where('rm_import_pos.po_date >=', $addCondition['dateStart']);
+        }
+
+        if (!empty($addCondition['dateEnd'])) {
+            $poDataQry->where('rm_import_pos.po_date <=', $addCondition['dateEnd']);
+        }
+
+        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $poDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $poDataQry->countAllResults(false);
+        $data = $poDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
 }

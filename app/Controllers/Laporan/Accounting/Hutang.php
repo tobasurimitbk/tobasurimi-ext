@@ -9,8 +9,11 @@ use App\Models\TransaksiPembelianModel;
 use App\Models\LocalPOPaymentModel;
 use App\Models\MetadataModel;
 use App\Models\KursModel;
+use App\Models\RMImportPOModel;
 use App\Models\RMImportPODetailModel;
+use App\Models\RMPurchaseOrderModel;
 use App\Models\RMPurchaseOrderDetailModel;
+use App\Models\AMPurchaseOrderModel;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\PenerimaanBarangDetailModel;
@@ -27,8 +30,11 @@ class Hutang extends BaseController
     protected $transaksiPembelianModel;
     protected $metadataModel;
     protected $kursModel;
+    protected $rMImportPOModel;
     protected $rMImportPODetailModel;
+    protected $rMPurchaseOrderModel;
     protected $rMPurchaseOrderDetailModel;
+    protected $aMPurchaseOrderModel;
     protected $aMPurchaseOrderDetailModel;
     protected $penerimaanBarangModel;
     protected $penerimaanBarangDetailModel;
@@ -41,8 +47,11 @@ class Hutang extends BaseController
         $this->transaksiPembelianModel = new TransaksiPembelianModel();
         $this->metadataModel = new MetadataModel();
         $this->kursModel = new KursModel();
+        $this->rMImportPOModel = new RMImportPOModel();
         $this->rMImportPODetailModel = new RMImportPODetailModel();
+        $this->rMPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->rMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+        $this->aMPurchaseOrderModel = new AMPurchaseOrderModel();
         $this->aMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
@@ -56,7 +65,16 @@ class Hutang extends BaseController
         ];
         return view('Laporan/LaporanHutang/index', $data);
     }
-    public function allTransaksi()
+
+    public function detail($id)
+    {
+        $data = [
+            'id' => $id
+        ];
+        return view('Laporan/LaporanHutang/detail', $data);
+    }
+
+    public function allHutang()
     {
         $payload = [
             "pageSize"      => $this->request->getGet("length"),
@@ -65,13 +83,13 @@ class Hutang extends BaseController
             "filter"        => $this->request->getGet("filter"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "startdate"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "lastdate"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $condition = [
-            // "company_id"  => $this->this_company_id,
-            "penerimaan_barang.deletedAt" => NULL
+            "suppliers.company_id"  => $this->this_company_id,
+            "suppliers.deletedAt" => NULL
         ];
 
         $addCondition = [
@@ -79,145 +97,105 @@ class Hutang extends BaseController
             "filter"        => $this->request->getGet("filter"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "startdate"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "lastdate"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        // $res = $this->transaksiPembelianModel->getList($condition, $addCondition, $limit, $offset);
-        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForAccounting($condition, $addCondition, $limit, $offset);
-        $metaValuta = $this->metadataModel->get_by_name('Valuta');
+        $res = $this->supplierModel->getSupplierHutangList($condition, $addCondition, $limit, $offset);
+
+        // var_dump($res['data']);
+        // exit;
 
         $rdata = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-
-        // var_dump($res);
-        // exit;
         foreach ($res['data'] as $data) {
-            $journal_num = '-';
-            $description = '-';
-            $invoice = $data->no_invoice;
-            $date = '-';
-            $tax_report = '-';
-            $supplier = $data->supplier_name;
-            $nominal_idr = 0.0;
-            $remaining_idr = 0.0;
-            $nominalTransaksi = 0.0;
-            $exchangeTransaksi = 1.0;
-            if ($data->status_penerimaan == "LOKAL" && $data->tipe_bahan == "BAKU") {
-                $lokalbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangBakuDetail($data->id);
-                foreach ($lokalbb as $value) {
-                    $poDetail = $this->rMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($value['purchase_order_id']);
-                    $transaksiJurnal = $this->transaksiJurnalModel->asObject()->where('deleted_at', null)->where('tipe_barang', $data->status_penerimaan)->where('kategori_barang', 'BAHAN ' . $data->tipe_bahan);
-                    if ($transaksiJurnal) {
-                        foreach ($transaksiJurnal as $valueTransaksiJurnal) {
-                            if (isset($valueTransaksiJurnal->no_transaksi)) {
-                                $journal_num = $valueTransaksiJurnal->no_transaksi;
-                            } else {
-                                $journal_num = "-";
-                            }
-                        }
-                    } else {
-                        $journal_num = "-";
-                    }
-
-                    foreach ($poDetail as $valueDetail) {
-                        $totalxqty = ($valueDetail['general_price'] + $valueDetail['daily_price'] + $valueDetail['monthly_price']) * $valueDetail['qty'];
-                        $nominalTransaksi += $totalxqty;
-                    }
-                    // $totalxqty = $value['qty_barang_po'] * $value['total_barang_po'];
-                }
-                $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
-                $nominal_idr += $totalHargaAll;
-            } else if ($data->status_penerimaan == "IMPORT" && $data->tipe_bahan == "BAKU") {
-                $importbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangImportBakuDetail($data->id);
-                foreach ($importbb as $value) {
-                    $poDetail = $this->rMImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($value['purchase_order_id']);
-                    $transaksiJurnal = $this->transaksiJurnalModel->asObject()->where('deleted_at', null)->where('tipe_barang', $data->status_penerimaan)->where('kategori_barang', 'BAHAN ' . $data->tipe_bahan);
-                    if ($transaksiJurnal) {
-                        foreach ($transaksiJurnal as $valueTransaksiJurnal) {
-                            if (isset($valueTransaksiJurnal->no_transaksi)) {
-                                $journal_num = $valueTransaksiJurnal->no_transaksi;
-                            } else {
-                                $journal_num = "-";
-                            }
-                        }
-                    } else {
-                        $journal_num = "-";
-                    }
-
-                    foreach ($poDetail as $valueDetail) {
-                        $nominalTransaksi += $valueDetail['total'];
-                    }
-                    $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
-                    if ($kursData) {
-                        foreach ($metaValuta as $valueValuta) {
-                            if ($value['currency'] == $valueValuta['id']) {
-                                $valasTransaksi = $valueValuta['value'];
-                                $exchangeTransaksi = $kursData->nilai_kurs;
-                            }
-                        }
-                    }
-                    // $nominalTransaksi += $value['total_po'];
-                }
-                $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
-                $nominal_idr += $totalHargaAll;
-            } else if ($data->tipe_bahan == "PENOLONG") {
-                $bp = $this->penerimaanBarangDetailModel->getPenerimaanBarangPenolongDetail($data->id);
-                foreach ($bp as $value) {
-                    $poDetail = $this->aMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($value['purchase_order_id']);
-                    $transaksiJurnal = $this->transaksiJurnalModel->asObject()->where('deleted_at', null)->where('tipe_barang', $data->status_penerimaan)->where('kategori_barang', 'BAHAN ' . $data->tipe_bahan);
-                    if ($transaksiJurnal) {
-                        foreach ($transaksiJurnal as $valueTransaksiJurnal) {
-                            if (isset($valueTransaksiJurnal->no_transaksi)) {
-                                $journal_num = $valueTransaksiJurnal->no_transaksi;
-                            } else {
-                                $journal_num = "-";
-                            }
-                        }
-                    } else {
-                        $journal_num = "-";
-                    }
-
-                    foreach ($poDetail as $valueDetail) {
-                        $nominalTransaksi += $valueDetail['total'];
-                    }
-                    $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
-                    if ($kursData) {
-                        foreach ($metaValuta as $valueValuta) {
-                            if ($value['currency'] == $valueValuta['id']) {
-                                $valasTransaksi = $valueValuta['value'];
-                                $exchangeTransaksi = $kursData->nilai_kurs;
-                            }
-                        }
-                    }
-                    // $nominalTransaksi += $value['total_po'];
-                }
-                // var_dump($exchangeTransaksi);
-                $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
-                $nominal_idr += $totalHargaAll;
-                // var_dump($nominalTransaksi);
-                // var_dump($exchangeTransaksi);
-                // var_dump($nominal_idr);
-            }
-            // var_dump($lokalbb);
-            // var_dump($importbb);
-            // var_dump($bp);
-
+            $totalRemaining = $data->total - $data->remaining;
             array_push($rdata, [
                 "no"                    => $no++,
-                "journal_num"           => $journal_num,
-                "description"           => $description,
-                "invoice"               => $invoice,
-                "date"                  => $date,
-                "tax_report"            => $tax_report,
-                "supplier"              => $supplier,
-                "nominal_idr"           => floatval($nominal_idr),
-                "remaining_idr"         => floatval($remaining_idr),
+                "id"                    => $data->id,
+                "supplier"              => $data->name,
+                "nominal_idr"           => floatval($data->total),
+                "remaining_idr"         => floatval($totalRemaining),
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $res['totalData'],
+            "recordsFiltered"   => $res['totalFilteredData'],
+            "data"              => $rdata,
+            "payload"           => $payload,
+        ];
+
+        return response()->setJSON($data);
+    }
+
+    public function allDetailsInvoice($id)
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "filter"        => $this->request->getGet("filter"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+        ];
+
+        $condition = [
+            "suppliers.company_id"  => $this->this_company_id,
+            "suppliers.id"  => $id,
+            "suppliers.deletedAt" => NULL
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "filter"        => $this->request->getGet("filter"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $checkSupplier = $this->supplierModel->find($id);
+
+        // var_dump($condition, $addCondition, $limit, $offset);
+        // exit;
+
+        if ($checkSupplier['type'] == "BAHAN PENOLONG") {
+            $res = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
+        } else if ($checkSupplier['type'] == "BAHAN BAKU") {
+            $res = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
+        } else {
+            $res = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
+            if (!$res) {
+                $res = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
+            }
+        }
+
+        $rdata = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($res['data'] as $data) {
+            $totalRemaining = $data->total - $data->remaining;
+            array_push($rdata, [
+                "no"                    => $no++,
+                "id"                    => $data->id,
+                "tanggal_invoice"       => $data->tanggal_invoice,
+                "no_invoice"            => $data->no_invoice,
+                "divisi_invoice"        => $data->divisi,
+                "nominal_invoice"       => floatval($data->total),
+                "remaining_invoice"     => floatval($totalRemaining),
             ]);
         }
 

@@ -143,7 +143,6 @@ class AMPurchaseOrderModel extends Model
         ];
     }
 
-
     // ALL PO BAHAN PENOLONG
     public function getPOLokalBPList($condition, $addCondition, $limit = 10, $offset = 0)
     {
@@ -583,5 +582,77 @@ class AMPurchaseOrderModel extends Model
             ->findAll();
 
         return $result;
+    }
+
+    public function getPOByIdSupplierWithInvoice($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'poDate'            => 'am_purchase_orders.po_date',
+            'poNo'              => 'am_purchase_orders.po_no',
+            'divisi'            => 'divisis.divisi',
+            'supplierName'      => 'suppliers.name',
+            'total'             => 'am_purchase_orders.total',
+            'currencyName'      => 'metadata.value',
+            'createdAt'         => 'am_purchase_orders.createdAt',
+            'updatedAt'         => 'am_purchase_orders.updatedAt',
+            'statusPenerimaan'  => 'am_purchase_orders.status_penerimaan'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'am_purchase_orders.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "am_purchase_orders.id AS id, 
+                    am_purchase_orders.po_date AS tanggal_invoice, 
+                    am_purchase_orders.po_no AS no_invoice, 
+                    suppliers.id AS supplier_id, 
+                    suppliers.name AS supplier_name,
+                    divisis.divisi AS divisi,
+                    COUNT(am_purchase_order_details.id) AS itemCount,
+                    am_purchase_orders.total AS total, 
+                    local_po_payments.amount AS remaining";
+
+        $poDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
+            ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
+            ->join('am_purchase_order_details', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
+            ->join('local_po_payments', 'FIND_IN_SET(am_purchase_orders.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left') // Menyesuaikan jika multiple_po_id berbentuk JSON atau array sebagai string
+            ->groupBy('am_purchase_orders.id')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $poDataQry->countAllResults(false);
+
+        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $poDataQry->groupStart();
+        }
+
+        if (!empty($addCondition['search'])) {
+            $poDataQry->like('am_purchase_orders.po_no', $addCondition['search']);
+        }
+
+        if (!empty($addCondition['dateStart'])) {
+            $poDataQry->where('am_purchase_orders.po_date >=', $addCondition['dateStart']);
+        }
+
+        if (!empty($addCondition['dateEnd'])) {
+            $poDataQry->where('am_purchase_orders.po_date <=', $addCondition['dateEnd']);
+        }
+
+        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $poDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $poDataQry->countAllResults(false);
+        $data = $poDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
     }
 }
