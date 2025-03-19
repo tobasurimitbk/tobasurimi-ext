@@ -198,7 +198,7 @@ class JasaVendorOut extends BaseController
             'divisi_id' => $this->request->getVar('divisi_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
             'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
-            'tanggal' => date('Y-m-d'),
+            "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
             'tipe_barang' => "bahan_baku",
             'no_kontainer' => $this->request->getVar('no_kontainer'),
             'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
@@ -528,14 +528,28 @@ class JasaVendorOut extends BaseController
 
     public function getJasaVendorOutNo()
     {
-        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+        $tanggal = date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))));
         $warehouse_id = $this->request->getVar('warehouse_id');
 
-        if (empty($warehouse_id)) {
-            $no = $this->jasaVendorOutModel->get_no(date('m'), date('Y'), $last_day, "", $warehouse_id);
+        if (empty($tanggal) || empty($warehouse_id)) {
+            $no = $this->jasaVendorOutModel->get_no(
+                date('m'),
+                date('Y'),
+                ""
+            );
         } else {
+
+            $tanggalExplode = explode('-', $tanggal);
+            $year = $tanggalExplode[0];
+            $month = $tanggalExplode[1];
+
             $warehouse = $this->warehouseModel->where('id', $warehouse_id)->first();
-            $no = $this->jasaVendorOutModel->get_no(date('m'), date('Y'), $last_day, strtoupper($warehouse['code_warehouse']), $warehouse_id);
+            $divisi = $this->divisiModel->where('id', $warehouse['divisi_id'])->first();
+            $no = $this->jasaVendorOutModel->get_no(
+                $month,
+                $year,
+                $divisi['divisi']
+            );
         }
         return response()->setJSON([
             'status' => true,

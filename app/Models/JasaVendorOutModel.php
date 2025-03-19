@@ -114,20 +114,22 @@ class JasaVendorOutModel extends Model
         ];
     }
 
-    public function get_no($bln, $thn, $last_day, $warehouseKode, $warehouse_id)
+    public function get_no($bln, $thn, $divisi)
     {
-        $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
+        $lastStr = convertBulanToAngkaRomawi($bln) . '/' . $thn;
+        $first_day = "$thn-$bln-01";
+        $last_day = date("Y-m-t", strtotime($first_day));
 
         $builder = $this->db->table('jasa_vendor_out');
         $builder->select('no_surat_jalan');
-        $builder->orderBy('no_surat_jalan', 'desc');
-        $builder->where('jasa_vendor_out.warehouse_id', $warehouse_id);
-        $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
-            ->where('createdAt <=', $last_day . " 23:59:59");
+        $builder->orderBy('id', 'desc');
+        $builder->where('company_id', session()->get("login")->this_company_id);
+        $builder->where('tanggal >=', $first_day);
+        $builder->where('tanggal <=', $last_day);
         $builder->like('no_surat_jalan', $lastStr);
         $query = $builder->get();
 
-        $kode = 'TOBA-VBK/' . $warehouseKode;
+        $kode = 'TOBA-VBK/' . $divisi;
 
         $lastPenerimaan = '1';
 

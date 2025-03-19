@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use Exception;
 
 class StockModel extends Model
 {
@@ -929,6 +930,137 @@ class StockModel extends Model
             ->findAll();
 
         return $dataQry;
+    }
+
+
+    public function updateNoAju($noAjuNew, $noAjuOld, $stockDateNew)
+    {
+        $stockDetailModel = new StockDetailModel();
+        $prosesRebusDetailModel = new ProsesRebusDetailModel();
+        $jasaVendorOutDetailModel = new JasaVendorOutDetailModel();
+        $jasaVendorInDetailModel = new JasaVendorInDetailModel();
+        $materialRequestPenolongDetailModel = new MaterialRequestPenolongDetailsModel();
+        $materialRequestDetailModel = new MaterialRequestDetailsModel();
+        $mutasiDetailModel = new MutasiDetailModel();
+        $mutasiGlobalDetailModel = new MutasiGlobalDetailModel();
+        $penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
+        $adjusmentDetailModel = new AdjusmentDetailModel();
+        $rasioBarangJadiModel = new RasioBarangJadiModel();
+        $rasioSaldoAkhirModel = new RasioSaldoAkhirModel();
+        $salesOrderLainDetailModel = new SalesOrderLainDetailModel();
+        $salesOrderReturnDetailModel = new SalesOrderReturnDetailModel();
+        $penerimaanMutasiGlobalDetailModel = new PenerimaanMutasiGlobalDetailModel();
+        $stockDetail2Model = new StockDetail2Model();
+        $stockDetailModel = new StockDetailModel();
+
+        $db = \Config\Database::connect();
+
+        try {
+            // Update di Proses Rebus Detail
+            $prosesRebusDetailModel->where('no_aju_rebus', $noAjuOld)
+                ->set('no_aju_rebus', $noAjuNew)
+                ->update();
+
+            // Update di Jasa Vendor Out Detail
+            $jasaVendorOutDetailModel->where('no_aju_out', $noAjuOld)
+                ->set('no_aju_out', $noAjuNew)
+                ->update();
+
+            // Update Jasa Vendor In Detail
+            $jasaVendorInDetailModel->where('no_aju_in', $noAjuOld)
+                ->set('no_aju_in', $noAjuNew)
+                ->update();
+
+            // Update Material Request Penolong & Kimia Detail
+            $materialRequestPenolongDetailModel->where('no_aju', $noAjuOld)
+                ->set('no_aju', $noAjuNew)
+                ->update();
+
+            // Update Material Request Detail
+            $materialRequestDetailModel->where('no_aju', $noAjuOld)
+                ->set('no_aju', $noAjuNew)
+                ->update();
+
+            // Update Mutasi Detail 
+            $mutasiDetailModel->where('no_aju', $noAjuOld)
+                ->set('no_aju', $noAjuNew)
+                ->update();
+
+            // Update Global Detail
+            $mutasiGlobalDetailModel->where('no_aju', $noAjuOld)
+                ->set('no_aju', $noAjuNew)
+                ->update();
+
+            // Update Penerimaan Mutasi Detail
+            $penerimaanMutasiDetailModel->where('no_aju_asal', $noAjuOld)
+                ->set('no_aju_asal', $noAjuNew)
+                ->update();
+
+            $penerimaanMutasiDetailModel->where('no_aju_mutasi', $noAjuOld)
+                ->set('no_aju_mutasi', $noAjuNew)
+                ->update();
+
+            // Adjusment Detail 
+            $adjusmentDetailModel->where('no_aju', $noAjuOld)
+                ->set('no_aju', $noAjuNew)
+                ->update();
+
+            // Rasio Barang Jadi
+            $rasioBarangJadiModel->where('no_aju', $noAjuOld)
+                ->set('no_aju', $noAjuNew)
+                ->update();
+
+            // Rasio Saldo Akhir
+            $rasioSaldoAkhirModel->where('no_aju', $noAjuOld)
+                ->set('no_aju', $noAjuNew)
+                ->update();
+
+            // Sales Order Lain Detail
+            $salesOrderLainDetailModel->where('no_aju', $noAjuOld)
+                ->set('no_aju', $noAjuNew)
+                ->update();
+
+            // Sales Order Return Detail
+            $salesOrderReturnDetailModel->where('no_aju', $noAjuOld)
+                ->set('no_aju', $noAjuNew)
+                ->update();
+
+            // Penerimaan Mutasi Global Detail
+            $penerimaanMutasiGlobalDetailModel->where('no_aju_mutasi', $noAjuOld)
+                ->set('no_aju_mutasi', $noAjuNew)
+                ->update();
+
+            // Update Stock nya
+            $stockDetail2Model->where('no_aju', $noAjuOld)
+                ->set('no_aju', $noAjuNew)
+                ->update();
+
+            // Update Stock Date (Hanya Incoming LPB)
+            $stockDetail2 = $stockDetailModel
+                ->select('stock_details.id')
+                ->join('stock_details2', 'stock_details2.stock_detail_id = stock_details.id', 'left')
+                ->where('stock_details2.no_aju', $noAjuNew)
+                ->where('stock_details.sumber', "LPB")
+                ->findAll();
+
+            $stockDetailsId = [];
+            foreach ($stockDetail2 as $s) {
+                array_push($stockDetailsId, $s['id']);
+            }
+
+            if (count($stockDetailsId) != 0) {
+                $stockDetailModel->whereIn('id', $stockDetailsId)->set('stock_date', $stockDateNew)->update();
+            }
+
+            $db->transCommit();
+
+            return true;
+        } catch (Exception $e) {
+            $db->transRollback();
+            var_dump($e->getMessage(), $e->getLine(), $e->getFile(), $e->getTraceAsString());
+            die;
+            return false;
+        }
     }
 
     public function checkStockLpbUsed($penerimaanBarangId)

@@ -54,8 +54,20 @@
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
-                            <?php $no = 1; ?>
+                            <?php
+                            $no = 1;
+                            $totalQtyPo = 0;
+                            $totalQtyDiterima = 0;
+                            $totalQtyDiterimaKonversi = 0;
+                            $totalHargaNumber = 0;
+                            ?>
                             <?php foreach ($daftarPoUsed as  $d) : ?>
+                                <?php
+                                $totalQtyPo += $d['qty_po'];
+                                $totalQtyDiterima += $d['qty_lpb'];
+                                $totalQtyDiterimaKonversi += $d['qty_lpb_konversi'];
+                                $totalHargaNumber += $d['harga'];
+                                ?>
                                 <tr>
                                     <td><?= $no++ ?></td>
                                     <td><?= $d['po_date'] ?></td>
@@ -71,6 +83,28 @@
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
+                        <tfoot>
+                            <tr style="color:whitesmoke; background-color:#f2c996; color:black;">
+                                <td style="text-align: right;" colspan="7">
+                                    <b>
+                                        GRAND TOTAL
+                                    </b>
+                                </td>
+                                <td>
+                                    <?= number_format($totalQtyPo) ?>
+                                </td>
+                                <td>
+                                    <?= number_format($totalQtyDiterima) ?>
+                                </td>
+                                <td>
+                                    <?= number_format($totalQtyDiterimaKonversi) ?>
+                                </td>
+                                <td>
+                                    <?= number_format($totalHargaNumber, 2) ?>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
 
                     </table>
                 </div>

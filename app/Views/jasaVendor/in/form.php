@@ -368,6 +368,12 @@
         })
     <?php endif; ?>
 
+    <?php if (empty($jasaVendorOut)): ?>
+        $('.tanggal').change(function() {
+            changeStatus();
+        })
+    <?php endif; ?>
+
     $('#vendor_id').select2({
         placeholder: "Pilih Vendor",
         theme: "bootstrap-5",
@@ -1131,7 +1137,8 @@
                 url: `<?= base_url("jasa-vendor-in/get-jasa-vendor-in-no"); ?>`,
                 method: "GET",
                 data: {
-                    warehouse_id: $('#warehouse_id option:selected').val()
+                    warehouse_id: $('#warehouse_id option:selected').val(),
+                    tanggal: $('#tanggal').val()
                 },
                 dataType: "json",
                 success: function(res) {

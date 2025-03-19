@@ -430,13 +430,6 @@
                     </div>
                 </div>
 
-                <!-- <div class="col-subtitle-modal mt-3">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <label class="form-label font-weight-bold modal-sub-title">Item Tanda Terima Supplier</label>
-                        </div>
-                    </div>
-                </div> -->
             </form>
         </div>
     </div>
@@ -452,9 +445,9 @@
     <?php if (!empty($detail)) : ?>
 
         var id = $('#tanda_terima_supplier').val();
+        var supplierId = $('#supplier_id option:selected').val();
         $.ajax({
-
-            url: '<?= base_url('pembayaran-po-lokal-bp/get-item-list/') ?>' + id,
+            url: '<?= base_url('pembayaran-po-lokal-bp/get-item-list/') ?>' + id + '/' + supplierId,
             method: "GET",
             data: {
                 status_pph: $('#status_pph').val(),
@@ -685,7 +678,6 @@
                 var input_user = (element.val());
                 listPanjar[i].bayar_panjar = destroyFormatRupiah(input_user);
             });
-
 
             $.each(listPinjaman, function(i, v) {
 
@@ -931,8 +923,9 @@
 
     function listBarangDetail() {
         var id = $('#tanda_terima_supplier').val();
+        var supplierId = $('#supplier_id option:selected').val();
         $.ajax({
-            url: '<?= base_url('pembayaran-po-lokal-bp/get-item-list/') ?>' + id,
+            url: '<?= base_url('pembayaran-po-lokal-bp/get-item-list/') ?>' + id + '/' + supplierId,
             method: "GET",
             data: {
                 status_pph: $('#status_pph').val()
@@ -1208,7 +1201,7 @@
         } else {
             var newRow = $('<tr>');
             newRow.append($('<td colspan="8" style="text-align:center;">Tidak Ada Panjar</td>'));
-            tablePinjaman.find('tbody').append(newRow);
+            tablePanjar.find('tbody').append(newRow);
         }
 
 
@@ -1296,7 +1289,7 @@
         } else {
             var newRow = $('<tr>');
             newRow.append($('<td colspan="8" style="text-align:center;">Tidak Ada Panjar TB</td>'));
-            tablePinjaman.find('tbody').append(newRow);
+            tablePanjar.find('tbody').append(newRow);
         }
 
     }
@@ -1543,7 +1536,7 @@
         newRow11.append($('<td style="text-align:right;" colspan="6"><b>Input Pembayaran</b></td>'));
         newRow11.append($('<td>').html(
             `
-                        <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${Number(sisaPembayaran)})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="" name = "nominal_pembayaran" style="height:40px">
+                        <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${Number(subTotal)})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="" name = "nominal_pembayaran" style="height:40px">
                     `
         ));
         table.find('tbody').append(newRow11);

@@ -24,18 +24,18 @@
                 <div class="col-md-4">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_bc_type" name="filter_bc_type" id="filter_bc_type">
+                            <option value="all" data-code="">All</option>
                             <option selected value="BC 2.3" data-code="">BC 2.3</option>
                             <option value="BC 2.7" data-code="">BC 2.7</option>
                             <option value="BC 4.0" data-code="">BC 4.0</option>
                             <option value="PPB KB" data-code="">PPB KB</option>
                             <option value="Non Pabean" data-code="">Non Pabean</option>
-
                         </select>
                         <label for="floatingInput">Filter Tipe BC</label>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="input-group input-group-password">
+                    <div class="input-group">
                         <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
@@ -43,7 +43,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="input-group input-group-password">
+                    <div class="input-group">
                         <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>

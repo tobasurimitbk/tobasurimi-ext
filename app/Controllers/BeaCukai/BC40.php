@@ -1473,7 +1473,9 @@ class BC40 extends BaseController
     {
         $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
         $noAju = $this->request->getVar('no_pengajuan');
+
         $bc40First = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
+        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
 
         $bc40 = $this->bc40Model
             ->where('no_aju', $noAju)
@@ -1489,7 +1491,6 @@ class BC40 extends BaseController
         }
 
         if ($bc40First == null) {
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
             $this->bc40Model->insert([
                 'no_aju' => $noAju,
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
@@ -2259,7 +2260,7 @@ class BC40 extends BaseController
                         $stok,
                         $p['jml_masuk_konversi'],
                         'In',
-                        date('Y-m-d'),
+                        date('Y-m-d', strtotime($bcPo['createdAt'])),
                         $this->this_user_id,
                         "LPB",
                         $penerimaanBarang['no_penerimaan_barang'],
@@ -2307,7 +2308,7 @@ class BC40 extends BaseController
                     $stok,
                     $penerimaanBarang['jumlah_kemasan'],
                     "In",
-                    date('Y-m-d'),
+                    date('Y-m-d', strtotime($bcPo['createdAt'])),
                     $this->this_user_id,
                     "LPB",
                     $penerimaanBarang['no_penerimaan_barang'],
@@ -2618,5 +2619,59 @@ class BC40 extends BaseController
             'data' => $supplierData,
             'status' => true,
         ]);
+    }
+
+    public function updateNoAjuBulk()
+    {
+        $bcPurchaseOrderID = $this->request->getVar('bc_purchase_order_id');
+        $noAjuNew = $this->request->getVar('no_pengajuan');
+        $noDaftar = $this->request->getVar('no_daftar');
+        $tanggalDokumen = $this->request->getVar("tanggal_dokumen") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_dokumen")))) : "";
+        // Get
+        $bc40 = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
+
+        // Periksa Nomor Aju
+        $bc40First = $this->bc40Model
+            ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+            ->where('no_aju', $noAjuNew)
+            ->where('bc_purchase_order_id !=', $bcPurchaseOrderID)
+            ->first();
+
+        if ($bc40First != null) {
+            return response()->setJSON([
+                'token' => csrf_token(),
+                'message' => "No Aju Sudah Digunakan",
+                'status' => true,
+            ]);
+        } else {
+            $updateBulkNoAju = $this->stockModel->updateNoAju(
+                $noAjuNew,
+                $bc40['no_aju'],
+                $tanggalDokumen
+            );
+
+            if ($updateBulkNoAju) {
+                $this->bcPurchaseOrderModel->update($bcPurchaseOrderID, [
+                    'createdAt' => $tanggalDokumen,
+                    'no_daftar' => $noDaftar,
+                ]);
+
+                $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)
+                    ->set('no_aju', $noAjuNew)
+                    ->update();
+
+                return response()->setJSON([
+                    'token' => csrf_token(),
+                    'message' => "No Aju & No Daftar Berhasil Diupdate",
+                    'status' => true,
+                ]);
+            } else {
+                return response()->setJSON([
+                    'token' => csrf_token(),
+                    'message' => "Terjadi Kesalahan Saat Mengubah Nomor Aju & No Daftar",
+                    'status' => false,
+                ]);
+            }
+        }
     }
 }

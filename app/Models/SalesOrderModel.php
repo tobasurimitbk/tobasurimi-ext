@@ -55,6 +55,7 @@ class SalesOrderModel extends Model
         'paid_amt',
         'used',
         'counter_print',
+        'posting',
     ];
 
     // Dates
