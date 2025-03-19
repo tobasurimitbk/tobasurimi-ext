@@ -206,35 +206,39 @@ class PanjarSupplierModel extends Model
 
     public function getNumber($companyId)
     {
-        $month = date('m');
-        $year = date('Y');
-        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-
-        $lastStr =  convertBulanToAngkaRomawi($month) . '/' . $year;
-
-        // AMBIL NO PANJAR TERAKHIR DI BULAN & TAHUN INI
+        $month = date('m'); // Bulan saat ini (format: 01-12)
+        $year = date('Y'); // Tahun saat ini (format: 2023)
+        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d'))); // Tanggal terakhir bulan ini
+    
+        $lastStr = convertBulanToAngkaRomawi($month) . '/' . $year; // Format: III/2023
+    
+        // Ambil no_panjar terakhir di bulan & tahun ini
         $builder = $this->asArray()->select('no_panjar')
             ->orderBy('no_panjar', "DESC")
             ->where('company_id', $companyId)
             ->where('createdAt >=', $year . "-" . $month . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59")
             ->first();
-
-        $kode = 'PJR';  // PJR/X/2023/00001
-        $lastNumber = 1;
-
-        if ($builder != null) {
-            $explode = explode('/', $builder['no_panjar']); // CONVERT TO ARRAY BY (/)
-            $number = intval($explode[2]); // CARI DIGIT ANGKA
-            if ($number > $lastNumber) {
-                $lastNumber = $number;
+    
+        $kode = 'PJR'; // Kode awal: PJR
+        $lastNumber = 1; // Nomor awal: 1
+    
+        if ($builder != null && isset($builder['no_panjar'])) {
+            $explode = explode('/', $builder['no_panjar']); // Pecah no_panjar menjadi array
+    
+            // Pastikan format no_panjar sesuai: PJR/X/2023/00001
+            if (count($explode) == 4) {
+                $numberStr = $explode[3]; // Ambil bagian nomor (00001)
+                $number = intval($numberStr); // Konversi ke integer
+                if ($number >= $lastNumber) {
+                    $lastNumber = $number + 1; // Increment nomor terakhir
+                }
             }
-            $lastNumber++;
         }
-
-        $formattedlastNumber = sprintf("%02d", $lastNumber); // 00001
-        $generatedNo = $kode . '/' . $lastStr . '/' . $formattedlastNumber;
-
+    
+        $formattedlastNumber = sprintf("%05d", $lastNumber); // Format nomor menjadi 5 digit (00001)
+        $generatedNo = $kode . '/' . $lastStr . '/' . $formattedlastNumber; // Gabungkan semua bagian
+    
         return $generatedNo;
     }
 

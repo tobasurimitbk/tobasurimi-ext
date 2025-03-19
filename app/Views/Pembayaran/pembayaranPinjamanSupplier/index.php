@@ -374,10 +374,23 @@
             },
             name: {
                 required: true
-            }
-
+            },
+            akun_kas: {
+                required: true
+            },
+            akun_selisih: {
+                required: true
+            },
         },
         messages: {
+            akun_kas: {
+                required: "akun kas wajib diisi",
+
+            },
+            akun_selisih: {
+                required: "akun selisih wajib diisi",
+
+            },
             total_pinjaman: {
                 required: "total pinjaman wajib diisi",
 
@@ -604,21 +617,13 @@
                         $("#no_pinjaman").val(res.data.no_pinjaman);
                         $("#payment_date").val(res.data.payment_date);
                         $("#tipe_supplier").val(res.data.type).change();
+                        $("#jenis_pinjaman").val(res.data.jenis_pinjaman).change();
                         $("#supplier_id").val(res.data.supplier_id);
                         $("#payment_date").val(res.data.payment_date);
                         $("#total_pinjaman").val(formatRupiah(res.data.total_pinjaman));
                         $("#sisa_pinjaman").val(res.data.fax);
                         $(".add-modal").modal("show");
                         $('#auto_generate').css('display', 'none');
-                        // $("#no_pinjaman").prop("disabled", true);
-                        // if (res.data.is_posted === "1") {
-                        //     $("#payment_date").prop("disabled", true);
-                        //     $("#tipe_supplier").prop("disabled", true);
-                        //     $("#supplier_id").prop("disabled", true);
-                        //     $("#total_pinjaman").prop("disabled", true);
-                        //     $(".delete-form").css('display', 'none');
-                        // }
-
                         if (res.data.akun_kas) {
                             let akunKas = new Option(res.data.akun_kas_name || "", res.data.akun_kas, true, true);
                             $("#akun_kas").append(akunKas).trigger('change');
@@ -627,6 +632,16 @@
                         if (res.data.akun_selisih) {
                             let akunSelisih = new Option(res.data.akun_selisih_name || "", res.data.akun_selisih, true, true);
                             $("#akun_selisih").append(akunSelisih).trigger('change');
+                        }
+
+                        if (res.data.is_posted == 1) {
+                            // Sembunyikan tombol Hapus dan Simpan
+                            $(".delete-form").hide(); // Tombol Hapus
+                            $(".btn-submit-form").hide(); // Tombol Simpan
+                        } else {
+                            // Tampilkan tombol Hapus dan Simpan
+                            $(".delete-form").show(); // Tombol Hapus
+                            $(".btn-submit-form").show(); // Tombol Simpan
                         }
 
                         $('.modal').on('hidden.bs.modal', function() {

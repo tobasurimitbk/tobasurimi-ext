@@ -394,9 +394,23 @@
             },
             name: {
                 required: true
+            },
+            akun_kas: {
+                required: true
+            },
+            akun_selisih: {
+                required: true
             }
         },
         messages: {
+            akun_kas: {
+                required: "akun kas wajib diisi",
+
+            },
+            akun_selisih: {
+                required: "akun selisih wajib diisi",
+
+            },
             total_panjar: {
                 required: "total panjar wajib diisi",
 
@@ -636,29 +650,18 @@
             success: function(res) {
                 if (res.status) {
                     try {
-                        // APPEND TO DROPDOWN SUPPLIER
                         appendDropdownSupplier(res.supplier);
-                        // APPEND TO FORM
                         $("#id").val(id);
                         $("#no_panjar").val(res.data.no_panjar);
                         $("#payment_date").val(res.data.payment_date);
                         $("#tipe_supplier").val(res.data.type).change();
+                        $("#jenis_panjar").val(res.data.jenis_panjar).change();
                         $("#supplier_id").val(res.data.supplier_id);
                         $("#payment_date").val(res.data.payment_date);
                         $("#total_panjar").val(formatRupiah(res.data.total_panjar));
                         $("#sisa_panjar").val(res.data.fax);
                         $(".add-modal").modal("show");
                         $('#auto_generate').css('display', 'none');
-                        // $("#no_panjar").prop("disabled", true);
-                        // if (res.data.is_posted === "1") {
-                        //     $("#payment_date").prop("disabled", true);
-                        //     $("#tipe_supplier").prop("disabled", true);
-                        //     $("#supplier_id").prop("disabled", true);
-                        //     $("#total_panjar").prop("disabled", true);
-                        //     $(".delete-form").css('display', 'none');
-                        // }
-
-                        // SET SELECT2 VALUE FOR EDIT
 
                         if (res.data.akun_kas) {
                             let akunKas = new Option(res.data.akun_kas_name || "", res.data.akun_kas, true, true);
@@ -668,6 +671,17 @@
                         if (res.data.akun_selisih) {
                             let akunSelisih = new Option(res.data.akun_selisih_name || "", res.data.akun_selisih, true, true);
                             $("#akun_selisih").append(akunSelisih).trigger('change');
+                        }
+
+                         // Cek is_posted
+                        if (res.data.is_posted == 1) {
+                            // Sembunyikan tombol Hapus dan Simpan
+                            $(".delete-form").hide(); // Tombol Hapus
+                            $(".btn-submit-form").hide(); // Tombol Simpan
+                        } else {
+                            // Tampilkan tombol Hapus dan Simpan
+                            $(".delete-form").show(); // Tombol Hapus
+                            $(".btn-submit-form").show(); // Tombol Simpan
                         }
 
                         $('.modal').on('hidden.bs.modal', function() {
