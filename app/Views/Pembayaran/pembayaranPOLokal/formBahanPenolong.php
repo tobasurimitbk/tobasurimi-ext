@@ -981,20 +981,20 @@
                 newRow3.append($('<td>').text(greatFormatRupiah(detail.nominal_faktur)));
                 table.find('tbody').append(newRow3);
 
-                // var newRow4 = $('<tr>');
-                // newRow4.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dipungut Negara (' + res.tax_dipungut_negara.taxType + ')'));
-                // newRow4.append($('<td>').text(greatFormatRupiah(res.tax_dipungut_negara.taxAmt)));
-                // table.find('tbody').append(newRow4);
+                var newRow4 = $('<tr>');
+                newRow4.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dipungut Negara (' + res.tax_dipungut_negara.taxType + ')'));
+                newRow4.append($('<td>').text(greatFormatRupiah(res.tax_dipungut_negara.taxAmt)));
+                table.find('tbody').append(newRow4);
 
-                // var newRow5 = $('<tr>');
-                // newRow5.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dikembalikan Lagi (' + res.tax_dikembalikan_lagi.taxType + ')'));
-                // newRow5.append($('<td>').text(greatFormatRupiah(res.tax_dikembalikan_lagi.taxAmt)));
-                // table.find('tbody').append(newRow5);
+                var newRow5 = $('<tr>');
+                newRow5.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dikembalikan Lagi (' + res.tax_dikembalikan_lagi.taxType + ')'));
+                newRow5.append($('<td>').text(greatFormatRupiah(res.tax_dikembalikan_lagi.taxAmt)));
+                table.find('tbody').append(newRow5);
 
-                // var newRow6 = $('<tr>');
-                // newRow6.append($('<td style="text-align:right;" colspan="6">').text('Pajak Penghasilan (2.5 %) (+)'));
-                // newRow6.append($('<td>').text(greatFormatRupiah(res.pph.toFixed(2))));
-                // table.find('tbody').append(newRow6);
+                var newRow6 = $('<tr>');
+                newRow6.append($('<td style="text-align:right;" colspan="6">').text('Pajak Penghasilan (2.5 %) (+)'));
+                newRow6.append($('<td>').text(greatFormatRupiah(res.pph.toFixed(2))));
+                table.find('tbody').append(newRow6);
 
 
                 var newRow8 = $('<tr>');
@@ -1442,20 +1442,20 @@
         newRow3.append($('<td>').text(greatFormatRupiah(detail.nominal_faktur)));
         table.find('tbody').append(newRow3);
 
-        // var newRow6 = $('<tr>');
-        // newRow6.append($('<td style="text-align:right;" colspan="6">').text('Pajak Penghasilan (2.5 %) (+)'));
-        // newRow6.append($('<td>').text(greatFormatRupiah(res.pph.toFixed(2))));
-        // table.find('tbody').append(newRow6);
+        var newRow6 = $('<tr>');
+        newRow6.append($('<td style="text-align:right;" colspan="6">').text('Pajak Penghasilan (2.5 %) (+)'));
+        newRow6.append($('<td>').text(greatFormatRupiah(res.pph.toFixed(2))));
+        table.find('tbody').append(newRow6);
         
-        // var newRow4 = $('<tr>');
-        // newRow4.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dipungut Negara (' + res.tax_dipungut_negara.taxType + ')'));
-        // newRow4.append($('<td>').text(greatFormatRupiah(res.tax_dipungut_negara.taxAmt)));
-        // table.find('tbody').append(newRow4);
+        var newRow4 = $('<tr>');
+        newRow4.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dipungut Negara (' + res.tax_dipungut_negara.taxType + ')'));
+        newRow4.append($('<td>').text(greatFormatRupiah(res.tax_dipungut_negara.taxAmt)));
+        table.find('tbody').append(newRow4);
 
-        // var newRow5 = $('<tr>');
-        // newRow5.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dikembalikan Lagi (' + res.tax_dikembalikan_lagi.taxType + ')'));
-        // newRow5.append($('<td>').text(greatFormatRupiah(res.tax_dikembalikan_lagi.taxAmt)));
-        // table.find('tbody').append(newRow5);
+        var newRow5 = $('<tr>');
+        newRow5.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dikembalikan Lagi (' + res.tax_dikembalikan_lagi.taxType + ')'));
+        newRow5.append($('<td>').text(greatFormatRupiah(res.tax_dikembalikan_lagi.taxAmt)));
+        table.find('tbody').append(newRow5);
 
         var newRow8 = $('<tr>');
         newRow8.append($('<td style="text-align:right;" colspan="6"><b>Potongan Panjar</b></td>'));
