@@ -563,9 +563,21 @@
 
     // HIDE MODAL
     $('.btn-discard').click(function() {
-        $('.add-modal').modal('hide');
+        // Reset form validation
         validator.resetForm();
         validator.reset();
+
+        // Clear input fields
+        $('.add-modal input').val('');
+        $('.add-modal textarea').val('');
+        $('.add-modal select').val('').trigger('change');
+
+        // Reset other cached data or state
+        $('.add-modal .error-message').text('');
+        $('.add-modal .preview-image').attr('src', '');
+
+        // Hide modal
+        $('.add-modal').modal('hide');
     });
 
     $('#tipe_supplier').select2({
