@@ -195,39 +195,48 @@
                         </div>
                     </div>
                 </div>
-                <div id="coa-panjar-section" style="display: none;">
+
+                <!-- Label Akun Coa Panjar Supplier (hanya muncul jika ada data) -->
+                <div id="coa-panjar-label" style="display: none;">
                     <div class="row">
                         <div class="col mb-3">
                             <label class="form-label font-weight-bold lable-title">Akun Coa Panjar Supplier</label>
                         </div>
                     </div>
+                </div>
+
+                <!-- Container untuk menampung semua coa-panjar-section -->
+                <div id="coa-panjar-container"></div>
+
+                <!-- Template untuk coa-panjar-section -->
+                <div id="coa-panjar-template" style="display: none;">
                     <div class="row">
-                        <input type="hidden" id="id_panjar">
+                        <input type="hidden" class="id_panjar">
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <input type="text" class="form-control" id="no_panjar" readonly>
+                                <input type="text" class="form-control no_panjar" readonly>
                                 <label for="no_panjar" style="z-index: 1;">No Panjar</label>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <select class="form-select" name="akun_kas_panjar" id="akun_kas_panjar"></select>
+                                <select class="form-select akun_kas_panjar"></select>
                                 <label for="akun_kas_panjar" style="z-index: 1;">Debit (Opsional)</label>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <select class="form-select" name="akun_selisih_panjar" id="akun_selisih_panjar"></select>
+                                <select class="form-select akun_selisih_panjar"></select>
                                 <label for="akun_selisih_panjar" style="z-index: 1;">Kredit</label>
                             </div>
                         </div>  
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <input class="form-control" name="keterangan_panjar" id="keterangan_panjar">
+                                <input class="form-control keterangan_panjar">
                                 <label for="keterangan_panjar" style="z-index: 1;">Keterangan</label>
                             </div>
                         </div>  
@@ -235,40 +244,47 @@
                     <br>
                 </div>
 
-                <div id="coa-panjar-tb-section" style="display: none;">
+                <!-- Label Akun Coa Panjar TB Supplier (hanya muncul jika ada data) -->
+                <div id="coa-panjar-tb-label" style="display: none;">
                     <div class="row">
                         <div class="col mb-3">
                             <label class="form-label font-weight-bold lable-title">Akun Coa Panjar TB Supplier</label>
                         </div>
                     </div>
+                </div>
 
+                <!-- Container untuk menampung semua coa-panjar-tb-section -->
+                <div id="coa-panjar-tb-container"></div>
+
+                <!-- Template untuk coa-panjar-tb-section -->
+                <div id="coa-panjar-tb-template" style="display: none;">
                     <div class="row">
-                        <input type="hidden" id="id_panjar_tb">
+                        <input type="hidden" class="id_panjar_tb">
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <input type="text" class="form-control" id="no_panjar_tb" readonly>
-                                <label for="no_panjar_tb" style="z-index: 1;">No Panjar</label>
+                                <input type="text" class="form-control no_panjar_tb" readonly>
+                                <label for="no_panjar_tb" style="z-index: 1;">No Panjar TB</label>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <select class="form-select" name="akun_kas_panjar_tb" id="akun_kas_panjar_tb"></select>
+                                <select class="form-select akun_kas_panjar_tb"></select>
                                 <label for="akun_kas_panjar_tb" style="z-index: 1;">Debit (Opsional)</label>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <select class="form-select" name="akun_selisih_panjar_tb" id="akun_selisih_panjar_tb"></select>
+                                <select class="form-select akun_selisih_panjar_tb"></select>
                                 <label for="akun_selisih_panjar_tb" style="z-index: 1;">Kredit</label>
                             </div>
                         </div>  
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <input class="form-control" name="keterangan_panjar_tb" id="keterangan_panjar_tb">
+                                <input class="form-control keterangan_panjar_tb">
                                 <label for="keterangan_panjar_tb" style="z-index: 1;">Keterangan</label>
                             </div>
                         </div>  
@@ -276,46 +292,53 @@
                     <br>
                 </div>
 
-                <div id="coa-pinjaman-section" style="display: none;">
+                <!-- Label Akun Coa Pinjaman Supplier (hanya muncul jika ada data) -->
+                <div id="coa-pinjaman-label" style="display: none;">
                     <div class="row">
                         <div class="col mb-3">
                             <label class="form-label font-weight-bold lable-title">Akun Coa Pinjaman Supplier</label>
                         </div>
                     </div>
+                </div>
+
+                <!-- Container untuk menampung semua coa-pinjaman-section -->
+                <div id="coa-pinjaman-container"></div>
+
+                <!-- Template untuk coa-pinjaman-section -->
+                <div id="coa-pinjaman-template" style="display: none;">
                     <div class="row">
-                        <input type="hidden" id="id_pinjaman">
+                        <input type="hidden" class="id_pinjaman">
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <input type="text" class="form-control" id="no_pinjaman" readonly>
-                                <label for="no_pinjaman" style="z-index: 1;">No Panjar</label>
+                                <input type="text" class="form-control no_pinjaman" readonly>
+                                <label for="no_pinjaman" style="z-index: 1;">No Pinjaman</label>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <select class="form-select" name="akun_kas_pinjaman" id="akun_kas_pinjaman"></select>
+                                <select class="form-select akun_kas_pinjaman"></select>
                                 <label for="akun_kas_pinjaman" style="z-index: 1;">Debit (Opsional)</label>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <select class="form-select" name="akun_selisih_pinjaman" id="akun_selisih_pinjaman"></select>
+                                <select class="form-select akun_selisih_pinjaman"></select>
                                 <label for="akun_selisih_pinjaman" style="z-index: 1;">Kredit</label>
                             </div>
                         </div>  
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <input class="form-control" name="keterangan_pinjaman" id="keterangan_pinjaman">
+                                <input class="form-control keterangan_pinjaman">
                                 <label for="keterangan_pinjaman" style="z-index: 1;">Keterangan</label>
                             </div>
                         </div>  
                     </div>
                     <br>
                 </div>
-
                 <div class="row">
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                         <li class="nav-item" role="presentation">
@@ -600,6 +623,14 @@
         $('.jatuh_tempo_element').hide();
 
         $("#payment_date").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        });
+
+
+        $("#payment_panjar_date").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
@@ -1025,31 +1056,6 @@
                 table.find('tbody').append(newRow7);
 
 
-
-                $(document).on("input", ".bayar_panjar", function() {
-                    $("#coa-panjar-section").show();
-
-                    var idPanjar = $(this).data('id');
-                    var noPanjar = $(this).data('no');
-                    var akunKas = $(this).data('akunKas') || "";
-                    var akunSelisih = $(this).data('akunCoa') || "";
-                    var keterangan = $(this).data('keterangan') || "";
-
-                    $('#id_panjar').val(idPanjar);
-                    $('#no_panjar').val(noPanjar);
-                    $('#akun_kas_panjar').val(akunKas);
-                    $('#akun_selisih_panjar').val(akunSelisih);
-                    $('#keterangan_panjar').val(keterangan);
-
-                    var totalBayarPanjar = updateTotalBayarPanjar();
-                    var newSubtotal = subTotal - totalBayarPanjar;
-                    subCountTotal = newSubtotal;
-
-                    $('input.nominal_pembayaran').attr('oninput', `limitInputBayar(this, ${subCountTotal})`);
-                    $('.subtotal').text(greatFormatRupiah(subCountTotal));
-
-                });
-
                 $(document).on("input", ".bayar_pinjaman", function() {
                     $("#coa-pinjaman-section").show();
 
@@ -1129,6 +1135,7 @@
         let no = 1;
         $("#no_panjar").empty();
         tablePanjar.find('tbody').empty();
+        $("#coa-panjar-container").empty();
 
         if (panjar.length > 0) {
             $.each(panjar, function(i, v) {
@@ -1170,31 +1177,37 @@
 
 
                 if (total_pembayaran > 0) {
-                    $("#coa-panjar-section").show();
+                    let $newSection = $("#coa-panjar-template").clone().removeAttr("id").show();
 
-                    $("#id_panjar").val(v.panjar_id); 
-                    $("#no_panjar").val(v.no_panjar);
+                    // Isi nilai
+                    $newSection.find(".id_panjar").val(v.panjar_id);
+                    $newSection.find(".no_panjar").val(v.no_panjar);
+                    $newSection.find(".keterangan_panjar").val(v.keterangan);
 
-                    setTimeout(() => {
-                        if (v.akun_kas_name) {
-                            if ($("#akun_kas_panjar").find("option[value='" + v.akun_kas_name + "']").length === 0) {
-                                let newOptionKas = new Option(v.akun_kas_name, v.akun_kas_name, true, true);
-                                $("#akun_kas_panjar").append(newOptionKas).trigger("change");
-                            } else {
-                                $("#akun_kas_panjar").val(v.akun_kas_name).trigger("change");
-                            }
+                    // Handle akun_kas_panjar
+                    if (v.akun_kas_name) {
+                        let $akunKas = $newSection.find(".akun_kas_panjar");
+                        if ($akunKas.find("option[value='" + v.akun_kas_name + "']").length === 0) {
+                            let newOptionKas = new Option(v.akun_kas_name, v.akun_kas_name, true, true);
+                            $akunKas.append(newOptionKas).trigger("change");
+                        } else {
+                            $akunKas.val(v.akun_kas_name).trigger("change");
                         }
+                    }
 
-                        if (v.akun_selisih_name) {
-                            if ($("#akun_selisih_panjar").find("option[value='" + v.akun_selisih_name + "']").length === 0) {
-                                let newOptionSelisih = new Option(v.akun_selisih_name, v.akun_selisih_name, true, true);
-                                $("#akun_selisih_panjar").append(newOptionSelisih).trigger("change");
-                            } else {
-                                $("#akun_selisih_panjar").val(v.akun_selisih_name).trigger("change");
-                            }
+                    // Handle akun_selisih_panjar
+                    if (v.akun_selisih_name) {
+                        let $akunSelisih = $newSection.find(".akun_selisih_panjar");
+                        if ($akunSelisih.find("option[value='" + v.akun_selisih_name + "']").length === 0) {
+                            let newOptionSelisih = new Option(v.akun_selisih_name, v.akun_selisih_name, true, true);
+                            $akunSelisih.append(newOptionSelisih).trigger("change");
+                        } else {
+                            $akunSelisih.val(v.akun_selisih_name).trigger("change");
                         }
+                    }
 
-                    }, 1000); 
+                    // Tambahkan ke container
+                    $("#coa-panjar-container").append($newSection);
                 }
 
             });
@@ -1217,6 +1230,7 @@
         let no = 1;
         $("#no_panjar").empty();
         tablePanjar.find('tbody').empty();
+        $("#coa-panjar-tb-container").empty();
 
         if (panjar.length > 0) {
             $.each(panjar, function(i, v) {
@@ -1258,31 +1272,37 @@
 
 
                 if (total_pembayaran > 0) {
-                    $("#coa-panjar-tb-section").show();
+                    let $newSection = $("#coa-panjar-tb-template").clone().removeAttr("id").show();
 
-                    $("#id_panjar_tb").val(v.panjar_id); 
-                    $("#no_panjar_tb").val(v.no_panjar);
+                    // Isi nilai
+                    $newSection.find(".id_panjar_tb").val(v.panjar_id);
+                    $newSection.find(".no_panjar_tb").val(v.no_panjar);
+                    $newSection.find(".keterangan_panjar_tb").val(v.keterangan);
 
-                    setTimeout(() => {
-                        if (v.akun_kas_name) {
-                            if ($("#akun_kas_panjar_tb").find("option[value='" + v.akun_kas_name + "']").length === 0) {
-                                let newOptionKas = new Option(v.akun_kas_name, v.akun_kas_name, true, true);
-                                $("#akun_kas_panjar_tb").append(newOptionKas).trigger("change");
-                            } else {
-                                $("#akun_kas_panjar_tb").val(v.akun_kas_name).trigger("change");
-                            }
+                    // Handle akun_kas_panjar
+                    if (v.akun_kas_name) {
+                        let $akunKas = $newSection.find(".akun_kas_panjar_tb");
+                        if ($akunKas.find("option[value='" + v.akun_kas_name + "']").length === 0) {
+                            let newOptionKas = new Option(v.akun_kas_name, v.akun_kas_name, true, true);
+                            $akunKas.append(newOptionKas).trigger("change");
+                        } else {
+                            $akunKas.val(v.akun_kas_name).trigger("change");
                         }
+                    }
 
-                        if (v.akun_selisih_name) {
-                            if ($("#akun_selisih_panjar_tb").find("option[value='" + v.akun_selisih_name + "']").length === 0) {
-                                let newOptionSelisih = new Option(v.akun_selisih_name, v.akun_selisih_name, true, true);
-                                $("#akun_selisih_panjar_tb").append(newOptionSelisih).trigger("change");
-                            } else {
-                                $("#akun_selisih_panjar_tb").val(v.akun_selisih_name).trigger("change");
-                            }
+                    // Handle akun_selisih_panjar
+                    if (v.akun_selisih_name) {
+                        let $akunSelisih = $newSection.find(".akun_selisih_panjar_tb");
+                        if ($akunSelisih.find("option[value='" + v.akun_selisih_name + "']").length === 0) {
+                            let newOptionSelisih = new Option(v.akun_selisih_name, v.akun_selisih_name, true, true);
+                            $akunSelisih.append(newOptionSelisih).trigger("change");
+                        } else {
+                            $akunSelisih.val(v.akun_selisih_name).trigger("change");
                         }
+                    }
 
-                    }, 1000); 
+                    // Tambahkan ke container
+                    $("#coa-panjar-tb-container").append($newSection);
                 }
 
             });
@@ -1304,6 +1324,7 @@
         let no = 1;
         $("#no_pinjaman").empty();
         tablePinjaman.find('tbody').empty();
+        $("#coa-pinjaman-container").empty();
 
         if (pinjaman.length > 0) {
             $.each(pinjaman, function(i, v) {
@@ -1345,33 +1366,38 @@
 
 
                 if (total_pembayaran > 0) {
-                    $("#coa-pinjaman-section").show();
+                    let $newSection = $("#coa-pinjaman-template").clone().removeAttr("id").show();
 
-                    $("#id_pinjaman").val(v.pinjaman_id); 
-                    $("#no_pinjaman").val(v.no_pinjaman);
+                    // Isi nilai
+                    $newSection.find(".id_pinjaman").val(v.pinjaman_id);
+                    $newSection.find(".no_pinjaman").val(v.no_pinjaman);
+                    $newSection.find(".keterangan_pinjaman").val(v.keterangan);
 
-                    setTimeout(() => {
-                        if (v.akun_kas_name) {
-                            if ($("#akun_kas_pinjaman").find("option[value='" + v.akun_kas_name + "']").length === 0) {
-                                let newOptionKas = new Option(v.akun_kas_name, v.akun_kas_name, true, true);
-                                $("#akun_kas_pinjaman").append(newOptionKas).trigger("change");
-                            } else {
-                                $("#akun_kas_pinjaman").val(v.akun_kas_name).trigger("change");
-                            }
+                    // Handle akun_kas_pinjaman
+                    if (v.akun_kas_name) {
+                        let $akunKas = $newSection.find(".akun_kas_pinjaman");
+                        if ($akunKas.find("option[value='" + v.akun_kas_name + "']").length === 0) {
+                            let newOptionKas = new Option(v.akun_kas_name, v.akun_kas_name, true, true);
+                            $akunKas.append(newOptionKas).trigger("change");
+                        } else {
+                            $akunKas.val(v.akun_kas_name).trigger("change");
                         }
+                    }
 
-                        if (v.akun_selisih_name) {
-                            if ($("#akun_selisih_pinjaman").find("option[value='" + v.akun_selisih_name + "']").length === 0) {
-                                let newOptionSelisih = new Option(v.akun_selisih_name, v.akun_selisih_name, true, true);
-                                $("#akun_selisih_pinjaman").append(newOptionSelisih).trigger("change");
-                            } else {
-                                $("#akun_selisih_pinjaman").val(v.akun_selisih_name).trigger("change");
-                            }
+                    // Handle akun_selisih_pinjaman
+                    if (v.akun_selisih_name) {
+                        let $akunSelisih = $newSection.find(".akun_selisih_pinjaman");
+                        if ($akunSelisih.find("option[value='" + v.akun_selisih_name + "']").length === 0) {
+                            let newOptionSelisih = new Option(v.akun_selisih_name, v.akun_selisih_name, true, true);
+                            $akunSelisih.append(newOptionSelisih).trigger("change");
+                        } else {
+                            $akunSelisih.val(v.akun_selisih_name).trigger("change");
                         }
+                    }
 
-                    }, 1000); 
+                    // Tambahkan ke container
+                    $("#coa-pinjaman-container").append($newSection);
                 }
-
             });
         } else {
             var newRow = $('<tr>');

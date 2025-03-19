@@ -386,17 +386,30 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row.id;
-                    return `
-                <button data-toggle="tooltip" title="Histori Harga Barang" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
-                </button>
-                <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash">
-                    <i class="fa fa-trash"></i>
-                </button>
-                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
-                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                </button>
-                `
+                    let posting = row.posting; 
+
+                    if (posting == 1) {
+                        return `
+                            <button data-toggle="tooltip" title="Histori Harga Barang" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </button>
+                            <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <button data-toggle="tooltip" title="Unposting" onclick="posting('${id}')" class="btn btn-success posting-btn">
+                                <i class="fa fa-paper-plane"></i>
+                            </button>
+                        `;
+                    } else {
+                        return `
+                            <button data-toggle="tooltip" title="Unposting" onclick="posting('${id}')" class="btn btn-danger unposting-btn">
+                                <i class="fa fa-undo"></i>
+                            </button>
+                        `;
+                    }
                 }
             }
         ],
@@ -511,6 +524,66 @@
 
             },
         });
+    }
+
+    const posting = function(id, status_posting) {
+        Swal.fire({
+            icon: 'question',
+            title: status_posting == "1" ? "Yakin Akan Diposting ?" : "Yakin Akan di Unposting ?",
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("po-lokal-bahan-baku/update-status"); ?>",
+                    data: {
+                        id: id,
+                        status_posting: status_posting
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
     }
 
     const print = function(url) {
