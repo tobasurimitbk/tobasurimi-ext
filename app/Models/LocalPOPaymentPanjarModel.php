@@ -194,7 +194,7 @@ class LocalPOPaymentPanjarModel extends Model
             $panjarSupplier = new PanjarSupplierModel();
 
             $dataPanjar = $panjarSupplier->select("id, no_panjar, payment_date, total_panjar, jenis_panjar")
-                                        ->where('jenis_panjar', "PANJAR_TB")
+                                        ->where('jenis_panjar', "PANJAR")
                                         ->where('supplier_id', $supllierId)
                                         ->findAll();
         }
@@ -230,7 +230,9 @@ class LocalPOPaymentPanjarModel extends Model
 
     public function getPembayaranPanjarTBDetailsbyIdandType($id = null, $type, $supllierId)
     {
-        // Jika $id ada, lakukan query dengan join ke tabel terkait
+        $dataPanjar = []; // Inisialisasi dengan nilai default
+        $paidData = [];   // Variabel baru untuk menyimpan data yang sudah terbayar
+
         if ($id) {
             $condition = [
                 'local_po_payment_panjar.local_po_payment_id' => $id,
@@ -242,7 +244,7 @@ class LocalPOPaymentPanjarModel extends Model
             local_po_payment_panjar.bayar_panjar, sum(local_po_payment_panjar.bayar_panjar) as total_bayar_panjar, local_po_payment_panjar.akun_kas, local_po_payment_panjar.akun_selisih, local_po_payment_panjar.keterangan,
             akun_kas.nama_sub as akun_kas_name,  akun_selisih.nama_sub as akun_selisih_name";
 
-            $result = $this
+            $resultPay = $this
                 ->select($selectQry)
                 ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
                 ->join('sub_akuns as akun_kas', 'local_po_payment_panjar.akun_kas = akun_kas.id', 'left')
@@ -272,21 +274,31 @@ class LocalPOPaymentPanjarModel extends Model
                                         ->findAll();
         }
 
-        if (empty($dataPanjar)) {
-            foreach ($result as $i => $r) {
-                $totalPembayaranPanjar = $this->getTotalPembayaranPanjar($r['panjar_id'], "BP");
-                $result[$i]['payment_date'] = date('d/m/Y', strtotime($r['payment_date']));
-                $result[$i]['akun_kas'] = $r['akun_kas'];
-                $result[$i]['akun_selisih'] = $r['akun_selisih'];
-                $result[$i]['akun_kas_name'] = $r['akun_kas_name'];
-                $result[$i]['akun_selisih_name'] = $r['akun_selisih_name'];
-                $result[$i]['keterangan'] = $r['keterangan'];
-                $result[$i]['total_pembayaran'] = $totalPembayaranPanjar;
-            }
-        } else {
+        // Jika $dataPanjar tidak kosong, gunakan $dataPanjar sebagai hasil
+        if (!empty($dataPanjar)) {
             $result = $dataPanjar;
         }
 
+        if (!empty($resultPay)) {
+            foreach ($resultPay as $i => $r) {
+                $totalPembayaranPanjar = $this->getTotalPembayaranPanjar($r['panjar_id'], "BP");
+
+                // Simpan data yang sudah terbayar ke variabel $paidData
+                $paidData[$i] = [
+                    'payment_date' => date('d/m/Y', strtotime($r['payment_date'])),
+                    'akun_kas' => $r['akun_kas'],
+                    'akun_selisih' => $r['akun_selisih'],
+                    'akun_kas_name' => $r['akun_kas_name'],
+                    'akun_selisih_name' => $r['akun_selisih_name'],
+                    'keterangan' => $r['keterangan'],
+                    'total_pembayaran' => $totalPembayaranPanjar,
+                ];
+
+                // Gabungkan $paidData ke $result
+                $result[$i] = array_merge($r, $paidData[$i]);
+            }
+        }
+
         return $result;
-    } 
+    }
 }
