@@ -282,36 +282,36 @@
                 if (headerIdValue === selectedValueTypeTransaksi && !selectedValueNoBukti) {
                     inputsDebit = $(this).find('.yy');
                     inputsDebit.each(function() {
-                        var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                        var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
                         totalInputsDebit += inputValue;
                     });
                     inputsKredit = $(this).find('.xx');
                     inputsKredit.each(function() {
-                        var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                        var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
                         totalInputsKredit += inputValue;
                     });
                     $(this).show();
                 } else if (transaksiIdValue === selectedValueNoBukti && !selectedValueTypeTransaksi) {
                     inputsDebit = $(this).find('.yy');
                     inputsDebit.each(function() {
-                        var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                        var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
                         totalInputsDebit += inputValue;
                     });
                     inputsKredit = $(this).find('.xx');
                     inputsKredit.each(function() {
-                        var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                        var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
                         totalInputsKredit += inputValue;
                     });
                     $(this).show();
                 } else if (headerIdValue === selectedValueTypeTransaksi && transaksiIdValue === selectedValueNoBukti) {
                     inputsDebit = $(this).find('.yy');
                     inputsDebit.each(function() {
-                        var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                        var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
                         totalInputsDebit += inputValue;
                     });
                     inputsKredit = $(this).find('.xx');
                     inputsKredit.each(function() {
-                        var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                        var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
                         totalInputsKredit += inputValue;
                     });
                     $(this).show();
@@ -319,8 +319,8 @@
                     $(this).hide();
                 }
             });
-            $("#jumlahDebet").text(formatRupiah(totalInputsDebit.toString()));
-            $("#jumlahKredit").text(formatRupiah(totalInputsKredit.toString()));
+            $("#jumlahDebet").text(formatRupiah(totalInputsDebit.toFixed(2).toString()));
+            $("#jumlahKredit").text(formatRupiah(totalInputsKredit.toFixed(2).toString()));
         } else {
             // Reset totalInputs menjadi 0 setiap kali dropdown berubah
             totalInputsDebit = 0;
@@ -332,17 +332,17 @@
                 }
                 inputsDebit = $(this).find('.yy');
                 inputsDebit.each(function() {
-                    var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                    var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
                     totalInputsDebit += inputValue;
                 });
                 inputsKredit = $(this).find('.xx');
                 inputsKredit.each(function() {
-                    var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replace('.', '').replace(',', '.'));
+                    var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
                     totalInputsKredit += inputValue;
                 });
             });
-            $("#jumlahDebet").text(formatRupiah(totalInputsDebit.toString()));
-            $("#jumlahKredit").text(formatRupiah(totalInputsKredit.toString()));
+            $("#jumlahDebet").text(formatRupiah(totalInputsDebit.toFixed(2).toString()));
+            $("#jumlahKredit").text(formatRupiah(totalInputsKredit.toFixed(2).toString()));
         }
 
         function formatRupiah(angka) {
