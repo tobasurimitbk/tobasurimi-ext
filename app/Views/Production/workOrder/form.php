@@ -301,6 +301,11 @@
         <?php if (!empty($dataWorkOrders)) : ?>
             // Membuat input readonly
             $('#date_production').prop('readonly', true);
+        <?php else: ?>
+            // Ketika Tanggal Dokumen DIedit Maka Nomor Menyesuaikan
+            $('#date_production').change(function() {
+                changeStatus();
+            });
         <?php endif; ?>
 
         $(".btn-show-detail").click(function() {
@@ -693,12 +698,15 @@
 
     const changeStatus = function() {
         let value = document.getElementById('auto_generate').checked ? true : false;
-
+        let date_production = $('#date_production').val();
         if (value) {
             $.ajax({
                 url: `<?= base_url("/work-order/generate-kode-produksi"); ?>`,
                 method: "GET",
                 dataType: "json",
+                data: {
+                    request_date: date_production // Nomor Mengikuti Tanggal Pembuatan Dokumen
+                },
                 success: function(res) {
                     if (res) {
                         $("#wo_no").val(res);
@@ -775,8 +783,8 @@
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.kode_barang + '</td>';
                 row += '<td>' + item.nama_barang + '</td>';
-                row += '<td>' + item.qty + '</td>';
-                row += '<td>' + item.qty_hasil + '</td>';
+                row += '<td>' + greatFormatRupiah(item.qty) + '</td>';
+                row += '<td>' + greatFormatRupiah(item.qty_hasil) + '</td>';
                 row += '<td>' + item.keterangan + '</td>';
                 <?php if (!empty($dataWorkOrders)) : ?>
                     <?php if ($dataWorkOrders->is_posted == '0') : ?>
@@ -869,8 +877,8 @@
                 'barang_id': "<?= encrypt($d->barang1_id) ?>",
                 'kode_barang': "<?= $d->kode_barang ?>",
                 'nama_barang': "<?= $d->nama_barang ?>",
-                'qty': "<?= $d->qty ?>",
-                'qty_hasil': "<?= $d->qty_hasil ?>",
+                'qty': "<?= floatval($d->qty) ?>",
+                'qty_hasil': "<?= floatval($d->qty_hasil) ?>",
                 'keterangan': "<?= $d->note ?>"
             });
         <?php endforeach; ?>

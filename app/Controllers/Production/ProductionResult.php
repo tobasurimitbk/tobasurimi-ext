@@ -157,17 +157,17 @@ class ProductionResult extends BaseController
 
         foreach ($productionResDetDataBJ as $key => &$value) {
             if ($value->barang_type == "bahan_baku") {
-                $value->type_barang_text = "Bahan Baku";
+                $value->type_barang_text = "BAHAN BAKU";
             } elseif ($value->barang_type == "bahan_penolong") {
-                $value->type_barang_text = "Bahan Penolong";
+                $value->type_barang_text = "BAHAN PENOLONG";
             } elseif ($value->barang_type == "bahan_jadi") {
-                $value->type_barang_text = "Bahan Jadi";
+                $value->type_barang_text = "BARANG JADI";
             } elseif ($value->barang_type == "bahan_scrap") {
-                $value->type_barang_text = "Bahan Scrap";
+                $value->type_barang_text = "BARANG SCRAP";
             } elseif ($value->barang_type == "bahan_modal") {
-                $value->type_barang_text = "Bahan Modal";
+                $value->type_barang_text = "BARANG MODAL";
             } elseif ($value->barang_type == "bahan_setengah_jadi") {
-                $value->type_barang_text = "Bahan Setengah Jadi";
+                $value->type_barang_text = "BAHAN SETENGAH JADI";
             }
         }
         $productionResDetSelectBS = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan, warehouses.warehouse_name as warehouse, divisis.divisi as divisi";
@@ -184,17 +184,17 @@ class ProductionResult extends BaseController
             ->findAll();
         foreach ($productionResDetDataBS as $key => &$value) {
             if ($value->barang_type == "bahan_baku") {
-                $value->type_barang_text = "Bahan Baku";
+                $value->type_barang_text = "BAHAN BAKU";
             } elseif ($value->barang_type == "bahan_penolong") {
-                $value->type_barang_text = "Bahan Penolong";
+                $value->type_barang_text = "BAHAN PENOLONG";
             } elseif ($value->barang_type == "bahan_jadi") {
-                $value->type_barang_text = "Bahan Jadi";
+                $value->type_barang_text = "BARANG JADI";
             } elseif ($value->barang_type == "bahan_scrap") {
-                $value->type_barang_text = "Bahan Scrap";
+                $value->type_barang_text = "BARANG SCRAP";
             } elseif ($value->barang_type == "bahan_modal") {
-                $value->type_barang_text = "Bahan Modal";
+                $value->type_barang_text = "BARANG MODAL";
             } elseif ($value->barang_type == "bahan_setengah_jadi") {
-                $value->type_barang_text = "Bahan Setengah Jadi";
+                $value->type_barang_text = "BAHAN SETENGAH JADI";
             }
         }
         $productionResDetSelectBD = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan, warehouses.warehouse_name, divisis.divisi";
@@ -210,17 +210,17 @@ class ProductionResult extends BaseController
             ->findAll();
         foreach ($productionResDetDataBD as $key => &$value) {
             if ($value->barang_type == "bahan_baku") {
-                $value->type_barang_text = "Bahan Baku";
+                $value->type_barang_text = "BAHAN BAKU";
             } elseif ($value->barang_type == "bahan_penolong") {
-                $value->type_barang_text = "Bahan Penolong";
+                $value->type_barang_text = "BAHAN PENOLONG";
             } elseif ($value->barang_type == "bahan_jadi") {
-                $value->type_barang_text = "Bahan Jadi";
+                $value->type_barang_text = "BARANG JADI";
             } elseif ($value->barang_type == "bahan_scrap") {
-                $value->type_barang_text = "Bahan Scrap";
+                $value->type_barang_text = "BARANG SCRAP";
             } elseif ($value->barang_type == "bahan_modal") {
-                $value->type_barang_text = "Bahan Modal";
+                $value->type_barang_text = "BARANG MODAL";
             } elseif ($value->barang_type == "bahan_setengah_jadi") {
-                $value->type_barang_text = "Bahan Setengah Jadi";
+                $value->type_barang_text = "BAHAN SETENGAH JADI";
             }
         }
 
@@ -235,17 +235,17 @@ class ProductionResult extends BaseController
             ->findAll();
         foreach ($productionResDetDataBR as $key => &$value) {
             if ($value->barang_type == "bahan_baku") {
-                $value->type_barang_text = "Bahan Baku";
+                $value->type_barang_text = "BAHAN BAKU";
             } elseif ($value->barang_type == "bahan_penolong") {
-                $value->type_barang_text = "Bahan Penolong";
+                $value->type_barang_text = "BAHAN PENOLONG";
             } elseif ($value->barang_type == "bahan_jadi") {
-                $value->type_barang_text = "Bahan Jadi";
+                $value->type_barang_text = "BARANG JADI";
             } elseif ($value->barang_type == "bahan_scrap") {
-                $value->type_barang_text = "Bahan Scrap";
+                $value->type_barang_text = "BARANG SCRAP";
             } elseif ($value->barang_type == "bahan_modal") {
-                $value->type_barang_text = "Bahan Modal";
+                $value->type_barang_text = "BARANG MODAL";
             } elseif ($value->barang_type == "bahan_setengah_jadi") {
-                $value->type_barang_text = "Bahan Setengah Jadi";
+                $value->type_barang_text = "BAHAN SETENGAH JADI";
             } else {
                 $value->type_barang_text = "Bahan Return";
             }
@@ -665,17 +665,17 @@ class ProductionResult extends BaseController
             );
             foreach ($dataResult as $key => &$value) {
                 if ($value['type_barang'] == "bahan_baku") {
-                    $value['type_barang_text'] = "Bahan Baku";
+                    $value['type_barang_text'] = "BAHAN BAKU";
                 } elseif ($value['type_barang'] == "bahan_penolong") {
-                    $value['type_barang_text'] = "Bahan Penolong";
+                    $value['type_barang_text'] = "BAHAN PENOLONG";
                 } elseif ($value['type_barang'] == "bahan_jadi") {
-                    $value['type_barang_text'] = "Bahan Jadi";
+                    $value['type_barang_text'] = "BARANG JADI";
                 } elseif ($value['type_barang'] == "bahan_scrap") {
-                    $value['type_barang_text'] = "Bahan Scrap";
+                    $value['type_barang_text'] = "BARANG SCRAP";
                 } elseif ($value['type_barang'] == "bahan_modal") {
-                    $value['type_barang_text'] = "Bahan Modal";
+                    $value['type_barang_text'] = "BARANG MODAL";
                 } elseif ($value['type_barang'] == "bahan_setengah_jadi") {
-                    $value['type_barang_text'] = "Bahan Setengah Jadi";
+                    $value['type_barang_text'] = "BAHAN SETENGAH JADI";
                 }
             }
             return response()->setJSON([
@@ -694,15 +694,15 @@ class ProductionResult extends BaseController
             );
             foreach ($dataResult as $key => &$value) {
                 if ($value['type_barang'] == "bahan_baku") {
-                    $value['type_barang_text'] = "Bahan Baku";
+                    $value['type_barang_text'] = "BAHAN BAKU";
                 } elseif ($value['type_barang'] == "bahan_penolong") {
-                    $value['type_barang_text'] = "Bahan Penolong";
+                    $value['type_barang_text'] = "BAHAN PENOLONG";
                 } elseif ($value['type_barang'] == "bahan_jadi") {
-                    $value['type_barang_text'] = "Bahan Jadi";
+                    $value['type_barang_text'] = "BARANG JADI";
                 } elseif ($value['type_barang'] == "bahan_scrap") {
-                    $value['type_barang_text'] = "Bahan Scrap";
+                    $value['type_barang_text'] = "BARANG SCRAP";
                 } elseif ($value['type_barang'] == "bahan_modal") {
-                    $value['type_barang_text'] = "Bahan Modal";
+                    $value['type_barang_text'] = "BARANG MODAL";
                 }
             }
             return response()->setJSON([
@@ -891,7 +891,7 @@ class ProductionResult extends BaseController
                                 $stokIn,
                                 $value['qty'],
                                 "In",
-                                date('Y-m-d'),
+                                $resultData['receive_date'],
                                 $this->this_user_id,
                                 "PRODUKSI",
                                 $resultData['pr_no'],
@@ -1030,17 +1030,17 @@ class ProductionResult extends BaseController
             ->findAll();
         foreach ($productionResDetDataBR as $key => &$value) {
             if ($value->barang_type == "bahan_baku") {
-                $value->type_barang_text = "Bahan Baku";
+                $value->type_barang_text = "BAHAN BAKU";
             } elseif ($value->barang_type == "bahan_penolong") {
-                $value->type_barang_text = "Bahan Penolong";
+                $value->type_barang_text = "BAHAN PENOLONG";
             } elseif ($value->barang_type == "bahan_jadi") {
-                $value->type_barang_text = "Bahan Jadi";
+                $value->type_barang_text = "BARANG JADI";
             } elseif ($value->barang_type == "bahan_scrap") {
-                $value->type_barang_text = "Bahan Scrap";
+                $value->type_barang_text = "BARANG SCRAP";
             } elseif ($value->barang_type == "bahan_modal") {
-                $value->type_barang_text = "Bahan Modal";
+                $value->type_barang_text = "BARANG MODAL";
             } elseif ($value->barang_type == "bahan_setengah_jadi") {
-                $value->type_barang_text = "Bahan Setengah Jadi";
+                $value->type_barang_text = "BAHAN SETENGAH JADI";
             } else {
                 $value->type_barang_text = "Bahan Return";
             }
@@ -1058,17 +1058,17 @@ class ProductionResult extends BaseController
 
         foreach ($productionResDetDataBJ as $key => &$value) {
             if ($value->barang_type == "bahan_baku") {
-                $value->type_barang_text = "Bahan Baku";
+                $value->type_barang_text = "BAHAN BAKU";
             } elseif ($value->barang_type == "bahan_penolong") {
-                $value->type_barang_text = "Bahan Penolong";
+                $value->type_barang_text = "BAHAN PENOLONG";
             } elseif ($value->barang_type == "bahan_jadi") {
-                $value->type_barang_text = "Bahan Jadi";
+                $value->type_barang_text = "BARANG JADI";
             } elseif ($value->barang_type == "bahan_scrap") {
-                $value->type_barang_text = "Bahan Scrap";
+                $value->type_barang_text = "BARANG SCRAP";
             } elseif ($value->barang_type == "bahan_modal") {
-                $value->type_barang_text = "Bahan Modal";
+                $value->type_barang_text = "BARANG MODAL";
             } elseif ($value->barang_type == "bahan_setengah_jadi") {
-                $value->type_barang_text = "Bahan Setengah Jadi";
+                $value->type_barang_text = "BAHAN SETENGAH JADI";
             }
         }
 
@@ -1087,17 +1087,17 @@ class ProductionResult extends BaseController
             ->findAll();
         foreach ($productionResDetDataBS as $key => &$value) {
             if ($value->barang_type == "bahan_baku") {
-                $value->type_barang_text = "Bahan Baku";
+                $value->type_barang_text = "BAHAN BAKU";
             } elseif ($value->barang_type == "bahan_penolong") {
-                $value->type_barang_text = "Bahan Penolong";
+                $value->type_barang_text = "BAHAN PENOLONG";
             } elseif ($value->barang_type == "bahan_jadi") {
-                $value->type_barang_text = "Bahan Jadi";
+                $value->type_barang_text = "BARANG JADI";
             } elseif ($value->barang_type == "bahan_scrap") {
-                $value->type_barang_text = "Bahan Scrap";
+                $value->type_barang_text = "BARANG SCRAP";
             } elseif ($value->barang_type == "bahan_modal") {
-                $value->type_barang_text = "Bahan Modal";
+                $value->type_barang_text = "BARANG MODAL";
             } elseif ($value->barang_type == "bahan_setengah_jadi") {
-                $value->type_barang_text = "Bahan Setengah Jadi";
+                $value->type_barang_text = "BAHAN SETENGAH JADI";
             }
         }
 
@@ -1115,17 +1115,17 @@ class ProductionResult extends BaseController
             ->findAll();
         foreach ($productionResDetDataBD as $key => &$value) {
             if ($value->barang_type == "bahan_baku") {
-                $value->type_barang_text = "Bahan Baku";
+                $value->type_barang_text = "BAHAN BAKU";
             } elseif ($value->barang_type == "bahan_penolong") {
-                $value->type_barang_text = "Bahan Penolong";
+                $value->type_barang_text = "BAHAN PENOLONG";
             } elseif ($value->barang_type == "bahan_jadi") {
-                $value->type_barang_text = "Bahan Jadi";
+                $value->type_barang_text = "BARANG JADI";
             } elseif ($value->barang_type == "bahan_scrap") {
-                $value->type_barang_text = "Bahan Scrap";
+                $value->type_barang_text = "BARANG SCRAP";
             } elseif ($value->barang_type == "bahan_modal") {
-                $value->type_barang_text = "Bahan Modal";
+                $value->type_barang_text = "BARANG MODAL";
             } elseif ($value->barang_type == "bahan_setengah_jadi") {
-                $value->type_barang_text = "Bahan Setengah Jadi";
+                $value->type_barang_text = "BAHAN SETENGAH JADI";
             }
         }
         $data = [

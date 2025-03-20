@@ -5,9 +5,9 @@
 <section class="section">
     <div class="section-header">
         <?php if (isset($ids)) { ?>
-            <h1 class="title-name">Update Material Request</h1>
+            <h1 class="title-name">Update Material Request Kimia</h1>
         <?php } else { ?>
-            <h1 class="title-name">Tambah Material Request</h1>
+            <h1 class="title-name">Tambah Material Request Kimia</h1>
         <?php } ?>
         <div class="col-button-tambah-spp text-right">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request-kimia"); ?>">

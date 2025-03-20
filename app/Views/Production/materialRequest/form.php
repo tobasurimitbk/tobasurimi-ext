@@ -1696,7 +1696,7 @@
         $.each(listStockSelectedBahanBaku, function(i, v) {
             totalQty += parseFloat(listStockSelectedBahanBaku[i].qty2) || 0;
         });
-        $('.nilai-total-bahan-baku-request').text(greatFormatRupiah(totalQty));
+        $('.nilai-total-bahan-baku-request').text(greatFormatRupiah(totalQty.toFixed(2)));
     }
 
     function drawTableSelectedItemBahanSetengahJadi(data) {

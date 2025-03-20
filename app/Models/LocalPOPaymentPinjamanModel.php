@@ -152,6 +152,9 @@ class LocalPOPaymentPinjamanModel extends Model
 
     public function getPembayaranPinjamanDetailsbyIdandType($id = null, $type, $supllierId)
     {
+        $dataPinjaman = []; // Inisialisasi dengan nilai default
+        $paidData = [];   // Variabel baru untuk menyimpan data yang sudah terbayar
+
         if ($id) {
             $condition = [
                 'local_po_payment_pinjaman.local_po_payment_id' => $id,
@@ -162,7 +165,7 @@ class LocalPOPaymentPinjamanModel extends Model
             local_po_payment_pinjaman.bayar_pinjaman, sum(local_po_payment_pinjaman.bayar_pinjaman) as total_bayar_pinjaman, local_po_payment_pinjaman.akun_kas, local_po_payment_pinjaman.akun_selisih, local_po_payment_pinjaman.keterangan,
             akun_kas.nama_sub as akun_kas_name,  akun_selisih.nama_sub as akun_selisih_name";
 
-            $result = $this
+            $resultPay = $this
                 ->select($selectQry)
                 ->join('pinjaman_supplier', 'local_po_payment_pinjaman.pinjaman_id = pinjaman_supplier.id')
                 ->join('sub_akuns as akun_kas', 'local_po_payment_pinjaman.akun_kas = akun_kas.id', 'left')
@@ -180,6 +183,7 @@ class LocalPOPaymentPinjamanModel extends Model
                 ->findAll();
         }
 
+        // Jika hasil query kosong, ambil data alternatif
         if (empty($result)) {
             $pinjamanSupplier = new PinjamanSupplierModel();
 
@@ -188,21 +192,31 @@ class LocalPOPaymentPinjamanModel extends Model
                                         ->findAll();
         }
 
-        if (empty($dataPinjaman)) {
-            foreach ($result as $i => $r) {
-                $totalPembayaranPinjaman = $this->getTotalPembayaranPinjaman($r['pinjaman_id']);
-                $result[$i]['payment_date'] = date('d/m/Y', strtotime($r['payment_date']));
-                $result[$i]['akun_kas'] = $r['akun_kas'];
-                $result[$i]['akun_selisih'] = $r['akun_selisih'];
-                $result[$i]['akun_kas_name'] = $r['akun_kas_name'];
-                $result[$i]['akun_selisih_name'] = $r['akun_selisih_name'];
-                $result[$i]['keterangan'] = $r['keterangan'];
-                $result[$i]['total_pembayaran'] = $totalPembayaranPinjaman;
-            }
-        } else {
+        // Jika $dataPinjaman tidak kosong, gunakan $dataPinjaman sebagai hasil
+        if (!empty($dataPinjaman)) {
             $result = $dataPinjaman;
         }
 
+        if (!empty($resultPay)) {
+            foreach ($resultPay as $i => $r) {
+                $totalPembayaranPinjaman = $this->getTotalPembayaranPinjaman($r['pinjaman_id'], "BP");
+
+                // Simpan data yang sudah terbayar ke variabel $paidData
+                $paidData[$i] = [
+                    'payment_date' => date('d/m/Y', strtotime($r['payment_date'])),
+                    'akun_kas' => $r['akun_kas'],
+                    'akun_selisih' => $r['akun_selisih'],
+                    'akun_kas_name' => $r['akun_kas_name'],
+                    'akun_selisih_name' => $r['akun_selisih_name'],
+                    'keterangan' => $r['keterangan'],
+                    'total_pembayaran' => $totalPembayaranPinjaman,
+                ];
+
+                // Gabungkan $paidData ke $result
+                $result[$i] = array_merge($r, $paidData[$i]);
+            }
+        }
+
         return $result;
-    } 
+    }
 }

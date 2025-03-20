@@ -210,7 +210,7 @@
 
                 <!-- Template untuk coa-panjar-section -->
                 <div id="coa-panjar-template" style="display: none;">
-                    <div class="row">
+                    <div class="row coa-panjar-section">
                         <input type="hidden" class="id_panjar">
 
                         <div class="col-md-3">
@@ -258,7 +258,7 @@
 
                 <!-- Template untuk coa-panjar-tb-section -->
                 <div id="coa-panjar-tb-template" style="display: none;">
-                    <div class="row">
+                    <div class="row coa-panjar-tb-section">
                         <input type="hidden" class="id_panjar_tb">
 
                         <div class="col-md-3">
@@ -306,7 +306,7 @@
 
                 <!-- Template untuk coa-pinjaman-section -->
                 <div id="coa-pinjaman-template" style="display: none;">
-                    <div class="row">
+                    <div class="row coa-pinjaman-section">
                         <input type="hidden" class="id_pinjaman">
 
                         <div class="col-md-3">
@@ -339,6 +339,7 @@
                     </div>
                     <br>
                 </div>
+
                 <div class="row">
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                         <li class="nav-item" role="presentation">
@@ -1104,9 +1105,6 @@
                     var newSubtotal = subTotal - totalBayarPanjarTB;
                     subCountTotal = newSubtotal;
 
-                    console.log(subTotal);
-                    console.log(greatFormatRupiah(subCountTotal));
-
                     $('input.nominal_pembayaran').attr('oninput', `limitInputBayar(this, ${subCountTotal})`);
                     $('.subtotal').text(greatFormatRupiah(subCountTotal));
 
@@ -1177,39 +1175,44 @@
 
 
                 if (total_pembayaran > 0) {
-                    let $newSection = $("#coa-panjar-template").clone().removeAttr("id").show();
+                    let $existingSection = $(`#coa-panjar-container .id_panjar[value="${v.panjar_id}"]`).closest('.coa-panjar-section');
 
-                    // Isi nilai
-                    $newSection.find(".id_panjar").val(v.panjar_id);
-                    $newSection.find(".no_panjar").val(v.no_panjar);
-                    $newSection.find(".keterangan_panjar").val(v.keterangan);
+                    if ($existingSection.length === 0) {
+                        // Jika elemen belum ada, buat elemen baru dari template
+                        let $newSection = $("#coa-panjar-template").clone().removeAttr("id").show();
+                        $("#coa-panjar-label").show();
 
-                    // Handle akun_kas_panjar
-                    if (v.akun_kas_name) {
-                        let $akunKas = $newSection.find(".akun_kas_panjar");
-                        if ($akunKas.find("option[value='" + v.akun_kas_name + "']").length === 0) {
-                            let newOptionKas = new Option(v.akun_kas_name, v.akun_kas_name, true, true);
-                            $akunKas.append(newOptionKas).trigger("change");
-                        } else {
-                            $akunKas.val(v.akun_kas_name).trigger("change");
+                        // Isi nilai
+                        $newSection.find(".id_panjar").val(v.panjar_id);
+                        $newSection.find(".no_panjar").val(v.no_panjar);
+                        $newSection.find(".keterangan_panjar").val(v.keterangan);
+
+                        // Handle akun_kas_panjar
+                        if (v.akun_kas_name) {
+                            let $akunKas = $newSection.find(".akun_kas_panjar");
+                            if ($akunKas.find("option[value='" + v.akun_kas_name + "']").length === 0) {
+                                let newOptionKas = new Option(v.akun_kas_name, v.akun_kas_name, true, true);
+                                $akunKas.append(newOptionKas).trigger("change");
+                            } else {
+                                $akunKas.val(v.akun_kas_name).trigger("change");
+                            }
                         }
-                    }
 
-                    // Handle akun_selisih_panjar
-                    if (v.akun_selisih_name) {
-                        let $akunSelisih = $newSection.find(".akun_selisih_panjar");
-                        if ($akunSelisih.find("option[value='" + v.akun_selisih_name + "']").length === 0) {
-                            let newOptionSelisih = new Option(v.akun_selisih_name, v.akun_selisih_name, true, true);
-                            $akunSelisih.append(newOptionSelisih).trigger("change");
-                        } else {
-                            $akunSelisih.val(v.akun_selisih_name).trigger("change");
+                        // Handle akun_selisih_panjar
+                        if (v.akun_selisih_name) {
+                            let $akunSelisih = $newSection.find(".akun_selisih_panjar");
+                            if ($akunSelisih.find("option[value='" + v.akun_selisih_name + "']").length === 0) {
+                                let newOptionSelisih = new Option(v.akun_selisih_name, v.akun_selisih_name, true, true);
+                                $akunSelisih.append(newOptionSelisih).trigger("change");
+                            } else {
+                                $akunSelisih.val(v.akun_selisih_name).trigger("change");
+                            }
                         }
-                    }
 
-                    // Tambahkan ke container
-                    $("#coa-panjar-container").append($newSection);
+                        // Tambahkan ke container
+                        $("#coa-panjar-container").append($newSection);
+                    }
                 }
-
             });
         } else {
             var newRow = $('<tr>');
@@ -1272,37 +1275,43 @@
 
 
                 if (total_pembayaran > 0) {
-                    let $newSection = $("#coa-panjar-tb-template").clone().removeAttr("id").show();
+                    let $existingSection = $(`#coa-panjar-tb-container .id_panjar[value="${v.panjar_id}"]`).closest('.coa-panjar-tb-section');
 
-                    // Isi nilai
-                    $newSection.find(".id_panjar_tb").val(v.panjar_id);
-                    $newSection.find(".no_panjar_tb").val(v.no_panjar);
-                    $newSection.find(".keterangan_panjar_tb").val(v.keterangan);
+                    if ($existingSection.length === 0) {
+                        // Jika elemen belum ada, buat elemen baru dari template
+                        let $newSection = $("#coa-panjar-tb-template").clone().removeAttr("id").show();
+                        $("#coa-panjar-tb-label").show();
 
-                    // Handle akun_kas_panjar
-                    if (v.akun_kas_name) {
-                        let $akunKas = $newSection.find(".akun_kas_panjar_tb");
-                        if ($akunKas.find("option[value='" + v.akun_kas_name + "']").length === 0) {
-                            let newOptionKas = new Option(v.akun_kas_name, v.akun_kas_name, true, true);
-                            $akunKas.append(newOptionKas).trigger("change");
-                        } else {
-                            $akunKas.val(v.akun_kas_name).trigger("change");
+                        // Isi nilai
+                        $newSection.find(".id_panjar_tb").val(v.panjar_id);
+                        $newSection.find(".no_panjar_tb").val(v.no_panjar);
+                        $newSection.find(".keterangan_panjar_tb").val(v.keterangan);
+
+                        // Handle akun_kas_panjar
+                        if (v.akun_kas_name) {
+                            let $akunKas = $newSection.find(".akun_kas_panjar_tb");
+                            if ($akunKas.find("option[value='" + v.akun_kas_name + "']").length === 0) {
+                                let newOptionKas = new Option(v.akun_kas_name, v.akun_kas_name, true, true);
+                                $akunKas.append(newOptionKas).trigger("change");
+                            } else {
+                                $akunKas.val(v.akun_kas_name).trigger("change");
+                            }
                         }
-                    }
 
-                    // Handle akun_selisih_panjar
-                    if (v.akun_selisih_name) {
-                        let $akunSelisih = $newSection.find(".akun_selisih_panjar_tb");
-                        if ($akunSelisih.find("option[value='" + v.akun_selisih_name + "']").length === 0) {
-                            let newOptionSelisih = new Option(v.akun_selisih_name, v.akun_selisih_name, true, true);
-                            $akunSelisih.append(newOptionSelisih).trigger("change");
-                        } else {
-                            $akunSelisih.val(v.akun_selisih_name).trigger("change");
+                        // Handle akun_selisih_panjar
+                        if (v.akun_selisih_name) {
+                            let $akunSelisih = $newSection.find(".akun_selisih_panjar_tb");
+                            if ($akunSelisih.find("option[value='" + v.akun_selisih_name + "']").length === 0) {
+                                let newOptionSelisih = new Option(v.akun_selisih_name, v.akun_selisih_name, true, true);
+                                $akunSelisih.append(newOptionSelisih).trigger("change");
+                            } else {
+                                $akunSelisih.val(v.akun_selisih_name).trigger("change");
+                            }
                         }
-                    }
 
-                    // Tambahkan ke container
-                    $("#coa-panjar-tb-container").append($newSection);
+                        // Tambahkan ke container
+                        $("#coa-panjar-tb-container").append($newSection);
+                    }
                 }
 
             });
@@ -1366,37 +1375,43 @@
 
 
                 if (total_pembayaran > 0) {
-                    let $newSection = $("#coa-pinjaman-template").clone().removeAttr("id").show();
+                    let $existingSection = $(`#coa-pinjaman-container .id_pinjaman[value="${v.pinjaman_id}"]`).closest('.coa-pinjaman-section');
 
-                    // Isi nilai
-                    $newSection.find(".id_pinjaman").val(v.pinjaman_id);
-                    $newSection.find(".no_pinjaman").val(v.no_pinjaman);
-                    $newSection.find(".keterangan_pinjaman").val(v.keterangan);
+                    if ($existingSection.length === 0) {
+                        // Jika elemen belum ada, buat elemen baru dari template
+                        let $newSection = $("#coa-pinjaman-template").clone().removeAttr("id").show();
+                        $("#coa-pinjaman-label").show();
 
-                    // Handle akun_kas_pinjaman
-                    if (v.akun_kas_name) {
-                        let $akunKas = $newSection.find(".akun_kas_pinjaman");
-                        if ($akunKas.find("option[value='" + v.akun_kas_name + "']").length === 0) {
-                            let newOptionKas = new Option(v.akun_kas_name, v.akun_kas_name, true, true);
-                            $akunKas.append(newOptionKas).trigger("change");
-                        } else {
-                            $akunKas.val(v.akun_kas_name).trigger("change");
+                        // Isi nilai
+                        $newSection.find(".id_pinjaman").val(v.pinjaman_id);
+                        $newSection.find(".no_pinjaman").val(v.no_pinjaman);
+                        $newSection.find(".keterangan_pinjaman").val(v.keterangan);
+
+                        // Handle akun_kas_pinjaman
+                        if (v.akun_kas_name) {
+                            let $akunKas = $newSection.find(".akun_kas_pinjaman");
+                            if ($akunKas.find("option[value='" + v.akun_kas_name + "']").length === 0) {
+                                let newOptionKas = new Option(v.akun_kas_name, v.akun_kas_name, true, true);
+                                $akunKas.append(newOptionKas).trigger("change");
+                            } else {
+                                $akunKas.val(v.akun_kas_name).trigger("change");
+                            }
                         }
-                    }
 
-                    // Handle akun_selisih_pinjaman
-                    if (v.akun_selisih_name) {
-                        let $akunSelisih = $newSection.find(".akun_selisih_pinjaman");
-                        if ($akunSelisih.find("option[value='" + v.akun_selisih_name + "']").length === 0) {
-                            let newOptionSelisih = new Option(v.akun_selisih_name, v.akun_selisih_name, true, true);
-                            $akunSelisih.append(newOptionSelisih).trigger("change");
-                        } else {
-                            $akunSelisih.val(v.akun_selisih_name).trigger("change");
+                        // Handle akun_selisih_pinjaman
+                        if (v.akun_selisih_name) {
+                            let $akunSelisih = $newSection.find(".akun_selisih_pinjaman");
+                            if ($akunSelisih.find("option[value='" + v.akun_selisih_name + "']").length === 0) {
+                                let newOptionSelisih = new Option(v.akun_selisih_name, v.akun_selisih_name, true, true);
+                                $akunSelisih.append(newOptionSelisih).trigger("change");
+                            } else {
+                                $akunSelisih.val(v.akun_selisih_name).trigger("change");
+                            }
                         }
-                    }
 
-                    // Tambahkan ke container
-                    $("#coa-pinjaman-container").append($newSection);
+                        // Tambahkan ke container
+                        $("#coa-pinjaman-container").append($newSection);
+                    }
                 }
             });
         } else {
@@ -1510,38 +1525,191 @@
         table.find('tbody').append(newRow7);
 
         $(document).on("input", ".bayar_panjar", function() {
-            console.log(totalBayarPanjar)
+            var idPanjar = $(this).data('id');
+            var noPanjar = $(this).data('no');
+            var akunKas = $(this).data('akunKas') || "";
+            var akunSelisih = $(this).data('akunCoa') || "";
+            var keterangan = $(this).data('keterangan') || "";
+            var bayarPanjar = parseFloat($(this).val()) || 0; // Ambil nilai input dan konversi ke angka
+
+            // Cari section yang sudah ada
+            let $existingSection = null;
+            $("#coa-panjar-container .id_panjar").each(function() {
+                if ($(this).val().trim() === String(idPanjar).trim()) {
+                    $existingSection = $(this).closest('.coa-panjar-section');
+                    return false; // Keluar dari loop setelah menemukan elemen
+                }
+            });
+
+            if (bayarPanjar <= 0) {
+                // Jika nilai bayar_panjar kurang dari atau sama dengan 0, sembunyikan atau hapus section
+                if ($existingSection && $existingSection.length > 0) {
+                    $existingSection.remove(); // Hapus section dari DOM
+                }
+            } else {
+                if ($existingSection && $existingSection.length > 0) {
+                    // Jika section sudah ada, update nilainya
+                    $existingSection.find(".no_panjar").val(noPanjar);
+                    $existingSection.find(".akun_kas_panjar").val(akunKas);
+                    $existingSection.find(".akun_selisih_panjar").val(akunSelisih);
+                    $existingSection.find(".keterangan_panjar").val(keterangan);
+                } else {
+                    // Jika section belum ada, buat elemen baru dari template
+                    let $newSection = $("#coa-panjar-template").clone().removeAttr("id").addClass("coa-panjar-section").show();
+
+                    // Isi nilai ke elemen baru
+                    $newSection.find(".id_panjar").val(idPanjar);
+                    $newSection.find(".no_panjar").val(noPanjar);
+                    $newSection.find(".akun_kas_panjar").val(akunKas);
+                    $newSection.find(".akun_selisih_panjar").val(akunSelisih);
+                    $newSection.find(".keterangan_panjar").val(keterangan);
+
+                    // Tambahkan elemen baru ke container
+                    $("#coa-panjar-container").append($newSection);
+                }
+            }
+
+            // Tampilkan label jika ada data
+            if ($("#coa-panjar-container .coa-panjar-section").length > 0) {
+                $("#coa-panjar-label").show();
+            } else {
+                $("#coa-panjar-label").hide();
+            }
+
+            // Hitung total bayar panjar dan update subtotal
             var totalBayarPanjar = updateTotalBayarPanjar();
             var newSubtotal = subTotal - totalBayarPanjar;
             subCountTotal = newSubtotal;
 
+            // Update input pembayaran dan tampilkan subtotal
             $('input.nominal_pembayaran').attr('oninput', `limitInputBayar(this, ${subCountTotal})`);
             $('.subtotal').text(greatFormatRupiah(subCountTotal));
-
         });
 
         $(document).on("input", ".bayar_pinjaman", function() {
+            var idPinjaman = $(this).data('id');
+            var noPinjaman = $(this).data('no');
+            var akunKas = $(this).data('akunKas') || "";
+            var akunSelisih = $(this).data('akunCoa') || "";
+            var keterangan = $(this).data('keterangan') || "";
+            var bayarPinjaman = parseFloat($(this).val()) || 0; // Ambil nilai input dan konversi ke angka
+
+            // Cari section yang sudah ada
+            let $existingSection = null;
+            $("#coa-pinjaman-container .id_pinjaman").each(function() {
+                if ($(this).val().trim() === String(idPinjaman).trim()) {
+                    $existingSection = $(this).closest('.coa-pinjaman-section');
+                    return false; // Keluar dari loop setelah menemukan elemen
+                }
+            });
+
+            if (bayarPinjaman <= 0) {
+                // Jika nilai bayar_pinjaman kurang dari atau sama dengan 0, sembunyikan atau hapus section
+                if ($existingSection && $existingSection.length > 0) {
+                    $existingSection.remove(); // Hapus section dari DOM
+                }
+            } else {
+                if ($existingSection && $existingSection.length > 0) {
+                    // Jika section sudah ada, update nilainya
+                    $existingSection.find(".no_pinjaman").val(noPinjaman);
+                    $existingSection.find(".akun_kas_pinjaman").val(akunKas);
+                    $existingSection.find(".akun_selisih_pinjaman").val(akunSelisih);
+                    $existingSection.find(".keterangan_pinjaman").val(keterangan);
+                } else {
+                    // Jika section belum ada, buat elemen baru dari template
+                    let $newSection = $("#coa-pinjaman-template").clone().removeAttr("id").addClass("coa-pinjaman-section").show();
+
+                    // Isi nilai ke elemen baru
+                    $newSection.find(".id_pinjaman").val(idPinjaman);
+                    $newSection.find(".no_pinjaman").val(noPinjaman);
+                    $newSection.find(".akun_kas_pinjaman").val(akunKas);
+                    $newSection.find(".akun_selisih_pinjaman").val(akunSelisih);
+                    $newSection.find(".keterangan_pinjaman").val(keterangan);
+
+                    // Tambahkan elemen baru ke container
+                    $("#coa-pinjaman-container").append($newSection);
+                }
+            }
+
+            // Tampilkan label jika ada data
+            if ($("#coa-pinjaman-container .coa-pinjaman-section").length > 0) {
+                $("#coa-pinjaman-label").show();
+            } else {
+                $("#coa-pinjaman-label").hide();
+            }
+
+            // Hitung total bayar pinjaman dan update subtotal
             var totalBayarPinjaman = updateTotalBayarPinjaman();
             var newSubtotal = subTotal - totalBayarPinjaman;
             subCountTotal = newSubtotal;
 
+            // Update input pembayaran dan tampilkan subtotal
             $('input.nominal_pembayaran').attr('oninput', `limitInputBayar(this, ${subCountTotal})`);
             $('.subtotal').text(greatFormatRupiah(subCountTotal));
-
         });
 
                 
         $(document).on("input", ".bayar_panjar_tb", function() {
+            var idPanjar = $(this).data('id');
+            var noPanjar = $(this).data('no');
+            var akunKas = $(this).data('akunKas') || "";
+            var akunSelisih = $(this).data('akunCoa') || "";
+            var keterangan = $(this).data('keterangan') || "";
+            var bayarPanjar = parseFloat($(this).val()) || 0; // Ambil nilai input dan konversi ke angka
+
+            // Cari section yang sudah ada
+            let $existingSection = null;
+            $("#coa-panjar-tb-container .id_panjar_tb").each(function() {
+                if ($(this).val().trim() === String(idPanjar).trim()) {
+                    $existingSection = $(this).closest('.coa-panjar-tb-section');
+                    return false; // Keluar dari loop setelah menemukan elemen
+                }
+            });
+
+            if (bayarPanjar <= 0) {
+                // Jika nilai bayar_panjar kurang dari atau sama dengan 0, sembunyikan atau hapus section
+                if ($existingSection && $existingSection.length > 0) {
+                    $existingSection.remove(); // Hapus section dari DOM
+                }
+            } else {
+                if ($existingSection && $existingSection.length > 0) {
+                    // Jika section sudah ada, update nilainya
+                    $existingSection.find(".no_panjar_tb").val(noPanjar);
+                    $existingSection.find(".akun_kas_panjar_tb").val(akunKas);
+                    $existingSection.find(".akun_selisih_panjar_tb").val(akunSelisih);
+                    $existingSection.find(".keterangan_panjar_tb").val(keterangan);
+                } else {
+                    // Jika section belum ada, buat elemen baru dari template
+                    let $newSection = $("#coa-panjar-tb-template").clone().removeAttr("id").addClass("coa-panjar-tb-section").show();
+
+                    // Isi nilai ke elemen baru
+                    $newSection.find(".id_panjar_tb").val(idPanjar);
+                    $newSection.find(".no_panjar_tb").val(noPanjar);
+                    $newSection.find(".akun_kas_panjar_tb").val(akunKas);
+                    $newSection.find(".akun_selisih_panjar_tb").val(akunSelisih);
+                    $newSection.find(".keterangan_panjar_tb").val(keterangan);
+
+                    // Tambahkan elemen baru ke container
+                    $("#coa-panjar-tb-container").append($newSection);
+                }
+            }
+
+            // Tampilkan label jika ada data
+            if ($("#coa-panjar-tb-container .coa-panjar-tb-section").length > 0) {
+                $("#coa-panjar-tb-label").show();
+            } else {
+                $("#coa-panjar-tb-label").hide();
+            }
+
+            // Hitung total bayar panjar dan update subtotal
             var totalBayarPanjarTB = updateTotalBayarPanjarTB();
             var newSubtotal = subTotal - totalBayarPanjarTB;
-         
             subCountTotal = newSubtotal;
 
+            // Update input pembayaran dan tampilkan subtotal
             $('input.nominal_pembayaran').attr('oninput', `limitInputBayar(this, ${subCountTotal})`);
             $('.subtotal').text(greatFormatRupiah(subCountTotal));
-
         });
-
 
         let sisaPembayaran = subTotal - paymentDetail.amount;
         var newRow9 = $('<tr>');
@@ -1988,32 +2156,186 @@
     }
 
     $(document).on("input", ".bayar_panjar", function() {
+        var idPanjar = $(this).data('id');
+        var noPanjar = $(this).data('no');
+        var akunKas = $(this).data('akunKas') || "";
+        var akunSelisih = $(this).data('akunCoa') || "";
+        var keterangan = $(this).data('keterangan') || "";
+        var bayarPanjar = parseFloat($(this).val()) || 0; // Ambil nilai input dan konversi ke angka
+
+        // Cari section yang sudah ada
+        let $existingSection = null;
+        $("#coa-panjar-container .id_panjar").each(function() {
+        if ($(this).val().trim() === String(idPanjar).trim()) {
+            $existingSection = $(this).closest('.coa-panjar-section');
+              return false; // Keluar dari loop setelah menemukan elemen
+            }
+        });
+
+        if (bayarPanjar <= 0) {
+                // Jika nilai bayar_panjar kurang dari atau sama dengan 0, sembunyikan atau hapus section
+            if ($existingSection && $existingSection.length > 0) {
+               $existingSection.remove(); // Hapus section dari DOM
+            }
+        } else {
+            if ($existingSection && $existingSection.length > 0) {
+                // Jika section sudah ada, update nilainya
+                $existingSection.find(".no_panjar").val(noPanjar);
+                $existingSection.find(".akun_kas_panjar").val(akunKas);
+                $existingSection.find(".akun_selisih_panjar").val(akunSelisih);
+                $existingSection.find(".keterangan_panjar").val(keterangan || "");
+            } else {
+                // Jika section belum ada, buat elemen baru dari template
+                let $newSection = $("#coa-panjar-template").clone().removeAttr("id").addClass("coa-panjar-section").show();
+
+                // Isi nilai ke elemen baru
+                $newSection.find(".id_panjar").val(idPanjar);
+                $newSection.find(".no_panjar").val(noPanjar);
+                $newSection.find(".akun_kas_panjar").val(akunKas);
+                $newSection.find(".akun_selisih_panjar").val(akunSelisih);
+                $newSection.find(".keterangan_panjar").val(keterangan || "");
+
+                // Tambahkan elemen baru ke container
+                $("#coa-panjar-container").append($newSection);
+            }
+        }
+
+        // Tampilkan label jika ada data
+        if ($("#coa-panjar-container .coa-panjar-section").length > 0 && bayarPanjar > 0) {
+            $("#coa-panjar-label").show();
+        } else {
+            $("#coa-panjar-label").hide();
+        }
+
+        // Hitung total bayar panjar dan update subtotal
         var totalBayarPanjar = updateTotalBayarPanjar();
         updateSubTotal(totalBayarPanjar);
-
     });
 
 
+    
     $(document).on("input", ".bayar_panjar_tb", function() {
+        var idPanjar = $(this).data('id');
+        var noPanjar = $(this).data('no');
+        var akunKas = $(this).data('akunKas') || "";
+        var akunSelisih = $(this).data('akunCoa') || "";
+        var keterangan = $(this).data('keterangan') || "";
+        var bayarPanjar = parseFloat($(this).val()) || 0; // Ambil nilai input dan konversi ke angka
+
+        // Cari section yang sudah ada
+        let $existingSection = null;
+        $("#coa-panjar-tb-container .id_panjar_tb").each(function() {
+        if ($(this).val().trim() === String(idPanjar).trim()) {
+            $existingSection = $(this).closest('.coa-panjar-tb-section');
+              return false; // Keluar dari loop setelah menemukan elemen
+            }
+        });
+
+        if (bayarPanjar <= 0) {
+                // Jika nilai bayar_panjar kurang dari atau sama dengan 0, sembunyikan atau hapus section
+            if ($existingSection && $existingSection.length > 0) {
+               $existingSection.remove(); // Hapus section dari DOM
+            }
+        } else {
+            if ($existingSection && $existingSection.length > 0) {
+                // Jika section sudah ada, update nilainya
+                $existingSection.find(".no_panjar_tb").val(noPanjar);
+                $existingSection.find(".akun_kas_panjar_tb").val(akunKas);
+                $existingSection.find(".akun_selisih_panjar_tb").val(akunSelisih);
+                $existingSection.find(".keterangan_panjar_tb").val(keterangan || "");
+            } else {
+                // Jika section belum ada, buat elemen baru dari template
+                let $newSection = $("#coa-panjar-tb-template").clone().removeAttr("id").addClass("coa-panjar-tb-section").show();
+
+                // Isi nilai ke elemen baru
+                $newSection.find(".id_panjar_tb").val(idPanjar);
+                $newSection.find(".no_panjar_tb").val(noPanjar);
+                $newSection.find(".akun_kas_panjar_tb").val(akunKas);
+                $newSection.find(".akun_selisih_panjar_tb").val(akunSelisih);
+                $newSection.find(".keterangan_panjar_tb").val(keterangan || "");
+
+                // Tambahkan elemen baru ke container
+                $("#coa-panjar-tb-container").append($newSection);
+            }
+        }
+
+        // Tampilkan label jika ada data
+        if ($("#coa-panjar-tb-container .coa-panjar-tb-section").length > 0 && bayarPanjar > 0) {
+            $("#coa-panjar-tb-label").show();
+        } else {
+            $("#coa-panjar-tb-label").hide();
+        }
+
+        // Hitung total bayar panjar dan update subtotal
         var totalBayarPanjarTB = updateTotalBayarPanjarTB();
         updateSubTotal(totalBayarPanjarTB);
-
     });
 
 
+    
     $(document).on("input", ".bayar_pinjaman", function() {
+        var idPinjaman = $(this).data('id');
+        var noPinjaman = $(this).data('no');
+        var akunKas = $(this).data('akunKas') || "";
+        var akunSelisih = $(this).data('akunCoa') || "";
+        var keterangan = $(this).data('keterangan') || "";
+        var bayarPinjaman = parseFloat($(this).val()) || 0; // Ambil nilai input dan konversi ke angka
+
+        // Cari section yang sudah ada
+        let $existingSection = null;
+        $("#coa-pinjaman-container .id_pinjaman").each(function() {
+        if ($(this).val().trim() === String(idPinjaman).trim()) {
+            $existingSection = $(this).closest('.coa-pinjaman-section');
+              return false; // Keluar dari loop setelah menemukan elemen
+            }
+        });
+
+        if (bayarPinjaman <= 0) {
+                // Jika nilai bayar_pinjaman kurang dari atau sama dengan 0, sembunyikan atau hapus section
+            if ($existingSection && $existingSection.length > 0) {
+               $existingSection.remove(); // Hapus section dari DOM
+            }
+        } else {
+            if ($existingSection && $existingSection.length > 0) {
+                // Jika section sudah ada, update nilainya
+                $existingSection.find(".no_pinjaman").val(noPinjaman);
+                $existingSection.find(".akun_kas_pinjaman").val(akunKas);
+                $existingSection.find(".akun_selisih_pinjaman").val(akunSelisih);
+                $existingSection.find(".keterangan_pinjaman").val(keterangan || "");
+            } else {
+                // Jika section belum ada, buat elemen baru dari template
+                let $newSection = $("#coa-pinjaman-template").clone().removeAttr("id").addClass("coa-pinjaman-section").show();
+
+                // Isi nilai ke elemen baru
+                $newSection.find(".id_pinjaman").val(idPinjaman);
+                $newSection.find(".no_pinjaman").val(noPinjaman);
+                $newSection.find(".akun_kas_pinjaman").val(akunKas);
+                $newSection.find(".akun_selisih_pinjaman").val(akunSelisih);
+                $newSection.find(".keterangan_pinjaman").val(keterangan || "");
+
+                // Tambahkan elemen baru ke container
+                $("#coa-pinjaman-container").append($newSection);
+            }
+        }
+
+        // Tampilkan label jika ada data
+        if ($("#coa-pinjaman-container .coa-pinjaman-section").length > 0 && bayarPinjaman > 0) {
+            $("#coa-pinjaman-label").show();
+        } else {
+            $("#coa-pinjaman-label").hide();
+        }
+
+        // Hitung total bayar pinjaman dan update subtotal
         var totalBayarPinjaman = updateTotalBayarPinjaman();
         updateSubTotal(totalBayarPinjaman);
-
     });
 
     function updateSubTotal(newSubtotal) {
-        var countSubTotal = newSubtotal;
-        return countSubTotal;
+        subCountTotal = newSubtotal; // Perbarui nilai global
+        $('.subtotal').text(greatFormatRupiah(subCountTotal)); // Tampilkan nilai subtotal ke UI
     }
 
     function formatDate(dateString) {
-
         let parts = dateString.split("-");
         let reversedParts = parts.reverse();
         let formattedDate = reversedParts.join("/");

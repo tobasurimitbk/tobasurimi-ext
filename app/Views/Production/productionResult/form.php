@@ -21,6 +21,11 @@
                 <button class="btn btn-show-form btn-save btn-submit-form mr-1" type="button">
                     Simpan
                 </button> -->
+                <?php if (can('Produksi', 'Hasil Produksi', 'p')) : ?>
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("production-result/print/"); ?><?= !empty($data) ? encrypt($data->id) : ''; ?>')">
+                        Print
+                    </button>
+                <?php endif; ?>
                 <?php if ($data->is_posted != 1) { ?>
                     <?php if (can('Produksi', 'Hasil Produksi', 'a')) : ?>
                         <button class="btn btn-success mr-1" onclick="posting('<?= !empty($data) ? encrypt($data->id) : ''; ?>', 1)">
@@ -36,11 +41,7 @@
                         Simpan
                     </button>
                 <?php } ?>
-                <?php if (can('Produksi', 'Hasil Produksi', 'p')) : ?>
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("production-result/print/"); ?><?= !empty($data) ? encrypt($data->id) : ''; ?>')">
-                        Print
-                    </button>
-                <?php endif; ?>
+
             <?php } else if (!isset($data)) { ?>
                 <button class="btn btn-show-form btn-save btn-submit-form mr-1" type="button">
                     Simpan
@@ -54,11 +55,9 @@
             <form class="create-form form-add-spp form-hp" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" value="<?= $data->id ?? ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
-                <div class="col-subtitle-modal">
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <label class="form-label font-weight-bold modal-sub-title">Bukti Penerimaan</label>
-                        </div>
+                <div class="row mt-3">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Bukti Penerimaan</label>
                     </div>
                 </div>
                 <div class="row">
@@ -82,11 +81,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-subtitle-modal">
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <label class="form-label font-weight-bold modal-sub-title">Data Work Order</label>
-                        </div>
+                <div class="row mt-3">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Data Work Order</label>
                     </div>
                 </div>
                 <div class="row">
@@ -145,106 +142,48 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-subtitle-modal">
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <label class="form-label font-weight-bold modal-sub-title">Data Material Request</label>
-                        </div>
+                <div class="row mt-3">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Data Hasil Produksi</label>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <?php if (!isset($data)) : ?>
-                                <select class="form-select kode_request" name="kode_request[]" id="kode_request[]" multiple>
-                                    <option value=""></option>
-                                </select>
-                            <?php endif; ?>
-                            <?php if (isset($data)) : ?>
-                                <input autocomplete="one-time-code" type="text" class="form-control req_no" name="req_no" id="req_no" placeholder="Kode Produksi" readonly>
-                            <?php endif; ?>
-                            <label for="floatingInput">Kode Request</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control date_picker" name="date_request" id="date_request" placeholder="Tanggal Request" readonly>
-                            <label for="floatingInput">Tanggal Request</label>
-                        </div>
-                    </div>
-                    <!-- <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control user_request" name="user_request" id="user_request" placeholder="User Request" readonly>
-                            <label for="floatingInput">User Request</label>
-                        </div>
-                    </div> -->
-                </div>
-                <!-- <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select department_id_request" name="department_id_request" id="department_id_request" disabled>
-                                <option value=""></option>
-                                <?php foreach ($dataDivisi as $divisi) : ?>
-                                    <option value="<?= $divisi['id'] ?>"><?= $divisi['divisi'] ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">Department</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select warehouse_id_request" name="warehouse_id_request" id="warehouse_id_request" disabled>
-                                <option value=""></option>
-                                <?php foreach ($dataWarehouse ?? [] as $Warehouse) : ?>
-                                    <option value="<?= $Warehouse['id'] ?>"><?= $Warehouse['warehouse_name'] ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">Warehouse</label>
-                        </div>
-                    </div>
-                </div> -->
-                <!-- details -->
                 <div class="row mt-3">
                     <div class="col-md-12">
                         <nav>
                             <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                                <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-material-request" type="button" role="tab" aria-controls="nav-barang-jadi" aria-selected="true">Barang Request</button>
+                                <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-jadi" type="button" role="tab" aria-controls="nav-barang-jadi" aria-selected="true">Barang Jadi</button>
+                                <button class="nav-link" id="nav-scrap-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-material-request" type="button" role="tab" aria-controls="nav-barang-material-request" aria-selected="false">Barang Material Request</button>
                                 <button class="nav-link" id="nav-scrap-tab" data-bs-toggle="tab" data-bs-target="#nav-scrap" type="button" role="tab" aria-controls="nav-scrap" aria-selected="false">Scrap</button>
                                 <button class="nav-link" id="nav-filling-tab" data-bs-toggle="tab" data-bs-target="#nav-filling" type="button" role="tab" aria-controls="nav-filling" aria-selected="false">Sisa Produksi</button>
-                                <button class="nav-link" id="nav-barang-jadi-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-jadi" type="button" role="tab" aria-controls="nav-barang-setengah-jadi" aria-selected="false">Barang Jadi</button>
+                                <!-- <button class="nav-link" id="nav-barang-jadi-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-jadi" type="button" role="tab" aria-controls="nav-barang-setengah-jadi" aria-selected="false">Barang Setengah Jadi</button> -->
                             </div>
                         </nav>
                         <div class="tab-content mt-3" id="nav-tabContent">
-                            <div class="tab-pane fade show active" id="nav-barang-material-request" role="tabpanel" aria-labelledby="nav-home-tab">
-                                <div class="col-subtitle-modal">
-                                    <div class="row mt-3">
-                                        <div class="col-md-12 text-left">
-                                            <label class="form-label font-weight-bold modal-sub-title">Daftar Bahan Digunakan</label>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="tab-pane fade show active" id="nav-barang-jadi" role="tabpanel" aria-labelledby="nav-barang-jadi">
+                                <?php if (!isset($data)) : ?>
+                                    <button type="button" class="btn btn-primary btn-add-barang-jadi" style="float: right;">Tambah Barang Jadi</button>
+                                    <br> <br>
+                                <?php endif; ?>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="table-responsive">
-                                            <table class="table table-bordered nowrap table-hover-tobasurimi tableBarangDigunakan text-center" id="tableBarangDigunakan" width="100%" cellspacing="0">
-                                                <thead class="thead-dark">
+                                            <table class="table table-bordered nowrap table-hover-tobasurimi tableBarangJadi dataTable" id="tableBarangJadi" width="100%" cellspacing="0">
+                                                <thead class="thead-dark text-center">
                                                     <tr>
                                                         <th style="width: 10px;">No</th>
-                                                        <th>Referensi</th>
-                                                        <?php if (!isset($data)) : ?>
-                                                            <th>Kondisi Barang</th>
-                                                        <?php endif; ?>
                                                         <th>Kode Barang</th>
                                                         <th>Jenis Barang</th>
-                                                        <th>Nama Barang</th>
+                                                        <th style="text-align:center">Nama Barang</th>
                                                         <th>Satuan</th>
-                                                        <th>Sisa Qty Request</th>
-                                                        <th>Jumlah Digunakan</th>
+                                                        <th>Qty Hasil</th>
+                                                        <th>Berat Isi</th>
+                                                        <th>Qty dalam KG</th>
+                                                        <th></th>
                                                     </tr>
                                                 </thead>
-                                                <tbody class="body-table-barang-digunakan" id="body-table-barang-digunakan">
+                                                <tbody class="body-table-barang-jadi" id="body-table-barang-jadi">
                                                 </tbody>
-                                                <tfoot id="tfoot-barang-digunakan">
+                                                <tfoot class="tfoot-table-barang-jadi" id="tfoot-barang-jadi">
                                                 </tfoot>
                                             </table>
                                         </div>
@@ -293,14 +232,14 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-4 mb-3">
-                                                <button type="button" class="btn btn-primary button-add-scrap">Tambah Barang Scrap</button>
+                                            <div class="col-md-12 mb-3">
+                                                <button type="button" class="btn btn-primary button-add-scrap" style="float: right;">Tambah Barang Scrap</button>
                                             </div>
                                         </div>
                                     </form>
                                 <?php endif; ?>
                                 <div class="table-responsive">
-                                    <table class="table nowrap table-hover-tobasurimi tableBarangScrap" id="tableBarangScrap" width="100%" cellspacing="0">
+                                    <table class="table nowrap table-hover-tobasurimi tableBarangScrap dataTable" id="tableBarangScrap" width="100%" cellspacing="0">
                                         <thead class="thead-dark text-center">
                                             <tr>
                                                 <th>No.</th>
@@ -374,14 +313,14 @@
                                             </div>
                                         </div> -->
                                         <div class="row">
-                                            <div class="col-md-4 mb-3">
-                                                <button type="button" class="btn btn-primary button-add-filling">Tambah Barang Filling</button>
+                                            <div class="col-md-12 mb-3">
+                                                <button type="button" class="btn btn-primary button-add-filling" style="float: right;">Tambah Barang Filling</button>
                                             </div>
                                         </div>
                                     </form>
                                 <?php endif; ?>
                                 <div class="table-responsive">
-                                    <table class="table nowrap table-hover-tobasurimi tableBarangFilling" id="tableBarangFilling" width="100%" cellspacing="0">
+                                    <table class="table nowrap table-hover-tobasurimi tableBarangFilling dataTable" id="tableBarangFilling" width="100%" cellspacing="0">
                                         <thead class="thead-dark text-center">
                                             <tr>
                                                 <th>No.</th>
@@ -402,39 +341,51 @@
                                     </table>
                                 </div>
                             </div>
-                            <div class="tab-pane fade show" id="nav-barang-jadi" role="tabpanel" aria-labelledby="nav-barang-jadi-tab">
-                                <div class="col-subtitle-modal">
-                                    <div class="row mt-3">
-                                        <div class="col-md-10">
-                                            <label class="form-label font-weight-bold modal-sub-title">Daftar Barang Jadi</label>
+
+                            <div class="tab-pane fade" id="nav-barang-material-request" role="tabpanel" aria-labelledby="nav-barang-material-request">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <?php if (!isset($data)) : ?>
+                                                <select class="form-select kode_request" name="kode_request[]" id="kode_request[]" multiple>
+                                                    <option value=""></option>
+                                                </select>
+                                            <?php endif; ?>
+                                            <?php if (isset($data)) : ?>
+                                                <input autocomplete="one-time-code" type="text" class="form-control req_no" name="req_no" id="req_no" placeholder="Kode Produksi" readonly>
+                                            <?php endif; ?>
+                                            <label for="floatingInput">Kode Request</label>
                                         </div>
-                                        <div class="col-md-2 text-right">
-                                            <button class="btn btn-show-detail btn-add btn-add-barang-jadi" type="button">
-                                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                                            </button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input autocomplete="one-time-code" type="text" class="form-control date_picker" name="date_request" id="date_request" placeholder="Tanggal Request" readonly>
+                                            <label for="floatingInput">Tanggal Request</label>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="table-responsive">
-                                            <table class="table table-bordered nowrap table-hover-tobasurimi tableBarangJadi" id="tableBarangJadi" width="100%" cellspacing="0">
-                                                <thead class="thead-dark text-center">
+                                            <table class="table table-bordered nowrap table-hover-tobasurimi tableBarangDigunakan text-center dataTable" id="tableBarangDigunakan" width="100%" cellspacing="0">
+                                                <thead class="thead-dark">
                                                     <tr>
                                                         <th style="width: 10px;">No</th>
+                                                        <th>Referensi</th>
+                                                        <?php if (!isset($data)) : ?>
+                                                            <th>Kondisi Barang</th>
+                                                        <?php endif; ?>
                                                         <th>Kode Barang</th>
                                                         <th>Jenis Barang</th>
                                                         <th>Nama Barang</th>
                                                         <th>Satuan</th>
-                                                        <th>Qty Hasil</th>
-                                                        <th>Berat Isi</th>
-                                                        <th>Qty dalam KG</th>
-                                                        <th></th>
+                                                        <th>Sisa Qty Request</th>
+                                                        <th>Jumlah Digunakan</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody class="body-table-barang-jadi" id="body-table-barang-jadi">
+                                                <tbody class="body-table-barang-digunakan" id="body-table-barang-digunakan">
                                                 </tbody>
-                                                <tfoot class="tfoot-table-barang-jadi" id="tfoot-barang-jadi">
+                                                <tfoot id="tfoot-barang-digunakan">
                                                 </tfoot>
                                             </table>
                                         </div>
@@ -530,77 +481,77 @@
             // list_items_barang_filling = [];
             <?php foreach ($dataResultBarangJadi as $key => $bj) : ?>
                 list_items_barang_jadi.push({
-                    'production_result_detail_id': '<?= addslashes($bj->id); ?>',
-                    'barang1_id': '<?= addslashes($bj->barang1_id); ?>',
-                    'barang2_id': '<?= addslashes($bj->barang2_id); ?>',
-                    'barang_name': '<?= addslashes($bj->nama_barang); ?>',
-                    'kode_barang': '<?= addslashes($bj->kode_barang); ?>',
-                    'kode_satuan': '<?= addslashes($bj->kode_satuan); ?>',
-                    'nama_barang': '<?= addslashes($bj->nama_barang); ?>',
-                    'qty': '<?= addslashes($bj->qty); ?>',
-                    'qty2': '<?= addslashes($bj->qty2); ?>',
-                    'qty_isi': '<?= addslashes($bj->qty_isi); ?>',
-                    'qty_jadi': '<?= addslashes($bj->qty); ?>',
-                    'berat_isi_jadi': '<?= addslashes($bj->qty2); ?>',
-                    'qty_isi_jadi': '<?= addslashes($bj->qty_isi); ?>',
-                    'type_barang': '<?= addslashes($bj->barang_type); ?>',
-                    'type_barang_text': '<?= addslashes($bj->type_barang_text); ?>',
+                    'production_result_detail_id': '<?= $bj->id; ?>',
+                    'barang1_id': '<?= $bj->barang1_id; ?>',
+                    'barang2_id': '<?= $bj->barang2_id; ?>',
+                    'barang_name': "<?= str_replace('"', '\"', $bj->nama_barang) ?>",
+                    'kode_barang': '<?= $bj->kode_barang; ?>',
+                    'kode_satuan': '<?= $bj->kode_satuan; ?>',
+                    'nama_barang': "<?= str_replace('"', '\"', $bj->nama_barang) ?>",
+                    'qty': '<?= floatval($bj->qty); ?>',
+                    'qty2': '<?= floatval($bj->qty2); ?>',
+                    'qty_isi': '<?= floatval($bj->qty_isi); ?>',
+                    'qty_jadi': '<?= floatval($bj->qty); ?>',
+                    'berat_isi_jadi': '<?= floatval($bj->qty2); ?>',
+                    'qty_isi_jadi': '<?= floatval($bj->qty_isi); ?>',
+                    'type_barang': '<?= $bj->barang_type; ?>',
+                    'type_barang_text': '<?= $bj->type_barang_text; ?>',
                 });
             <?php endforeach; ?>
             drawTableBarangJadi();
             <?php foreach ($dataResultBarangScrap as $key => $bs) : ?>
                 list_items_barang_scrap.push({
                     'barang_detail_id': getID(),
-                    'production_result_detail_id': '<?= addslashes($bs->id); ?>',
-                    'barang1_id': '<?= addslashes($bs->barang1_id); ?>',
-                    'barang2_id': '<?= addslashes($bs->barang2_id); ?>',
-                    'barang_name': '<?= addslashes($bs->nama_barang); ?>',
-                    'kode_barang': '<?= addslashes($bs->kode_barang); ?>',
-                    'kode_satuan': '<?= addslashes($bs->kode_satuan); ?>',
-                    'nama_barang': '<?= addslashes($bs->nama_barang); ?>',
-                    'divisi_name': '<?= addslashes($bs->divisi); ?>',
-                    'warehouse_name': '<?= addslashes($bs->warehouse); ?>',
-                    'qty': '<?= addslashes($bs->qty); ?>',
-                    'type_barang': '<?= addslashes($bs->barang_type); ?>',
-                    'type_barang_text': '<?= addslashes($bs->type_barang_text); ?>',
+                    'production_result_detail_id': '<?= $bs->id; ?>',
+                    'barang1_id': '<?= $bs->barang1_id; ?>',
+                    'barang2_id': '<?= $bs->barang2_id; ?>',
+                    'barang_name': '<?= str_replace('"', '\"', $bs->nama_barang); ?>',
+                    'kode_barang': '<?= $bs->kode_barang; ?>',
+                    'kode_satuan': '<?= $bs->kode_satuan; ?>',
+                    'nama_barang': '<?= str_replace('"', '\"', $bs->nama_barang); ?>',
+                    'divisi_name': '<?= $bs->divisi; ?>',
+                    'warehouse_name': '<?= $bs->warehouse; ?>',
+                    'qty': '<?= floatval($bs->qty); ?>',
+                    'type_barang': '<?= $bs->barang_type; ?>',
+                    'type_barang_text': '<?= $bs->type_barang_text; ?>',
                 });
             <?php endforeach; ?>
             drawTableBarangScrap();
             <?php foreach ($dataResultBarangDigunakan as $key => $bd) : ?>
                 list_items_barang_digunakan.push({
                     'barang_detail_id': getID(),
-                    'production_result_detail_id': '<?= addslashes($bd->id); ?>',
-                    'barang1_id': '<?= addslashes($bd->barang1_id); ?>',
-                    'barang2_id': '<?= addslashes($bd->barang2_id); ?>',
-                    'barang_name': '<?= addslashes($bd->nama_barang); ?>',
-                    'kode_barang': '<?= addslashes($bd->kode_barang); ?>',
-                    'satuan': '<?= addslashes($bd->kode_satuan); ?>',
-                    'nama_barang': '<?= addslashes($bd->nama_barang); ?>',
-                    'qty': '<?= addslashes($bd->qty); ?>',
-                    'ref_no': '<?= addslashes($bd->no_ref); ?>',
-                    'no_aju': '<?= addslashes($bd->no_aju); ?>',
-                    'type_barang': '<?= addslashes($bd->barang_type); ?>',
-                    'type_barang_text': '<?= addslashes($bd->type_barang_text); ?>',
+                    'production_result_detail_id': '<?= $bd->id; ?>',
+                    'barang1_id': '<?= $bd->barang1_id; ?>',
+                    'barang2_id': '<?= $bd->barang2_id; ?>',
+                    'barang_name': '<?= str_replace('"', '\"', $bd->nama_barang); ?>',
+                    'kode_barang': '<?= $bd->kode_barang; ?>',
+                    'satuan': '<?= $bd->kode_satuan; ?>',
+                    'nama_barang': '<?= str_replace('"', '\"', $bd->nama_barang); ?>',
+                    'qty': '<?= floatval($bd->qty); ?>',
+                    'ref_no': '<?= $bd->no_ref; ?>',
+                    'no_aju': '<?= $bd->no_aju; ?>',
+                    'type_barang': '<?= $bd->barang_type; ?>',
+                    'type_barang_text': '<?= $bd->type_barang_text; ?>',
                 });
             <?php endforeach; ?>
             drawTableBarangDigunakan();
             <?php foreach ($dataResultBarangReturn as $key => $br) : ?>
                 list_items_barang_filling.push({
                     'barang_detail_id': getID(),
-                    'production_result_detail_id': '<?= addslashes($br->id); ?>',
-                    'barang1_id': '<?= addslashes($br->barang1_id); ?>',
-                    'barang2_id': '<?= addslashes($br->barang2_id); ?>',
-                    'barang_name': '<?= addslashes($br->barang_name); ?>',
-                    'kode_barang': '<?= addslashes($br->kode_barang); ?>',
-                    'satuan': '<?= addslashes($br->kode_satuan); ?>',
-                    'nama_barang': '<?= addslashes($br->nama_barang); ?>',
-                    'qty': '<?= addslashes($br->qty); ?>',
-                    'ref_no': '<?= addslashes($br->no_ref); ?>',
-                    'no_aju': '<?= addslashes($br->no_aju); ?>',
-                    'type_barang': '<?= addslashes($br->barang_type); ?>',
-                    'type_barang_text': '<?= addslashes($br->type_barang_text); ?>',
-                    'kondisi_barang': '<?= addslashes($br->kondisi_barang); ?>',
-                    'kondisi_barang_text': '<?= addslashes(strtoupper($br->kondisi_barang)); ?>',
+                    'production_result_detail_id': '<?= $br->id; ?>',
+                    'barang1_id': '<?= $br->barang1_id; ?>',
+                    'barang2_id': '<?= $br->barang2_id; ?>',
+                    'barang_name': '<?= str_replace('"', '\"', $br->nama_barang) ?>',
+                    'kode_barang': '<?= $br->kode_barang; ?>',
+                    'satuan': '<?= $br->kode_satuan; ?>',
+                    'nama_barang': '<?= str_replace('"', '\"', $br->nama_barang); ?>',
+                    'qty': '<?= floatval($br->qty); ?>',
+                    'ref_no': '<?= $br->no_ref; ?>',
+                    'no_aju': '<?= $br->no_aju; ?>',
+                    'type_barang': '<?= $br->barang_type; ?>',
+                    'type_barang_text': '<?= $br->type_barang_text; ?>',
+                    'kondisi_barang': '<?= $br->kondisi_barang; ?>',
+                    'kondisi_barang_text': '<?= strtoupper($br->kondisi_barang); ?>',
                 });
             <?php endforeach; ?>
             drawTableBarangFilling();
@@ -1595,16 +1546,16 @@
                 row += '<td>' + item.barang_name + '</td>';
                 row += '<td>' + item.kode_satuan + '</td>';
                 row += '<td>' + `
-                    <input class="form-control qty-barang-jadi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>
+                    <input  style="height:40px" class="form-control qty-barang-jadi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>
                 ` + '</td>';
                 row += '<td>' + `
-                    <input class="form-control berat-barang-jadi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty2}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>
+                    <input  style="height:40px" class="form-control berat-barang-jadi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty2}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>
                 ` + '</td>';
                 row += '<td>' + `
-                    <input class="form-control qty-berat-barang-jadi" readonly autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty_isi}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>
+                    <input  style="height:40px" class="form-control qty-berat-barang-jadi" readonly autocomplete="one-time-code" type="text" data-index="${index}" value="${greatFormatRupiah(item.qty_isi)}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>
                 ` + '</td>';
                 row += '<td>' + `
-                    <button type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteRowDetailJadi('${item.barang_detail_id}', '${item.production_result_detail_id}')"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                    <button <?= isset($data) ? ($data->is_posted ? 'disabled' : '') : '' ?>  type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteRowDetailJadi('${item.barang_detail_id}', '${item.production_result_detail_id}')"><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 ` + '</td>';
 
                 no++;
@@ -1624,9 +1575,9 @@
             var footerRow = `
                 <tr style="font-weight: bold;">
                     <td colspan="5"></td>
-                    <td class="text-center">${totalQtyHasil.toFixed(2)}</td>
-                    <td class="text-center">${totalBeratIsi.toFixed(2)}</td>
-                    <td class="text-center">${totalQtyKg.toFixed(2)}</td>
+                    <td>${greatFormatRupiah(totalQtyHasil.toFixed(2))}</td>
+                    <td>${greatFormatRupiah(totalBeratIsi.toFixed(2))}</td>
+                    <td>${greatFormatRupiah(totalQtyKg.toFixed(2))}</td>
                     <td></td>
                 </tr>
             `;
@@ -1675,7 +1626,7 @@
                 totalQtyDigunakan += parseFloat(qty || 0);
                 totalQtyRequest += parseFloat(item.qty || 0);
 
-                row += '<tr style="color:whitesmoke;text-align: center;">';
+                row += '<tr style="color:whitesmoke;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.ref_no + '</td>';
                 <?php if (!isset($data)) : ?>
@@ -1685,9 +1636,9 @@
                 row += '<td>' + item.type_barang_text + '</td>';
                 row += '<td>' + item.nama_barang + '</td>';
                 row += '<td>' + item.satuan + '</td>';
-                row += '<td>' + item.qty + '</td>';
+                row += '<td>' + greatFormatRupiah(item.qty) + '</td>';
                 row += '<td>' + `
-                <input class="form-control qty-barang-digunakan" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${qty}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>` +
+                <input class="form-control qty-barang-digunakan" <?= isset($data) ? ($data->is_posted ? 'readonly' : '') : '' ?>   style="height:40px" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${qty}">` +
                     '</td>';
 
                 no++;
@@ -1698,8 +1649,8 @@
             var footerRow = `
                 <tr style="font-weight: bold;">
                     <td colspan="6"></td>
-                    <td class="text-center">${totalQtyRequest.toFixed(2)}</td>
-                    <td colspan="2" style="text-align: center;">${totalQtyDigunakan.toFixed(2)}</td>
+                    <td class="text-center">${greatFormatRupiah(totalQtyRequest.toFixed(2))}</td>
+                    <td colspan="2" >${greatFormatRupiah(totalQtyDigunakan.toFixed(2))}</td>
                 </tr>
             `;
             $('#tfoot-barang-digunakan').append(footerRow); // Gunakan ID untuk target footer khusus
@@ -1737,7 +1688,7 @@
                 row += '<td>' + item.nama_barang + '</td>';
                 row += '<td>' + item.divisi_name + '</td>';
                 row += '<td>' + item.warehouse_name + '</td>';
-                row += '<td>' + item.qty + '</td>';
+                row += '<td>' + greatFormatRupiah(item.qty) + '</td>';
 
                 // Hanya tampilkan tombol delete jika data belum diposting
                 <?php if (!isset($data)) : ?>
@@ -1773,12 +1724,12 @@
         } else {
             // Looping untuk menampilkan data barang filling
             list_items_barang_filling.map(item => {
-                row += '<tr style="color:whitesmoke;text-align: center;">';
+                row += '<tr style="color:whitesmoke;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.kode_barang + '</td>';
                 row += '<td>' + item.nama_barang + '</td>';
                 row += '<td>' + item.kondisi_barang_text + '</td>';
-                row += '<td>' + item.qty + '</td>';
+                row += '<td>' + greatFormatRupiah(item.qty) + '</td>';
 
                 // Hanya tampilkan tombol delete jika data belum diposting
                 <?php if (!isset($data)) : ?>

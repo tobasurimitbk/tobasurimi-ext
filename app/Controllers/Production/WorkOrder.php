@@ -124,7 +124,9 @@ class WorkOrder extends BaseController
         $addCondition = [
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType")
+            "sortType"      => $this->request->getGet("sortType"),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $limit = $this->request->getGet("length");
@@ -144,6 +146,7 @@ class WorkOrder extends BaseController
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
                 // "id_material_request"   => $materialRequestId ? encrypt($materialRequestId) : 0,
+                'request_date'          => date('d/m/Y', strtotime($data->request_date)),
                 "id_production_result"  => $productionResultId ? encrypt($productionResultId) : 0,
                 "wo_no"                 => $data->wo_no,
                 "nama_barang"           => $data->nama_barang,
@@ -215,28 +218,9 @@ class WorkOrder extends BaseController
     {
         try {
             $id = ($this->request->getPost("id"));
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-            $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day, $this->this_company_id);
-            // $no = $this->workOrdersModel->get_no();
-            $payload = [
-                "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
-                'company_id' => $this->this_company_id,
-                'divisi_id' => $this->request->getVar("department_id"),
-                'warehouse_id' => $this->request->getVar("warehouse_id"),
-                "request_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
-                'standart_production' => $this->request->getVar('standart_production'),
-                'note' => $this->request->getVar('note'),
-                'is_posted' => 0,
-                'request_status' => "waiting",
-                'createdBy' =>  session()->get("login")->user_id,
-            ];
-
-            // $condition = [
-            //     'id' => $id
-            // ];
 
             $response = $this->workOrdersModel->update($id, [
-                "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
+                "wo_no" =>  $this->request->getPost("wo_no"),
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar("department_id"),
                 'warehouse_id' => $this->request->getVar("warehouse_id"),
@@ -325,8 +309,23 @@ class WorkOrder extends BaseController
 
     public function generateKodeProduksi()
     {
-        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-        $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day, $this->this_company_id);
+
+        $request_date = date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("request_date"))));
+        if (empty($this->request->getVar("request_date"))) {
+            $no = $this->workOrdersModel->get_no(
+                date('m'),
+                date('Y'),
+            );
+        } else {
+            $tanggalExplode = explode('-', $request_date);
+            $year = $tanggalExplode[0];
+            $month = $tanggalExplode[1];
+
+            $no = $this->workOrdersModel->get_no(
+                $month,
+                $year,
+            );
+        }
 
         return json_encode($no);
     }

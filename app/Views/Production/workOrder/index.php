@@ -5,28 +5,47 @@
 <section class="section">
     <div class="section-header">
         <h1>Work Order</h1>
-
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("work-order/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        <?php if (can('Produksi', 'Work Order', 'c')): ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("work-order/create"); ?>">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </a>
+        <?php endif; ?>
         <?= csrf_field() ?>
     </div>
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
-                <div class="col-md-4 mb-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Kode Produksi / Nama Barang" value="" />
+                <div class="col-md-4 mb-2 mt-2">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Mulai">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                        </div>
+                    </div>
                 </div>
+                <div class="col-md-4 mb-2 mt-2">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2 mt-2">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data" value="" />
+                </div>
+
             </div>
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th style="width: 10px;">No</th>
+                                <th onclick="changeSort('request_date')" class="sort">Tanggal</th>
                                 <th onclick="changeSort('wo_no')" class="sort">Kode Produksi</th>
-                                <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('department')" class="sort">Department</th>
+                                <th onclick="changeSort('nama_barang')" class="sort">Barang Jadi</th>
+                                <th onclick="changeSort('department')" class="sort">Departemen</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -43,7 +62,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
-    let sort = "wo_no";
+    let sort = "work_orders.id";
     let sortType = "desc";
 
     let search = $('.search').val();
@@ -69,6 +88,8 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
+                data.dateStart = $(".dateStart").val();
+                data.dateEnd = $(".dateEnd").val();
                 data.sort = sort;
                 data.sortType = sortType;
             },
@@ -90,6 +111,10 @@
                 data: "no",
                 className: "text-center",
                 orderable: false
+            },
+            {
+                data: "request_date",
+                className: "text-center"
             },
             {
                 data: "wo_no",
@@ -117,8 +142,8 @@
                         <div class="mt-0">
                     `;
                     buttonsHTML += `
-                        <button class="btn btn-primary to-material-request" onclick="toMaterialRequest()" >
-                            <i class="fa fa-phone fa-sm" aria-hidden="true"></i>
+                        <button data-toggle="tooltip" title="Material Request" onclick="toMaterialRequest()" class="btn btn-success text-white">
+                            <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
                         </button>
                     `;
                     // if (id_production_result) {
@@ -129,11 +154,13 @@
                     //     `;
                     // }
                     // Tombol hapus selalu ditampilkan
-                    buttonsHTML += `
-                        <button class="btn btn-danger" onclick="remove('${id}')" >
-                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                        </button>
-                    `;
+                    <?php if (can('Produksi', 'Work Order', 'd')): ?>
+                        buttonsHTML += `
+                            <button data-toggle="tooltip" title="Hapus" class="btn btn-danger" onclick="remove('${id}')" >
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        `;
+                    <?php endif; ?>
                     buttonsHTML += `
                         </div>
                     `;
@@ -141,6 +168,12 @@
                 }
             }
         ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -163,10 +196,38 @@
             table.ajax.reload();
         })
 
+        $(".dateStart, .dateEnd").change(function() {
+            table.ajax.reload();
+        })
+
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             location.replace(`<?= base_url("work-order/details"); ?>/${data.id}`);
         })
+
+        $(".dateStart").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".dateEnd").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $('.icon-dateStart').click(function() {
+            $(".dateStart").focus();
+        });
+
+        $('.icon-dateEnd').click(function() {
+            $(".dateEnd").focus();
+        });
+
+
     })
 
     const spp = function() {
