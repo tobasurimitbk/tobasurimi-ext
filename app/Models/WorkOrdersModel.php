@@ -58,6 +58,7 @@ class WorkOrdersModel extends Model
     public function getWorkOrderList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
+            'request_date'      => 'request_date',
             'wo_no'             => 'work_orders.wo_no',
             'department'       => 'divisis.divisi',
             'nama_barang'       => 'work_order_details.nama_barang',
@@ -94,6 +95,18 @@ class WorkOrdersModel extends Model
             $workOrdersDataQry->groupEnd();
         }
 
+        // Pisahkan filter tanggal dari pencarian agar tidak terkena efek `LIKE`
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $workOrdersDataQry->groupStart(); // Pastikan tanggal hanya masuk dalam satu blok kondisi
+            if (!empty($addCondition['dateStart'])) {
+                $workOrdersDataQry->where('request_date >=', $addCondition['dateStart']);
+            }
+            if (!empty($addCondition['dateEnd'])) {
+                $workOrdersDataQry->where('request_date <=', $addCondition['dateEnd']);
+            }
+            $workOrdersDataQry->groupEnd();
+        }
+
         $totalFilteredData = $workOrdersDataQry->countAllResults(false);
         $data = $workOrdersDataQry->findAll($limit, $offset);
 
@@ -104,7 +117,7 @@ class WorkOrdersModel extends Model
         ];
     }
 
-    public function get_no($tgl, $bln, $thn, $last_day, $company_id)
+    public function get_no($bln, $thn)
     {
         $romanNumb = [
             'I',
@@ -121,28 +134,31 @@ class WorkOrdersModel extends Model
             'XII',
         ];
 
-        $lastStr =  $romanNumb[$bln - 1] . '/' . $thn;
+        $first_day = "$thn-$bln-01";
+        $last_day = date("Y-m-t", strtotime($first_day));
+        $lastStr = $romanNumb[$bln - 1] . '/' . $thn;
 
         $builder = $this->db->table('work_orders');
         $builder->select('wo_no');
-        $builder->orderBy('wo_no', 'desc')
-            ->where('deletedAt', null)
-            ->where('company_id', $company_id);
+        $builder->where('deletedAt IS NULL'); // Gunakan IS NULL agar lebih aman
+        $builder->where('company_id', session()->get("login")->this_company_id);
+        $builder->where('request_date >=', $first_day);
+        $builder->where('request_date <=', $last_day);
         $builder->like('wo_no', $lastStr);
+        $builder->orderBy('id', "desc");
         $query = $builder->get();
 
         $kode = 'PRD';
-
         $lastWO = '0001';
-        if ($query->getResultArray()) {
-            $lastWO = explode('/', $query->getResultArray()[0]['wo_no']);
-            $lastWO = intval($lastWO[3]) + 1;
 
+        $result = $query->getRowArray(); // Ambil satu baris data
+
+        if ($result && isset($result['wo_no'])) {
+            $lastWO = explode('/', $result['wo_no']);
+            $lastWO = intval(end($lastWO)) + 1;
             $lastWO = sprintf("%04d", $lastWO);
-        };
+        }
 
-        $generatedNo = $kode . '/' . $lastStr . '/' . $lastWO;
-
-        return $generatedNo;
+        return "{$kode}/{$lastStr}/{$lastWO}";
     }
 }

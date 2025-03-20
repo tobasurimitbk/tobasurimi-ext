@@ -4,11 +4,12 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Material Request</h1>
-
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("material-request-kimia/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        <h1>Material Request Kimia</h1>
+        <?php if (can('Produksi', 'Material Request Kimia', 'c')): ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("material-request-kimia/create"); ?>">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </a>
+        <?php endif; ?>
         <?= csrf_field() ?>
     </div>
     <div class="card">
