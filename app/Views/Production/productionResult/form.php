@@ -1687,7 +1687,7 @@
                 row += '<td>' + item.satuan + '</td>';
                 row += '<td>' + item.qty + '</td>';
                 row += '<td>' + `
-                <input class="form-control qty-barang-digunakan" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${qty}">` +
+                <input class="form-control qty-barang-digunakan" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${qty}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>` +
                     '</td>';
 
                 no++;
