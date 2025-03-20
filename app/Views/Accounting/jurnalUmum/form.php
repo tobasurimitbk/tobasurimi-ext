@@ -288,6 +288,15 @@
 
     });
 
+
+    $("#tanggal_transaksi").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+
     $('#valas_id').select2({
         placeholder: "Pilih Valas",
         theme: "bootstrap-5",
