@@ -44,7 +44,7 @@
                                     if (!empty($suppliers)) {
                                         foreach ($suppliers as $sub) {
                                     ?>
-                                            <option value="<?= $sub->id; ?>"><?= $sub->name; ?></option>
+                                            <option value="<?= $sub->id; ?>"><?= $sub->name.' ('.$sub->company.')'; ?></option>
                                     <?php
                                         }
                                     }

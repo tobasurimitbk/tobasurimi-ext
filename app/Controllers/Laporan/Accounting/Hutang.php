@@ -59,7 +59,18 @@ class Hutang extends BaseController
     }
     public function index()
     {
-        $supplierData = $this->supplierModel->asObject()->findAll();
+        if ($this->this_company_id != 16) {
+            $companyId = [1, 2, 15];
+        } else {
+            $companyId = [16];
+        }
+        
+        $supplierData = $this->supplierModel
+            ->select('suppliers.id, suppliers.name, companies.company')
+            ->join('companies', 'companies.id = suppliers.company_id')
+            ->whereIn('company_id', $companyId)
+            ->asObject()
+            ->findAll();
         $data = [
             'suppliers' => $supplierData
         ];
