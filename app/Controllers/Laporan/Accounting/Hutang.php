@@ -4,6 +4,7 @@ namespace App\Controllers\Laporan\Accounting;
 
 use App\Controllers\BaseController;
 use App\Controllers\Master\Kurs;
+use App\Models\DivisisModel;
 use App\Models\SupplierModel;
 use App\Models\TransaksiPembelianModel;
 use App\Models\LocalPOPaymentModel;
@@ -44,6 +45,7 @@ class Hutang extends BaseController
     {
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->supplierModel = new SupplierModel();
+        $this->divisisModel = new DivisisModel();
         $this->transaksiPembelianModel = new TransaksiPembelianModel();
         $this->metadataModel = new MetadataModel();
         $this->kursModel = new KursModel();
@@ -59,8 +61,10 @@ class Hutang extends BaseController
     }
     public function index()
     {
-        if ($this->this_company_id != 16) {
-            $companyId = [1, 2, 15];
+        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+            $companyId = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $companyId = [15];
         } else {
             $companyId = [16];
         }
@@ -71,8 +75,16 @@ class Hutang extends BaseController
             ->whereIn('company_id', $companyId)
             ->asObject()
             ->findAll();
+
+        $divisiData = $this->divisisModel
+            ->select('divisis.id, divisis.divisi, companies.company')
+            ->join('companies', 'companies.id = divisis.company_id')
+            ->whereIn('company_id', $companyId)
+            ->asObject()
+            ->findAll();
         $data = [
-            'suppliers' => $supplierData
+            'suppliers' => $supplierData,
+            'divisis' => $divisiData,
         ];
         return view('Laporan/LaporanHutang/index', $data);
     }
@@ -106,6 +118,8 @@ class Hutang extends BaseController
         $addCondition = [
             "search"        => $this->request->getGet("search"),
             "filter"        => $this->request->getGet("filter"),
+            "divisi"        => $this->request->getGet("divisi"),
+            "type_barang"   => $this->request->getGet("type_barang"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "startdate"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",

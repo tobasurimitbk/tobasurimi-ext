@@ -20,7 +20,7 @@
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-12">
                     <div class="row">
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-4 mb-3">
                             <div class="input-group" style="height: 50px;">
                                 <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Transaksi">
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -28,7 +28,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-4 mb-3">
                             <div class="input-group" style="height: 50px;">
                                 <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal Transaksi">
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -36,7 +36,27 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4" style="height: 50px;">
+                            <input style="height: 100%;" autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select list_divisi" name="list_divisi" id="list_divisi">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($divisis)) {
+                                        foreach ($divisis as $item) {
+                                    ?>
+                                            <option value="<?= $item->id; ?>"><?= $item->divisi.' ('.$item->company.')'; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">List Department</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select list_supplier" name="list_supplier" id="list_supplier">
                                     <option value=""></option>
@@ -50,11 +70,19 @@
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Supplier</label>
+                                <label for="floatingInput">List Supplier</label>
                             </div>
                         </div>
-                        <div class="col-md-3" style="height: 50px;">
-                            <input style="height: auto;" autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select list_type_barang" name="list_type_barang" id="list_type_barang">
+                                    <option value=""></option>
+                                    <option value="BAHAN PENOLONG">Bahan Penolong</option>
+                                    <option value="BAHAN BAKU">Bahan Baku</option>
+                                    <option value="INTERNASIONAL">Internasional</option>
+                                </select>
+                                <label for="floatingInput">Tipe Supplier</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -111,6 +139,8 @@
                 data: function(data) {
                     data.search = $(".search").val();
                     data.filter = $(".list_supplier").val();
+                    data.divisi = $(".list_divisi").val();
+                    data.type_barang = $(".list_type_barang").val();
                     data.dateStart = $(".dateStart").val();
                     data.dateEnd = $(".dateEnd").val();
                     data.sort = sort;
@@ -164,14 +194,24 @@
             theme: "bootstrap-5",
             allowClear: true
         });
-        $('.list_supplier, .dokumen')
+        $('.list_divisi').select2({
+            placeholder: "Filter Divisi",
+            theme: "bootstrap-5",
+            allowClear: true
+        });
+        $('.list_type_barang').select2({
+            placeholder: "Filter Tipe Bahan",
+            theme: "bootstrap-5",
+            allowClear: true
+        });
+        $('.list_supplier, .list_divisi, .list_type_barang')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.list_supplier, .dokumen')
+        $('.list_supplier, .list_divisi, .list_type_barang')
             .parent('div')
             .children('span')
             .children('span')
@@ -179,7 +219,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.list_supplier, .dokumen')
+        $('.list_supplier, .list_divisi, .list_type_barang')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -210,7 +250,7 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd, .list_supplier").change(function() {
+        $(".dateStart, .dateEnd, .list_supplier, .list_divisi, .list_type_barang").change(function() {
             table.ajax.reload();
         })
 
