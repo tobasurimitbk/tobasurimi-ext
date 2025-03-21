@@ -591,7 +591,7 @@
         });
 
         $(document).ready(function() {
-            $("#akun_kas_panjar, #akun_selisih_panjar, #akun_kas_panjar_tb, #akun_selisih_panjar_tb, #akun_selisih_pinjaman, #akun_kas_pinjaman").select2({
+            $(".akun_kas_panjar, .akun_selisih_panjar, .akun_kas_panjar_tb, .akun_selisih_panjar_tb, .akun_selisih_pinjaman, .akun_kas_pinjaman").select2({
                 theme: "bootstrap-5",
                 placeholder: "Pilih Akun",
                 allowClear: true,
@@ -691,8 +691,8 @@
             $.each(listPanjar, function(i, v) {
 
                 var idPanjar = $('#id_panjar').val(); 
-                var akunKas = $('#akun_kas_panjar').val();
-                var akunSelisih = $('#akun_selisih_panjar').val();
+                var akunKas = $('.akun_kas_panjar').val();
+                var akunSelisih = $('.akun_selisih_panjar').val();
                 var keterangan = $('#keterangan_panjar').val();
 
                 var foundPanjar = listPanjar.find(function(item) {
@@ -714,8 +714,8 @@
             $.each(listPinjaman, function(i, v) {
 
                 var idPinjaman = $('#id_pinjaman').val(); 
-                var akunKas = $('#akun_kas_pinjaman').val();
-                var akunSelisih = $('#akun_selisih_pinjaman').val();
+                var akunKas = $('.akun_kas_pinjaman').val();
+                var akunSelisih = $('.akun_selisih_pinjaman').val();
                 var keterangan = $('#keterangan_pinjaman').val();
 
                 var foundPinjaman = listPinjaman.find(function(item) {
@@ -740,8 +740,8 @@
             $.each(listPanjarTB, function(i, v) {
 
                 var idPanjarTB = $('#id_panjar_tb').val(); 
-                var akunKasTB = $('#akun_kas_panjar_tb').val();
-                var akunSelisihTB = $('#akun_selisih_panjar_tb').val();
+                var akunKasTB = $('.akun_kas_panjar_tb').val();
+                var akunSelisihTB = $('.akun_selisih_panjar_tb').val();
                 var keteranganTB = $('#keterangan_panjar_tb').val();
 
                 var foundPanjarTB = listPanjarTB.find(function(item) {
@@ -1070,8 +1070,8 @@
                     // Isi section coa-pinjaman-section dengan data yang sesuai
                     $('#id_pinjaman').val(idPinjaman);
                     $('#no_pinjaman').val(noPinjaman);
-                    $('#akun_kas_pinjaman').val(akunKas);
-                    $('#akun_selisih_pinjaman').val(akunSelisih);
+                    $('.akun_kas_pinjaman').val(akunKas);
+                    $('.akun_selisih_pinjaman').val(akunSelisih);
                     $('#keterangan_pinjaman').val(keterangan);
 
                     var totalBayarPinjaman = updateTotalBayarPinjaman();
@@ -1097,8 +1097,8 @@
                     // Isi section coa-panjar-section dengan data yang sesuai
                     $('#id_panjar_tb').val(idPanjar);
                     $('#no_panjar_tb').val(noPanjar);
-                    $('#akun_kas_panjar_tb').val(akunKas);
-                    $('#akun_selisih_panjar_tb').val(akunSelisih);
+                    $('.akun_kas_panjar_tb').val(akunKas);
+                    $('.akun_selisih_panjar_tb').val(akunSelisih);
                     $('#keterangan_panjar_tb').val(keterangan);
 
                     var totalBayarPanjarTB = updateTotalBayarPanjarTB();
@@ -2158,9 +2158,7 @@
     $(document).on("input", ".bayar_panjar", function() {
         var idPanjar = $(this).data('id');
         var noPanjar = $(this).data('no');
-        var akunKas = $(this).data('akunKas') || "";
-        var akunSelisih = $(this).data('akunCoa') || "";
-        var keterangan = $(this).data('keterangan') || "";
+
         var bayarPanjar = parseFloat($(this).val()) || 0; // Ambil nilai input dan konversi ke angka
 
         // Cari section yang sudah ada
@@ -2181,9 +2179,6 @@
             if ($existingSection && $existingSection.length > 0) {
                 // Jika section sudah ada, update nilainya
                 $existingSection.find(".no_panjar").val(noPanjar);
-                $existingSection.find(".akun_kas_panjar").val(akunKas);
-                $existingSection.find(".akun_selisih_panjar").val(akunSelisih);
-                $existingSection.find(".keterangan_panjar").val(keterangan || "");
             } else {
                 // Jika section belum ada, buat elemen baru dari template
                 let $newSection = $("#coa-panjar-template").clone().removeAttr("id").addClass("coa-panjar-section").show();
@@ -2191,9 +2186,6 @@
                 // Isi nilai ke elemen baru
                 $newSection.find(".id_panjar").val(idPanjar);
                 $newSection.find(".no_panjar").val(noPanjar);
-                $newSection.find(".akun_kas_panjar").val(akunKas);
-                $newSection.find(".akun_selisih_panjar").val(akunSelisih);
-                $newSection.find(".keterangan_panjar").val(keterangan || "");
 
                 // Tambahkan elemen baru ke container
                 $("#coa-panjar-container").append($newSection);
@@ -2240,9 +2232,6 @@
             if ($existingSection && $existingSection.length > 0) {
                 // Jika section sudah ada, update nilainya
                 $existingSection.find(".no_panjar_tb").val(noPanjar);
-                $existingSection.find(".akun_kas_panjar_tb").val(akunKas);
-                $existingSection.find(".akun_selisih_panjar_tb").val(akunSelisih);
-                $existingSection.find(".keterangan_panjar_tb").val(keterangan || "");
             } else {
                 // Jika section belum ada, buat elemen baru dari template
                 let $newSection = $("#coa-panjar-tb-template").clone().removeAttr("id").addClass("coa-panjar-tb-section").show();
@@ -2250,9 +2239,6 @@
                 // Isi nilai ke elemen baru
                 $newSection.find(".id_panjar_tb").val(idPanjar);
                 $newSection.find(".no_panjar_tb").val(noPanjar);
-                $newSection.find(".akun_kas_panjar_tb").val(akunKas);
-                $newSection.find(".akun_selisih_panjar_tb").val(akunSelisih);
-                $newSection.find(".keterangan_panjar_tb").val(keterangan || "");
 
                 // Tambahkan elemen baru ke container
                 $("#coa-panjar-tb-container").append($newSection);
@@ -2299,9 +2285,6 @@
             if ($existingSection && $existingSection.length > 0) {
                 // Jika section sudah ada, update nilainya
                 $existingSection.find(".no_pinjaman").val(noPinjaman);
-                $existingSection.find(".akun_kas_pinjaman").val(akunKas);
-                $existingSection.find(".akun_selisih_pinjaman").val(akunSelisih);
-                $existingSection.find(".keterangan_pinjaman").val(keterangan || "");
             } else {
                 // Jika section belum ada, buat elemen baru dari template
                 let $newSection = $("#coa-pinjaman-template").clone().removeAttr("id").addClass("coa-pinjaman-section").show();
@@ -2309,9 +2292,6 @@
                 // Isi nilai ke elemen baru
                 $newSection.find(".id_pinjaman").val(idPinjaman);
                 $newSection.find(".no_pinjaman").val(noPinjaman);
-                $newSection.find(".akun_kas_pinjaman").val(akunKas);
-                $newSection.find(".akun_selisih_pinjaman").val(akunSelisih);
-                $newSection.find(".keterangan_pinjaman").val(keterangan || "");
 
                 // Tambahkan elemen baru ke container
                 $("#coa-pinjaman-container").append($newSection);
