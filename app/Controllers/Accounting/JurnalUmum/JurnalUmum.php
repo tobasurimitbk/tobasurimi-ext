@@ -1525,7 +1525,7 @@ class JurnalUmum extends BaseController
         }
     }
 
-    public function insertDataPembayaran($payID, $module)
+    public function insertDataPembayaran($payID, $module, $divisi)
     {
         $KasAP = "";
         $KasAR = "";
@@ -1604,7 +1604,7 @@ class JurnalUmum extends BaseController
                             'id_transaksi'      => $id_transaksi_jurnal,
                             'id_coa'            => $POlocal->akun_kas == 0 || $POlocal->akun_kas == NULL ? $UtangAR : $POlocal->akun_kas,
                             'company_id'            => $POlocal->company_id,
-                            'divisi_id'            => $POlocal->divisi_id,
+                            'divisi_id'         => $divisi,
                             'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
                             'debit'             => ($sumValue),
                             'kredit'            => 0,
@@ -1617,7 +1617,7 @@ class JurnalUmum extends BaseController
                             'id_transaksi'      => $id_transaksi_jurnal,
                             'id_coa'            => $POlocal->akun_selisih,
                             'company_id'            => $POlocal->company_id,
-                            'divisi_id'            => $POlocal->divisi_id,
+                            'divisi_id'         => $divisi,
                             'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
                             'debit'             => 0,
                             'kredit'            => ($sumValue),
@@ -1949,7 +1949,7 @@ class JurnalUmum extends BaseController
     }
 
 
-    public function inserDataPembayaranPanjar($payID, $module)
+    public function inserDataPembayaranPanjar($payID, $module, $divisi)
     {
         $KasAP = "";
         $KasAR = "";
@@ -2004,6 +2004,7 @@ class JurnalUmum extends BaseController
                     'id_coa'            => $dataPanjar->akun_kas == 0 || $dataPanjar->akun_kas == NULL ? $UtangAR : $dataPanjar->akun_kas,
                     'company_id'            => $dataPanjar->company_id,
                     // 'divisi_id'            => $this->divisi,
+                    'divisi_id'         => $divisi,
                     'tanggal_jurnal' => Carbon::parse($dataPanjar->createdAt)->format('Y-m-d'),
                     'debit'             => $dataPanjar->bayar_panjar,
                     'kredit'            => 0,
@@ -2017,6 +2018,7 @@ class JurnalUmum extends BaseController
                     'id_coa'            => $dataPanjar->akun_selisih,
                     'company_id'            => $dataPanjar->company_id,
                     // 'divisi_id'            => $this->divisi,
+                    'divisi_id'         => $divisi,
                     'tanggal_jurnal' => Carbon::parse($dataPanjar->createdAt)->format('Y-m-d'),
                     'debit'             => 0,
                     'kredit'            => $dataPanjar->bayar_panjar,
@@ -2033,7 +2035,7 @@ class JurnalUmum extends BaseController
 
 
 
-    public function inserDataPembayaranPinjaman($payID, $module)
+    public function inserDataPembayaranPinjaman($payID, $module,$divisi)
     {
         $KasAP = "";
         $KasAR = "";
@@ -2093,6 +2095,7 @@ class JurnalUmum extends BaseController
                     'kredit'            => 0,
                     'valas'             => '20',
                     'kurs'              => 1,
+                    'divisi_id'         => $divisi,
                     'keterangan'        => "Pembayaran Pinjaman " . $payPinjaman->no_panjar,
                     'id_inputer'        => session()->get("login")->user_id
                 );
@@ -2105,6 +2108,7 @@ class JurnalUmum extends BaseController
                     'kredit'            => $payPinjaman->bayar_panjar,
                     'valas'             => '20',
                     'kurs'              => 1,
+                    'divisi_id'         => $divisi,
                     'keterangan'        => "Pembayaran Pinjaman" . $payPinjaman->no_panjar,
                     'id_inputer'        => session()->get("login")->user_id
                 );
