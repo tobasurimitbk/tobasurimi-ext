@@ -705,8 +705,8 @@
             row += '<td>' + greatFormatRupiah(item.jumlah) + '</td>';
             row += '<td>' + item.valas + '</td>';
             row += '<td>' + greatFormatRupiah(item.kurs) + '</td>';
-            row += '<td>' + (item.jenis_transaksi == "debit" ? greatFormatRupiah(item.jumlah) : greatFormatRupiah(0)) + '</td>';
-            row += '<td>' + (item.jenis_transaksi == "kredit" ? greatFormatRupiah(item.jumlah) : greatFormatRupiah(0)) + '</td>';
+            row += '<td>' + (item.jenis_transaksi == "debit" ? greatFormatRupiah(item.jumlah_idr) : greatFormatRupiah(0)) + '</td>';
+            row += '<td>' + (item.jenis_transaksi == "kredit" ? greatFormatRupiah(item.jumlah_idr) : greatFormatRupiah(0)) + '</td>';
 
             <?php if (isset($tutupBuku)) : ?>
                 <?php if ($tutupBuku == 0) : ?>

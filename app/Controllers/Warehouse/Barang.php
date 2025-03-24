@@ -546,6 +546,7 @@ class Barang extends BaseController
             array_push($rdata, [
                 "no"                    => $no++,
                 "po_no"                 => $data['po_no'],
+                "spp_no"                => $data['spp_no'],
                 "po_date"               => date('d/m/Y', strtotime($data['po_date'])),
                 "nama_supplier"         => $data['nama_supplier'],
                 "nama_barang"           => $data['nama_barang'],

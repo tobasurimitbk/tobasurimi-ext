@@ -88,8 +88,8 @@
                     <td class="text-right"><?= number_format($jurnal['jumlah'], 2); ?></td>
                     <td><?= $jurnal['valas']; ?></td>
                     <td class="text-right"><?= number_format($jurnal['kurs'], 2); ?></td>
-                    <td class="text-right"><?= $jurnal['jenis_transaksi'] == 'debit' ? number_format($jurnal['jumlah'], 2) : '0.00'; ?></td>
-                    <td class="text-right"><?= $jurnal['jenis_transaksi'] == 'kredit' ? number_format($jurnal['jumlah'], 2) : '0.00'; ?></td>
+                    <td class="text-right"><?= $jurnal['jenis_transaksi'] == 'debit' ? number_format($jurnal['jumlah_idr'], 2) : '0.00'; ?></td>
+                    <td class="text-right"><?= $jurnal['jenis_transaksi'] == 'kredit' ? number_format($jurnal['jumlah_idr'], 2) : '0.00'; ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

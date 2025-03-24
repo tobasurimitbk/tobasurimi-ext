@@ -265,7 +265,7 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">No</th>
-                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_no')" class="sort">No PO</th>
+                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.purchase_request_id')" class="sort">No SPP</th>
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_date')" class="sort">Tanggal</th>
                                         <th scope="col" onclick="changeShortPoLokal('suppliers.name')" class="sort">Supplier</th>
                                         <th scope="col" onclick="changeShortPoLokal('barang_master_spesifikasi.spesifikasi')" class="sort">Barang</th>
@@ -811,7 +811,7 @@
                 className: "text-center",
                 sortable: false
             }, {
-                data: "po_no",
+                data: "spp_no",
                 className: "text-center"
             }, {
                 data: "po_date",
