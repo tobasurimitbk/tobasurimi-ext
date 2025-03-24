@@ -146,6 +146,7 @@ class SuratJalan extends BaseController
                 "sales_order_invoice_id" => $data->sales_order_invoice_id,
                 "print" => $data->counter_print,
                 "total_harga" => ($data->estimated_freight + $data->total_harga),
+                "posting" => $data->posting,
             ]);
         }
         //dd($dataAllSuratJalan);
@@ -315,7 +316,7 @@ class SuratJalan extends BaseController
         $dataSo = $this->SalesOrderModel
             ->asObject()
             ->where(['id_customer' => $dataSuratJalan->id_customer, 'tipe_sales_order' => 'LOKAL', 'deletedAt' => null])
-            // ->where('id_company', $this->this_company_id)
+            ->where('posting', 1)
             ->select(['id', 'no_sales_order'])
             ->findAll();
 
@@ -517,6 +518,7 @@ class SuratJalan extends BaseController
             'id_customer'               => $idCustomer,
             'tipe_sales_order'          => 'LOKAL',
             // "sales_order.id_company"    => $this->this_company_id,
+            'posting'         => 1,
             'surat_jalan_so_id'         => null,
             'sales_order_invoice_id'    => null
         ];
@@ -690,5 +692,43 @@ class SuratJalan extends BaseController
             'token' => csrf_hash(),
             'status' => true
         ]);
+    }
+
+    public function posting()
+    {
+        try {
+
+            $id = $this->request->getVar('id');
+            if (is_numeric($id)) {
+                $id = $id;
+            } else {
+                $id = decrypt($id);
+            }
+
+            // po posting
+            $payload = [
+                "posting" => $this->request->getVar('status_posting'),
+            ];
+
+            $this->SuratJalanModel->update($id, $payload);
+
+            $data = [
+                "status"    => true,
+                "message"   => "Surat Jalan Berhasil Diperbaruhi",
+                "payload"   => json_encode($payload),
+                'token'     => csrf_hash()
+            ];
+
+            echo json_encode($data);
+            
+        } catch (Exception $e) {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
     }
 }

@@ -388,7 +388,7 @@
                     let id = row.id;
                     let posting = row.posting; 
 
-                    if (posting == 1) {
+                    if (posting == 0) {
                         return `
                             <button data-toggle="tooltip" title="Histori Harga Barang" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
@@ -399,13 +399,16 @@
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
-                            <button data-toggle="tooltip" title="Unposting" onclick="posting('${id}')" class="btn btn-success posting-btn">
+                            <button data-toggle="tooltip" title="posting" onclick="posting('${id}', '1')" class="btn btn-success posting-btn">
                                 <i class="fa fa-paper-plane"></i>
                             </button>
                         `;
                     } else {
                         return `
-                            <button data-toggle="tooltip" title="Unposting" onclick="posting('${id}')" class="btn btn-danger unposting-btn">
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <button data-toggle="tooltip" title="Unposting" onclick="posting('${id}', '0')" class="btn btn-danger unposting-btn">
                                 <i class="fa fa-undo"></i>
                             </button>
                         `;
@@ -540,7 +543,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("po-lokal-bahan-baku/update-status"); ?>",
+                    url: "<?= base_url("order-form-lokal/posting"); ?>",
                     data: {
                         id: id,
                         status_posting: status_posting

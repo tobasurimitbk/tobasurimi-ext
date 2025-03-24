@@ -27,6 +27,7 @@ class SuratJalanModel extends Model
         'counter_print',
         'note',
         'id_company',
+        'posting'
     ];
 
     // Dates

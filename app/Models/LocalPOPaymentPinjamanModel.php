@@ -152,20 +152,23 @@ class LocalPOPaymentPinjamanModel extends Model
 
     public function getPembayaranPinjamanDetailsbyIdandType($id = null, $type, $supllierId)
     {
-        $dataPinjaman = []; // Inisialisasi dengan nilai default
-        $paidData = [];   // Variabel baru untuk menyimpan data yang sudah terbayar
-
+        // Inisialisasi variabel dengan nilai default
+        $dataPinjaman = []; // Data dari pinjaman_supplier
+        $paidData = [];   // Data dari local_po_payment_pinjaman
+        $result = [];     // Hasil akhir yang akan di-return
+    
+        // Jika $id tidak null, ambil data dari local_po_payment_pinjaman
         if ($id) {
             $condition = [
                 'local_po_payment_pinjaman.local_po_payment_id' => $id,
                 'local_po_payment_pinjaman.type'  => $type,
             ];
-
+    
             $selectQry = "local_po_payment_pinjaman.id, pinjaman_supplier.no_pinjaman, pinjaman_supplier.payment_date, pinjaman_supplier.total_pinjaman, local_po_payment_pinjaman.pinjaman_id,
             local_po_payment_pinjaman.bayar_pinjaman, sum(local_po_payment_pinjaman.bayar_pinjaman) as total_bayar_pinjaman, local_po_payment_pinjaman.akun_kas, local_po_payment_pinjaman.akun_selisih, local_po_payment_pinjaman.keterangan,
             akun_kas.nama_sub as akun_kas_name,  akun_selisih.nama_sub as akun_selisih_name";
-
-            $resultPay = $this
+    
+            $paidData = $this
                 ->select($selectQry)
                 ->join('pinjaman_supplier', 'local_po_payment_pinjaman.pinjaman_id = pinjaman_supplier.id')
                 ->join('sub_akuns as akun_kas', 'local_po_payment_pinjaman.akun_kas = akun_kas.id', 'left')
@@ -173,37 +176,29 @@ class LocalPOPaymentPinjamanModel extends Model
                 ->groupBy('local_po_payment_pinjaman.pinjaman_id')
                 ->where($condition)
                 ->findAll();
-        } else {
-            // Jika $id null, ambil data hanya dari pinjaman_supplier tanpa join
-            $pinjamanSupplier = new PinjamanSupplierModel();
-
-            $result = $pinjamanSupplier
-                ->select("id, no_pinjaman, payment_date, total_pinjaman")
-                ->where('supplier_id', $supllierId)
-                ->findAll();
         }
-
-        // Jika hasil query kosong, ambil data alternatif
-        if (empty($result)) {
-            $pinjamanSupplier = new PinjamanSupplierModel();
-
-            $dataPinjaman = $pinjamanSupplier->select("id, no_pinjaman, payment_date, total_pinjaman")
-                                        ->where('supplier_id', $supllierId)
-                                        ->findAll();
-        }
-
-        // Jika $dataPinjaman tidak kosong, gunakan $dataPinjaman sebagai hasil
-        if (!empty($dataPinjaman)) {
-            $result = $dataPinjaman;
-        }
-
-        if (!empty($resultPay)) {
-            foreach ($resultPay as $i => $r) {
+    
+        // Ambil data dari pinjaman_supplier (tanpa join) jika $id null atau jika $paidData kosong
+        $pinjamanSupplier = new PinjamanSupplierModel();
+        $dataPinjaman = $pinjamanSupplier
+            ->select("id, no_pinjaman, payment_date, total_pinjaman")
+            ->where('supplier_id', $supllierId)
+            ->findAll();
+    
+        // Jika $paidData tidak kosong, gabungkan dengan $dataPinjaman
+        if (!empty($paidData)) {
+            foreach ($paidData as $i => $r) {
                 $totalPembayaranPinjaman = $this->getTotalPembayaranPinjaman($r['pinjaman_id'], "BP");
-
-                // Simpan data yang sudah terbayar ke variabel $paidData
-                $paidData[$i] = [
+    
+                // Gabungkan data yang sudah terbayar ke $result
+                $result[$i] = [
+                    'id' => $r['id'],
+                    'no_pinjaman' => $r['no_pinjaman'],
                     'payment_date' => date('d/m/Y', strtotime($r['payment_date'])),
+                    'total_pinjaman' => $r['total_pinjaman'],
+                    'pinjaman_id' => $r['pinjaman_id'],
+                    'bayar_pinjaman' => $r['bayar_pinjaman'],
+                    'total_bayar_pinjaman' => $r['total_bayar_pinjaman'],
                     'akun_kas' => $r['akun_kas'],
                     'akun_selisih' => $r['akun_selisih'],
                     'akun_kas_name' => $r['akun_kas_name'],
@@ -211,12 +206,43 @@ class LocalPOPaymentPinjamanModel extends Model
                     'keterangan' => $r['keterangan'],
                     'total_pembayaran' => $totalPembayaranPinjaman,
                 ];
-
-                // Gabungkan $paidData ke $result
-                $result[$i] = array_merge($r, $paidData[$i]);
             }
         }
-
+    
+        // Jika $dataPinjaman tidak kosong, tambahkan ke $result
+        if (!empty($dataPinjaman)) {
+            foreach ($dataPinjaman as $i => $r) {
+                // Cek apakah data pinjaman sudah ada di $result
+                $exists = false;
+                foreach ($result as $res) {
+                    if ($res['pinjaman_id'] == $r['id']) {
+                        $exists = true;
+                        break;
+                    }
+                }
+    
+                // Jika belum ada, tambahkan ke $result
+                if (!$exists) {
+                    $result[] = [
+                        'id' => null, // Karena tidak ada data pembayaran
+                        'no_pinjaman' => $r['no_pinjaman'],
+                        'payment_date' => date('d/m/Y', strtotime($r['payment_date'])),
+                        'total_pinjaman' => $r['total_pinjaman'],
+                        'pinjaman_id' => $r['id'],
+                        'bayar_pinjaman' => 0, // Default nilai bayar_pinjaman
+                        'total_bayar_pinjaman' => 0, // Default nilai total_bayar_pinjaman
+                        'akun_kas' => null,
+                        'akun_selisih' => null,
+                        'akun_kas_name' => null,
+                        'akun_selisih_name' => null,
+                        'keterangan' => null,
+                        'total_pembayaran' => 0, // Default nilai total_pembayaran
+                    ];
+                }
+            }
+        }
+    
+        // Jika tidak ada data sama sekali, return array kosong
         return $result;
     }
 }

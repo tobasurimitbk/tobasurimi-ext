@@ -690,4 +690,37 @@ class RMPurchaseOrderDetailModel extends Model
             'sub_total' => $subTotal
         ];
     }
+
+    public function getSpesifikasiBarangAsString($rmPurchaseOrderId)
+    {
+        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+
+        $selectQry = "
+            barang_master.barang_name,
+            GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', ') as spesifikasi_tergabung,
+            SUM(rm_purchase_order_details.qty) as qty_diterima_total,
+            satuans.kode_satuan,
+            suppliers.name as nama_supplier,
+            rm_purchase_orders.po_no
+        ";
+
+        $rmPurchaseOrderDetail = $rmPurchaseOrderDetailModel->select($selectQry)
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_purchase_order_details.barang2_id', 'left')
+            ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+            ->join('rm_purchase_orders', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->join('barang_master', 'barang_master.id = rm_purchase_orders.barang_id', 'left')
+            ->where('rm_purchase_order_details.rm_purchase_order_id', $rmPurchaseOrderId)
+            ->where('rm_purchase_order_details.deletedAt', null)
+            ->groupBy('barang_master.barang_name, rm_purchase_orders.po_no')
+            ->findAll();
+
+        // Format output sesuai permintaan
+        $output = [];
+        foreach ($rmPurchaseOrderDetail as $detail) {
+            $output[] = "PEMB. {$detail['barang_name']} {$detail['spesifikasi_tergabung']}; {$detail['qty_diterima_total']} {$detail['kode_satuan']}; {$detail['nama_supplier']}; {$detail['po_no']}";
+        }
+
+        return implode('; ', $output); // Jika ada banyak barang, pisahkan dengan titik koma
+    }
 }

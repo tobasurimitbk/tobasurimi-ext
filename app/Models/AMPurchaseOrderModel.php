@@ -432,12 +432,14 @@ class AMPurchaseOrderModel extends Model
             am_purchase_order_details.price,
             am_purchase_order_details.qty,
             divisis.divisi,
-            satuans.kode_satuan
+            satuans.kode_satuan,
+            purchase_requests.spp_no
         ";
 
         $poDataQry = $this->asArray()
             ->select($selectQry)
             ->where($condition)
+            ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
             ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id', 'left')
             ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id', 'left')
@@ -457,7 +459,7 @@ class AMPurchaseOrderModel extends Model
         }
 
         if ($addCondition['search']) {
-            $poDataQry->like('am_purchase_orders.po_no', $addCondition['search'])
+            $poDataQry->like('purchase_requests.spp_no', $addCondition['search'])
                 ->orLike('suppliers.name', $addCondition['search'])
                 ->orLike("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
                 ->orLike('am_purchase_orders.note', $addCondition['search'])
