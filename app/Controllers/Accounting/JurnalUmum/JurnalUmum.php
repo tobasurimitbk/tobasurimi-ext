@@ -466,6 +466,73 @@ class JurnalUmum extends BaseController
         return view('Accounting/jurnalUmum/form', $data);
     }
 
+    public function detailView($id)
+    {
+        $id = decrypt($id);
+        $transaksiJurnal = $this->transaksiJurnalModel->where('id', $id)->first();
+
+        if ($transaksiJurnal == null) {
+            return redirect()->to('jurnal');
+        }
+
+        $jurnalUmum = $this->jurnalUmumModel->select('
+            jurnal_umum.*,
+            sub_akuns.no_sub,
+            sub_akuns.nama_sub,
+            metadata.value as valas_name,    
+        ')
+            ->join('sub_akuns', 'sub_akuns.id = jurnal_umum.id_coa', 'left')
+            ->join('metadata', 'metadata.id = jurnal_umum.valas', 'left')
+            ->where('id_transaksi', $id)
+            ->where('jurnal_umum.deletedAt', null)
+            ->findAll();
+
+        $divisiId = "ALL";
+
+        $jurnalUmumList = [];
+        foreach ($jurnalUmum as $j) {
+            $divisiId = $j['divisi_id'];
+
+            $jumlah =  $j['debit'] == 0.00 ? $j['kredit'] : $j['debit'];
+            array_push($jurnalUmumList, [
+                'id' => $j['id'],
+                'jenis_transaksi' => $j['debit'] == 0.00 ? "kredit" : "debit",
+                'keterangan' => $j['keterangan'],
+                'id_coa' => $j['id_coa'],
+                'valas_id' => $j['valas'],
+                'valas' => $j['valas_name'],
+                'jumlah' => floatval($jumlah / $j['kurs']),
+                'kurs' => floatval($j['kurs']),
+                'jumlah_idr' => floatval($jumlah),
+                'nama_sub' => $j['nama_sub'],
+                'no_sub' => $j['no_sub'],
+            ]);
+        }
+
+        $tipeTransaksi = $this->MetadataModel
+            ->where('name', 'tipe_transaksi')
+            ->findAll();
+
+        $tutupBuku = $this->tutupBukuModel
+            ->where('company_id', $this->this_company_id)
+            ->where('bulan', date('Y-m', \strtotime($transaksiJurnal['tanggal_transaksi'])))
+            ->first();
+
+        $data = [
+            'transaksiJurnal' => $transaksiJurnal,
+            'jurnalUmumList' => $jurnalUmumList,
+            'tipeTransaksi' => $tipeTransaksi,
+            'tutupBuku' => $tutupBuku == null ? 0 : 1,
+            'divisiId' => $divisiId,
+            'divisi' => $this->divisionModel->getDivisiAccess(),
+            'subAkun' =>  $this->Sub_AkunsModel->getAPAR($this->this_company_id),
+            'valuta' => $this->metadataModel->get_by_name('Valuta'),
+
+        ];
+
+        return view('Accounting/jurnalUmum/form_view', $data);
+    }
+
     public function delete()
     {
         $id = decrypt($this->request->getVar('id'));
@@ -2035,7 +2102,7 @@ class JurnalUmum extends BaseController
 
 
 
-    public function inserDataPembayaranPinjaman($payID, $module,$divisi)
+    public function inserDataPembayaranPinjaman($payID, $module, $divisi)
     {
         $KasAP = "";
         $KasAR = "";
