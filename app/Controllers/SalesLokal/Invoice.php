@@ -1061,6 +1061,7 @@ class Invoice extends BaseController
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
                 ->where('sales_order.id', $docId)
+                ->where('sales_order.posting', 1)
                 ->first();
 
             $salesName = $soData->salesName ?? "-";
@@ -1086,6 +1087,7 @@ class Invoice extends BaseController
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
                 ->where('surat_jalan_so.id', $docId)
+                ->where('surat_jalan_so.posting', 1)
                 ->first();
 
             $salesName = $suratJalanData->salesName ?? "-";

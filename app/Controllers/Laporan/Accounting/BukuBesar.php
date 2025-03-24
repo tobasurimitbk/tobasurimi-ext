@@ -26,6 +26,7 @@ class BukuBesar extends BaseController
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_role_id = session()->get("login")->this_role_id;
         $this->Sub_AkunsModel = new Sub_AkunsModel();
         $this->KategoriAkunsModel = new KategoriAkunsModel();
         $this->HeaderAkunsModel = new HeaderAkunsModel();
@@ -87,23 +88,39 @@ class BukuBesar extends BaseController
 
 
         $result = [];
+        
+        if ($this->this_company_id == 1 || $this->this_company_id == 2) {
+            $companyId = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $companyId = [15];
+        } else {
+            $companyId = [16];
+        }
+
+        $condition = [];
+        if ($this->this_role_id != '7') {
+            $condition['jurnal_umum.id_transaksi !='] = '1404';
+            $condition['transaksi_jurnal.type_transaksi !='] = '1404';
+        }
 
         // Fungsi umum untuk mendapatkan saldo lama dan data jurnal
-        $fetchJurnalData = function ($coaIds) use ($dateStart, $dateEnd, $divisiId) {
+        $fetchJurnalData = function ($coaIds) use ($dateStart, $dateEnd, $divisiId, $companyId, $condition) {
             // Query dasar
             $dataJurnalUmum = $this->jurnalUmumModel
                 ->select('
-          jurnal_umum.*, 
-          transaksi_jurnal.no_transaksi, 
-          transaksi_jurnal.id AS transaksi_jurnal_id, 
-          m_valas.value AS valas, 
-          m_jenis_transaksi.value AS jenis_transaksi
-      ')
+                    jurnal_umum.*, 
+                    transaksi_jurnal.no_transaksi, 
+                    transaksi_jurnal.id AS transaksi_jurnal_id, 
+                    m_valas.value AS valas, 
+                    m_jenis_transaksi.value AS jenis_transaksi
+                ')
                 ->join('transaksi_jurnal', 'transaksi_jurnal.id = jurnal_umum.id_transaksi', 'left')
                 ->join('metadata AS m_valas', 'm_valas.id = jurnal_umum.valas', 'left')
                 ->join('metadata AS m_jenis_transaksi', 'm_jenis_transaksi.id = transaksi_jurnal.type_transaksi', 'left')
                 ->where('transaksi_jurnal.deleted_at', null)
                 ->where('jurnal_umum.deletedAt', null)
+                ->where($condition)
+                ->whereIn('jurnal_umum.company_id', $companyId)
                 ->orderBy('jurnal_umum.tanggal_jurnal', "ASC")
                 ->orderBy('jurnal_umum.debit', "DESC");
 

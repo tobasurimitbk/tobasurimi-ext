@@ -32,12 +32,12 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" placeholder="No. Sales Order" required value="<?= $data->no_surat_jalan ?? ''; ?>">
+                                    <input autocomplete="one-time-code" type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" placeholder="No. Sales Order" required value="<?= $data->no_surat_jalan ?? ''; ?>" <?= (!empty($data) && $data->posting == 1 ? 'readonly' : '') ?>>
                                     <label for="floatingInput">No. Surat Jalan</label>
                                 </div>
                                 <?php if (empty($data)) : ?>
                                     <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                        <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 5px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                        <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 5px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()" <?= (!empty($data) && $data->posting == 1 ? 'disabled' : '') ?>>
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -45,7 +45,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_customer" name="id_customer" id="id_customer">
+                            <select class="form-select id_customer" name="id_customer" id="id_customer" <?= (!empty($data) && $data->posting == 1 ? 'disabled' : '') ?>>
                                 <option value=""></option>
                                 <?php foreach ($dataCustomers ?? [] as $customer) : ?>
                                     <option value="<?= $customer['id']; ?>" <?= !empty($data) && $data->id_customer === $customer['id'] ? "selected" : ""; ?>>
@@ -58,7 +58,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_so" name="id_so[]" id="id_so[]" multiple>
+                            <select class="form-select id_so" name="id_so[]" id="id_so[]" multiple <?= (!empty($data) && $data->posting == 1 ? 'disabled' : '') ?>>
                                 <option value=""></option>
                                 <?php foreach ($dataSo ?? [] as $so) : ?>
                                     <option value="<?= $so->id; ?>,<?= $so->no_sales_order ?>" <?= !empty($data) && in_array($so->id, $data->multiple_id_so) ? "selected" : ""; ?>>
@@ -73,19 +73,19 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control" id="tagihan_ke" name="tagihan_ke" value="<?= $data->customerAddress ?? ''; ?>">
+                            <input autocomplete="one-time-code" class="form-control" id="tagihan_ke" name="tagihan_ke" value="<?= $data->customerAddress ?? ''; ?>" <?= (!empty($data) && $data->posting == 1 ? 'readonly' : '') ?>>
                             <label for="floatingInput">Alamat Customer</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control" id="no_telp" name="no_telp" value="<?= $data->customerPhone ?? ''; ?>">
+                            <input autocomplete="one-time-code" class="form-control" id="no_telp" name="no_telp" value="<?= $data->customerPhone ?? ''; ?>" <?= (!empty($data) && $data->posting == 1 ? 'readonly' : '') ?>>
                             <label for="floatingInput">No. Telp</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control" id="termin" name="termin" value="<?= $data->customerTermin ?? ''; ?>">
+                            <input autocomplete="one-time-code" class="form-control" id="termin" name="termin" value="<?= $data->customerTermin ?? ''; ?>" <?= (!empty($data) && $data->posting == 1 ? 'readonly' : '') ?>>
                             <label for="floatingInput">Termin</label>
                         </div>
                     </div>
@@ -94,24 +94,24 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control" id="salesName" name="salesName" value="<?= $data->customerSales ?? ''; ?>">
+                            <input autocomplete="one-time-code" class="form-control" id="salesName" name="salesName" value="<?= $data->customerSales ?? ''; ?>" <?= (!empty($data) && $data->posting == 1 ? 'readonly' : '') ?>>
                             <label for="floatingInput">Nama Sales</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" name="shipping_date" type="text" value="<?= !empty($data) ? $data->shipping_date : date('d/m/Y') ?>" class="form-control shipping_date" id="shipping_date">
+                                <input autocomplete="one-time-code" name="shipping_date" type="text" value="<?= !empty($data) ? $data->shipping_date : date('d/m/Y') ?>" class="form-control shipping_date" id="shipping_date" <?= (!empty($data) && $data->posting == 1 ? 'readonly' : '') ?>>
                                 <label>Tanggal Pengiriman</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date" <?= (!empty($data) && $data->posting == 1 ? 'style="display:none;"' : '') ?>></i>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly autocomplete="one-time-code" class="form-control" id="no_po" name="no_po" placeholder="Nomor PO" value="<?= $data->no_po ?? ''; ?>">
+                            <input readonly autocomplete="one-time-code" class="form-control" id="no_po" name="no_po" placeholder="Nomor PO" value="<?= $data->no_po ?? ''; ?>" <?= (!empty($data) && $data->posting == 1 ? 'readonly' : '') ?>>
                             <label for="floatingInput">No. PO</label>
                         </div>
                     </div>
@@ -120,19 +120,19 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <textarea autocomplete="one-time-code" class="form-control" id="note" name="note" placeholder="Keterangan"><?= $data->note ?? ""; ?></textarea>
+                            <textarea autocomplete="one-time-code" class="form-control" id="note" name="note" placeholder="Keterangan" <?= (!empty($data) && $data->posting == 1 ? 'readonly' : '') ?>><?= $data->note ?? ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly autocomplete="one-time-code" type="text" class="form-control jenis_penjualan" id="jenis_penjualan" name="jenis_penjualan" value="<?= $getJenisPenjualan ?? ''; ?>">
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control jenis_penjualan" id="jenis_penjualan" name="jenis_penjualan" value="<?= $getJenisPenjualan ?? ''; ?>" <?= (!empty($data) && $data->posting == 1 ? 'readonly' : '') ?>>
                             <label for="floatingInput">Jenis Penjualan</label>
                         </div>
                     </div>
                     <div class="col-md-4 nama_ecommerce_div">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly autocomplete="one-time-code" type="text" class="form-control nama_ecommerce" id="nama_ecommerce" name="nama_ecommerce" value="<?= $data->nama_ecommerce ?? ''; ?>">
+                            <input readonly autocomplete="one-time-code" type="text" class="form-control nama_ecommerce" id="nama_ecommerce" name="nama_ecommerce" value="<?= $data->nama_ecommerce ?? ''; ?>" <?= (!empty($data) && $data->posting == 1 ? 'readonly' : '') ?>>
                             <label for="floatingInput">Nama Ecommerce</label>
                         </div>
                     </div>

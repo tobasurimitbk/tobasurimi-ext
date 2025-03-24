@@ -109,9 +109,16 @@ class Hutang extends BaseController
             "startdate"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastdate"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
+        
+        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+            $companyId = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $companyId = [15];
+        } else {
+            $companyId = [16];
+        }
 
         $condition = [
-            "suppliers.company_id"  => $this->this_company_id,
             "suppliers.deletedAt" => NULL
         ];
 
@@ -129,7 +136,7 @@ class Hutang extends BaseController
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $res = $this->supplierModel->getSupplierHutangList($condition, $addCondition, $limit, $offset);
+        $res = $this->supplierModel->getSupplierHutangList($condition, $addCondition, $limit, $offset, $companyId);
 
         // var_dump($res['data']);
         // exit;
@@ -144,8 +151,8 @@ class Hutang extends BaseController
                 "no"                    => $no++,
                 "id"                    => $data->id,
                 "supplier"              => $data->name,
-                "nominal_idr"           => floatval($data->total),
-                "remaining_idr"         => floatval($totalRemaining),
+                "nominal_idr"           => number_format($data->total, 2, '.', ''),
+                "remaining_idr"         => number_format($totalRemaining, 2, '.', ''),
             ]);
         }
 
@@ -174,7 +181,6 @@ class Hutang extends BaseController
         ];
 
         $condition = [
-            "suppliers.company_id"  => $this->this_company_id,
             "suppliers.id"  => $id,
             "suppliers.deletedAt" => NULL
         ];
@@ -219,8 +225,8 @@ class Hutang extends BaseController
                 "tanggal_invoice"       => $data->tanggal_invoice,
                 "no_invoice"            => $data->no_invoice,
                 "divisi_invoice"        => $data->divisi,
-                "nominal_invoice"       => floatval($data->total),
-                "remaining_invoice"     => floatval($totalRemaining),
+                "nominal_invoice"       => number_format($data->total, 2, '.', ''),
+                "remaining_invoice"     => number_format($totalRemaining, 2, '.', ''),
             ]);
         }
 

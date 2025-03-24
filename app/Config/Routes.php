@@ -562,7 +562,7 @@ $routes->get('/order-form-lokal/print/(:segment)', 'SalesLokal\OrderForm::printO
 $routes->get('/order-form-lokal/getItemList', 'SalesLokal\OrderForm::getItemListByIds', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/getItemList/(:num)', 'SalesLokal\OrderForm::getItemListById/$1', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/histori-harga', 'SalesLokal\OrderForm::HistoriHargaBarang', ['filter' => 'Auth']);
-
+$routes->post('/order-form-lokal/posting', 'SalesLokal\OrderForm::posting', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/barangAll', 'SalesLokal\OrderForm::getAllBarang', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/customer', 'SalesLokal\OrderForm::dropdownCustomer', ['filter' => 'Auth']);
 $routes->post('/order-form-lokal/generate-no-order-form', 'SalesLokal\OrderForm::generateNomorSalesOrder', ['filter' => 'Auth']);
@@ -595,6 +595,7 @@ $routes->get('/surat-jalan/all', 'SalesLokal\SuratJalan::all', ['filter' => 'Aut
 $routes->post('/surat-jalan/save', 'SalesLokal\SuratJalan::save', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/update', 'SalesLokal\SuratJalan::update', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/delete', 'SalesLokal\SuratJalan::delete', ['filter' => 'Auth']);
+$routes->post('/surat-jalan/posting', 'SalesLokal\SuratJalan::posting', ['filter' => 'Auth']);
 $routes->get('/surat-jalan/print/(:segment)', 'SalesLokal\SuratJalan::printSJ/$1', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/generate-no-surat-jalan', 'SalesLokal\SuratJalan::generateNomorSuratJalan', ['filter' => 'Auth']);
 

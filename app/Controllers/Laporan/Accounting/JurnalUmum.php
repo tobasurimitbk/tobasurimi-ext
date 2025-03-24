@@ -67,6 +67,14 @@ class JurnalUmum extends BaseController
                 'tanggal_transaksi <=' => date('Y-m-d')
             ];
         }
+        
+        if ($this->this_company_id == 1 || $this->this_company_id == 2) {
+            $companyId = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $companyId = [15];
+        } else {
+            $companyId = [16];
+        }
 
         if ($this->this_role_id != '7') {
             $condition['jurnal_umum.id_transaksi !='] = '1404';
@@ -116,6 +124,7 @@ class JurnalUmum extends BaseController
             ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
             ->join('divisis', 'jurnal_umum.divisi_id = divisis.id', 'left')
             ->where($condition)
+            ->whereIn('jurnal_umum.company_id', $companyId)
             ->findAll();
         $dataJurnalUmumWithGroup = $this->jurnalUmumModel
             ->asObject()
@@ -124,6 +133,7 @@ class JurnalUmum extends BaseController
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
             ->where($condition)
+            ->whereIn('jurnal_umum.company_id', $companyId)
             ->groupBy('trans_id')
             ->findAll();
         // var_dump($dataJurnalUmumWithGroup);
@@ -192,11 +202,14 @@ class JurnalUmum extends BaseController
                 'name' => 'tipe_transaksi',
             ];
         }
-
-        // var_dump($condition);
-        // var_dump($condition2);
-        // var_dump($condition3);
-        // exit;
+        
+        if ($this->this_company_id == 1 || $this->this_company_id == 2) {
+            $companyId = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $companyId = [15];
+        } else {
+            $companyId = [16];
+        }
 
         $dataMetadataTipeTransaksi = $this->MetadataModel
             ->asObject()
@@ -224,6 +237,7 @@ class JurnalUmum extends BaseController
             ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
             ->join('divisis', 'jurnal_umum.divisi_id = divisis.id', 'left')
             ->where($condition)
+            ->whereIn('jurnal_umum.company_id', $companyId)
             ->findAll();
         // var_dump($dataJurnalUmumWithGroup);
 

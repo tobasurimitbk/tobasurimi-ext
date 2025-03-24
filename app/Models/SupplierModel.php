@@ -107,7 +107,7 @@ class SupplierModel extends Model
         ];
     }
 
-    public function getSupplierHutangList($condition, $addCondition, $limit = 10, $offset = 0)
+    public function getSupplierHutangList($condition, $addCondition, $limit = 10, $offset = 0, $companyId)
     {
         $availableSort = [
             'kode'              => 'suppliers.kode',
@@ -147,6 +147,7 @@ class SupplierModel extends Model
             ->join('local_po_payments', 'local_po_payments.supplier_id = suppliers.id AND local_po_payments.status_posting = 1', 'left')
             ->join('import_po_payments', 'import_po_payments.supplier_id = suppliers.id AND import_po_payments.status_posting = 1', 'left')
             ->where($condition)
+            ->whereIn('suppliers.company_id', $companyId)
             ->groupBy('suppliers.id')
             ->having("total > 0") 
             ->orderBy($sort, $sortType);
