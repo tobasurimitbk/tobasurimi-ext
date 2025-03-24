@@ -145,7 +145,7 @@ class KursModel extends Model
         $data = $this->asObject()
             ->select($selectQry)
             ->where('start_date <=', $date)
-            ->where('end_date <=', $date)
+            ->where('end_date >=', $date)
             ->where('metadata_id', $id)
             ->where('deletedAt', NULL)
             ->first();

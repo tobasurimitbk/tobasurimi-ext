@@ -651,4 +651,43 @@ class AMPurchaseOrderDetailModel extends Model
 
         return $poBPDetailData;
     }
+
+    public function getSpesifikasiBarangAsString($amPurchaseOrderId)
+    {
+        $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
+
+        $selectQry = "
+            barang_master.barang_name,
+            GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', ') as spesifikasi_tergabung,
+            SUM(am_purchase_order_details.qty) as qty_diterima_total,
+            satuans.kode_satuan,
+            suppliers.name as nama_supplier,
+            am_purchase_orders.po_no
+        ";
+
+        $rmPurchaseOrderDetail = $amPurchaseOrderDetailModel->select($selectQry)
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id', 'left')
+            ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+            ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id', 'left')
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
+            ->where('am_purchase_order_details.am_purchase_order_id', $amPurchaseOrderId)
+            ->where('am_purchase_order_details.deletedAt IS NULL') // Pastikan ini berfungsi
+            ->groupBy('barang_master.barang_name, am_purchase_orders.po_no')
+            ->findAll();
+
+        // Format output sesuai permintaan
+        $output = [];
+        $namaSupplier = "";
+        $noPo = "";
+
+        foreach ($rmPurchaseOrderDetail as $detail) {
+            $namaSupplier = $detail['nama_supplier'];
+            $noPo = $detail['po_no'];
+
+            $output[] = "{$detail['barang_name']} {$detail['spesifikasi_tergabung']}; {$detail['qty_diterima_total']} {$detail['kode_satuan']}";
+        }
+
+        return "PEMB. " . implode('; ', $output) . "; " . $namaSupplier . "; " . $noPo; // Jika ada banyak barang, pisahkan dengan titik koma
+    }
 }

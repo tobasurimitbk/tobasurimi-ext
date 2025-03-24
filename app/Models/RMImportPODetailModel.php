@@ -607,4 +607,43 @@ class RMImportPODetailModel extends Model
 
         return $poBBImportDetailData;
     }
+
+    public function getSpesifikasiBarangAsString($rmPurchaseOrderId)
+    {
+        $rmImportPoDetailModel = new RMImportPODetailModel();
+
+        $selectQry = "
+            barang_master.barang_name,
+            GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', ') as spesifikasi_tergabung,
+            SUM(rm_import_po_details.qty) as qty_diterima_total,
+            satuans.kode_satuan,
+            suppliers.name as nama_supplier,
+            rm_import_pos.po_no
+        ";
+
+        $rmPurchaseOrderDetail = $rmImportPoDetailModel->select($selectQry)
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_import_po_details.spesifikasi_id', 'left')
+            ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left')
+            ->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id', 'left')
+            ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id', 'left')
+            ->where('rm_import_po_details.rm_import_po_id', $rmPurchaseOrderId)
+            ->where('rm_import_po_details.deletedAt IS NULL') // Pastikan ini berfungsi
+            ->groupBy('barang_master.barang_name, rm_import_pos.po_no')
+            ->findAll();
+
+        // Format output sesuai permintaan
+        $output = [];
+        $namaSupplier = "";
+        $noPo = "";
+
+        foreach ($rmPurchaseOrderDetail as $detail) {
+            $namaSupplier = $detail['nama_supplier'];
+            $noPo = $detail['po_no'];
+
+            $output[] = "{$detail['barang_name']} {$detail['spesifikasi_tergabung']}; {$detail['qty_diterima_total']} {$detail['kode_satuan']}";
+        }
+
+        return "PEMB. " . implode('; ', $output) . "; " . $namaSupplier . "; " . $noPo; // Jika ada banyak barang, pisahkan dengan titik koma
+    }
 }
