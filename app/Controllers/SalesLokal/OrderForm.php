@@ -203,6 +203,7 @@ class OrderForm extends BaseController
                 "surat_jalan_so_id" => $data->surat_jalan_so_id,
                 "sales_order_invoice_id" => $data->sales_order_invoice_id,
                 "counter_print" => $data->counter_print,
+                "posting" => $data->posting,
             ]);
         }
 
@@ -214,7 +215,7 @@ class OrderForm extends BaseController
             "data"              => $dataSalesOrder,
             "payload"           => $payload
         ];
-
+        
         echo json_encode($data);
         return;
     }
@@ -1059,5 +1060,43 @@ class OrderForm extends BaseController
             'token' => csrf_hash(),
             'status' => true
         ]);
+    }
+
+    public function posting()
+    {
+        try {
+
+            $id = $this->request->getVar('id');
+            if (is_numeric($id)) {
+                $id = $id;
+            } else {
+                $id = decrypt($id);
+            }
+
+            // po posting
+            $payload = [
+                "posting" => $this->request->getVar('status_posting'),
+            ];
+
+            $this->SalesOrderModel->update($id, $payload);
+
+            $data = [
+                "status"    => true,
+                "message"   => "Order Form Berhasil Diperbaruhi",
+                "payload"   => json_encode($payload),
+                'token'     => csrf_hash()
+            ];
+
+            echo json_encode($data);
+
+        } catch (Exception $e) {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
     }
 }
