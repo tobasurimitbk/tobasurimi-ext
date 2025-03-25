@@ -164,7 +164,7 @@ class TransaksiJurnalModel extends Model
         }
 
         if ($addCondition['search']) {
-            $dataQry->like('no_transaksi', $addCondition['search']);
+            $dataQry->like('no_transaksi', $addCondition['search'])->orLike('uraian_transaksi', $addCondition['search']);
         }
 
         if ($addCondition['start_date'] || $addCondition['end_date'] || $addCondition['type_transaksi'] || $addCondition['search']) {

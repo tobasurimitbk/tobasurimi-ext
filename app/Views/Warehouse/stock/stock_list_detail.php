@@ -1,4 +1,5 @@
-<?= $this->include('layouts/template_pop_up.php') ?>
+<?= $this->extend('layouts/template-new-window'); ?>
+<?= $this->Section('content'); ?>
 <section class="section">
     <div class="card">
         <div class="card-body">
@@ -2257,3 +2258,4 @@
         stokTablePenjualan.ajax.reload();
     }
 </script>
+<?= $this->endSection(); ?>
