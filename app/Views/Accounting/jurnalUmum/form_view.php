@@ -88,10 +88,9 @@
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td colspan="6" style="text-align: right;"><b>GRAND TOTAL</b></td>
+                                <td colspan="7" style="text-align: right;"><b>GRAND TOTAL</b></td>
                                 <td style="text-align: center;"><b>0.00</b></td>
                                 <td style="text-align: center;"><b>0.00</b></td>
-                                <td style="text-align: center;"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -171,10 +170,9 @@
         // FOOTER
         row_detail += `
                     <tr>
-                        <td colspan="6" style="text-align: right;"><b>GRAND TOTAL</b></td>
+                        <td colspan="7" style="text-align: right;"><b>GRAND TOTAL</b></td>
                         <td style="text-align: center;"><b>${greatFormatRupiah(debitTotal.toFixed(2))}</b></td>
                         <td style="text-align: center;"><b>${greatFormatRupiah(kreditTotal.toFixed(2))}</b></td>
-                        <td></td>
                     </tr>
                 `;
 
