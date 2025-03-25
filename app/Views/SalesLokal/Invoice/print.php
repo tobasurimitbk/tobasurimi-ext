@@ -7,57 +7,59 @@
     <title>Invoice Penjualan Lokal</title>
     <style>
         body {
-            font-size: 10px; /* Ukuran font diperkecil */
+            font-size: 11px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
         @page {
-            size: 8.27in 5.50in landscape;
-            margin: 15px; /* Margin diperkecil */
-            padding: 15px; /* Padding diperkecil */
+            size: 9.5in 11in;
+            margin: 0.5in;
         }
 
         .company-name {
             font-weight: 700;
             border: 1px solid;
-            padding: 3px; /* Padding diperkecil */
+            padding: 5px;
             border-radius: 5px;
-            margin-bottom: 1px;
+            margin-bottom: 5px;
             display: inline-block;
-            min-width: 70px;
+            min-width: 100px;
         }
 
         .description-container {
             border: 1px solid;
             border-radius: 5px;
-            min-height: 50px; /* Tinggi diperkecil */
-            margin-top: 3px; /* Margin diperkecil */
-            padding-left: 5px; /* Padding diperkecil */
+            min-height: 60px;
+            margin-top: 5px;
+            padding: 5px;
         }
 
         .item-table {
             border: 1px solid;
             width: 100%;
-            font-size: 10px; /* Ukuran font tabel diperkecil */
-            margin-top: 1px;
-            margin-bottom: 3px; /* Margin diperkecil */
+            font-size: 11px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            border-collapse: collapse;
         }
 
         .item-table th,
         .item-table td {
-            border-right: 1px solid;
-            padding: 2px; /* Padding diperkecil */
+            border: 1px solid;
+            padding: 3px;
         }
 
         .rounded-border {
             border: 1px solid;
             border-radius: 5px;
-            padding: 3px; /* Padding diperkecil */
+            padding: 5px;
         }
 
         .signature-table {
-            border-spacing: 15px 0; /* Spasi diperkecil */
-            margin-top: 1px;
+            border-spacing: 15px 0;
+            margin-top: 5px;
         }
 
         .txt-bold {
@@ -75,13 +77,18 @@
         .w-100 {
             width: 100%;
         }
+        
+        .payment-list {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
     </style>
 </head>
 
 <body>
     <table class="w-100">
         <tr>
-            <td style="width: 60%;padding-right: 100px">
+            <td style="width: 60%;">
                 <div class="company-name">
                     Toba Fish <br>
                     <?= $companyName ?>
@@ -101,8 +108,8 @@
                 </div>
             </td>
             <td align="right" style="text-align: right;">
-                <div class="txt-bold txt-center" style="font-size: 17px;">Sales Invoice</div>
-                <table class="w-100 rounded-border" style="margin-left: auto;margin-right: 0">
+                <div class="txt-bold txt-center" style="font-size: 18px;">Sales Invoice</div>
+                <table class="w-100 rounded-border" style="margin-left: auto;">
                     <tr>
                         <td style="border-right: 1px solid;border-right-style: dashed;width: 50%;">
                             <div>Tgl. Faktur</div>
@@ -118,8 +125,6 @@
                             <div>No. PO</div>
                             <div class="txt-center"><?= $invData->no_po ?>&nbsp;</div>
                         </td>
-
-
                         <td style="border-top: 1px solid;border-top-style: dashed">
                             <div>SJ/OF No.</div>
                             <?php
@@ -129,7 +134,7 @@
                             // Gantikan karakter tidak diinginkan dengan string kosong
                             $cleaned_string_document_no = str_replace($unwanted_characters, '', $invData->document_no);
                             ?>
-                            <div class="txt-center" style="font-size: 10px;"><?= $cleaned_string_document_no ?>&nbsp;</div>
+                            <div class="txt-center"><?= $cleaned_string_document_no ?>&nbsp;</div>
                         </td>
                     </tr>
                 </table>
@@ -137,27 +142,26 @@
         </tr>
     </table>
 
-    <table class=" item-table" border="1" style="border-collapse: collapse">
+    <table class="item-table">
         <tr>
-            <th>No</th>
-            <th style="height: 1px;">Item Description</th>
-            <th>Qty</th>
-            <th>Satuan</th>
-            <th>Unit Price</th>
-            <th>Disc %</th>
-            <th>Amount</th>
+            <th style="width: 30px;">No</th>
+            <th>Item Description</th>
+            <th style="width: 50px;">Qty</th>
+            <th style="width: 50px;">Satuan</th>
+            <th style="width: 80px;">Unit Price</th>
+            <th style="width: 50px;">Disc %</th>
+            <th style="width: 90px;">Amount</th>
         </tr>
         <?php
         $rowNumber = 1;
         foreach ($soData as $detail) :
-
         ?>
             <tr>
-                <td class="txt-center" style="height: 1px;"><?= $rowNumber ?></td>
+                <td class="txt-center"><?= $rowNumber ?></td>
                 <td><?= $detail->nama_barang ?></td>
                 <td class="txt-center"><?= $detail->qty_invoice ?></td>
                 <td class="txt-center"><?= $detail->satuan ?></td>
-                <td class="txt-center">Rp. <?= number_format($detail->harga_barang) ?></td>
+                <td class="txt-right">Rp. <?= number_format($detail->harga_barang) ?></td>
                 <td class="txt-center"><?= $detail->disc ?></td>
                 <td class="txt-right">Rp. <?= number_format($detail->amount) ?></td>
             </tr>
@@ -178,14 +182,14 @@
         <?php endfor; ?>
     </table>
 
-    <table class="w-100" style="border-spacing: 3px 0;border: 1px;">
+    <table class="w-100" style="margin-top: 5px;">
         <tr>
             <td style="width: 40px;" valign="top">Say : </td>
-            <td class="rounded-border" style="width: 65%;" valign="top">
+            <td class="rounded-border" style="width: 60%;" valign="top">
                 <?= (isset($invData->status_tax) && isset($invData->status_tax)) ? terbilang($invData->total_invoice) : terbilang($invData->total_invoice) ?>
             </td>
-            <td class="rounded-border">
-                <table class="w-100" style="border-collapse: collapse">
+            <td class="rounded-border" style="width: 30%;">
+                <table class="w-100">
                     <tr>
                         <td class="txt-right" style="border-bottom: 1px solid;">DPP: </td>
                         <td class="txt-right" style="border-bottom: 1px solid;">Rp. <?= number_format($invData->dpp) ?></td>
@@ -199,53 +203,44 @@
         </tr>
     </table>
 
-    <table class="w-100">
+    <table class="w-100" style="margin-top: 10px;">
         <tr>
-            <td style="width: 70%;" valign="top">
-                <table class="w-100">
+            <td style="width: 60%;" valign="top">
+                <div class="description-container">
+                    <label class="description-label">Description: </label>
+                    <ol class="payment-list">
+                        <?= $companyAccount ?>
+                    </ol>
+                    <?= '' //$invData->keterangan ?>
+                </div>
+                <table style="margin-top: 10px;">
                     <tr>
-                        <td valign="top" style="width: 65%;">
-                            <div class="description-container">
-                                <label class="description-label">Description: </label>
-                                <ol class="payment-list">
-                                    <?= $companyAccount ?>
-                                </ol>
-                                <?= '' //$invData->keterangan 
-                                ?>
-                            </div>
-                        </td>
-                        <td valign="bottom">
-                            <table class="signature-table">
-                                <tr style="vertical-align: top;">
-                                    <td style="height: 65px;border-bottom: 1px solid;width: 90px">Hormat Kami</td>
-                                </tr>
-                                <tr>
-                                    <td>Date: </td>
-                                </tr>
-                            </table>
-                        </td>
+                        <td style="height: 60px;border-bottom: 1px solid; width: 150px;">Hormat Kami</td>
+                    </tr>
+                    <tr>
+                        <td>Date: </td>
                     </tr>
                 </table>
             </td>
-            <td valign="top">
-                <table class="w-100 rounded-border" style="margin-bottom: 3px;">
+            <td valign="top" style="width: 40%;">
+                <table class="w-100 rounded-border">
                     <tr>
                         <td>Tot Sub Stlh Pjk</td>
                         <td class="txt-right">Rp. <?= number_format($invData->total_invoice) ?></td>
                     </tr>
                 </table>
-                <div class="rounded-border" style="margin-bottom: 3px;">&nbsp;</div>
+                <div class="rounded-border" style="margin: 5px 0; height: 20px;">&nbsp;</div>
                 <div class="rounded-border">
-                    <table class="w-100 txt-bold" style="border-collapse: collapse;">
+                    <table class="w-100 txt-bold">
                         <tr>
                             <td style="border-right: 1px solid;width: 100px">Total Invoice : </td>
                             <td class="txt-right">Rp. <?= number_format($invData->total_invoice) ?></td>
                         </tr>
                     </table>
                 </div>
-                <table class="signature-table" style="margin-left: auto;margin-right: 0;">
-                    <tr style="vertical-align: top;">
-                        <td style="height: 65px;border-bottom: 1px solid;width: 100px">Diterima Oleh</td>
+                <table style="margin-top: 10px; float: right;">
+                    <tr>
+                        <td style="height: 60px;border-bottom: 1px solid; width: 150px;">Diterima Oleh</td>
                     </tr>
                     <tr>
                         <td>Date: </td>
@@ -254,7 +249,5 @@
             </td>
         </tr>
     </table>
-
 </body>
-
 </html>
