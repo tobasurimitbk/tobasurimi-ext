@@ -107,6 +107,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select customer" name="customer" id="customer">
                                 <option value=""></option>
+                                <option value="import">Import</option>
                                 <?php if (!empty($customers)): ?>
                                     <?php foreach ($customers as $cus): ?>
                                         <option <?= !empty($detail) ?  ( encrypt($detail['customer_id']) == $cus['id'] ? "selected" : "") : '' ?> value="<?= encrypt($cus['id']); ?>"><?= $cus['name']; ?></option>
@@ -779,8 +780,27 @@
             dataType: "json",
             success: function(res) {
                 if (res.status && res.data.length > 0) {
-                    res.data.forEach((data) => {
-                           
+                    if (res.isImport) {
+                        res.data.forEach((data) => {
+                                dataList.push({
+                                    id: getID(),
+                                    qty_invoice: data.qty_invoice || "-",
+                                    document_type: data.document_type || "-",
+                                    harga_barang_invoice: data.harga_barang_invoice || null,
+                                    amount_invoice: data.total_invoice || "-",
+                                    kode_barang: data.kode_barang || "-",
+                                    barang_name: data.barang_name || "-",
+                                    sales_order_invoice_id: data.sales_order_invoice_id || null,
+                                    sales_order_invoice_detail_id: data.sales_order_invoice_detail_id || null,
+                                    no_faktur: data.no_faktur || "-",
+                                    akun_kas_lain: data.id_akun_kas_lain || null,
+                                    akun_selisih_lain: data.id_akun_selisih_lain || null,
+                                    nama_akun_kas_lain: data.akun_kas_lain || "-",
+                                    nama_akun_selisih_lain: data.akun_selisih_lain || "-"
+                                });
+                        });
+                    } else {
+                        res.data.forEach((data) => {
                                 dataList.push({
                                     id: getID(),
                                     qty_invoice: data.qty_invoice,
@@ -796,8 +816,8 @@
                                     nama_akun_kas_lain: data.akun_kas_lain || "-",
                                     nama_akun_selisih_lain: data.akun_selisih_lain || "-"
                                 });
-                            
-                    });
+                        });
+                    }
                 }
 
                 const totalPembayaran = parseFloat(res.totalPembayaran) || 0;
@@ -833,23 +853,34 @@
             let group = groupedData[key];
             let isFirstRow = true;
 
-            group.forEach((item, index) => { // Tambahkan `index` sebagai parameter
+            group.forEach((item, index) => {
                 let newRow = $('<tr style="color:whitesmoke;">');
+                
                 if (isFirstRow) {
                     newRow.append(
                         $('<td rowspan="' + group.length + '" style="text-align:center;">').text(item.no_faktur)
                     );
                     isFirstRow = false;
                 }
-                newRow.append($('<td style="text-align:center;">').text(item.kode_barang));
-                newRow.append($('<td style="text-align:center;">').text(item.barang_name));
-                newRow.append($('<td style="text-align:center;">').text(item.qty_invoice));
-                newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.harga_barang_invoice)));
-                newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.amount_invoice)));
+
+                // Check if document_type exists
+                if (item.document_type) {
+                    newRow.append(
+                        $('<td colspan="4" style="text-align:center;">').text('DATA IMPORT')
+                    );
+                    newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.amount_invoice)));
+                } else {
+                    newRow.append($('<td style="text-align:center;">').text(item.kode_barang));
+                    newRow.append($('<td style="text-align:center;">').text(item.barang_name));
+                    newRow.append($('<td style="text-align:center;">').text(item.qty_invoice));
+                    newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.harga_barang_invoice)));
+                    newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.amount_invoice)));
+                }
+
                 // Tambahkan baris ke tabel
                 table.find('tbody').append(newRow);
 
-                // Update total amounts
+                // Update total amounts (include all rows, including DATA IMPORT)
                 total_amount += parseFloat(item.amount_invoice);
             });
         });
