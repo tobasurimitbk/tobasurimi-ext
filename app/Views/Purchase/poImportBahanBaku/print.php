@@ -212,13 +212,13 @@
                 <tr>
                     <td style="text-align: center; border:0px;"><?= $no++; ?></td>
                     <td style="text-align: center;border:0px;">
-                        <?= $detail["nama_barang"] . " ( " . $detail['note'] . " )" ?>
+                        <?= $detail["nama_barang"] . " " . $detail['spesifikasi'] . ($detail['note'] == null ? "" : " ( " . $detail['note'] . " )") ?>
                     </td>
                     <td style="text-align: center;border:0px;">
                         <?= number_format($detail["qty"]) . " " . $detail["kode_satuan"] ?>
                     </td>
                     <td style="text-align: center;border:0px;">
-                        <?= number_format(formatter($detail["price"], "STR_TO_INT"), 2, '.', ',') ?>
+                        <?= $detail["price"] ?>
                     </td>
                     <td style="text-align: center;border:0px;">
                         <?= number_format($totalWithAdditional, 2, '.', ','); ?>

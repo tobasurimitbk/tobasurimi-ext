@@ -291,26 +291,32 @@ class PembayaranInvoice extends BaseController
     }
 
     public function getDataDokumenInvoiceLokal($customer_id, $pembayaran_invoice_id = null)
-    {
-        $customer_id_decrypt = decrypt($customer_id);
-        $pembayaran_invoice_id_decrypt = $this->request->getVar('pembayaran_invoice_id') ? decrypt($this->request->getVar('pembayaran_invoice_id')) : null;
-        $this->salesOrderInvoiceModel
+    {   
+        if ($customer_id == "import") {
+            $this->salesOrderInvoiceModel
             ->select('sales_order_invoice.no_faktur, sales_order_invoice.id') // Pilih kolom yang dibutuhkan
-            ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_id = sales_order_invoice.id', 'left') // Relasi ke pembayaran_invoice_detail
-            ->where('sales_order_invoice.id_customer', $customer_id_decrypt)
-            ->where('sales_order_invoice.deletedAt', null);
-
-        // Jika dalam mode edit
-        if ($pembayaran_invoice_id_decrypt) {
-            // Tampilkan semua data, termasuk yang terkait dengan pembayaran_invoice_id
-            $this->salesOrderInvoiceModel->groupStart()
-                ->where('pembayaran_invoice_detail.id', null)
-                ->where('pembayaran_invoice_detail.type_invoice', 'LOKAL')
-                ->orWhere('pembayaran_invoice_detail.pembayaran_invoice_id', $pembayaran_invoice_id_decrypt)
-                ->groupEnd();
+            ->where('sales_order_invoice.document_type', "import");
         } else {
-            // Non-edit mode: hanya data yang belum dibayar
-            $this->salesOrderInvoiceModel->where('pembayaran_invoice_detail.id', null);
+            $customer_id_decrypt = decrypt($customer_id);
+            $pembayaran_invoice_id_decrypt = $this->request->getVar('pembayaran_invoice_id') ? decrypt($this->request->getVar('pembayaran_invoice_id')) : null;
+            $this->salesOrderInvoiceModel
+                ->select('sales_order_invoice.no_faktur, sales_order_invoice.id') // Pilih kolom yang dibutuhkan
+                ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_id = sales_order_invoice.id', 'left') // Relasi ke pembayaran_invoice_detail
+                ->where('sales_order_invoice.id_customer', $customer_id_decrypt)
+                ->where('sales_order_invoice.deletedAt', null);
+
+            // Jika dalam mode edit
+            if ($pembayaran_invoice_id_decrypt) {
+                // Tampilkan semua data, termasuk yang terkait dengan pembayaran_invoice_id
+                $this->salesOrderInvoiceModel->groupStart()
+                    ->where('pembayaran_invoice_detail.id', null)
+                    ->where('pembayaran_invoice_detail.type_invoice', 'LOKAL')
+                    ->orWhere('pembayaran_invoice_detail.pembayaran_invoice_id', $pembayaran_invoice_id_decrypt)
+                    ->groupEnd();
+            } else {
+                // Non-edit mode: hanya data yang belum dibayar
+                $this->salesOrderInvoiceModel->where('pembayaran_invoice_detail.id', null);
+            }
         }
 
         $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel->findAll();
@@ -568,6 +574,7 @@ class PembayaranInvoice extends BaseController
         $pembayaranInvoiceId = decrypt($this->request->getVar('pembayaran_invoice_id'));
 
         $dataBarang = [];
+        $isImport = false;
         $totalPembayaran = 0;
 
         if (!empty($idArray)) {
@@ -622,12 +629,24 @@ class PembayaranInvoice extends BaseController
                     ->where('id', $pembayaranInvoiceId)
                     ->first();
             }
+
+            if (empty($dataBarang)) {
+
+                $dataBarang = $this->salesOrderInvoiceModel->where("id", $idArray)
+                ->select('id as sales_order_invoice_id, no_faktur, tanggal_faktur, total_invoice, document_type')
+                ->first();
+
+                $dataBarang = [$dataBarang];
+
+                $isImport = true;
+            }
         }
 
         return $this->response->setJSON([
             'data' => $dataBarang,
             'totalPembayaran' => $pembayaranInvoiceData['total_bayar'] ?? 0,
             'status' => true,
+            'isImport' => $isImport,
         ]);
     }
 

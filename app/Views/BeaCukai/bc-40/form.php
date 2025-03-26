@@ -90,6 +90,7 @@
                             <th style="text-align: center;">Tgl LPB</th>
                             <th style="text-align: center;">No LPB</th>
                             <th style="text-align: center;">No PO</th>
+                            <th style="text-align: center;">No SPP</th>
                             <th style="text-align: center;">Kode</th>
                             <th style="text-align: center;">Barang</th>
                             <th style="text-align: center;">Qty PO</th>
@@ -347,6 +348,7 @@
                     newRow.append($('<td style="text-align:center;">').text(v.lpb_date));
                     newRow.append($('<td style="text-align:center;">').text(v.lpb_no));
                     newRow.append($('<td style="text-align:center;">').text(v.po_no));
+                    newRow.append($('<td style="text-align:center;">').text(v.spp_no));
                     newRow.append($('<td style="text-align:center;">').text(v.kode_barang));
                     newRow.append($('<td style="text-align:center;">').text(v.barang_name));
                     newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_po)));

@@ -136,7 +136,13 @@
             },
             {
                 data: "customer_name",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+                    if (data === null || data === undefined || data === "") {
+                        return 'DATA IMPORT';
+                    }
+                    return data;
+                }
             },
             {
                 data: "amount",

@@ -43,16 +43,16 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable dataTable-barang" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
-                                <th onclick="changeSort('kelompok_barang')" class="sort">Kategori</th>
-                                <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
-                                <th onclick="changeSort('barang_name')" class="sort">Nama Barang</th>
-                                <th class="sort">Satuan 1</th>
-                                <th class="sort">Satuan 2</th>
-                                <th class="sort">Satuan 3</th>
-                                <th class="sort">Harga Terakhir</th>
-                                <th class="sort">Supplier Terakhir</th>
-                                <th class="sort">Akun COA</th>
+                                <th style="width:10px;">No</th>
+                                <th onclick="changeSort('kelompok_barang')" class="sort" style="text-align:left;">Kategori</th>
+                                <th onclick="changeSort('kode_barang')" class="sort" style="text-align:left;">Kode Barang</th>
+                                <th onclick="changeSort('barang_name')" class="sort" style="text-align:left;">Nama Barang</th>
+                                <th class="sort">Satuan</th>
+                                <!-- <th class="sort">Satuan 2</th>
+                                <th class="sort">Satuan 3</th> -->
+                                <th class="sort" style="text-align:left;">Harga Terakhir</th>
+                                <th class="sort" style="text-align:left;">Supplier Terakhir</th>
+                                <th class="sort" style="text-align:center;">Akun COA</th>
                                 <th class="sort" style="text-align: center;">Histori</th>
                             </tr>
                         </thead>
@@ -402,39 +402,39 @@
                 width: "5%"
             }, {
                 data: "kelompok_barang",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "kode_barang",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "barang_name",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "satuan",
                 className: "text-center",
                 sortable: false,
             },
-            {
-                data: "satuan2",
-                className: "text-center",
-                sortable: false,
-            },
-            {
-                data: "satuan3",
-                className: "text-center",
-                sortable: false,
-            },
+            // {
+            //     data: "satuan2",
+            //     className: "text-center",
+            //     sortable: false,
+            // },
+            // {
+            //     data: "satuan3",
+            //     className: "text-center",
+            //     sortable: false,
+            // },
             {
                 data: "harga_terakhir",
-                className: "text-center",
+                className: "text-left",
                 sortable: false,
             },
             {
                 data: "supplier_terakhir",
-                className: "text-center",
+                className: "text-left",
                 sortable: false,
             },
             {
@@ -457,7 +457,7 @@
                 render: function(data, type, row) {
                     return `
                     <div class="mt-0 actions">
-                        <button onclick="displayHistory('${row.id}')" class="btn btn-success posting-spp actions">
+                        <button onclick="displayHistory('${row.spesifikasi_id}')" class="btn btn-success posting-spp actions">
                             <i class="fa-solid fa-clock-rotate-left"></i>
                         </button>
                     </div>
