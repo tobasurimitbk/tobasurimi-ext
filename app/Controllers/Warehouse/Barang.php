@@ -570,6 +570,67 @@ class Barang extends BaseController
         return response()->setJSON($data);
     }
 
+    public function historiHargaPOBahanPenolongBySupplier()
+    {
+        $amPurchaseOrderModel = new AMPurchaseOrderModel();
+
+        $payload = [
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search" => $this->request->getGet("search"),
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+        ];
+
+        $condition = [
+            "am_purchase_orders.company_id"  => $this->this_company_id,
+            "am_purchase_orders.supplier_id" => $this->request->getVar('supplier_id'),
+            "am_purchase_orders.deletedAt" => NULL,
+            "am_purchase_order_details.deletedAt" => NULL,
+            "am_purchase_orders.po_type" => "Lokal"
+        ];
+
+        $addCondition = [
+            'search' => $this->request->getGet('search'),
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : ""
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $res = $amPurchaseOrderModel->historiHargaPOBahanPenolong($condition, $addCondition, $limit, $offset);
+
+        $rdata = [];
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        foreach ($res['data'] as $data) {
+            array_push($rdata, [
+                "no"                    => $no++,
+                "po_no"                 => $data['po_no'],
+                "spp_no"                => $data['spp_no'],
+                "po_date"               => date('d/m/Y', strtotime($data['po_date'])),
+                "nama_supplier"         => $data['nama_supplier'],
+                "nama_barang"           => $data['nama_barang'],
+                'divisi'                => $data['divisi'],
+                'note'                  => $data['note'],
+                'qty'                   => floatval($data['qty']),
+                'kode_satuan'           => $data['kode_satuan'],
+                "price"                 => number_format($data['price'], 2, ',', '.'),
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $res['totalData'],
+            "recordsFiltered"   => $res['totalFilteredData'],
+            "data"              => $rdata,
+            "payload"           => $payload,
+        ];
+
+        return response()->setJSON($data);
+    }
+
     public function dropdownBarangType()
     {
         $barangModel = new BarangMasterModel();
