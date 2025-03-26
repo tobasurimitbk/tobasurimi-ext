@@ -144,6 +144,7 @@ class BCPurchaseOrderModel extends Model
                 penerimaan_barang_detail.barang_id,
                 am_purchase_orders.po_no,
                 am_purchase_orders.po_date,
+                purchase_requests.spp_no,
                 CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang_name,
                 barang_master.kode_barang
             ')
@@ -151,6 +152,7 @@ class BCPurchaseOrderModel extends Model
                 ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+                ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "LOKAL")
                 ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
                 ->where('penerimaan_barang.supplier_id', $first['supplier_id'])
@@ -241,6 +243,7 @@ class BCPurchaseOrderModel extends Model
                 'barang1_id' => $p['barang_id'],
                 'lpb_date' => date('d/m/Y', strtotime($p['lpb_date'])),
                 'lpb_no' => $p['no_penerimaan_barang'],
+                'spp_no' => isset($p['spp_no']) ? $p['spp_no'] : "",
                 'purchase_order_id' => $p['purchase_order_id'],
                 'qty_lpb' => $p['qty_lpb'],
                 'qty_lpb_konversi' => $p['qty_lpb_konversi'],

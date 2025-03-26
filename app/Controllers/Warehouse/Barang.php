@@ -419,6 +419,7 @@ class Barang extends BaseController
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data['id']),
+                "spesifikasi_id"        => $data['spesifikasi_id'],
                 "kelompok_barang"       => $data['kelompok_barang'],
                 "kode_barang"           => $data['kode_barang'],
                 "barang_name"           => $data['barang_name'] . " - " . $data['spesifikasi'],
@@ -522,7 +523,7 @@ class Barang extends BaseController
 
         $condition = [
             "am_purchase_orders.company_id"  => $this->this_company_id,
-            "am_purchase_order_details.barang_id" => decrypt($this->request->getVar('id')),
+            "am_purchase_order_details.spesifikasi_id" => $this->request->getVar('id'),
             "am_purchase_orders.deletedAt" => NULL,
             "am_purchase_order_details.deletedAt" => NULL,
             "am_purchase_orders.po_type" => $this->request->getVar('po_type')

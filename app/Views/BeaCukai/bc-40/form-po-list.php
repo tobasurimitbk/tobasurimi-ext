@@ -139,6 +139,7 @@
                                         <th style="text-align: center;">Tgl LPB</th>
                                         <th style="text-align: center;">No LPB</th>
                                         <th style="text-align: center;">No PO</th>
+                                        <th style="text-align: center;">No SPP</th>
                                         <th style="text-align: center;">Kode</th>
                                         <th style="text-align: center;">Barang</th>
                                         <th style="text-align: center;">Qty PO</th>
@@ -169,6 +170,7 @@
                                     <th style="text-align: center;">Tgl LPB</th>
                                     <th style="text-align: center;">No LPB</th>
                                     <th style="text-align: center;">No PO</th>
+                                    <th style="text-align: center;">No SPP</th>
                                     <th style="text-align: center;">Kode</th>
                                     <th style="text-align: center;">Barang</th>
                                     <th style="text-align: center;">Qty PO</th>
@@ -271,6 +273,7 @@
             qty_po: "<?= floatval($d['qty_po']) ?>",
             barang_id: "<?= $d['barang_id'] ?>",
             po_no: "<?= $d['po_no'] ?>",
+            spp_no: "<?= $d['spp_no'] ?>",
             po_date: "<?= $d['po_date'] ?>",
             barang_name: "<?= $d['barang_name'] ?>",
             kode_barang: "<?= $d['kode_barang'] ?>",
@@ -693,11 +696,12 @@
                     newRow.append($('<td style="text-align:center;">').text(v.lpb_date));
                     newRow.append($('<td style="text-align:center;">').text(v.lpb_no));
                     newRow.append($('<td style="text-align:center;">').text(v.po_no));
+                    newRow.append($('<td style="text-align:center;">').text(v.spp_no));
                     newRow.append($('<td style="text-align:center;">').text(v.kode_barang));
                     newRow.append($('<td style="text-align:center;">').text(v.barang_name));
                     newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_po)));
                     newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_lpb)));
-                    newRow.append($('<td style="text-align:center;">').text(v.harga));
+                    newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.harga_number)));
                     table.find('tbody').append(newRow);
                 });
 
@@ -766,12 +770,13 @@
                 newRow.append($('<td style="text-align: center;">').text(v.lpb_date));
                 newRow.append($('<td style="text-align: center;">').text(v.lpb_no));
                 newRow.append($('<td style="text-align: center;">').text(v.po_no));
+                newRow.append($('<td style="text-align: center;">').text(v.spp_no));
                 newRow.append($('<td style="text-align: center;">').text(v.kode_barang));
                 newRow.append($('<td style="text-align: center;">').text(v.barang_name));
                 newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_po)));
                 newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_lpb)));
                 newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_lpb_konversi)));
-                newRow.append($('<td style="text-align: center;">').text(formatRupiah(v.harga_number)));
+                newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.harga_number)));
 
                 newRow.append($('<td style="text-align: center;">').html(
                     `
@@ -782,11 +787,11 @@
             });
 
             var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-            newRow.append($('<td style="text-align: right;" colspan="7">').html("<b>GRAND TOTAL</b>"));
-            newRow.append($('<td>').text(greatFormatRupiah(totalQtyPo.toFixed(2))));
+            newRow.append($('<td style="text-align: right;" colspan="8">').html("<b>GRAND TOTAL</b>"));
+            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(totalQtyPo.toFixed(2))));
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(totalQtyDiterima.toFixed(2))));
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(totalQtyDiterimaKonversi.toFixed(2))));
-            newRow.append($('<td>').text(greatFormatRupiah(totalHargaNumber.toFixed(2))));
+            newRow.append($('<td  style="text-align:center;">').text(greatFormatRupiah(totalHargaNumber.toFixed(2))));
             newRow.append($('<td>').text(''));
 
             table.find('tbody').append(newRow);

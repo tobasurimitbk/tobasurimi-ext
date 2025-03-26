@@ -45,6 +45,7 @@
                                 <th style="text-align: center;">Tgl LPB</th>
                                 <th style="text-align: center;">No LPB</th>
                                 <th style="text-align: center;">No PO</th>
+                                <th style="text-align: center;">No SPP</th>
                                 <th style="text-align: center;">Kode</th>
                                 <th style="text-align: center;">Barang</th>
                                 <th style="text-align: center;">Qty PO</th>
@@ -74,6 +75,7 @@
                                     <td><?= $d['lpb_date'] ?></td>
                                     <td><?= $d['lpb_no'] ?></td>
                                     <td><?= $d['po_no'] ?></td>
+                                    <td><?= $d['spp_no'] ?></td>
                                     <td><?= $d['kode_barang'] ?></td>
                                     <td><?= $d['barang_name'] ?></td>
                                     <td><?= number_format($d['qty_po']) ?></td>
@@ -85,7 +87,7 @@
                         </tbody>
                         <tfoot>
                             <tr style="color:whitesmoke; background-color:#f2c996; color:black;">
-                                <td style="text-align: right;" colspan="7">
+                                <td style="text-align: right;" colspan="8">
                                     <b>
                                         GRAND TOTAL
                                     </b>
@@ -102,7 +104,6 @@
                                 <td>
                                     <?= number_format($totalHargaNumber, 2) ?>
                                 </td>
-                                <td></td>
                             </tr>
                         </tfoot>
 
