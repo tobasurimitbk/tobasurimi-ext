@@ -334,12 +334,8 @@
                 data: "nama_customer",
                 className: "text-center"
             }, {
-                data: "customer_name",
-                className: "text-center",
-                render: function(data, type, row) {
-                    // Jika customer_name tidak ada (null/undefined/empty), tampilkan "DATA IMPORT"
-                    return data ? data : 'DATA IMPORT';
-                }
+                data: "destination",
+                className: "text-center"
             }, {
                 data: "qty_barang",
                 className: "text-center"
