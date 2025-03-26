@@ -143,6 +143,80 @@ class CustomerModel extends Model
         ];
     }
 
+    public function getCustomerPiutangList($condition, $addCondition, $limit = 10, $offset = 0, $companyId)
+    {
+        $availableSort = [
+            'kode'              => 'customers.kode',
+            'name'              => 'customers.name',
+            'address'           => 'customers.address',
+            'createdAt'         => 'customers.createdAt',
+            'updatedAt'         => 'customers.updatedAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'customers.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "customers.*, 
+        CASE 
+            WHEN customers.tipe_customer = 'LOKAL' 
+            THEN SUM(sales_order_invoice.total_invoice)
+            ELSE SUM(sales_order_invoice.total_invoice)
+        END AS total, 
+        CASE 
+            WHEN customers.tipe_customer = 'LOKAL'
+            THEN (import_po_payments.payment_amt * import_po_payments.current_exchange_rate)
+            ELSE (local_po_payments.amount)
+        END AS remaining";
+
+        $supplierDataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('sales_order_invoice', 'sales_order_invoice.id_customer = customers.id AND sales_order_invoice.status_posting = 1', 'left')
+            ->where($condition)
+            ->whereIn('suppliers.company_id', $companyId)
+            ->groupBy('suppliers.id')
+            ->having("total > 0") 
+            ->orderBy($sort, $sortType);
+
+        $totalData = $supplierDataQry->countAllResults(false);
+
+        if ($addCondition['search'] || $addCondition['filter'] || $addCondition['divisi'] || $addCondition['type_barang']) {
+            $supplierDataQry->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $supplierDataQry->like('name', $addCondition['search'])
+                ->orLike('kode', $addCondition['search']);
+        }
+
+        if ($addCondition['filter']) {
+            $supplierDataQry->where('suppliers.id', $addCondition['filter']);
+        }
+        
+        if ($addCondition['divisi']) {
+            $supplierDataQry->where('rm_purchase_orders.divisi_id', $addCondition['divisi'])
+            ->orwhere('am_purchase_orders.division_id', $addCondition['divisi'])
+            ->orwhere('rm_import_pos.division_id', $addCondition['divisi']);
+        }
+
+        if ($addCondition['type_barang']) {
+            $supplierDataQry->where('suppliers.type', $addCondition['type_barang']);
+        }
+
+        if ($addCondition['search'] || $addCondition['filter'] || $addCondition['divisi'] || $addCondition['type_barang']) {
+            $supplierDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $supplierDataQry->countAllResults(false);
+        $data = $supplierDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
+
     // public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
     // {
     //     $requete = "SELECT customers.*,provinces.province_name,cities.city_name FROM customers ";

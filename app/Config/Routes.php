@@ -2020,6 +2020,13 @@ $routes->get('/laporan-accounting/hutang/details/invoice/(:segment)', 'Laporan\A
 $routes->get('/laporan-accounting/hutang/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Hutang::LaporanHutangPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/hutang/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Hutang::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
 
+$routes->get('/laporan-accounting/piutang', 'Laporan\Accounting\Piutang::index', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/piutang/all', 'Laporan\Accounting\Piutang::allPiutang', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/piutang/details/(:segment)', 'Laporan\Accounting\Piutang::detail/$1', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/piutang/details/invoice/(:segment)', 'Laporan\Accounting\Piutang::allDetailsInvoice/$1', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/piutang/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Piutang::LaporanPiutangPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/piutang/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Piutang::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
+
 $routes->get('/laporan-accounting/neraca', 'Laporan\Accounting\Neraca::index', ['filter' => 'Auth']);
 $routes->post('/laporan-accounting/neraca', 'Laporan\Accounting\Neraca::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/neraca/printPDF/(:segment)/(:segment)', 'Laporan\Accounting\Neraca::exportPDF/$1/$2', ['filter' => 'Auth']);
