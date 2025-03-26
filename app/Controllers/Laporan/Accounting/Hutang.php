@@ -183,6 +183,7 @@ class Hutang extends BaseController
 
         $condition = [
             "suppliers.id"  => $id,
+            "status_penerimaan"  => 1,
             "suppliers.deletedAt" => NULL
         ];
 

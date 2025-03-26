@@ -51,7 +51,20 @@ class Pembelian extends BaseController
 
     public function index()
     {
-        $supplierData = $this->supplierModel->asObject()->where('company_id', $this->this_company_id)->findAll();
+        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+            $companyId = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $companyId = [15];
+        } else {
+            $companyId = [16];
+        }
+
+        $supplierData = $this->supplierModel
+            ->select('suppliers.id, suppliers.name, companies.company')
+            ->join('companies', 'companies.id = suppliers.company_id')
+            ->whereIn('company_id', $companyId)
+            ->asObject()
+            ->findAll();
         $data = [
             'suppliers' => $supplierData
         ];
@@ -71,8 +84,16 @@ class Pembelian extends BaseController
             "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
+        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+            $companyId = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $companyId = [15];
+        } else {
+            $companyId = [16];
+        }
+
         $condition = [
-            "penerimaan_barang.company_id"  => $this->this_company_id,
+            // "penerimaan_barang.company_id"  => $this->this_company_id,
             "penerimaan_barang.deletedAt" => NULL
         ];
 
@@ -89,7 +110,7 @@ class Pembelian extends BaseController
         $offset = $this->request->getGet("start");
 
         // $res = $this->transaksiPembelianModel->getList($condition, $addCondition, $limit, $offset);
-        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForAccounting($condition, $addCondition, $limit, $offset);
+        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForAccounting($condition, $addCondition, $limit, $offset, $companyId);
         $metaValuta = $this->metadataModel->get_by_name('Valuta');
 
         $rdata = [];

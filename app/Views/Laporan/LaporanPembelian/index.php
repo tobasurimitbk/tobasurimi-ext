@@ -46,13 +46,13 @@
                                     if (!empty($suppliers)) {
                                         foreach ($suppliers as $sub) {
                                     ?>
-                                            <option value="<?= $sub->id; ?>"><?= $sub->name; ?></option>
+                                            <option value="<?= $sub->id; ?>"><?= $sub->name.' ('.$sub->company.')'; ?></option>
                                     <?php
                                         }
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Supplier</label>
+                                <label for="floatingInput">List Supplier</label>
                             </div>
                         </div>
                         <div class="col-md-3" style="height: 50px;">

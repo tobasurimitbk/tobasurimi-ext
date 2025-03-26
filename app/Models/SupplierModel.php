@@ -141,9 +141,9 @@ class SupplierModel extends Model
 
         $supplierDataQry = $this->asObject()
             ->select($selectQry)
-            ->join('rm_purchase_orders', 'rm_purchase_orders.supplier_id = suppliers.id AND rm_purchase_orders.is_posted = 1', 'left')
-            ->join('am_purchase_orders', 'am_purchase_orders.supplier_id = suppliers.id AND am_purchase_orders.is_posted = 1', 'left')
-            ->join('rm_import_pos', 'rm_import_pos.supplier_id = suppliers.id AND rm_import_pos.is_posted = 1', 'left')
+            ->join('rm_purchase_orders', 'rm_purchase_orders.supplier_id = suppliers.id AND rm_purchase_orders.is_posted = 1 AND rm_purchase_orders.status_penerimaan = 1', 'left')
+            ->join('am_purchase_orders', 'am_purchase_orders.supplier_id = suppliers.id AND am_purchase_orders.is_posted = 1 AND am_purchase_orders.status_penerimaan = 1', 'left')
+            ->join('rm_import_pos', 'rm_import_pos.supplier_id = suppliers.id AND rm_import_pos.is_posted = 1 AND rm_import_pos.status_penerimaan = 1', 'left')
             ->join('local_po_payments', 'local_po_payments.supplier_id = suppliers.id AND local_po_payments.status_posting = 1', 'left')
             ->join('import_po_payments', 'import_po_payments.supplier_id = suppliers.id AND import_po_payments.status_posting = 1', 'left')
             ->where($condition)

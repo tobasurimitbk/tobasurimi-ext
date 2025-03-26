@@ -189,7 +189,7 @@ class PenerimaanBarangModel extends Model
         ];
     }
 
-    public function getPenerimaanBarangListForAccounting($condition, $addCondition, $limit = 10, $offset = 0)
+    public function getPenerimaanBarangListForAccounting($condition, $addCondition, $limit = 10, $offset = 0, $companyId)
     {
         $availableSort = [
             'no_penerimaan_barang'      => 'penerimaan_barang.no_penerimaan_barang',
@@ -224,6 +224,7 @@ class PenerimaanBarangModel extends Model
             ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_40_po.id', 'left')
             ->groupBy(('penerimaan_barang.id'))
             ->where($condition)
+            ->whereIn('penerimaan_barang.company_id', $companyId)
             ->orderBy($sort, $sortType);
 
         $totalData = $penerimaanBarangDataQry->countAllResults(false);
