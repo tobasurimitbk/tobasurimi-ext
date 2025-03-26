@@ -177,7 +177,7 @@
                 data: "nilai",
                 className: "text-center",
                 render: function(data, type, row) {
-                    return greatFormatRupiah(row.nilai);
+                    return greatFormatRupiahPayment(row.nilai);
                 },
                 searchable: false,
                 sortable: false
@@ -185,7 +185,7 @@
                 data: "nilai_idr",
                 className: "text-center",
                 render: function(data, type, row) {
-                    return greatFormatRupiah(row.nilai_idr);
+                    return greatFormatRupiahPayment(row.nilai_idr);
                 },
                 searchable: false,
                 sortable: false
@@ -202,6 +202,9 @@
                     if (tutupBuku === 0) {
                         return `
                         <div class="mt-0">
+                            <a href="javascript:void(0)" onclick="detail('${id}')" data-toggle="tooltip" title="Detail" class="btn btn-success posting-spp actions">
+                                <i class="fas fa-eye"></i>
+                            </a>
                             <?php if (can('Accounting', 'Jurnal', 'p')) : ?>
                                 <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jurnal/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -422,6 +425,20 @@
             }
         })
 
+
+    }
+
+    function detail(id) {
+        const width = 800;
+        const height = 600;
+        const left = window.innerWidth / 2 - width / 2;
+        const top = window.innerHeight / 2 - height / 2;
+
+        window.open(
+            "<?= base_url('jurnal/detail/') ?>" + id,
+            "_blank",
+            `width=${width},height=${height},top=${top},left=${left},resizable=yes`
+        );
 
     }
 

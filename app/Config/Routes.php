@@ -1896,7 +1896,7 @@ $routes->get('/api/sync-attendances', 'API\Attendances::sync_attendance', ['filt
 //Jurnal
 $routes->get('/jurnal', 'Accounting\JurnalUmum\JurnalUmum::index', ['filter' => 'Auth']);
 $routes->post('/jurnal/generate-no-bukti', 'Accounting\JurnalUmum\JurnalUmum::generateNoBukti', ['filter' => 'Auth']);
-// $routes->post('/jurnal/addJurnal', 'Accounting\JurnalUmum\JurnalUmum::save', ['filter' => 'Auth']);
+$routes->get('/jurnal/detail/(:segment)', 'Accounting\JurnalUmum\JurnalUmum::detailView/$1', ['filter' => 'Auth']);
 $routes->post('/jurnal/import', 'Accounting\JurnalUmum\JurnalUmum::import', ['filter' => 'Auth']);
 $routes->post('/jurnal/getSubAkuns', 'Accounting\JurnalUmum\JurnalUmum::searchSubAkun', ['filter' => 'Auth']);
 $routes->post('/jurnal/getSubAkunsExact', 'Accounting\JurnalUmum\JurnalUmum::searchSubAkunExact', ['filter' => 'Auth']);

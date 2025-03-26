@@ -40,6 +40,7 @@ class Hutang extends BaseController
     protected $penerimaanBarangModel;
     protected $penerimaanBarangDetailModel;
     protected $transaksiJurnalModel;
+    protected $divisisModel;
 
     public function __construct()
     {
@@ -68,7 +69,7 @@ class Hutang extends BaseController
         } else {
             $companyId = [16];
         }
-        
+
         $supplierData = $this->supplierModel
             ->select('suppliers.id, suppliers.name, companies.company')
             ->join('companies', 'companies.id = suppliers.company_id')
@@ -109,7 +110,7 @@ class Hutang extends BaseController
             "startdate"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastdate"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
-        
+
         if ($this->this_company_id != 16 && $this->this_company_id != 15) {
             $companyId = [1, 2];
         } else if ($this->this_company_id == 15) {

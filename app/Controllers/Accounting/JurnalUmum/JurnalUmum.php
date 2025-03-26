@@ -466,6 +466,73 @@ class JurnalUmum extends BaseController
         return view('Accounting/jurnalUmum/form', $data);
     }
 
+    public function detailView($id)
+    {
+        $id = decrypt($id);
+        $transaksiJurnal = $this->transaksiJurnalModel->where('id', $id)->first();
+
+        if ($transaksiJurnal == null) {
+            return redirect()->to('jurnal');
+        }
+
+        $jurnalUmum = $this->jurnalUmumModel->select('
+            jurnal_umum.*,
+            sub_akuns.no_sub,
+            sub_akuns.nama_sub,
+            metadata.value as valas_name,    
+        ')
+            ->join('sub_akuns', 'sub_akuns.id = jurnal_umum.id_coa', 'left')
+            ->join('metadata', 'metadata.id = jurnal_umum.valas', 'left')
+            ->where('id_transaksi', $id)
+            ->where('jurnal_umum.deletedAt', null)
+            ->findAll();
+
+        $divisiId = "ALL";
+
+        $jurnalUmumList = [];
+        foreach ($jurnalUmum as $j) {
+            $divisiId = $j['divisi_id'];
+
+            $jumlah =  $j['debit'] == 0.00 ? $j['kredit'] : $j['debit'];
+            array_push($jurnalUmumList, [
+                'id' => $j['id'],
+                'jenis_transaksi' => $j['debit'] == 0.00 ? "kredit" : "debit",
+                'keterangan' => $j['keterangan'],
+                'id_coa' => $j['id_coa'],
+                'valas_id' => $j['valas'],
+                'valas' => $j['valas_name'],
+                'jumlah' => floatval($jumlah / $j['kurs']),
+                'kurs' => floatval($j['kurs']),
+                'jumlah_idr' => floatval($jumlah),
+                'nama_sub' => $j['nama_sub'],
+                'no_sub' => $j['no_sub'],
+            ]);
+        }
+
+        $tipeTransaksi = $this->MetadataModel
+            ->where('name', 'tipe_transaksi')
+            ->findAll();
+
+        $tutupBuku = $this->tutupBukuModel
+            ->where('company_id', $this->this_company_id)
+            ->where('bulan', date('Y-m', \strtotime($transaksiJurnal['tanggal_transaksi'])))
+            ->first();
+
+        $data = [
+            'transaksiJurnal' => $transaksiJurnal,
+            'jurnalUmumList' => $jurnalUmumList,
+            'tipeTransaksi' => $tipeTransaksi,
+            'tutupBuku' => $tutupBuku == null ? 0 : 1,
+            'divisiId' => $divisiId,
+            'divisi' => $this->divisionModel->getDivisiAccess(),
+            'subAkun' =>  $this->Sub_AkunsModel->getAPAR($this->this_company_id),
+            'valuta' => $this->metadataModel->get_by_name('Valuta'),
+
+        ];
+
+        return view('Accounting/jurnalUmum/form_view', $data);
+    }
+
     public function delete()
     {
         $id = decrypt($this->request->getVar('id'));
@@ -1102,7 +1169,7 @@ class JurnalUmum extends BaseController
                                         'company_id' => $this->this_company_id,
                                         'id_coa' =>  $barangAP,
                                         'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
-                                        'debit' => (repairDouble($totalPOqty)),
+                                        'debit' => $totalPOqty,
                                         'kredit' => 0,
                                         'valas' => $dataMetadataValutaIDR->id,
                                         'kurs' => 1,
@@ -1137,7 +1204,7 @@ class JurnalUmum extends BaseController
                                 'id_coa' =>  $UtangAP,
                                 'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
                                 'debit' => 0,
-                                'kredit' => repairDouble($totalPO),
+                                'kredit' => $totalPO,
                                 'valas' => $dataMetadataValutaIDR->id,
                                 'kurs' => 1,
                                 'keterangan' => $keteranganJurnal,
@@ -1254,7 +1321,7 @@ class JurnalUmum extends BaseController
                             // end inisialisasi kode transaksi
                             // start input jurnal dari banyak detail barang
                             foreach ($dataPOBBDetail as $dataBBDetail) {
-                                $totalPO += repairDouble($dataBBDetail->total);
+                                $totalPO += ($dataBBDetail->total);
                                 $barangAPFound = false;
                                 foreach ($dataAccountBarang as $value) {
                                     if ($dataBBDetail->barang_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataBBDetail->spesifikasi_id == $value->barang_master_spesifikasi_id && $dataBBDetail->note == $value->keterangan && $dataBB->division_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
@@ -1278,7 +1345,7 @@ class JurnalUmum extends BaseController
                                         'company_id' => $this->this_company_id,
                                         'id_coa' =>  $barangAP,
                                         'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
-                                        'debit' => repairDouble($dataBBDetail->total) * $exchangeTransaksi,
+                                        'debit' => $dataBBDetail->total * $exchangeTransaksi,
                                         'kredit' => 0,
                                         'valas' =>  $dataBB->currency,
                                         'kurs' => $exchangeTransaksi,
@@ -1420,7 +1487,7 @@ class JurnalUmum extends BaseController
 
                         // start input jurnal dari banyak detail barang
                         foreach ($dataPOBPDetail as $dataBPDetail) {
-                            $totalPO += repairDouble($dataBPDetail->total);
+                            $totalPO += ($dataBPDetail->total);
                             $barangAPFound = false;
                             foreach ($dataAccountBarang as $value) {
                                 if ($dataBPDetail->barang_id == $value->barang_master_id && $dataBP->company_id == $value->company_id && $dataBPDetail->spesifikasi_id == $value->barang_master_spesifikasi_id && $dataBPDetail->note == $value->keterangan && $dataBP->division_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
@@ -1673,8 +1740,8 @@ class JurnalUmum extends BaseController
                 $resultTransaksiJurnal = array(
                     'no_transaksi' => $no_transaksi_jurnal,
                     'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
-                    'total_debit' => repairDouble($POimport->payment_amt),
-                    'total_kredit' => repairDouble($POimport->payment_amt),
+                    'total_debit' => ($POimport->payment_amt),
+                    'total_kredit' => ($POimport->payment_amt),
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
                     'no_bukti' => $no_transaksi_jurnal,
@@ -1695,7 +1762,7 @@ class JurnalUmum extends BaseController
                     'id_coa' =>  $POimport->akun_kas,
                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
                     'debit' => 0,
-                    'kredit' => repairDouble($POimport->payment_amt),
+                    'kredit' => ($POimport->payment_amt),
                     'valas' => $POimport->currency,
                     'kurs' => $POimport->current_exchange_rate,
                     'company_id' => $POimport->company_id,
@@ -1707,7 +1774,7 @@ class JurnalUmum extends BaseController
                     'id_transaksi' => $id_transaksi_jurnal,
                     'id_coa' =>  $POimport->akun_selisih == 0 || $POimport->akun_selisih == NULL ? $UtangAR : $POimport->akun_selisih,
                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
-                    'debit' => repairDouble($POimport->payment_amt),
+                    'debit' => ($POimport->payment_amt),
                     'kredit' => 0,
                     'valas' => $POimport->currency,
                     'kurs' => $POimport->current_exchange_rate,
@@ -1746,8 +1813,8 @@ class JurnalUmum extends BaseController
                 $resultTransaksiJurnal = array(
                     'no_transaksi' => $no_transaksi_jurnal,
                     'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $otherPayment->tanggal))),
-                    'total_debit' => repairDouble($otherPayment->nominal),
-                    'total_kredit' => repairDouble($otherPayment->nominal),
+                    'total_debit' => ($otherPayment->nominal),
+                    'total_kredit' => ($otherPayment->nominal),
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
                     'no_bukti' => $no_transaksi_jurnal,
@@ -1764,7 +1831,7 @@ class JurnalUmum extends BaseController
                     'id_coa' =>  $otherPayment->akun_kas,
                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $otherPayment->tanggal))),
                     'debit' => 0,
-                    'kredit' => repairDouble($otherPayment->nominal),
+                    'kredit' => ($otherPayment->nominal),
                     'valas' => $otherPayment->valas,
                     'kurs' => $kursData,
                     'company_id' => $otherPayment->company_id,
@@ -1776,7 +1843,7 @@ class JurnalUmum extends BaseController
                     'id_transaksi' => $id_transaksi_jurnal,
                     'id_coa' =>  $otherPayment->akun_selisih,
                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $otherPayment->tanggal))),
-                    'debit' => repairDouble($otherPayment->nominal),
+                    'debit' => ($otherPayment->nominal),
                     'kredit' => 0,
                     'valas' => $otherPayment->valas,
                     'kurs' => $kursData,
@@ -2035,7 +2102,7 @@ class JurnalUmum extends BaseController
 
 
 
-    public function inserDataPembayaranPinjaman($payID, $module,$divisi)
+    public function inserDataPembayaranPinjaman($payID, $module, $divisi)
     {
         $KasAP = "";
         $KasAR = "";
@@ -2260,7 +2327,7 @@ class JurnalUmum extends BaseController
                 'divisi_id' =>  $divisiID,
                 'tanggal_jurnal' => date('Y-m-d'),
                 'debit' => 0,
-                'kredit' => repairDouble($dataPO['hargaTerakhirNumber']),
+                'kredit' => ($dataPO['hargaTerakhirNumber']),
                 'valas' => $valas,
                 'kurs' => $kurs,
                 'keterangan' => "Pindah Saldo ",
@@ -2273,7 +2340,7 @@ class JurnalUmum extends BaseController
                 'company_id' =>  $companyID,
                 'divisi_id' =>  $divisiID,
                 'tanggal_jurnal' => date('Y-m-d'),
-                'debit' => repairDouble($dataPO['hargaTerakhirNumber']),
+                'debit' => ($dataPO['hargaTerakhirNumber']),
                 'kredit' => 0,
                 'valas' => $valas,
                 'kurs' => $kurs,
@@ -2287,7 +2354,7 @@ class JurnalUmum extends BaseController
                 'company_id' =>  $companyID,
                 'divisi_id' =>  $divisiID,
                 'tanggal_jurnal' => date('Y-m-d'),
-                'debit' => repairDouble($dataPO['hargaTerakhirNumber']),
+                'debit' => ($dataPO['hargaTerakhirNumber']),
                 'kredit' => 0,
                 'valas' => $valas,
                 'kurs' => $kurs,
@@ -2302,7 +2369,7 @@ class JurnalUmum extends BaseController
                 'divisi_id' =>  $divisiID,
                 'tanggal_jurnal' => date('Y-m-d'),
                 'debit' => 0,
-                'kredit' => repairDouble($dataPO['hargaTerakhirNumber']),
+                'kredit' => ($dataPO['hargaTerakhirNumber']),
                 'valas' => $valas,
                 'kurs' => $kurs,
                 'keterangan' => "Pindah Saldo ",

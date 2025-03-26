@@ -198,22 +198,8 @@
     <!-- <script src="https://kit.fontawesome.com/6297a3e18a.js" crossorigin="anonymous"></script> -->
 
     <div id="app">
-        <!-- {% block content_2 %}{% endblock %} -->
-        <div class="main-wrapper">
-            <div class="navbar-bg"></div>
+        <?= $this->renderSection('content'); ?>
 
-            <!-- Header -->
-            <?= $this->include('layouts/header'); ?>
-
-            <!-- Main Content -->
-            <div class="main-content">
-                <?= $this->renderSection('content'); ?>
-            </div>
-
-            <!-- Footer -->
-            <?= $this->include('layouts/footer'); ?>
-        </div>
-        <!-- {% endif %} -->
     </div>
     <script>
         const isNumberKey = function(evt) {
