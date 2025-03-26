@@ -264,7 +264,8 @@
 
     $('.filter_po_type, .filter_divisi, .filter_supplier, .filter_barang').select2({
         placeholder: "",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     })
 
     $('.filter_po_type, .filter_divisi, .filter_supplier, .filter_barang')
