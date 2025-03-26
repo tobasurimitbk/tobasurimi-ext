@@ -922,6 +922,7 @@ $routes->group('barang-master', ['filter' => 'Auth'], function ($routes) {
 });
 $routes->get('barang/supplier/(:num)', 'Warehouse\Barang::getBySupplier/$1', ['filter' => 'Auth']);
 $routes->get('barang-bahan-penolong/histori', 'Warehouse\Barang::historiHargaPOBahanPenolong', ['filter' => 'Auth']);
+$routes->get('barang-bahan-penolong/histori-supplier', 'Warehouse\Barang::historiHargaPOBahanPenolongBySupplier', ['filter' => 'Auth']);
 // MASTER KEMASAN
 $routes->get('/kemasan', 'Warehouse\Kemasan::index', ['filter' => 'Auth']);
 $routes->post('/kemasan/save', 'Warehouse\Kemasan::create', ['filter' => 'Auth']);

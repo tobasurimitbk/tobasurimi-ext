@@ -159,12 +159,13 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th style="width: 10px;">No</th>
                                 <th onclick="changeSort('kode')" class="sort">Kode</th>
                                 <th onclick="changeSort('name')" class="sort">Nama</th>
                                 <th onclick="changeSort('no_npwp')" class="sort">NPWP</th>
                                 <th onclick="changeSort('address')" class="sort">No Telephone</th>
                                 <th onclick="changeSort('phone')" class="sort">Alamat</th>
+                                <th onclick="changeSort('phone')" class="sort">Histori</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -200,11 +201,59 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="historiModal" tabindex="-1" role="dialog" aria-labelledby="historiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="historiModalLabel">Histori Purchase Order</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row justify-content-end ">
+                    <div class="col-md-3">
+                        <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Tanggal PO" class="form-control form-control-lg po-date-lokal">
+                    </div>
+                    <div class="col-md-3">
+                        <input autocomplete="one-time-code" style="height: 40px;" placeholder="Cari Data" value="" type="text" class="form-control form-control-lg search-po-lokal">
+                    </div>
+
+                </div>
+                <table class="table-inside table-borderd nowrap table-hover-tobasurimi tablePoLokal mt-3" id="tablePoLokal" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th scope="col">No</th>
+                            <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.purchase_request_id')" class="sort">No SPP</th>
+                            <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_date')" class="sort">Tanggal</th>
+                            <th scope="col" onclick="changeShortPoLokal('suppliers.name')" class="sort">Supplier</th>
+                            <th scope="col" onclick="changeShortPoLokal('barang_master_spesifikasi.spesifikasi')" class="sort">Barang</th>
+                            <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.note')" class="sort">Keterangan</th>
+                            <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.division_id')" class="sort">Departemen</th>
+                            <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.qty')" class="sort">Qty</th>
+                            <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.unit')" class="sort">Satuan</th>
+                            <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.price')" class="sort">Harga</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode";
     let sortType = "desc";
     let trigger = true;
+    let sortPoLokal = "am_purchase_orders.id";
+    let sortTypePoLokal = "desc";
+    let tablePoLokal = null;
+    let supplierId = null;
 
     // Init changeStatus
     changeStatus();
@@ -260,6 +309,13 @@
         .find('label')
         .css('z-index', '1');
 
+    $(".po-date-lokal").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
     const table = $('.dataTable').DataTable({
 
         processing: true,
@@ -311,6 +367,20 @@
         }, {
             data: "address",
             className: "text-center"
+        }, {
+            data: "id",
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                return `
+                    <div class="mt-0 actions">
+                        <button onclick="displayHistory('${row.id}')" class="btn btn-success posting-spp actions">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </button>
+                    </div>
+                `
+            }
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -325,6 +395,102 @@
             }
         }
     });
+
+    $(document).ready(function() {
+        tablePoLokal = $('#tablePoLokal').DataTable({
+            processing: true,
+            serverSide: true,
+            ordering: true,
+            order: [
+                [2, 'desc']
+            ],
+            fixedHeader: true,
+            lengthMenu: [
+                [25],
+                [25],
+            ],
+            pageLength: 25,
+            ajax: {
+                url: "<?= base_url("barang-bahan-penolong/histori-supplier"); ?>",
+                dataSrc: "data",
+                data: function(data) {
+                    data.supplier_id = supplierId;
+                    data.search = $(".search-po-lokal").val();
+                    data.po_date = $(".po-date-lokal").val();
+                    data.sort = sortPoLokal;
+                    data.sortType = sortTypePoLokal;
+                }
+            },
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.tablePoLokal').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            columns: [{
+                data: "no",
+                className: "text-center",
+                sortable: false
+            }, {
+                data: "spp_no",
+                className: "text-center"
+            }, {
+                data: "po_date",
+                className: "text-center"
+            }, {
+                data: "nama_supplier",
+                className: "text-center"
+            }, {
+                data: "nama_barang",
+                className: "text-center"
+            }, {
+                data: "note",
+                className: "text-center"
+            }, {
+                data: "divisi",
+                className: "text-center"
+            }, {
+                data: "qty",
+                className: "text-center"
+            }, {
+                data: "kode_satuan",
+                className: "text-center"
+            }, {
+                data: "price",
+                className: "text-center"
+            }],
+            columnDefs: [{
+                defaultContent: "-",
+                targets: "_all"
+            }],
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+    })
+
+    $(".search-po-lokal").keyup(function() {
+        tablePoLokal.ajax.reload();
+    })
+
+    $(".po-date-lokal").change(function() {
+        tablePoLokal.ajax.reload();
+    })
+
+    function displayHistory(id) {
+        supplierId = id;
+        tablePoLokal.ajax.reload();
+        $('.search-po-lokal').val();
+        $('.po-date-lokal').val();
+        $('#historiModal').modal('show');
+    }
 
     $(document).ready(function() {
         var validator = $(".create-form").validate({
@@ -748,6 +914,16 @@
     const exportExcel = function(type) {
         var url = "<?= base_url('supplier/export-excel') ?>";
         window.open(url + `?type=${type}&sort=${sort}&sortType=${sortType}&`, "_blank");
+    }
+
+    function changeShortPoLokal(val) {
+        if (sortPoLokal !== val) {
+            sortTypePoLokal = "asc";
+            sortPoLokal = val;
+        } else {
+            sortTypePoLokal = sortTypePoLokal === "asc" ? "desc" : "asc";
+        }
+        tablePoLokal.ajax.reload();
     }
 </script>
 
