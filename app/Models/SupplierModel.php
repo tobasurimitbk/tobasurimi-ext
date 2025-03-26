@@ -157,29 +157,38 @@ class SupplierModel extends Model
         if ($addCondition['search'] || $addCondition['filter'] || $addCondition['divisi'] || $addCondition['type_barang']) {
             $supplierDataQry->groupStart();
         }
-
+        
         if ($addCondition['search']) {
-            $supplierDataQry->like('name', $addCondition['search'])
-                ->orLike('kode', $addCondition['search']);
+            $supplierDataQry->groupStart()
+                ->like('suppliers.name', $addCondition['search'])
+                ->orLike('suppliers.kode', $addCondition['search'])
+            ->groupEnd();
         }
-
-        if ($addCondition['filter']) {
+        
+        if ($addCondition['filter'] && $addCondition['divisi']) {
+            $supplierDataQry->groupStart()
+                ->where('rm_purchase_orders.divisi_id', $addCondition['divisi'])
+                ->orWhere('am_purchase_orders.division_id', $addCondition['divisi'])
+                ->orWhere('rm_import_pos.division_id', $addCondition['divisi'])
+            ->groupEnd()
+            ->where('suppliers.id', $addCondition['filter']);
+        } elseif ($addCondition['divisi']) {
+            $supplierDataQry->groupStart()
+                ->where('rm_purchase_orders.divisi_id', $addCondition['divisi'])
+                ->orWhere('am_purchase_orders.division_id', $addCondition['divisi'])
+                ->orWhere('rm_import_pos.division_id', $addCondition['divisi'])
+            ->groupEnd();
+        } elseif ($addCondition['filter']) {
             $supplierDataQry->where('suppliers.id', $addCondition['filter']);
         }
         
-        if ($addCondition['divisi']) {
-            $supplierDataQry->where('rm_purchase_orders.divisi_id', $addCondition['divisi'])
-            ->orwhere('am_purchase_orders.division_id', $addCondition['divisi'])
-            ->orwhere('rm_import_pos.division_id', $addCondition['divisi']);
-        }
-
         if ($addCondition['type_barang']) {
             $supplierDataQry->where('suppliers.type', $addCondition['type_barang']);
         }
-
+        
         if ($addCondition['search'] || $addCondition['filter'] || $addCondition['divisi'] || $addCondition['type_barang']) {
             $supplierDataQry->groupEnd();
-        }
+        }        
 
         $totalFilteredData = $supplierDataQry->countAllResults(false);
         $data = $supplierDataQry->findAll($limit, $offset);
