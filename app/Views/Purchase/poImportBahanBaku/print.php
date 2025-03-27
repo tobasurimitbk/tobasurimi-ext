@@ -168,7 +168,7 @@
         <tr>
             <td>ATTN</td>
             <td>:</td>
-            <td><?= $dataPO->attn ?></td>
+            <td></td>
         </tr>
         <tr>
             <td>DESTINATION</td>
