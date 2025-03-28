@@ -2237,7 +2237,7 @@
                 'nama_satuan': "<?= $d->kode_satuan ?>",
                 'satuan_id': "<?= $d->unit ?>",
                 'qty': "<?= $d->qty ?>",
-                'keterangan': "<?= trim($d->note) ?>"
+                'keterangan': "<?= json_encode(trim($d->note)) ?>"
             });
         <?php endforeach; ?>
         drawTableDetail();
