@@ -211,7 +211,7 @@
                 ?>
                 <tr>
                     <td style="text-align: center; border:0px;"><?= $no++; ?></td>
-                    <td style="text-align: center;border:0px;">
+                    <td style="border:0px;">
                         <?= $detail["nama_barang"] . " " . $detail['spesifikasi'] . ($detail['note'] == null ? "" : " ( " . $detail['note'] . " )") ?>
                     </td>
                     <td style="text-align: center;border:0px;">
