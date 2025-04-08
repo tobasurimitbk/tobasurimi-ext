@@ -500,7 +500,7 @@ class POImportBahanPenolong extends BaseController
         $data["alamatKantor"] = $this->metadataModel->where('name', "Alamat Kantor")->first();
 
         $this->dompdf->loadHtml(view('Purchase/poImportBahanPenolong/print', $data));
-        $this->dompdf->setPaper([0, 0, 600, 2000], 'portrait');
+        $this->dompdf->setPaper('legal', 'portrait');
         $this->dompdf->render();
         $this->dompdf->stream($filename, array("Attachment" => false));
         exit(0);
