@@ -509,7 +509,7 @@ class POImportBahanBaku extends BaseController
                 }
             }
             $this->dompdf->loadHtml(view('Purchase/poImportBahanBaku/print', $data));
-            $this->dompdf->setPaper('A4', 'portrait');
+            $this->dompdf->setPaper('legal', 'portrait');
             $this->dompdf->render();
             $this->dompdf->stream($filename, array("Attachment" => false));
             exit(0);

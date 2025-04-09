@@ -33,7 +33,8 @@ class PembayaranInvoiceModel extends Model
         'akun_selisih',
         'akun_kas_lain',
         'akun_selisih_lain',
-        'payment_method'
+        'payment_method',
+        'jenis_data'
 
     ];
 

@@ -577,6 +577,8 @@ class PembayaranInvoice extends BaseController
         $isImport = false;
         $totalPembayaran = 0;
 
+        $idArray = array_map('intval', $idArray);
+
         if (!empty($idArray)) {
             // Ambil data invoice berdasarkan ID jika tidak ada pembayaran_invoice_id
             if (empty($pembayaranInvoiceId)) {
@@ -625,22 +627,28 @@ class PembayaranInvoice extends BaseController
                 }
 
                 $pembayaranInvoiceData = $this->pembayaranInvoiceModel
-                    ->select('total_bayar')
+                    ->select('total_bayar, jenis_data')
                     ->where('id', $pembayaranInvoiceId)
                     ->first();
+
+                
+                if ($pembayaranInvoiceData["jenis_data"] == "import") {
+                    $isImport = true;
+                }
             }
 
             if (empty($dataBarang)) {
 
-                $dataBarang = $this->salesOrderInvoiceModel->where("id", $idArray)
-                ->select('id as sales_order_invoice_id, no_faktur, tanggal_faktur, total_invoice, document_type')
-                ->first();
+                $dataBarang = $this->salesOrderInvoiceModel->whereIn("id", $idArray)
+                ->select('id as sales_order_invoice_id, no_faktur, tanggal_faktur, total_invoice as amount_invoice, document_type')
+                ->findAll();
 
-                $dataBarang = [$dataBarang];
+                $dataBarang = $dataBarang;
 
                 $isImport = true;
             }
         }
+
 
         return $this->response->setJSON([
             'data' => $dataBarang,
@@ -862,6 +870,7 @@ class PembayaranInvoice extends BaseController
                     'total_bayar' => repairDouble($this->request->getVar('total_bayar')),
                     'akun_kas' => $this->request->getVar('akun_kas'),
                     'akun_selisih' => $this->request->getVar('akun_selisih'),
+                    'jenis_data' => $this->request->getVar('jenis_data'),
                     'status_posting' => '0'
                 ]);
 
@@ -1018,13 +1027,13 @@ class PembayaranInvoice extends BaseController
 
         try {
             $id = decrypt($this->request->getVar('id'));
-            if ($this->request->getVar('total_bayar') == null || repairDouble($this->request->getVar('total_bayar'))  <= 0) {
-                return response()->setJSON([
-                    'token' => csrf_hash(),
-                    'message' => "Pembayaran Tidak Boleh Kosong",
-                    'status' => false
-                ]);
-            }   
+            // if ($this->request->getVar('total_bayar') == null || repairDouble($this->request->getVar('total_bayar'))  <= 0) {
+            //     return response()->setJSON([
+            //         'token' => csrf_hash(),
+            //         'message' => "Pembayaran Tidak Boleh Kosong",
+            //         'status' => false
+            //     ]);
+            // }   
 
                 // Ambil nilai total bayar sebelumnya
             $lastPay = $this->pembayaranInvoiceModel
@@ -1056,7 +1065,8 @@ class PembayaranInvoice extends BaseController
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
                 'status_posting' => '0',
-                'payment_method' => $this->request->getVar('payment_methods')
+                'payment_method' => $this->request->getVar('payment_methods'),
+                'jenis_data' => $this->request->getVar('jenis_data')
             ]);
 
             $pembayaranInvoiceFirst = $this->pembayaranInvoiceModel->find($id);
@@ -1071,9 +1081,6 @@ class PembayaranInvoice extends BaseController
                     'qty' => $l->qty_invoice,
                     'harga_satuan' => $l->harga_barang_invoice,
                     'harga_total' => $l->amount_invoice,
-                    'akun_kas_lain' => $l->akun_kas_lain,
-                    'akun_selisih_lain' => $l->akun_selisih_lain,
-                    'keterangan_pajak' => $l->keterangan_pajak,
                     'nominal_pajak' => $l->nominal_pajak
                 ]);
             }
@@ -1234,6 +1241,7 @@ class PembayaranInvoice extends BaseController
                 "dokumenList" => $dokumenList,
                 "detail" => $this->pembayaranInvoiceModel->getPembayaranInvoiceDetail($id),
             ];
+
             return view('Pembayaran/pembayaranInvoice/formLokal', $data);
         } elseif ($tipe_invoice == "EKSPOR") {
             $salesOrderExportData = $this->salesOrderExportModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll();

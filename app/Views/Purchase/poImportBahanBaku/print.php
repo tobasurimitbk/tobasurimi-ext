@@ -168,7 +168,7 @@
         <tr>
             <td>ATTN</td>
             <td>:</td>
-            <td><?= $attnKantor ?></td>
+            <td></td>
         </tr>
         <tr>
             <td>DESTINATION</td>
@@ -211,11 +211,11 @@
                 ?>
                 <tr>
                     <td style="text-align: center; border:0px;"><?= $no++; ?></td>
-                    <td style="text-align: center;border:0px;">
+                    <td style="border:0px;">
                         <?= $detail["nama_barang"] . " " . $detail['spesifikasi'] . ($detail['note'] == null ? "" : " ( " . $detail['note'] . " )") ?>
                     </td>
                     <td style="text-align: center;border:0px;">
-                        <?= number_format($detail["qty"]) . " " . $detail["kode_satuan"] ?>
+                        <?= $detail["qty"] . " " . $detail["kode_satuan"] ?>
                     </td>
                     <td style="text-align: center;border:0px;">
                         <?= $detail["price"] ?>
@@ -237,9 +237,9 @@
     </table>
     <table style="margin-top: 15px;">
         <tr>
-            <td>SHIPMENT</td>
+            <td>LATEST SHIPMENT DATE</td>
             <td>:</td>
-            <td><?= $shipmentPO; ?></td>
+            <td><?= date('d/m/Y', strtotime($dataPO->latest_shipment_date)); ?></td>
         </tr>
         <tr>
             <td>PAYMENT TERM</td>

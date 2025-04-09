@@ -123,7 +123,7 @@
         allowClear: true
     }).change(function() {});
 
-    $('#npwp_perusahaan').mask('000000000000000');
+    $('#npwp_perusahaan').mask('0000000000000000');
 
     $('.form-select')
         .parent('div')
