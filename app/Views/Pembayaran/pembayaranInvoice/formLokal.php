@@ -92,15 +92,6 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : "" ?> class="form-select jenis_data" name="jenis_data" id="jenis_data">
-                                <option value="input" <?= (!empty($detail) && $detail['jenis_data'] == 'input') ? 'selected' : '' ?>>Input Data</option>    
-                                <option value="import" <?= (!empty($detail) && $detail['jenis_data'] == 'import') ? 'selected' : '' ?>>Import Data</option>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Jenis Data Invoice</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select divisi_id " name="divisi_id" id="divisi_id">
                                 <option value=""></option>
                                 <?php foreach ($divisi as $d): ?>
@@ -355,17 +346,6 @@
             theme: "bootstrap-5"
         });
 
-        
-        $('#jenis_data').select2({
-            placeholder: "Pilih Jenis Data",
-            theme: "bootstrap-5"
-        }).change(function() {
-            const table = $('#dataTable');
-            table.find('tbody').empty();
-            let customerId = $(this).val();
-            getDataDokumenInvoice(customerId);
-        });
-
         $('#customer').select2({
             placeholder: "Pilih Customer",
             theme: "bootstrap-5"
@@ -373,14 +353,7 @@
             const table = $('#dataTable');
             table.find('tbody').empty();
             let customerId = $(this).val();
-            const jenisData = $('#jenis_data').val();
-            if (jenisData !== "import") {
-                const table = $('#dataTable');
-                table.find('tbody').empty();
-                let customerId = $(this).val();
-                getDataDokumenInvoice(customerId);
-            }
-            getDataDokumenInvoice(jenisData)
+            getDataDokumenInvoice(customerId);
             updateKeterangan();
         });
 
@@ -809,7 +782,6 @@
             success: function(res) {
                 if (res.status && res.data.length > 0) {
                     if (res.isImport) {
-                        console.log(res)
                         res.data.forEach((data) => {
                                 dataList.push({
                                     id: getID(),
@@ -848,8 +820,6 @@
                         });
                     }
                 }
-
-                console.log(dataList)
 
                 const totalPembayaran = parseFloat(res.totalPembayaran) || 0;
                 const totalSudahDiBayar = parseFloat(res.totalSudahDiBayar) || 0;

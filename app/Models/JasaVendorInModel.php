@@ -125,6 +125,7 @@ class JasaVendorInModel extends Model
         $stockDetail2Model = new StockDetail2Model();
         $supplierModel = new SupplierModel();
         $rmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $jasaVendorInModel = new JasaVendorInModel();
 
         $jasaVendorOutData = $jasaVendorOutDetailModel->whereIn('jasa_vendor_out_id', $jasaVendorOutArr)->where('deletedAt', null)->findAll();
         $result = array();
@@ -158,15 +159,29 @@ class JasaVendorInModel extends Model
                 ->where('company_id', $stockListOutDetail['company_id'])
                 ->first();
 
+
+            $resultNoJasaVendorIn = strstr($j['stock_dokumen'], '(', true);
+            $noJasaVendorIn = trim($resultNoJasaVendorIn);
+            $supplierName = $stockListOutDetail['supplier_name'];
+            $stockDate = $rmPurchaseOrder == null ? "" :  date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
+
+            $jasaVendorIn = $jasaVendorInModel
+                ->select('jasa_vendor_in.*,vendors.name as nama_vendor')
+                ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
+                ->where('no_penerimaan_surat_jalan', $noJasaVendorIn)
+                ->where('jasa_vendor_in.company_id',  session()->get("login")->this_company_id)
+                ->first();
+
+
             if ($jasaVendorInID == null) {
                 $result[] = [
                     'jasa_vendor_out_detail_id' => $j['id'],
                     'jasa_vendor_out_id' => $j['jasa_vendor_out_id'],
                     'barang1_id' => $stockListOutDetail != null ? $stockListOutDetail['barang1_id'] : 0,
                     'stock_out_id' => $j['stock_out_id'],
-                    'stock_date' => $rmPurchaseOrder != null ? date('d/m/Y', strtotime($rmPurchaseOrder['po_date'])) : "-",
+                    'stock_date' =>  $jasaVendorIn == null ? $stockDate :  date('d/m/Y', strtotime($jasaVendorIn['tanggal'])),
                     'tipe_barang' => $stockBarangOut != null ? strtoupper(str_replace('_', ' ', $stockBarangOut['tipe_barang'])) : "",
-                    'supplier_name' => $supplier != null ? strtoupper($supplier['name']) : '-',
+                    'supplier_name' =>  $jasaVendorIn == null ? $supplierName : $supplierName . ' / ' . $jasaVendorIn['nama_vendor'],
                     'bc_name' => $bc != null ? $bc['value'] : 'NON PABEAN',
                     'bc_id' => $j['bc_out_id'],
                     'no_aju' => $j['no_aju_out'],
@@ -185,9 +200,9 @@ class JasaVendorInModel extends Model
                         'jasa_vendor_out_id' => $j['jasa_vendor_out_id'],
                         'barang1_id' => $stockListOutDetail != null ? $stockListOutDetail['barang1_id'] : 0,
                         'stock_out_id' => (string)$j['stock_out_id'],
-                        'stock_date' => $rmPurchaseOrder != null ? date('d/m/Y', strtotime($rmPurchaseOrder['po_date'])) : "-",
+                        'stock_date' =>  $jasaVendorIn == null ? $stockDate :  date('d/m/Y', strtotime($jasaVendorIn['tanggal'])),
                         'tipe_barang' => $stockBarangOut != null ? strtoupper(str_replace('_', ' ', $stockBarangOut['tipe_barang'])) : "",
-                        'supplier_name' => $supplier != null ? strtoupper($supplier['name']) : '-',
+                        'supplier_name' =>  $jasaVendorIn == null ? $supplierName : $supplierName . ' / ' . $jasaVendorIn['nama_vendor'],
                         'bc_name' => $bc != null ? $bc['value'] : 'NON PABEAN',
                         'bc_id' => $j['bc_out_id'],
                         'no_aju' => $j['no_aju_out'],

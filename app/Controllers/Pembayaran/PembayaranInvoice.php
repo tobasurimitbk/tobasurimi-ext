@@ -2,6 +2,7 @@
 
 namespace App\Controllers\Pembayaran;
 
+use Illuminate\Support\Collection;
 use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Controllers\BaseController;
 use App\Models\PayrollsModel;
@@ -819,6 +820,8 @@ class PembayaranInvoice extends BaseController
 
     public function saveLokalInvoice()
     {
+
+
         try {
             $check = $this->pembayaranInvoiceModel->where('company_id', $this->this_company_id)->where('no_pembayaran', $this->request->getVar('no_bukti_pembayaran'))->first();
             if ($check != null) {
@@ -854,6 +857,12 @@ class PembayaranInvoice extends BaseController
                     $no_dokumen_implode = "[]"; // Default jika array kosong
                 }
 
+                $listBarang = json_decode($_POST['list_barang']);
+                
+                $isImport = array_reduce($listBarang, function ($carry, $item) {
+                    return $carry && isset($item->document_type) && stripos($item->document_type, 'import') !== false;
+                }, true) ? 'import' : null;
+
                 $id = $this->pembayaranInvoiceModel->insert([
                     'company_id' => $this->this_company_id,
                     'user_id' => $this->user_id,
@@ -870,8 +879,8 @@ class PembayaranInvoice extends BaseController
                     'total_bayar' => repairDouble($this->request->getVar('total_bayar')),
                     'akun_kas' => $this->request->getVar('akun_kas'),
                     'akun_selisih' => $this->request->getVar('akun_selisih'),
-                    'jenis_data' => $this->request->getVar('jenis_data'),
-                    'status_posting' => '0'
+                    'status_posting' => '0',
+                    'jenis_data' => $isImport
                 ]);
 
                 foreach (json_decode($_POST['list_barang']) as $l) {
@@ -1050,6 +1059,11 @@ class PembayaranInvoice extends BaseController
             // Hitung total pembayaran kumulatif
             $updatedTotalBayar = $previousTotalBayar + $newPayment;
 
+            $listBarang = collect(json_decode($_POST['list_barang']));
+
+            $isImport = array_reduce($listBarang, function ($carry, $item) {
+                return $carry && isset($item->document_type) && stripos($item->document_type, 'import') !== false;
+            }, true) ? 'import' : null;
 
             $this->pembayaranInvoiceModel->update($id, [
                 'company_id' => $this->this_company_id,
@@ -1066,7 +1080,7 @@ class PembayaranInvoice extends BaseController
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
                 'status_posting' => '0',
                 'payment_method' => $this->request->getVar('payment_methods'),
-                'jenis_data' => $this->request->getVar('jenis_data')
+                'jenis_data' => $isImport
             ]);
 
             $pembayaranInvoiceFirst = $this->pembayaranInvoiceModel->find($id);
