@@ -143,7 +143,7 @@ class BC40 extends BaseController
         $beacukaiApi = new BeaCukaiApi($username, $password);
         $dataOnline = $beacukaiApi->getListStatusResponseAll();
 
-        if ($dataOnline['status'] == false) {
+        if ($dataOnline->status == false) {
             return response()->setJSON($dataOnline);
         } else {
             return response()->setJSON([

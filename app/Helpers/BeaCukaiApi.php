@@ -353,7 +353,7 @@ class BeaCukaiApi
                 return $responseData;
             } else {
                 return [
-                    'message' => "Server Ceisa Error : " . $httpCode,
+                    'message' => "Sisi Server Ceisa Error : " . $httpCode,
                     'status' => false
                 ];
             }
