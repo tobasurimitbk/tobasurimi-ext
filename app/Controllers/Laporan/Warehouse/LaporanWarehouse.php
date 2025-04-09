@@ -617,6 +617,8 @@ class LaporanWarehouse extends BaseController
                 $condition['rm_purchase_order_details.barang2_id'] = $filter_barang;
             }
 
+            // var_dump($condition,  $addCondition, "LOKAL", "BAKU", $pageSize, $offset);
+
             $dataPurchaseOrder = $this->rmPurchaseOrderDetailModel->getListLPBBahanBakuReport($condition,  $addCondition, "LOKAL", "BAKU", $pageSize, $offset);
         } elseif ($po_type == "PO LOKAL BP") {
             $condition = [
@@ -639,6 +641,8 @@ class LaporanWarehouse extends BaseController
                 $condition['am_purchase_order_details.barang_id'] = $this->barangMasterSpesifikasiModel->find($filter_barang)['barang_master_id'];
                 $condition['am_purchase_order_details.spesifikasi_id'] = $filter_barang;
             }
+
+            // var_dump($condition,  $addCondition, "LOKAL", "PENOLONG", $pageSize, $offset);
 
             $dataPurchaseOrder = $this->amPurchaseOrderDetailModel->getListLPBBahanPenolongReport($condition,  $addCondition, "LOKAL", "PENOLONG", $pageSize, $offset);
         } elseif ($po_type == "PO IMPOR BB") {
@@ -1479,7 +1483,7 @@ class LaporanWarehouse extends BaseController
             $bcPurchaseOrderBc40 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc40($addCondition, $pageSize, $offset);
             $bcPurchaseOrderBc23 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc23($addCondition, $pageSize, $offset);
             $penerimaanBarangNoPabean = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportNoPabean($addCondition, $pageSize, $offset);
-            
+
 
             $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
             $dataAllPenerimaanBarang = [];
@@ -2443,12 +2447,12 @@ class LaporanWarehouse extends BaseController
 
             ];
         } elseif ($filter_bc_type  == "all") {
-           $penerimaanBarangMutasi = $this->penerimaanMutasiModel->getPenerimaanBarangListReportPPBKBPDF($addCondition);
-           $penerimaanBarangGlobal = $this->penerimaanMutasiGlobalModel->getPenerimaanBarangListReportBc27PDF($addCondition);
-           $penerimaanBarangNoPabean = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportNoPabean($addCondition);
-           $bcPurchaseOrderBc40 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc40($addCondition);
-           $bcPurchaseOrderBc23 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc23($addCondition);
-            
+            $penerimaanBarangMutasi = $this->penerimaanMutasiModel->getPenerimaanBarangListReportPPBKBPDF($addCondition);
+            $penerimaanBarangGlobal = $this->penerimaanMutasiGlobalModel->getPenerimaanBarangListReportBc27PDF($addCondition);
+            $penerimaanBarangNoPabean = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportNoPabean($addCondition);
+            $bcPurchaseOrderBc40 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc40($addCondition);
+            $bcPurchaseOrderBc23 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc23($addCondition);
+
 
             $no = 1;
             $dataAllPenerimaanBarang = [];
@@ -3254,13 +3258,6 @@ class LaporanWarehouse extends BaseController
 
         if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['tipeBarang']) || !empty($addCondition['divisi']) || !empty($addCondition['warehouse']) || !empty($addCondition['search'])) {
             $dataQry->groupStart();
-            if (!empty($addCondition['search'])) {
-                $dataQry
-                    ->like('barang_master.barang_name', $addCondition['search'])
-                    ->orLike('kemasan.name', $addCondition['search'])
-                    ->orLike('barang_master.kode_barang', $addCondition['search'])
-                    ->orLike('kemasan.kode', $addCondition['search']);
-            }
             if (!empty($addCondition['dateStart'])) {
                 $dataQry->where('stock_details.stock_date >=', $addCondition['dateStart']);
             }
@@ -3275,6 +3272,13 @@ class LaporanWarehouse extends BaseController
             }
             if (!empty($addCondition['warehouse'])) {
                 $dataQry->where('warehouses.warehouse_name', $addCondition['warehouse']);
+            }
+            if (!empty($addCondition['search'])) {
+                $dataQry
+                    ->like('barang_master.barang_name', $addCondition['search'])
+                    ->orLike('kemasan.name', $addCondition['search'])
+                    ->orLike('barang_master.kode_barang', $addCondition['search'])
+                    ->orLike('kemasan.kode', $addCondition['search']);
             }
             $dataQry->groupEnd();
         }
