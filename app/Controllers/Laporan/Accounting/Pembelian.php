@@ -60,10 +60,11 @@ class Pembelian extends BaseController
         }
 
         $supplierData = $this->supplierModel
-            ->select('suppliers.id, suppliers.name, companies.company')
+            ->select('GROUP_CONCAT(suppliers.id) AS id, suppliers.name, companies.company')
             ->join('companies', 'companies.id = suppliers.company_id')
             ->whereIn('company_id', $companyId)
             ->asObject()
+            ->groupBy('suppliers.name')
             ->findAll();
         $data = [
             'suppliers' => $supplierData
@@ -73,11 +74,18 @@ class Pembelian extends BaseController
 
     public function allTransaksi()
     {
+        $rawFilter = $this->request->getGet("filter");
+        $filter = [];
+
+        if ($rawFilter) {
+            $filter = explode(',', $rawFilter);
+        }
+
         $payload = [
             "pageSize"      => $this->request->getGet("length"),
             "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search"        => $this->request->getGet("search"),
-            "filter"        => $this->request->getGet("filter"),
+            "filter"        => $filter,
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
@@ -99,11 +107,11 @@ class Pembelian extends BaseController
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
-            "filter"        => $this->request->getGet("filter"),
+            "filter"        => $filter,
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "startdate"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : date("Y-m-d"),
+            "lastdate"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : date("Y-m-d"),
         ];
 
         $limit = $this->request->getGet("length");
@@ -117,8 +125,13 @@ class Pembelian extends BaseController
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-        foreach ($res['data'] as $data) {
+        $grandTotal = [
+            'nominal'       => 0.0,
+            'nominal_idr'   => 0.0,
+            'paid_idr'      => 0.0,
+        ];
 
+        foreach ($res['data'] as $data) {
             // CARI BC NYA DI BC_PURCHASE ORDER
             $bc23PurchaseOrder = $this->bcPurchaseOrderModel->select('
                         bc_purchase_order.no_daftar,
@@ -188,7 +201,7 @@ class Pembelian extends BaseController
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
-            } else {
+            } else if ($data->tipe_bahan == "PENOLONG") {
                 $bp = $this->penerimaanBarangDetailModel->getPenerimaanBarangPenolongDetail($data->id);
                 foreach ($bp as $value) {
                     $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
@@ -208,6 +221,15 @@ class Pembelian extends BaseController
                 $nominalIdrTransaksi += $totalHargaAll;
             }
 
+            $grandTotal['nominal'] += floatval($nominalTransaksi) ?? 0;
+            $grandTotal['nominal_idr'] += floatval($nominalIdrTransaksi) ?? 0;
+            $grandTotal['paid_idr'] += floatval($paidIdrTransaksi) ?? 0;
+
+            // var_dump($data);
+            // var_dump(floatval($nominalTransaksi) ?? 0);
+            // var_dump(floatval($nominalIdrTransaksi) ?? 0);
+            // var_dump(floatval($paidIdrTransaksi) ?? 0);
+
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => $data->id,
@@ -225,9 +247,8 @@ class Pembelian extends BaseController
                 "nominal_idr"           => floatval($nominalIdrTransaksi),
                 "paid_idr"              => floatval($paidIdrTransaksi),
             ]);
-
-            // var_dump($rdata);
         }
+        // exit;
 
         $data = [
             "draw"              => intval($this->request->getGet("draw")),
@@ -235,6 +256,7 @@ class Pembelian extends BaseController
             "recordsFiltered"   => $res['totalFilteredData'],
             "data"              => $addCondition['startdate'] != "" && $addCondition['lastdate'] != "" ? $rdata : [],
             "payload"           => $payload,
+            "grandTotal"        => $grandTotal,
         ];
 
         return response()->setJSON($data);
@@ -555,10 +577,19 @@ class Pembelian extends BaseController
                 ->setCellValue('H' . $column, $poNumberTransaksi)
                 ->setCellValue('I' . $column, $supplierTransaksi)
                 ->setCellValue('J' . $column, $valasTransaksi)
-                ->setCellValue('K' . $column, number_format(floatval($exchangeTransaksi)))
-                ->setCellValue('L' . $column, number_format(floatval($nominalTransaksi)))
-                ->setCellValue('M' . $column, number_format(floatval($nominalIdrTransaksi)))
-                ->setCellValue('N' . $column, number_format(floatval($paidIdrTransaksi)));
+                ->setCellValue('K' . $column, floatval($exchangeTransaksi))
+                ->setCellValue('L' . $column, floatval($nominalTransaksi))
+                ->setCellValue('M' . $column, floatval($nominalIdrTransaksi))
+                ->setCellValue('N' . $column, floatval($paidIdrTransaksi));
+
+                $spreadsheet->getActiveSheet()->getStyle('K' . $column)
+                    ->getNumberFormat()->setFormatCode('#,##0.00');
+                $spreadsheet->getActiveSheet()->getStyle('L' . $column)
+                    ->getNumberFormat()->setFormatCode('#,##0.00');
+                $spreadsheet->getActiveSheet()->getStyle('M' . $column)
+                    ->getNumberFormat()->setFormatCode('#,##0.00');
+                $spreadsheet->getActiveSheet()->getStyle('N' . $column)
+                    ->getNumberFormat()->setFormatCode('#,##0.00');
 
             $column++;
         }

@@ -46,7 +46,7 @@
                                     if (!empty($suppliers)) {
                                         foreach ($suppliers as $sub) {
                                     ?>
-                                            <option value="<?= $sub->id; ?>"><?= $sub->name.' ('.$sub->company.')'; ?></option>
+                                            <option value="<?= $sub->id; ?>"><?= $sub->name; ?></option>
                                     <?php
                                         }
                                     }
@@ -92,6 +92,14 @@
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
                         </tbody>
+                        <tfoot class="thead">
+                            <tr>
+                                <th colspan="11" class="text-right">Grand Total:</th>
+                                <th class="text-right" id="gt-nominal">-</th>
+                                <th class="text-right" id="gt-nominal-idr">-</th>
+                                <th class="text-right" id="gt-paid-idr">-</th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -210,6 +218,14 @@
                 }
             }
         });
+        // Tambahkan handler xhr
+        table.on('xhr.dt', function(e, settings, json, xhr) {
+            if (json.grandTotal) {
+                $('#gt-nominal').text(greatFormatRupiah(json.grandTotal.nominal));
+                $('#gt-nominal-idr').text(greatFormatRupiah(json.grandTotal.nominal_idr));
+                $('#gt-paid-idr').text(greatFormatRupiah(json.grandTotal.paid_idr));
+            }
+        });
         //CSS SELECT2 FLOATING LABEL
         $('.list_supplier').select2({
             placeholder: "Filter Supplier",
@@ -263,7 +279,9 @@
         })
 
         $(".dateStart, .dateEnd, .list_supplier").change(function() {
-            table.ajax.reload();
+            if ($(".dateStart").val() != "" && $(".dateEnd").val() != "") {
+                table.ajax.reload();
+            }
         })
 
     });

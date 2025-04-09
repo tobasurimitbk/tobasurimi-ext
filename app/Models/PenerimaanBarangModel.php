@@ -238,7 +238,7 @@ class PenerimaanBarangModel extends Model
         }
 
         if ($addCondition['filter']) {
-            $penerimaanBarangDataQry->where('suppliers.id', $addCondition['filter']);
+            $penerimaanBarangDataQry->whereIn('suppliers.id', $addCondition['filter']);
         }
 
         if ($addCondition['startdate']) {
@@ -309,12 +309,9 @@ class PenerimaanBarangModel extends Model
             $penerimaanBarangDataQry->where('suppliers.id', $addCondition['filter']);
         }
 
-        if ($addCondition['startdate']) {
-            $penerimaanBarangDataQry->where('penerimaan_barang.tanggal >=', $addCondition['startdate']);
-        }
-
-        if ($addCondition['lastdate']) {
-            $penerimaanBarangDataQry->where('penerimaan_barang.tanggal <=', $addCondition['lastdate']);
+        if ($addCondition['startdate'] && $addCondition['lastdate']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.tanggal >=', $addCondition['startdate'])
+            ->where('penerimaan_barang.tanggal <=', $addCondition['lastdate']);
         }
 
         if ($addCondition['search'] || $addCondition['filter'] || $addCondition['startdate'] || $addCondition['lastdate']) {
