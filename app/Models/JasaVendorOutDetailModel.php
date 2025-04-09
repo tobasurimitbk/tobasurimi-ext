@@ -50,6 +50,7 @@ class JasaVendorOutDetailModel extends Model
         $kemasanModel = new KemasanModel();
         $metaDataModel = new MetadataModel();
         $rmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $jasaVendorInModel = new JasaVendorInModel();
 
         $result = array();
         $jasaVendorOutDetail = $this->asArray()->where('jasa_vendor_out_id', $jasaVendorOutID)->findAll();
@@ -76,6 +77,17 @@ class JasaVendorOutDetailModel extends Model
 
             $rmPurchaseOrder = $rmPurchaseOrderModel->where('po_no', $m['stock_dokumen'])->where('company_id', $stockList['company_id'])->first();
 
+            $resultNoJasaVendorIn = strstr($m['stock_dokumen'], '(', true);
+            $noJasaVendorIn = trim($resultNoJasaVendorIn);
+            $supplierName = $stockList['supplier_name'];
+            $stockDate = $rmPurchaseOrder == null ? "" :  date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
+
+            $jasaVendorIn = $jasaVendorInModel
+                ->select('jasa_vendor_in.*,vendors.name as nama_vendor')
+                ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
+                ->where('no_penerimaan_surat_jalan', $noJasaVendorIn)
+                ->where('jasa_vendor_in.company_id',  session()->get("login")->this_company_id)
+                ->first();
 
             $stockList['qty'] = $m['qty'];
             $bcType = $metaDataModel->find($stockList['bc_id']);
@@ -87,7 +99,8 @@ class JasaVendorOutDetailModel extends Model
             $stockList['type_barang'] = $stock['tipe_barang'];
             $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
             $stockList['stok_total'] = ($stockList['stok_total']);
-            $stockList['stock_date'] = $rmPurchaseOrder == null ? "" :  date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
+            $stockList['stock_date'] = $jasaVendorIn == null ? $stockDate :  date('d/m/Y', strtotime($jasaVendorIn['tanggal']));
+            $stockList['supplier_name'] = $jasaVendorIn == null ? $supplierName : $supplierName . ' / ' . $jasaVendorIn['nama_vendor'];
 
             array_push($result, $stockList);
         }

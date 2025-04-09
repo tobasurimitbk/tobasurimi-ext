@@ -83,7 +83,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> class="form-select vendor_id" id="vendor_id" name="vendor_id" aria-label="Floating label select example">
+                            <select <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> class="form-select vendor_id" id="vendor_id" name="vendor_id">
                                 <option value=""></option>
                                 <?php foreach ($vendor as $v) : ?>
                                     <option <?= !empty($jasaVendorOut) ? ($jasaVendorOut['vendor_id'] == $v['id'] ? 'selected' : '') : '' ?> value="<?= $v['id'] ?>">
@@ -91,18 +91,18 @@
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Pilih Vendor</label>
+                            <label for="floatingInput" style="z-index: 1;">Pilih Vendor Tujuan</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Nomor Kontainer" value="<?= !empty($jasaVendorOut) ? $jasaVendorOut['no_kontainer'] : '' ?>" class="form-control no_kontainer" id="no_kontainer" name="no_kontainer" aria-label="Floating label select example" />
+                            <input <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Nomor Kontainer" value="<?= !empty($jasaVendorOut) ? $jasaVendorOut['no_kontainer'] : '' ?>" class="form-control no_kontainer" id="no_kontainer" name="no_kontainer" />
                             <label for="floatingInput" style="z-index: 1;">Nomor Kontainer (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                            <select <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_id" id="divisi_id" name="divisi_id">
                                 <option value=""></option>
                                 <?php foreach ($divisi as $d) : ?>
                                     <option <?= !empty($jasaVendorOut) ? ($jasaVendorOut['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
@@ -115,7 +115,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
+                            <select <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id">
                                 <option value=""></option>
                                 <?php if (!empty($warehouse)) : ?>
                                     <?php foreach ($warehouse as $w) : ?>
@@ -130,7 +130,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock" aria-label="Floating label select example">
+                            <select <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock">
                                 <option value=""></option>
                                 <option <?= !empty($jasaVendorOut) ? ($jasaVendorOut['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">PABEAN</option>
                                 <option <?= !empty($jasaVendorOut) ? ($jasaVendorOut['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO">FIFO</option>
@@ -140,7 +140,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($jasaVendorOut) ? $jasaVendorOut['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
+                            <input <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($jasaVendorOut) ? $jasaVendorOut['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" />
                             <label for="floatingInput" style="z-index: 1;">Keterangan (Opsional)</label>
                         </div>
                     </div>
@@ -149,18 +149,19 @@
             </form>
 
             <div class="detail-form-layout">
+
                 <div class="row">
                     <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Data Barang Dari Pembelian</label>
+                        <label class="form-label font-weight-bold lable-title">Data Barang Dari Pembelian / Vendor</label>
                     </div>
                 </div>
                 <form class="detail-form">
                     <input type="hidden" name="id_detail" class="id_detail" id="id_detail">
                     <div class="row">
 
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select type_barang" disabled id="type_barang" name="type_barang" aria-label="Floating label select example">
+                                <select class="form-select type_barang" disabled id="type_barang" name="type_barang">
                                     <option value=""></option>
                                     <?php foreach ($tipeBarang as $t) : ?>
                                         <?php if ($t['description'] == "bahan_baku") : ?>
@@ -173,9 +174,19 @@
                                 <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
+                                <select class="form-select type_asal_barang" id="type_asal_barang" name="type_asal_barang">
+                                    <option value=""></option>
+                                    <option value="SUPPLIER" selected>SUPPLIER</option>
+                                    <option value="VENDOR">VENDOR</option>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Asal Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4" id="supplier_id_select">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select supplier_id" id="supplier_id" name="supplier_id">
                                     <option value=""></option>
                                     <?php foreach ($supplier as $s): ?>
                                         <option value="<?= $s['id'] ?>"><?= $s['name']  ?></option>
@@ -184,10 +195,20 @@
                                 <label for="floatingInput" style="z-index: 1;">Supplier</label>
                             </div>
                         </div>
-
+                        <div class="col-md-4" id="vendor_barang_id_select">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select vendor_barang_id" id="vendor_barang_id" name="vendor_barang_id">
+                                    <option value=""></option>
+                                    <?php foreach ($vendor as $v): ?>
+                                        <option value="<?= $v['id'] ?>"> <?= strtoupper($v['name']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Vendor</label>
+                            </div>
+                        </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id" aria-label="Floating label select example">
+                                <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id">
                                     <option value=""></option>
 
                                 </select>
@@ -197,7 +218,7 @@
 
                         <div class="col-md-4 form-fifo">
                             <div class="form-floating" style="height: 50px;">
-                                <input placeholder="Qty" oninput="preventNegativeInput(this)" class="form-control qty_keluar_fifo" id="qty_keluar_fifo" name="qty_keluar_fifo" aria-label="Floating label select example" />
+                                <input placeholder="Qty" oninput="preventNegativeInput(this)" class="form-control qty_keluar_fifo" id="qty_keluar_fifo" name="qty_keluar_fifo" />
                                 <label for="floatingInput" style="z-index: 1;">Qty Dikeluarkan</label>
                             </div>
                         </div>
@@ -217,10 +238,10 @@
                                         <th style="text-align: center;">#</th>
                                         <th style="text-align: center;">Asal Barang</th>
                                         <th style="text-align: center;">No PO</th>
-                                        <th style="text-align: center;">Supplier</th>
+                                        <th style="text-align: center;">Supplier / Vendor</th>
                                         <th style="text-align: center;">Dokumen Pabean</th>
                                         <!-- <th style="text-align: center;">No Aju / No Daftar</th> -->
-                                        <th style="text-align: center;">Tgl PO</th>
+                                        <th style="text-align: center;">Tgl PO / Tgl Vendor Masuk</th>
                                         <th style="text-align: center;">Barang - Spesifikasi</th>
                                         <th style="text-align: center;">Satuan</th>
                                         <th style="text-align: center;">Qty</th>
@@ -248,9 +269,9 @@
                                     <th style="text-align: center;">#</th>
                                     <th style="text-align: center;">Asal Barang</th>
                                     <th style="text-align: center;">No PO</th>
-                                    <th style="text-align: center;">Supplier</th>
+                                    <th style="text-align: center;">Supplier / Vendor</th>
                                     <!-- <th style="text-align: center;">Dokumen Pabean</th> -->
-                                    <th style="text-align: center;">Tgl PO</th>
+                                    <th style="text-align: center;">Tgl PO / Tgl Vendor Masuk</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Satuan</th>
                                     <th style="text-align: center;">Sisa Qty</th>
@@ -326,6 +347,8 @@
             changeStatus();
         })
     <?php endif; ?>
+
+    $('#vendor_barang_id_select').hide();
 
     $('#type_pengambilan_stock').select2({
         placeholder: "Pilih Tipe Ambil Stok",
@@ -403,10 +426,26 @@
     })
 
     $('#vendor_id').select2({
-        placeholder: "Pilih Vendor",
+        placeholder: "Pilih Vendor Tujuan",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {});
+
+    $('#type_asal_barang').select2({
+        placeholder: "Pilih Asal Barang",
+        theme: "bootstrap-5",
+    }).change(function() {
+        getDropdownAsalBarang();
+    });
+
+    $('#vendor_barang_id').select2({
+        placeholder: "Pilih Vendor",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+        // LIST DOKUMEN PABEAN
+        getListDokumenPabean();
+    });
 
     $("#tanggal").datepicker({
         todayHighlight: true,
@@ -473,7 +512,6 @@
         // LIST DOKUMEN PABEAN
         getListDokumenPabean();
     });
-
 
     // VALIDATOR
     var validator = $(".create-form").validate({
@@ -760,7 +798,7 @@
     });
 
 
-    $("#vendor_id,#warehouse_id,#divisi_id,#type_barang,#spesifikasi_id,#type_pengambilan_stock,#supplier_id")
+    $("#vendor_id,#warehouse_id,#divisi_id,#type_barang,#spesifikasi_id,#type_pengambilan_stock,#supplier_id,#type_asal_barang,#vendor_barang_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -842,7 +880,8 @@
             },
             data: {
                 stock_id: $(".spesifikasi_id option:selected").data('stock_id'),
-                supplier_id: $(".supplier_id option:selected").val()
+                supplier_id: $(".supplier_id option:selected").val(),
+                vendor_id: $('.vendor_barang_id option:selected').val()
             },
             dataType: "json",
             success: function(res) {
@@ -1047,6 +1086,20 @@
             $(".no_surat_jalan").attr("readonly", false);
             $(".no_surat_jalan").val("");
         }
+    }
+
+    function getDropdownAsalBarang() {
+        var typeAsalBarang = $('#type_asal_barang option:selected').val();
+        if (typeAsalBarang == 'SUPPLIER') {
+            $('#supplier_id_select').show();
+            $('#vendor_barang_id_select').hide();
+        } else {
+            $('#supplier_id_select').hide();
+            $('#vendor_barang_id_select').show();
+        }
+        $('#supplier_id').val(null).change();
+        $('#vendor_barang_id').val(null).change();
+
     }
 
     const print = function(url) {
