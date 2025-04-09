@@ -150,7 +150,7 @@ class BeaCukaiApi
                 'status' => false
             ];
         } else {
-            $responseData = json_decode($response);            
+            $responseData = json_decode($response);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
             if ($httpCode == 200) {
