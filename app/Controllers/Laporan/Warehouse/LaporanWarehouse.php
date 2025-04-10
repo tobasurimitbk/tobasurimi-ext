@@ -579,6 +579,7 @@ class LaporanWarehouse extends BaseController
                 'rm_purchase_orders.deletedAt' => null,
                 'rm_purchase_order_details.deletedAt' => null,
                 'rm_purchase_orders.is_posted' => '1',
+                'rm_purchase_orders.status_penerimaan' => '1',
                 'rm_purchase_orders.company_id' => $this->this_company_id
             ];
 
@@ -601,6 +602,7 @@ class LaporanWarehouse extends BaseController
                 'rm_purchase_orders.deletedAt' => null,
                 'rm_purchase_order_details.deletedAt' => null,
                 'rm_purchase_orders.is_posted' => '1',
+                'rm_purchase_orders.status_penerimaan' => '1',
                 'rm_purchase_orders.company_id' => $this->this_company_id
             ];
 
@@ -625,6 +627,7 @@ class LaporanWarehouse extends BaseController
                 'am_purchase_orders.deletedAt' => null,
                 'am_purchase_order_details.deletedAt' => null,
                 'am_purchase_orders.is_posted' => '1',
+                'am_purchase_orders.status_penerimaan' => '1',
                 'am_purchase_orders.po_type' => 'Lokal',
                 'am_purchase_orders.company_id' => $this->this_company_id
             ];
@@ -650,6 +653,7 @@ class LaporanWarehouse extends BaseController
                 'rm_import_pos.deletedAt' => null,
                 'rm_import_po_details.deletedAt' => null,
                 'rm_import_pos.is_posted' => '1',
+                'rm_import_pos.status_penerimaan' => '1',
                 'rm_import_pos.company_id' => $this->this_company_id
             ];
 
@@ -672,6 +676,7 @@ class LaporanWarehouse extends BaseController
                 'am_purchase_orders.deletedAt' => null,
                 'am_purchase_order_details.deletedAt' => null,
                 'am_purchase_orders.is_posted' => '1',
+                'am_purchase_orders.status_penerimaan' => '1',
                 'am_purchase_orders.po_type' => 'Import',
                 'am_purchase_orders.company_id' => $this->this_company_id
             ];
@@ -692,41 +697,43 @@ class LaporanWarehouse extends BaseController
             $dataPurchaseOrder = $this->amPurchaseOrderDetailModel->getListLPBBahanPenolongReport($condition,  $addCondition, "IMPORT", "PENOLONG", $pageSize, $offset);
         }
 
-        // var_dump($dataPurchaseOrder['result']);
-        // die();
-
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         $dataAllPurchaseOrderInvoice = [];
 
+        $grandTotal = [
+            'nominal'       => 0.0,
+            'nominal_idr'   => 0.0,
+            'paid_idr'      => 0.0,
+        ];
+
         foreach ($dataPurchaseOrder['result'] as $data) {
             if ($data['sub_total'] != 0) {
+                $grandTotal['nominal'] += floatval($data['sub_total']) ?? 0.0;
+
                 array_push($dataAllPurchaseOrderInvoice, [
-
                     "no"                => $no++,
-                    "po_no"     => $data['po_no'],
-                    "po_date"     => $data['po_date'],
+                    "po_no"             => $data['po_no'],
+                    "po_date"           => $data['po_date'],
                     "nama_supplier"     => $data['nama_supplier'],
-                    "kode_barang"     => $data['kode_barang'],
-                    "nama_barang"     => $data['nama_barang'],
-                    "satuan"     => $data['satuan'],
-                    "spesifikasi_name"     => $data['spesifikasi_name'],
-                    "jml_order"     => number_format($data['jml_order']),
-                    "jml_diterima_lpb"     => number_format($data['jml_diterima_lpb']),
-                    "sisa_total"     => number_format($data['sisa_total']),
-                    "sub_total"     => number_format($data['sub_total']),
-
-
+                    "kode_barang"       => $data['kode_barang'],
+                    "nama_barang"       => $data['nama_barang'],
+                    "satuan"            => $data['satuan'],
+                    "spesifikasi_name"  => $data['spesifikasi_name'],
+                    "jml_order"         => number_format($data['jml_order']),
+                    "jml_diterima_lpb"  => number_format($data['jml_diterima_lpb']),
+                    "sisa_total"        => number_format($data['sisa_total']),
+                    "sub_total"         => number_format($data['sub_total']),
                 ]);
             }
         }
 
         $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $dataPurchaseOrder['totalData'],
-            "recordsFiltered" => $dataPurchaseOrder['totalFilteredData'],
-            'data'      => $dataAllPurchaseOrderInvoice,
-            "payload" => $payload,
-
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $dataPurchaseOrder['totalData'],
+            "recordsFiltered"   => $dataPurchaseOrder['totalFilteredData'],
+            'data'              => $dataAllPurchaseOrderInvoice,
+            "payload"           => $payload,
+            "grandTotal"        => number_format($grandTotal['nominal']),
         ];
 
         echo json_encode($data);

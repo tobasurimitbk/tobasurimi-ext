@@ -424,10 +424,6 @@ class RMPurchaseOrderDetailModel extends Model
         $totalFilteredData = $barangs->countAllResults(false);
         $barangs = $barangs->findAll($limit, $offset);
 
-
-        // var_dump($barangs);
-        // die();
-
         $jmlOrderTotal = 0;
         $jmlDiterimaInTotal = 0;
         $jmlDiterimaTotal = 0;
@@ -438,6 +434,8 @@ class RMPurchaseOrderDetailModel extends Model
         $hargaSumTotal = 0;
         $subTotal = 0;
 
+        // var_dump($barangs, $limit, $offset, $totalData, $totalFilteredData, $condition, $addCondition);
+        // die();
 
         foreach ($barangs as $b) {
 
@@ -511,18 +509,18 @@ class RMPurchaseOrderDetailModel extends Model
 
 
         return [
-            'result' => $res,
-            'totalData'         => $totalData,
-            'totalFilteredData' => $totalFilteredData,
-            'jml_order_total' => $jmlOrderTotal,
-            'jml_diterima_in_total' => $jmlDiterimaInTotal,
-            'jml_diterima_total' => $jmlDiterimaTotal,
-            'sisa_diterima_total' => $sisaDiterimaTotal,
-            'harga_umum_total' => $hargaUmumTotal,
-            'harga_harian_total' => $hargaHarianTotal,
-            'harga_bulanan_total' => $hargaBulananTotal,
-            'harga_sum_total' => $hargaSumTotal,
-            'sub_total' => $subTotal
+            'result'                    => $res,
+            'totalData'                 => $totalData,
+            'totalFilteredData'         => $totalFilteredData,
+            'jml_order_total'           => $jmlOrderTotal,
+            'jml_diterima_in_total'     => $jmlDiterimaInTotal,
+            'jml_diterima_total'        => $jmlDiterimaTotal,
+            'sisa_diterima_total'       => $sisaDiterimaTotal,
+            'harga_umum_total'          => $hargaUmumTotal,
+            'harga_harian_total'        => $hargaHarianTotal,
+            'harga_bulanan_total'       => $hargaBulananTotal,
+            'harga_sum_total'           => $hargaSumTotal,
+            'sub_total'                 => $subTotal
         ];
     }
 

@@ -295,9 +295,6 @@ class RMImportPODetailModel extends Model
         $availableSort = [
             'po_no'          => 'rm_import_pos.po_no',
             'po_date'        => 'rm_import_pos.po_date',
-
-
-
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -428,15 +425,15 @@ class RMImportPODetailModel extends Model
         }
 
         return [
-            'result' => $res,
-            'totalData'         => $totalData,
-            'totalFilteredData' => $totalFilteredData,
-            'jml_order_total' => $jmlOrderTotal,
-            'jml_diterima_in_total' => $jmlDiterimaInTotal,
-            'jml_diterima_total' => $jmlDiterimaTotal,
-            'sisa_diterima_total' => $sisaDiterimaTotal,
-            'harga_per_barang_total' => $hargaPerBarangTotal,
-            'sub_total' => $subTotal
+            'result'                    => $res,
+            'totalData'                 => count($res), // atau bisa juga pakai totalFilteredData kalau memang relevan
+            'totalFilteredData'         => count($res),
+            'jml_order_total'           => $jmlOrderTotal,
+            'jml_diterima_in_total'     => $jmlDiterimaInTotal,
+            'jml_diterima_total'        => $jmlDiterimaTotal,
+            'sisa_diterima_total'       => $sisaDiterimaTotal,
+            'harga_per_barang_total'    => $hargaPerBarangTotal,
+            'sub_total'                 => $subTotal
         ];
     }
 

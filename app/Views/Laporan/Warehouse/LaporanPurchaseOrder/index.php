@@ -101,12 +101,16 @@
                                 <th onclick="changeSort('jml_diterima_lpb')" class="sort">Jumlah Diterima</th>
                                 <th onclick="changeSort('sisa_total')" class="sort">Sisa</th>
                                 <th onclick="changeSort('sub_total')" class="sort">Total Harga</th>
-
                             </tr>
-
                         </thead>
                         <tbody class="body-table" id="body-table">
                         </tbody>
+                        <tfoot class="thead">
+                            <tr>
+                                <th colspan="11" class="text-right">Grand Total:</th>
+                                <th class="text-right" id="gt-nominal">-</th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -222,6 +226,12 @@
             }
         }
     })
+    // Tambahkan handler xhr
+    table.on('xhr.dt', function(e, settings, json, xhr) {
+        if (json.grandTotal) {
+            $('#gt-nominal').text((json.grandTotal));
+        }
+    });
 
     const changeSort = function(val) {
         if (sort !== val) {
