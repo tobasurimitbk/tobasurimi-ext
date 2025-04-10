@@ -107,6 +107,7 @@
                                 <th onclick="changeSort('warehouse')" class="sort">Warehouse</th>
                                 <th onclick="changeSort('tanggal_penerimaan')" class="sort">Tanggal Penerimaan</th>
                                 <th onclick="changeSort('no_dok')" class="sort">Nomor</th>
+                                <th onclick="changeSort('no_lpb')" class="sort">Nomor LPB</th>
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang </th>
                                 <th onclick="changeSort('nama_baramg')" class="sort">Nama Barang</th>
                                 <th onclick="changeSort('spesifikasi')" class="sort">Spesifikasi</th>
@@ -175,7 +176,6 @@
             {
                 data: "tipe_barang",
                 className: "text-center",
-
             },
             {
                 data: "sumber_barang",
@@ -199,6 +199,10 @@
             },
             {
                 data: "nomor",
+                className: "text-center",
+            },
+            {
+                data: "no_dokumen_1",
                 className: "text-center",
             },
             {

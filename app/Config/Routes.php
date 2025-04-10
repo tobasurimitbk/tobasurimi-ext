@@ -674,9 +674,11 @@ $routes->get('/master-barang-internasional/export-excel', 'SalesInternasional\Ba
 $routes->get('/customer-lokal', 'SalesLokal\Customer::index', ['filter' => 'Auth']);
 $routes->get('/customer-lokal/all', 'SalesLokal\Customer::all', ['filter' => 'Auth']);
 $routes->get('/customer-lokal/id/(:segment)', 'Master\Customer::getByIdCustomer/$1', ['filter' => 'Auth']);
+$routes->get('/customer-lokal/generate-no', 'Master\Customer::generateNo', ['filter' => 'Auth']);
 $routes->post('/customer-lokal/save', 'Master\Customer::saveCustomer', ['filter' => 'Auth']);
 $routes->post('/customer-lokal/update', 'Master\Customer::updateCustomer', ['filter' => 'Auth']);
 $routes->post('/customer-lokal/delete', 'Master\Customer::deleteCustomer', ['filter' => 'Auth']);
+
 
 // Customer Ekspor
 $routes->get('/customer-ekspor', 'SalesInternasional\Customer::index', ['filter' => 'Auth']);
@@ -2113,6 +2115,7 @@ $routes->get('/laporan-warehouse/sales-order-ekspor/print', 'Laporan\Warehouse\L
 $routes->get('/laporan-warehouse/purchase-order', 'Laporan\Warehouse\LaporanWarehouse::laporanPurchaseOrder', ['filter' => 'Auth']);
 $routes->get('/laporan-warehouse/purchase-order/all-purchase-order', 'Laporan\Warehouse\LaporanWarehouse::allLaporanPurchaseOrder', ['filter' => 'Auth']);
 $routes->get('/laporan-warehouse/purchase-order/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanPurchaseOrder', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/purchase-order/excel', 'Laporan\Warehouse\LaporanWarehouse::exportExcelLaporanPurchaseOrder', ['filter' => 'Auth']);
 
 
 $routes->get('/laporan-warehouse/penerimaan-barang', 'Laporan\Warehouse\LaporanWarehouse::laporanPenerimaanBarang', ['filter' => 'Auth']);

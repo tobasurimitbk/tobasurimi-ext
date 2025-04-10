@@ -666,26 +666,44 @@ class SuratJalan extends BaseController
     public function generateNomorSuratJalan()
     {
         $code = "TSI/SJ";
-        $currentYear = date('y'); // Get last two digits of the year
-        $currentMonth = date('n'); // Get numeric month without leading zeros
+        $currentYear = date('y'); // 2 digit tahun
+        $currentMonth = date('n'); // 1-12
         $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
         $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
 
-        $lastData = $this->SuratJalanModel->asObject()
-            // ->where('id_company', $this->this_company_id)
+        $listData = $this->SuratJalanModel->asObject()
             ->like('no_surat_jalan', $numberTemplate)
-            ->orderBy('createdAt', 'DESC')
-            ->first();
+            ->orderBy('no_surat_jalan', 'ASC') // penting buat gap-check
+            ->findAll();
 
-        if (!empty($lastData)) {
-            $asd = explode('/', $lastData->no_surat_jalan);
-            $lastIncrement = intval($asd[4]) + 1;
-            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+        $existingNumbers = [];
 
-            $invNumber = $numberTemplate . $paddedNumber;
-        } else {
-            $invNumber = $numberTemplate . '001';
+        foreach ($listData as $data) {
+            $parts = explode('/', $data->no_surat_jalan);
+            if (isset($parts[4]) && is_numeric($parts[4])) {
+                $existingNumbers[] = intval($parts[4]);
+            }
         }
+
+        sort($existingNumbers);
+
+        $nextNumber = 1;
+        $foundGap = false;
+
+        foreach ($existingNumbers as $num) {
+            if ($num != $nextNumber) {
+                $foundGap = true;
+                break;
+            }
+            $nextNumber++;
+        }
+
+        if (!$foundGap) {
+            $nextNumber = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
+        }
+
+        $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        $invNumber = $numberTemplate . $paddedNumber;
 
         return response()->setJSON([
             'data' => $invNumber,

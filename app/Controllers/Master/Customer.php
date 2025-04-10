@@ -74,6 +74,27 @@ class Customer extends BaseController
         return view('Master/customer/index', $data);
     }
 
+
+    public function generateNo()
+    {
+        $bln = date('m');
+        $thn = date('Y'); // Tahun awal, full (contoh: 2025)
+        $thn2 = date('y'); // Untuk disisipkan dalam kode, biasanya tahun full
+        $last_year = $thn . "-12-31"; // Batas akhir tahun ini
+
+        $no = $this->CustomerModel->get_kode(
+            $bln,
+            $thn,
+            $thn2,
+            $last_year
+        );
+
+        return response()->setJSON([
+            'status' => true,
+            'data' => $no
+        ]);
+    }
+
     public function allCustomer()
     {
         $payload = [
@@ -137,7 +158,7 @@ class Customer extends BaseController
     }
 
     public function saveCustomer()
-    {
+    {   
         try {
             $rules = [
                 "name" => [
@@ -181,7 +202,7 @@ class Customer extends BaseController
 
             if ($this->validate($rules)) {
                 $last_year = date("Y-m-t", strtotime(date('Y') . "-12-31"));
-                $kode = $this->CustomerModel->get_kode(date('m'), date('Y'), date('y'), $last_year);
+                $kode = $this->request->getPost("kode");
                 $values = [
                     "company_id" => $this->this_company_id,
                     "user_id" => $this->this_user_id,
@@ -291,6 +312,7 @@ class Customer extends BaseController
                 $values = [
                     "company_id" => $this->this_company_id,
                     "user_id" => $this->this_user_id,
+                    "kode" => $this->request->getPost("kode"),
                     "name" => strtoupper($this->request->getVar("name")),
                     "address" => strtoupper($this->request->getVar("address")),
                     "nik" => $this->request->getPost("nik"),

@@ -851,10 +851,9 @@ class BCPurchaseOrderModel extends Model
 
         $totalData = $penerimaanBarangDataQry->countAllResults(false);
 
-        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_divisi'] || $addCondition['filter_supplier'] || $addCondition['filter_barang']) {
             $penerimaanBarangDataQry->groupStart();
         }
-
 
         if ($addCondition['dateStart']) {
             $penerimaanBarangDataQry->where('penerimaan_barang.tanggal >=', $addCondition['dateStart']);
@@ -864,7 +863,19 @@ class BCPurchaseOrderModel extends Model
             $penerimaanBarangDataQry->where('penerimaan_barang.tanggal <=', $addCondition['dateEnd']);
         }
 
-        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['filter_divisi']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.divisi_id', $addCondition['filter_divisi']);
+        }
+
+        if ($addCondition['filter_supplier']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.supplier_id', $addCondition['filter_supplier']);
+        }
+
+        if ($addCondition['filter_barang']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang_detail.spesifikasi_id', $addCondition['filter_barang']);
+        }
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_divisi'] || $addCondition['filter_supplier'] || $addCondition['filter_barang']) {
             $penerimaanBarangDataQry->groupEnd();
         }
 

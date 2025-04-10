@@ -10,6 +10,7 @@
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
             <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-warehouse/purchase-order/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-warehouse/purchase-order/excel"); ?>')">Excel</button></li>
         </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-warehouse"); ?>">
