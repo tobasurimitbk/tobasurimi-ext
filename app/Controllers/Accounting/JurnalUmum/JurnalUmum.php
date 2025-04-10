@@ -348,7 +348,7 @@ class JurnalUmum extends BaseController
                     ->where('tipe_bahan', "BAKU")
                     ->like('multiple_po_id', $data->id_import_bb)
                     ->first();
-                $noLPB = $penerimaanBarang['no_penerimaan_barang'];
+                $noLPB = $penerimaanBarang == null ? "" : $penerimaanBarang['no_penerimaan_barang'];
             } elseif ($data->id_po_bp != null) {
                 $tipePembelian = ($data->po_type === "Lokal") ? "LOKAL BP" : "IMPORT BP";
                 if ($tipePembelian == "LOKAL BP") {
@@ -371,7 +371,7 @@ class JurnalUmum extends BaseController
                         ->first();
                 }
 
-                $noLPB = $penerimaanBarang['no_penerimaan_barang'];
+                $noLPB = $penerimaanBarang == null ? "" : $penerimaanBarang['no_penerimaan_barang'];
             }
 
             $dataResult[] = [
