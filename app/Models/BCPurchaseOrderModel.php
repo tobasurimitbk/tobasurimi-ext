@@ -738,7 +738,12 @@ class BCPurchaseOrderModel extends Model
         // }
 
         $totalFilteredData = $bcPurchaseOrderDataQry->countAllResults(false);
-        $data = $bcPurchaseOrderDataQry->findAll($limit, $offset);
+        if ($limit != 10) {
+            $data = $bcPurchaseOrderDataQry->findAll($limit, $offset);
+        } else {
+            $data = $bcPurchaseOrderDataQry->findAll();
+        }
+
 
         return [
             'data'              => $data,
@@ -776,25 +781,12 @@ class BCPurchaseOrderModel extends Model
 
         $totalData = $bcPurchaseOrderDataQry->countAllResults(false);
 
-        // if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
-        //     $bcPurchaseOrderDataQry->groupStart();
-        // }
-
-
-        // if ($addCondition['dateStart']) {
-        //     $bcPurchaseOrderDataQry->where('DATE(bc_purchase_order.createdAt) >=', $addCondition['dateStart']);
-        // }
-
-        // if ($addCondition['dateEnd']) {
-        //     $bcPurchaseOrderDataQry->where('DATE(bc_purchase_order.createdAt) <=', $addCondition['dateEnd']);
-        // }
-
-        // if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
-        //     $bcPurchaseOrderDataQry->groupEnd();
-        // }
-
         $totalFilteredData = $bcPurchaseOrderDataQry->countAllResults(false);
-        $data = $bcPurchaseOrderDataQry->findAll($limit, $offset);
+        if ($limit != 10) {
+            $data = $bcPurchaseOrderDataQry->findAll($limit, $offset);
+        } else {
+            $data = $bcPurchaseOrderDataQry->findAll();
+        }
 
         return [
             'data'              => $data,
@@ -880,7 +872,11 @@ class BCPurchaseOrderModel extends Model
         }
 
         $totalFilteredData = $penerimaanBarangDataQry->countAllResults(false);
-        $data = $penerimaanBarangDataQry->findAll($limit, $offset);
+        if ($limit != 10) {
+            $data = $penerimaanBarangDataQry->findAll($limit, $offset);
+        } else {
+            $data = $penerimaanBarangDataQry->findAll();
+        }
 
         return [
             'data'              => $data,

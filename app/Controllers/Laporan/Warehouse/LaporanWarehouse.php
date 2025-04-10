@@ -205,10 +205,6 @@ class LaporanWarehouse extends BaseController
 
         $dataSalesOrder = $this->salesOrderInvoiceModel->getAllSalesOrderInvoiceReportLaporan($condition, $addCondition, $pageSize, $offset);
 
-        // var_dump($dataSalesOrder['data']);
-        // die();
-
-
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         $dataAllSalesOrderInvoice = [];
 
@@ -570,9 +566,6 @@ class LaporanWarehouse extends BaseController
         $filter_supplier        = $this->request->getGet("filter_supplier");
         $filter_barang          = $this->request->getGet("filter_barang");
 
-        // var_dump($po_type, $filter_divisi, $filter_supplier, $filter_barang, $this->barangMasterSpesifikasiModel->find($filter_barang)['barang_master_id']);
-        // die();
-
         if (empty($po_type)) {
             $condition = [
                 'rm_purchase_orders.deletedAt' => null,
@@ -618,8 +611,6 @@ class LaporanWarehouse extends BaseController
                 $condition['rm_purchase_order_details.barang2_id'] = $filter_barang;
             }
 
-            // var_dump($condition,  $addCondition, "LOKAL", "BAKU", $pageSize, $offset);
-
             $dataPurchaseOrder = $this->rmPurchaseOrderDetailModel->getListLPBBahanBakuReport($condition,  $addCondition, "LOKAL", "BAKU", $pageSize, $offset);
         } elseif ($po_type == "PO LOKAL BP") {
             $condition = [
@@ -643,8 +634,6 @@ class LaporanWarehouse extends BaseController
                 $condition['am_purchase_order_details.barang_id'] = $this->barangMasterSpesifikasiModel->find($filter_barang)['barang_master_id'];
                 $condition['am_purchase_order_details.spesifikasi_id'] = $filter_barang;
             }
-
-            // var_dump($condition,  $addCondition, "LOKAL", "PENOLONG", $pageSize, $offset);
 
             $dataPurchaseOrder = $this->amPurchaseOrderDetailModel->getListLPBBahanPenolongReport($condition,  $addCondition, "LOKAL", "PENOLONG", $pageSize, $offset);
         } elseif ($po_type == "PO IMPOR BB") {
@@ -1130,9 +1119,6 @@ class LaporanWarehouse extends BaseController
         $pageSize = $this->request->getGet("length");
         $currentPage = ($this->request->getGet("start") / $this->request->getGet("length")) + 1;
         $offset = $currentPage - 1;
-        $filter_divisi          = $this->request->getGet("filter_divisi");
-        $filter_supplier        = $this->request->getGet("filter_supplier");
-        $filter_barang          = $this->request->getGet("filter_barang");
 
         $payload = [
             "pageSize"      => $pageSize,
@@ -1149,10 +1135,12 @@ class LaporanWarehouse extends BaseController
             "company_id"        => $this->this_company_id,
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-
         ];
 
         $filter_bc_type        = $this->request->getGet("filter_bc_type");
+        $filter_divisi          = $this->request->getGet("filter_divisi");
+        $filter_supplier        = $this->request->getGet("filter_supplier");
+        $filter_barang          = $this->request->getGet("filter_barang");
 
         if ($filter_bc_type  == "BC 2.3") {
             $bcPurchaseOrderBc23 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc23($addCondition, $pageSize, $offset);
@@ -1287,7 +1275,7 @@ class LaporanWarehouse extends BaseController
                 }
             }
 
-            if ($addCondition['dateStart'] && $addCondition['dateEnd']) {
+            if (!empty($addCondition['dateStart']) && !empty($addCondition['dateEnd'])) {
                 $filteredData = array_filter($dataAllPenerimaanBarang, function ($item) use ($addCondition) {
                     $tanggal_bc = date('Y-m-d', strtotime($item['tanggal_bc']));
                     return $tanggal_bc >= $addCondition['dateStart'] && $tanggal_bc <= $addCondition['dateEnd'];
@@ -1429,21 +1417,22 @@ class LaporanWarehouse extends BaseController
                         "kode_satuan"           => $po->kode_satuan ?? "-",
                         "qty"                   => $po->qty ?? "-",
                         "jml_masuk"             => $po->jml_masuk ?? "-",
-
                     ]);
                 }
             }
 
-            if ($addCondition['dateStart'] && $addCondition['dateEnd']) {
+            if (!empty($addCondition['dateStart']) && !empty($addCondition['dateEnd'])) {
                 $filteredData = array_filter($dataAllPenerimaanBarang, function ($item) use ($addCondition) {
                     $tanggal_bc = date('Y-m-d', strtotime($item['tanggal_bc']));
-                    // var_dump($tanggal_bc, $addCondition['dateStart'], $addCondition['dateEnd']);
-                    // die();
+
                     return $tanggal_bc >= $addCondition['dateStart'] && $tanggal_bc <= $addCondition['dateEnd'];
                 });
             } else {
                 $filteredData = $dataAllPenerimaanBarang;
             }
+
+            var_dump($filteredData, count($filteredData), $bcPurchaseOrderBc40['totalData']);
+            die;
 
 
             $data = [
@@ -1463,9 +1452,6 @@ class LaporanWarehouse extends BaseController
             $addCondition['filter_barang'] = $filter_barang;
 
             $penerimaanBarang = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportNoPabean($addCondition, $pageSize, $offset);
-
-            // var_dump($penerimaanBarang['data']);
-            // die();
 
             $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
             $dataAllPenerimaanBarang = [];
@@ -1545,9 +1531,6 @@ class LaporanWarehouse extends BaseController
 
             $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
             $dataAllPenerimaanBarang = [];
-
-            // var_dump($penerimaanBarang['data']);
-            // die();
 
             foreach ($penerimaanBarang['data'] as $data) {
                 if ($data->tipe_barang == 'kemasan') {
@@ -2145,14 +2128,12 @@ class LaporanWarehouse extends BaseController
 
     public function exportPDFLaporanPenerimaanBarang()
     {
-
         $addCondition = [
             "dateStart"        => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"        => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
             "company_id"        => $this->this_company_id,
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-
         ];
 
         $filter_bc_type        = $this->request->getGet("filter_bc_type");
@@ -2249,9 +2230,6 @@ class LaporanWarehouse extends BaseController
                         ->first();
                 }
 
-
-
-
                 array_push($dataAllPenerimaanBarang, [
                     "no"                => $no++,
                     "bc_type"     => "BC 2.3",
@@ -2268,48 +2246,39 @@ class LaporanWarehouse extends BaseController
                     "kode_satuan"    => $po->kode_satuan,
                     "qty"    => $po->qty,
                     "jml_masuk"    => $po->jml_masuk,
-
                 ]);
             }
 
-            if ($addCondition['dateStart'] && $addCondition['dateEnd']) {
+            if (!empty($addCondition['dateStart']) && !empty($addCondition['dateEnd'])) {
                 $filteredData = array_filter($dataAllPenerimaanBarang, function ($item) use ($addCondition) {
                     $tanggal_bc = date('Y-m-d', strtotime($item['tanggal_bc']));
-                    // var_dump($tanggal_bc, $addCondition['dateStart'], $addCondition['dateEnd']);
-                    // die();
+
                     return $tanggal_bc >= $addCondition['dateStart'] && $tanggal_bc <= $addCondition['dateEnd'];
                 });
             } else {
                 $filteredData = $dataAllPenerimaanBarang;
             }
 
-
             $data = [
-
                 'dataAllPenerimaanBarang' => $filteredData,
                 'no' => 1,
                 'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
                 'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
                 'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
-
             ];
         } elseif ($filter_bc_type  == "BC 4.0") {
             $bcPurchaseOrderBc40 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc40($addCondition);
-
 
             $no = 1;
             $dataAllPenerimaanBarang = [];
 
             foreach ($bcPurchaseOrderBc40['data'] as $data) {
-
                 $bcPenerimaanBarangIDArr = json_decode($data->multiple_lpb_id);
                 $bcPurchaseOrderIDArr = json_decode($data->multiple_po_id);
 
-
-
                 if ($data->po_type == "LOKAL BAKU") {
                     // PO LOKAL BAHAN BAKU
-                    $po = $this->penerimaanBarangModel->asObject()
+                    $poQuery = $this->penerimaanBarangModel->asObject()
                         ->select('
                     penerimaan_barang.tanggal AS lpb_date,
                     penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
@@ -2335,20 +2304,27 @@ class LaporanWarehouse extends BaseController
                         ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                         ->join('satuans', 'penerimaan_barang_detail.unit = satuans.id', 'left')
                         ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
-                        // ->where('penerimaan_barang.status_penerimaan', "LOKAL")
-                        // ->where('penerimaan_barang.tipe_bahan', "BAKU")
-                        // ->where('penerimaan_barang.supplier_id', $first['supplier_id'])
                         ->where('penerimaan_barang.bc_type', '53')
                         ->where('penerimaan_barang.deletedAt', null)
                         ->where('penerimaan_barang_detail.deletedAt', null)
                         ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
-                        ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
-                        // ->groupBy('barang_id')
-                        // ->groupBy('penerimaan_barang_id')
-                        ->first();
+                        ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr);
+                    if (!empty($filter_divisi)) {
+                        $poQuery->where('penerimaan_barang.divisi_id', $filter_divisi);
+                    }
+
+                    if (!empty($filter_supplier)) {
+                        $poQuery->where('penerimaan_barang.supplier_id', $filter_supplier);
+                    }
+
+                    if (!empty($filter_barang)) {
+                        $poQuery->where('penerimaan_barang_detail.spesifikasi_id', $filter_barang);
+                    }
+
+                    $po = $poQuery->first();
                 } elseif ($data->po_type == "LOKAL PENOLONG") {
                     // PO LOKAL BAHAN PENOLONG
-                    $po = $this->penerimaanBarangModel->asObject()
+                    $poQuery = $this->penerimaanBarangModel->asObject()
                         ->select('
                     penerimaan_barang.tanggal AS lpb_date,
                      penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
@@ -2374,61 +2350,63 @@ class LaporanWarehouse extends BaseController
                         ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                         ->join('satuans', 'penerimaan_barang_detail.unit = satuans.id', 'left')
                         ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
-                        // ->where('penerimaan_barang.status_penerimaan', "LOKAL")
-                        // ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
                         ->where('penerimaan_barang.bc_type', '53')
                         ->where('penerimaan_barang.deletedAt', null)
                         ->where('penerimaan_barang_detail.deletedAt', null)
                         ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
-                        ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
-                        // ->groupBy('barang_id')
-                        // ->groupBy('penerimaan_barang_id')
-                        ->first();
+                        ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr);
+
+                    if (!empty($filter_divisi)) {
+                        $poQuery->where('penerimaan_barang.divisi_id', $filter_divisi);
+                    }
+
+                    if (!empty($filter_supplier)) {
+                        $poQuery->where('penerimaan_barang.supplier_id', $filter_supplier);
+                    }
+
+                    if (!empty($filter_barang)) {
+                        $poQuery->where('penerimaan_barang_detail.spesifikasi_id', $filter_barang);
+                    }
+
+                    $po = $poQuery->first();
                 }
-
-
-
-
-                array_push($dataAllPenerimaanBarang, [
-                    "no"                => $no++,
-                    "bc_type"     => "BC 4.0",
-                    "tanggal_bc"         =>  date('Y-m-d', strtotime($data->updatedAt)),
-                    "no_daftar"    => $data->no_daftar,
-                    "no_aju"    => $data->no_aju,
-                    "no_penerimaan_barang"    => $po->no_penerimaan_barang,
-                    "tanggal_lpb"    => $po->lpb_date,
-                    "po_no"    => $po->po_no,
-                    "po_date"    => $po->po_date,
-                    "divisi"    => $po->divisi,
-                    "kode_barang"       => $po->kode_barang,
-                    "nama_barang_dok"    => $po->nama_barang_dok,
-                    "kode_satuan"    => $po->kode_satuan,
-                    "qty"    => $po->qty,
-                    "jml_masuk"    => $po->jml_masuk,
-
-                ]);
+                if (!empty($po)) {
+                    array_push($dataAllPenerimaanBarang, [
+                        "no"                => $no++,
+                        "bc_type"     => "BC 4.0",
+                        "tanggal_bc"         =>  date('Y-m-d', strtotime($data->updatedAt)),
+                        "no_daftar"    => $data->no_daftar,
+                        "no_aju"    => $data->no_aju,
+                        "no_penerimaan_barang"    => $po->no_penerimaan_barang,
+                        "tanggal_lpb"    => $po->lpb_date,
+                        "po_no"    => $po->po_no,
+                        "po_date"    => $po->po_date,
+                        "divisi"    => $po->divisi,
+                        "kode_barang"       => $po->kode_barang,
+                        "nama_barang_dok"    => $po->nama_barang_dok,
+                        "kode_satuan"    => $po->kode_satuan,
+                        "qty"    => $po->qty,
+                        "jml_masuk"    => $po->jml_masuk,
+                    ]);
+                }
             }
 
-            if ($addCondition['dateStart'] && $addCondition['dateEnd']) {
+            if (!empty($addCondition['dateStart']) && !empty($addCondition['dateEnd'])) {
                 $filteredData = array_filter($dataAllPenerimaanBarang, function ($item) use ($addCondition) {
                     $tanggal_bc = date('Y-m-d', strtotime($item['tanggal_bc']));
-                    // var_dump($tanggal_bc, $addCondition['dateStart'], $addCondition['dateEnd']);
-                    // die();
+
                     return $tanggal_bc >= $addCondition['dateStart'] && $tanggal_bc <= $addCondition['dateEnd'];
                 });
             } else {
                 $filteredData = $dataAllPenerimaanBarang;
             }
 
-
             $data = [
-
                 'dataAllPenerimaanBarang' => $filteredData,
                 'no' => 1,
                 'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
                 'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
                 'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
-
             ];
         } elseif ($filter_bc_type  == "Non Pabean") {
             $addCondition['filter_divisi'] = $filter_divisi;
@@ -2437,17 +2415,11 @@ class LaporanWarehouse extends BaseController
 
             $penerimaanBarang = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportNoPabean($addCondition);
 
-            // var_dump($penerimaanBarang['data']);
-            // die();
-
             $no = 1;
             $dataAllPenerimaanBarang = [];
 
             foreach ($penerimaanBarang['data'] as $data) {
-
                 $po_id_array = json_decode($data->multiple_po_id);
-
-
 
                 if (($data->status_penerimaan == "LOKAL") && ($data->tipe_bahan == "BAKU")) {
 
@@ -2484,9 +2456,6 @@ class LaporanWarehouse extends BaseController
                         ->first();
                 }
 
-
-
-
                 array_push($dataAllPenerimaanBarang, [
                     "no"                => $no++,
                     "bc_type"     => "Non Pabean",
@@ -2503,19 +2472,15 @@ class LaporanWarehouse extends BaseController
                     "kode_satuan"    => $data->kode_satuan,
                     "qty"    => $data->qty,
                     "jml_masuk"    => $data->jml_masuk,
-
                 ]);
             }
 
-
             $data = [
-
                 'dataAllPenerimaanBarang' => $dataAllPenerimaanBarang,
                 'no' => 1,
                 'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
                 'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
                 'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
-
             ];
         } elseif ($filter_bc_type  == "BC 2.7") {
             $penerimaanBarang = $this->penerimaanMutasiGlobalModel->getPenerimaanBarangListReportBc27PDF($addCondition);
@@ -2523,10 +2488,7 @@ class LaporanWarehouse extends BaseController
             $no = 1;
             $dataAllPenerimaanBarang = [];
 
-
             foreach ($penerimaanBarang['data'] as $data) {
-
-
                 if ($data->tipe_barang == 'kemasan') {
                     // Kemasan
                     $kemasan = $this->kemasanModel->find($data->kemasan_id);
@@ -2564,7 +2526,6 @@ class LaporanWarehouse extends BaseController
                 } elseif (!empty($getRmImportPo)) {
                     $po_date = $getRmImportPo['po_date'];
                 }
-
 
                 array_push($dataAllPenerimaanBarang, [
                     "no"                => $no++,
@@ -2582,18 +2543,15 @@ class LaporanWarehouse extends BaseController
                     "kode_satuan"    => $satuan,
                     "qty"    => !empty($data->qty) ? $data->qty : 0,
                     "jml_masuk"    => $data->jml_masuk,
-
                 ]);
             }
 
             $data = [
-
                 'dataAllPenerimaanBarang' => $dataAllPenerimaanBarang,
                 'no' => 1,
                 'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
                 'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
                 'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
-
             ];
         } elseif ($filter_bc_type  == "PPB KB") {
             $penerimaanBarang = $this->penerimaanMutasiModel->getPenerimaanBarangListReportPPBKBPDF($addCondition);
@@ -2601,10 +2559,7 @@ class LaporanWarehouse extends BaseController
             $no = 1;
             $dataAllPenerimaanBarang = [];
 
-
             foreach ($penerimaanBarang['data'] as $data) {
-
-
                 if ($data->tipe_barang == 'kemasan') {
                     // Kemasan
                     $kemasan = $this->kemasanModel->find($data->kemasan_id);
@@ -2643,7 +2598,6 @@ class LaporanWarehouse extends BaseController
                     $po_date = $getRmImportPo['po_date'];
                 }
 
-
                 array_push($dataAllPenerimaanBarang, [
                     "no"                => $no++,
                     "bc_type"     => "PPB KB",
@@ -2660,18 +2614,15 @@ class LaporanWarehouse extends BaseController
                     "kode_satuan"    => $satuan,
                     "qty"    => !empty($data->qty) ? $data->qty : 0,
                     "jml_masuk"    => $data->jml_masuk,
-
                 ]);
             }
 
             $data = [
-
                 'dataAllPenerimaanBarang' => $dataAllPenerimaanBarang,
                 'no' => 1,
                 'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
                 'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
                 'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
-
             ];
         } elseif ($filter_bc_type  == "all") {
             $addCondition['filter_divisi'] = $filter_divisi;
@@ -2684,17 +2635,12 @@ class LaporanWarehouse extends BaseController
             $bcPurchaseOrderBc40 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc40($addCondition);
             $bcPurchaseOrderBc23 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc23($addCondition);
 
-
             $no = 1;
             $dataAllPenerimaanBarang = [];
 
-
             foreach ($bcPurchaseOrderBc23['data'] as $data) {
-
                 $bcPenerimaanBarangIDArr = json_decode($data->multiple_lpb_id);
                 $bcPurchaseOrderIDArr = json_decode($data->multiple_po_id);
-
-
 
                 if ($data->po_type == "IMPORT BAKU") {
                     // PO IMPORT BAHAN BAKU
@@ -2775,9 +2721,6 @@ class LaporanWarehouse extends BaseController
                         ->first();
                 }
 
-
-
-
                 array_push($dataAllPenerimaanBarang, [
                     "no"                => $no++,
                     "bc_type"     => "BC 2.3",
@@ -2794,20 +2737,16 @@ class LaporanWarehouse extends BaseController
                     "kode_satuan"    => $po->kode_satuan,
                     "qty"    => $po->qty,
                     "jml_masuk"    => $po->jml_masuk,
-
                 ]);
             }
 
             foreach ($bcPurchaseOrderBc40['data'] as $data) {
-
                 $bcPenerimaanBarangIDArr = json_decode($data->multiple_lpb_id);
                 $bcPurchaseOrderIDArr = json_decode($data->multiple_po_id);
 
-
-
                 if ($data->po_type == "LOKAL BAKU") {
                     // PO LOKAL BAHAN BAKU
-                    $po = $this->penerimaanBarangModel->asObject()
+                    $poQuery = $this->penerimaanBarangModel->asObject()
                         ->select('
                     penerimaan_barang.tanggal AS lpb_date,
                     penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
@@ -2833,10 +2772,381 @@ class LaporanWarehouse extends BaseController
                         ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                         ->join('satuans', 'penerimaan_barang_detail.unit = satuans.id', 'left')
                         ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
-                        // ->where('penerimaan_barang.status_penerimaan', "LOKAL")
+                        ->where('penerimaan_barang.bc_type', '53')
+                        ->where('penerimaan_barang.deletedAt', null)
+                        ->where('penerimaan_barang_detail.deletedAt', null)
+                        ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
+                        ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr);
+                    if (!empty($filter_divisi)) {
+                        $poQuery->where('penerimaan_barang.divisi_id', $filter_divisi);
+                    }
+
+                    if (!empty($filter_supplier)) {
+                        $poQuery->where('penerimaan_barang.supplier_id', $filter_supplier);
+                    }
+
+                    if (!empty($filter_barang)) {
+                        $poQuery->where('penerimaan_barang_detail.spesifikasi_id', $filter_barang);
+                    }
+
+                    $po = $poQuery->first();
+                } elseif ($data->po_type == "LOKAL PENOLONG") {
+                    // PO LOKAL BAHAN PENOLONG
+                    $poQuery = $this->penerimaanBarangModel->asObject()
+                        ->select('
+                    penerimaan_barang.tanggal AS lpb_date,
+                     penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
+                    penerimaan_barang_detail.penerimaan_barang_id,
+                    penerimaan_barang_detail.purchase_order_id,
+                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
+                   
+                    penerimaan_barang_detail.barang_id,
+                    penerimaan_barang_detail.nama_barang_dok,
+                    penerimaan_barang_detail.qty,
+                    penerimaan_barang_detail.jml_masuk,
+                    am_purchase_orders.po_no,
+                    am_purchase_orders.po_date,
+                    barang_master.barang_name,
+                    barang_master.kode_barang,
+                    satuans.kode_satuan,
+                    warehouses.warehouse_name, 
+                    divisis.divisi
+                ')
+                        ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+                        ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
+                        ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+                        ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                        ->join('satuans', 'penerimaan_barang_detail.unit = satuans.id', 'left')
+                        ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+                        ->where('penerimaan_barang.bc_type', '53')
+                        ->where('penerimaan_barang.deletedAt', null)
+                        ->where('penerimaan_barang_detail.deletedAt', null)
+                        ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
+                        ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr);
+
+                    if (!empty($filter_divisi)) {
+                        $poQuery->where('penerimaan_barang.divisi_id', $filter_divisi);
+                    }
+
+                    if (!empty($filter_supplier)) {
+                        $poQuery->where('penerimaan_barang.supplier_id', $filter_supplier);
+                    }
+
+                    if (!empty($filter_barang)) {
+                        $poQuery->where('penerimaan_barang_detail.spesifikasi_id', $filter_barang);
+                    }
+
+                    $po = $poQuery->first();
+                }
+                if (!empty($po)) {
+                    array_push($dataAllPenerimaanBarang, [
+                        "no"                => $no++,
+                        "bc_type"     => "BC 4.0",
+                        "tanggal_bc"         =>  date('Y-m-d', strtotime($data->updatedAt)),
+                        "no_daftar"    => $data->no_daftar,
+                        "no_aju"    => $data->no_aju,
+                        "no_penerimaan_barang"    => $po->no_penerimaan_barang,
+                        "tanggal_lpb"    => $po->lpb_date,
+                        "po_no"    => $po->po_no,
+                        "po_date"    => $po->po_date,
+                        "divisi"    => $po->divisi,
+                        "kode_barang"       => $po->kode_barang,
+                        "nama_barang_dok"    => $po->nama_barang_dok,
+                        "kode_satuan"    => $po->kode_satuan,
+                        "qty"    => $po->qty,
+                        "jml_masuk"    => $po->jml_masuk,
+                    ]);
+                }
+            }
+
+            foreach ($penerimaanBarangNoPabean['data'] as $data) {
+                $po_id_array = json_decode($data->multiple_po_id);
+                if (($data->status_penerimaan == "LOKAL") && ($data->tipe_bahan == "BAKU")) {
+                    $po = $this->rmPurchaseOrderModel->asObject()
+                        ->select('
+                            rm_purchase_orders.po_no ,
+                            rm_purchase_orders.po_date 
+                        ')
+                        ->whereIn('rm_purchase_orders.id', $po_id_array)
+                        ->first();
+                } elseif (($data->status_penerimaan == "LOKAL") && ($data->tipe_bahan == "PENOLONG")) {
+                    $po = $this->amPurchaseOrderModel->asObject()
+                        ->select('
+                            am_purchase_orders.po_no ,
+                            am_purchase_orders.po_date 
+                        ')
+                        ->whereIn('am_purchase_orders.id', $po_id_array)
+                        ->first();
+                } elseif (($data->status_penerimaan == "IMPORT") && ($data->tipe_bahan == "BAKU")) {
+                    $po = $this->rmImportPOModel->asObject()
+                        ->select('
+                            rm_import_pos.po_no ,
+                            rm_import_pos.po_date 
+                        ')
+                        ->whereIn('rm_import_pos.id', $po_id_array)
+                        ->first();
+                } elseif (($data->status_penerimaan == "IMPORT") && ($data->tipe_bahan == "PENOLONG")) {
+                    $po = $this->amPurchaseOrderModel->asObject()
+                        ->select('
+                            am_purchase_orders.po_no ,
+                            am_purchase_orders.po_date 
+                        ')
+                        ->whereIn('am_purchase_orders.id', $po_id_array)
+                        ->first();
+                }
+
+                array_push($dataAllPenerimaanBarang, [
+                    "no"                => $no++,
+                    "bc_type"     => "Non Pabean",
+                    "tanggal_bc"         =>  $data->lpb_date,
+                    "no_daftar"    => "-",
+                    "no_aju"    => "-",
+                    "no_penerimaan_barang"    => $data->no_penerimaan_barang,
+                    "tanggal_lpb"    => $data->lpb_date,
+                    "po_no"    => !empty($po->po_no) ? $po->po_no : "",
+                    "po_date"    => !empty($po->po_date) ? $po->po_date : "",
+                    "divisi"    => $data->divisi,
+                    "kode_barang"       => $data->kode_barang,
+                    "nama_barang_dok"    => $data->nama_barang_dok,
+                    "kode_satuan"    => $data->kode_satuan,
+                    "qty"    => $data->qty,
+                    "jml_masuk"    => $data->jml_masuk,
+                ]);
+            }
+
+            foreach ($penerimaanBarangMutasi['data'] as $data) {
+                if ($data->tipe_barang == 'kemasan') {
+                    // Kemasan
+                    $kemasan = $this->kemasanModel->find($data->kemasan_id);
+                    $satuan = $this->satuanModel->find($kemasan['satuan_id'])['kode_satuan'];
+                    $barang = $kemasan['name'];
+                    $kodeBarang = $kemasan['kode'];
+                } else {
+                    // Barang
+                    $barangSpesifikasi = $this->barangMasterModel
+                        ->select("barang_master_spesifikasi.satuan_1, CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS barang, barang_master.kode_barang")
+                        ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                        ->where('barang_master_spesifikasi.id', $data->barang2_id)
+                        ->where('barang_master_spesifikasi.barang_master_id', $data->barang1_id)
+                        ->first();
+                    $satuan = $this->satuanModel->find($barangSpesifikasi['satuan_1'])['kode_satuan'];
+                    $barang = $barangSpesifikasi['barang'];
+                    $kodeBarang = $barangSpesifikasi['kode_barang'];
+                }
+
+                $stockListDetailAsal = $this->stockDetail2Model->getStockListDetail(
+                    $data->stock_id_asal,
+                    $data->bc_id_asal,
+                    $data->no_aju_asal,
+                    $data->stock_dokumen_asal,
+                );
+
+                $getRmPo = $this->rmPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getAmPo = $this->amPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getRmImportPo = $this->rmImportPOModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+
+                if (!empty($getRmPo)) {
+                    $po_date = $getRmPo['po_date'];
+                } elseif (!empty($getAmPo)) {
+                    $po_date = $getAmPo['po_date'];
+                } elseif (!empty($getRmImportPo)) {
+                    $po_date = $getRmImportPo['po_date'];
+                }
+
+                array_push($dataAllPenerimaanBarang, [
+                    "no"                => $no++,
+                    "bc_type"     => "PPB KB",
+                    "tanggal_bc"         =>  $data->tanggal_bc,
+                    "no_daftar"    => $data->no_daftar,
+                    "no_aju"    => $data->no_ppbkb,
+                    "no_penerimaan_barang"    => $data->penerimaan_mutasi_no,
+                    "tanggal_lpb"    => $data->tanggal,
+                    "po_no"    => !empty($stockListDetailAsal['no_po']) ? $stockListDetailAsal['no_po'] : "",
+                    "po_date"    => !empty($po_date) ? $po_date  : "",
+                    "divisi"    => $data->divisi_penerima,
+                    "kode_barang"       => $kodeBarang,
+                    "nama_barang_dok"    => $barang,
+                    "kode_satuan"    => $satuan,
+                    "qty"    => !empty($data->qty) ? $data->qty : 0,
+                    "jml_masuk"    => $data->jml_masuk,
+                ]);
+            }
+
+            foreach ($penerimaanBarangGlobal['data'] as $data) {
+                if ($data->tipe_barang == 'kemasan') {
+                    // Kemasan
+                    $kemasan = $this->kemasanModel->find($data->kemasan_id);
+                    $satuan = $this->satuanModel->find($kemasan['satuan_id'])['kode_satuan'];
+                    $barang = $kemasan['name'];
+                    $kodeBarang = $kemasan['kode'];
+                } else {
+                    // Barang
+                    $barangSpesifikasi = $this->barangMasterModel
+                        ->select("barang_master_spesifikasi.satuan_1, CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS barang, barang_master.kode_barang")
+                        ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                        ->where('barang_master_spesifikasi.id', $data->barang2_id)
+                        ->where('barang_master_spesifikasi.barang_master_id', $data->barang1_id)
+                        ->first();
+                    $satuan = $this->satuanModel->find($barangSpesifikasi['satuan_1'])['kode_satuan'];
+                    $barang = $barangSpesifikasi['barang'];
+                    $kodeBarang = $barangSpesifikasi['kode_barang'];
+                }
+
+                $stockListDetailAsal = $this->stockDetail2Model->getStockListDetail(
+                    $data->stock_id_asal,
+                    $data->bc_id_asal,
+                    $data->no_aju_asal,
+                    $data->stock_dokumen_asal,
+                );
+
+                $getRmPo = $this->rmPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getAmPo = $this->amPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getRmImportPo = $this->rmImportPOModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+
+                if (!empty($getRmPo)) {
+                    $po_date = $getRmPo['po_date'];
+                } elseif (!empty($getAmPo)) {
+                    $po_date = $getAmPo['po_date'];
+                } elseif (!empty($getRmImportPo)) {
+                    $po_date = $getRmImportPo['po_date'];
+                }
+
+                array_push($dataAllPenerimaanBarang, [
+                    "no"                => $no++,
+                    "bc_type"     => "BC 2.7",
+                    "tanggal_bc"         =>  date('Y-m-d', strtotime($data->tanggal_bc)),
+                    "no_daftar"    => $data->no_daftar,
+                    "no_aju"    => $data->no_aju,
+                    "no_penerimaan_barang"    => $data->penerimaan_mutasi_no,
+                    "tanggal_lpb"    => $data->tanggal,
+                    "po_no"    => !empty($stockListDetailAsal['no_po']) ? $stockListDetailAsal['no_po'] : "",
+                    "po_date"    => !empty($po_date) ? $po_date  : "",
+                    "divisi"    => $data->divisi_penerima,
+                    "kode_barang"       => $kodeBarang,
+                    "nama_barang_dok"    => $barang,
+                    "kode_satuan"    => $satuan,
+                    "qty"    => !empty($data->qty) ? $data->qty : 0,
+                    "jml_masuk"    => $data->jml_masuk,
+
+                ]);
+            }
+            $data = [
+                'dataAllPenerimaanBarang' => $dataAllPenerimaanBarang,
+                'no' => 1,
+                'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+                'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+                'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
+            ];
+        }
+
+
+        $domPdf = new Dompdf();
+
+        $fileName = 'Laporan Penerimaan Barang';
+
+        // load HTML content
+        $domPdf->loadHtml(view('Laporan/Warehouse/LaporanPenerimaanBarang/print', $data));
+
+        // (optional) setup the paper size and orientation
+        $domPdf->setPaper('legal', 'landscape');
+
+        // render html as PDF
+        $domPdf->render();
+
+        // output the generated pdf
+        $domPdf->stream($fileName, array("Attachment" => false));
+
+        exit();
+        // return view('Supplier/supplierBahanBaku/print');
+    }
+
+    public function exportExcelLaporanPenerimaanBarang()
+    {
+        $spreadsheet = new Spreadsheet();
+        $addCondition = [
+            "dateStart"        => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"        => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "company_id"        => $this->this_company_id,
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+        $filter_bc_type        = $this->request->getGet("filter_bc_type");
+        $filter_divisi          = $this->request->getGet("filter_divisi");
+        $filter_supplier        = $this->request->getGet("filter_supplier");
+        $filter_barang          = $this->request->getGet("filter_barang");
+
+        // Menggabungkan sel dari A1 hingga O1 dan mengisi dengan teks "Purchase Order"
+        $spreadsheet->setActiveSheetIndex(0)
+            ->mergeCells('A1:O1')
+            ->setCellValue('A1', 'Penerimaan Barang')
+            ->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        // Menggabungkan sel dari A1 hingga N1 dan mengisi dengan teks "Purchase Order"
+        $spreadsheet->setActiveSheetIndex(0)
+            ->mergeCells('A2:O2')
+            ->setCellValue('A2', 'Periode : ' . ($addCondition['dateStart'] != "all" ? date("d/m/Y", strtotime($addCondition['dateStart'])) : "All") . " - " . ($addCondition['dateEnd'] != "now" ? date("d/m/Y", strtotime($addCondition['dateEnd'])) : "Now"))
+            ->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A3', 'No.')
+            ->setCellValue('B3', 'Jenis Doc')
+            ->setCellValue('C3', 'Tanggal Doc')
+            ->setCellValue('D3', 'No Daftar')
+            ->setCellValue('E3', 'No Aju / No Daftar')
+            ->setCellValue('F3', 'No Bukti')
+            ->setCellValue('G3', 'Tanggal Bukti')
+            ->setCellValue('H3', 'No Order')
+            ->setCellValue('I3', 'Tanggal Order')
+            ->setCellValue('J3', 'Departemen')
+            ->setCellValue('K3', 'Kode Barang')
+            ->setCellValue('L3', 'Nama Barang')
+            ->setCellValue('M3', 'Kode Satuan')
+            ->setCellValue('N3', 'Jumlah Order')
+            ->setCellValue('O3', 'Jumlah Diterima');
+
+        if ($filter_bc_type  == "BC 2.3") {
+            $bcPurchaseOrderBc23 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc23($addCondition);
+
+            $no = 1;
+            $dataAllPenerimaanBarang = [];
+
+            foreach ($bcPurchaseOrderBc23['data'] as $data) {
+                $bcPenerimaanBarangIDArr = json_decode($data->multiple_lpb_id);
+                $bcPurchaseOrderIDArr = json_decode($data->multiple_po_id);
+
+                if ($data->po_type == "IMPORT BAKU") {
+                    // PO IMPORT BAHAN BAKU
+                    $po = $this->penerimaanBarangModel->asObject()
+                        ->select('
+                    penerimaan_barang.tanggal AS lpb_date,
+                    penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
+                    penerimaan_barang_detail.penerimaan_barang_id,
+                    penerimaan_barang_detail.purchase_order_id,
+                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
+                   
+                    penerimaan_barang_detail.barang_id,
+                    penerimaan_barang_detail.nama_barang_dok,
+                    penerimaan_barang_detail.qty,
+                    penerimaan_barang_detail.jml_masuk,
+                    rm_import_pos.po_no,
+                    rm_import_pos.po_date,
+                    barang_master.barang_name,
+                    barang_master.kode_barang,
+                    satuans.kode_satuan,
+                    warehouses.warehouse_name, 
+                    divisis.divisi
+                ')
+                        ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+                        ->join('rm_import_pos', 'penerimaan_barang_detail.purchase_order_id = rm_import_pos.id', 'left')
+                        ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+                        ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                        ->join('satuans', 'penerimaan_barang_detail.unit = satuans.id', 'left')
+                        ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+                        // ->where('penerimaan_barang.status_penerimaan', "IMPORT")
                         // ->where('penerimaan_barang.tipe_bahan', "BAKU")
                         // ->where('penerimaan_barang.supplier_id', $first['supplier_id'])
-                        ->where('penerimaan_barang.bc_type', '53')
+                        ->where('penerimaan_barang.bc_type', '48')
                         ->where('penerimaan_barang.deletedAt', null)
                         ->where('penerimaan_barang_detail.deletedAt', null)
                         ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
@@ -2844,8 +3154,8 @@ class LaporanWarehouse extends BaseController
                         // ->groupBy('barang_id')
                         // ->groupBy('penerimaan_barang_id')
                         ->first();
-                } elseif ($data->po_type == "LOKAL PENOLONG") {
-                    // PO LOKAL BAHAN PENOLONG
+                } elseif ($data->po_type == "IMPORT PENOLONG") {
+                    // PO IMPORT BAHAN PENOLONG
                     $po = $this->penerimaanBarangModel->asObject()
                         ->select('
                     penerimaan_barang.tanggal AS lpb_date,
@@ -2872,9 +3182,9 @@ class LaporanWarehouse extends BaseController
                         ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                         ->join('satuans', 'penerimaan_barang_detail.unit = satuans.id', 'left')
                         ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
-                        // ->where('penerimaan_barang.status_penerimaan', "LOKAL")
+                        // ->where('penerimaan_barang.status_penerimaan', "IMPORT")
                         // ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
-                        ->where('penerimaan_barang.bc_type', '53')
+                        ->where('penerimaan_barang.bc_type', '48')
                         ->where('penerimaan_barang.deletedAt', null)
                         ->where('penerimaan_barang_detail.deletedAt', null)
                         ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
@@ -2884,13 +3194,10 @@ class LaporanWarehouse extends BaseController
                         ->first();
                 }
 
-
-
-
                 array_push($dataAllPenerimaanBarang, [
                     "no"                => $no++,
-                    "bc_type"     => "BC 4.0",
-                    "tanggal_bc"         =>  date('Y-m-d', strtotime($data->updatedAt)),
+                    "bc_type"     => "BC 2.3",
+                    "tanggal_bc"         => date('Y-m-d', strtotime($data->updatedAt)),
                     "no_daftar"    => $data->no_daftar,
                     "no_aju"    => $data->no_aju,
                     "no_penerimaan_barang"    => $po->no_penerimaan_barang,
@@ -2903,15 +3210,180 @@ class LaporanWarehouse extends BaseController
                     "kode_satuan"    => $po->kode_satuan,
                     "qty"    => $po->qty,
                     "jml_masuk"    => $po->jml_masuk,
-
                 ]);
             }
 
-            foreach ($penerimaanBarangNoPabean['data'] as $data) {
+            if (!empty($addCondition['dateStart']) && !empty($addCondition['dateEnd'])) {
+                $filteredData = array_filter($dataAllPenerimaanBarang, function ($item) use ($addCondition) {
+                    $tanggal_bc = date('Y-m-d', strtotime($item['tanggal_bc']));
 
+                    return $tanggal_bc >= $addCondition['dateStart'] && $tanggal_bc <= $addCondition['dateEnd'];
+                });
+            } else {
+                $filteredData = $dataAllPenerimaanBarang;
+            }
+
+            $data = [
+                'dataAllPenerimaanBarang' => $filteredData,
+                'no' => 1,
+                'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+                'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+                'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
+            ];
+        } elseif ($filter_bc_type  == "BC 4.0") {
+            $bcPurchaseOrderBc40 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc40($addCondition);
+
+            $no = 1;
+            $dataAllPenerimaanBarang = [];
+
+            foreach ($bcPurchaseOrderBc40['data'] as $data) {
+                $bcPenerimaanBarangIDArr = json_decode($data->multiple_lpb_id);
+                $bcPurchaseOrderIDArr = json_decode($data->multiple_po_id);
+
+                if ($data->po_type == "LOKAL BAKU") {
+                    // PO LOKAL BAHAN BAKU
+                    $poQuery = $this->penerimaanBarangModel->asObject()
+                        ->select('
+                    penerimaan_barang.tanggal AS lpb_date,
+                    penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
+                    penerimaan_barang_detail.penerimaan_barang_id,
+                    penerimaan_barang_detail.purchase_order_id,
+                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
+                   
+                    penerimaan_barang_detail.barang_id,
+                    penerimaan_barang_detail.nama_barang_dok,
+                    penerimaan_barang_detail.qty,
+                    penerimaan_barang_detail.jml_masuk,
+                    rm_purchase_orders.po_no,
+                    rm_purchase_orders.po_date,
+                    barang_master.barang_name,
+                    barang_master.kode_barang,
+                    satuans.kode_satuan,
+                    warehouses.warehouse_name, 
+                    divisis.divisi
+                ')
+                        ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+                        ->join('rm_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
+                        ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+                        ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                        ->join('satuans', 'penerimaan_barang_detail.unit = satuans.id', 'left')
+                        ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+                        ->where('penerimaan_barang.bc_type', '53')
+                        ->where('penerimaan_barang.deletedAt', null)
+                        ->where('penerimaan_barang_detail.deletedAt', null)
+                        ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
+                        ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr);
+                    if (!empty($filter_divisi)) {
+                        $poQuery->where('penerimaan_barang.divisi_id', $filter_divisi);
+                    }
+
+                    if (!empty($filter_supplier)) {
+                        $poQuery->where('penerimaan_barang.supplier_id', $filter_supplier);
+                    }
+
+                    if (!empty($filter_barang)) {
+                        $poQuery->where('penerimaan_barang_detail.spesifikasi_id', $filter_barang);
+                    }
+
+                    $po = $poQuery->first();
+                } elseif ($data->po_type == "LOKAL PENOLONG") {
+                    // PO LOKAL BAHAN PENOLONG
+                    $poQuery = $this->penerimaanBarangModel->asObject()
+                        ->select('
+                    penerimaan_barang.tanggal AS lpb_date,
+                     penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
+                    penerimaan_barang_detail.penerimaan_barang_id,
+                    penerimaan_barang_detail.purchase_order_id,
+                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
+                   
+                    penerimaan_barang_detail.barang_id,
+                    penerimaan_barang_detail.nama_barang_dok,
+                    penerimaan_barang_detail.qty,
+                    penerimaan_barang_detail.jml_masuk,
+                    am_purchase_orders.po_no,
+                    am_purchase_orders.po_date,
+                    barang_master.barang_name,
+                    barang_master.kode_barang,
+                    satuans.kode_satuan,
+                    warehouses.warehouse_name, 
+                    divisis.divisi
+                ')
+                        ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+                        ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
+                        ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+                        ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                        ->join('satuans', 'penerimaan_barang_detail.unit = satuans.id', 'left')
+                        ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+                        ->where('penerimaan_barang.bc_type', '53')
+                        ->where('penerimaan_barang.deletedAt', null)
+                        ->where('penerimaan_barang_detail.deletedAt', null)
+                        ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
+                        ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr);
+
+                    if (!empty($filter_divisi)) {
+                        $poQuery->where('penerimaan_barang.divisi_id', $filter_divisi);
+                    }
+
+                    if (!empty($filter_supplier)) {
+                        $poQuery->where('penerimaan_barang.supplier_id', $filter_supplier);
+                    }
+
+                    if (!empty($filter_barang)) {
+                        $poQuery->where('penerimaan_barang_detail.spesifikasi_id', $filter_barang);
+                    }
+
+                    $po = $poQuery->first();
+                }
+                if (!empty($po)) {
+                    array_push($dataAllPenerimaanBarang, [
+                        "no"                => $no++,
+                        "bc_type"     => "BC 4.0",
+                        "tanggal_bc"         =>  date('Y-m-d', strtotime($data->updatedAt)),
+                        "no_daftar"    => $data->no_daftar,
+                        "no_aju"    => $data->no_aju,
+                        "no_penerimaan_barang"    => $po->no_penerimaan_barang,
+                        "tanggal_lpb"    => $po->lpb_date,
+                        "po_no"    => $po->po_no,
+                        "po_date"    => $po->po_date,
+                        "divisi"    => $po->divisi,
+                        "kode_barang"       => $po->kode_barang,
+                        "nama_barang_dok"    => $po->nama_barang_dok,
+                        "kode_satuan"    => $po->kode_satuan,
+                        "qty"    => $po->qty,
+                        "jml_masuk"    => $po->jml_masuk,
+                    ]);
+                }
+            }
+
+            if (!empty($addCondition['dateStart']) && !empty($addCondition['dateEnd'])) {
+                $filteredData = array_filter($dataAllPenerimaanBarang, function ($item) use ($addCondition) {
+                    $tanggal_bc = date('Y-m-d', strtotime($item['tanggal_bc']));
+
+                    return $tanggal_bc >= $addCondition['dateStart'] && $tanggal_bc <= $addCondition['dateEnd'];
+                });
+            } else {
+                $filteredData = $dataAllPenerimaanBarang;
+            }
+
+            $data = [
+                'dataAllPenerimaanBarang' => $filteredData,
+                'no' => 1,
+                'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+                'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+                'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
+            ];
+        } elseif ($filter_bc_type  == "Non Pabean") {
+            $addCondition['filter_divisi'] = $filter_divisi;
+            $addCondition['filter_supplier'] = $filter_supplier;
+            $addCondition['filter_barang'] = $filter_barang;
+
+            $penerimaanBarang = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportNoPabean($addCondition);
+
+            $no = 1;
+            $dataAllPenerimaanBarang = [];
+
+            foreach ($penerimaanBarang['data'] as $data) {
                 $po_id_array = json_decode($data->multiple_po_id);
-
-
 
                 if (($data->status_penerimaan == "LOKAL") && ($data->tipe_bahan == "BAKU")) {
 
@@ -2948,9 +3420,6 @@ class LaporanWarehouse extends BaseController
                         ->first();
                 }
 
-
-
-
                 array_push($dataAllPenerimaanBarang, [
                     "no"                => $no++,
                     "bc_type"     => "Non Pabean",
@@ -2967,13 +3436,23 @@ class LaporanWarehouse extends BaseController
                     "kode_satuan"    => $data->kode_satuan,
                     "qty"    => $data->qty,
                     "jml_masuk"    => $data->jml_masuk,
-
                 ]);
             }
 
-            foreach ($penerimaanBarangMutasi['data'] as $data) {
+            $data = [
+                'dataAllPenerimaanBarang' => $dataAllPenerimaanBarang,
+                'no' => 1,
+                'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+                'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+                'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
+            ];
+        } elseif ($filter_bc_type  == "BC 2.7") {
+            $penerimaanBarang = $this->penerimaanMutasiGlobalModel->getPenerimaanBarangListReportBc27PDF($addCondition);
 
+            $no = 1;
+            $dataAllPenerimaanBarang = [];
 
+            foreach ($penerimaanBarang['data'] as $data) {
                 if ($data->tipe_barang == 'kemasan') {
                     // Kemasan
                     $kemasan = $this->kemasanModel->find($data->kemasan_id);
@@ -3012,6 +3491,76 @@ class LaporanWarehouse extends BaseController
                     $po_date = $getRmImportPo['po_date'];
                 }
 
+                array_push($dataAllPenerimaanBarang, [
+                    "no"                => $no++,
+                    "bc_type"     => "BC 2.7",
+                    "tanggal_bc"         =>  date('Y-m-d', strtotime($data->tanggal_bc)),
+                    "no_daftar"    => $data->no_daftar,
+                    "no_aju"    => $data->no_aju,
+                    "no_penerimaan_barang"    => $data->penerimaan_mutasi_no,
+                    "tanggal_lpb"    => $data->tanggal,
+                    "po_no"    => !empty($stockListDetailAsal['no_po']) ? $stockListDetailAsal['no_po'] : "",
+                    "po_date"    => !empty($po_date) ? $po_date  : "",
+                    "divisi"    => $data->divisi_penerima,
+                    "kode_barang"       => $kodeBarang,
+                    "nama_barang_dok"    => $barang,
+                    "kode_satuan"    => $satuan,
+                    "qty"    => !empty($data->qty) ? $data->qty : 0,
+                    "jml_masuk"    => $data->jml_masuk,
+                ]);
+            }
+
+            $data = [
+                'dataAllPenerimaanBarang' => $dataAllPenerimaanBarang,
+                'no' => 1,
+                'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+                'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+                'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
+            ];
+        } elseif ($filter_bc_type  == "PPB KB") {
+            $penerimaanBarang = $this->penerimaanMutasiModel->getPenerimaanBarangListReportPPBKBPDF($addCondition);
+
+            $no = 1;
+            $dataAllPenerimaanBarang = [];
+
+            foreach ($penerimaanBarang['data'] as $data) {
+                if ($data->tipe_barang == 'kemasan') {
+                    // Kemasan
+                    $kemasan = $this->kemasanModel->find($data->kemasan_id);
+                    $satuan = $this->satuanModel->find($kemasan['satuan_id'])['kode_satuan'];
+                    $barang = $kemasan['name'];
+                    $kodeBarang = $kemasan['kode'];
+                } else {
+                    // Barang
+                    $barangSpesifikasi = $this->barangMasterModel
+                        ->select("barang_master_spesifikasi.satuan_1, CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS barang, barang_master.kode_barang")
+                        ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                        ->where('barang_master_spesifikasi.id', $data->barang2_id)
+                        ->where('barang_master_spesifikasi.barang_master_id', $data->barang1_id)
+                        ->first();
+                    $satuan = $this->satuanModel->find($barangSpesifikasi['satuan_1'])['kode_satuan'];
+                    $barang = $barangSpesifikasi['barang'];
+                    $kodeBarang = $barangSpesifikasi['kode_barang'];
+                }
+
+                $stockListDetailAsal = $this->stockDetail2Model->getStockListDetail(
+                    $data->stock_id_asal,
+                    $data->bc_id_asal,
+                    $data->no_aju_asal,
+                    $data->stock_dokumen_asal,
+                );
+
+                $getRmPo = $this->rmPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getAmPo = $this->amPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getRmImportPo = $this->rmImportPOModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+
+                if (!empty($getRmPo)) {
+                    $po_date = $getRmPo['po_date'];
+                } elseif (!empty($getAmPo)) {
+                    $po_date = $getAmPo['po_date'];
+                } elseif (!empty($getRmImportPo)) {
+                    $po_date = $getRmImportPo['po_date'];
+                }
 
                 array_push($dataAllPenerimaanBarang, [
                     "no"                => $no++,
@@ -3029,13 +3578,307 @@ class LaporanWarehouse extends BaseController
                     "kode_satuan"    => $satuan,
                     "qty"    => !empty($data->qty) ? $data->qty : 0,
                     "jml_masuk"    => $data->jml_masuk,
-
                 ]);
             }
 
-            foreach ($penerimaanBarangGlobal['data'] as $data) {
+            $data = [
+                'dataAllPenerimaanBarang' => $dataAllPenerimaanBarang,
+                'no' => 1,
+                'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+                'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+                'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
+            ];
+        } elseif ($filter_bc_type  == "all") {
+            $addCondition['filter_divisi'] = $filter_divisi;
+            $addCondition['filter_supplier'] = $filter_supplier;
+            $addCondition['filter_barang'] = $filter_barang;
 
+            $penerimaanBarangMutasi = $this->penerimaanMutasiModel->getPenerimaanBarangListReportPPBKBPDF($addCondition);
+            $penerimaanBarangGlobal = $this->penerimaanMutasiGlobalModel->getPenerimaanBarangListReportBc27PDF($addCondition);
+            $penerimaanBarangNoPabean = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportNoPabean($addCondition);
+            $bcPurchaseOrderBc40 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc40($addCondition);
+            $bcPurchaseOrderBc23 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc23($addCondition);
 
+            $no = 1;
+            $dataAllPenerimaanBarang = [];
+
+            foreach ($bcPurchaseOrderBc23['data'] as $data) {
+                $bcPenerimaanBarangIDArr = json_decode($data->multiple_lpb_id);
+                $bcPurchaseOrderIDArr = json_decode($data->multiple_po_id);
+
+                if ($data->po_type == "IMPORT BAKU") {
+                    // PO IMPORT BAHAN BAKU
+                    $po = $this->penerimaanBarangModel->asObject()
+                        ->select('
+                    penerimaan_barang.tanggal AS lpb_date,
+                    penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
+                    penerimaan_barang_detail.penerimaan_barang_id,
+                    penerimaan_barang_detail.purchase_order_id,
+                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
+                   
+                    penerimaan_barang_detail.barang_id,
+                    penerimaan_barang_detail.nama_barang_dok,
+                    penerimaan_barang_detail.qty,
+                    penerimaan_barang_detail.jml_masuk,
+                    rm_import_pos.po_no,
+                    rm_import_pos.po_date,
+                    barang_master.barang_name,
+                    barang_master.kode_barang,
+                    satuans.kode_satuan,
+                    warehouses.warehouse_name, 
+                    divisis.divisi
+                ')
+                        ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+                        ->join('rm_import_pos', 'penerimaan_barang_detail.purchase_order_id = rm_import_pos.id', 'left')
+                        ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+                        ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                        ->join('satuans', 'penerimaan_barang_detail.unit = satuans.id', 'left')
+                        ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+                        // ->where('penerimaan_barang.status_penerimaan', "IMPORT")
+                        // ->where('penerimaan_barang.tipe_bahan', "BAKU")
+                        // ->where('penerimaan_barang.supplier_id', $first['supplier_id'])
+                        ->where('penerimaan_barang.bc_type', '48')
+                        ->where('penerimaan_barang.deletedAt', null)
+                        ->where('penerimaan_barang_detail.deletedAt', null)
+                        ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
+                        ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
+                        // ->groupBy('barang_id')
+                        // ->groupBy('penerimaan_barang_id')
+                        ->first();
+                } elseif ($data->po_type == "IMPORT PENOLONG") {
+                    // PO IMPORT BAHAN PENOLONG
+                    $po = $this->penerimaanBarangModel->asObject()
+                        ->select('
+                    penerimaan_barang.tanggal AS lpb_date,
+                     penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
+                    penerimaan_barang_detail.penerimaan_barang_id,
+                    penerimaan_barang_detail.purchase_order_id,
+                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
+                   
+                    penerimaan_barang_detail.barang_id,
+                    penerimaan_barang_detail.nama_barang_dok,
+                    penerimaan_barang_detail.qty,
+                    penerimaan_barang_detail.jml_masuk,
+                    am_purchase_orders.po_no,
+                    am_purchase_orders.po_date,
+                    barang_master.barang_name,
+                    barang_master.kode_barang,
+                    satuans.kode_satuan,
+                    warehouses.warehouse_name, 
+                    divisis.divisi
+                ')
+                        ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+                        ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
+                        ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+                        ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                        ->join('satuans', 'penerimaan_barang_detail.unit = satuans.id', 'left')
+                        ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+                        // ->where('penerimaan_barang.status_penerimaan', "IMPORT")
+                        // ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
+                        ->where('penerimaan_barang.bc_type', '48')
+                        ->where('penerimaan_barang.deletedAt', null)
+                        ->where('penerimaan_barang_detail.deletedAt', null)
+                        ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
+                        ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
+                        // ->groupBy('barang_id')
+                        // ->groupBy('penerimaan_barang_id')
+                        ->first();
+                }
+
+                array_push($dataAllPenerimaanBarang, [
+                    "no"                => $no++,
+                    "bc_type"     => "BC 2.3",
+                    "tanggal_bc"         => date('Y-m-d', strtotime($data->updatedAt)),
+                    "no_daftar"    => $data->no_daftar,
+                    "no_aju"    => $data->no_aju,
+                    "no_penerimaan_barang"    => $po->no_penerimaan_barang,
+                    "tanggal_lpb"    => $po->lpb_date,
+                    "po_no"    => $po->po_no,
+                    "po_date"    => $po->po_date,
+                    "divisi"    => $po->divisi,
+                    "kode_barang"       => $po->kode_barang,
+                    "nama_barang_dok"    => $po->nama_barang_dok,
+                    "kode_satuan"    => $po->kode_satuan,
+                    "qty"    => $po->qty,
+                    "jml_masuk"    => $po->jml_masuk,
+                ]);
+            }
+
+            foreach ($bcPurchaseOrderBc40['data'] as $data) {
+                $bcPenerimaanBarangIDArr = json_decode($data->multiple_lpb_id);
+                $bcPurchaseOrderIDArr = json_decode($data->multiple_po_id);
+
+                if ($data->po_type == "LOKAL BAKU") {
+                    // PO LOKAL BAHAN BAKU
+                    $poQuery = $this->penerimaanBarangModel->asObject()
+                        ->select('
+                    penerimaan_barang.tanggal AS lpb_date,
+                    penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
+                    penerimaan_barang_detail.penerimaan_barang_id,
+                    penerimaan_barang_detail.purchase_order_id,
+                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
+                   
+                    penerimaan_barang_detail.barang_id,
+                    penerimaan_barang_detail.nama_barang_dok,
+                    penerimaan_barang_detail.qty,
+                    penerimaan_barang_detail.jml_masuk,
+                    rm_purchase_orders.po_no,
+                    rm_purchase_orders.po_date,
+                    barang_master.barang_name,
+                    barang_master.kode_barang,
+                    satuans.kode_satuan,
+                    warehouses.warehouse_name, 
+                    divisis.divisi
+                ')
+                        ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+                        ->join('rm_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
+                        ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+                        ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                        ->join('satuans', 'penerimaan_barang_detail.unit = satuans.id', 'left')
+                        ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+                        ->where('penerimaan_barang.bc_type', '53')
+                        ->where('penerimaan_barang.deletedAt', null)
+                        ->where('penerimaan_barang_detail.deletedAt', null)
+                        ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
+                        ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr);
+                    if (!empty($filter_divisi)) {
+                        $poQuery->where('penerimaan_barang.divisi_id', $filter_divisi);
+                    }
+
+                    if (!empty($filter_supplier)) {
+                        $poQuery->where('penerimaan_barang.supplier_id', $filter_supplier);
+                    }
+
+                    if (!empty($filter_barang)) {
+                        $poQuery->where('penerimaan_barang_detail.spesifikasi_id', $filter_barang);
+                    }
+
+                    $po = $poQuery->first();
+                } elseif ($data->po_type == "LOKAL PENOLONG") {
+                    // PO LOKAL BAHAN PENOLONG
+                    $poQuery = $this->penerimaanBarangModel->asObject()
+                        ->select('
+                    penerimaan_barang.tanggal AS lpb_date,
+                     penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
+                    penerimaan_barang_detail.penerimaan_barang_id,
+                    penerimaan_barang_detail.purchase_order_id,
+                    penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
+                   
+                    penerimaan_barang_detail.barang_id,
+                    penerimaan_barang_detail.nama_barang_dok,
+                    penerimaan_barang_detail.qty,
+                    penerimaan_barang_detail.jml_masuk,
+                    am_purchase_orders.po_no,
+                    am_purchase_orders.po_date,
+                    barang_master.barang_name,
+                    barang_master.kode_barang,
+                    satuans.kode_satuan,
+                    warehouses.warehouse_name, 
+                    divisis.divisi
+                ')
+                        ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+                        ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
+                        ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+                        ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                        ->join('satuans', 'penerimaan_barang_detail.unit = satuans.id', 'left')
+                        ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+                        ->where('penerimaan_barang.bc_type', '53')
+                        ->where('penerimaan_barang.deletedAt', null)
+                        ->where('penerimaan_barang_detail.deletedAt', null)
+                        ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
+                        ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr);
+
+                    if (!empty($filter_divisi)) {
+                        $poQuery->where('penerimaan_barang.divisi_id', $filter_divisi);
+                    }
+
+                    if (!empty($filter_supplier)) {
+                        $poQuery->where('penerimaan_barang.supplier_id', $filter_supplier);
+                    }
+
+                    if (!empty($filter_barang)) {
+                        $poQuery->where('penerimaan_barang_detail.spesifikasi_id', $filter_barang);
+                    }
+
+                    $po = $poQuery->first();
+                }
+                if (!empty($po)) {
+                    array_push($dataAllPenerimaanBarang, [
+                        "no"                => $no++,
+                        "bc_type"     => "BC 4.0",
+                        "tanggal_bc"         =>  date('Y-m-d', strtotime($data->updatedAt)),
+                        "no_daftar"    => $data->no_daftar,
+                        "no_aju"    => $data->no_aju,
+                        "no_penerimaan_barang"    => $po->no_penerimaan_barang,
+                        "tanggal_lpb"    => $po->lpb_date,
+                        "po_no"    => $po->po_no,
+                        "po_date"    => $po->po_date,
+                        "divisi"    => $po->divisi,
+                        "kode_barang"       => $po->kode_barang,
+                        "nama_barang_dok"    => $po->nama_barang_dok,
+                        "kode_satuan"    => $po->kode_satuan,
+                        "qty"    => $po->qty,
+                        "jml_masuk"    => $po->jml_masuk,
+                    ]);
+                }
+            }
+
+            foreach ($penerimaanBarangNoPabean['data'] as $data) {
+                $po_id_array = json_decode($data->multiple_po_id);
+                if (($data->status_penerimaan == "LOKAL") && ($data->tipe_bahan == "BAKU")) {
+                    $po = $this->rmPurchaseOrderModel->asObject()
+                        ->select('
+                            rm_purchase_orders.po_no ,
+                            rm_purchase_orders.po_date 
+                        ')
+                        ->whereIn('rm_purchase_orders.id', $po_id_array)
+                        ->first();
+                } elseif (($data->status_penerimaan == "LOKAL") && ($data->tipe_bahan == "PENOLONG")) {
+                    $po = $this->amPurchaseOrderModel->asObject()
+                        ->select('
+                            am_purchase_orders.po_no ,
+                            am_purchase_orders.po_date 
+                        ')
+                        ->whereIn('am_purchase_orders.id', $po_id_array)
+                        ->first();
+                } elseif (($data->status_penerimaan == "IMPORT") && ($data->tipe_bahan == "BAKU")) {
+                    $po = $this->rmImportPOModel->asObject()
+                        ->select('
+                            rm_import_pos.po_no ,
+                            rm_import_pos.po_date 
+                        ')
+                        ->whereIn('rm_import_pos.id', $po_id_array)
+                        ->first();
+                } elseif (($data->status_penerimaan == "IMPORT") && ($data->tipe_bahan == "PENOLONG")) {
+                    $po = $this->amPurchaseOrderModel->asObject()
+                        ->select('
+                            am_purchase_orders.po_no ,
+                            am_purchase_orders.po_date 
+                        ')
+                        ->whereIn('am_purchase_orders.id', $po_id_array)
+                        ->first();
+                }
+
+                array_push($dataAllPenerimaanBarang, [
+                    "no"                => $no++,
+                    "bc_type"     => "Non Pabean",
+                    "tanggal_bc"         =>  $data->lpb_date,
+                    "no_daftar"    => "-",
+                    "no_aju"    => "-",
+                    "no_penerimaan_barang"    => $data->no_penerimaan_barang,
+                    "tanggal_lpb"    => $data->lpb_date,
+                    "po_no"    => !empty($po->po_no) ? $po->po_no : "",
+                    "po_date"    => !empty($po->po_date) ? $po->po_date : "",
+                    "divisi"    => $data->divisi,
+                    "kode_barang"       => $data->kode_barang,
+                    "nama_barang_dok"    => $data->nama_barang_dok,
+                    "kode_satuan"    => $data->kode_satuan,
+                    "qty"    => $data->qty,
+                    "jml_masuk"    => $data->jml_masuk,
+                ]);
+            }
+
+            foreach ($penerimaanBarangMutasi['data'] as $data) {
                 if ($data->tipe_barang == 'kemasan') {
                     // Kemasan
                     $kemasan = $this->kemasanModel->find($data->kemasan_id);
@@ -3074,6 +3917,63 @@ class LaporanWarehouse extends BaseController
                     $po_date = $getRmImportPo['po_date'];
                 }
 
+                array_push($dataAllPenerimaanBarang, [
+                    "no"                => $no++,
+                    "bc_type"     => "PPB KB",
+                    "tanggal_bc"         =>  $data->tanggal_bc,
+                    "no_daftar"    => $data->no_daftar,
+                    "no_aju"    => $data->no_ppbkb,
+                    "no_penerimaan_barang"    => $data->penerimaan_mutasi_no,
+                    "tanggal_lpb"    => $data->tanggal,
+                    "po_no"    => !empty($stockListDetailAsal['no_po']) ? $stockListDetailAsal['no_po'] : "",
+                    "po_date"    => !empty($po_date) ? $po_date  : "",
+                    "divisi"    => $data->divisi_penerima,
+                    "kode_barang"       => $kodeBarang,
+                    "nama_barang_dok"    => $barang,
+                    "kode_satuan"    => $satuan,
+                    "qty"    => !empty($data->qty) ? $data->qty : 0,
+                    "jml_masuk"    => $data->jml_masuk,
+                ]);
+            }
+
+            foreach ($penerimaanBarangGlobal['data'] as $data) {
+                if ($data->tipe_barang == 'kemasan') {
+                    // Kemasan
+                    $kemasan = $this->kemasanModel->find($data->kemasan_id);
+                    $satuan = $this->satuanModel->find($kemasan['satuan_id'])['kode_satuan'];
+                    $barang = $kemasan['name'];
+                    $kodeBarang = $kemasan['kode'];
+                } else {
+                    // Barang
+                    $barangSpesifikasi = $this->barangMasterModel
+                        ->select("barang_master_spesifikasi.satuan_1, CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS barang, barang_master.kode_barang")
+                        ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                        ->where('barang_master_spesifikasi.id', $data->barang2_id)
+                        ->where('barang_master_spesifikasi.barang_master_id', $data->barang1_id)
+                        ->first();
+                    $satuan = $this->satuanModel->find($barangSpesifikasi['satuan_1'])['kode_satuan'];
+                    $barang = $barangSpesifikasi['barang'];
+                    $kodeBarang = $barangSpesifikasi['kode_barang'];
+                }
+
+                $stockListDetailAsal = $this->stockDetail2Model->getStockListDetail(
+                    $data->stock_id_asal,
+                    $data->bc_id_asal,
+                    $data->no_aju_asal,
+                    $data->stock_dokumen_asal,
+                );
+
+                $getRmPo = $this->rmPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getAmPo = $this->amPurchaseOrderModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+                $getRmImportPo = $this->rmImportPOModel->select('po_date')->where('po_no', $stockListDetailAsal['no_po'])->first();
+
+                if (!empty($getRmPo)) {
+                    $po_date = $getRmPo['po_date'];
+                } elseif (!empty($getAmPo)) {
+                    $po_date = $getAmPo['po_date'];
+                } elseif (!empty($getRmImportPo)) {
+                    $po_date = $getRmImportPo['po_date'];
+                }
 
                 array_push($dataAllPenerimaanBarang, [
                     "no"                => $no++,
@@ -3094,50 +3994,48 @@ class LaporanWarehouse extends BaseController
 
                 ]);
             }
-
-
-            // $totalPenerimaanBarangMutasi = count($penerimaanBarangMutasi);
-            // $totalPenerimaanBarangGlobalMutasi = count($penerimaanBarangGlobal);
-            // $totalBcPurchaseOrderBc40 = count($bcPurchaseOrderBc40);
-            // $totalBcPurchaseOrderBc23 = count($bcPurchaseOrderBc23);
-            // $totalPenerimaanBarangNoPabean = count($penerimaanBarangNoPabean);
-
-            // $recordsTotal = $totalPenerimaanBarangMutasi + $totalPenerimaanBarangGlobalMutasi + $totalBcPurchaseOrderBc40 + $totalBcPurchaseOrderBc23 + $totalPenerimaanBarangNoPabean;
-
-            // $recordsFiltered = $recordsTotal;
-
-
-
             $data = [
-
                 'dataAllPenerimaanBarang' => $dataAllPenerimaanBarang,
                 'no' => 1,
                 'tanggalAwal' => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
                 'tanggalAkhir' => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
                 'filter_bc_type' =>  $this->request->getGet("filter_bc_type"),
-
             ];
         }
 
+        $no =  1;
+        $column = 4;
 
-        $domPdf = new Dompdf();
+        foreach ($data['dataAllPenerimaanBarang'] as $data) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $column, $no++)
+                ->setCellValue('B' . $column, $data['bc_type'])
+                ->setCellValue('C' . $column, $data['tanggal_bc'])
+                ->setCellValue('D' . $column, $data['no_daftar'])
+                ->setCellValue('E' . $column, $data['no_aju'])
+                ->setCellValue('F' . $column, $data['no_penerimaan_barang'])
+                ->setCellValue('G' . $column, $data['tanggal_lpb'])
+                ->setCellValue('H' . $column, $data['po_no'])
+                ->setCellValue('I' . $column, $data['po_date'])
+                ->setCellValue('J' . $column, $data['divisi'])
+                ->setCellValue('K' . $column, $data['kode_barang'])
+                ->setCellValue('L' . $column, $data['nama_barang_dok'])
+                ->setCellValue('M' . $column, $data['kode_satuan'])
+                ->setCellValue('N' . $column, $data['qty'])
+                ->setCellValue('O' . $column, $data['jml_masuk']);
+            $column++;
+        }
 
-        $fileName = 'Laporan Penerimaan Barang';
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Laporan Penerimaan Barang PT. TOBA SURIMI INDUSTRIES, Tbk (' . session()->get("login")->this_company . ')';
+        $encodedFilename = rawurlencode($filename . '.xlsx');
 
-        // load HTML content
-        $domPdf->loadHtml(view('Laporan/Warehouse/LaporanPenerimaanBarang/print', $data));
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $encodedFilename . '"');
+        header('Cache-Control: max-age=0');
 
-        // (optional) setup the paper size and orientation
-        $domPdf->setPaper('legal', 'landscape');
-
-        // render html as PDF
-        $domPdf->render();
-
-        // output the generated pdf
-        $domPdf->stream($fileName, array("Attachment" => false));
-
-        exit();
-        // return view('Supplier/supplierBahanBaku/print');
+        $writer->save('php://output');
+        die;
     }
 
 
