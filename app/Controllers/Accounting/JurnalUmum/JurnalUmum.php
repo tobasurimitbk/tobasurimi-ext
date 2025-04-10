@@ -42,8 +42,6 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use App\Models\LocalPOPaymentPanjarModel;
 use App\Models\LocalPOPaymentPinjamanModel;
-use App\Models\PanjarSupplierModel;
-use App\Models\PinjamanSupplierModel;
 use Carbon\Carbon;
 
 class JurnalUmum extends BaseController
@@ -137,10 +135,28 @@ class JurnalUmum extends BaseController
     {
         $tipeTransaksi = $this->MetadataModel
             ->where('name', 'tipe_transaksi')
+            ->where('name !=', "PEMBELIAN")
             ->findAll();
+        // Tambahkan Transaksi Pembelian Bahan Baku dan Bahan Penolong
+        $tipeTransaksiArr = array(
+            [
+                'id' => "BAHAN BAKU",
+                'value' => "PEMBELIAN BAHAN BAKU"
+            ],
+            [
+                'id' => "BAHAN PENOLONG",
+                'value' => "PEMBELIAN BAHAN PENOLONG"
+            ]
+        );
+        foreach ($tipeTransaksi as $t) {
+            array_push($tipeTransaksiArr, [
+                'id' => $t['id'],
+                'value' => $t['value']
+            ]);
+        }
 
         $data = [
-            'tipeTransaksi' => $tipeTransaksi
+            'tipeTransaksi' => $tipeTransaksiArr
         ];
 
         return view('Accounting/jurnalUmum/index', $data);
@@ -158,8 +174,8 @@ class JurnalUmum extends BaseController
         $addCondition = [
             "sort"   => $this->request->getVar("sort"),
             "sortType"  => $this->request->getVar("sortType"),
-            "start_date" => $this->request->getVar('start_date'),
-            "end_date" => $this->request->getVar("end_date"),
+            "start_date" =>  $this->request->getVar("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("start_date")))) : "",
+            "end_date" =>  $this->request->getVar("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("end_date")))) : "",
             "type_transaksi" => $this->request->getVar('type_transaksi'),
             "search" => $this->request->getVar("search"),
         ];
@@ -186,47 +202,176 @@ class JurnalUmum extends BaseController
         return response()->setJSON($data);
     }
 
+    // private function getData($dataJurnal, $payload)
+    // {
+
+    //     $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+    //     $dataResult = [];
+    //     foreach ($dataJurnal as $data) {
+    //         // Cek Tutup Buku Per Transaksi
+    //         $tutupBuku = $this->tutupBukuModel
+    //             ->where('company_id', $this->this_company_id)
+    //             ->where('bulan', date('Y-m', strtotime($data->tanggal_transaksi)))
+    //             ->first();
+
+    //         // Untuk Mencari Transaksi Jurnal
+    //         $transaksiPembelian = $this->transaksiPembelianModel
+    //             ->where('id_transaksi_jurnal', $data->id)
+    //             ->first();
+
+    //         $tipePembelian = "";
+    //         $noLPB = "";
+    //         $supplierName = "";
+
+    //         if ($transaksiPembelian != null) {
+    //             if ($transaksiPembelian['id_local_bb'] != null) {
+    //                 $tipePembelian = "LOKAL BB";
+    //                 $penerimaanBarang = $this->penerimaanBarangModel
+    //                     ->select('penerimaan_barang.*,suppliers.name as supplier')
+    //                     ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+    //                     ->where('penerimaan_barang.company_id', $this->this_company_id)
+    //                     ->where('status_penerimaan', "LOKAL")
+    //                     ->where('tipe_bahan', "BAKU")
+    //                     ->like('multiple_po_id', $transaksiPembelian['id_local_bb'])
+    //                     ->first();
+
+    //                 if ($penerimaanBarang != null) {
+    //                     $supplierName = $penerimaanBarang['supplier'];
+    //                     $noLPB = $penerimaanBarang['no_penerimaan_barang'];
+    //                 }
+    //             } elseif ($transaksiPembelian['id_import_bb'] != null) {
+    //                 $tipePembelian = "IMPORT BB";
+    //                 $penerimaanBarang = $this->penerimaanBarangModel
+    //                     ->select('penerimaan_barang.*,suppliers.name as supplier')
+    //                     ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+    //                     ->where('penerimaan_barang.company_id', $this->this_company_id)
+    //                     ->where('status_penerimaan', "IMPORT")
+    //                     ->where('tipe_bahan', "BAKU")
+    //                     ->like('multiple_po_id', $transaksiPembelian['id_import_bb'])
+    //                     ->first();
+
+    //                 if ($penerimaanBarang != null) {
+    //                     $supplierName = $penerimaanBarang['supplier'];
+    //                     $noLPB = $penerimaanBarang['no_penerimaan_barang'];
+    //                 }
+    //             } else {
+    //                 // Lokal Bp / Import Bp
+    //                 $amPurchaseOrder = $this->aMPurchaseOrderModel->where('id', $transaksiPembelian['id_po_bp'])->first();
+    //                 if ($amPurchaseOrder != null) {
+    //                     if ($amPurchaseOrder['po_type'] == "Lokal") {
+    //                         $tipePembelian = "LOKAL BP";
+    //                         $penerimaanBarang = $this->penerimaanBarangModel
+    //                             ->select('penerimaan_barang.*,suppliers.name as supplier')
+    //                             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+    //                             ->where('penerimaan_barang.company_id', $this->this_company_id)
+    //                             ->where('status_penerimaan', "LOKAL")
+    //                             ->where('tipe_bahan', "PENOLONG")
+    //                             ->like('multiple_po_id', $transaksiPembelian['id_po_bp'])
+    //                             ->first();
+    //                         if ($penerimaanBarang != null) {
+    //                             $supplierName = $penerimaanBarang['supplier'];
+    //                             $noLPB = $penerimaanBarang['no_penerimaan_barang'];
+    //                         }
+    //                     } else {
+    //                         $tipePembelian = "IMPORT BP";
+    //                         $penerimaanBarang = $this->penerimaanBarangModel
+    //                             ->select('penerimaan_barang.*,suppliers.name as supplier')
+    //                             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+    //                             ->where('penerimaan_barang.company_id', $this->this_company_id)
+    //                             ->where('status_penerimaan', "IMPORT")
+    //                             ->where('tipe_bahan', "PENOLONG")
+    //                             ->like('multiple_po_id', $transaksiPembelian['id_po_bp'])
+    //                             ->first();
+    //                         if ($penerimaanBarang != null) {
+    //                             $supplierName = $penerimaanBarang['supplier'];
+    //                             $noLPB = $penerimaanBarang['no_penerimaan_barang'];
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+
+    //         array_push($dataResult, [
+    //             "no"                    => $no++,
+    //             "id"                    => encrypt($data->id),
+    //             "transaksi_type_name"   =>  $data->transaksi_type_name . " " . $tipePembelian,
+    //             "no_transaksi"          => $data->metode_input == 'system' ? $data->no_transaksi : $data->no_bukti,
+    //             "tanggal_transaksi"     => date('d/m/Y', strtotime($data->tanggal_transaksi)),
+    //             "uraian_transaksi"      => $data->uraian_transaksi,
+    //             "supplier"              => !empty($supplierName) ? "0 : " . $supplierName : "0 : ",
+    //             "no_lpb"                => $noLPB,
+    //             "metode_input"          => strtoupper($data->metode_input),
+    //             "valas"                 => $data->valas,
+    //             "exchange_rate"         => "",
+    //             "nilai"                 => $data->exchange_rate == 1 ? "" : $data->exchange_rate,
+    //             "nilai_idr"             => $data->total_debit * $data->exchange_rate,
+    //             "tutup_buku"            => $tutupBuku == null ? 0 : 1,
+    //         ]);
+    //     }
+
+    //     return $dataResult;
+    // }
+
     private function getData($dataJurnal, $payload)
     {
-
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         $dataResult = [];
+
         foreach ($dataJurnal as $data) {
-            $transaksiPembelian = $this->transaksiPembelianModel
-                ->select('suppliers.name as supplier')
-                ->join('suppliers', 'suppliers.id = transaksi_pembelian.id_supplier', 'left')
-                ->where('id_transaksi_jurnal', $data->id)
-                ->first();
-            if ($transaksiPembelian != null) {
-                $supplierName = $transaksiPembelian != null ? "0 : " . $transaksiPembelian['supplier'] : "0 : ";
-            }
-            // Cek Tutup Buku Per Transaksi
+            // Cek Tutup Buku per transaksi
             $tutupBuku = $this->tutupBukuModel
                 ->where('company_id', $this->this_company_id)
                 ->where('bulan', date('Y-m', strtotime($data->tanggal_transaksi)))
                 ->first();
 
+            // Penentuan tipe pembelian
+            $tipePembelian = "";
+            if ($data->id_local_bb != null) {
+                $tipePembelian = "LOKAL BB";
+            } elseif ($data->id_import_bb != null) {
+                $tipePembelian = "IMPORT BB";
+            } elseif ($data->id_po_bp != null) {
+                $tipePembelian = ($data->po_type === "Lokal") ? "LOKAL BP" : "IMPORT BP";
+            }
 
+            // Tentukan LPB & Supplier berdasarkan jenis transaksi
+            $noLPB = $data->no_penerimaan_lokal
+                ?? $data->no_penerimaan_import
+                ?? $data->no_penerimaan_bp
+                ?? "";
 
-            array_push($dataResult, [
+            // Jika PO Lokal BB, kosongkan LPB
+            if ($data->id_local_bb != null) {
+                $noLPB = "";
+            }
+
+            // Supplier juga bisa dibedakan kalau perlu, ini contoh
+            $supplierName = $data->supplier_lokal
+                ?? $data->supplier_import
+                ?? $data->supplier_bp
+                ?? "";
+
+            $dataResult[] = [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
-                "transaksi_type_name"   => $data->transaksi_type_name,
-                "no_transaksi"          => $data->metode_input == 'system' ? $data->no_transaksi : $data->no_bukti,
+                "transaksi_type_name"   => $data->transaksi_type_name . " " . $tipePembelian,
+                "no_transaksi"          => $data->metode_input === 'system' ? $data->no_transaksi : $data->no_bukti,
                 "tanggal_transaksi"     => date('d/m/Y', strtotime($data->tanggal_transaksi)),
                 "uraian_transaksi"      => $data->uraian_transaksi,
-                "invoice"               => isset($supplierName) ? $supplierName : "0 : ",
+                "supplier"              => "0 : " . $supplierName,
+                "no_lpb"                => $noLPB,
                 "metode_input"          => strtoupper($data->metode_input),
                 "valas"                 => $data->valas,
-                "exchange_rate"         => "",
+                "exchange_rate"         => $data->exchange_rate == 1 ? "" : $data->exchange_rate,
                 "nilai"                 => $data->exchange_rate == 1 ? "" : $data->exchange_rate,
                 "nilai_idr"             => $data->total_debit * $data->exchange_rate,
-                "tutup_buku"            => $tutupBuku == null ? 0 : 1,
-            ]);
+                "tutup_buku"            => $tutupBuku ? 1 : 0,
+            ];
         }
 
         return $dataResult;
     }
+
 
     public function create()
     {
@@ -615,8 +760,8 @@ class JurnalUmum extends BaseController
         $addCondition = [
             "sort"   => $this->request->getVar("sort"),
             "sortType"  => $this->request->getVar("sortType"),
-            "start_date" => $this->request->getVar('start_date'),
-            "end_date" => $this->request->getVar("end_date"),
+            "start_date" =>  $this->request->getVar("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("start_date")))) : "",
+            "end_date" =>  $this->request->getVar("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("end_date")))) : "",
             "type_transaksi" => $this->request->getVar('type_transaksi'),
             "search" => $this->request->getVar("search"),
         ];
@@ -643,7 +788,7 @@ class JurnalUmum extends BaseController
 
         $dataStyleArray = [
             'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
                 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
             ],
         ];
@@ -653,27 +798,29 @@ class JurnalUmum extends BaseController
             ->setCellValue('B1', 'Transaksi')
             ->setCellValue('C1', 'Nomor')
             ->setCellValue('D1', 'Tanggal')
-            ->setCellValue('E1', 'Invoice')
-            ->setCellValue('F1', 'Keterangan')
-            ->setCellValue('G1', 'Nilai')
-            ->setCellValue('H1', 'Valas')
-            ->setCellValue('I1', 'Nilai (IDR)');
+            ->setCellValue('E1', 'No LPB')
+            ->setCellValue('F1', 'Invoice')
+            ->setCellValue('G1', 'Keterangan')
+            ->setCellValue('H1', 'Nilai')
+            ->setCellValue('I1', 'Valas')
+            ->setCellValue('J1', 'Nilai (IDR)');
 
 
-        $sheet->getStyle('A1:I1')->applyFromArray($headerStyleArray);
+        $sheet->getStyle('A1:J1')->applyFromArray($headerStyleArray);
 
         foreach ($dataJurnal as $row) {
             $sheet->setCellValue('A' . $column, $row['no'])
                 ->setCellValue('B' . $column, $row['transaksi_type_name'])
                 ->setCellValue('C' . $column, $row['no_transaksi'])
                 ->setCellValue('D' . $column, $row['tanggal_transaksi'])
-                ->setCellValue('E' . $column, $row['invoice'])
-                ->setCellValue('F' . $column, $row['uraian_transaksi'])
-                ->setCellValue('G' . $column, $row['nilai'])
-                ->setCellValue('H' . $column, $row['valas'])
-                ->setCellValue('I' . $column, $row['nilai_idr']);
+                ->setCellValue('E' . $column, $row['no_lpb'])
+                ->setCellValue('F' . $column, $row['supplier'])
+                ->setCellValue('G' . $column, $row['uraian_transaksi'])
+                ->setCellValue('H' . $column, $row['nilai'])
+                ->setCellValue('I' . $column, $row['valas'])
+                ->setCellValue('J' . $column, $row['nilai_idr']);
 
-            $sheet->getStyle('A' . $column . ':I' . $column)->applyFromArray($dataStyleArray);
+            $sheet->getStyle('A' . $column . ':J' . $column)->applyFromArray($dataStyleArray);
             $column++;
         }
 
@@ -706,8 +853,8 @@ class JurnalUmum extends BaseController
         $addCondition = [
             "sort"   => $this->request->getVar("sort"),
             "sortType"  => $this->request->getVar("sortType"),
-            "start_date" => $this->request->getVar('start_date'),
-            "end_date" => $this->request->getVar("end_date"),
+            "start_date" =>  $this->request->getVar("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("start_date")))) : "",
+            "end_date" =>  $this->request->getVar("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("end_date")))) : "",
             "type_transaksi" => $this->request->getVar('type_transaksi'),
             "search" => $this->request->getVar("search"),
         ];
