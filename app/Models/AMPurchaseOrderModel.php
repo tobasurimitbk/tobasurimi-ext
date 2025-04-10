@@ -427,7 +427,7 @@ class AMPurchaseOrderModel extends Model
             CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) as nama_barang, 
             am_purchase_orders.po_no,
             am_purchase_orders.po_date,
-            am_purchase_orders.note,
+            am_purchase_order_details.note,
             suppliers.name as nama_supplier,
             am_purchase_order_details.price,
             am_purchase_order_details.qty,

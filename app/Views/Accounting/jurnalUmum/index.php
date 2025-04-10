@@ -159,40 +159,40 @@
             },
             {
                 data: "transaksi_type_name",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "no_transaksi",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "tanggal_transaksi",
-                className: "text-center",
+                className: "text-left",
 
             },
             {
                 data: "no_lpb",
-                className: "text-center",
+                className: "text-left",
                 searchable: false,
                 sortable: false
             },
             {
                 data: "uraian_transaksi",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "supplier",
-                className: "text-center",
+                className: "text-left",
                 searchable: false,
                 sortable: false
             },
             {
                 data: "metode_input",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "nilai",
-                className: "text-center",
+                className: "text-left",
                 render: function(data, type, row) {
                     return greatFormatRupiahPayment(row.nilai);
                 },
@@ -200,7 +200,7 @@
                 sortable: false
             }, {
                 data: "nilai_idr",
-                className: "text-center",
+                className: "text-left",
                 render: function(data, type, row) {
                     return greatFormatRupiahPayment(row.nilai_idr);
                 },

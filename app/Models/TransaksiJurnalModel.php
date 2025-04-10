@@ -188,6 +188,7 @@ class TransaksiJurnalModel extends Model
     //         'totalFilteredData' => $totalFilteredData,
     //     ];
     // }
+
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
@@ -209,103 +210,74 @@ class TransaksiJurnalModel extends Model
             transaksi_pembelian.id_local_bb,
             transaksi_pembelian.id_import_bb,
             transaksi_pembelian.id_po_bp,
-            pb_lokal.no_penerimaan_barang as no_penerimaan_lokal,
-            pb_import.no_penerimaan_barang as no_penerimaan_import,
-            pb_bp.no_penerimaan_barang as no_penerimaan_bp,
-            s_lokal.name as supplier_lokal,
-            s_import.name as supplier_import,
-            s_bp.name as supplier_bp,
+            suppliers.name as supplier_name,
             am_purchase_orders.po_type
         ";
 
-        $dataQry = $this->asObject()->select($selectQry);
-        $dataQry->join('metadata', 'metadata.id = transaksi_jurnal.type_transaksi', 'left');
-        $dataQry->join('jurnal_umum', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left');
-        $dataQry->join('transaksi_pembelian', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left');
+        // Base Query ringan tanpa relasi berat
+        $baseQry = $this->asObject()->select($selectQry);
+        $baseQry->join('metadata', 'metadata.id = transaksi_jurnal.type_transaksi', 'left');
+        $baseQry->join('jurnal_umum', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left');
+        $baseQry->join('transaksi_pembelian', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left');
+        $baseQry->join('am_purchase_orders', 'am_purchase_orders.id = transaksi_pembelian.id_po_bp', 'left');
+        $baseQry->join('suppliers', 'suppliers.id = transaksi_pembelian.id_supplier', 'left');
 
-        // JOIN untuk BAHAN BAKU - LOKAL
-        $dataQry->join(
-            'penerimaan_barang pb_lokal',
-            'pb_lokal.status_penerimaan = "LOKAL" AND pb_lokal.tipe_bahan = "BAKU" AND pb_lokal.multiple_po_id LIKE CONCAT("%", transaksi_pembelian.id_local_bb, "%")',
-            'left'
-        );
+        // Total data awal (tanpa filter pencarian/dinamis)
+        $totalDataQry = clone $baseQry;
+        $totalDataQry->where($condition);
+        $totalData = $totalDataQry->countAllResults(false);
 
-        // JOIN untuk BAHAN BAKU - IMPORT
-        $dataQry->join(
-            'penerimaan_barang pb_import',
-            'pb_import.status_penerimaan = "IMPORT" AND pb_import.tipe_bahan = "BAKU" AND pb_import.multiple_po_id LIKE CONCAT("%", transaksi_pembelian.id_import_bb, "%")',
-            'left'
-        );
-
-        // JOIN untuk BAHAN PENOLONG (lokal/import cek dari am_purchase_orders.po_type)
-        $dataQry->join(
-            'penerimaan_barang pb_bp',
-            'pb_bp.tipe_bahan = "PENOLONG" AND pb_bp.multiple_po_id LIKE CONCAT("%", transaksi_pembelian.id_po_bp, "%")',
-            'left'
-        );
-
-        // Supplier
-        $dataQry->join('suppliers s_lokal', 's_lokal.id = pb_lokal.supplier_id', 'left');
-        $dataQry->join('suppliers s_import', 's_import.id = pb_import.supplier_id', 'left');
-        $dataQry->join('suppliers s_bp', 's_bp.id = pb_bp.supplier_id', 'left');
-
-        // PO BP untuk tipe
-        $dataQry->join('am_purchase_orders', 'am_purchase_orders.id = transaksi_pembelian.id_po_bp', 'left');
-
+        // Query data utama
+        $dataQry = clone $baseQry;
         $dataQry->where($condition);
-        $dataQry->orderBy($sort, $sortType);
         $dataQry->groupBy('jurnal_umum.id_transaksi');
 
-        // Hitung total sebelum filter
-        $totalData = $dataQry->countAllResults(false);
-
-        // Dynamic filter
-        if ($addCondition['start_date'] || $addCondition['end_date'] || $addCondition['type_transaksi'] || $addCondition['search']) {
+        // Filter dinamis
+        if (
+            !empty($addCondition['start_date']) ||
+            !empty($addCondition['end_date']) ||
+            !empty($addCondition['type_transaksi']) ||
+            !empty($addCondition['search'])
+        ) {
             $dataQry->groupStart();
 
-            if ($addCondition['start_date']) {
+            if (!empty($addCondition['start_date'])) {
                 $dataQry->where('transaksi_jurnal.tanggal_transaksi >=', $addCondition['start_date']);
             }
 
-            if ($addCondition['end_date']) {
+            if (!empty($addCondition['end_date'])) {
                 $dataQry->where('transaksi_jurnal.tanggal_transaksi <=', $addCondition['end_date']);
             }
 
-            if ($addCondition['type_transaksi']) {
-                if ($addCondition['type_transaksi'] == "BAHAN BAKU") {
+            if (!empty($addCondition['type_transaksi'])) {
+                if ($addCondition['type_transaksi'] === "BAHAN BAKU") {
                     $dataQry->groupStart();
                     $dataQry->where('transaksi_pembelian.id_local_bb IS NOT NULL');
                     $dataQry->orWhere('transaksi_pembelian.id_import_bb IS NOT NULL');
                     $dataQry->groupEnd();
-                } elseif ($addCondition['type_transaksi'] == "BAHAN PENOLONG") {
+                } elseif ($addCondition['type_transaksi'] === "BAHAN PENOLONG") {
                     $dataQry->where('transaksi_pembelian.id_po_bp IS NOT NULL');
                 } else {
                     $dataQry->where('transaksi_jurnal.type_transaksi', $addCondition['type_transaksi']);
                 }
             }
 
-            if ($addCondition['search']) {
+            if (!empty($addCondition['search'])) {
                 $dataQry->groupStart();
                 $dataQry->like('transaksi_jurnal.no_transaksi', $addCondition['search']);
                 $dataQry->orLike('transaksi_jurnal.uraian_transaksi', $addCondition['search']);
-                $dataQry->orLike('pb_lokal.no_penerimaan_barang', $addCondition['search']);
-                $dataQry->orLike('pb_import.no_penerimaan_barang', $addCondition['search']);
-                $dataQry->orLike('pb_bp.no_penerimaan_barang', $addCondition['search']);
-                $dataQry->orLike('s_lokal.name', $addCondition['search']);
-                $dataQry->orLike('s_import.name', $addCondition['search']);
-                $dataQry->orLike('s_bp.name', $addCondition['search']);
-
                 $dataQry->groupEnd();
             }
 
             $dataQry->groupEnd();
         }
 
-        // Total setelah filter
-        $totalFilteredData = $dataQry->countAllResults(false);
+        // Hitung total data setelah filter
+        $filteredQry = clone $dataQry;
+        $totalFilteredData = $filteredQry->countAllResults(false);
 
-        // Ambil data hasil akhir
-        $data = $dataQry->findAll($limit, $offset);
+        // Ambil data akhir
+        $data = $dataQry->orderBy($sort, $sortType)->findAll($limit, $offset);
 
         return [
             'data'              => $data,

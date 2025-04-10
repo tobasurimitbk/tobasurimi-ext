@@ -323,43 +323,66 @@ class JurnalUmum extends BaseController
                 ->where('company_id', $this->this_company_id)
                 ->where('bulan', date('Y-m', strtotime($data->tanggal_transaksi)))
                 ->first();
+            $noLPB = "";
 
             // Penentuan tipe pembelian
             $tipePembelian = "";
             if ($data->id_local_bb != null) {
                 $tipePembelian = "LOKAL BB";
+                // $penerimaanBarang = $this->penerimaanBarangModel
+                //     ->select('penerimaan_barang.*,suppliers.name as supplier')
+                //     ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+                //     ->where('penerimaan_barang.company_id', $this->this_company_id)
+                //     ->where('status_penerimaan', "LOKAL")
+                //     ->where('tipe_bahan', "BAKU")
+                //     ->like('multiple_po_id', $data->id_local_bb)
+                //     ->first();
+                // $noLPB = $penerimaanBarang['no_penerimaan_barang'];
             } elseif ($data->id_import_bb != null) {
                 $tipePembelian = "IMPORT BB";
+                $penerimaanBarang = $this->penerimaanBarangModel
+                    ->select('penerimaan_barang.*,suppliers.name as supplier')
+                    ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+                    ->where('penerimaan_barang.company_id', $this->this_company_id)
+                    ->where('status_penerimaan', "IMPORT")
+                    ->where('tipe_bahan', "BAKU")
+                    ->like('multiple_po_id', $data->id_import_bb)
+                    ->first();
+                $noLPB = $penerimaanBarang['no_penerimaan_barang'];
             } elseif ($data->id_po_bp != null) {
                 $tipePembelian = ($data->po_type === "Lokal") ? "LOKAL BP" : "IMPORT BP";
+                if ($tipePembelian == "LOKAL BP") {
+                    $penerimaanBarang = $this->penerimaanBarangModel
+                        ->select('penerimaan_barang.*,suppliers.name as supplier')
+                        ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+                        ->where('penerimaan_barang.company_id', $this->this_company_id)
+                        ->where('status_penerimaan', "LOKAL")
+                        ->where('tipe_bahan', "PENOLONG")
+                        ->like('multiple_po_id', $data->id_po_bp)
+                        ->first();
+                } else {
+                    $penerimaanBarang = $this->penerimaanBarangModel
+                        ->select('penerimaan_barang.*,suppliers.name as supplier')
+                        ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+                        ->where('penerimaan_barang.company_id', $this->this_company_id)
+                        ->where('status_penerimaan', "IMPORT")
+                        ->where('tipe_bahan', "PENOLONG")
+                        ->like('multiple_po_id', $data->id_po_bp)
+                        ->first();
+                }
+
+                $noLPB = $penerimaanBarang['no_penerimaan_barang'];
             }
-
-            // Tentukan LPB & Supplier berdasarkan jenis transaksi
-            $noLPB = $data->no_penerimaan_lokal
-                ?? $data->no_penerimaan_import
-                ?? $data->no_penerimaan_bp
-                ?? "";
-
-            // Jika PO Lokal BB, kosongkan LPB
-            if ($data->id_local_bb != null) {
-                $noLPB = "";
-            }
-
-            // Supplier juga bisa dibedakan kalau perlu, ini contoh
-            $supplierName = $data->supplier_lokal
-                ?? $data->supplier_import
-                ?? $data->supplier_bp
-                ?? "";
 
             $dataResult[] = [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
-                "transaksi_type_name"   => $data->transaksi_type_name . " " . $tipePembelian,
+                "transaksi_type_name"   => trim($data->transaksi_type_name . " " . $tipePembelian),
                 "no_transaksi"          => $data->metode_input === 'system' ? $data->no_transaksi : $data->no_bukti,
                 "tanggal_transaksi"     => date('d/m/Y', strtotime($data->tanggal_transaksi)),
                 "uraian_transaksi"      => $data->uraian_transaksi,
-                "supplier"              => "0 : " . $supplierName,
-                "no_lpb"                => $noLPB,
+                "supplier"              => "0 : " . $data->supplier_name, // tidak tersedia setelah relasi dihapus
+                "no_lpb"                => $noLPB, // tidak tersedia setelah relasi dihapus
                 "metode_input"          => strtoupper($data->metode_input),
                 "valas"                 => $data->valas,
                 "exchange_rate"         => $data->exchange_rate == 1 ? "" : $data->exchange_rate,
@@ -371,6 +394,7 @@ class JurnalUmum extends BaseController
 
         return $dataResult;
     }
+
 
 
     public function create()
