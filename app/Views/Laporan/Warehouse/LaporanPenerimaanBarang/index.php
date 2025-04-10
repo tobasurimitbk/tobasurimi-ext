@@ -50,9 +50,41 @@
                         </div>
                     </div>
                 </div>
-
-
-
+            </div>
+            <div class="row justify-content-end row-col-spp">
+                <div class="col-md-4">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_divisi" name="filter_divisi" id="filter_divisi">
+                            <option selected value="">Semua Divisi</option>
+                            <?php foreach ($divisis as $divisi) : ?>
+                                <option value="<?= $divisi['id']; ?>"><?= $divisi['divisi']; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Filter Divisi</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_supplier" name="filter_supplier" id="filter_supplier">
+                            <option selected value="">Semua Supplier</option>
+                            <?php foreach ($suppliers as $supplier) : ?>
+                                <option value="<?= $supplier['id']; ?>"><?= $supplier['name']; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Filter Supplier</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_barang" name="filter_barang" id="filter_barang">
+                            <option selected value="">Semua Barang</option>
+                            <?php foreach ($barangs as $barang) : ?>
+                                <option value="<?= $barang['barang_master_spesifikasi_id']; ?>"><?= $barang['barang_name_master'] . ' ' . $barang['spesifikasi']; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Filter Barang</label>
+                    </div>
+                </div>
             </div>
             <div class="row">
                 <div class="table-responsive">
@@ -64,7 +96,7 @@
                                 <th onclick="changeSort('tanggal_bc')" class="sort">Tanggal Doc</th>
                                 <th onclick="changeSort('no_daftar')" class="sort">No Daftar</th>
                                 <th onclick="changeSort('no_aju')" class="sort">No Aju</th>
-                                <th onclick="changeSort('no_penerimaan_barang')" class="sort">No Bukti</th>
+                                <th onclick="changeSort('no_penerimaan_barang')" class="sort">No LPB</th>
                                 <th onclick="changeSort('tanggal_lpb')" class="sort">Tanggal Bukti</th>
                                 <th onclick="changeSort('po_no')" class="sort">No Order</th>
                                 <th onclick="changeSort('po_date')" class="sort">Tanggal Order</th>
@@ -116,8 +148,9 @@
                 data.filter_bc_type = $(".filter_bc_type").val();
                 data.sort = sort;
                 data.sortType = sortType;
-
-
+                data.filter_divisi = $(".filter_divisi").val();
+                data.filter_supplier = $(".filter_supplier").val();
+                data.filter_barang = $(".filter_barang").val();
             },
         },
         // scrollX: true,
@@ -242,23 +275,24 @@
         table.ajax.reload();
     })
 
-    $(".dateStart, .dateEnd, .filter_bc_type").change(function() {
+    $(".dateStart, .dateEnd, .filter_bc_type, .filter_divisi, .filter_supplier, .filter_barang").change(function() {
         table.ajax.reload();
     });
 
-    $('.filter_bc_type').select2({
+    $('.filter_bc_type, .filter_divisi, .filter_supplier, .filter_barang').select2({
         placeholder: "",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true
     })
 
-    $('.filter_bc_type')
+    $('.filter_bc_type, .filter_divisi, .filter_supplier, .filter_barang')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.filter_bc_type')
+    $('.filter_bc_type, .filter_divisi, .filter_supplier, .filter_barang')
         .parent('div')
         .children('span')
         .children('span')
@@ -266,7 +300,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.filter_bc_type')
+    $('.filter_bc_type, .filter_divisi, .filter_supplier, .filter_barang')
         .parent('div')
         .find('label')
         .css('z-index', '1');

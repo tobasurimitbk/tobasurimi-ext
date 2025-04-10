@@ -441,7 +441,7 @@ class RMPurchaseOrderDetailModel extends Model
 
 
             $allLPB = $penerimaanBarangModel
-                ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk')
+                ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk, group_concat(penerimaan_barang.no_penerimaan_barang) AS no_penerimaan_barang')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
                 ->join('rm_purchase_orders', 'rm_purchase_orders.id = penerimaan_barang.multiple_po_id', 'left')
                 ->where('purchase_order_id', $b['rm_purchase_order_id'])
@@ -454,8 +454,12 @@ class RMPurchaseOrderDetailModel extends Model
                 ->findAll();
 
             $jmlMasukAll = 0;
+            $noLpbList = [];
             foreach ($allLPB as $a) {
-                $jmlMasukAll = $a['jmlMasuk'];
+                $jmlMasukAll += $a['jmlMasuk'];
+                if (!empty($a['no_penerimaan_barang'])) {
+                    $noLpbList[] = $a['no_penerimaan_barang'];
+                }
             }
 
             $firstLPB =  $penerimaanBarangModel
@@ -493,7 +497,8 @@ class RMPurchaseOrderDetailModel extends Model
                 'harga_bulanan' => $b['monthly_price'],
                 'harga_sum' => ($b['general_price'] + $b['daily_price'] + $b['monthly_price']),
                 'sub_total' => ($inLPB * ($b['general_price'] + $b['daily_price'] + $b['monthly_price'])),
-                'keterangan' => $b['note']
+                'keterangan' => $b['note'],
+                'no_lpb' => implode(', ', $noLpbList),
             ];
 
             $jmlOrderTotal += $b['qty'];

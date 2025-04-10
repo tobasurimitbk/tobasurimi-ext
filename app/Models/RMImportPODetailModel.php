@@ -361,7 +361,7 @@ class RMImportPODetailModel extends Model
         foreach ($barangs as $b) {
 
             $allLPB = $penerimaanBarangModel
-                ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk')
+                ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk, group_concat(penerimaan_barang.no_penerimaan_barang) AS no_penerimaan_barang')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
                 ->join('rm_import_pos', 'rm_import_pos.id = penerimaan_barang.multiple_po_id', 'left')
                 ->where('purchase_order_id', $b['rm_import_po_id'])
@@ -374,8 +374,12 @@ class RMImportPODetailModel extends Model
                 ->findAll();
 
             $jmlMasukAll = 0;
+            $noLpbList = [];
             foreach ($allLPB as $a) {
-                $jmlMasukAll = $a['jmlMasuk'];
+                $jmlMasukAll += $a['jmlMasuk'];
+                if (!empty($a['no_penerimaan_barang'])) {
+                    $noLpbList[] = $a['no_penerimaan_barang'];
+                }
             }
 
             $firstLPB =  $penerimaanBarangModel
@@ -413,7 +417,8 @@ class RMImportPODetailModel extends Model
                 'sisa_total' => $sisaDiterima,
                 'harga' => $harga,
                 'sub_total' => ($inLPB * $harga),
-                'keterangan' => $b['note']
+                'keterangan' => $b['note'],
+                'no_lpb' => implode(', ', $noLpbList),
             ];
 
             $jmlOrderTotal += $b['qty'];

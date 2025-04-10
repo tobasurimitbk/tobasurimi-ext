@@ -410,7 +410,7 @@ class AMPurchaseOrderDetailModel extends Model
 
         foreach ($barangs as $b) {
             $allLPB = $penerimaanBarangModel
-                ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk')
+                ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk, group_concat(penerimaan_barang.no_penerimaan_barang) AS no_penerimaan_barang')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
                 ->join('am_purchase_orders', 'am_purchase_orders.id = penerimaan_barang.multiple_po_id', 'left')
                 ->where('purchase_order_id', $b['am_purchase_order_id'])
@@ -420,9 +420,16 @@ class AMPurchaseOrderDetailModel extends Model
                 ->where('penerimaan_barang.deletedAt', null)
                 ->where('penerimaan_barang_detail.deletedAt', null)
                 ->groupBy('purchase_order_id', 'purchase_order_details_id')
-                ->first();
+                ->findAll();
 
-            $jmlMasukAll = $allLPB['jmlMasuk'] ?? 0;
+            $jmlMasukAll = 0;
+            $noLpbList = [];
+            foreach ($allLPB as $a) {
+                $jmlMasukAll += $a['jmlMasuk'];
+                if (!empty($a['no_penerimaan_barang'])) {
+                    $noLpbList[] = $a['no_penerimaan_barang'];
+                }
+            }
 
             $firstLPB = $penerimaanBarangModel
                 ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
@@ -459,7 +466,8 @@ class AMPurchaseOrderDetailModel extends Model
                 'sisa_total'                   => round($sisaDiterima, 4),
                 'harga'                        => $harga,
                 'sub_total'                    => $subtotal,
-                'keterangan'                   => $b['note']
+                'keterangan'                   => $b['note'],
+                'no_lpb' => implode(', ', $noLpbList),
             ];
 
             $jmlOrderTotal += $b['qty'];
@@ -554,10 +562,8 @@ class AMPurchaseOrderDetailModel extends Model
         $subTotal = 0;
 
         foreach ($barangs as $b) {
-
-
             $allLPB = $penerimaanBarangModel
-                ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk')
+                ->select('SUM(penerimaan_barang_detail.jml_masuk) AS jmlMasuk, group_concat(penerimaan_barang.no_penerimaan_barang) AS no_penerimaan_barang')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
                 ->join('am_purchase_orders', 'am_purchase_orders.id = penerimaan_barang.multiple_po_id', 'left')
                 ->where('purchase_order_id', $b['am_purchase_order_id'])
@@ -570,8 +576,12 @@ class AMPurchaseOrderDetailModel extends Model
                 ->findAll();
 
             $jmlMasukAll = 0;
+            $noLpbList = [];
             foreach ($allLPB as $a) {
-                $jmlMasukAll = $a['jmlMasuk'];
+                $jmlMasukAll += $a['jmlMasuk'];
+                if (!empty($a['no_penerimaan_barang'])) {
+                    $noLpbList[] = $a['no_penerimaan_barang'];
+                }
             }
 
             $firstLPB =  $penerimaanBarangModel
@@ -609,7 +619,8 @@ class AMPurchaseOrderDetailModel extends Model
                 'sisa_total' => round($sisaDiterima, 4),
                 'harga' => $harga,
                 'sub_total' => $b['total'],
-                'keterangan' => $b['note']
+                'keterangan' => $b['note'],
+                'no_lpb' => implode(', ', $noLpbList),
             ];
 
             $jmlOrderTotal += $b['qty'];
