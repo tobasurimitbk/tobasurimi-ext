@@ -15,6 +15,19 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input readonly autocomplete="one-time-code" type="text" class="form-control kode" id="kode" name="kode" placeholder="Kode Customer">
+                                        <label for="floatingInput">Kode Customer</label>
+                                    </div>
+                                    <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                        <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Nama">
                                 <label for="floatingInput">Nama</label>
                             </div>
@@ -25,15 +38,16 @@
                                 <label for="floatingInput">NIK (Opsional)</label>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                    
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)">
                                 <label for="floatingInput"> NPWP (Opsional)</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <textarea autocomplete="one-time-code" class="form-control address" id="address" name="address"></textarea>
                                 <label for="floatingInput">Alamat</label>
@@ -691,6 +705,15 @@
                 success: function(res) {
                     if (res.data) {
                         $(".id").val(id);
+                        $(".kode").val(res.data.kode);
+                        if (res.data.kode) {
+                            $("#auto_generate").off("change");
+                            $("#auto_generate").prop("checked", true);
+                            $(".kode").attr("readonly", true);
+                            $("#auto_generate").on("change", function () {
+                                changeStatus();
+                            });
+                        }
                         $(".name").val(res.data.name);
                         $(".address").val(res.data.address);
                         $(".no_npwp").val(res.data.no_npwp);
@@ -1000,6 +1023,43 @@
             }
         })
     });
+
+    function changeStatus() {
+        let isChecked = document.getElementById('auto_generate').checked;
+
+        if (isChecked) {
+            $(".kode").attr("readonly", true);
+
+            $.ajax({
+                url: `<?= base_url("customer-lokal/generate-no"); ?>`,
+                method: "GET",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                dataType: "json",
+                success: function(res) {
+                    if (res.status) {
+                        $(".kode").val(res.data);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        });
+                        $(".kode").attr("readonly", false);
+                        $("#auto_generate").prop("checked", false);
+                        $(".kode").val("");
+                    }
+                }
+            });
+        } else {
+            $(".kode").attr("readonly", false);
+            $(".kode").val(""); // Kosongin input biar bisa manual
+        }
+    }
 
     const getCityParent = function() {
         const id = $(".province_parent_id option:selected").val()
