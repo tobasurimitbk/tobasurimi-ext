@@ -3395,12 +3395,11 @@ class LaporanWarehouse extends BaseController
         return view('Laporan/Warehouse/LaporanKartuStock/index', $data);
     }
 
-    public function AlllaporanKartuStock()
+    public function allLaporanKartuStock()
     {
         $pageSize = intval($this->request->getVar("length"));
         $currentPage = (intval($this->request->getVar("start")) / $pageSize) + 1;
         $offset = ($currentPage - 1) * $pageSize;
-
 
         $payload = [
             "pageSize"    => $pageSize,
@@ -3436,8 +3435,6 @@ class LaporanWarehouse extends BaseController
 
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'stock_details2.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
-
-
 
         $no = ($pageSize * ($currentPage - 1)) + 1;
 
@@ -3559,7 +3556,6 @@ class LaporanWarehouse extends BaseController
                 $spesifikasi = $barangSpesifikasiData == null ? "" : $barangSpesifikasiData['spesifikasi'];
             }
 
-
             $dataAllKartuStock[] = [
                 'no' => $no++,
                 'tipe_barang' => strtoupper(str_replace('_', " ", $data['tipe_barang'])),
@@ -3573,7 +3569,8 @@ class LaporanWarehouse extends BaseController
                 'nama_barang' => $namaBarang,
                 'spesifikasi' => $spesifikasi,
                 'satuan' => $satuan,
-                'qty' => $data['stok_total']
+                'qty' => $data['stok_total'],
+                'no_dokumen_1' => $data['no_dokumen_1']
             ];
         }
 
@@ -3588,13 +3585,12 @@ class LaporanWarehouse extends BaseController
 
         ];
 
-
         return json_encode($data);
     }
 
     public function exportSheetLaporanKartuStock()
     {
-        $jsonList = $this->AlllaporanKartuStock();
+        $jsonList = $this->allLaporanKartuStock();
         $list = json_decode($jsonList, true);
 
 
