@@ -329,32 +329,52 @@ class CustomerModel extends Model
 
     public function get_kode($bln, $thn, $thn2, $last_year)
     {
-        $lastStr =  $thn2;
-
+        $lastStr = $thn2;
+        $first_day = "$thn-01-01 00:00:00";
+        $last_day = "$last_year 23:59:59";
+    
         $builder = $this->db->table('customers');
         $builder->select('kode');
-        $builder->orderBy('kode', 'desc');
-        $builder->where('createdAt >=', $thn . "-01-01" . " 00:00:00")
-            ->where('createdAt <=', $last_year . " 23:59:59");
+        $builder->orderBy('kode', 'asc');
+        $builder->where('createdAt >=', $first_day);
+        $builder->where('createdAt <=', $last_day);
         $builder->like('kode', $lastStr);
         $query = $builder->get();
-
-        $kode = 'CS';
-
-        $lastKode = '0001';
-        if ($query->getResultArray()) {
+    
+        $kodePrefix = 'CS/' . $bln . '/' . $thn2;
+    
+        $existingNumbers = [];
+    
+        // Ambil semua nomor urut yang sudah ada
+        if (!empty($query->getResultArray())) {
             foreach ($query->getResultArray() as $string) {
                 $explode = explode('/', $string['kode']);
-                $number = intval($explode[3]);
-                if ($number > $lastKode) {
-                    $lastKode = $number;
+                if (isset($explode[3]) && is_numeric($explode[3])) {
+                    $existingNumbers[] = intval($explode[3]);
                 }
             }
-            $lastKode = sprintf("%04d", $lastKode + 1);
-        };
-
-        $generatedNo = $kode . '/' . $bln . '/' . $thn2 . '/' . $lastKode;
-
+        }
+    
+        // Sort dan cari celah nomor
+        $lastKode = 1;
+        sort($existingNumbers);
+        $foundGap = false;
+    
+        foreach ($existingNumbers as $number) {
+            if ($number != $lastKode) {
+                $foundGap = true;
+                break;
+            }
+            $lastKode++;
+        }
+    
+        if (!$foundGap) {
+            $lastKode = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
+        }
+    
+        $formattedKode = sprintf("%04d", $lastKode);
+        $generatedNo = $kodePrefix . '/' . $formattedKode;
+    
         return $generatedNo;
     }
 }

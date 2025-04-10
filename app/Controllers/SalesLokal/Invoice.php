@@ -1341,30 +1341,38 @@ class Invoice extends BaseController
 
     public function getNomorFaktur()
     {
-        // $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur($this->this_company_id);
-        // return json_encode($noFaktur);
-
         $code = "LKL/INV";
-        $currentYear = date('y'); // Get last two digits of the year
-        $currentMonth = date('n'); // Get numeric month without leading zeros
+        $currentYear = date('y'); // 2 digit
+        $currentMonth = date('n'); // 1-12 tanpa nol depan
         $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
         $numberTemplate = $code . "/" . $currentYear . "/" . $romawi[$currentMonth] . "/";
 
-        $lastData = $this->SalesOrderInvoiceModel->asObject()
-            // ->where('id_company', $this->this_company_id)
+        $listData = $this->SalesOrderInvoiceModel->asObject()
             ->like('no_faktur', $numberTemplate)
-            ->orderBy('createdAt', 'DESC')
-            ->first();
+            ->orderBy('no_faktur', 'ASC')
+            ->findAll();
 
-        if (!empty($lastData)) {
-            $asd = explode('/', $lastData->no_faktur);
-            $lastIncrement = intval($asd[4]) + 1;
-            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+        $existingNumbers = [];
 
-            $invNumber = $numberTemplate . $paddedNumber;
-        } else {
-            $invNumber = $numberTemplate . '001';
+        foreach ($listData as $data) {
+            $parts = explode('/', $data->no_faktur);
+            if (isset($parts[4]) && is_numeric($parts[4])) {
+                $existingNumbers[] = intval($parts[4]);
+            }
         }
+
+        sort($existingNumbers);
+
+        $nextNumber = 1;
+        foreach ($existingNumbers as $num) {
+            if ($num != $nextNumber) {
+                break; // ketemu celah
+            }
+            $nextNumber++;
+        }
+
+        $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        $invNumber = $numberTemplate . $paddedNumber;
 
         return response()->setJSON([
             'data' => $invNumber,

@@ -240,18 +240,18 @@ class OrderForm extends BaseController
                     'required' => 'Tanggal pemesananan tidak boleh kosong',
                 ]
             ],
-            "shipping_date" => [
-                "rules" => "required|valid_date[d/m/Y]",
-                'errors' => [
-                    'required' => 'tanggal pengiriman tidak boleh kosong',
-                ]
-            ],
-            "estimated_freight" => [
-                "rules" => "permit_empty",
-                'errors' => [
-                    // 'required' => 'tanggal pengiriman tidak boleh kosong',
-                ]
-            ],
+            // "shipping_date" => [
+            //     "rules" => "required|valid_date[d/m/Y]",
+            //     'errors' => [
+            //         'required' => 'tanggal pengiriman tidak boleh kosong',
+            //     ]
+            // ],
+            // "estimated_freight" => [
+            //     "rules" => "permit_empty",
+            //     'errors' => [
+            //         // 'required' => 'tanggal pengiriman tidak boleh kosong',
+            //     ]
+            // ],
             "total" => [
                 "rules" => "required",
                 'errors' => [
@@ -307,21 +307,6 @@ class OrderForm extends BaseController
             return;
         }
 
-        // check customer
-        $customerData = $this->CustomerModel->asObject()
-            ->find($postData['id_customer']);
-
-        if (empty($customerData)) {
-            $data = [
-                "status"    => false,
-                "message"   => 'Customer tidak ditemukan!',
-                'token'     => csrf_hash(),
-            ];
-            echo json_encode($data);
-            return;
-        }
-
-        // Validate PPN status consistency
         $initialPPNStatus = $items[0]->statusppn;
 
         if ($initialPPNStatus == "0") {
@@ -341,11 +326,22 @@ class OrderForm extends BaseController
             }
         }
 
+        // check customer
+        $customerData = $this->CustomerModel->asObject()
+            ->find($postData['id_customer']);
+
+        if (empty($customerData)) {
+            $data = [
+                "status"    => false,
+                "message"   => 'Customer tidak ditemukan!',
+                'token'     => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        }
         try {
             $this->SalesOrderModel->db->transException(true)->transStart();
             $orderDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['order_date'])));
-            $shippingDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['shipping_date'])));
-            $estimatedFreight = str_replace(',', '', $postData['estimated_freight']);
 
             $values = [
                 "no_sales_order"        => strtoupper($postData['no_sales_order']),
@@ -354,17 +350,9 @@ class OrderForm extends BaseController
                 "jenis_penjualan"           => $postData['jenis_penjualan'],
                 "sales_id"              => isset($postData['id_sales']) ? $postData['id_sales'] : NULL,
                 "nama_ecommerce"           => $postData['nama_ecommerce'] ? $postData['nama_ecommerce'] : "",
-                "no_po"           => $postData['no_po'] ? $postData['no_po'] : "",
                 "order_date"            => $orderDate,
-                "shipping_date"         => $shippingDate,
-                "payment_terms"         => $postData['termin'],
-                "keterangan"            => $postData['parent_keterangan'],
-                "destination"           => $customerData->address,
-                "estimated_freight"     => $estimatedFreight,
                 "total_harga"           => $postData['total'],
-                "id_company"            => ($this->this_company_id != 16) 
-                                            ? $this->request->getPost('company_id') 
-                                            : $this->this_company_id,
+                "id_company"            => $this->this_company_id,
                 "tipe_sales_order"      => 'LOKAL',
                 "ppn"      => $status_ppn
             ];
@@ -972,33 +960,52 @@ class OrderForm extends BaseController
     public function generateNomorSalesOrder()
     {
         $code = "TSI";
-        $currentYear = date('y'); // Get last two digits of the year
-        $currentMonth = date('n'); // Get numeric month without leading zeros
+        $currentYear = date('y'); // 2 digit
+        $currentMonth = date('n'); // 1-12
         $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
         $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
-
-        $lastData = $this->SalesOrderModel->asObject()
-            // ->where('id_company', $this->this_company_id)
+    
+        $listData = $this->SalesOrderModel->asObject()
             ->like('no_sales_order', $numberTemplate)
-            ->orderBy('createdAt', 'DESC')
-            ->first();
-
-        if (!empty($lastData)) {
-            $asd = explode('/', $lastData->no_sales_order);
-            $lastIncrement = intval($asd[3]) + 1;
-            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
-
-            $invNumber = $numberTemplate . $paddedNumber;
-        } else {
-            $invNumber = $numberTemplate . '001';
+            ->orderBy('no_sales_order', 'ASC') // penting: ASC buat gap detect
+            ->findAll();
+    
+        $existingNumbers = [];
+    
+        foreach ($listData as $data) {
+            $parts = explode('/', $data->no_sales_order);
+            if (isset($parts[3]) && is_numeric($parts[3])) {
+                $existingNumbers[] = intval($parts[3]);
+            }
         }
-
+    
+        sort($existingNumbers);
+    
+        $nextNumber = 1;
+        $foundGap = false;
+    
+        foreach ($existingNumbers as $num) {
+            if ($num != $nextNumber) {
+                $foundGap = true;
+                break;
+            }
+            $nextNumber++;
+        }
+    
+        if (!$foundGap) {
+            $nextNumber = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
+        }
+    
+        $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        $invNumber = $numberTemplate . $paddedNumber;
+    
         return response()->setJSON([
             'data' => $invNumber,
             'token' => csrf_hash(),
             'status' => true
         ]);
     }
+    
 
     public function getMetaData($id)
     {

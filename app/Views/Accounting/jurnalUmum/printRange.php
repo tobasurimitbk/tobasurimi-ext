@@ -78,7 +78,7 @@
                     <td><?= $jurnal['transaksi_type_name'] ?></td>
                     <td><?= $jurnal['no_transaksi'] ?></td>
                     <td><?= $jurnal['tanggal_transaksi']; ?></td>
-                    <td><?= $jurnal['invoice']; ?></td>
+                    <td><?= $jurnal['supplier']; ?></td>
                     <td><?= $jurnal['uraian_transaksi']; ?></td>
                     <td class="text-right"><?= number_format($jurnal['nilai'], 2); ?></td>
                     <td><?= $jurnal['valas']; ?></td>

@@ -11,8 +11,8 @@
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
                 <li><button class="dropdown-item" id="btn_import_excel">Import Excel</button></li>
-                <li><button class="dropdown-item" onclick="pdfExcel('<?= base_url("jurnal/print-pdf"); ?>')">Export Pdf</button></li>
-                <li><button class="dropdown-item" onclick="pdfExcel('<?= base_url("jurnal/print-excel"); ?>')">Export Excel</button></li>
+                <li><button class="dropdown-item" onclick="pdfExcel('<?= base_url("jurnal/print-pdf"); ?>')">Export Pdf (By Filter)</button></li>
+                <li><button class="dropdown-item" onclick="pdfExcel('<?= base_url("jurnal/print-excel"); ?>')">Export Excel (By Filter)</button></li>
             </ul>
         <?php endif; ?>
         <?php if (can('Accounting', 'Jurnal', 'c')) : ?>
@@ -50,7 +50,17 @@
                     </select>
                 </div>
                 <div class="col">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" id="search" placeholder="Cari No Transaksi" value="" />
+                    <div class="input-group">
+                        <input autocomplete="one-time-code" class="form-control search form-out-search" id="search" placeholder="Cari Data" value="" />
+                        <div class="input-group-append">
+                            <span class="input-group-text bg-danger text-white" style="height:40px;cursor:pointer;" onclick="resetSearchAction()">
+                                <i class="fa-solid fa-xmark" style="margin-bottom: 14px;"></i>
+                            </span>
+                            <!-- <span class="input-group-text bg-success text-white" style="height:40px;cursor:pointer;" onclick="resetSearchAction()">
+                                <i class="fa-solid fa-magnifying-glass" style="margin-bottom: 14px;"></i>
+                            </span> -->
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -62,6 +72,7 @@
                                 <th onclick="changeSort('transaksi_jurnal.type_transaksi')" class="sort">Transaksi</th>
                                 <th onclick="changeSort('transaksi_jurnal.no_transaksi')" class="sort">Nomor</th>
                                 <th onclick="changeSort('transaksi_jurnal.tanggal_transaksi')">Tanggal</th>
+                                <th class="sort">No LPB</th>
                                 <th onclick="changeSort('transaksi_jurnal.uraian_transaksi')" class="sort">Keterangan</th>
                                 <th>Invoice</th>
                                 <th onclick="changeSort('transaksi_jurnal.metode_input')">Metode Input</th>
@@ -160,11 +171,17 @@
 
             },
             {
+                data: "no_lpb",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
                 data: "uraian_transaksi",
                 className: "text-center"
             },
             {
-                data: "invoice",
+                data: "supplier",
                 className: "text-center",
                 searchable: false,
                 sortable: false
@@ -288,7 +305,19 @@
 
     $("#start_date,#end_date,#type_transaksi").change(function() {
         table.ajax.reload();
-    })
+    });
+
+    // function searchAction() {
+    //     table.ajax.reload();
+    // }
+
+    function resetSearchAction() {
+        $('#search').val(null);
+        $('#start_date').val(null);
+        $('#end_date').val(null);
+        $('#type_transaksi').val(null);
+        table.ajax.reload();
+    }
 
     function destroy(id) {
         Swal.fire({
@@ -346,11 +375,25 @@
     }
 
     function pdfExcel(url) {
-        var start_date = $("#start_date").val();
-        var end_date = $("#end_date").val();
-        var type_transaksi = $('#type_transaksi').val();
-        var search = $("#search").val();
-        window.open(url + `?start_date=${start_date}&end_date=${end_date}&type_transaksi=${type_transaksi}&search=${search}&sort=${sort}&sortType=${sortType}`, "_blank");
+        Swal.fire({
+            icon: 'question',
+            title: 'Export Data Menyesuaiakan Sesuai Dengan Filter yang Sudah Anda Terapkan, Pastikan Filter Data Sudah Sesuai',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Export',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var start_date = $("#start_date").val();
+                var end_date = $("#end_date").val();
+                var type_transaksi = $('#type_transaksi').val();
+                var search = $("#search").val();
+                window.open(url + `?start_date=${start_date}&end_date=${end_date}&type_transaksi=${type_transaksi}&search=${search}&sort=${sort}&sortType=${sortType}`, "_blank");
+            }
+        })
+
     }
 
     // Function to handle the Excel file upload using AJAX
@@ -363,7 +406,7 @@
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Simpan',
+            confirmButtonText: 'Export Data',
             cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
