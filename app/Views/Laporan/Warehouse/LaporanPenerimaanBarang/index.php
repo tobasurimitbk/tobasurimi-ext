@@ -10,6 +10,8 @@
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
             <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-warehouse/penerimaan-barang/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-warehouse/penerimaan-barang/excel"); ?>')">Excel</button></li>
+
         </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-warehouse"); ?>">
@@ -310,9 +312,11 @@
         let dateStart = $(".dateStart").val();
         let dateEnd = $(".dateEnd").val();
         let filter_bc_type = $(".filter_bc_type").val();
+        let filter_divisi = $(".filter_divisi").val();
+        let filter_supplier = $(".filter_supplier").val();
+        let filter_barang = $(".filter_barang").val();
 
-
-        window.open(url + `?filter_bc_type=${filter_bc_type}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
+        window.open(url + `?filter_bc_type=${filter_bc_type}&filter_divisi=${filter_divisi}&filter_supplier=${filter_supplier}&filter_barang=${filter_barang}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 
