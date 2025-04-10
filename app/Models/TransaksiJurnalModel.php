@@ -118,76 +118,6 @@ class TransaksiJurnalModel extends Model
     }
 
 
-    // public function getList($condition, $addCondition, $limit = 10, $offset = 0)
-    // {
-    //     $availableSort = [
-    //         'transaksi_jurnal.id' => 'transaksi_jurnal.id',
-    //         'transaksi_jurnal.type_transaksi' => 'transaksi_jurnal.type_transaksi',
-    //         'transaksi_jurnal.no_transaksi' => 'transaksi_jurnal.no_transaksi',
-    //         'transaksi_jurnal.tanggal_transaksi' => 'transaksi_jurnal.tanggal_transaksi',
-    //         'transaksi_jurnal.uraian_transaksi' => 'transaksi_jurnal.uraian_transaksi',
-    //         'transaksi_jurnal.metode_input' => 'transaksi_jurnal.metode_input',
-    //     ];
-    //     $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
-
-    //     $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'created_at';
-    //     $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
-
-    //     $selectQry = "transaksi_jurnal.*,
-    //     metadata.value as transaksi_type_name,
-
-    //     ";
-
-    //     $dataQry = $this->asObject()->select($selectQry);
-    //     $dataQry->join('metadata', 'metadata.id = transaksi_jurnal.type_transaksi', 'left');
-    //     $dataQry->join('jurnal_umum', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left');
-    //     $dataQry->join('transaksi_pembelian', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left');
-    //     $dataQry->where($condition);
-    //     $dataQry->orderBy($sort, $sortType);
-    //     $dataQry->groupBy('jurnal_umum.id_transaksi');
-
-    //     $totalData = $dataQry->countAllResults(false);
-
-    //     if ($addCondition['start_date'] || $addCondition['end_date'] || $addCondition['type_transaksi'] || $addCondition['search']) {
-    //         $dataQry->groupStart();
-    //     }
-
-    //     if ($addCondition['start_date']) {
-    //         $dataQry->where('transaksi_jurnal.tanggal_transaksi >=', $addCondition['start_date']);
-    //     }
-
-    //     if ($addCondition['end_date']) {
-    //         $dataQry->where('transaksi_jurnal.tanggal_transaksi <=', $addCondition['end_date']);
-    //     }
-
-    //     if ($addCondition['type_transaksi']) {
-    //         if ($addCondition['type_transaksi'] == "BAHAN BAKU") {
-    //             $dataQry->where('transaksi_pembelian.id_local_bb !=', null);
-    //             $dataQry->orWhere('transaksi_pembelian.id_import_bb !=', null);
-    //         } elseif ($addCondition['type_transaksi'] == "BAHAN PENOLONG") {
-    //             $dataQry->where('transaksi_pembelian.id_po_bp !=', null);
-    //         } else {
-    //             $dataQry->where('transaksi_jurnal.type_transaksi', $addCondition['type_transaksi']);
-    //         }
-    //     }
-
-    //     if ($addCondition['search']) {
-    //         $dataQry->like('no_transaksi', $addCondition['search'])->orLike('uraian_transaksi', $addCondition['search']);
-    //     }
-
-    //     if ($addCondition['start_date'] || $addCondition['end_date'] || $addCondition['type_transaksi'] || $addCondition['search']) {
-    //         $dataQry->groupEnd();
-    //     }
-
-    //     $totalFilteredData = $dataQry->countAllResults(false);
-    //     $data = $dataQry->findAll($limit, $offset);
-
-    //     return [
-    //         'data'              => $data,
-    //         'totalData'         => $totalData,
-    //         'totalFilteredData' => $totalFilteredData,
-    //     ];
-    // }
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
@@ -203,108 +133,53 @@ class TransaksiJurnalModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'created_at';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "
-            transaksi_jurnal.*,
-            metadata.value as transaksi_type_name,
-            transaksi_pembelian.id_local_bb,
-            transaksi_pembelian.id_import_bb,
-            transaksi_pembelian.id_po_bp,
-            pb_lokal.no_penerimaan_barang as no_penerimaan_lokal,
-            pb_import.no_penerimaan_barang as no_penerimaan_import,
-            pb_bp.no_penerimaan_barang as no_penerimaan_bp,
-            s_lokal.name as supplier_lokal,
-            s_import.name as supplier_import,
-            s_bp.name as supplier_bp,
-            am_purchase_orders.po_type
+        $selectQry = "transaksi_jurnal.*,
+        metadata.value as transaksi_type_name,
+
         ";
 
         $dataQry = $this->asObject()->select($selectQry);
         $dataQry->join('metadata', 'metadata.id = transaksi_jurnal.type_transaksi', 'left');
         $dataQry->join('jurnal_umum', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left');
         $dataQry->join('transaksi_pembelian', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left');
-
-        // JOIN untuk BAHAN BAKU - LOKAL
-        $dataQry->join(
-            'penerimaan_barang pb_lokal',
-            'pb_lokal.status_penerimaan = "LOKAL" AND pb_lokal.tipe_bahan = "BAKU" AND pb_lokal.multiple_po_id LIKE CONCAT("%", transaksi_pembelian.id_local_bb, "%")',
-            'left'
-        );
-
-        // JOIN untuk BAHAN BAKU - IMPORT
-        $dataQry->join(
-            'penerimaan_barang pb_import',
-            'pb_import.status_penerimaan = "IMPORT" AND pb_import.tipe_bahan = "BAKU" AND pb_import.multiple_po_id LIKE CONCAT("%", transaksi_pembelian.id_import_bb, "%")',
-            'left'
-        );
-
-        // JOIN untuk BAHAN PENOLONG (lokal/import cek dari am_purchase_orders.po_type)
-        $dataQry->join(
-            'penerimaan_barang pb_bp',
-            'pb_bp.tipe_bahan = "PENOLONG" AND pb_bp.multiple_po_id LIKE CONCAT("%", transaksi_pembelian.id_po_bp, "%")',
-            'left'
-        );
-
-        // Supplier
-        $dataQry->join('suppliers s_lokal', 's_lokal.id = pb_lokal.supplier_id', 'left');
-        $dataQry->join('suppliers s_import', 's_import.id = pb_import.supplier_id', 'left');
-        $dataQry->join('suppliers s_bp', 's_bp.id = pb_bp.supplier_id', 'left');
-
-        // PO BP untuk tipe
-        $dataQry->join('am_purchase_orders', 'am_purchase_orders.id = transaksi_pembelian.id_po_bp', 'left');
-
         $dataQry->where($condition);
         $dataQry->orderBy($sort, $sortType);
         $dataQry->groupBy('jurnal_umum.id_transaksi');
 
-        // Hitung total sebelum filter
         $totalData = $dataQry->countAllResults(false);
 
-        // Dynamic filter
         if ($addCondition['start_date'] || $addCondition['end_date'] || $addCondition['type_transaksi'] || $addCondition['search']) {
             $dataQry->groupStart();
+        }
 
-            if ($addCondition['start_date']) {
-                $dataQry->where('transaksi_jurnal.tanggal_transaksi >=', $addCondition['start_date']);
+        if ($addCondition['start_date']) {
+            $dataQry->where('transaksi_jurnal.tanggal_transaksi >=', $addCondition['start_date']);
+        }
+
+        if ($addCondition['end_date']) {
+            $dataQry->where('transaksi_jurnal.tanggal_transaksi <=', $addCondition['end_date']);
+        }
+
+        if ($addCondition['type_transaksi']) {
+            if ($addCondition['type_transaksi'] == "BAHAN BAKU") {
+                $dataQry->where('transaksi_pembelian.id_local_bb !=', null);
+                $dataQry->orWhere('transaksi_pembelian.id_import_bb !=', null);
+            } elseif ($addCondition['type_transaksi'] == "BAHAN PENOLONG") {
+                $dataQry->where('transaksi_pembelian.id_po_bp !=', null);
+            } else {
+                $dataQry->where('transaksi_jurnal.type_transaksi', $addCondition['type_transaksi']);
             }
+        }
 
-            if ($addCondition['end_date']) {
-                $dataQry->where('transaksi_jurnal.tanggal_transaksi <=', $addCondition['end_date']);
-            }
+        if ($addCondition['search']) {
+            $dataQry->like('no_transaksi', $addCondition['search'])->orLike('uraian_transaksi', $addCondition['search']);
+        }
 
-            if ($addCondition['type_transaksi']) {
-                if ($addCondition['type_transaksi'] == "BAHAN BAKU") {
-                    $dataQry->groupStart();
-                    $dataQry->where('transaksi_pembelian.id_local_bb IS NOT NULL');
-                    $dataQry->orWhere('transaksi_pembelian.id_import_bb IS NOT NULL');
-                    $dataQry->groupEnd();
-                } elseif ($addCondition['type_transaksi'] == "BAHAN PENOLONG") {
-                    $dataQry->where('transaksi_pembelian.id_po_bp IS NOT NULL');
-                } else {
-                    $dataQry->where('transaksi_jurnal.type_transaksi', $addCondition['type_transaksi']);
-                }
-            }
-
-            if ($addCondition['search']) {
-                $dataQry->groupStart();
-                $dataQry->like('transaksi_jurnal.no_transaksi', $addCondition['search']);
-                $dataQry->orLike('transaksi_jurnal.uraian_transaksi', $addCondition['search']);
-                $dataQry->orLike('pb_lokal.no_penerimaan_barang', $addCondition['search']);
-                $dataQry->orLike('pb_import.no_penerimaan_barang', $addCondition['search']);
-                $dataQry->orLike('pb_bp.no_penerimaan_barang', $addCondition['search']);
-                $dataQry->orLike('s_lokal.name', $addCondition['search']);
-                $dataQry->orLike('s_import.name', $addCondition['search']);
-                $dataQry->orLike('s_bp.name', $addCondition['search']);
-
-                $dataQry->groupEnd();
-            }
-
+        if ($addCondition['start_date'] || $addCondition['end_date'] || $addCondition['type_transaksi'] || $addCondition['search']) {
             $dataQry->groupEnd();
         }
 
-        // Total setelah filter
         $totalFilteredData = $dataQry->countAllResults(false);
-
-        // Ambil data hasil akhir
         $data = $dataQry->findAll($limit, $offset);
 
         return [
@@ -313,4 +188,132 @@ class TransaksiJurnalModel extends Model
             'totalFilteredData' => $totalFilteredData,
         ];
     }
+
+    // public function getList($condition, $addCondition, $limit = 10, $offset = 0)
+    // {
+    //     $availableSort = [
+    //         'transaksi_jurnal.id' => 'transaksi_jurnal.id',
+    //         'transaksi_jurnal.type_transaksi' => 'transaksi_jurnal.type_transaksi',
+    //         'transaksi_jurnal.no_transaksi' => 'transaksi_jurnal.no_transaksi',
+    //         'transaksi_jurnal.tanggal_transaksi' => 'transaksi_jurnal.tanggal_transaksi',
+    //         'transaksi_jurnal.uraian_transaksi' => 'transaksi_jurnal.uraian_transaksi',
+    //         'transaksi_jurnal.metode_input' => 'transaksi_jurnal.metode_input',
+    //     ];
+    //     $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+    //     $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'created_at';
+    //     $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+    //     $selectQry = "
+    //         transaksi_jurnal.*,
+    //         metadata.value as transaksi_type_name,
+    //         transaksi_pembelian.id_local_bb,
+    //         transaksi_pembelian.id_import_bb,
+    //         transaksi_pembelian.id_po_bp,
+    //         pb_lokal.no_penerimaan_barang as no_penerimaan_lokal,
+    //         pb_import.no_penerimaan_barang as no_penerimaan_import,
+    //         pb_bp.no_penerimaan_barang as no_penerimaan_bp,
+    //         s_lokal.name as supplier_lokal,
+    //         s_import.name as supplier_import,
+    //         s_bp.name as supplier_bp,
+    //         am_purchase_orders.po_type
+    //     ";
+
+    //     // Base Query dengan semua JOIN
+    //     $baseQry = $this->asObject()->select($selectQry);
+    //     $baseQry->join('metadata', 'metadata.id = transaksi_jurnal.type_transaksi', 'left');
+    //     $baseQry->join('jurnal_umum', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left');
+    //     $baseQry->join('transaksi_pembelian', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left');
+
+    //     // Gunakan FIND_IN_SET untuk multiple_po_id
+    //     $baseQry->join(
+    //         'penerimaan_barang pb_lokal',
+    //         'pb_lokal.status_penerimaan = "LOKAL" AND pb_lokal.tipe_bahan = "BAKU" AND FIND_IN_SET(transaksi_pembelian.id_local_bb, pb_lokal.multiple_po_id)',
+    //         'left'
+    //     );
+    //     $baseQry->join(
+    //         'penerimaan_barang pb_import',
+    //         'pb_import.status_penerimaan = "IMPORT" AND pb_import.tipe_bahan = "BAKU" AND FIND_IN_SET(transaksi_pembelian.id_import_bb, pb_import.multiple_po_id)',
+    //         'left'
+    //     );
+    //     $baseQry->join(
+    //         'penerimaan_barang pb_bp',
+    //         'pb_bp.tipe_bahan = "PENOLONG" AND FIND_IN_SET(transaksi_pembelian.id_po_bp, pb_bp.multiple_po_id)',
+    //         'left'
+    //     );
+
+    //     $baseQry->join('suppliers s_lokal', 's_lokal.id = pb_lokal.supplier_id', 'left');
+    //     $baseQry->join('suppliers s_import', 's_import.id = pb_import.supplier_id', 'left');
+    //     $baseQry->join('suppliers s_bp', 's_bp.id = pb_bp.supplier_id', 'left');
+    //     $baseQry->join('am_purchase_orders', 'am_purchase_orders.id = transaksi_pembelian.id_po_bp', 'left');
+
+    //     // Total data awal (tanpa filter pencarian/dinamis)
+    //     $totalDataQry = clone $baseQry;
+    //     $totalDataQry->where($condition);
+    //     $totalData = $totalDataQry->countAllResults(false);
+
+    //     // Query data utama
+    //     $dataQry = clone $baseQry;
+    //     $dataQry->where($condition);
+    //     $dataQry->groupBy('jurnal_umum.id_transaksi');
+
+    //     // Filter dinamis
+    //     if (
+    //         !empty($addCondition['start_date']) ||
+    //         !empty($addCondition['end_date']) ||
+    //         !empty($addCondition['type_transaksi']) ||
+    //         !empty($addCondition['search'])
+    //     ) {
+    //         $dataQry->groupStart();
+
+    //         if (!empty($addCondition['start_date'])) {
+    //             $dataQry->where('transaksi_jurnal.tanggal_transaksi >=', $addCondition['start_date']);
+    //         }
+
+    //         if (!empty($addCondition['end_date'])) {
+    //             $dataQry->where('transaksi_jurnal.tanggal_transaksi <=', $addCondition['end_date']);
+    //         }
+
+    //         if (!empty($addCondition['type_transaksi'])) {
+    //             if ($addCondition['type_transaksi'] === "BAHAN BAKU") {
+    //                 $dataQry->groupStart();
+    //                 $dataQry->where('transaksi_pembelian.id_local_bb IS NOT NULL');
+    //                 $dataQry->orWhere('transaksi_pembelian.id_import_bb IS NOT NULL');
+    //                 $dataQry->groupEnd();
+    //             } elseif ($addCondition['type_transaksi'] === "BAHAN PENOLONG") {
+    //                 $dataQry->where('transaksi_pembelian.id_po_bp IS NOT NULL');
+    //             } else {
+    //                 $dataQry->where('transaksi_jurnal.type_transaksi', $addCondition['type_transaksi']);
+    //             }
+    //         }
+
+    //         if (!empty($addCondition['search'])) {
+    //             $dataQry->groupStart();
+    //             $dataQry->like('transaksi_jurnal.no_transaksi', $addCondition['search']);
+    //             $dataQry->orLike('transaksi_jurnal.uraian_transaksi', $addCondition['search']);
+    //             $dataQry->orLike('pb_lokal.no_penerimaan_barang', $addCondition['search']);
+    //             $dataQry->orLike('pb_import.no_penerimaan_barang', $addCondition['search']);
+    //             $dataQry->orLike('pb_bp.no_penerimaan_barang', $addCondition['search']);
+    //             $dataQry->orLike('s_lokal.name', $addCondition['search']);
+    //             $dataQry->orLike('s_import.name', $addCondition['search']);
+    //             $dataQry->orLike('s_bp.name', $addCondition['search']);
+    //             $dataQry->groupEnd();
+    //         }
+
+    //         $dataQry->groupEnd();
+    //     }
+
+    //     // Hitung total data setelah filter
+    //     $filteredQry = clone $dataQry;
+    //     $totalFilteredData = $filteredQry->countAllResults(false);
+
+    //     // Ambil data akhir
+    //     $data = $dataQry->orderBy($sort, $sortType)->findAll($limit, $offset);
+
+    //     return [
+    //         'data'              => $data,
+    //         'totalData'         => $totalData,
+    //         'totalFilteredData' => $totalFilteredData,
+    //     ];
+    // }
 }
