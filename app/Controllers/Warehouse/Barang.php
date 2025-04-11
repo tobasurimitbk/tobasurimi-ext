@@ -382,6 +382,9 @@ class Barang extends BaseController
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
+        $aksesSupplierLokalBP = can('Pembelian', 'PO Lokal BP', 'r');
+        $aksesSupplierImportBP = can('Pembelian', 'PO Import BP', 'r');
+
         $res = $barangMasterModel->getList($condition, $addCondition, $limit, $offset);
 
         $rdata = [];
@@ -399,9 +402,6 @@ class Barang extends BaseController
             $satuan2_kode = (isset($satuan2) && $data['satuan_2'] != 0) ? $satuan2->kode_satuan : "-";
             $satuan3_kode = (isset($satuan3) && $data['satuan_3'] != 0) ? $satuan3->kode_satuan : "-";
             $accountBarang = $accountBarangModel->asObject()->where('company_id', $this->this_company_id)->where('barang_master_id', $data['id'])->where('deleted_at', null)->first();
-
-            $aksesSupplierLokalBP = can('Pembelian', 'PO Lokal BP', 'r');
-            $aksesSupplierImportBP = can('Pembelian', 'PO Import BP', 'r');
 
             if ($lokalDetail['createdAt'] != null && $aksesSupplierLokalBP) {
                 // LOKAL 
@@ -461,6 +461,17 @@ class Barang extends BaseController
             $codeName = $this->kodeBahanSetengahJadi;
         } else {
             $codeName = $this->kodeBahanModal;
+        }
+
+        $aksesSupplierLokalBP = can('Pembelian', 'PO Lokal BP', 'r');
+        $aksesSupplierImportBP = can('Pembelian', 'PO Import BP', 'r');
+
+        if ($aksesSupplierLokalBP && !$aksesSupplierImportBP && $type == 'bahan_penolong') {
+            // PO LOKAL BP — sembunyikan kode barang yang diawali 'BI-'
+            $codeName = $this->kodeBahanPenolong;
+        } elseif (!$aksesSupplierLokalBP && $aksesSupplierImportBP && $type == 'bahan_penolong') {
+            // PO IMPORT BP — hanya tampilkan kode barang yang diawali 'BI-'
+            $codeName = "BI-BP";
         }
 
         $lastBarang = $barangModel->asObject()

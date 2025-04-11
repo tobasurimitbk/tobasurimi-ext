@@ -68,14 +68,23 @@ class BarangMasterModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'barang_master.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
+        $aksesSupplierLokalBP = can('Pembelian', 'PO Lokal BP', 'r');
+        $aksesSupplierImportBP = can('Pembelian', 'PO Import BP', 'r');
+
         // Hitung total data tanpa filter
-        $totalData = $this->where($condition)
-            ->select([
-                'barang_master.id',
-            ])
-            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
-            ->countAllResults();
+        $totalDataQry = $this->select([
+            'barang_master.id',
+        ]);
+        $totalDataQry->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left');
+        $totalDataQry->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left');
+        if ($aksesSupplierLokalBP && !$aksesSupplierImportBP) {
+            // PO LOKAL BP — sembunyikan kode barang yang diawali 'BI-'
+            $totalDataQry->notLike('barang_master.kode_barang', 'BI-', 'after');
+        } elseif (!$aksesSupplierLokalBP && $aksesSupplierImportBP) {
+            // PO IMPORT BP — hanya tampilkan kode barang yang diawali 'BI-'
+            $totalDataQry->like('barang_master.kode_barang', 'BI-', 'after');
+        }
+        $totalData =  $totalDataQry->where($condition)->countAllResults();
 
         $barangDataQry = $this->asArray()
             ->select([
@@ -94,6 +103,14 @@ class BarangMasterModel extends Model
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
             ->where($condition);
+
+        if ($aksesSupplierLokalBP && !$aksesSupplierImportBP) {
+            // PO LOKAL BP — sembunyikan kode barang yang diawali 'BI-'
+            $barangDataQry->notLike('barang_master.kode_barang', 'BI-', 'after');
+        } elseif (!$aksesSupplierLokalBP && $aksesSupplierImportBP) {
+            // PO IMPORT BP — hanya tampilkan kode barang yang diawali 'BI-'
+            $barangDataQry->like('barang_master.kode_barang', 'BI-', 'after');
+        }
 
         if ($addCondition['search']) {
             $search = strtolower($addCondition['search'] . " ");
