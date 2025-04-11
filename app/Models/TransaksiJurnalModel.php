@@ -205,7 +205,15 @@ class TransaksiJurnalModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "
-            transaksi_jurnal.*,
+            transaksi_jurnal.id,
+            transaksi_jurnal.tanggal_transaksi,
+            transaksi_jurnal.no_transaksi,
+            transaksi_jurnal.uraian_transaksi,
+            transaksi_jurnal.metode_input,
+            transaksi_jurnal.valas,
+            transaksi_jurnal.exchange_rate,
+            transaksi_jurnal.total_debit,
+            transaksi_jurnal.no_bukti,                 
             metadata.value as transaksi_type_name,
             transaksi_pembelian.id_local_bb,
             transaksi_pembelian.id_import_bb,
