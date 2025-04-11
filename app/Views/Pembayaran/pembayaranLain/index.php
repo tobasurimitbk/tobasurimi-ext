@@ -615,6 +615,103 @@
             });
         }
 
+
+        
+
+        $('#add_modal').on('hidden.bs.modal', function () {
+            // Reset all form fields
+            $('.create-form')[0].reset();
+            
+            // Clear the details table
+            $('#detail-table tbody').empty();
+            
+            // Clear any hidden fields or special inputs
+            $('.hidden').val('');
+            
+            // Reset any select2 elements if you're using them
+            $('.form-select').val('').trigger('change');
+
+            details = [];
+        });
+
+        
+        $('.btn-add-detail').click(function () {
+            // Jalankan validasi detail dulu
+            if (!validateDetails()) {
+                refreshValidation(); // buat update styling error
+                return; // stop proses kalau gak valid
+            }
+
+            const detail = {
+                tanggal: $('#tanggal').val(),
+                metode_pembayaran: $('#metode_pembayaran').val(),
+                nominal_pembayaran: $('#nominal_pembayaran').val(),
+                pembayaran_oleh: $('#pembayaran_oleh').val(),
+                akun_kas: $('#akun_kas').val(),
+                akun_selisih: $('#akun_selisih').val(),
+                keterangan: $('#keterangan').val()
+            };
+
+            details.push(detail);
+            refreshDetailsTable();
+            clearDetailForm();
+            refreshValidation(); // bersihin styling error kalau sudah valid
+        });
+
+        
+        // Refresh details table
+        function refreshDetailsTable() {
+            const tbody = $('#detail-table tbody');
+            tbody.empty();
+            
+            details.forEach((detail, index) => {
+                tbody.append(`
+                    <tr>
+                        <td>${detail.tanggal}</td>
+                        <td>${detail.metode_pembayaran}</td>
+                        <td>${detail.nominal_pembayaran}</td>
+                        <td>${detail.pembayaran_oleh}</td>
+                        <td>${detail.keterangan}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm btn-remove-detail" data-index="${index}">Hapus</button>
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+        
+        // Remove detail
+        $(document).on('click', '.btn-remove-detail', function() {
+            const index = $(this).data('index');
+            details.splice(index, 1);
+            refreshDetailsTable();
+        });
+        
+        // Clear detail form
+        function clearDetailForm() {
+            $('#tanggal, #nominal_pembayaran, #keterangan').val('');
+            $('#metode_pembayaran, #akun_kas, #akun_selisih').val('').trigger('change');
+        }
+        
+        // Handle final submission
+        $('.btn-submit-form').click(function() {
+            if (details.length === 0) {
+                alert('Tambahkan setidaknya satu detail pembayaran');
+                return;
+            }
+            
+            const formData = {
+                no_pembayaran: $('#no_pembayaran').val(),
+                divisi_id: $('#divisi_id').val(),
+                valas: $('#valas').val(),
+                bayar_ke: $('#bayar_ke').val(),
+                details: details
+            };
+            
+            // Submit via AJAX or form submission
+            // ...
+        });
+
         $(".dataTable_info").addClass("pt-0");
 
         $(".btn-show-form").click(function() {
@@ -866,99 +963,6 @@
             }
         });
     }
-
-
-
-    $(document).ready(function() {
-
-
-        $('#add_modal').on('hidden.bs.modal', function () {
-            // Reset all form fields
-            $('.create-form')[0].reset();
-            
-            // Clear the details table
-            $('#detail-table tbody').empty();
-            
-            // Clear any hidden fields or special inputs
-            $('.hidden').val('');
-            
-            // Reset any select2 elements if you're using them
-            $('.form-select').val('').trigger('change');
-
-            details = [];
-        });
-
-        
-        // Add detail to table
-        $('.btn-add-detail').click(function() {
-            const detail = {
-                tanggal: $('#tanggal').val(),
-                metode_pembayaran: $('#metode_pembayaran').val(),
-                nominal_pembayaran: $('#nominal_pembayaran').val(),
-                pembayaran_oleh: $('#pembayaran_oleh').val(),
-                akun_kas: $('#akun_kas').val(),
-                akun_selisih: $('#akun_selisih').val(),
-                keterangan: $('#keterangan').val()
-            };
-            
-            details.push(detail);
-            refreshDetailsTable();
-            clearDetailForm();
-        });
-        
-        // Refresh details table
-        function refreshDetailsTable() {
-            const tbody = $('#detail-table tbody');
-            tbody.empty();
-            
-            details.forEach((detail, index) => {
-                tbody.append(`
-                    <tr>
-                        <td>${detail.tanggal}</td>
-                        <td>${detail.metode_pembayaran}</td>
-                        <td>${detail.nominal_pembayaran}</td>
-                        <td>${detail.pembayaran_oleh}</td>
-                        <td>${detail.keterangan}</td>
-                        <td>
-                            <button class="btn btn-danger btn-sm btn-remove-detail" data-index="${index}">Hapus</button>
-                        </td>
-                    </tr>
-                `);
-            });
-        }
-        
-        // Remove detail
-        $(document).on('click', '.btn-remove-detail', function() {
-            const index = $(this).data('index');
-            details.splice(index, 1);
-            refreshDetailsTable();
-        });
-        
-        // Clear detail form
-        function clearDetailForm() {
-            $('#tanggal, #nominal_pembayaran, #keterangan').val('');
-            $('#metode_pembayaran, #akun_kas, #akun_selisih').val('').trigger('change');
-        }
-        
-        // Handle final submission
-        $('.btn-submit-form').click(function() {
-            if (details.length === 0) {
-                alert('Tambahkan setidaknya satu detail pembayaran');
-                return;
-            }
-            
-            const formData = {
-                no_pembayaran: $('#no_pembayaran').val(),
-                divisi_id: $('#divisi_id').val(),
-                valas: $('#valas').val(),
-                bayar_ke: $('#bayar_ke').val(),
-                details: details
-            };
-            
-            // Submit via AJAX or form submission
-            // ...
-        });
-    });
 
 
     function disabledForm() {
