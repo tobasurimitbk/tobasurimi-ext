@@ -1653,6 +1653,8 @@ class LaporanBeaCukai extends BaseController
             "supplierName" => $this->request->getVar("supplierName"),
             "noAju" => $this->request->getVar("noAju"),
             "noPenerimaanBarang" => $this->request->getVar("noPenerimaanBarang"),
+            "searchData" => $this->request->getGet('search'),
+            "statusPosting" => $this->request->getGet("statusPosting"),
         ];
 
         $condition = [
@@ -1856,6 +1858,8 @@ class LaporanBeaCukai extends BaseController
             "supplierName" => $this->request->getVar("supplierName"),
             "noAju" => $this->request->getVar("noAju"),
             "noPenerimaanBarang" => $this->request->getVar("noPenerimaanBarang"),
+            "searchData" => $this->request->getGet('search'),
+            "statusPosting" => $this->request->getGet("statusPosting"),
         ];
 
         $condition = [
@@ -3609,6 +3613,8 @@ class LaporanBeaCukai extends BaseController
             "supplierName" => $this->request->getVar("supplierName"),
             "noAju" => $this->request->getVar("noAju"),
             "noPenerimaanBarang" => $this->request->getVar("noPenerimaanBarang"),
+            "searchData" => $this->request->getGet('search'),
+            "statusPosting" => $this->request->getGet("statusPosting"),
         ];
 
         $condition = [
@@ -3782,6 +3788,8 @@ class LaporanBeaCukai extends BaseController
             "supplierName" => $this->request->getVar("supplierName"),
             "noAju" => $this->request->getVar("noAju"),
             "noPenerimaanBarang" => $this->request->getVar("noPenerimaanBarang"),
+            "searchData" => $this->request->getGet('search'),
+            "statusPosting" => $this->request->getGet("statusPosting"),
         ];
 
         $condition = [
