@@ -213,6 +213,12 @@
                                     <i class="fa-solid fa-ban"></i>    
                                 </button>
                             `;
+                            res += `
+                               <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                            `;
+
                         }
 
                         <?php if (can('Jasa Vendor', 'Barang Keluar', 'p')) : ?>
