@@ -578,19 +578,39 @@
         // Custom validation for details
         function validateDetails() {
             let isValid = true;
-            
-            // Check if at least one detail exists
-            if ($("#detail-table tbody tr").length === 0) {
+            const nominalRaw = $('#nominal_pembayaran').val();
+            const nominalClean = destroyFormatRupiah(nominalRaw);
+
+            // Cek apakah field kosong atau nominal 0
+            if (
+                !$('#tanggal').val() ||
+                !$('#metode_pembayaran').val() ||
+                !nominalClean || // bisa tambah pengecekan nominal < 1 kalau mau
+                !$('#pembayaran_oleh').val() ||
+                !$('#akun_kas').val() ||
+                !$('#akun_selisih').val()
+            ) {
                 isValid = false;
-                // Highlight all detail fields
-                $('#tanggal, #metode_pembayaran, #nominal_pembayaran, #pembayaran_oleh, #akun_kas, #akun_selisih').each(function() {
-                    $(this).closest('.form-floating').addClass('has-error');
-                    $(this).addClass('is-invalid');
+
+                // Highlight all detail fields (khususnya yang kosong)
+                $('#tanggal, #metode_pembayaran, #pembayaran_oleh, #akun_kas, #akun_selisih').each(function () {
+                    const value = $(this).val();
+                    const fieldId = $(this).attr('id');
+
+                    // Untuk nominal, kita pakai hasil clean
+                    if (
+                        (fieldId === 'nominal_pembayaran' && !nominalClean) ||
+                        (fieldId !== 'nominal_pembayaran' && !value)
+                    ) {
+                        $(this).closest('.form-floating').addClass('has-error');
+                        $(this).addClass('is-invalid');
+                    }
                 });
             }
-            
+
             return isValid;
         }
+
 
         // Update validation when adding/removing details
         function refreshValidation() {
