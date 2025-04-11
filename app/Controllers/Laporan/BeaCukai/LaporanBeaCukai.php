@@ -1514,8 +1514,9 @@ class LaporanBeaCukai extends BaseController
             "mulaiTanggalBC23" => $this->request->getGet("mulaiTanggalBC23"),
             "selesaiTanggalBC23" => $this->request->getGet('selesaiTanggalBC23'),
             "noPenerimaanBarang" => $this->request->getGet('noPenerimaanBarang'),
+            "statusPosting" => $this->request->getGet("statusPosting"),
             "noAju" => $this->request->getGet('noAju'),
-            "search" => $this->request->getGet('search')
+            "searchData" => $this->request->getGet('search')
         ];
 
         $condition = [
@@ -3483,8 +3484,9 @@ class LaporanBeaCukai extends BaseController
             "mulaiTanggalBC40" => $this->request->getGet("mulaiTanggalBC40"),
             "selesaiTanggalBC40" => $this->request->getGet('selesaiTanggalBC40'),
             "noPenerimaanBarang" => $this->request->getGet('noPenerimaanBarang'),
+            "statusPosting" => $this->request->getGet("statusPosting"),
             "noAju" => $this->request->getGet('noAju'),
-            "search" => $this->request->getGet('search')
+            "searchData" => $this->request->getGet('search')
         ];
 
         $condition = [
