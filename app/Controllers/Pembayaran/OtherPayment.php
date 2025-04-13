@@ -122,6 +122,7 @@ class OtherPayment extends BaseController
             'no_pembayaran'  => $payload['no_pembayaran'],
             'bayar_ke'       => $payload['bayar_ke'],
             'valas'          => $payload['valas'],
+            'akun_selisih'         => $payload['akun_selisih'],
         ];
 
         $parentId = $this->otherPaymentModel->insert($parentData);
@@ -134,7 +135,7 @@ class OtherPayment extends BaseController
                 'nominal'              => str_replace(['.', ','], '', $detail['nominal_pembayaran']),
                 'pembayaran_oleh'      => $detail['pembayaran_oleh'],
                 'akun_kas'             => $detail['akun_kas'],
-                'akun_selisih'         => $detail['akun_selisih'],
+                'akun_selisih'         =>  $payload['akun_selisih'],
                 'keterangan'           => $detail['keterangan'] ?? null
             ];
 
@@ -170,6 +171,7 @@ class OtherPayment extends BaseController
             'no_pembayaran' => $payload['no_pembayaran'],
             'bayar_ke'      => $payload['bayar_ke'],
             'valas'         => $payload['valas'],
+            'akun_selisih'         => $payload['akun_selisih'],
         ];
         $this->otherPaymentModel->update($parentId, $parentData);
     
@@ -186,7 +188,7 @@ class OtherPayment extends BaseController
                 'nominal'              => str_replace(['.', ','], '', $detail['nominal_pembayaran']),
                 'pembayaran_oleh'      => $detail['pembayaran_oleh'],
                 'akun_kas'             => $detail['akun_kas'],
-                'akun_selisih'         => $detail['akun_selisih'],
+                'akun_selisih'         =>  $payload['akun_selisih'],
                 'keterangan'           => $detail['keterangan'] ?? null
             ];
     
@@ -241,7 +243,16 @@ class OtherPayment extends BaseController
         }
 
         // Get all child details
-        $details = $this->otherPaymentDetailModel->where('other_payment_id', $id)->findAll();
+        $details = $this->otherPaymentDetailModel
+                    ->select('other_payment_detail.*, 
+                            kas.nama_sub as akun_kas_name, 
+                            selisih.nama_sub as akun_selisih_name,
+                            kas.no_sub as akun_kas_no,
+                            selisih.no_sub as akun_selisih_no')
+                    ->join('sub_akuns as kas', 'kas.id = other_payment_detail.akun_kas', 'left')
+                    ->join('sub_akuns as selisih', 'selisih.id = other_payment_detail.akun_selisih', 'left')
+                    ->where('other_payment_detail.other_payment_id', $id)
+                    ->findAll();
         
         // Format details data
         $formattedDetails = [];
@@ -254,6 +265,8 @@ class OtherPayment extends BaseController
                 'pembayaran_oleh' => $detail['pembayaran_oleh'],
                 'akun_kas' => $detail['akun_kas'],
                 'akun_selisih' => $detail['akun_selisih'],
+                'akun_kas_name' => $detail['akun_kas_no'] . ' ' . $detail['akun_kas_name'],
+                'akun_selisih_name' => $detail['akun_selisih_no'] . ' ' . $detail['akun_selisih_name'],
                 'keterangan' => $detail['keterangan']
             ];
         }
@@ -268,6 +281,7 @@ class OtherPayment extends BaseController
                     'divisi_id' => $parentData['divisi_id'],
                     'bayar_ke' => $parentData['bayar_ke'],
                     'valas' => $parentData['valas'],
+                    'akun_selisih' => $parentData['akun_selisih'],
                     'status_posting' => $parentData['status_posting'] ?? '0'
                 ],
                 'details' => $formattedDetails

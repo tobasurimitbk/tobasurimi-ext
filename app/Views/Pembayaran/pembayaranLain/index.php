@@ -2,7 +2,7 @@
 <?= $this->Section('content'); ?>
 <meta name="csrf-token" content="<?= csrf_hash() ?>">
 <div class="modal add-modal" id="add_modal" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px">
+    <div class="modal-dialog" style="min-width: 1200px">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label></h5>
@@ -51,6 +51,19 @@
                                         <label for="floatingInput" style="z-index: 1;">Valas</label>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select" name="akun_selisih" id="akun_selisih" required>
+                                            <option disabled selected value=""></option>
+                                            <?php foreach ($subsAkuns as $subs) : ?>
+                                                <option value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                            <?php endforeach ?>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Kredit</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" type="text" class="form-control bayar_ke" name="bayar_ke" id="bayar_ke" placeholder="Pembayaran Ke">
@@ -116,17 +129,6 @@
                                         <label for="floatingInput" style="z-index: 1;">Debit</label>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select" name="akun_selisih" id="akun_selisih" required>
-                                            <option disabled selected value=""></option>
-                                            <?php foreach ($subsAkuns as $subs) : ?>
-                                                <option value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
-                                            <?php endforeach ?>
-                                        </select>
-                                        <label for="floatingInput" style="z-index: 1;">Kredit</label>
-                                    </div>
-                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
@@ -152,6 +154,8 @@
                                                 <th>Tanggal</th>
                                                 <th>Metode</th>
                                                 <th>Nominal</th>
+                                                <th>Akun Debit</th>
+                                                <th>Akun Kredit</th>
                                                 <th>Pembayaran Oleh</th>
                                                 <th>Keterangan</th>
                                                 <th>Aksi</th>
@@ -367,6 +371,9 @@
                 valas: {
                     required: true
                 },
+                akun_selisih: {
+                    required: true
+                },
                 
                 // Child/detail section rules
                 tanggal: {
@@ -395,11 +402,6 @@
                         return $("#detail-table tbody tr").length === 0;
                     }
                 },
-                akun_selisih: {
-                    required: function() {
-                        return $("#detail-table tbody tr").length === 0;
-                    }
-                }
             },
             messages: {
                 no_pembayaran: {
@@ -587,13 +589,12 @@
                 !$('#metode_pembayaran').val() ||
                 !nominalClean || // bisa tambah pengecekan nominal < 1 kalau mau
                 !$('#pembayaran_oleh').val() ||
-                !$('#akun_kas').val() ||
-                !$('#akun_selisih').val()
+                !$('#akun_kas').val()
             ) {
                 isValid = false;
 
                 // Highlight all detail fields (khususnya yang kosong)
-                $('#tanggal, #metode_pembayaran, #pembayaran_oleh, #akun_kas, #akun_selisih').each(function () {
+                $('#tanggal, #metode_pembayaran, #pembayaran_oleh, #akun_kas').each(function () {
                     const value = $(this).val();
                     const fieldId = $(this).attr('id');
 
@@ -619,7 +620,7 @@
             
             // Special handling for detail fields
             const hasDetails = $("#detail-table tbody tr").length > 0;
-            const detailFields = ['#tanggal', '#metode_pembayaran', '#nominal_pembayaran', '#pembayaran_oleh', '#akun_kas', '#akun_selisih'];
+            const detailFields = ['#tanggal', '#metode_pembayaran', '#nominal_pembayaran', '#pembayaran_oleh', '#akun_kas'];
             
             detailFields.forEach(field => {
                 const element = $(field);
@@ -668,7 +669,8 @@
                 nominal_pembayaran: $('#nominal_pembayaran').val(),
                 pembayaran_oleh: $('#pembayaran_oleh').val(),
                 akun_kas: $('#akun_kas').val(),
-                akun_selisih: $('#akun_selisih').val(),
+                akun_kas_name: $('#akun_kas option:selected').text(),
+                akun_selisih_name: $('#akun_selisih option:selected').text(),
                 keterangan: $('#keterangan').val()
             };
 
@@ -690,6 +692,8 @@
                         <td>${detail.tanggal}</td>
                         <td>${detail.metode_pembayaran}</td>
                         <td>${detail.nominal_pembayaran}</td>
+                        <td>${detail.akun_kas_name}</td>
+                        <td>${detail.akun_selisih_name}</td>
                         <td>${detail.pembayaran_oleh}</td>
                         <td>${detail.keterangan}</td>
                         <td>
@@ -710,7 +714,7 @@
         // Clear detail form
         function clearDetailForm() {
             $('#tanggal, #nominal_pembayaran, #keterangan').val('');
-            $('#metode_pembayaran, #akun_kas, #akun_selisih').val('').trigger('change');
+            $('#metode_pembayaran, #akun_kas').val('').trigger('change');
         }
         
         // Handle final submission
@@ -795,6 +799,7 @@
                         $('#divisi_id').val(parent.divisi_id).change();
                         $('#bayar_ke').val(parent.bayar_ke);
                         $('#valas').val(parent.valas).change();
+                        $('#akun_selisih').val(parent.akun_selisih).change();
                         
                         // Disable fields if needed
                         if (parent.status_posting === "1") {
@@ -813,7 +818,8 @@
                                     nominal_pembayaran: detail.nominal_pembayaran,
                                     pembayaran_oleh: detail.pembayaran_oleh,
                                     akun_kas: detail.akun_kas,
-                                    akun_selisih: detail.akun_selisih,
+                                    akun_kas_name: detail.akun_kas_name,
+                                    akun_selisih_name: detail.akun_selisih_name,
                                     keterangan: detail.keterangan
                                 });
                             });
@@ -863,6 +869,7 @@
                             no_pembayaran: $('#no_pembayaran').val(),
                             bayar_ke: $('#bayar_ke').val(),
                             valas: $('#valas').val(),
+                            akun_selisih: $('#akun_selisih').val(),
                             details: details.map(detail => ({
                                 id: detail.id || '',
                                 tanggal: detail.tanggal,
@@ -870,7 +877,6 @@
                                 nominal_pembayaran: detail.nominal_pembayaran.toString().replace(/\./g, ''),
                                 pembayaran_oleh: detail.pembayaran_oleh,
                                 akun_kas: detail.akun_kas,
-                                akun_selisih: detail.akun_selisih,
                                 keterangan: detail.keterangan || ''
                             }))
                         };
