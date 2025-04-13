@@ -152,6 +152,38 @@ class SalesOrderInvoiceModel extends Model
         ];
     }
 
+    public function getAllSalesOrderInvoiceLokalForPembayaran()
+    {
+        $selectQry = "sales_order_invoice.*,
+        sales_order_invoice.document_no AS doc_no,
+        sales_order_invoice.document_type AS doc_type,
+                      DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
+                      customers.name AS nama_pelanggan,
+                      customers.kode AS kode_pelanggan,
+                      CONCAT(employees.nip , ' - ', employees.name) AS salesName,
+                      IFNULL(sales_order.no_sales_order, surat_jalan_so.no_surat_jalan) AS document_no";
+
+        $salesOrderInvoiceLokal = $this->asObject()
+            ->select($selectQry)
+            ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+            ->join('employees', 'employees.id = customers.sales_id', 'left')
+            ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pesanan"', 'LEFT')
+            ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pengiriman"', 'LEFT')
+            ->where('sales_order_invoice.status_pelunasan', "UNPAID")
+            ->where('sales_order_invoice.status_posting', 1);
+
+        $totalData = $salesOrderInvoiceLokal->countAllResults(false);
+
+        $totalFilteredData = $salesOrderInvoiceLokal->countAllResults(false);
+        $data = $salesOrderInvoiceLokal->findAll();
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
+
     public function getAllSalesOrderInvoiceLokalWithoutLimit($condition, $addCondition)
     {
         $availableSort = [

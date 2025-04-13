@@ -24,6 +24,7 @@ use App\Models\MetadataModel;
 use App\Models\PembayaranInvoiceDetailModel;
 use App\Models\SalesOrderReturnDetailModel;
 use App\Models\SalesOrderReturnModel;
+use DateTime;
 use Exception;
 
 class PembayaranInvoice extends BaseController
@@ -538,6 +539,76 @@ class PembayaranInvoice extends BaseController
             'test' => $addCondition
         ];
 
+        echo json_encode($data);
+        return;
+    }
+
+
+    public function getAllDataInvoice()
+    {   
+        $dataSalesOrderInvoice = $this->salesOrderInvoiceModel
+            ->getAllSalesOrderInvoiceLokalForPembayaran();
+    
+        $dataAllSalesOrderInvoice = [];
+    
+        $no = 1;
+        foreach ($dataSalesOrderInvoice['data'] as $data) {
+            // Karakter yang akan dihapus
+            $unwanted_characters = array('[', '"', ']');
+    
+            // Gantikan karakter tidak diinginkan dengan string kosong
+            $cleaned_string_document_no = str_replace($unwanted_characters, ' ', $data->doc_no);
+    
+            $statusPembayaranInvoice = "";
+            if ($data->status_pelunasan = "UNPAID") {
+                $statusPembayaranInvoice = "BELUM LUNAS";
+            } else {
+                $statusPembayaranInvoice = "LUNAS";
+            }
+            // Calculate due date
+            $tanggalJatuhTempo = "Tidak ada terms";
+            if (isset($data->terms) && $data->terms !== "" && ctype_digit($data->terms)) {  // Pengecekan lebih akurat untuk string angka
+                try {
+                    // Ubah format tanggal dari d/m/Y ke d-m-Y untuk pemrosesan
+                    $tanggalFaktur = DateTime::createFromFormat('d/m/Y', $data->tanggal_faktur);
+                    if ($tanggalFaktur) {
+                        $terms = (int)$data->terms;  // Konversi ke integer
+                        $tanggalFaktur->modify('+' . $terms . ' days');
+                        $tanggalJatuhTempo = $tanggalFaktur->format('d/m/Y');  // Kembalikan ke format asal
+                    }
+                } catch (Exception $e) {
+                    $tanggalJatuhTempo = "Format tanggal tidak valid";
+                }
+            }
+    
+            array_push($dataAllSalesOrderInvoice, [
+                "no"                => $no++,
+                "id"                => encrypt($data->id),
+                "no_faktur"         => $data->no_faktur,
+                "tanggal_faktur"    => $data->tanggal_faktur,
+                "document_type"     => strtoupper($data->doc_type),
+                "document_no"       => $cleaned_string_document_no,
+                "total_invoice"     => number_format(floatval($data->total_invoice)),
+                "kode_pelanggan"    => $data->kode_pelanggan,
+                "nama_pelanggan"    => $data->nama_pelanggan,
+                "nama_sales"        => $data->salesName,
+                "tipe_invoice"      => $data->tipe_invoice,
+                "counter_print"     => $data->counter_print,
+                "terms"     => $data->terms,
+                "status_pembayaran" => $statusPembayaranInvoice,
+                "tanggal_jatuh_tempo" => $tanggalJatuhTempo,
+                "dpp" => $data->dpp,
+                "ppn" => $data->ppn,
+            ]);
+        }
+    
+        $data = [
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $dataSalesOrderInvoice['totalData'],
+            "recordsFiltered" => $dataSalesOrderInvoice['totalFilteredData'],
+            "data" => $dataAllSalesOrderInvoice,
+        ];
+    
         echo json_encode($data);
         return;
     }

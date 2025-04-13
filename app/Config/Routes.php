@@ -540,6 +540,7 @@ $routes->post('/pembayaran-invoice/update', 'Pembayaran\PembayaranInvoice::updat
 $routes->get('/pembayaran-invoice/get-customer', 'Pembayaran\PembayaranInvoice::getCustomer', ['filter' => 'Auth']);
 $routes->post('/pembayaran-invoice/delete', 'Pembayaran\PembayaranInvoice::deletePembayaranInvoice', ['filter' => 'Auth']);
 $routes->post('/pembayaran-invoice/posting', 'Pembayaran\PembayaranInvoice::posting', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/all-invoice', 'Pembayaran\PembayaranInvoice::getAllDataInvoice', ['filter' => 'Auth']);
 
 
 

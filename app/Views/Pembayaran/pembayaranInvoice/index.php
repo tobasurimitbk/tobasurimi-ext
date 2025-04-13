@@ -6,6 +6,9 @@
     <div class="section-header">
         <h1>Pembayaran Invoice</h1>
         <?php if (can('Pembayaran', 'Pembayaran Invoice', 'c')) : ?>
+            <button class="btn btn-discard float-right" type="button" id="dropdownMenuButtonExport" aria-expanded="false" style="margin-right: 20px;" onclick="showInvoice()">
+                <i class="fa fa-eye fa-sm mr-2" aria-hidden="true"></i>Invoice Belum Lunas
+            </button>
             <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-invoice/create"); ?>">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
@@ -73,6 +76,39 @@
         </div>
     </div>
 </section>
+
+<div class="modal add-modal" id="showInvoiceModal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 1400px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><label class="title-name"></label> Data Invoice Belum Lunas</h5>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th width="5%">No</th>
+                                <th width="25%">Customer / No. Faktur</th>
+                                <th width="15%">Tgl Faktur</th>
+                                <th width="15%">Jatuh Tempo</th>
+                                <th width="20%">Nilai Faktur</th>
+                                <th width="20%">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table-invoice" id="body-table-invoice" style="cursor: pointer;">
+                            <!-- Data will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
     let sort = "payment_no";
@@ -359,5 +395,84 @@
             }
         });
     }
+
+    function showInvoice() {
+        $("#showInvoiceModal").modal('show');
+        
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
+        $.ajax({
+            method: "GET",
+            url: "pembayaran-invoice/all-invoice",
+            dataType: "json",
+            beforeSend: function(xhr) {
+                setLoading();
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            complete: function() {
+                stopLoading();
+            },
+            success: function(response) {
+                let html = '';
+                let currentCustomer = '';
+                let customerRowCount = 0;
+                
+                // Group invoices by customer first
+                const customers = {};
+                response.data.forEach(item => {
+                    if (!customers[item.nama_pelanggan]) {
+                        customers[item.nama_pelanggan] = {
+                            total: 0,
+                            invoices: []
+                        };
+                    }
+                    
+                    // Convert string to number (remove commas and parse)
+                    const amount = parseFloat(item.total_invoice.replace(/,/g, ''));
+                    customers[item.nama_pelanggan].total += amount;
+                    customers[item.nama_pelanggan].invoices.push(item);
+                });
+                
+                // Generate table rows
+                Object.keys(customers).forEach((customerName, index) => {
+                    const customerData = customers[customerName];
+                    customerRowCount++;
+                    
+                    // Format total with thousand separators
+                    const formattedTotal = customerData.total.toLocaleString('id-ID');
+                    
+                    // Add customer summary row
+                    html += `
+                    <tr style="background-color: #f8f9fa; font-weight: bold;">
+                        <td>${customerRowCount}</td>
+                        <td colspan="2">${customerName}</td>
+                        <td></td>
+                        <td class="text-right">${formattedTotal}</td>
+                        <td></td>
+                    </tr>`;
+                    
+                    // Add invoice detail rows
+                    customerData.invoices.forEach(invoice => {
+                        html += `
+                        <tr>
+                            <td></td>
+                            <td style="padding-left: 30px;">${invoice.no_faktur}</td>
+                            <td>${invoice.tanggal_faktur}</td>
+                            <td>${invoice.tanggal_jatuh_tempo}</td>
+                            <td class="text-right">${invoice.total_invoice}</td>
+                            <td>${invoice.status_pembayaran}</td>
+                        </tr>`;
+                    });
+                });
+                
+                $('#body-table-invoice').html(html);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                alert('Gagal memuat data invoice');
+            }
+        });
+    }
+
 </script>
 <?= $this->endSection(); ?>
