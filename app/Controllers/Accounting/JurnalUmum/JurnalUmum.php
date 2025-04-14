@@ -43,6 +43,9 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use App\Models\LocalPOPaymentPanjarModel;
 use App\Models\LocalPOPaymentPinjamanModel;
+use App\Models\PanjarSupplierModel;
+use App\Models\PinjamanKaryawanModel;
+use App\Models\EmployeesModel;
 use Carbon\Carbon;
 
 class JurnalUmum extends BaseController
@@ -81,6 +84,7 @@ class JurnalUmum extends BaseController
     protected $localPOPaymentPinjamanModel;
     protected $PanjarSupplierModel;
     protected $PinjamanSupplierModel;
+    protected $EmployeeModel;
 
     protected $salesOrderLainModel;
     protected $salesOrderLainDetailModel;
@@ -123,8 +127,9 @@ class JurnalUmum extends BaseController
         $this->tutupBukuModel = new TutupBukuModel();
         $this->localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
         $this->localPOPaymentPinjamanModel = new LocalPOPaymentPanjarModel();
-        $this->PinjamanSupplierModel = new LocalPOPaymentPanjarModel();
-        $this->PanjarSupplierModel = new LocalPOPaymentPinjamanModel();
+        $this->PinjamanSupplierModel = new PinjamanKaryawanModel();
+        $this->PanjarSupplierModel = new PanjarSupplierModel();
+        $this->EmployeeModel = new EmployeesModel();
 
         $this->salesOrderLainModel = new SalesOrderLainModel();
         $this->salesOrderLainDetailModel = new SalesOrderLainDetailModel();
@@ -2076,6 +2081,7 @@ class JurnalUmum extends BaseController
         $barangAP = "";
         $barangAR = "";
         $dataPO = "";
+        $divisi = $this->EmployeeModel->select('division_id')->asObject()->where('id', session()->get("login")->employee_id)->first();
 
         if ($module == "PANJAR") {
             $result = array();
@@ -2117,7 +2123,7 @@ class JurnalUmum extends BaseController
                     'id_transaksi'      => $id_transaksi_jurnal,
                     'id_coa'            => $dataPanjar->akun_kas == 0 || $dataPanjar->akun_kas == NULL ? $UtangAR : $dataPanjar->akun_kas,
                     'company_id'        => $dataPanjar->company_id,
-                    // 'divisi_id'            => $this->divisi,
+                    'divisi_id'            => $divisi->division_id,
                     'tanggal_jurnal' => Carbon::parse($dataPanjar->createdAt)->format('Y-m-d'),
                     'debit'             => $dataPanjar->total_panjar,
                     'kredit'            => 0,
@@ -2130,7 +2136,7 @@ class JurnalUmum extends BaseController
                     'id_transaksi'      => $id_transaksi_jurnal,
                     'id_coa'            => $dataPanjar->akun_selisih,
                     'company_id'        => $dataPanjar->company_id,
-                    // 'divisi_id'            => $this->divisi,
+                    'divisi_id'            => $divisi->division_id,
                     'tanggal_jurnal'    => Carbon::parse($dataPanjar->createdAt)->format('Y-m-d'),
                     'debit'             => 0,
                     'kredit'            => $dataPanjar->total_panjar,

@@ -35,7 +35,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select jenis_panjar" name="jenis_panjar" id="jenis_panjar">
-                                    <option value="" selected></option>
+                                    <option value=""></option>
                                     <option value="PANJAR">PANJAR</option>
                                     <option value="PANJAR_TB">PANJAR TB</option>
                                 </select>
@@ -46,7 +46,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select tipe_supplier" name="tipe_supplier" id="tipe_supplier">
-                                    <option value="INTERNASIONAL" selected>INTERNASIONAL</option>
+                                    <option value="INTERNASIONAL">INTERNASIONAL</option>
                                     <option value="BAHAN PENOLONG">BAHAN PENOLONG</option>
                                     <option value="BAHAN BAKU">BAHAN BAKU</option>
                                 </select>
@@ -65,9 +65,9 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select tipe_panjar" name="tipe_panjar" id="tipe_panjar">
-                                    <option value="MERAH" selected>Merah</option>
+                                    <option value=""></option>    
+                                    <option value="MERAH">Merah</option>
                                     <option value="PUTIH">Putih</option>
-
                                 </select>
                                 <label for="floatingInput">Tipe Panjar</label>
                             </div>
@@ -619,7 +619,7 @@
     });
 
 
-    $("#tipe_supplier, #supplier_id")
+    $("#tipe_supplier, #supplier_id, #tipe_panjar, #jenis_panjar")
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -655,6 +655,7 @@
                         $("#no_panjar").val(res.data.no_panjar);
                         $("#payment_date").val(res.data.payment_date);
                         $("#tipe_supplier").val(res.data.type).change();
+                        $("#tipe_panjar").val(res.data.type_panjar).change();
                         $("#jenis_panjar").val(res.data.jenis_panjar).change();
                         $("#supplier_id").val(res.data.supplier_id);
                         $("#payment_date").val(res.data.payment_date);
@@ -739,6 +740,34 @@
 
 
     $(document).ready(function() {
+
+        // Handler saat modal ditutup
+        $('.add-modal').on('hidden.bs.modal', function() {
+            // Reset form utama
+            $(this).find('form')[0].reset();
+            
+            // Kosongkan select2 jika digunakan
+            if($('#supplier_id').hasClass('select2-hidden-accessible')) {
+                $('#supplier_id').val(null).trigger('change');
+            }
+            if($('#akun_kas').hasClass('select2-hidden-accessible')) {
+                $('#akun_kas').val(null).trigger('change');
+            }
+            if($('#akun_selisih').hasClass('select2-hidden-accessible')) {
+                $('#akun_selisih').val(null).trigger('change');
+            }
+            
+            // Reset format Rupiah jika ada
+            $('#total_panjar').val('');
+            
+            // Reset checkbox generate
+            $('#auto_generate').prop('checked', false);
+            
+            // Reset hidden field ID
+            $('.id').val('');
+        });
+
+
         $("#akun_kas, #akun_selisih").select2({
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal .modal-content"),

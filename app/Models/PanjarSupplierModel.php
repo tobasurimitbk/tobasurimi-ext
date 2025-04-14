@@ -24,7 +24,7 @@ class PanjarSupplierModel extends Model
         'jenis_panjar',
         'akun_kas',
         'akun_selisih',
-        'tipe_panjar',
+        'type_panjar',
         'sisa_panjar',
         'is_posted'
     ];
