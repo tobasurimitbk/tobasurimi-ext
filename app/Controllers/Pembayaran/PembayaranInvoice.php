@@ -547,7 +547,7 @@ class PembayaranInvoice extends BaseController
     public function getAllDataInvoice()
     {   
         $dataSalesOrderInvoice = $this->salesOrderInvoiceModel
-            ->getAllSalesOrderInvoiceLokalForPembayaran();
+            ->getAllSalesOrderInvoiceLokalForPembayaran($this->this_company_id);
     
         $dataAllSalesOrderInvoice = [];
     
