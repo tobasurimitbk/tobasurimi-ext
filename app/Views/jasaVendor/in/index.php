@@ -213,7 +213,12 @@
                                     <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-in/print/"); ?>${id}')" style="box-shadow: none !important;">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                     </button>
-                                    
+                                <?php endif; ?>
+
+                                <?php if (can('Jasa Vendor', 'Barang Masuk', 'ua')): ?>
+                                    <button data-toggle="tooltip" title="Un Posting" onclick="unPosting('${id}')" class="btn btn-danger posting-spp">
+                                        <i class="fa-solid fa-ban"></i>    
+                                    </button>
                                 <?php endif; ?>
                             </div>
                         
@@ -347,6 +352,56 @@
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("jasa-vendor-in/posting"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then((result) => {
+                                table.ajax.reload()
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                });
+            }
+        })
+    }
+
+    const unPosting = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Unposting Jasa Vendor Barang Masuk ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("jasa-vendor-in/unposting"); ?>",
                     data: {
                         id: id
                     },

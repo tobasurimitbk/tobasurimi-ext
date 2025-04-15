@@ -465,7 +465,7 @@ class PembayaranPOLokal extends BaseController
 
             $total_bayar_panjar_tb = 0;
             foreach ($panjarTBList as $p) {
-                $total_bayar_panjar_tb += intval($p->bayar_panjar);
+                $total_bayar_panjar_tb += intval($p->bayar_panjar_tb);
             }
 
             $total_bayar_pinjaman = 0;
@@ -555,7 +555,7 @@ class PembayaranPOLokal extends BaseController
                         "jenis_panjar" => "PANJAR",
                         "local_po_payment_id" => $id,
                         "type"  => "BB",
-                        "panjar_id" => $p->id,
+                        "panjar_id" => $p->panjar_id,
                         "akun_kas" => $p->akun_kas_panjar,
                         "akun_selisih" => $p->akun_selisih_panjar,
                         "keterangan" => $p->keterangan_panjar,
@@ -566,15 +566,15 @@ class PembayaranPOLokal extends BaseController
 
 
             foreach ($panjarTBList as $p) {
-                if ($p->bayar_panjar != '') {
+                if ($p->bayar_panjar_tb != '') {
 
-                    if (intval($p->bayar_panjar) != 0) {
+                    if (intval($p->bayar_panjar_tb) != 0) {
                         $localPOPaymentPanjarModel->insert([
                             "company_id" => $this->this_company_id,
                             "local_po_payment_id" => $id,
                             "jenis_panjar" => "PANJAR_TB",
                             "type" => "BB",
-                            "panjar_id" => $p->id,
+                            "panjar_id" => $p->panjar_tb_id,
                             "akun_kas" => $p->akun_kas_panjar_tb,
                             "akun_selisih" => $p->akun_selisih_panjar_tb,
                             "keterangan" => $p->keterangan_panjar_tb,
@@ -593,7 +593,7 @@ class PembayaranPOLokal extends BaseController
                             "company_id" => $this->this_company_id,
                             "local_po_payment_id" => $id,
                             "type" => "BB",
-                            "pinjaman_id" => $p->id,
+                            "pinjaman_id" => $p->pinjaman_id,
                             "akun_kas" => $p->akun_kas_pinjaman,
                             "akun_selisih" => $p->akun_selisih_pinjaman,
                             "keterangan" => $p->keterangan_pinjaman,
@@ -621,7 +621,7 @@ class PembayaranPOLokal extends BaseController
         } catch (Exception $e) {
             return response()->setJSON([
                 'message' => "terjadi kesalahan " . $e->getMessage() . $e->getLine(),
-                'status' => true,
+                'status' => false,
                 'token' => csrf_hash()
             ]);
         }
@@ -910,8 +910,6 @@ class PembayaranPOLokal extends BaseController
         }
 
 
-
-
         $data = [
             "draw"              => intval($this->request->getGet("draw")),
             "recordsTotal"      => $paymentData['totalData'],
@@ -1062,14 +1060,14 @@ class PembayaranPOLokal extends BaseController
     
             $panjarTBList[$p->id] = [
                 'pembayaran_id'  => "NULL",
-                'panjar_id'            => $p->id,
-                'bayar_panjar'  => 0,
-                'no_panjar'     => $p->no_panjar,
+                'panjar_tb_id'  => $p->id,
+                'bayar_panjar_tb'  => 0,
+                'no_panjar_tb'     => $p->no_panjar,
                 'payment_date'  => date('d/m/Y', strtotime($p->payment_date)),
-                'total_panjar_number'  => $p->total_panjar,
-                'total_panjar'         => number_format($p->total_panjar, 2),
-                'sisa_panjar_number'   => $p->total_panjar - $total_bayar_panjar,
-                'sisa_panjar'          => number_format($p->total_panjar - $total_bayar_panjar, 2)
+                'total_panjar_tb_number'  => $p->total_panjar,
+                'total_panjar_tb'         => number_format($p->total_panjar, 2),
+                'sisa_panjar_tb_number'   => $p->total_panjar - $total_bayar_panjar,
+                'sisa_panjar_tb'          => number_format($p->total_panjar - $total_bayar_panjar, 2)
             ];
         }
     
@@ -1096,14 +1094,14 @@ class PembayaranPOLokal extends BaseController
                 $panjarTBList[$p['panjar_id']] = [
                     'pembayaran_id' => $pembayaranId,
                     'id'                  => $p['id'],
-                    'panjar_id'           => $p['panjar_id'],
-                    'bayar_panjar'        => intval($p['bayar_panjar']),
-                    'no_panjar'           => $p['no_panjar'],
+                    'panjar_tb_id'           => $p['panjar_id'],
+                    'bayar_panjar_tb'        => intval($p['bayar_panjar']),
+                    'no_panjar_tb'           => $p['no_panjar'],
                     'payment_date'        => date('d/m/Y', strtotime($p['payment_date'])),
-                    'total_panjar_number' => intval($p['total_panjar']),
-                    'total_panjar'        => number_format($p['total_panjar'], 2),
-                    'sisa_panjar_number'  => intval($p['total_panjar']) - $localPOPaymentPanjarModel->getTotalPembayaranPanjar($p['panjar_id'], "BB")['total_bayar_panjar'],
-                    'sisa_panjar'         => number_format(intval($p['total_panjar']) - $localPOPaymentPanjarModel->getTotalPembayaranPanjar($p['panjar_id'], "BB")['total_bayar_panjar'], 2),
+                    'total_panjar_tb_number' => intval($p['total_panjar']),
+                    'total_panjar_tb'        => number_format($p['total_panjar'], 2),
+                    'sisa_panjar_tb_number'  => intval($p['total_panjar']) - $localPOPaymentPanjarModel->getTotalPembayaranPanjar($p['panjar_id'], "BB")['total_bayar_panjar'],
+                    'sisa_panjar_tb'         => number_format(intval($p['total_panjar']) - $localPOPaymentPanjarModel->getTotalPembayaranPanjar($p['panjar_id'], "BB")['total_bayar_panjar'], 2),
                     'akun_kas_name'       => $p['akun_kas_name'],
                     'akun_selisih_name'   => $p['akun_selisih_name'],
                     'akun_kas_id'       => $p['akun_kas_id'],

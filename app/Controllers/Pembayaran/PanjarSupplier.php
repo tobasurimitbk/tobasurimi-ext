@@ -99,6 +99,7 @@ class PanjarSupplier extends BaseController
                 "supplier_id"   => $this->request->getVar('supplier_id'),
                 "jenis_panjar"   => $this->request->getVar('jenis_panjar'),
                 "no_panjar"     => $this->request->getPost("no_panjar"),
+                "type_panjar"     => $this->request->getVar("tipe_panjar"),
                 "payment_date"  => $this->request->getVar("payment_date"),
                 "total_panjar"  => repairDouble($this->request->getVar("total_panjar")),
                 "akun_kas"  => repairDouble($this->request->getVar("akun_kas")),
@@ -193,6 +194,7 @@ class PanjarSupplier extends BaseController
                     "akun_kas"  => $this->request->getVar("akun_kas"),
                     "akun_selisih"  => $this->request->getVar("akun_selisih"),
                     "total_panjar"  => repairDouble($this->request->getVar("total_panjar")),
+                    "type_panjar"     => $this->request->getVar("tipe_panjar"),
                 ];
             }
 

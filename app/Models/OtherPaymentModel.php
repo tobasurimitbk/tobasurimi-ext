@@ -56,14 +56,20 @@ class OtherPaymentModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "
-            other_payment.*,divisis.divisi,metadata.value AS valas_name
+            other_payment.*,
+            divisis.divisi,
+            metadata.value AS valas_name,
+            SUM(other_payment_detail.nominal) AS nominal_all
         ";
 
         $dataQry = $this->asArray()
             ->select($selectQry)
             ->join('divisis', 'divisis.id = other_payment.divisi_id')
             ->join('metadata', 'metadata.id = other_payment.valas')
+            ->join('other_payment_detail', 'other_payment_detail.other_payment_id = other_payment.id', 'left')
             ->where($condition)
+            ->where('other_payment_detail.deletedAt', null)
+            ->groupBy('other_payment.id, divisis.divisi, metadata.value')
             ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);
@@ -80,7 +86,6 @@ class OtherPaymentModel extends Model
                 ->orLike('tanggal', $addCondition['search'])
                 ->orLike('nominal', $addCondition['search']);
         }
-
 
         if ($addCondition['status_posting']) {
             if ($addCondition['status_posting'] != "ALL") {
@@ -101,6 +106,7 @@ class OtherPaymentModel extends Model
         if ($addCondition['search']) {
             $dataQry->groupEnd();
         }
+        
         $totalFilteredData = $dataQry->countAllResults(false);
         $data = $dataQry->findAll($limit, $offset);
 

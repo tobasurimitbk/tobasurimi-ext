@@ -1,8 +1,8 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
-
+<meta name="csrf-token" content="<?= csrf_hash() ?>">
 <div class="modal add-modal" id="add_modal" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px">
+    <div class="modal-dialog" style="min-width: 1200px">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label></h5>
@@ -10,113 +10,162 @@
             <div class="modal-body">
                 <?= csrf_field() ?>
                 <form class="create-form" role="form" method="POST">
-                    <input type="hidden" class="id" name="id" id="id">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control no_pembayaran" name="no_pembayaran" id="no_pembayaran" placeholder="No Pembayaran">
-                                <label for="floatingInput">No Pembayaran</label>
-                            </div>
+                    <!-- Parent Form (Header) -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5>Informasi Pembayaran</h5>
                         </div>
-                        <div class="col-md-6">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Jatuh Tempo" <?= !empty($detail) ? 'disabled value="' . date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_date']))  . '"' : '' ?>>
-                                    <label for="floatingInput">Tanggal Pembayaran</label>
+                        <div class="card-body">
+                            <div class="row">
+                                <input type="text" style="display: none;" class="form-control hidden" name="id" id="id">
+
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control no_pembayaran" name="no_pembayaran" id="no_pembayaran" placeholder="No Pembayaran">
+                                        <label for="floatingInput">No Pembayaran</label>
+                                    </div>
                                 </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 6px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                                            <option value=""></option>
+                                            <?php foreach ($divisi as $d) : ?>
+                                                <option value="<?= $d['id'] ?>">
+                                                    <?= $d['divisi']; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Departemen</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select valas" id="valas" name="valas" aria-label="Floating label select example">
+                                            <option value=""></option>
+                                            <?php foreach ($dataValuta as $valuta) : ?>
+                                                <option value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
+                                            <?php endforeach ?>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Valas</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select" name="akun_selisih" id="akun_selisih" required>
+                                            <option disabled selected value=""></option>
+                                            <?php foreach ($subsAkuns as $subs) : ?>
+                                                <option value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                            <?php endforeach ?>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Kredit</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control bayar_ke" name="bayar_ke" id="bayar_ke" placeholder="Pembayaran Ke">
+                                        <label for="floatingInput">Pembayaran Kepada</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($divisi as $d) : ?>
-                                        <option value="<?= $d['id'] ?>">
-                                            <?= $d['divisi']; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Departemen</label>
-                            </div>
+
+                    <!-- Child Form (Details) -->
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5>Detail Pembayaran</h5>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control bayar_ke" name="bayar_ke" id="bayar_ke" placeholder="Pembayaran Ke">
-                                <label for="floatingInput">Pembayaran Kepada</label>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group input-group-password">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Jatuh Tempo">
+                                            <label for="floatingInput">Tanggal Pembayaran</label>
+                                        </div>
+                                        <div class="input-group-prepend group-prepend-password align-items-center">
+                                            <i style="cursor: pointer; z-index: 99; margin-bottom: 6px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select" name="metode_pembayaran" id="metode_pembayaran">
+                                            <option selected value="">Pilih Metode Pembayaran</option>
+                                            <option value="Bank">Bank</option>
+                                            <option value="Cash">Cash</option>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select valas" id="valas" name="valas" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($dataValuta as $valuta) : ?>
-                                        <option value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
-                                    <?php endforeach ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Valas</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" placeholder="Nominal Pembayaran">
+                                        <label for="floatingInput">Nominal Pembayaran</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control pembayaran_oleh" name="pembayaran_oleh" id="pembayaran_oleh" placeholder="Pembayaran Oleh" value="<?= session()->get("login")->name; ?>">
+                                        <label for="floatingInput">Pembayaran Oleh</label>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select " name="metode_pembayaran" id="metode_pembayaran">
-                                    <option selected value="">Pilih Metode Pembayaran</option>
-                                    <option value="Bank">Bank</option>
-                                    <option value="Cash">Cash</option>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select" name="akun_kas" id="akun_kas" required>
+                                            <option disabled selected value=""></option>
+                                            <?php foreach ($subsAkuns as $subs) : ?>
+                                                <option value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                            <?php endforeach ?>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Debit</label>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" placeholder="Nominal Pembayaran">
-                                <label for="floatingInput">Nominal Pembayaran</label>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan" value="">
+                                        <label for="floatingInput">Keterangan (Opsional)</label>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control pembayaran_oleh" name="pembayaran_oleh" id="pembayaran_oleh" placeholder="Pembayaran Oleh" value="<?= session()->get("login")->name; ?>">
-                                <label for="floatingInput">Pembayaran Oleh</label>
+                            
+                            <div class="row">
+                                <div class="col-md-12 text-end">
+                                    <button type="button" class="btn btn-primary btn-add-detail">Tambah Detail</button>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating  mb-3" style="height: 50px;">
-                                <select class="form-select" name="akun_kas" id="akun_kas" required>
-                                    <option disabled selected value=""></option>
-                                    <?php foreach ($subsAkuns as $subs) : ?>
-                                        <option value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
-                                    <?php endforeach ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Debit</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating  mb-3" style="height: 50px;">
-                                <select class="form-select" name="akun_selisih" id="akun_selisih" required>
-                                    <option disabled selected value=""></option>
-                                    <?php foreach ($subsAkuns as $subs) : ?>
-                                        <option value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
-                                    <?php endforeach ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Kredit</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan" value="">
-                                <label for="floatingInput">Keterangan (Opsional)</label>
+                            
+                            <!-- Table for showing added details -->
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <table class="table table-bordered" id="detail-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Tanggal</th>
+                                                <th>Metode</th>
+                                                <th>Nominal</th>
+                                                <th>Akun Debit</th>
+                                                <th>Akun Kredit</th>
+                                                <th>Pembayaran Oleh</th>
+                                                <th>Keterangan</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Details will be added here dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -124,7 +173,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
-                <button type="submit" class="btn btn-submit-form">Simpan</button>
+                <button type="submit" class="btn btn-submit-form">Simpan Semua</button>
             </div>
         </div>
     </div>
@@ -178,8 +227,6 @@
                                 <th>No</th>
                                 <th onclick="changeSort('no_pembayaran')">No. Pembayaran</th>
                                 <th onclick="changeSort('divisi_id')">Departemen</th>
-                                <th onclick="changeSort('tanggal')">Tanggal</th>
-                                <th onclick="changeSort('metode_pembayaran')">Metode Pembayaran</th>
                                 <th onclick="changeSort('valas')">Valas</th>
                                 <th onclick="changeSort('nominal_pembayaran')">Nominal</th>
                                 <th>Action</th>
@@ -195,6 +242,7 @@
 </section>
 
 <script>
+    let details = [];
     let sort = "id";
     let sortType = "desc";
 
@@ -249,14 +297,6 @@
             },
             {
                 data: "divisi",
-                className: "text-center"
-            },
-            {
-                data: "tanggal",
-                className: "text-center"
-            },
-            {
-                data: "metode_pembayaran",
                 className: "text-center"
             },
             {
@@ -318,10 +358,8 @@
     $(document).ready(function() {
         var validator = $(".create-form").validate({
             rules: {
+                // Parent section rules
                 no_pembayaran: {
-                    required: true
-                },
-                tanggal: {
                     required: true
                 },
                 divisi_id: {
@@ -333,46 +371,69 @@
                 valas: {
                     required: true
                 },
-                metode_pembayaran: {
+                akun_selisih: {
                     required: true
+                },
+                
+                // Child/detail section rules
+                tanggal: {
+                    required: function() {
+                        return $("#detail-table tbody tr").length === 0;
+                    }
+                },
+                metode_pembayaran: {
+                    required: function() {
+                        return $("#detail-table tbody tr").length === 0;
+                    }
                 },
                 nominal_pembayaran: {
-                    required: true
+                    required: function() {
+                        return $("#detail-table tbody tr").length === 0;
+                    },
+                    min: 1
                 },
                 pembayaran_oleh: {
-                    required: true
+                    required: function() {
+                        return $("#detail-table tbody tr").length === 0;
+                    }
                 },
                 akun_kas: {
-                    required: true
-                }
+                    required: function() {
+                        return $("#detail-table tbody tr").length === 0;
+                    }
+                },
             },
             messages: {
                 no_pembayaran: {
                     required: "No pembayaran wajib diisi"
                 },
-                tanggal: {
-                    required: "Tanggal pembayaran wajib diisi"
-                },
                 divisi_id: {
                     required: "Departemen wajib diisi"
                 },
                 bayar_ke: {
-                    required: "Pembayaran oleh wajib diisi"
+                    required: "Pembayaran kepada wajib diisi"
                 },
                 valas: {
                     required: "Mata uang wajib diisi"
+                },
+                tanggal: {
+                    required: "Tanggal pembayaran wajib diisi"
                 },
                 metode_pembayaran: {
                     required: "Metode pembayaran wajib diisi"
                 },
                 nominal_pembayaran: {
-                    required: "Nominal pembayaran wajib diisi"
+                    required: "Nominal pembayaran wajib diisi",
+                    min: "Nominal harus lebih dari 0"
                 },
                 pembayaran_oleh: {
                     required: "Pembayaran oleh wajib diisi"
                 },
                 akun_kas: {
-                    required: "Debit wajib diisi"
+                    required: "Akun debit wajib diisi"
+                },
+                akun_selisih: {
+                    required: "Akun kredit wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -387,65 +448,292 @@
                 }
             },
             highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
-
+                $(element).closest('.form-floating').addClass('has-error');
+                $(element).addClass('is-invalid');
             },
             unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
+                $(element).closest('.form-floating').removeClass('has-error');
+                $(element).removeClass('is-invalid');
             },
+            submitHandler: function(form) {
+                // Custom validation for at least one detail
+                if ($("#detail-table tbody tr").length === 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Tambahkan setidaknya satu detail pembayaran',
+                        confirmButtonColor: '#4e73df',
+                    });
+                    return false;
+                }
+                return true;
+            }
+        });
+
+
+        // Initialize Select2 for dropdowns
+        $('#divisi_id').select2({
+            placeholder: "Pilih Departemen",
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal .modal-content') // Updated to match modal structure
+        });
+
+        $('#valas').select2({
+            placeholder: "Pilih Mata Uang",
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal .modal-content')
+        });
+
+        $('#metode_pembayaran').select2({
+            placeholder: "Pilih Metode Pembayaran",
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal .modal-content')
+        });
+
+        $('#akun_kas').select2({
+            placeholder: "Pilih Debit",
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal .modal-content')
+        });
+
+        $('#akun_selisih').select2({
+            placeholder: "Pilih Kredit",
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal .modal-content')
         });
 
         $("#tanggal").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
-            autoclose: true
+            autoclose: true,
+            language: 'id', // opsional untuk bahasa Indonesia
+            todayBtn: "linked"
+        }).on('changeDate', function(e) {
+            $(this).valid(); // Trigger validasi saat tanggal berubah
         });
 
-        $(".dateStart").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        })
-
-        $(".dateEnd").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        })
-
-        $('#divisi_id').select2({
-            placeholder: "Pilih Departemen",
-            theme: "bootstrap-5",
-            dropdownParent: $('#add_modal')
+        // When adding a detail
+        $('.btn-add-detail').click(function() {
+            // ... your existing code ...
+            refreshValidation();
         });
 
-        $('#metode_pembayaran').select2({
-            placeholder: "Pilih Metode Pembayaran",
-            theme: "bootstrap-5",
-            dropdownParent: $('#add_modal')
+        // When removing a detail
+        $(document).on('click', '.btn-remove-detail', function() {
+            // ... your existing code ...
+            refreshValidation();
+        });
+        
+        function refreshDetailsTable() {
+            const tbody = $('#detail-table tbody');
+            tbody.empty();
+            
+            details.forEach((detail, index) => {
+                tbody.append(`
+                    <tr>
+                        <td>${detail.tanggal}</td>
+                        <td>${detail.metode_pembayaran}</td>
+                        <td>${detail.nominal_pembayaran}</td>
+                        <td>${detail.pembayaran_oleh}</td>
+                        <td>${detail.keterangan}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm btn-remove-detail" data-index="${index}">Hapus</button>
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+        
+        // Remove detail
+        $(document).on('click', '.btn-remove-detail', function() {
+            const index = $(this).data('index');
+            details.splice(index, 1);
+            refreshDetailsTable();
+        });
+        
+        // Clear detail form
+        function clearDetailForm() {
+            $('#tanggal, #nominal_pembayaran, #keterangan').val('');
+            $('#metode_pembayaran, #akun_kas, #akun_selisih').val('').trigger('change');
+        }
+        
+        // Handle final submission
+        $('.btn-submit-form').click(function() {
+            if (details.length === 0) {
+                alert('Tambahkan setidaknya satu detail pembayaran');
+                return;
+            }
+            
+            const formData = {
+                no_pembayaran: $('#no_pembayaran').val(),
+                divisi_id: $('#divisi_id').val(),
+                valas: $('#valas').val(),
+                bayar_ke: $('#bayar_ke').val(),
+                details: details
+            };
+            
+            // Submit via AJAX or form submission
+            // ...
         });
 
-        $('#valas').select2({
-            placeholder: "Pilih Mata Uang",
-            theme: "bootstrap-5",
-            dropdownParent: $('#add_modal')
+        // Custom validation for details
+        function validateDetails() {
+            let isValid = true;
+            const nominalRaw = $('#nominal_pembayaran').val();
+            const nominalClean = destroyFormatRupiah(nominalRaw);
+
+            // Cek apakah field kosong atau nominal 0
+            if (
+                !$('#tanggal').val() ||
+                !$('#metode_pembayaran').val() ||
+                !nominalClean || // bisa tambah pengecekan nominal < 1 kalau mau
+                !$('#pembayaran_oleh').val() ||
+                !$('#akun_kas').val()
+            ) {
+                isValid = false;
+
+                // Highlight all detail fields (khususnya yang kosong)
+                $('#tanggal, #metode_pembayaran, #pembayaran_oleh, #akun_kas').each(function () {
+                    const value = $(this).val();
+                    const fieldId = $(this).attr('id');
+
+                    // Untuk nominal, kita pakai hasil clean
+                    if (
+                        (fieldId === 'nominal_pembayaran' && !nominalClean) ||
+                        (fieldId !== 'nominal_pembayaran' && !value)
+                    ) {
+                        $(this).closest('.form-floating').addClass('has-error');
+                        $(this).addClass('is-invalid');
+                    }
+                });
+            }
+
+            return isValid;
+        }
+
+
+        // Update validation when adding/removing details
+        function refreshValidation() {
+            // Trigger validation on all fields
+            $(".create-form").validate().form();
+            
+            // Special handling for detail fields
+            const hasDetails = $("#detail-table tbody tr").length > 0;
+            const detailFields = ['#tanggal', '#metode_pembayaran', '#nominal_pembayaran', '#pembayaran_oleh', '#akun_kas'];
+            
+            detailFields.forEach(field => {
+                const element = $(field);
+                if (hasDetails) {
+                    // If details exist, remove error styling
+                    element.closest('.form-floating').removeClass('has-error');
+                    element.removeClass('is-invalid');
+                    element.next('span.text-danger').remove();
+                } else {
+                    // If no details, validate these fields
+                    element.valid();
+                }
+            });
+        }
+
+
+        
+
+        $('#add_modal').on('hidden.bs.modal', function () {
+            // Reset all form fields
+            $('.create-form')[0].reset();
+            
+            // Clear the details table
+            $('#detail-table tbody').empty();
+            
+            // Clear any hidden fields or special inputs
+            $('.hidden').val('');
+            
+            // Reset any select2 elements if you're using them
+            $('.form-select').val('').trigger('change');
+
+            details = [];
         });
 
-        $('#akun_kas').select2({
-            placeholder: "Pilih Debit",
-            theme: "bootstrap-5",
-            dropdownParent: $('#add_modal')
+        
+        $('.btn-add-detail').click(function () {
+            // Jalankan validasi detail dulu
+            if (!validateDetails()) {
+                refreshValidation(); // buat update styling error
+                return; // stop proses kalau gak valid
+            }
+
+            const detail = {
+                tanggal: $('#tanggal').val(),
+                metode_pembayaran: $('#metode_pembayaran').val(),
+                nominal_pembayaran: $('#nominal_pembayaran').val(),
+                pembayaran_oleh: $('#pembayaran_oleh').val(),
+                akun_kas: $('#akun_kas').val(),
+                akun_kas_name: $('#akun_kas option:selected').text(),
+                akun_selisih_name: $('#akun_selisih option:selected').text(),
+                keterangan: $('#keterangan').val()
+            };
+
+            details.push(detail);
+            refreshDetailsTable();
+            clearDetailForm();
+            refreshValidation(); // bersihin styling error kalau sudah valid
         });
 
-        $('#akun_selisih').select2({
-            placeholder: "Pilih Kredit",
-            theme: "bootstrap-5",
-            dropdownParent: $('#add_modal')
+        
+        // Refresh details table
+        function refreshDetailsTable() {
+            const tbody = $('#detail-table tbody');
+            tbody.empty();
+            
+            details.forEach((detail, index) => {
+                tbody.append(`
+                    <tr>
+                        <td>${detail.tanggal}</td>
+                        <td>${detail.metode_pembayaran}</td>
+                        <td>${detail.nominal_pembayaran}</td>
+                        <td>${detail.akun_kas_name}</td>
+                        <td>${detail.akun_selisih_name}</td>
+                        <td>${detail.pembayaran_oleh}</td>
+                        <td>${detail.keterangan}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm btn-remove-detail" data-index="${index}">Hapus</button>
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+        
+        // Remove detail
+        $(document).on('click', '.btn-remove-detail', function() {
+            const index = $(this).data('index');
+            details.splice(index, 1);
+            refreshDetailsTable();
+        });
+        
+        // Clear detail form
+        function clearDetailForm() {
+            $('#tanggal, #nominal_pembayaran, #keterangan').val('');
+            $('#metode_pembayaran, #akun_kas').val('').trigger('change');
+        }
+        
+        // Handle final submission
+        $('.btn-submit-form').click(function() {
+            if (details.length === 0) {
+                alert('Tambahkan setidaknya satu detail pembayaran');
+                return;
+            }
+            
+            const formData = {
+                no_pembayaran: $('#no_pembayaran').val(),
+                divisi_id: $('#divisi_id').val(),
+                valas: $('#valas').val(),
+                bayar_ke: $('#bayar_ke').val(),
+                details: details
+            };
+            
+            // Submit via AJAX or form submission
+            // ...
         });
 
         $(".dataTable_info").addClass("pt-0");
@@ -489,9 +777,7 @@
 
             $.ajax({
                 url: "<?= base_url("pembayaran-lain/get"); ?>",
-                data: {
-                    id: id
-                },
+                data: { id: id },
                 beforeSend: function() {
                     setLoading();
                 },
@@ -502,34 +788,62 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
+                        // Reset form and clear details
                         resetForm();
-                        $('#id').val(res.data.id);
-                        $("#no_pembayaran").val(res.data.no_pembayaran);
-                        $('#tanggal').val(res.data.tanggal);
-                        $('#divisi_id').val(res.data.divisi_id).change();
-                        $('#bayar_ke').val(res.data.bayar_ke);
-                        $('#valas').val(res.data.valas).change();
-                        $('#metode_pembayaran').val(res.data.metode_pembayaran).change();
-                        $('#nominal_pembayaran').val(res.data.nominal);
-                        $('#pembayaran_oleh').val(res.data.pembayaran_oleh);
-                        $('#akun_kas').val(res.data.akun_kas).change();
-                        $('#akun_selisih').val(res.data.akun_selisih).change();
-                        $('#keterangan').val(res.data.keterangan);
-                        if (res.data.status_posting === "1") {
+                        details = [];
+                        
+                        // Set parent data
+                        const parent = res.data.parent;
+                        $('#id').val(parent.id);
+                        $("#no_pembayaran").val(parent.no_pembayaran);
+                        $('#divisi_id').val(parent.divisi_id).change();
+                        $('#bayar_ke').val(parent.bayar_ke);
+                        $('#valas').val(parent.valas).change();
+                        $('#akun_selisih').val(parent.akun_selisih).change();
+                        
+                        // Disable fields if needed
+                        if (parent.status_posting === "1") {
                             disabledForm();
                         } else {
                             $("#no_pembayaran").attr('disabled', true);
                         }
-                        $(".add-modal").modal("show")
+                        
+                        // Set details data
+                        if (res.data.details && res.data.details.length > 0) {
+                            res.data.details.forEach(detail => {
+                                details.push({
+                                    id: detail.id,
+                                    tanggal: detail.tanggal,
+                                    metode_pembayaran: detail.metode_pembayaran,
+                                    nominal_pembayaran: detail.nominal_pembayaran,
+                                    pembayaran_oleh: detail.pembayaran_oleh,
+                                    akun_kas: detail.akun_kas,
+                                    akun_kas_name: detail.akun_kas_name,
+                                    akun_selisih_name: detail.akun_selisih_name,
+                                    keterangan: detail.keterangan
+                                });
+                            });
+                            refreshDetailsTable();
+                        }
+                        
+                        $(".add-modal").modal("show");
                     } else {
                         Swal.fire({
                             icon: 'error',
                             title: res.message,
                             confirmButtonColor: '#4e73df',
-                        })
+                        });
                     }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: xhr.responseJSON?.message || 'Failed to load data',
+                        confirmButtonColor: '#4e73df',
+                    });
                 }
-            })
+            });
         });
 
         $(".btn-submit-form").click(function() {
@@ -545,97 +859,88 @@
                     cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        let id = $('.id').val();
-                        let data = new FormData(document.querySelector(".create-form"));
-                        let nominalPembayaran = destroyFormatRupiah($('.nominal_pembayaran').val())
-                        data.set('nominal_pembayaran', nominalPembayaran);
-                        if (id) {
-                            $.ajax({
-                                url: "<?= base_url("pembayaran-lain/update"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    setLoading();
-                                },
-                                complete: function() {
-                                    stopLoading()
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload()
-                                                $(".add-modal").modal("hide")
-                                            })
+                        const csrf = $('meta[name="csrf-token"]').attr('content');
+                        let id = $('#id').val();
+                        
+                        // Prepare data with proper formatting
+                        const requestData = {
+                            id: id,
+                            divisi_id: $('#divisi_id').val(),
+                            no_pembayaran: $('#no_pembayaran').val(),
+                            bayar_ke: $('#bayar_ke').val(),
+                            valas: $('#valas').val(),
+                            akun_selisih: $('#akun_selisih').val(),
+                            details: details.map(detail => ({
+                                id: detail.id || '',
+                                tanggal: detail.tanggal,
+                                metode_pembayaran: detail.metode_pembayaran,
+                                nominal_pembayaran: detail.nominal_pembayaran.toString().replace(/\./g, ''),
+                                pembayaran_oleh: detail.pembayaran_oleh,
+                                akun_kas: detail.akun_kas,
+                                keterangan: detail.keterangan || ''
+                            }))
+                        };
 
+                        // Determine URL based on whether it's an update or create
+                        let url = id ? "<?= base_url('pembayaran-lain/update'); ?>" : "<?= base_url('pembayaran-lain/save'); ?>";
+                        let method = id ? "POST" : "POST";
+                        
+                        $.ajax({
+                            url: url,
+                            data: JSON.stringify(requestData),
+                            contentType: "application/json", 
+                            headers: {
+                                "X-CSRF-TOKEN": csrf
+                            },
+                            beforeSend: function() {
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            method: method,
+                            dataType: "json",
+                            success: function(response) {
+                                if (response.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    }).then(() => {
+                                        table.ajax.reload();
+                                        $(".add-modal").modal("hide");
                                         resetForm();
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                    }
-                                },
-
-                            });
-                        } else {
-                            $.ajax({
-                                url: "<?= base_url("pembayaran-lain/save"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    setLoading();
-                                },
-                                complete: function() {
-                                    stopLoading()
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload()
-                                                $(".add-modal").modal("hide")
-                                            })
-
-                                        resetForm();
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                    }
-                                },
-
-                            });
-                        }
-
-
-
+                                        details = []; // Clear details array
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                let errorMessage = 'Silakan coba lagi';
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    errorMessage = xhr.responseJSON.message;
+                                } else if (xhr.statusText) {
+                                    errorMessage = xhr.statusText;
+                                }
+                                
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Terjadi kesalahan',
+                                    text: errorMessage,
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            }
+                        });
                     }
-                })
+                });
             }
-        })
+        });
+        
     });
 
     const remove = function(id) {
@@ -684,6 +989,7 @@
             }
         });
     }
+
 
     function disabledForm() {
         $("#no_pembayaran").attr('disabled', true);

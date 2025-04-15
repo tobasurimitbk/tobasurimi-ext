@@ -21,6 +21,7 @@ use App\Models\SupplierModel;
 use App\Models\VendorModel;
 use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
+use Exception;
 
 class JasaVendorOut extends BaseController
 {
@@ -117,6 +118,8 @@ class JasaVendorOut extends BaseController
 
         foreach ($dataQry['data'] as $data) {
 
+            $jasaVendorIn = $this->jasaVendorInModel->where('company_id', $this->this_company_id)->like('multiple_jasa_vendor_out_id', $data->id)->where('deletedAt', null)->first();
+
             $jasaVendorOutDetail = $this->jasaVendorOutDetailModel
                 ->where('jasa_vendor_out_id', $data->id)
                 ->where('deletedAt', null)
@@ -133,6 +136,7 @@ class JasaVendorOut extends BaseController
                 "vendor_name"           => $data->vendor_name,
                 "status_posting"        => $data->status_posting,
                 "status_closed"         => $data->status_closed == "1" ? "CLOSED" : "OPEN",
+                "un_posting"            => $jasaVendorIn == null ? 1 : 0,
             ]);
         }
 
@@ -371,7 +375,7 @@ class JasaVendorOut extends BaseController
                 $stok,
                 $qty,
                 "Out",
-                date('Y-m-d'),
+                $jasaVendorOut['tanggal'],
                 $this->this_user_id,
                 "JASA VENDOR",
                 "-",
@@ -400,6 +404,26 @@ class JasaVendorOut extends BaseController
         return response()->setJSON([
             'status' => true,
             'message' => "Jasa vendor pengeluaran barang berhasil diposting",
+            'token' => csrf_hash(),
+        ]);
+    }
+
+    public function unPosting()
+    {
+        $id = decrypt($this->request->getVar('id'));
+
+        $result =  $this->stockModel->unPostingStockJasaVendorOut($id);
+        if ($result) {
+            $this->jasaVendorOutModel->update($id, ['status_posting' => '0']);
+            return response()->setJSON([
+                'status' => true,
+                'message' => "Jasa vendor pengeluaran barang berhasil diposting",
+                'token' => csrf_hash(),
+            ]);
+        }
+        return response()->setJSON([
+            'status' => false,
+            'message' => "terjadi kesalahan saat unposting stok",
             'token' => csrf_hash(),
         ]);
     }
