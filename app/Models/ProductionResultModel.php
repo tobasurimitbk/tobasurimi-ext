@@ -319,4 +319,60 @@ class ProductionResultModel extends Model
 
         return $dataQry;
     }
+
+    public function getDataProductionResultBahanBaku($where)
+    {
+        $where['deletedAt'] = null;
+        $selectQryJadi = '
+        barang_master.kode_barang, 
+        barang_master.barang_name, 
+        production_result_details.type,
+        production_result_details.production_result_id,
+        production_result_details.barang1_id,
+        SUM(production_result_details.qty) as qty_produksi
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQryJadi)
+            ->join('production_result_details', 'production_result_details.production_result_id = production_results.id', 'left')
+            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+            ->join('work_orders', 'work_orders.id = production_results.work_order_id', 'left')
+            ->like('production_results.receive_date', $where['date_production'])
+            ->where('production_result_details.type', 'DIGUNAKAN')
+            ->orWhere('production_result_details.type', 'JADI')
+            ->where('production_results.company_id', $where['company_id'])
+            ->where('production_result_details.deletedAt', $where['deletedAt'])
+            ->where('production_results.deletedAt', $where['deletedAt'])
+            ->groupBy('production_result_details.barang1_id')
+            ->findAll();
+
+        return $dataQry;
+    }
+
+    public function getDataProductionResultBarangJadi($where)
+    {
+        $where['deletedAt'] = null;
+        $selectQryJadi = '
+        barang_master.kode_barang, 
+        barang_master.barang_name, 
+        production_result_details.production_result_id,
+        production_result_details.barang1_id,
+        SUM(production_result_details.qty) as qty_produksi
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQryJadi)
+            ->join('production_result_details', 'production_result_details.production_result_id = production_results.id', 'left')
+            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+            ->join('work_orders', 'work_orders.id = production_results.work_order_id', 'left')
+            ->like('production_results.receive_date', $where['date_production'])
+            ->where('production_result_details.type', 'JADI')
+            ->where('production_results.company_id', $where['company_id'])
+            ->where('production_result_details.deletedAt', $where['deletedAt'])
+            ->where('production_results.deletedAt', $where['deletedAt'])
+            ->groupBy('production_result_details.barang1_id')
+            ->findAll();
+
+        return $dataQry;
+    }
 }

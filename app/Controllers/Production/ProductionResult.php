@@ -20,8 +20,13 @@ use App\Models\StockModel;
 use App\Models\WarehousesModel;
 use App\Models\WorkOrderDetailsModel;
 use App\Models\WorkOrdersModel;
+use CodeIgniter\HTTP\Request;
+use DateTime;
 use Dompdf\Dompdf;
 use Exception;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ProductionResult extends BaseController
 {
@@ -1135,12 +1140,6 @@ class ProductionResult extends BaseController
             'barang_sisa' => $productionResDetDataBR
         ];
 
-
-
-
-
-
-
         $dompdf->loadHtml(view('Production/productionResult/printProductionResult', $data));
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
@@ -1153,5 +1152,233 @@ class ProductionResult extends BaseController
     {
         $no = $this->generatePRNo();
         return json_encode($no);
+    }
+
+    public function exportHasilProduksi()
+    {
+        $date_production = $this->request->getVar('date_production');
+        $tipe_export = $this->request->getVar('tipe_export');
+        $dateObj = DateTime::createFromFormat('d/m/Y', $date_production);
+
+        if ($dateObj) {
+            $date_production = $dateObj->format('Y-m-d');
+        } else {
+            $date_production = now('Y-m-d');
+        }
+
+        $data = [
+            'date_production' => $date_production,
+            'company_id' => $this->this_company_id,
+        ];
+
+        if ($tipe_export == 'excel') {
+            $this->exportExcelHasilProduksi($data);
+        } else {
+            $this->exportPdfHasilProduksi($data);
+        }
+    }
+
+    public function exportExcelHasilProduksi($data)
+    {
+        $spreadsheet = new Spreadsheet();
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->mergeCells('A1:C1')
+            ->setCellValue('A1', 'Hasil Produksi')
+            ->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->mergeCells('A2:C2')
+            ->setCellValue('A2', 'Tanggal Produksi : ' . date('d-m-Y', strtotime($data['date_production'])))
+            ->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+        $dataProduksi = $this->productionResultModel->getDataProductionResultBahanBaku($data);
+
+        $bahanBakuList = [];
+        $hasilProduksiList = [];
+
+        foreach ($dataProduksi as $item) {
+            if ($item['type'] == 'DIGUNAKAN') {
+                $bahanBakuList[] = $item;
+            } else if ($item['type'] == 'JADI') {
+                $hasilProduksiList[] = $item;
+            }
+        }
+
+        // Ambil nama hasil unik sebagai kolom dinamis
+        $namaHasilUnik = [];
+        foreach ($hasilProduksiList as $hasil) {
+            if (!in_array($hasil['barang_name'], $namaHasilUnik)) {
+                $namaHasilUnik[] = $hasil['barang_name'];
+            }
+        }
+
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // HEADER
+        $sheet->setCellValue('A3', 'No.')
+            ->setCellValue('B3', 'Nama Bahan')
+            ->setCellValue('C3', 'Qty Digunakan');
+
+        $colIndex = 4;
+        $colMap = [];
+
+        foreach ($namaHasilUnik as $hasilName) {
+            $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+            $sheet->setCellValue($colLetter . '3', $hasilName);
+            $colMap[$hasilName] = $colLetter;
+            $colIndex++;
+        }
+
+        // Kolom untuk total per baris
+        $totalColLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+        $sheet->setCellValue($totalColLetter . '3', 'Total');
+
+        // ISI DATA
+        $row = 4;
+        $no = 1;
+        $colTotals = [];
+
+        foreach ($bahanBakuList as $bahan) {
+            $sheet->setCellValue('A' . $row, $no++)
+                ->setCellValue('B' . $row, $bahan['barang_name'])
+                ->setCellValue('C' . $row, $bahan['qty_produksi']);
+
+            $rowTotal = 0;
+
+            foreach ($hasilProduksiList as $hasil) {
+                if ($hasil['production_result_id'] == $bahan['production_result_id']) {
+                    $col = $colMap[$hasil['barang_name']] ?? null;
+                    if ($col) {
+                        $sheet->setCellValue($col . $row, $hasil['qty_produksi']);
+                        $rowTotal += $hasil['qty_produksi'];
+
+                        // Total per kolom
+                        if (!isset($colTotals[$col])) {
+                            $colTotals[$col] = 0;
+                        }
+                        $colTotals[$col] += $hasil['qty_produksi'];
+                    }
+                }
+            }
+
+            $sheet->setCellValue($totalColLetter . $row, $rowTotal);
+            $row++;
+        }
+
+        // Baris total di bawah
+        $sheet->setCellValue('B' . $row, 'Total');
+
+        // Total Qty Digunakan
+        $totalQtyDigunakan = array_sum(array_column($bahanBakuList, 'qty_produksi'));
+        $sheet->setCellValue('C' . $row, $totalQtyDigunakan);
+
+        $grandTotal = 0;
+
+        foreach ($colMap as $hasilName => $colLetter) {
+            $total = $colTotals[$colLetter] ?? 0;
+            $sheet->setCellValue($colLetter . $row, $total);
+            $grandTotal += $total;
+        }
+
+        $sheet->setCellValue($totalColLetter . $row, $grandTotal);
+
+        // (Optional) auto-size semua kolom
+        foreach (range('A', $totalColLetter) as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Laporan Hasil Produksi PT. TOBA SURIMI INDUSTRIES, Tbk (' . session()->get("login")->this_company . ') ' . date('d-m-Y', strtotime($data['date_production']));
+        $encodedFilename = rawurlencode($filename . '.xlsx');
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $encodedFilename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
+    }
+
+    public function exportPdfHasilProduksi($data)
+    {
+        $dataProduksi = $this->productionResultModel->getDataProductionResultBahanBaku($data);
+
+        $bahanBakuList = [];
+        $hasilProduksiList = [];
+
+        foreach ($dataProduksi as $item) {
+            if ($item['type'] == 'DIGUNAKAN') {
+                $bahanBakuList[] = $item;
+            } else if ($item['type'] == 'JADI') {
+                $hasilProduksiList[] = $item;
+            }
+        }
+
+        // Ambil nama hasil unik sebagai kolom dinamis
+        $namaHasilUnik = [];
+        foreach ($hasilProduksiList as $hasil) {
+            if (!in_array($hasil['barang_name'], $namaHasilUnik)) {
+                $namaHasilUnik[] = $hasil['barang_name'];
+            }
+        }
+
+        // Susun array data untuk dikirim ke view
+        $tableData = [];
+        $no = 1;
+        foreach ($bahanBakuList as $bahan) {
+            $rowData = [
+                'no' => $no++,
+                'nama_bahan' => $bahan['barang_name'],
+                'qty_digunakan' => $bahan['qty_produksi'],
+                'hasil' => [],
+                'total' => 0,
+            ];
+
+            foreach ($namaHasilUnik as $hasilNama) {
+                $rowData['hasil'][$hasilNama] = 0;
+            }
+
+            foreach ($hasilProduksiList as $hasil) {
+                if ($hasil['production_result_id'] == $bahan['production_result_id']) {
+                    $rowData['hasil'][$hasil['barang_name']] += $hasil['qty_produksi'];
+                    $rowData['total'] += $hasil['qty_produksi'];
+                }
+            }
+
+            $tableData[] = $rowData;
+        }
+
+        // Hitung total per kolom
+        $totalQtyDigunakan = array_sum(array_column($bahanBakuList, 'qty_produksi'));
+        $colTotals = [];
+        foreach ($namaHasilUnik as $hasilNama) {
+            $colTotals[$hasilNama] = 0;
+        }
+        $grandTotal = 0;
+        foreach ($tableData as $row) {
+            foreach ($namaHasilUnik as $hasilNama) {
+                $colTotals[$hasilNama] += $row['hasil'][$hasilNama];
+            }
+            $grandTotal += $row['total'];
+        }
+
+        $datas = [
+            'tableData' => $tableData,
+            'totalQtyDigunakan' => $totalQtyDigunakan,
+            'colTotals' => $colTotals,
+            'grandTotal' => $grandTotal,
+            'namaHasilUnik' => $namaHasilUnik,
+            'date_production' => date('d-m-Y', strtotime($data['date_production'])),
+        ];
+
+        $filename = 'Laporan Hasil Produksi PT. TOBA SURIMI INDUSTRIES, Tbk (' . session()->get("login")->this_company . ')';
+        $encodedFilename = rawurlencode($filename . '.pdf');
+
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml(view('Production/productionResult/print', $datas));
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        $dompdf->stream($encodedFilename, array("Attachment" => false));
     }
 }
