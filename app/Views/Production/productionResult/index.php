@@ -7,10 +7,13 @@
         <h1>Hasil Produksi</h1>
         <?= csrf_field() ?>
         <?php if (can('Produksi', 'Hasil Produksi', 'c')): ?>
-            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("production-result/create"); ?>">
+            <a class="btn btn-show-form btn-add" href="<?= base_url("production-result/create"); ?>">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
+        <button class="btn btn-discard btn-show-modal mr-4 float-end" type="button" aria-haspopup="true" aria-expanded="false">
+            Export
+        </button>
     </div>
     <div class="card">
         <div class="card-body">
@@ -59,6 +62,44 @@
         </div>
     </div>
 </section>
+
+<div class="modal" id="export_hasil_produksi" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <form class="form-excel" method="post" action="<?= base_url("production-result/export"); ?>">
+                <div class="modal-header">
+                    <h5 class="modal-title">Export Hasil Produksi</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select tipe_export" name="tipe_export" id="tipe_export" required>
+                                    <option value="excel" selected>Excel</option>
+                                    <option value="pdf">PDF</option>
+                                </select>
+                                <label for="floatingInput">Tipe Export</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input autocomplete="one-time-code" class="form-control input-picker date_production" id="date_production" name="date_production" placeholder="Tanggal Produksi" required>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
+                    <button type="submit" class="btn btn-submit-form">Export</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -186,7 +227,7 @@
 
     $(document).ready(function() {
 
-        $(".dateStart, .dateEnd").datepicker({
+        $(".dateStart, .dateEnd, .date_production").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
@@ -202,6 +243,14 @@
         $(".dateStart, .dateEnd").change(function() {
             table.ajax.reload();
         })
+
+        $('.btn-show-modal').on('click', function() {
+            $('#export_hasil_produksi').modal('show');
+        });
+
+        $('.btn-hide-form').on('click', function() {
+            $('#export_hasil_produksi').modal('hide');
+        });
 
         $('.dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();

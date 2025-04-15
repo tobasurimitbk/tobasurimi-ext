@@ -715,6 +715,7 @@ $routes->get('/production-result', 'Production\ProductionResult::index', ['filte
 $routes->get('/production-result/generate-kode-penerimaan', 'Production\ProductionResult::generateKodePenerimaan', ['filter' => 'Auth']);
 $routes->get('/production-result/details/(:segment)', 'Production\ProductionResult::getById/$1', ['filter' => 'Auth']);
 $routes->get('/production-result/print/(:segment)', 'Production\ProductionResult::printProductionResultPDF/$1', ['filter' => 'Auth']);
+$routes->post('/production-result/export', 'Production\ProductionResult::exportHasilProduksi', ['filter' => 'Auth']);
 $routes->get('/production-result/all', 'Production\ProductionResult::getAll', ['filter' => 'Auth']);
 $routes->get('/production-result/create', 'Production\ProductionResult::createProductionResult', ['filter' => 'Auth']);
 $routes->post('/production-result/create', 'Production\ProductionResult::saveProductionResult', ['filter' => 'Auth']);

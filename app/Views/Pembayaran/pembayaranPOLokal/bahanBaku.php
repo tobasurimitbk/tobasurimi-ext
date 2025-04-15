@@ -148,7 +148,7 @@
                 className: "text-center"
             },
             {
-                data: "total_sum_amount",
+                data: "amount",
                 className: "text-center"
             },
             {

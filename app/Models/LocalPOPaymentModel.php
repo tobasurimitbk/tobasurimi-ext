@@ -1119,7 +1119,7 @@ class LocalPOPaymentModel extends Model
 
         // Ambil semua pembayaran yang terkait dengan PO yang dipilih
         $payments = $localPOPaymentDetailModel
-            ->select('local_po_payment_details.id, local_po_payment_details.local_po_payment_id as po_payment_id, local_po_payment_details.rm_purchase_order_id, SUM(local_po_payment_details.total) as total_paid, SUM(local_po_payment_panjar.bayar_panjar) as total_panjar,  SUM(local_po_payment_pinjaman.bayar_pinjaman) as total_pinjaman, local_po_payment_panjar.id as panjar_payment_id')
+            ->select('local_po_payment_details.id, local_po_payment_details.local_po_payment_id as po_payment_id, local_po_payment_details.rm_purchase_order_id, local_po_payment_details.total as total_paid, local_po_payment_panjar.bayar_panjar as total_panjar,  local_po_payment_pinjaman.bayar_pinjaman as total_pinjaman, local_po_payment_panjar.id as panjar_payment_id')
             ->whereIn('rm_purchase_order_id', $poIdArr)
             ->groupBy('rm_purchase_order_id')
             ->join("local_po_payment_panjar", 'local_po_payment_panjar.local_po_payment_id = local_po_payment_details.local_po_payment_id', 'left')
@@ -1135,8 +1135,6 @@ class LocalPOPaymentModel extends Model
                 'total_pinjaman'=> (float) ($pay['total_pinjaman'] ?? 0)
             ];
         }   
-
-       
 
         foreach ($purchaseOrders as &$p) {
             $totalWithPPH = $purchaseOrderModel->getTotalwithPPH($p['rm_purchase_order_id']);
