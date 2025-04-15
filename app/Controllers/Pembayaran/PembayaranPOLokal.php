@@ -910,8 +910,6 @@ class PembayaranPOLokal extends BaseController
         }
 
 
-
-
         $data = [
             "draw"              => intval($this->request->getGet("draw")),
             "recordsTotal"      => $paymentData['totalData'],
