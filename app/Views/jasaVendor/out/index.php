@@ -183,6 +183,7 @@
                     let id = row.id;
                     let status = row.status_posting
                     let status_closed = row.status_closed;
+                    let un_posting = row.un_posting;
 
                     if (status === "0") {
                         return `
@@ -210,14 +211,18 @@
                         if (status_closed != "CLOSED") {
                             res += `
                                 <button data-toggle="tooltip" title="Close" onclick="closed('${id}')" class="btn btn-danger posting-spp">
-                                    <i class="fa-solid fa-ban"></i>    
+                                     <i class="fa fa-xmark fa-sm" aria-hidden="true"></i> 
                                 </button>
                             `;
-                            res += `
-                               <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-                            `;
+
+                            if (un_posting) {
+                                res += `
+                                    <button data-toggle="tooltip" title="Un Posting" onclick="unPosting('${id}')" class="btn btn-danger posting-spp">
+                                        <i class="fa-solid fa-ban"></i>    
+                                    </button>
+                                `;
+
+                            }
 
                         }
 
@@ -391,6 +396,57 @@
             }
         })
     }
+
+    const unPosting = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Unposting Jasa Vendor Barang Keluar ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("jasa-vendor-out/unposting"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then((result) => {
+                                table.ajax.reload()
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                });
+            }
+        })
+    }
+
 
     const remove = function(id) {
         Swal.fire({

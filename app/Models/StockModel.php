@@ -1112,9 +1112,6 @@ class StockModel extends Model
                     break;
                 }
 
-
-
-
                 // CEK APAKAH STOK DIGUNAKAN DI JASA VENDOR
                 $jasaVendorOutData = $jasaVendorOutModel->select('
                     jasa_vendor_out.no_surat_jalan
@@ -1298,5 +1295,290 @@ class StockModel extends Model
                 );
             }
         }
+    }
+
+    public function unPostingStockJasaVendorOut($jasaVendorOutId)
+    {
+        try {
+            $jasaVendorOutModel = new JasaVendorOutModel();
+            $jasaVendorOutDetailModel = new JasaVendorOutDetailModel();
+            $stockModel = new StockModel();
+            $stockDetailModel = new StockDetailModel();
+            $stockDetail2Model = new StockDetail2Model();
+
+            // BARANG OUT KE VENDOR
+            // Insert To Inventori (+)
+            $jasaVendorOut = $jasaVendorOutModel->find($jasaVendorOutId);
+            $jasaVendorOutDetail = $jasaVendorOutDetailModel->where('jasa_vendor_out_id', $jasaVendorOutId)->where('deletedAt', null)->findAll();
+
+
+            foreach ($jasaVendorOutDetail as $j) {
+                $stock = $stockModel->find($j['stock_out_id']);
+
+                $qty = $j['qty'];
+
+                if ($stock['tipe_barang'] == "kemasan") {
+                    $barang2_id = $stock['kemasan_id'];
+                } else {
+                    $barang2_id = $stock['barang2_id'];
+                }
+
+                // BARANG LAMA
+                $stockOldDetail = $stockDetail2Model->getStockListDetail(
+                    $j['stock_out_id'],
+                    $j['bc_out_id'],
+                    $j['no_aju_out'],
+                    $j['stock_dokumen']
+                );
+
+                $stok = $stockModel->insertStok(
+                    $jasaVendorOut['company_id'],
+                    $jasaVendorOut['warehouse_id'],
+                    $jasaVendorOut['divisi_id'],
+                    $stock['tipe_barang'],
+                    $stock['barang1_id'],
+                    $barang2_id,
+                    $qty
+                );
+
+                // DETAIL
+                $stokDetail = $stockDetailModel->insertStokDetail(
+                    $stok,
+                    $qty,
+                    "In",
+                    $jasaVendorOut['tanggal'],
+                    session()->get("login")->user_id,
+                    "JASA VENDOR",
+                    "-",
+                    "UNPOSTING STOK BARANG KELUAR"
+                );
+
+                // SUB DETAIL
+                $stockDetail2Model->insertStokDetail2(
+                    $j['bc_out_id'],
+                    $j['stock_out_id'],
+                    $stokDetail,
+                    $qty,
+                    $j['no_aju_out'],
+                    $jasaVendorOut['no_surat_jalan'],
+                    $j['stock_dokumen'],
+                    $stockOldDetail['supplier_id'],
+                    $stockOldDetail['harga_umum'],
+                    $stockOldDetail['harga_harian'],
+                    $stockOldDetail['harga_bulanan'],
+                    $stockOldDetail['no_po']
+                );
+            }
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    public function unPostingStockJasaVendorIn($jasaVendorInId)
+    {
+        $jasaVendorInModel = new JasaVendorInModel();
+        $jasaVendorInDetailModel = new JasaVendorInDetailModel();
+        $stockModel = new StockModel();
+        $jasaVendorOutModel = new JasaVendorOutModel();
+        $jasaVendorOutDetailModel = new JasaVendorOutDetailModel();
+        $stockDetail2Model = new StockDetail2Model();
+        $stockDetailModel = new StockDetailModel();
+
+        $jasaVendorIn = $jasaVendorInModel->find($jasaVendorInId);
+        $jasaVendorInDetail = $jasaVendorInDetailModel->where('jasa_vendor_in_id', $jasaVendorInId)->findAll();
+
+        foreach ($jasaVendorInDetail as $j) {
+            $stock = $stockModel->find($j['stock_in_id']);
+            $qty = $j['qty_bersih'];
+
+            $stok = $stockModel->insertStok(
+                $jasaVendorIn['company_id'],
+                $jasaVendorIn['warehouse_id'],
+                $jasaVendorIn['divisi_id'],
+                "bahan_baku",
+                $stock['barang1_id'],
+                $stock['barang2_id'],
+                $qty
+            );
+
+            $jasaVendorOut = $jasaVendorOutModel->find($j['jasa_vendor_out_id']);
+            $jasaVendorOutDetail = $jasaVendorOutDetailModel->find($j['jasa_vendor_out_detail_id']);
+
+            $stockOldDetail = $stockDetail2Model->getStockListDetail(
+                $jasaVendorOutDetail['stock_out_id'],
+                $jasaVendorOutDetail['bc_out_id'],
+                $jasaVendorOutDetail['no_aju_out'],
+                $jasaVendorOutDetail['stock_dokumen']
+            );
+
+            // DETAIL
+            $stokDetail = $stockDetailModel->insertStokDetail(
+                $stok,
+                $qty,
+                "Out",
+                date('Y-m-d'),
+                session()->get("login")->user_id,
+                "JASA VENDOR",
+                $jasaVendorOut['no_surat_jalan'],
+                $jasaVendorIn['keterangan']
+            );
+
+            // SUB DETAIL
+            $stockDetail2Model->insertStokDetail2(
+                $j['bc_in_id'],
+                $j['stock_in_id'],
+                $stokDetail,
+                $qty,
+                $j['no_aju_in'],
+                $jasaVendorIn['no_penerimaan_surat_jalan'],
+                $jasaVendorIn['no_penerimaan_surat_jalan'] . " (" . $stockOldDetail['no_po'] . ")",
+                $stockOldDetail['supplier_id'],
+                $stockOldDetail['harga_umum'],
+                $stockOldDetail['harga_harian'],
+                $stockOldDetail['harga_bulanan'],
+                $stockOldDetail['no_po']
+            );
+        }
+    }
+    public function checkStockJasaVendorInUsed($jasaVendorInId)
+    {
+        $jasaVendorInModel = new JasaVendorInModel();
+        $stockDetailModel = new StockDetailModel();
+        $prosesRebusModel = new ProsesRebusModel();
+        $jasaVendorOutModel = new JasaVendorOutModel();
+        $materialRequestPenolongModel = new MaterialRequestsPenolongModel();
+        $materialRequestModel = new MaterialRequestsModel();
+        $mutasiModel = new MutasiModel();
+        $mutasiGlobalModel = new MutasiGlobalModel();
+
+        $message = null;
+        $jasaVendorIn = $jasaVendorInModel->where('id', $jasaVendorInId)->first();
+        if ($jasaVendorIn != null) {
+            $stockDetail = $stockDetailModel->select('
+                stock_details2.stock_id,
+                stock_details2.bc_id,
+                stock_details2.no_aju,
+                stock_details2.stock_dokumen,
+            ')
+                ->join('stock_details2', 'stock_details2.stock_detail_id = stock_details.id', 'left')
+                ->join('stock', 'stock_details2.stock_id = stock.id', 'left')
+                ->where('stock.company_id', $jasaVendorIn['company_id'])
+                ->where('stock.divisi_id', $jasaVendorIn['divisi_id'])
+                ->where('stock.warehouse_id', $jasaVendorIn['warehouse_id'])
+                ->where('stock_details.sumber', "JASA VENDOR")
+                ->where('stock_details.status', "In")
+                ->where('stock_details2.no_dokumen', $jasaVendorIn['no_penerimaan_surat_jalan'])
+                ->findAll();
+
+
+            foreach ($stockDetail as $s) {
+                // CEK APAKAH STOK DIGUNAKAN PROSES REBUS
+                $prosesRebusData = $prosesRebusModel->select('
+                    proses_rebus.no_rebus
+                ')
+                    ->join('proses_rebus_detail', 'proses_rebus_detail.proses_rebus_id = proses_rebus.id', 'left')
+                    ->where('proses_rebus.company_id', $jasaVendorIn['company_id'])
+                    ->where('proses_rebus_detail.stock_rebus_id', $s['stock_id'])
+                    ->where('proses_rebus_detail.bc_rebus_id', $s['bc_id'])
+                    ->where('proses_rebus_detail.no_aju_rebus', $s['no_aju'])
+                    ->where('proses_rebus_detail.stock_dokumen', $s['stock_dokumen'])
+                    ->first();
+
+                if ($prosesRebusData != null) {
+                    $message = "Stok sudah digunakan di modul proses rebus dengan nomor rebus " . $prosesRebusData['no_rebus'];
+                    break;
+                }
+
+                // CEK APAKAH STOK DIGUNAKAN DI JASA VENDOR
+                $jasaVendorOutData = $jasaVendorOutModel->select('
+                    jasa_vendor_out.no_surat_jalan
+                ')
+                    ->join('jasa_vendor_out_detail', 'jasa_vendor_out_detail.jasa_vendor_out_id = jasa_vendor_out.id', 'left')
+                    ->where('jasa_vendor_out.company_id', $jasaVendorIn['company_id'])
+                    ->where('jasa_vendor_out_detail.stock_out_id', $s['stock_id'])
+                    ->where('jasa_vendor_out_detail.bc_out_id', $s['bc_id'])
+                    ->where('jasa_vendor_out_detail.no_aju_out', $s['no_aju'])
+                    ->where('jasa_vendor_out_detail.stock_dokumen', $s['stock_dokumen'])
+                    ->first();
+
+                if ($jasaVendorOutData != null) {
+                    $message = "Stok sudah digunakan di modul jasa vendor out dengan nomor surat jalan " . $jasaVendorOutData['no_surat_jalan'];
+                    break;
+                }
+
+                // CEK APAKAH SUDAH DIGUNAKAN DI MATERIAL REQUEST PENOLONG
+                $materialRequestPenolongData = $materialRequestPenolongModel
+                    ->select('material_requests_penolong.req_no')
+                    ->join(
+                        'material_request_penolong_details',
+                        'material_request_penolong_details.material_request_id = material_requests_penolong.id',
+                        'left'
+                    )
+                    ->where('material_requests_penolong.company_id', $jasaVendorIn['company_id'])
+                    ->where('material_request_penolong_details.stock_id', $s['stock_id'])
+                    ->where('material_request_penolong_details.bc_id', $s['bc_id'])
+                    ->where('material_request_penolong_details.no_aju', $s['no_aju'])
+                    ->where('material_request_penolong_details.stock_dokumen', $s['stock_dokumen'])
+                    ->first();
+
+                if ($materialRequestPenolongData != null) {
+                    $message = "Stok sudah digunakan di material request bahan penolong dengan nomor " . $materialRequestPenolongData['req_no'];
+                }
+
+                // CEK APAKAH SUDAH DIGUNAKAN DI MATERIAL REQUEST BIASA
+                $materialRequestData = $materialRequestModel->select('
+                    material_requests.req_no
+                ')
+                    ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
+                    ->where('material_requests.company_id', $jasaVendorIn['company_id'])
+                    ->where('material_request_details.stock_id', $s['stock_id'])
+                    ->where('material_request_details.bc_id', $s['bc_id'])
+                    ->where('material_request_details.no_aju', $s['no_aju'])
+                    ->where('material_request_details.stock_dokumen', $s['stock_dokumen'])
+                    ->first();
+
+                if ($materialRequestData != null) {
+                    $message = "Stok sudah digunakan di material request dengan nomor " . $materialRequestData['req_no'];
+                }
+
+
+                // CEK APAKAH STOK SUDAH DIGUNAKAN DI MUTASI PPBKB
+                $mutasiData = $mutasiModel->select('
+                    mutasi.no_mutasi
+                ')
+                    ->join('mutasi_detail', 'mutasi_detail.mutasi_id = mutasi.id', 'left')
+                    ->where('mutasi.company_id', $jasaVendorIn['company_id'])
+                    ->where('mutasi_detail.stock_id', $s['stock_id'])
+                    ->where('mutasi_detail.bc_id', $s['bc_id'])
+                    ->where('mutasi_detail.no_aju', $s['no_aju'])
+                    ->where('mutasi_detail.stock_dokumen', $s['stock_dokumen'])
+                    ->first();
+
+                if ($mutasiData != null) {
+                    $message = "Stok sudah digunakan di modul mutasi PPBKB " . $mutasiData['no_mutasi'];
+                }
+
+
+
+                // CEK APAKAH STOK SUDAH DIGUNAKAN DI MUTASI GLOBAL
+                $mutasiGlobalData = $mutasiGlobalModel->select('
+                    mutasi_global.no_mutasi
+                ')
+                    ->join('mutasi_global_detail', 'mutasi_global_detail.mutasi_global_id = mutasi_global.id', 'left')
+                    ->where('mutasi_global.company_asal_id', $jasaVendorIn['company_id'])
+                    ->where('mutasi_global_detail.stock_id', $s['stock_id'])
+                    ->where('mutasi_global_detail.bc_id', $s['bc_id'])
+                    ->where('mutasi_global_detail.no_aju', $s['no_aju'])
+                    ->where('mutasi_global_detail.stock_dokumen', $s['stock_dokumen'])
+                    ->first();
+
+                if ($mutasiGlobalData != null) {
+                    $message = "Stok sudah digunakan di modul mutasi BC 2.7 " . $mutasiGlobalData['no_mutasi'];
+                }
+            }
+        }
+
+        return $message;
     }
 }

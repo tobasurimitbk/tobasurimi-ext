@@ -15,6 +15,7 @@ use App\Models\StockModel;
 use App\Models\VendorModel;
 use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
+use Exception;
 
 class JasaVendorIn extends BaseController
 {
@@ -448,6 +449,42 @@ class JasaVendorIn extends BaseController
         ]);
     }
 
+    public function unPosting()
+    {
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $cekStockJasaVendorInUsed = $this->stockModel->checkStockJasaVendorInUsed(
+                $id
+            );
+
+            if ($cekStockJasaVendorInUsed != null) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Gagal UnPosting : " . $cekStockJasaVendorInUsed,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            $this->stockModel->unPostingStockJasaVendorIn($id);
+
+            $this->jasaVendorInModel->update($id, [
+                'status_posting' => '0'
+            ]);
+
+            return response()->setJSON([
+                'status' => true,
+                'message' => "Barang Masuk Berhasil Di Unposting",
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Gagal Posting : Terjadi kesalahan saat unposting barang masuk",
+                'error' => $e->getTrace(),
+                'token' => csrf_hash()
+            ]);
+        }
+    }
 
     public function dropdownListBarangKeluar()
     {
