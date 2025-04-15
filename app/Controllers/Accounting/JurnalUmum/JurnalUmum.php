@@ -126,7 +126,7 @@ class JurnalUmum extends BaseController
         $this->kursModel = new KursModel();
         $this->tutupBukuModel = new TutupBukuModel();
         $this->localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
-        $this->localPOPaymentPinjamanModel = new LocalPOPaymentPanjarModel();
+        $this->localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
         $this->PinjamanSupplierModel = new PinjamanKaryawanModel();
         $this->PanjarSupplierModel = new PanjarSupplierModel();
         $this->EmployeeModel = new EmployeesModel();
@@ -2330,7 +2330,7 @@ class JurnalUmum extends BaseController
         if ($module == "PINJAMAN") {
             $result = array();
             $payPinjaman = $this->localPOPaymentPinjamanModel->where('local_po_payment_pinjaman.id', $payID)
-                ->join('pinjaman_supplier', 'pinjaman_supplier.id = local_po_payment_pinjaman.panjar_id', 'left')
+                ->join('pinjaman_supplier', 'pinjaman_supplier.id = local_po_payment_pinjaman.pinjaman_id', 'left')
                 ->asObject()
                 ->select('local_po_payment_pinjaman.*, pinjaman_supplier.no_pinjaman')
                 ->first();
@@ -2353,8 +2353,8 @@ class JurnalUmum extends BaseController
                 $resultTransaksiJurnal = array(
                     'no_transaksi' => $no_transaksi_jurnal,
                     'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $payPinjaman->createdAt))),
-                    'total_debit' => $payPinjaman->bayar_panjar,
-                    'total_kredit' => $payPinjaman->bayar_panjar,
+                    'total_debit' => $payPinjaman->bayar_pinjaman,
+                    'total_kredit' => $payPinjaman->bayar_pinjaman,
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
                     'no_bukti' => $no_transaksi_jurnal,
@@ -2373,12 +2373,12 @@ class JurnalUmum extends BaseController
                     'id_coa'            => $payPinjaman->akun_kas == 0 || $payPinjaman->akun_kas == NULL ? $UtangAR : $payPinjaman->akun_kas,
                     'company_id'            => $payPinjaman->company_id,
                     'tanggal_jurnal' => Carbon::parse($payPinjaman->createdAt)->format('Y-m-d'),
-                    'debit'             => $payPinjaman->bayar_panjar,
+                    'debit'             => $payPinjaman->bayar_pinjaman,
                     'kredit'            => 0,
                     'valas'             => '20',
                     'kurs'              => 1,
                     'divisi_id'         => $divisi,
-                    'keterangan'        => "Pembayaran Pinjaman " . $payPinjaman->no_panjar,
+                    'keterangan'        => "Pembayaran Pinjaman " . $payPinjaman->no_pinjaman,
                     'id_inputer'        => session()->get("login")->user_id
                 );
                 $result[] = array(
@@ -2387,11 +2387,11 @@ class JurnalUmum extends BaseController
                     'company_id'            => $payPinjaman->company_id,
                     'tanggal_jurnal' => Carbon::parse($payPinjaman->createdAt)->format('Y-m-d'),
                     'debit'             => 0,
-                    'kredit'            => $payPinjaman->bayar_panjar,
+                    'kredit'            => $payPinjaman->bayar_pinjaman,
                     'valas'             => '20',
                     'kurs'              => 1,
                     'divisi_id'         => $divisi,
-                    'keterangan'        => "Pembayaran Pinjaman" . $payPinjaman->no_panjar,
+                    'keterangan'        => "Pembayaran Pinjaman" . $payPinjaman->no_pinjaman,
                     'id_inputer'        => session()->get("login")->user_id
                 );
 
