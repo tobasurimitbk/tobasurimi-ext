@@ -361,13 +361,13 @@ class TandaTerimaSupBB extends BaseController
 
         $taxData = $pajakTandaTerimaFakturModel->asObject()
             ->where('tanda_terima_faktur_id', $id)
-            ->whereNotIn('tax_type', ['PPN Masukan 11%'])
+            ->where('tax_status', 'Pajak dipungut oleh negara')
             ->where('deletedAt', null)
             ->findAll();
 
         $taxReturnData = $pajakTandaTerimaFakturModel->asObject()
             ->where('tanda_terima_faktur_id', $id)
-            ->whereIn('tax_type', ['PPN Masukan 11%', 'PPN Masukan'])
+            ->where('tax_status', 'Pajak dikembalikan lagi')
             ->where('deletedAt', null)
             ->findAll();
 
@@ -416,7 +416,14 @@ class TandaTerimaSupBB extends BaseController
         $data['taxReturnData'] = $taxReturnData;
         $data['taxData'] = $taxData;
 
+        // Bon Merah Bukti Penerimaan
+        $totalDikembalikan = 0;
+        foreach ($taxReturnData as $t) :
+            $totalDikembalikan += $t->tax_amt;
+        endforeach;
+        $totalDikembalikan += $data['potongan'];
         // dd($data['taxData']);
+        $data['totalDikembalikan'] = $totalDikembalikan;
 
         $this->dompdf->loadHtml(view('Purchase/terimaSupplierLokal/bp/print', $data));
         $this->dompdf->setPaper('A5', 'landscape');

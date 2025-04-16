@@ -100,7 +100,7 @@
 
 <body style="border: 0px solid;font-size: 11px;">
 
-    <div style="margin: 25px; padding: 25px" class="<?= $data->potongan != 0 || !empty($taxReturnData) ? 'pagebreak' : '' ?>">
+    <div style="margin: 25px; padding: 25px" class="<?= $totalDikembalikan != 0 ? 'pagebreak' : '' ?>">
         <table class="w-100">
             <tr>
                 <td>
@@ -185,7 +185,7 @@
                 <td></td>
             </tr> -->
 
-            <?php foreach ($taxReturnData as $t) : ?>
+            <?php foreach ($taxData as $t) : ?>
                 <?php $totalTaxAmt += $t->tax_amt; ?>
                 <tr>
                     <td></td>
@@ -242,7 +242,7 @@
         </table>
     </div>
 
-    <?php if ($data->potongan != 0 || !empty($taxReturnData)) { ?>
+    <?php if ($totalDikembalikan != 0) { ?>
         <div style="background-color: #ffe4e1; padding: 1rem; border: 1px solid #ffb6c1; height: 93.2%">
             <div style="padding: 25px; margin: 25px;">
                 <table class="w-100">
@@ -314,15 +314,8 @@
                         <th class="txt-right">JUMLAH</th>
                         <th class="txt-left">NO. PERKIRAAN</th>
                     </tr>
-                    <!-- <?php if (!empty($taxReturnList)) : ?>
-                    <tr>
-                        <td><?= $taxReturnList ?></td>
-                        <td class="txt-right"><?= number_format($taxReturnTotal, 2) ?></td>
-                        <td></td>
-                    </tr>
-                <?php endif; ?> -->
                     <?php $totalPenerimaan = 0; ?>
-                    <?php foreach ($taxData as $t) : ?>
+                    <?php foreach ($taxReturnData as $t) : ?>
                         <?php $totalPenerimaan += $t->tax_amt; ?>
                         <tr>
                             <td><?= $t->tax_type . " - " . $t->tax_inv_no . (!empty($t->tax_note) ? " - " . $t->tax_note : "") ?></td>
