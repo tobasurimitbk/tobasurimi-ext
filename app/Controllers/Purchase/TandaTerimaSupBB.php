@@ -361,7 +361,7 @@ class TandaTerimaSupBB extends BaseController
 
         $taxData = $pajakTandaTerimaFakturModel->asObject()
             ->where('tanda_terima_faktur_id', $id)
-            ->where('tax_status', 'Pajak dipungut oleh negara')
+            ->whereIn('tax_type', ['PPN Masukan', 'PPN Masukan 11%', 'PPh Pasal 21', 'PPh Pasal 23', 'PPh Pasal 4 (2)'])
             ->where('deletedAt', null)
             ->findAll();
 
