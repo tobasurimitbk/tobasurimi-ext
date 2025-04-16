@@ -1006,11 +1006,11 @@
         const noBuktiPembayaranText = noBuktiPembayaranElement.value.trim();
 
         // Ambil semua opsi yang dipilih dari elemen <select>
-        const selectedNoDokumen = Array.from(noDokumenElement.selectedOptions).map(option => `TERIMA A/ INVOICE ${option.text}`);
+        const selectedNoDokumen = Array.from(noDokumenElement.selectedOptions).map(option => `${option.text}`);
         const selectedCustomer = Array.from(customerElement.selectedOptions).map(option => option.text);
 
         // Gabungkan nilai opsi yang dipilih ke dalam textarea
-        const combinedText = [...selectedCustomer, ...selectedNoDokumen].join('; ');
+        const combinedText = `${selectedCustomer[0]}; TERIMA A/ INVOICE ${selectedNoDokumen.join('; ')}`;
         textareaElement.value = combinedText;
     }
 
