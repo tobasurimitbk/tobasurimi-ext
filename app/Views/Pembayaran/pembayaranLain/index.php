@@ -519,6 +519,7 @@
         }).on('change', function(e) {
             const jenis = $(this).val();
             updateAccountLabels(jenis);
+            details = [];
         });
         updateAccountLabels($('#jenis_pembayaran').val());
 
