@@ -182,7 +182,7 @@ class User extends BaseController
         try {
             $rules = [
                 "username" => [
-                    "rules" => "required|is_unique[users.username]",
+                    "rules" => "required",
                     'errors' => [
                         'required' => 'Username tidak boleh kosong',
                         'is_unique' => 'Username sudah ada!'
@@ -201,6 +201,18 @@ class User extends BaseController
                 $data = [
                     "status"    => false,
                     "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            $user = $this->UserModel->where('username', $this->request->getPost('username'))->where('deletedAt', null)->first();
+
+            if ($user != null) {
+                $data = [
+                    "status"    => false,
+                    "message"   => "Username sudah ada",
                     'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
@@ -292,8 +304,24 @@ class User extends BaseController
                 return;
             }
 
+            $id = $this->request->getPost("id");
+
+            $user = $this->UserModel->where('username', $this->request->getPost('username'))
+                ->where('deletedAt', null)
+                ->where('id !=', $id)
+                ->first();
+
+            if ($user != null) {
+                $data = [
+                    "status"    => false,
+                    "message"   => "Username sudah ada",
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
             if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
 
                 $password = $this->request->getPost("password");
 
