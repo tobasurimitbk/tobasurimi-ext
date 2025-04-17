@@ -1818,7 +1818,7 @@ class JurnalUmum extends BaseController
                     'total_kredit' => $POlocal->amount,
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
-                    'no_bukti' => $no_transaksi_jurnal,
+                    'no_bukti' => $POlocal->payment_no,
                     'valas' => '30',
                     'exchange_rate' => 1,
                 );
@@ -1834,22 +1834,26 @@ class JurnalUmum extends BaseController
 
                     $sumValue = 0;
                     $dataPO = $this->localPOPaymentModel->asObject()
-                        ->select('local_po_payments.*, local_po_payment_details.*')
+                        ->select('local_po_payments.*, local_po_payment_details.*, suppliers.name as supplier_name')
                         ->join('local_po_payment_details', 'local_po_payment_details.local_po_payment_id = local_po_payments.id', 'left')
+                        ->join('suppliers', 'suppliers.id = local_po_payments.supplier_id', 'left')
                         ->where('local_po_payments.id', $payID)
                         ->where('local_po_payments.deletedAt', null)
                         ->where('local_po_payment_details.deletedAt', null)
                         ->where('local_po_payment_details.rm_purchase_order_id', $poId)
                         ->groupBy('local_po_payment_details.local_po_payment_id')
                         ->findAll();
-
+                        
                     foreach ($dataPO as $value) {
-                        $dataPO = str_replace(['[', ']', '"', "\\"], '', $value->multiple_po_no);
+                        
+                        $cleanedPO = str_replace(['[', ']', '"', "\\"], '', $value->multiple_po_no);
+                        $dataPO = $value->supplier_name . ' - ' . $cleanedPO;
+
                         $sumValue = $value->total;
                         $result[] = array(
                             'id_transaksi'      => $id_transaksi_jurnal,
                             'id_coa'            => $POlocal->akun_kas == 0 || $POlocal->akun_kas == NULL ? $UtangAR : $POlocal->akun_kas,
-                            'company_id'            => $POlocal->company_id,
+                            'company_id'        => $POlocal->company_id,
                             'divisi_id'         => $divisi,
                             'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
                             'debit'             => ($sumValue),
@@ -1862,7 +1866,7 @@ class JurnalUmum extends BaseController
                         $result[] = array(
                             'id_transaksi'      => $id_transaksi_jurnal,
                             'id_coa'            => $POlocal->akun_selisih,
-                            'company_id'            => $POlocal->company_id,
+                            'company_id'        => $POlocal->company_id,
                             'divisi_id'         => $divisi,
                             'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
                             'debit'             => 0,
