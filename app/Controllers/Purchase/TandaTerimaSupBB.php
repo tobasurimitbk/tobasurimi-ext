@@ -105,7 +105,7 @@ class TandaTerimaSupBB extends BaseController
                 "faktur_no"      => $data->faktur_no,
                 "divisi"         => $data->divisi,
                 "supplier_name"  => strtoupper($data->supplierName),
-                "nominal_faktur" => str_replace('Rp', '', toRupiah($data->nominal_faktur, 0, ',', '.')),
+                "nominal_faktur" => $data->nominal_faktur,
                 "jumlah_item"    => $data->jumlah_item,
                 "invoice_date"   => $data->invoice_date,
                 "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
@@ -359,15 +359,17 @@ class TandaTerimaSupBB extends BaseController
             ->where('deletedAt', null)
             ->findAll();
 
+        // Pajak Bukti Pengeluaran (Bon Putih)
         $taxData = $pajakTandaTerimaFakturModel->asObject()
             ->where('tanda_terima_faktur_id', $id)
-            ->whereIn('tax_type', ['PPN Masukan', 'PPN Masukan 11%', 'PPh Pasal 21', 'PPh Pasal 23', 'PPh Pasal 4 (2)'])
+            ->whereIn('tax_type', ['PPN Masukan', 'PPN Masukan 11%'])
             ->where('deletedAt', null)
             ->findAll();
 
+        // Pajak Bukti Pemasukkan (Bon Merah)
         $taxReturnData = $pajakTandaTerimaFakturModel->asObject()
             ->where('tanda_terima_faktur_id', $id)
-            ->where('tax_status', 'Pajak dikembalikan lagi')
+            ->whereIn('tax_type', ['PPN Masukan', 'PPh Pasal 21', 'PPh Pasal 23', 'PPh Pasal 4 (2)'])
             ->where('deletedAt', null)
             ->findAll();
 
@@ -377,13 +379,18 @@ class TandaTerimaSupBB extends BaseController
             $itemTotal += $det->qty * $det->price_single;
         }
 
+        // foreach ($taxData as $tax) {
+        //     $taxList[] = "{$tax->tax_type}: {$tax->tax_inv_no}";
+        //     if ($tax->tax_type == "PPh Pasal 23") {
+        //         $taxPph23 += $tax->tax_amt;
+        //     } else {
+        //         $taxTotal += $tax->tax_amt;
+        //     }
+        // }
+
         foreach ($taxData as $tax) {
             $taxList[] = "{$tax->tax_type}: {$tax->tax_inv_no}";
-            if ($tax->tax_type == "PPh Pasal 23") {
-                $taxPph23 += $tax->tax_amt;
-            } else {
-                $taxTotal += $tax->tax_amt;
-            }
+            $taxTotal += $tax->tax_amt;
         }
 
         foreach ($taxReturnData as $tax) {

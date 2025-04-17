@@ -175,7 +175,7 @@
                 data: "nominal_faktur",
                 className: "text-center",
                 render: function(data, type, row) {
-                    return data ? greatFormatRupiah(data) : '-';
+                    return data ? greatFormatRupiah(data) : '';
                 }
             },
             {
