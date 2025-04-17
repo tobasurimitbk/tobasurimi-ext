@@ -1275,7 +1275,7 @@
         const tbody = table.find('tbody');
         var no = 1;
         $.each(data, function(i, v) {
-            var harga = (Number(v.qty_akan_diterima) * Number(v.harga));
+            var harga = Math.round(Number(v.qty_akan_diterima) * Number(v.harga));
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align: center;">').text(no++));
             newRow.append($('<td style="text-align: center;">').text(v.po_no));
