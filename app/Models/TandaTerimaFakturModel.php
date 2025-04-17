@@ -120,11 +120,11 @@ class TandaTerimaFakturModel extends Model
             $tandaTerimaQry->groupStart();
 
             if (!empty($addCondition['start'])) {
-                $tandaTerimaQry->where('tanda_terima_faktur.invoice_date >=', $addCondition['start']);
+                $tandaTerimaQry->where('tanda_terima_faktur.receive_date >=', $addCondition['start']);
             }
 
             if (!empty($addCondition['finish'])) {
-                $tandaTerimaQry->where('tanda_terima_faktur.invoice_date <=', $addCondition['finish']);
+                $tandaTerimaQry->where('tanda_terima_faktur.receive_date <=', $addCondition['finish']);
             }
 
             $tandaTerimaQry->groupEnd();

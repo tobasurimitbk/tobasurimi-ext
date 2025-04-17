@@ -160,7 +160,7 @@
                 className: "text-center"
             },
             {
-                data: "invoice_date",
+                data: "receive_date",
                 className: "text-center"
             },
             {
