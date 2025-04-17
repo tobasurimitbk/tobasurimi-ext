@@ -1,6 +1,7 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 <meta name="csrf-token" content="<?= csrf_hash() ?>">
+
 <div class="modal add-modal" id="add_modal" tabindex="-1">
     <div class="modal-dialog" style="min-width: 1200px">
         <div class="modal-content">
@@ -42,13 +43,11 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select valas" id="valas" name="valas" aria-label="Floating label select example">
-                                            <option value=""></option>
-                                            <?php foreach ($dataValuta as $valuta) : ?>
-                                                <option value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
-                                            <?php endforeach ?>
+                                        <select class="form-select" name="jenis_pembayaran" id="jenis_pembayaran" required>
+                                            <option value="PUTIH">PUTIH</option>
+                                            <option value="MERAH">MERAH</option>
                                         </select>
-                                        <label for="floatingInput" style="z-index: 1;">Valas</label>
+                                        <label for="floatingInput" style="z-index: 1;">Jenis Pembayaran</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -64,6 +63,17 @@
                                 </div>
                             </div>
                             <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select valas" id="valas" name="valas" aria-label="Floating label select example">
+                                            <option value=""></option>
+                                            <?php foreach ($dataValuta as $valuta) : ?>
+                                                <option value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
+                                            <?php endforeach ?>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Valas</label>
+                                    </div>
+                                </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" type="text" class="form-control bayar_ke" name="bayar_ke" id="bayar_ke" placeholder="Pembayaran Ke">
@@ -502,6 +512,16 @@
             dropdownParent: $('#add_modal .modal-content')
         });
 
+        $('#jenis_pembayaran').select2({
+            placeholder: "Pilih Jenis Pembayaran",
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal .modal-content')
+        }).on('change', function(e) {
+            const jenis = $(this).val();
+            updateAccountLabels(jenis);
+        });
+        updateAccountLabels($('#jenis_pembayaran').val());
+
         $("#tanggal").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
@@ -552,6 +572,47 @@
             refreshDetailsTable();
         });
         
+        // Function to update labels based on payment type
+        function updateAccountLabels(jenis) {
+            if (jenis === 'PUTIH') {
+                // Update label
+                $('#akun_kas').parent().find('label').text('Debit');
+                $('#akun_selisih').parent().find('label').text('Kredit');
+                
+                // Update placeholder Select2
+                $('#akun_kas').select2({
+                    placeholder: "Pilih Akun Debit",
+                    theme: "bootstrap-5",
+                    dropdownParent: $('#add_modal .modal-content')
+                });
+                
+                $('#akun_selisih').select2({
+                    placeholder: "Pilih Akun Kredit",
+                    theme: "bootstrap-5",
+                    dropdownParent: $('#add_modal .modal-content')
+                });
+                
+            } else if (jenis === 'MERAH') {
+                // Update label
+                $('#akun_kas').parent().find('label').text('Kredit');
+                $('#akun_selisih').parent().find('label').text('Debit');
+                
+                // Update placeholder Select2
+                $('#akun_kas').select2({
+                    placeholder: "Pilih Akun Kredit",
+                    theme: "bootstrap-5",
+                    dropdownParent: $('#add_modal .modal-content')
+                });
+                
+                $('#akun_selisih').select2({
+                    placeholder: "Pilih Akun Debit",
+                    theme: "bootstrap-5",
+                    dropdownParent: $('#add_modal .modal-content')
+                });
+            }
+        }
+    
+
         // Clear detail form
         function clearDetailForm() {
             $('#tanggal, #nominal_pembayaran, #keterangan').val('');
@@ -663,6 +724,8 @@
                 return; // stop proses kalau gak valid
             }
 
+            const jenisPembayaran = $('#jenis_pembayaran').val();
+
             const detail = {
                 tanggal: $('#tanggal').val(),
                 metode_pembayaran: $('#metode_pembayaran').val(),
@@ -671,7 +734,8 @@
                 akun_kas: $('#akun_kas').val(),
                 akun_kas_name: $('#akun_kas option:selected').text(),
                 akun_selisih_name: $('#akun_selisih option:selected').text(),
-                keterangan: $('#keterangan').val()
+                keterangan: $('#keterangan').val(),
+                jenis_pembayaran: jenisPembayaran
             };
 
             details.push(detail);
@@ -687,13 +751,28 @@
             tbody.empty();
             
             details.forEach((detail, index) => {
+
+                let debitAccount, creditAccount;
+                if (detail.dataBE) {
+                    debitAccount = detail.akun_kas_name;
+                    creditAccount = detail.akun_selisih_name;
+                } else {
+                    if (detail.jenis_pembayaran === 'PUTIH') {
+                        debitAccount = detail.akun_kas_name;
+                        creditAccount = detail.akun_selisih_name;
+                    } else {
+                        debitAccount = detail.akun_selisih_name;
+                        creditAccount = detail.akun_kas_name;
+                    }
+                }
+
                 tbody.append(`
                     <tr>
                         <td>${detail.tanggal}</td>
                         <td>${detail.metode_pembayaran}</td>
                         <td>${detail.nominal_pembayaran}</td>
-                        <td>${detail.akun_kas_name}</td>
-                        <td>${detail.akun_selisih_name}</td>
+                        <td>${debitAccount}</td>
+                        <td>${creditAccount}</td>
                         <td>${detail.pembayaran_oleh}</td>
                         <td>${detail.keterangan}</td>
                         <td>
@@ -800,7 +879,17 @@
                         $('#bayar_ke').val(parent.bayar_ke);
                         $('#valas').val(parent.valas).change();
                         $('#akun_selisih').val(parent.akun_selisih).change();
+
+                        // Handle jenis pembayaran dan akun
+                        $('#jenis_pembayaran').val(parent.jenis_pembayaran).change();
                         
+                        // Untuk MERAH: akun_selisih parent sebenarnya adalah akun_kas
+                        if (parent.jenis_pembayaran === 'MERAH' && parent.akun_kas) {
+                            $('#akun_selisih').val(parent.akun_kas).change();
+                        } else {
+                            $('#akun_selisih').val(parent.akun_selisih).change();
+                        }
+
                         // Disable fields if needed
                         if (parent.status_posting === "1") {
                             disabledForm();
@@ -820,7 +909,8 @@
                                     akun_kas: detail.akun_kas,
                                     akun_kas_name: detail.akun_kas_name,
                                     akun_selisih_name: detail.akun_selisih_name,
-                                    keterangan: detail.keterangan
+                                    keterangan: detail.keterangan,
+                                    dataBE: true
                                 });
                             });
                             refreshDetailsTable();
@@ -861,6 +951,7 @@
                     if (result.isConfirmed) {
                         const csrf = $('meta[name="csrf-token"]').attr('content');
                         let id = $('#id').val();
+                        const jenisPembayaran = $('#jenis_pembayaran').val();
                         
                         // Prepare data with proper formatting
                         const requestData = {
@@ -870,6 +961,7 @@
                             bayar_ke: $('#bayar_ke').val(),
                             valas: $('#valas').val(),
                             akun_selisih: $('#akun_selisih').val(),
+                            jenis_pembayaran: jenisPembayaran,
                             details: details.map(detail => ({
                                 id: detail.id || '',
                                 tanggal: detail.tanggal,

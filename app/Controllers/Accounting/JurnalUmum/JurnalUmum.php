@@ -2013,6 +2013,11 @@ class JurnalUmum extends BaseController
                     ->where('other_payment_id', $otherPayment->id)
                     ->findAll();
 
+                $totalNominal = array_reduce($detailPembayaran, function($carry, $item) {
+                    return $carry + floatval(str_replace([',', '.'], '', $item['nominal']));
+                }, 0);
+                $isFirstTransaction = true; 
+
                 foreach ($detailPembayaran as $detail) {
                     $nominal = floatval(str_replace([',', '.'], '', $detail['nominal']));
                     $tanggal = date('Y-m-d', strtotime(str_replace('/', '-', $detail['tanggal_pembayaran'])));
@@ -2036,35 +2041,74 @@ class JurnalUmum extends BaseController
 
                     // 2. Buat jurnal umum: kredit akun kas, debit akun selisih
                     $result = [];
-                    $result[] = array(
-                        'id_transaksi' => $id_transaksi_jurnal,
-                        'id_coa' => $detail['akun_kas'],
-                        'tanggal_jurnal' => $tanggal,
-                        'debit' => 0,
-                        'kredit' => $nominal,
-                        'valas' => $otherPayment->valas,
-                        'kurs' => $kursData,
-                        'company_id' => $otherPayment->company_id,
-                        'divisi_id' => $otherPayment->divisi_id,
-                        'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
-                        'id_inputer' => session()->get("login")->user_id
-                    );
+                    
+                    if ($otherPayment->jenis_pembayaran === 'PUTIH') {
+                      
+                        if ($isFirstTransaction) {
+                            $result[] = array(
+                                'id_transaksi' => $id_transaksi_jurnal,
+                                'id_coa' => $detail['akun_selisih'],
+                                'tanggal_jurnal' => $tanggal,
+                                'debit' => 0,
+                                'kredit' => $totalNominal, // Total semua nominal
+                                'valas' => $otherPayment->valas,
+                                'kurs' => $kursData,
+                                'company_id' => $otherPayment->company_id,
+                                'divisi_id' => $otherPayment->divisi_id,
+                                'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                                'id_inputer' => session()->get("login")->user_id
+                            );
+                        }
 
-                    $result[] = array(
-                        'id_transaksi' => $id_transaksi_jurnal,
-                        'id_coa' => $detail['akun_selisih'],
-                        'tanggal_jurnal' => $tanggal,
-                        'debit' => $nominal,
-                        'kredit' => 0,
-                        'valas' => $otherPayment->valas,
-                        'kurs' => $kursData,
-                        'company_id' => $otherPayment->company_id,
-                        'divisi_id' => $otherPayment->divisi_id,
-                        'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
-                        'id_inputer' => session()->get("login")->user_id
-                    );
+                        $result[] = array(
+                            'id_transaksi' => $id_transaksi_jurnal,
+                            'id_coa' => $detail['akun_kas'],
+                            'tanggal_jurnal' => $tanggal,
+                            'debit' => $nominal,
+                            'kredit' => 0,
+                            'valas' => $otherPayment->valas,
+                            'kurs' => $kursData,
+                            'company_id' => $otherPayment->company_id,
+                            'divisi_id' => $otherPayment->divisi_id,
+                            'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                            'id_inputer' => session()->get("login")->user_id
+                        );
 
+                    } else {
+                        if ($isFirstTransaction) {
+                            $result[] = array(
+                                'id_transaksi' => $id_transaksi_jurnal,
+                                'id_coa' => $detail['akun_kas'],
+                                'tanggal_jurnal' => $tanggal,
+                                'debit' => $totalNominal, // Total semua nominal
+                                'kredit' => 0,
+                                'valas' => $otherPayment->valas,
+                                'kurs' => $kursData,
+                                'company_id' => $otherPayment->company_id,
+                                'divisi_id' => $otherPayment->divisi_id,
+                                'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                                'id_inputer' => session()->get("login")->user_id
+                            );
+                        }
+
+                        $result[] = array(
+                            'id_transaksi' => $id_transaksi_jurnal,
+                            'id_coa' => $detail['akun_selisih'],
+                            'tanggal_jurnal' => $tanggal,
+                            'debit' => 0,
+                            'kredit' => $nominal,
+                            'valas' => $otherPayment->valas,
+                            'kurs' => $kursData,
+                            'company_id' => $otherPayment->company_id,
+                            'divisi_id' => $otherPayment->divisi_id,
+                            'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                            'id_inputer' => session()->get("login")->user_id
+                        );
+
+                    }
+                   
                     $this->jurnalUmumModel->insertJurnalBatch($result);
+                    $isFirstTransaction = false;
                 }
             }
 
