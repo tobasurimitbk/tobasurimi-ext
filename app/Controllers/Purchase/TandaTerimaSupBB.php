@@ -107,7 +107,7 @@ class TandaTerimaSupBB extends BaseController
                 "supplier_name"  => strtoupper($data->supplierName),
                 "nominal_faktur" => $data->nominal_faktur,
                 "jumlah_item"    => $data->jumlah_item,
-                "invoice_date"   => $data->invoice_date,
+                "invoice_date"   => date('d/m/Y', strtotime($data->invoice_date)),
                 "receive_date"   => date('d/m/Y', strtotime($data->receive_date)),
                 "recipient"      => $data->recipient,
                 'is_used'        => $data->total_dibayar  == 0 ? false : true,
