@@ -213,16 +213,22 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-floating mb-3">
                                     <input <?= $isUsed ? 'disabled' : '' ?> onkeyup="this.value = greatFormatRupiah(this.value); hitungPotonganTambahan();" autocomplete="one-time-code" type="text" class="form-control potongan" name="potongan" id="potongan" value="<?= !empty($dataTandaTerimaFaktur) ? number_format($dataTandaTerimaFaktur['potongan'], 2) : '' ?> " placeholder="Keterangan">
                                     <label for="floatingInput">Potongan (Opsional)</label>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-floating mb-3">
                                     <input <?= $isUsed ? 'disabled' : '' ?> onkeyup="this.value = greatFormatRupiah(this.value); hitungPotonganTambahan();" autocomplete="one-time-code" type="text" class="form-control tambahan" name="tambahan" id="tambahan" value="<?= !empty($dataTandaTerimaFaktur) ? number_format($dataTandaTerimaFaktur['tambahan'], 2) : '' ?> " placeholder="Keterangan">
                                     <label for="floatingInput">Penambahan (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" readonly type="text" class="form-control total_pph_21" id="total_pph_21" name="total_pph_21" value="0" />
+                                    <label for="floatingInput">Total Potongan PPH Pasal 21</label>
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -1007,6 +1013,8 @@
         var tambahan = Number(destroyFormatRupiah($('.tambahan').val()) || 0);
         var harga = 0;
         var total_ppn_11 = 0;
+        var total_pph_21 = 0;
+
         $.each(list_penerimaan_selected, function(i, v) {
             harga += (Number(v.qty_akan_diterima) * Number(destroyFormatRupiah(v.harga)));
         });
@@ -1015,11 +1023,17 @@
                 total_ppn_11 += destroyFormatRupiah(v.tax_amt);
                 harga += Number(destroyFormatRupiah(v.tax_amt));
             }
+
+            if (v.tax_type == 'PPh Pasal 21') {
+                total_pph_21 += destroyFormatRupiah(v.tax_amt);
+                harga -= destroyFormatRupiah(v.tax_amt);
+            }
         })
         var total = harga - potongan + tambahan;
         $('.nominal_faktur').val(greatFormatRupiah(harga));
         $('.total_tambahan_potongan').val(greatFormatRupiah(total));
         $('.total_ppn_11').val(greatFormatRupiah(total_ppn_11));
+        $('.total_pph_21').val(greatFormatRupiah(total_pph_21));
     }
 
     // UPDATE
