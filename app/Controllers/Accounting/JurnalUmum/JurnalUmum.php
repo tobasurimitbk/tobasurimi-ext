@@ -1855,6 +1855,7 @@ class JurnalUmum extends BaseController
                             'id_coa'            => $POlocal->akun_kas == 0 || $POlocal->akun_kas == NULL ? $UtangAR : $POlocal->akun_kas,
                             'company_id'        => $POlocal->company_id,
                             'divisi_id'         => $divisi,
+                            'supplier_id'       => $POlocal->supplier_id,
                             'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
                             'debit'             => ($sumValue),
                             'kredit'            => 0,
@@ -1868,6 +1869,7 @@ class JurnalUmum extends BaseController
                             'id_coa'            => $POlocal->akun_selisih,
                             'company_id'        => $POlocal->company_id,
                             'divisi_id'         => $divisi,
+                            'supplier_id'       => $POlocal->supplier_id,
                             'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
                             'debit'             => 0,
                             'kredit'            => ($sumValue),
@@ -2177,7 +2179,7 @@ class JurnalUmum extends BaseController
                     'kredit'            => 0,
                     'valas'             => '20',
                     'kurs'              => 1,
-                    'keterangan'        => "Pembuatan Panjar " . $dataPanjar->no_panjar,
+                    'keterangan' => "Pembuatan Panjar " . $dataPanjar->no_panjar . " " . $dataPanjar->keterangan,
                     'id_inputer'        => session()->get("login")->user_id
                 );
                 $result[] = array(
@@ -2190,7 +2192,7 @@ class JurnalUmum extends BaseController
                     'kredit'            => $dataPanjar->total_panjar,
                     'valas'             => '20',
                     'kurs'              => 1,
-                    'keterangan'        => "Pembuatan Panjar " . $dataPanjar->no_panjar,
+                    'keterangan' => "Pembuatan Panjar " . $dataPanjar->no_panjar . " " . $dataPanjar->keterangan,
                     'id_inputer'        => session()->get("login")->user_id
                 );
 

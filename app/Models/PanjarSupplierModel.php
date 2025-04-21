@@ -26,6 +26,7 @@ class PanjarSupplierModel extends Model
         'akun_selisih',
         'type_panjar',
         'sisa_panjar',
+        'keterangan',
         'is_posted'
     ];
     // Dates
