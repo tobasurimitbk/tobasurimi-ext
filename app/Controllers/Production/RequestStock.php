@@ -322,7 +322,7 @@ class RequestStock extends BaseController
                     // var_dump($statusOUT, $statusIN);
                     // exit;
 
-                    if ($statusOUT && $statusIN) {
+                    if (!$statusOUT && !$statusIN) {
                         $data = [
                             "status"    => false,
                             "message"   => "Barang belum memiliki Akun COA",
