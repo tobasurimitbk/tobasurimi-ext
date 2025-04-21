@@ -78,9 +78,9 @@
                                     <td><?= $d['spp_no'] ?></td>
                                     <td><?= $d['kode_barang'] ?></td>
                                     <td><?= $d['barang_name'] ?></td>
-                                    <td><?= number_format($d['qty_po']) ?></td>
-                                    <td><?= number_format($d['qty_lpb']) ?></td>
-                                    <td><?= number_format($d['qty_lpb_konversi']) ?></td>
+                                    <td><?= floatval($d['qty_po']) ?></td>
+                                    <td><?= floatval($d['qty_lpb']) ?></td>
+                                    <td><?= floatval($d['qty_lpb_konversi']) ?></td>
                                     <td><?= number_format($d['harga'], 2) ?></td>
                                 </tr>
                             <?php endforeach; ?>
@@ -93,13 +93,13 @@
                                     </b>
                                 </td>
                                 <td>
-                                    <?= number_format($totalQtyPo) ?>
+                                    <?= floatval($totalQtyPo) ?>
                                 </td>
                                 <td>
-                                    <?= number_format($totalQtyDiterima) ?>
+                                    <?= floatval($totalQtyDiterima) ?>
                                 </td>
                                 <td>
-                                    <?= number_format($totalQtyDiterimaKonversi) ?>
+                                    <?= floatval($totalQtyDiterimaKonversi) ?>
                                 </td>
                                 <td>
                                     <?= number_format($totalHargaNumber, 2) ?>
