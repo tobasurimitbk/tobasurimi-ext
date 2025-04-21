@@ -73,6 +73,9 @@ class PanjarSupplier extends BaseController
                 "total_panjar" => [
                     "rules" => "required"
                 ],
+                "keterangan" => [
+                    "rules" => "required"
+                ],
             ];
             if (!$this->validate($rules)) {
                 $errorList = $this->validator->getErrors();
@@ -104,6 +107,7 @@ class PanjarSupplier extends BaseController
                 "total_panjar"  => repairDouble($this->request->getVar("total_panjar")),
                 "akun_kas"  => repairDouble($this->request->getVar("akun_kas")),
                 "akun_selisih"  => repairDouble($this->request->getVar("akun_selisih")),
+                "keterangan"  => $this->request->getVar("keterangan"),
             ];
 
             $insert = $this->panjarSupplierModel->insert($insertData);
@@ -156,6 +160,9 @@ class PanjarSupplier extends BaseController
                 "total_panjar" => [
                     "rules" => "required"
                 ],
+                "keterangan" => [
+                    "rules" => "required"
+                ],
             ];
 
             if (!$this->validate($rules)) {
@@ -195,6 +202,7 @@ class PanjarSupplier extends BaseController
                     "akun_selisih"  => $this->request->getVar("akun_selisih"),
                     "total_panjar"  => repairDouble($this->request->getVar("total_panjar")),
                     "type_panjar"     => $this->request->getVar("tipe_panjar"),
+                    "keterangan"     => $this->request->getVar("keterangan"),
                 ];
             }
 

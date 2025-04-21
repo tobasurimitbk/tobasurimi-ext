@@ -88,14 +88,19 @@
                             </div>
                         </div>
 
-
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control name" id="total_panjar" name="total_panjar" placeholder="Nama" oninput="preventNegativeInput(this)" onkeyup="this.value = greatFormatRupiah(this.value)">
-                                <label for="floatingInput">Total Panjar</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control keterangan" id="keterangan" name="keterangan">
+                                <label for="floatingInput">Keterangan Panjar</label>
                             </div>
                         </div>
 
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="total_panjar" name="total_panjar"  oninput="preventNegativeInput(this)" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <label for="floatingInput">Total Panjar</label>
+                            </div>
+                        </div>
 
                     </div>
                 </form>
@@ -400,6 +405,9 @@
             },
             akun_selisih: {
                 required: true
+            },
+            keterangan: {
+                required: true
             }
         },
         messages: {
@@ -426,8 +434,8 @@
             payment_date: {
                 required: "date have to be selected"
             },
-            name: {
-                required: "Nama wajib diisi"
+            keterangan: {
+                required: "Keterangan wajib diisi"
             }
         },
         errorElement: 'span',
@@ -659,6 +667,7 @@
                         $("#jenis_panjar").val(res.data.jenis_panjar).change();
                         $("#supplier_id").val(res.data.supplier_id);
                         $("#payment_date").val(res.data.payment_date);
+                        $("#keterangan").val(res.data.keterangan);
                         $("#total_panjar").val(formatRupiah(res.data.total_panjar));
                         $("#sisa_panjar").val(res.data.fax);
                         $(".add-modal").modal("show");
@@ -695,6 +704,7 @@
                             $("#tipe_supplier").prop("disabled", false);
                             $("#supplier_id").prop("disabled", false);
                             $("#total_panjar").prop("disabled", false);
+                            $("#keterangan").prop("disabled", false);
                             $(".delete-form").css('display', '');
                             $('#auto_generate').css('display', '');
                         }
@@ -759,6 +769,8 @@
             
             // Reset format Rupiah jika ada
             $('#total_panjar').val('');
+
+            $('#keterangan').val('');
             
             // Reset checkbox generate
             $('#auto_generate').prop('checked', false);

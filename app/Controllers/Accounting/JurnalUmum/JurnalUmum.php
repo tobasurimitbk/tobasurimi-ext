@@ -1855,6 +1855,7 @@ class JurnalUmum extends BaseController
                             'id_coa'            => $POlocal->akun_kas == 0 || $POlocal->akun_kas == NULL ? $UtangAR : $POlocal->akun_kas,
                             'company_id'        => $POlocal->company_id,
                             'divisi_id'         => $divisi,
+                            'supplier_id'       => $POlocal->supplier_id,
                             'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
                             'debit'             => ($sumValue),
                             'kredit'            => 0,
@@ -1868,6 +1869,7 @@ class JurnalUmum extends BaseController
                             'id_coa'            => $POlocal->akun_selisih,
                             'company_id'        => $POlocal->company_id,
                             'divisi_id'         => $divisi,
+                            'supplier_id'       => $POlocal->supplier_id,
                             'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
                             'debit'             => 0,
                             'kredit'            => ($sumValue),
@@ -2177,7 +2179,7 @@ class JurnalUmum extends BaseController
                     'kredit'            => 0,
                     'valas'             => '20',
                     'kurs'              => 1,
-                    'keterangan'        => "Pembuatan Panjar " . $dataPanjar->no_panjar,
+                    'keterangan' => "Pembuatan Panjar " . $dataPanjar->no_panjar . " " . $dataPanjar->keterangan,
                     'id_inputer'        => session()->get("login")->user_id
                 );
                 $result[] = array(
@@ -2190,7 +2192,7 @@ class JurnalUmum extends BaseController
                     'kredit'            => $dataPanjar->total_panjar,
                     'valas'             => '20',
                     'kurs'              => 1,
-                    'keterangan'        => "Pembuatan Panjar " . $dataPanjar->no_panjar,
+                    'keterangan' => "Pembuatan Panjar " . $dataPanjar->no_panjar . " " . $dataPanjar->keterangan,
                     'id_inputer'        => session()->get("login")->user_id
                 );
 
@@ -2804,5 +2806,56 @@ class JurnalUmum extends BaseController
             \var_dump($e->getMessage(), $e->getLine());
             return false;
         }
+    }
+
+    public function fix(){
+        $data = $this->transaksiJurnalModel->select('
+            transaksi_jurnal.id as transaksi_jurnal_id,
+            transaksi_jurnal.total_debit as transaksi_jurnal_total_debit,
+            transaksi_jurnal.total_kredit as transaksi_jurnal_total_kredit,
+            rm_purchase_orders.id as rm_purchase_orders_id,
+            rm_purchase_orders.total_before_pph as rm_purchase_orders_total,
+            am_purchase_orders.id as am_purchase_orders_id,
+            am_purchase_orders.total as am_purchase_orders_total,
+            rm_import_pos.id as rm_import_pos_id,
+            rm_import_pos.total as rm_import_pos_total,
+        ')
+        // ->join('transaksi_jurnal', 'transaksi_jurnal.id = jurnal_umum.id_transaksi', 'left')
+        ->join('transaksi_pembelian', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left')
+        ->join('rm_purchase_orders', 'rm_purchase_orders.id = transaksi_pembelian.id_local_bb', 'left')
+        ->join('am_purchase_orders', 'am_purchase_orders.id = transaksi_pembelian.id_po_bp', 'left')
+        ->join('rm_import_pos', 'rm_import_pos.id = transaksi_pembelian.id_import_bb', 'left')
+        ->findAll();
+        // dd($data);
+
+        $datas = [];
+        foreach ($data as $key => $value) {
+            $expected = null;
+    
+            if ($value['rm_purchase_orders_id']) {
+                $expected = $value['rm_purchase_orders_total'];
+            } elseif ($value['am_purchase_orders_id']) {
+                $expected = $value['am_purchase_orders_total'];
+            } elseif ($value['rm_import_pos_id']) {
+                $expected = $value['rm_import_pos_total'];
+            }
+    
+            if ($expected !== null) {
+                // $needsUpdate = ($value['transaksi_jurnal_total_debit'] != $expected || $value['transaksi_jurnal_total_kredit'] != $expected);
+    
+                if (($value['transaksi_jurnal_total_debit'] != $expected || $value['transaksi_jurnal_total_kredit'] != $expected)) {
+                    // Update jurnal_umum
+                    // $this->jurnalUmumModel->update($value['jurnal_id'], [
+                    //     'debit'  => $expected,
+                    //     'kredit' => $expected,
+                    // ]);
+                    $datas[] = [
+                            'id'  => $value['transaksi_jurnal_id'],
+                            'expected'  => $expected
+                    ];
+                }
+            }
+        }
+        dd($datas);
     }
 }

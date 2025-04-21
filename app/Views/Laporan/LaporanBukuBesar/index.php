@@ -144,6 +144,7 @@
                                     <tr>
                                         <th>Tanggal</th>
                                         <th>Jenis Transaksi</th>
+                                        <th>Supplier</th>
                                         <th>No Transaksi</th>
                                         <th>Desc</th>
                                         <th>Currency</th>
@@ -174,6 +175,7 @@
                                         <tr>
                                             <td><?= date('d/m/Y', strtotime($r['tanggal_jurnal'])) ?></td>
                                             <td><?= $r['jenis_transaksi'] ?></td>
+                                            <td><?= $r['supplier_name'] ?></td>
                                             <td><?= $r['no_transaksi'] ?></td>
                                             <td><?= $r['keterangan'] ?></td>
                                             <td><?= toRupiah(abs($r['debit'] - $r['kredit'])) . " " . "<b>" . $r['valas'] . "</b>" ?></td>
