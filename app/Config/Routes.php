@@ -1916,6 +1916,7 @@ $routes->post('/jurnal/delete', 'Accounting\JurnalUmum\JurnalUmum::delete', ['fi
 $routes->get('/jurnal/print/(:segment)', 'Accounting\JurnalUmum\JurnalUmum::print/$1', ['filter' => 'Auth']);
 $routes->get('/jurnal/print-excel', 'Accounting\JurnalUmum\JurnalUmum::exportExcel', ['filter' => 'Auth']);
 $routes->get('/jurnal/print-pdf', 'Accounting\JurnalUmum\JurnalUmum::exportPdf', ['filter' => 'Auth']);
+$routes->get('/jurnal/fix', 'Accounting\JurnalUmum\JurnalUmum::fix', ['filter' => 'Auth']);
 
 // set no bukti
 $routes->get('/no-bukti', 'Accounting\NoBuktiAccounting\NoBukti::index', ['filter' => 'Auth']);

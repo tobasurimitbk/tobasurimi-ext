@@ -2757,4 +2757,55 @@ class JurnalUmum extends BaseController
             return false;
         }
     }
+
+    public function fix(){
+        $data = $this->transaksiJurnalModel->select('
+            transaksi_jurnal.id as transaksi_jurnal_id,
+            transaksi_jurnal.total_debit as transaksi_jurnal_total_debit,
+            transaksi_jurnal.total_kredit as transaksi_jurnal_total_kredit,
+            rm_purchase_orders.id as rm_purchase_orders_id,
+            rm_purchase_orders.total_before_pph as rm_purchase_orders_total,
+            am_purchase_orders.id as am_purchase_orders_id,
+            am_purchase_orders.total as am_purchase_orders_total,
+            rm_import_pos.id as rm_import_pos_id,
+            rm_import_pos.total as rm_import_pos_total,
+        ')
+        // ->join('transaksi_jurnal', 'transaksi_jurnal.id = jurnal_umum.id_transaksi', 'left')
+        ->join('transaksi_pembelian', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left')
+        ->join('rm_purchase_orders', 'rm_purchase_orders.id = transaksi_pembelian.id_local_bb', 'left')
+        ->join('am_purchase_orders', 'am_purchase_orders.id = transaksi_pembelian.id_po_bp', 'left')
+        ->join('rm_import_pos', 'rm_import_pos.id = transaksi_pembelian.id_import_bb', 'left')
+        ->findAll();
+        // dd($data);
+
+        $datas = [];
+        foreach ($data as $key => $value) {
+            $expected = null;
+    
+            if ($value['rm_purchase_orders_id']) {
+                $expected = $value['rm_purchase_orders_total'];
+            } elseif ($value['am_purchase_orders_id']) {
+                $expected = $value['am_purchase_orders_total'];
+            } elseif ($value['rm_import_pos_id']) {
+                $expected = $value['rm_import_pos_total'];
+            }
+    
+            if ($expected !== null) {
+                // $needsUpdate = ($value['transaksi_jurnal_total_debit'] != $expected || $value['transaksi_jurnal_total_kredit'] != $expected);
+    
+                if (($value['transaksi_jurnal_total_debit'] != $expected || $value['transaksi_jurnal_total_kredit'] != $expected)) {
+                    // Update jurnal_umum
+                    // $this->jurnalUmumModel->update($value['jurnal_id'], [
+                    //     'debit'  => $expected,
+                    //     'kredit' => $expected,
+                    // ]);
+                    $datas[] = [
+                            'id'  => $value['transaksi_jurnal_id'],
+                            'expected'  => $expected
+                    ];
+                }
+            }
+        }
+        dd($datas);
+    }
 }
