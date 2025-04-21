@@ -111,7 +111,7 @@
 
 
 <script>
-    let sort = "payment_no";
+    let sort = "no_pembayaran";
     let sortType = "desc";
     const csrfToken = '<?= csrf_token() ?>';
 
