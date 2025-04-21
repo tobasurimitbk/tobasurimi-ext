@@ -89,7 +89,6 @@ class BCPurchaseOrderModel extends Model
 
         $first = $this->find($bcPurchaseOrderID);
         $bcPenerimaanBarangIDArr = json_decode($first['multiple_lpb_id']);
-        $bcPurchaseOrderIDArr = json_decode($first['multiple_po_id']);
 
         if ($first['po_type'] == "LOKAL BAKU") {
             // PO LOKAL BAHAN BAKU
@@ -104,6 +103,7 @@ class BCPurchaseOrderModel extends Model
                 SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                 SUM(penerimaan_barang_detail.qty) AS qty_po,
                 penerimaan_barang_detail.barang_id,
+                penerimaan_barang_detail.spesifikasi_id,
                 rm_purchase_orders.po_no,
                 rm_purchase_orders.po_date,
                 rm_purchase_orders.total_before_pph as sub_total,
@@ -142,6 +142,7 @@ class BCPurchaseOrderModel extends Model
                 SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                 SUM(penerimaan_barang_detail.sub_total) AS sub_total,
                 penerimaan_barang_detail.barang_id,
+                penerimaan_barang_detail.spesifikasi_id,
                 am_purchase_orders.po_no,
                 am_purchase_orders.po_date,
                 purchase_requests.spp_no,
@@ -178,6 +179,7 @@ class BCPurchaseOrderModel extends Model
                 SUM(penerimaan_barang_detail.qty) AS qty_po,
                 SUM(penerimaan_barang_detail.sub_total) AS sub_total,
                 penerimaan_barang_detail.barang_id,
+                penerimaan_barang_detail.spesifikasi_id,
                 rm_import_pos.po_no,
                 rm_import_pos.po_date,
                 CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang_name,
@@ -212,6 +214,7 @@ class BCPurchaseOrderModel extends Model
                 SUM(penerimaan_barang_detail.qty) AS qty_po,
                 SUM(penerimaan_barang_detail.sub_total) AS sub_total,
                 penerimaan_barang_detail.barang_id,
+                penerimaan_barang_detail.spesifikasi_id,
                 am_purchase_orders.po_no,
                 am_purchase_orders.po_date,
                 CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang_name,
@@ -241,6 +244,7 @@ class BCPurchaseOrderModel extends Model
                 'penerimaan_barang_id' => $p['penerimaan_barang_id'],
                 'penerimaan_barang_detail_id' => $p['penerimaan_barang_detail_id'],
                 'barang1_id' => $p['barang_id'],
+                'spesifikasi_id' => $p['spesifikasi_id'],
                 'lpb_date' => date('d/m/Y', strtotime($p['lpb_date'])),
                 'lpb_no' => $p['no_penerimaan_barang'],
                 'spp_no' => isset($p['spp_no']) ? $p['spp_no'] : "",
