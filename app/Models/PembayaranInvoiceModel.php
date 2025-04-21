@@ -66,18 +66,18 @@ class PembayaranInvoiceModel extends Model
     {
 
         $availableSort = [
-            'no_pembayaran'     => 'pembayaran_invoice.no_pembayaran',
-            'tanggal'   => 'pembayaran_invoice.tanggal',
-            'type_invoice'  => 'pembayaran_invoice.type_invoice',
-            'createdAt'     => 'pembayaran_invoice.createdAt',
-            'updatedAt'     => 'pembayaran_invoice.updatedAt'
+            'no_pembayaran' => 'pembayaran_invoice.no_pembayaran',
+            'tanggal' => 'pembayaran_invoice.tanggal',
+            'type_invoice' => 'pembayaran_invoice.type_invoice',
+            'createdAt' => 'pembayaran_invoice.createdAt',
+            'updatedAt' => 'pembayaran_invoice.updatedAt'
         ];
 
+       
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'pembayaran_invoice.createdAt';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
-        $selectQry = "pembayaran_invoice.*";
+        $sort = $availableSort[$addCondition['sort'] ?? 'no_pembayaran'] ?? 'pembayaran_invoice.no_pembayaran';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'asc'] ?? 'ASC';     $selectQry = "pembayaran_invoice.*";
         $dataQry = $this
             ->select($selectQry)
             ->where($condition)
