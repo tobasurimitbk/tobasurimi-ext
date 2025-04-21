@@ -18,6 +18,7 @@ class JurnalUmumModel extends Model
         'id',
         'id_transaksi',
         'divisi_id',
+        'supplier_id',
         'company_id',
         'id_coa',
         'tanggal_jurnal',

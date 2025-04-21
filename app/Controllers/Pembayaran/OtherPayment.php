@@ -103,9 +103,9 @@ class OtherPayment extends BaseController
 
     public function createAction()
     {
-        $payload = $this->request->getJSON(true); // Ambil body JSON sebagai array
+        $payload = $this->request->getJSON(true);
 
-        $noPembayaran = $payload['no_pembayaran'];
+        $noPembayaran = $payload['no_pembayaran'];  
         $existing = $this->otherPaymentModel->where('no_pembayaran', $noPembayaran)->first();
 
         if ($existing !== null) {
@@ -115,27 +115,39 @@ class OtherPayment extends BaseController
                 'token' => csrf_hash()
             ]);
         }
-
+        
         $parentData = [
             'company_id'     => $this->this_company_id,
             'divisi_id'      => $payload['divisi_id'],
             'no_pembayaran'  => $payload['no_pembayaran'],
             'bayar_ke'       => $payload['bayar_ke'],
             'valas'          => $payload['valas'],
+            'jenis_pembayaran'          => $payload['jenis_pembayaran'],
             'akun_selisih'         => $payload['akun_selisih'],
+            'akun_selisih'     => ($payload['jenis_pembayaran'] === 'PUTIH') ? $payload['akun_selisih'] : null,
+            'akun_kas'         => ($payload['jenis_pembayaran'] === 'MERAH') ? $payload['akun_selisih'] : null,
         ];
 
         $parentId = $this->otherPaymentModel->insert($parentData);
 
         foreach ($payload['details'] as $detail) {
+
+            if ($payload['jenis_pembayaran'] === 'MERAH') {
+                $akunKas = $payload['akun_selisih'];
+                $akunSelisih = $detail['akun_kas'];
+            } else {
+                $akunKas = $detail['akun_kas'];
+                $akunSelisih = $payload['akun_selisih'];
+            }
+
             $detailData = [
                 'other_payment_id'     => $parentId,
                 'tanggal_pembayaran'   => date("Y-m-d", strtotime(str_replace("/", "-", $detail['tanggal']))),
                 'metode_pembayaran'    => $detail['metode_pembayaran'],
                 'nominal'              => str_replace(['.', ','], '', $detail['nominal_pembayaran']),
                 'pembayaran_oleh'      => $detail['pembayaran_oleh'],
-                'akun_kas'             => $detail['akun_kas'],
-                'akun_selisih'         =>  $payload['akun_selisih'],
+                'akun_kas'             => $akunKas,
+                'akun_selisih'         => $akunSelisih,
                 'keterangan'           => $detail['keterangan'] ?? null
             ];
 
@@ -171,7 +183,8 @@ class OtherPayment extends BaseController
             'no_pembayaran' => $payload['no_pembayaran'],
             'bayar_ke'      => $payload['bayar_ke'],
             'valas'         => $payload['valas'],
-            'akun_selisih'         => $payload['akun_selisih'],
+            'akun_selisih'     => ($payload['jenis_pembayaran'] === 'PUTIH') ? $payload['akun_selisih'] : null,
+            'akun_kas'         => ($payload['jenis_pembayaran'] === 'MERAH') ? $payload['akun_selisih'] : null,
         ];
         $this->otherPaymentModel->update($parentId, $parentData);
     
@@ -181,14 +194,23 @@ class OtherPayment extends BaseController
         $submittedDetailIds = [];
     
         foreach ($payload['details'] as $detail) {
+
+            if ($payload['jenis_pembayaran'] === 'MERAH') {
+                $akunKas = $payload['akun_selisih'];
+                $akunSelisih = $detail['akun_kas'];
+            } else {
+                $akunKas = $detail['akun_kas'];
+                $akunSelisih = $payload['akun_selisih'];
+            }
+
             $detailData = [
                 'other_payment_id'     => $parentId,
                 'tanggal_pembayaran'   => date("Y-m-d", strtotime(str_replace("/", "-", $detail['tanggal']))),
                 'metode_pembayaran'    => $detail['metode_pembayaran'],
                 'nominal'              => str_replace(['.', ','], '', $detail['nominal_pembayaran']),
                 'pembayaran_oleh'      => $detail['pembayaran_oleh'],
-                'akun_kas'             => $detail['akun_kas'],
-                'akun_selisih'         =>  $payload['akun_selisih'],
+                'akun_kas'             => $akunKas,
+                'akun_selisih'         => $akunSelisih,
                 'keterangan'           => $detail['keterangan'] ?? null
             ];
     
@@ -282,6 +304,8 @@ class OtherPayment extends BaseController
                     'bayar_ke' => $parentData['bayar_ke'],
                     'valas' => $parentData['valas'],
                     'akun_selisih' => $parentData['akun_selisih'],
+                    'akun_kas' => $parentData['akun_kas'],
+                    'jenis_pembayaran' => $parentData['jenis_pembayaran'],
                     'status_posting' => $parentData['status_posting'] ?? '0'
                 ],
                 'details' => $formattedDetails

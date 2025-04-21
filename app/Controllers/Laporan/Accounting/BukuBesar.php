@@ -110,11 +110,13 @@ class BukuBesar extends BaseController
                 ->select('
                     jurnal_umum.*, 
                     transaksi_jurnal.no_transaksi, 
+                    suppliers.name as supplier_name, 
                     transaksi_jurnal.id AS transaksi_jurnal_id, 
                     m_valas.value AS valas, 
                     m_jenis_transaksi.value AS jenis_transaksi
                 ')
                 ->join('transaksi_jurnal', 'transaksi_jurnal.id = jurnal_umum.id_transaksi', 'left')
+                ->join('suppliers', 'suppliers.id = jurnal_umum.supplier_id', 'left')
                 ->join('metadata AS m_valas', 'm_valas.id = jurnal_umum.valas', 'left')
                 ->join('metadata AS m_jenis_transaksi', 'm_jenis_transaksi.id = transaksi_jurnal.type_transaksi', 'left')
                 ->where('transaksi_jurnal.deleted_at', null)

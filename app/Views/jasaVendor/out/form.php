@@ -528,6 +528,10 @@
             warehouse_id: {
                 required: true
             },
+            type_pengambilan_stock: {
+                required: true
+
+            }
         },
         messages: {
             no_surat_jalan: {
@@ -544,6 +548,9 @@
             },
             warehouse_id: {
                 required: "Pilih Warehouse"
+            },
+            type_pengambilan_stock: {
+                required: "Pilih Tip[e Pengambilan Stock"
             },
         },
         errorElement: 'span',

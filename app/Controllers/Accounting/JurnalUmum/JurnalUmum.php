@@ -1818,7 +1818,7 @@ class JurnalUmum extends BaseController
                     'total_kredit' => $POlocal->amount,
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
-                    'no_bukti' => $no_transaksi_jurnal,
+                    'no_bukti' => $POlocal->payment_no,
                     'valas' => '30',
                     'exchange_rate' => 1,
                 );
@@ -1834,23 +1834,28 @@ class JurnalUmum extends BaseController
 
                     $sumValue = 0;
                     $dataPO = $this->localPOPaymentModel->asObject()
-                        ->select('local_po_payments.*, local_po_payment_details.*')
+                        ->select('local_po_payments.*, local_po_payment_details.*, suppliers.name as supplier_name')
                         ->join('local_po_payment_details', 'local_po_payment_details.local_po_payment_id = local_po_payments.id', 'left')
+                        ->join('suppliers', 'suppliers.id = local_po_payments.supplier_id', 'left')
                         ->where('local_po_payments.id', $payID)
                         ->where('local_po_payments.deletedAt', null)
                         ->where('local_po_payment_details.deletedAt', null)
                         ->where('local_po_payment_details.rm_purchase_order_id', $poId)
                         ->groupBy('local_po_payment_details.local_po_payment_id')
                         ->findAll();
-
+                        
                     foreach ($dataPO as $value) {
-                        $dataPO = str_replace(['[', ']', '"', "\\"], '', $value->multiple_po_no);
+                        
+                        $cleanedPO = str_replace(['[', ']', '"', "\\"], '', $value->multiple_po_no);
+                        $dataPO = $value->supplier_name . ' - ' . $cleanedPO;
+
                         $sumValue = $value->total;
                         $result[] = array(
                             'id_transaksi'      => $id_transaksi_jurnal,
                             'id_coa'            => $POlocal->akun_kas == 0 || $POlocal->akun_kas == NULL ? $UtangAR : $POlocal->akun_kas,
-                            'company_id'            => $POlocal->company_id,
+                            'company_id'        => $POlocal->company_id,
                             'divisi_id'         => $divisi,
+                            'supplier_id'       => $POlocal->supplier_id,
                             'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
                             'debit'             => ($sumValue),
                             'kredit'            => 0,
@@ -1862,8 +1867,9 @@ class JurnalUmum extends BaseController
                         $result[] = array(
                             'id_transaksi'      => $id_transaksi_jurnal,
                             'id_coa'            => $POlocal->akun_selisih,
-                            'company_id'            => $POlocal->company_id,
+                            'company_id'        => $POlocal->company_id,
                             'divisi_id'         => $divisi,
+                            'supplier_id'       => $POlocal->supplier_id,
                             'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
                             'debit'             => 0,
                             'kredit'            => ($sumValue),
@@ -2013,6 +2019,11 @@ class JurnalUmum extends BaseController
                     ->where('other_payment_id', $otherPayment->id)
                     ->findAll();
 
+                $totalNominal = array_reduce($detailPembayaran, function($carry, $item) {
+                    return $carry + floatval(str_replace([',', '.'], '', $item['nominal']));
+                }, 0);
+                $isFirstTransaction = true; 
+
                 foreach ($detailPembayaran as $detail) {
                     $nominal = floatval(str_replace([',', '.'], '', $detail['nominal']));
                     $tanggal = date('Y-m-d', strtotime(str_replace('/', '-', $detail['tanggal_pembayaran'])));
@@ -2036,35 +2047,74 @@ class JurnalUmum extends BaseController
 
                     // 2. Buat jurnal umum: kredit akun kas, debit akun selisih
                     $result = [];
-                    $result[] = array(
-                        'id_transaksi' => $id_transaksi_jurnal,
-                        'id_coa' => $detail['akun_kas'],
-                        'tanggal_jurnal' => $tanggal,
-                        'debit' => 0,
-                        'kredit' => $nominal,
-                        'valas' => $otherPayment->valas,
-                        'kurs' => $kursData,
-                        'company_id' => $otherPayment->company_id,
-                        'divisi_id' => $otherPayment->divisi_id,
-                        'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
-                        'id_inputer' => session()->get("login")->user_id
-                    );
+                    
+                    if ($otherPayment->jenis_pembayaran === 'PUTIH') {
+                      
+                        if ($isFirstTransaction) {
+                            $result[] = array(
+                                'id_transaksi' => $id_transaksi_jurnal,
+                                'id_coa' => $detail['akun_selisih'],
+                                'tanggal_jurnal' => $tanggal,
+                                'debit' => 0,
+                                'kredit' => $totalNominal, // Total semua nominal
+                                'valas' => $otherPayment->valas,
+                                'kurs' => $kursData,
+                                'company_id' => $otherPayment->company_id,
+                                'divisi_id' => $otherPayment->divisi_id,
+                                'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                                'id_inputer' => session()->get("login")->user_id
+                            );
+                        }
 
-                    $result[] = array(
-                        'id_transaksi' => $id_transaksi_jurnal,
-                        'id_coa' => $detail['akun_selisih'],
-                        'tanggal_jurnal' => $tanggal,
-                        'debit' => $nominal,
-                        'kredit' => 0,
-                        'valas' => $otherPayment->valas,
-                        'kurs' => $kursData,
-                        'company_id' => $otherPayment->company_id,
-                        'divisi_id' => $otherPayment->divisi_id,
-                        'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
-                        'id_inputer' => session()->get("login")->user_id
-                    );
+                        $result[] = array(
+                            'id_transaksi' => $id_transaksi_jurnal,
+                            'id_coa' => $detail['akun_kas'],
+                            'tanggal_jurnal' => $tanggal,
+                            'debit' => $nominal,
+                            'kredit' => 0,
+                            'valas' => $otherPayment->valas,
+                            'kurs' => $kursData,
+                            'company_id' => $otherPayment->company_id,
+                            'divisi_id' => $otherPayment->divisi_id,
+                            'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                            'id_inputer' => session()->get("login")->user_id
+                        );
 
+                    } else {
+                        if ($isFirstTransaction) {
+                            $result[] = array(
+                                'id_transaksi' => $id_transaksi_jurnal,
+                                'id_coa' => $detail['akun_kas'],
+                                'tanggal_jurnal' => $tanggal,
+                                'debit' => $totalNominal, // Total semua nominal
+                                'kredit' => 0,
+                                'valas' => $otherPayment->valas,
+                                'kurs' => $kursData,
+                                'company_id' => $otherPayment->company_id,
+                                'divisi_id' => $otherPayment->divisi_id,
+                                'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                                'id_inputer' => session()->get("login")->user_id
+                            );
+                        }
+
+                        $result[] = array(
+                            'id_transaksi' => $id_transaksi_jurnal,
+                            'id_coa' => $detail['akun_selisih'],
+                            'tanggal_jurnal' => $tanggal,
+                            'debit' => 0,
+                            'kredit' => $nominal,
+                            'valas' => $otherPayment->valas,
+                            'kurs' => $kursData,
+                            'company_id' => $otherPayment->company_id,
+                            'divisi_id' => $otherPayment->divisi_id,
+                            'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                            'id_inputer' => session()->get("login")->user_id
+                        );
+
+                    }
+                   
                     $this->jurnalUmumModel->insertJurnalBatch($result);
+                    $isFirstTransaction = false;
                 }
             }
 
@@ -2129,7 +2179,7 @@ class JurnalUmum extends BaseController
                     'kredit'            => 0,
                     'valas'             => '20',
                     'kurs'              => 1,
-                    'keterangan'        => "Pembuatan Panjar " . $dataPanjar->no_panjar,
+                    'keterangan' => "Pembuatan Panjar " . $dataPanjar->no_panjar . " " . $dataPanjar->keterangan,
                     'id_inputer'        => session()->get("login")->user_id
                 );
                 $result[] = array(
@@ -2142,7 +2192,7 @@ class JurnalUmum extends BaseController
                     'kredit'            => $dataPanjar->total_panjar,
                     'valas'             => '20',
                     'kurs'              => 1,
-                    'keterangan'        => "Pembuatan Panjar " . $dataPanjar->no_panjar,
+                    'keterangan' => "Pembuatan Panjar " . $dataPanjar->no_panjar . " " . $dataPanjar->keterangan,
                     'id_inputer'        => session()->get("login")->user_id
                 );
 
