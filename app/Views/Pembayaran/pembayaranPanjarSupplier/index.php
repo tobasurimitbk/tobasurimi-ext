@@ -21,7 +21,7 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> <span id="form-title">Panjar & Pinjaman Supplier</span></h5>
+                <h5 class="modal-title"><label class="title-name"></label> <span id="form-title">Panjar Supplier</span></h5>
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
@@ -135,7 +135,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Panjar Supplier</h1>
+        <h1>Panjar & Pinjaman Supplier</h1>
         <button class="btn btn-show-form btn-add float-right" id="btn-display-modal">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </button>
