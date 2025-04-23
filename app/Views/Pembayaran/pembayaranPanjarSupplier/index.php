@@ -182,7 +182,7 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSort('no_panjar')">No. Panjar</th>
-                                <th onclick="changeSort('jenis_panjar')">Panjar</th>
+                                <th onclick="changeSort('jenis_panjar')">Jenis</th>
                                 <th onclick="changeSort('supplier_id')">Supplier</th>
                                 <th>Akun Kas</th>
                                 <th>Akun Selisih</th>
