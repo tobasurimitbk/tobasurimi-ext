@@ -19,11 +19,13 @@ class PinjamanSupplierModel extends Model
         'company_id',
         'no_pinjaman',
         'supplier_id',
+        'keterangan',
         'payment_date',
         'total_pinjaman',
         'akun_kas',
         'akun_selisih',
         'sisa_pinjaman',
+        'type_pinjaman',
         'is_posted'
     ];
     // Dates
@@ -138,7 +140,7 @@ class PinjamanSupplierModel extends Model
     //get pinjaman id not use array
     public function getPinjamanSupplierbyID($id)
     {
-        $selectQry = "pinjaman_supplier.*,type,name, akun_kas.id as akun_kas, akun_kas.nama_sub as akun_kas_name, akun_selisih.id as akun_selisih, akun_selisih.nama_sub as akun_selisih_name";
+        $selectQry = "pinjaman_supplier.*, type, name, akun_kas.id as akun_kas, akun_kas.nama_sub as akun_kas_name, akun_selisih.id as akun_selisih, akun_selisih.nama_sub as akun_selisih_name";
         $pinjamanSupplierData = $this->asObject()
             ->select($selectQry)
             ->join('sub_akuns AS akun_kas', 'pinjaman_supplier.akun_kas = akun_kas.id', 'left')

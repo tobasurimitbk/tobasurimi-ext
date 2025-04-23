@@ -5,6 +5,7 @@ namespace App\Controllers\Pembayaran;
 use App\Controllers\BaseController;
 use App\Models\PanjarSupplierModel;
 use App\Models\SupplierModel;
+use App\Models\PinjamanSupplierModel;
 use App\Models\LocalPOPaymentPanjarModel;
 use App\Models\Sub_AkunsModel;
 use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
@@ -16,6 +17,7 @@ class PanjarSupplier extends BaseController
     protected $this_company_id;
 
     protected $panjarSupplierModel;
+    protected $pinjamanSupplierModel;
     protected $jurnalController;
     protected $supplierModel;
 
@@ -25,6 +27,7 @@ class PanjarSupplier extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->panjarSupplierModel = new PanjarSupplierModel();
+        $this->pinjamanSupplierModel = new PinjamanSupplierModel();
         $this->supplierModel = new SupplierModel();
         $this->jurnalController = new JurnalUmum();
         $this->localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
@@ -102,7 +105,7 @@ class PanjarSupplier extends BaseController
                 "supplier_id"   => $this->request->getVar('supplier_id'),
                 "jenis_panjar"   => $this->request->getVar('jenis_panjar'),
                 "no_panjar"     => $this->request->getPost("no_panjar"),
-                "type_panjar"     => $this->request->getVar("tipe_panjar"),
+                "type_panjar"     => $this->request->getVar("tipe"),
                 "payment_date"  => $this->request->getVar("payment_date"),
                 "total_panjar"  => repairDouble($this->request->getVar("total_panjar")),
                 "akun_kas"  => repairDouble($this->request->getVar("akun_kas")),
@@ -201,7 +204,7 @@ class PanjarSupplier extends BaseController
                     "akun_kas"  => $this->request->getVar("akun_kas"),
                     "akun_selisih"  => $this->request->getVar("akun_selisih"),
                     "total_panjar"  => repairDouble($this->request->getVar("total_panjar")),
-                    "type_panjar"     => $this->request->getVar("tipe_panjar"),
+                    "type_panjar"     => $this->request->getVar("tipe"),
                     "keterangan"     => $this->request->getVar("keterangan"),
                 ];
             }
@@ -291,73 +294,122 @@ class PanjarSupplier extends BaseController
         $payload = [
             "pageSize"      => $this->request->getGet("length"),
             "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search"        => $this->request->getGet("search"),
+            "search"        => $this->request->getGet("search")['value'] ?? $this->request->getGet("search"),
             "panjar_status" => $this->request->getVar("panjar_status"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
+            "sort"          => $this->request->getGet("order")[0]['column'] ?? $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("order")[0]['dir'] ?? $this->request->getGet("sortType"),
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
-
         ];
-
+    
         $addCondition = [
-            "search"    => $this->request->getGet("search"),
-            "sort"      => $this->request->getGet("sort"),
-            "sortType"  => $this->request->getGet("sortType"),
-            "panjar_status" => $this->request->getVar("panjar_status"),
-            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "search"        => $payload['search'],
+            "sort"          => $payload['sort'],
+            "sortType"      => $payload['sortType'],
+            "panjar_status" => $payload['panjar_status'],
+            "dateStart"     => $payload['dateStart'],
+            "dateEnd"       => $payload['dateEnd'],
         ];
-
-        $condition = [
+    
+        $conditionPanjar = [
             'panjar_supplier.company_id' => $this->this_company_id,
             'panjar_supplier.deletedAt' => null
-
         ];
 
-        $limit = $this->request->getGet("length");
+        $conditionPinjaman = [
+            'pinjaman_supplier.company_id' => $this->this_company_id,
+            'pinjaman_supplier.deletedAt' => null
+        ];
+    
+        $limit = $payload["pageSize"];
         $offset = $this->request->getGet("start");
-        $supplierData = $this->panjarSupplierModel->getPanjarSupplierList($addCondition, $condition, $limit, $offset);
+    
+        // Ambil data dari kedua model
+        $pinjamanData = $this->pinjamanSupplierModel->getPinjamanSupplierList($addCondition, $conditionPinjaman, $limit, $offset);
+        $panjarData = $this->panjarSupplierModel->getPanjarSupplierList($addCondition, $conditionPanjar, $limit, $offset);
+    
         $dataSupplier = [];
-
-        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-
-        foreach ($supplierData['data'] as $data) {
-
+    
+        // Proses data panjar
+        foreach ($panjarData['data'] as $data) {
             $bayar_panjar = $this->localPOPaymentPanjarModel
                 ->where('panjar_id', $data->id)
                 ->findAll();
-
+    
             $total_bayar_panjar = 0;
-
             foreach ($bayar_panjar as $b) {
                 $total_bayar_panjar += $b['bayar_panjar'];
             }
-
-            array_push($dataSupplier, [
-                "no"            => $no++,
+    
+            $dataSupplier[] = [
                 "id"            => encrypt($data->id),
                 "no_panjar"     => $data->no_panjar,
-                "jenis_panjar"     => str_replace('_', ' ', $data->jenis_panjar),
+                "jenis_panjar"  => str_replace('_', ' ', $data->jenis_panjar ?? 'PANJAR'),
                 "supplier"      => $data->name,
                 "akun_kas"      => $data->akun_kas,
                 "akun_selisih"  => $data->akun_selisih,
-                "akun_selisih_nama"  => $data->akun_selisih_name,
-                "akun_kas_nama"  => $data->akun_kas_name,
+                "akun_selisih_nama" => $data->akun_selisih_name,
+                "akun_kas_nama" => $data->akun_kas_name,
                 "payment_date"  => date('d/m/Y', strtotime($data->payment_date)),
                 "total_panjar"  => number_format($data->total_panjar, 2),
                 "sisa_panjar"   => number_format(($data->total_panjar) - $total_bayar_panjar, 2),
-                "is_posted"     => $data->is_posted
-            ]);
+                "is_posted"     => $data->is_posted,
+                "keterangan"     => $data->keterangan,
+                "type"          => 'panjar' // Tambahkan identifier
+            ];
         }
+    
+        // Proses data pinjaman (disesuaikan dengan struktur panjar)
+        foreach ($pinjamanData['data'] as $data) {
+            // Hitung total bayar pinjaman jika ada model pembayaran pinjaman
+            $total_bayar_pinjaman = 0; // Anda perlu menyesuaikan ini dengan model pembayaran pinjaman
+            
+            $dataSupplier[] = [
+                "id"            => encrypt($data->id),
+                "no_panjar"     => $data->no_pinjaman ?? '-',
+                "jenis_panjar"  => 'PINJAMAN',
+                "supplier"      => $data->name,
+                "akun_kas"      => $data->akun_kas ?? null,
+                "akun_selisih"  => $data->akun_selisih ?? null,
+                "akun_selisih_nama" => $data->akun_selisih_name ?? '-',
+                "akun_kas_nama" => $data->akun_kas_name ?? '-',
+                "payment_date"  => date('d/m/Y', strtotime($data->payment_date)),
+                "total_panjar"  => number_format($data->total_pinjaman ?? 0, 2),
+                "sisa_panjar"   => number_format(($data->total_pinjaman ?? 0) - $total_bayar_pinjaman, 2),
+                "is_posted"     => $data->is_posted,
+                "keterangan"     => $data->keterangan,
+                "type"          => 'pinjaman' // Tambahkan identifier
+            ];
+        }
+
+        // Gabungkan total data
+        $totalData = $pinjamanData['totalData'] + $panjarData['totalData'];
+        $totalFilteredData = $pinjamanData['totalFilteredData'] + $panjarData['totalFilteredData'];
+    
+        // Urutkan data gabungan berdasarkan payment_date DESC (default)
+        usort($dataSupplier, function($a, $b) {
+            $dateA = strtotime(str_replace('/', '-', $a['payment_date']));
+            $dateB = strtotime(str_replace('/', '-', $b['payment_date']));
+            return $dateB - $dateA;
+        });
+    
+        // Potong data sesuai pagination
+        $paginatedData = array_slice($dataSupplier, $offset, $limit);
+
+        // TAMBAHKAN NOMOR URUT SETELAH SORTING DAN PAGINATION
+        $startNumber = $offset + 1;
+        foreach ($paginatedData as $key => &$item) {
+            $item['no'] = $startNumber + $key;
+        }
+
         $data = [
             "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $supplierData['totalData'],
-            "recordsFiltered"   => $supplierData['totalFilteredData'],
-            "data"              => $dataSupplier,
+            "recordsTotal"      => $totalData,
+            "recordsFiltered"   => $totalFilteredData,
+            "data"              => $paginatedData,
             "payload"           => $payload
         ];
+        
         echo json_encode($data);
         return;
     }
