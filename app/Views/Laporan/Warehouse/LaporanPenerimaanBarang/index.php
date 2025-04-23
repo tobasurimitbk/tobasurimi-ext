@@ -26,8 +26,8 @@
                 <div class="col-md-4">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_bc_type" name="filter_bc_type" id="filter_bc_type">
-                            <option value="all" data-code="">All</option>
-                            <option selected value="BC 2.3" data-code="">BC 2.3</option>
+                            <option selected value="all" data-code="">All</option>
+                            <option value="BC 2.3" data-code="">BC 2.3</option>
                             <option value="BC 2.7" data-code="">BC 2.7</option>
                             <option value="BC 4.0" data-code="">BC 4.0</option>
                             <option value="PPB KB" data-code="">PPB KB</option>
@@ -281,10 +281,14 @@
         table.ajax.reload();
     });
 
-    $('.filter_bc_type, .filter_divisi, .filter_supplier, .filter_barang').select2({
-        placeholder: "",
+    $('.filter_divisi, .filter_supplier, .filter_barang').select2({
         theme: "bootstrap-5",
         allowClear: true
+    })
+
+    $('.filter_bc_type').select2({
+        theme: "bootstrap-5",
+        allowClear: false
     })
 
     $('.filter_bc_type, .filter_divisi, .filter_supplier, .filter_barang')
