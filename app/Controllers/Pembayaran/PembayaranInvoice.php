@@ -1063,8 +1063,6 @@ class PembayaranInvoice extends BaseController
                         'keterangan' => $l->keterangan,
                         'akun_kredit' => $l->akun_kredit,
                         'akun_debit' => $l->akun_debit,
-                        'keterangan_pajak' => $l->keterangan_pajak,
-                        'nominal_pajak' => $l->nominal_pajak
                     ]);
 
                     $this->salesOrderReturnModel->update($l->sales_order_invoice_id, [
@@ -1130,7 +1128,7 @@ class PembayaranInvoice extends BaseController
             // Hitung total pembayaran kumulatif
             $updatedTotalBayar = $previousTotalBayar + $newPayment;
 
-            $listBarang = collect(json_decode($_POST['list_barang']));
+            $listBarang = json_decode($_POST['list_barang']);
 
             $isImport = array_reduce($listBarang, function ($carry, $item) {
                 return $carry && isset($item->document_type) && stripos($item->document_type, 'import') !== false;
@@ -1166,7 +1164,6 @@ class PembayaranInvoice extends BaseController
                     'qty' => $l->qty_invoice,
                     'harga_satuan' => $l->harga_barang_invoice,
                     'harga_total' => $l->amount_invoice,
-                    'nominal_pajak' => $l->nominal_pajak
                 ]);
             }
 
