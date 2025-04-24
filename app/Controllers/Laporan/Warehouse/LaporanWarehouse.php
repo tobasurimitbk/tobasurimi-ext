@@ -1116,9 +1116,9 @@ class LaporanWarehouse extends BaseController
 
     public function allLaporanPenerimaanBarang()
     {
-        $pageSize = $this->request->getGet("length");
-        $currentPage = ($this->request->getGet("start") / $this->request->getGet("length")) + 1;
-        $offset = $currentPage - 1;
+        $pageSize = intval($this->request->getGet("length")) ?: 10;
+        $offset = intval($this->request->getGet("start")) ?: 0;
+        $currentPage = intval($offset / $pageSize) + 1;
 
         $payload = [
             "pageSize"      => $pageSize,
@@ -1431,10 +1431,6 @@ class LaporanWarehouse extends BaseController
                 $filteredData = $dataAllPenerimaanBarang;
             }
 
-            var_dump($filteredData, count($filteredData), $bcPurchaseOrderBc40['totalData']);
-            die;
-
-
             $data = [
                 "draw"            => intval($this->request->getGet("draw")),
                 "recordsTotal"    => $bcPurchaseOrderBc40['totalData'],
@@ -1681,14 +1677,14 @@ class LaporanWarehouse extends BaseController
             $addCondition['filter_supplier'] = $filter_supplier;
             $addCondition['filter_barang'] = $filter_barang;
 
-            $penerimaanBarangMutasi = $this->penerimaanMutasiModel->getPenerimaanBarangListReportPPBKB($addCondition, $pageSize, $offset);
-            $penerimaanBarangGlobalMutasi = $this->penerimaanMutasiGlobalModel->getPenerimaanBarangListReportBc27($addCondition, $pageSize, $offset);
-            $bcPurchaseOrderBc40 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc40($addCondition, $pageSize, $offset);
-            $bcPurchaseOrderBc23 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc23($addCondition, $pageSize, $offset);
-            $penerimaanBarangNoPabean = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportNoPabean($addCondition, $pageSize, $offset);
+            $penerimaanBarangMutasi = $this->penerimaanMutasiModel->getPenerimaanBarangListReportPPBKB($addCondition);
+            $penerimaanBarangGlobalMutasi = $this->penerimaanMutasiGlobalModel->getPenerimaanBarangListReportBc27($addCondition);
+            $bcPurchaseOrderBc40 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc40($addCondition);
+            $bcPurchaseOrderBc23 = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportBc23($addCondition);
+            $penerimaanBarangNoPabean = $this->bcPurchaseOrderModel->getPenerimaanBarangListReportNoPabean($addCondition);
 
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+            // $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
             $dataAllPenerimaanBarang = [];
 
             foreach ($bcPurchaseOrderBc23['data'] as $data) {
@@ -1794,7 +1790,7 @@ class LaporanWarehouse extends BaseController
                 }
                 if (!empty($po)) {
                     array_push($dataAllPenerimaanBarang, [
-                        "no"                => $no++,
+                        // "no"                => $no++,
                         "bc_type"     => "BC 2.3",
                         "tanggal_bc"         => date('Y-m-d', strtotime($data->updatedAt)),
                         "no_daftar"    => $data->no_daftar,
@@ -1914,7 +1910,7 @@ class LaporanWarehouse extends BaseController
                 }
                 if (!empty($po)) {
                     array_push($dataAllPenerimaanBarang, [
-                        "no"                => $no++,
+                        // "no"                => $no++,
                         "bc_type"     => "BC 4.0",
                         "tanggal_bc"         =>  date('Y-m-d', strtotime($data->updatedAt)),
                         "no_daftar"    => $data->no_daftar,
@@ -1970,7 +1966,7 @@ class LaporanWarehouse extends BaseController
                 }
 
                 array_push($dataAllPenerimaanBarang, [
-                    "no"                => $no++,
+                    // "no"                => $no++,
                     "bc_type"     => "Non Pabean",
                     "tanggal_bc"         =>  $data->lpb_date,
                     "no_daftar"    => "-",
@@ -2027,7 +2023,7 @@ class LaporanWarehouse extends BaseController
                 }
 
                 array_push($dataAllPenerimaanBarang, [
-                    "no"                => $no++,
+                    // "no"                => $no++,
                     "bc_type"     => "BC 2.7",
                     "tanggal_bc"         =>  $data->tanggal_bc,
                     "no_daftar"    => $data->no_daftar,
@@ -2085,7 +2081,7 @@ class LaporanWarehouse extends BaseController
                 }
 
                 array_push($dataAllPenerimaanBarang, [
-                    "no"                => $no++,
+                    // "no"                => $no++,
                     "bc_type"     => "PPB KB",
                     "tanggal_bc"         =>  $data->tanggal_bc,
                     "no_daftar"    => $data->no_daftar,
@@ -2103,22 +2099,29 @@ class LaporanWarehouse extends BaseController
 
                 ]);
             }
+            // After merging all data, apply pagination
+            $pageSize = $payload["pageSize"];
+            $currentPage = $payload["currentPage"];
+            $start = ($currentPage - 1) * $pageSize;
 
-            $totalPenerimaanBarangMutasi = count($penerimaanBarangMutasi);
-            $totalPenerimaanBarangGlobalMutasi = count($penerimaanBarangGlobalMutasi);
-            $totalBcPurchaseOrderBc40 = count($bcPurchaseOrderBc40);
-            $totalBcPurchaseOrderBc23 = count($bcPurchaseOrderBc23);
-            $totalPenerimaanBarangNoPabean = count($penerimaanBarangNoPabean);
-            $recordsTotal = $totalPenerimaanBarangMutasi + $totalPenerimaanBarangGlobalMutasi + $totalBcPurchaseOrderBc40 + $totalBcPurchaseOrderBc23 + $totalPenerimaanBarangNoPabean;
-            $recordsFiltered = $recordsTotal;
+            // Slice the array to get the current page's data
+            $paginatedData = array_slice($dataAllPenerimaanBarang, $start, $pageSize);
+
+            // Recalculate the 'no' for each entry in the paginated data
+            foreach ($paginatedData as $index => &$item) {
+                $item['no'] = $start + $index + 1;
+            }
+
+            // Calculate total records
+            $recordsTotal = $penerimaanBarangMutasi['totalData'] + $penerimaanBarangGlobalMutasi['totalData'] + $bcPurchaseOrderBc40['totalData'] + $bcPurchaseOrderBc23['totalData'] + $penerimaanBarangNoPabean['totalData'];
+            $recordsFiltered = $penerimaanBarangMutasi['totalFilteredData'] + $penerimaanBarangGlobalMutasi['totalFilteredData'] + $bcPurchaseOrderBc40['totalFilteredData'] + $bcPurchaseOrderBc23['totalFilteredData'] + $penerimaanBarangNoPabean['totalFilteredData'];
 
             $data = [
                 "draw"            => intval($this->request->getGet("draw")),
                 "recordsTotal"    => $recordsTotal,
                 "recordsFiltered" => $recordsFiltered,
-                'data'      => $dataAllPenerimaanBarang,
-                "payload" => $payload,
-
+                'data'            => $paginatedData, // Use the paginated subset
+                "payload"         => $payload,
             ];
 
             echo json_encode($data);

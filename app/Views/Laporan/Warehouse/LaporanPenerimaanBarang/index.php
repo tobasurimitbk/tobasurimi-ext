@@ -153,6 +153,7 @@
                 data.filter_divisi = $(".filter_divisi").val();
                 data.filter_supplier = $(".filter_supplier").val();
                 data.filter_barang = $(".filter_barang").val();
+                console.log(data);
             },
         },
         // scrollX: true,
