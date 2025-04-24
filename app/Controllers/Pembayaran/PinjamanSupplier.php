@@ -165,12 +165,15 @@ class PinjamanSupplier extends BaseController
                 ]);
             }
 
+
             $insertData = [
 
                 "company_id"    => $this->this_company_id,
                 "supplier_id"   => $this->request->getVar('supplier_id'),
                 "no_pinjaman"     => $this->request->getPost("no_pinjaman"),
                 "payment_date"  => $this->request->getVar("payment_date"),
+                "type_pinjaman"  => $this->request->getVar("tipe"),
+                "keterangan"  => $this->request->getVar("keterangan"),
                 "total_pinjaman"  => repairDouble($this->request->getVar("total_pinjaman")),
                 "akun_kas"  => repairDouble($this->request->getVar("akun_kas")),
                 "akun_selisih"  => repairDouble($this->request->getVar("akun_selisih")),
@@ -262,6 +265,8 @@ class PinjamanSupplier extends BaseController
                     "akun_kas"  => $this->request->getVar("akun_kas"),
                     "akun_selisih"  => $this->request->getVar("akun_selisih"),
                     "payment_date"  => $this->request->getVar("payment_date"),
+                    "keterangan"  => $this->request->getVar("keterangan"),
+                    "type_pinjaman"  => $this->request->getVar("tipe"),
                     "total_pinjaman"  => repairDouble($this->request->getVar("total_pinjaman")),
                 ];
             }
