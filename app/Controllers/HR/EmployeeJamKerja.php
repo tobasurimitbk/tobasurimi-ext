@@ -37,7 +37,7 @@ class EmployeeJamKerja extends BaseController
         $data = [
             'detail' => [],
             'employee' => $employee,
-            'jamKerja' => $this->jamKerjaModel->where('company_id', $this->this_company_id)->findAll(),
+            'jamKerja' => $this->jamKerjaModel->where('company_id', $this->this_company_id)->where('divisi_id', $employee['division_id'])->findAll(),
         ];
 
         if (!empty($this->request->getGet('bulan'))) {

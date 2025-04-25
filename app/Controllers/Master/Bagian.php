@@ -23,7 +23,7 @@ class Bagian extends BaseController
         $divisiModel = new DivisisModel();
         $id = decrypt($id);
 
-        $res = $divisiModel->select('divisis.*,jam_kerja.jenis')->join('jam_kerja', 'jam_kerja.id = divisis.jam_kerja_id')->where('divisis.id', $id)->first();
+        $res = $divisiModel->select('divisis.*')->where('divisis.id', $id)->first();
         if ($res == null) {
             return redirect()->to('divisi');
         }

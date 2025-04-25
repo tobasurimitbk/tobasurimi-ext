@@ -82,8 +82,6 @@ class Divisi extends BaseController
 
         $res = $this->DivisisModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);
 
-        $number = $row * $rowperpage;
-
         $data = [];
 
         $bagianModel = new BagianModel();
@@ -96,7 +94,6 @@ class Divisi extends BaseController
                 "no" => ($row + $i + 1),
                 "id" => encrypt($res[$i]["id"]),
                 "divisi" => strtoupper($res[$i]["divisi"]),
-                "jamKerja" => strtoupper($res[$i]["jenis"]),
                 "totalBagian" => count($totalBagian) == 0 ? '-' : count($totalBagian) . " BAGIAN",
                 "komponenGaji" => count($totalKomponenGaji) == 0 ? 'BELUM DIATUR' : 'SUDAH DIATUR',
             );
@@ -120,9 +117,9 @@ class Divisi extends BaseController
                 "divisi" => [
                     "rules" => "required"
                 ],
-                "jam_kerja_id" => [
-                    "rules" => "required"
-                ]
+                // "jam_kerja_id" => [
+                //     "rules" => "required"
+                // ]
             ];
 
             if ($this->validate($rules)) {
@@ -205,9 +202,9 @@ class Divisi extends BaseController
                 "divisi" => [
                     "rules" => "required"
                 ],
-                "jam_kerja_id" => [
-                    "rules" => "required"
-                ]
+                // "jam_kerja_id" => [
+                //     "rules" => "required"
+                // ]
             ];
 
             if ($this->validate($rules)) {

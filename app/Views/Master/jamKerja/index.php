@@ -16,8 +16,8 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
-                <div class="col-md-2">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search mb-3" placeholder="Cari Jam Kerja" value="" />
+                <div class="col-md-3">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search mb-3" placeholder="Cari Data" value="" />
                 </div>
             </div>
             <div class="row">
@@ -26,6 +26,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="width: 10px;" class="sort">No</th>
+                                <th onclick="changeSort('divisi_id')" class="sort">Departemen</th>
                                 <th onclick="changeSort('jenis')" class="sort">Jenis Jam Kerja</th>
                                 <th style="width: 100px;">Action</th>
                             </tr>
@@ -42,10 +43,9 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "id";
+    let sort = "jam_kerja.divisi_id";
     let sortType = "desc";
     let trigger = true;
-    let year = 2023;
 
     var row = 0;
 
@@ -98,6 +98,9 @@
             className: "text-center",
             sortable: false,
             orderable: false,
+        }, {
+            data: "divisi",
+            className: "text-center"
         }, {
             data: "jenis",
             className: "text-center"

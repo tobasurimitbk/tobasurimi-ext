@@ -75,8 +75,8 @@
                             <th style="text-align: center;">Tanggal</th>
                             <th style="text-align: center;">Jam Kerja</th>
                             <th style="text-align: center;">Masuk</th>
-                            <th style="text-align: center;">Mulai Istirahat</th>
-                            <th style="text-align: center;">Selesai Istirahat</th>
+                            <!-- <th style="text-align: center;">Mulai Istirahat</th>
+                            <th style="text-align: center;">Selesai Istirahat</th> -->
                             <th style="text-align: center;">Pulang</th>
                             <th style="text-align: center; width:10px;">Action</th>
                         </tr>
@@ -89,8 +89,8 @@
                                 <td style="text-align: center;"><?= $d['tanggal_text'] ?></td>
                                 <td style="text-align: center;"><?= @$d['jam_kerja']['jenis'] ?></td>
                                 <td style="text-align: center;"><?= @$d['jam_kerja']['jam_masuk'] ?></td>
-                                <td style="text-align: center;"><?= @$d['jam_kerja']['jam_istirahat_mulai'] ?></td>
-                                <td style="text-align: center;"><?= @$d['jam_kerja']['jam_istirahat_selesai'] ?></td>
+                                <!-- <td style="text-align: center;"><?= @$d['jam_kerja']['jam_istirahat_mulai'] ?></td>
+                                <td style="text-align: center;"><?= @$d['jam_kerja']['jam_istirahat_selesai'] ?></td> -->
                                 <td style="text-align: center;"><?= @$d['jam_kerja']['jam_pulang'] ?></td>
                                 <td style="text-align: center;">
                                     <a href="#" data-jam_kerja_id="<?= @$d['jam_kerja']['jam_kerja_id'] ?>" data-tanggal_text="<?= $d['tanggal_text'] ?>" data-tanggal="<?= $d['tanggal'] ?>" data-toggle="tooltip" title="Atur Jam Kerja" class="btn btn-primary btn-update-modal">
@@ -141,7 +141,7 @@
                                     <option value=""></option>
                                     <?php foreach ($jamKerja as $j) : ?>
                                         <option value="<?= $j['id'] ?>">
-                                            <?= strtoupper($j['jenis']) ?>
+                                            <?= $j['jenis'] . " - " . $j['shift'] ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -156,8 +156,8 @@
                                 <th style="text-align: center; width:10px;">No</th>
                                 <th style="text-align: center;">Hari</th>
                                 <th style="text-align: center;">Masuk</th>
-                                <th style="text-align: center;">Mulai Istirahat</th>
-                                <th style="text-align: center;">Selesai Istirahat</th>
+                                <!-- <th style="text-align: center;">Mulai Istirahat</th>
+                                <th style="text-align: center;">Selesai Istirahat</th> -->
                                 <th style="text-align: center;">Pulang</th>
                             </tr>
                         </thead>
@@ -339,8 +339,8 @@
                         ));
                         newRow.append($('<td style="text-align: center;">').text(v.hari));
                         newRow.append($('<td style="text-align: center;">').text(v.jam_masuk));
-                        newRow.append($('<td style="text-align: center;">').text(v.jam_istirahat_mulai));
-                        newRow.append($('<td style="text-align: center;">').text(v.jam_istirahat_selesai));
+                        // newRow.append($('<td style="text-align: center;">').text(v.jam_istirahat_mulai));
+                        // newRow.append($('<td style="text-align: center;">').text(v.jam_istirahat_selesai));
                         newRow.append($('<td style="text-align: center;">').text(v.jam_pulang));
                         table.find('tbody').append(newRow);
                     });

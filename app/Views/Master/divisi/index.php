@@ -13,13 +13,13 @@
                     <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control divisi" placeholder="Masukkan Divisi" id="divisi" name="divisi">
                                 <label for="floatingInput">Departemen</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <!-- <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select" name="jam_kerja_id" required>
                                     <option value="">PILIH JAM KERJA</option>
@@ -32,7 +32,7 @@
                                 </select>
                                 <label for="floatingInput">Pilih Jam Kerja</label>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                     <?php if ($isGajiPokok == null || $isCadangan == null) : ?>
                         <div class="alert alert-danger mt-2 mb-2" role="alert">
@@ -106,9 +106,9 @@
                             <tr>
                                 <th style="width: 10%;">No</th>
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
-                                <th onclick="changeSort('jam_kerja.jenis')" class="sort">Jam Kerja</th>
-                                <th class="sort">Komponen Gaji</th>
-                                <th class="sort">Total Bagian</th>
+                                <!-- <th onclick="changeSort('jam_kerja.jenis')" class="sort">Jam Kerja</th> -->
+                                <!-- <th class="sort">Komponen Gaji</th>
+                                <th class="sort">Total Bagian</th> -->
                                 <th class="sort" style="width: 100px;">Action</th>
                             </tr>
                         </thead>
@@ -167,39 +167,36 @@
             }, {
                 data: "divisi",
                 className: "text-center"
-            }, {
-                data: "jamKerja",
-                className: "text-center"
             },
-            {
-                data: "komponenGaji",
-                className: "text-center",
-                searchable: false,
-                sortable: false,
-                render: function(data, type, row) {
-                    let htmlRes = '';
+            // {
+            //     data: "komponenGaji",
+            //     className: "text-center",
+            //     searchable: false,
+            //     sortable: false,
+            //     render: function(data, type, row) {
+            //         let htmlRes = '';
 
-                    if (row.komponenGaji == "SUDAH DIATUR") {
-                        htmlRes += `
-                            <div class="text-success">
-                               <b>SUDAH DIATUR</b>
-                            </div>`
-                    } else {
-                        htmlRes += `
-                            <div class="text-danger">
-                               <b>BELUM DIATUR</b>
-                            </div>`
-                    }
+            //         if (row.komponenGaji == "SUDAH DIATUR") {
+            //             htmlRes += `
+            //                 <div class="text-success">
+            //                    <b>SUDAH DIATUR</b>
+            //                 </div>`
+            //         } else {
+            //             htmlRes += `
+            //                 <div class="text-danger">
+            //                    <b>BELUM DIATUR</b>
+            //                 </div>`
+            //         }
 
-                    return htmlRes;
-                }
-            },
-            {
-                data: "totalBagian",
-                className: "text-center",
-                searchable: false,
-                sortable: false,
-            },
+            //         return htmlRes;
+            //     }
+            // },
+            // {
+            //     data: "totalBagian",
+            //     className: "text-center",
+            //     searchable: false,
+            //     sortable: false,
+            // },
             {
                 data: "id",
                 className: "text-center actions",
