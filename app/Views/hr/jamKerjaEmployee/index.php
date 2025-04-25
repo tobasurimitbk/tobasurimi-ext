@@ -87,7 +87,7 @@
                             <tr style="color:whitesmoke;">
                                 <td style="text-align: center;"><?= $i++ ?></td>
                                 <td style="text-align: center;"><?= $d['tanggal_text'] ?></td>
-                                <td style="text-align: center;"><?= @$d['jam_kerja']['jenis'] ?></td>
+                                <td style="text-align: center;"><?= @$d['jam_kerja']['jenis'] . " - " . @$d['jam_kerja']['shift'] ?></td>
                                 <td style="text-align: center;"><?= @$d['jam_kerja']['jam_masuk'] ?></td>
                                 <!-- <td style="text-align: center;"><?= @$d['jam_kerja']['jam_istirahat_mulai'] ?></td>
                                 <td style="text-align: center;"><?= @$d['jam_kerja']['jam_istirahat_selesai'] ?></td> -->
