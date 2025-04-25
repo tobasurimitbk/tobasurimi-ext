@@ -80,7 +80,7 @@ class JamKerja extends BaseController
     {
         $modelMetaData = new MetadataModel();
         $divisiModel = new DivisisModel();
-        $shift = array("PAGI", "NORMAL");
+        $shift = array("PAGI", "NORMAL", "SIANG");
         foreach (range(1, 50) as $s) {
             array_push($shift, "SHIFT " . $s);
         }
@@ -161,7 +161,7 @@ class JamKerja extends BaseController
         $divisiModel = new DivisisModel();
 
         $id = decrypt($id);
-        $shift = array("PAGI", "NORMAL");
+        $shift = array("PAGI", "NORMAL", "SIANG");
         foreach (range(1, 50) as $s) {
             array_push($shift, "SHIFT " . $s);
         }
