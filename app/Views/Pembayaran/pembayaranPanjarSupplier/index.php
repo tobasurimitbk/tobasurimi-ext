@@ -1,123 +1,156 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
+<meta name="csrf-token" content="<?= csrf_hash() ?>">
 
-
-<div class="modal choice-modal" tabindex="-1">
-    <div class="modal-dialog modal-sm">
+<div class="modal add-modal" id="add_modal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 1200px">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Pilih Jenis Transaksi</h5>
-            </div>
-            <div class="modal-body text-center">
-                <button class="btn btn-primary btn-panjar mb-2" style="width: 200px;">Panjar Supplier</button><br>
-                <button class="btn btn-success btn-pinjaman" style="width: 200px;">Pinjaman Supplier</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<div class="modal add-modal" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> <span id="form-title">Panjar Supplier</span></h5>
+                <h5 class="modal-title"><label class="title-name"></label></h5>
             </div>
             <div class="modal-body">
-                <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" id="form-type" value="panjar"> <!-- Tambahkan ini -->
-                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id">
-                    <?= csrf_field() ?>
-                    
-                    <!-- Field-field yang sama -->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control name" id="no_transaksi" name="no_transaksi" placeholder="No Transaksi">
-                                    <label for="no_transaksi">No Transaksi</label>
+                <?= csrf_field() ?>
+                <form class="create-form" role="form" method="POST">
+                    <!-- Parent Form (Header) -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5>Informasi Panjar Dan Pinjaman</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <input type="text" style="display: none;" class="form-control hidden" name="id" id="id">
+
+                                <div class="col-md-6">
+                                    <div class="input-group input-group-password">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input autocomplete="one-time-code" type="text" class="form-control name" id="no_transaksi" name="no_transaksi" placeholder="No Transaksi">
+                                            <label for="no_transaksi">No Transaksi</label>
+                                        </div>
+                                        <div style="" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                            <input autocomplete="one-time-code" style="z-index: 5; margin-bottom: -8px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div style="" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 5; margin-bottom: -8px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select" name="jenis" id="jenis">
+                                            <option value="PUTIH">PUTIH</option>
+                                            <option value="MERAH">MERAH</option>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Jenis </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select tipe_supplier" name="tipe_supplier" id="tipe_supplier">
+                                            <option value=""></option>
+                                            <option value="INTERNASIONAL">INTERNASIONAL</option>
+                                            <option value="BAHAN PENOLONG">BAHAN PENOLONG</option>
+                                            <option value="BAHAN BAKU">BAHAN BAKU</option>
+                                        </select>
+                                        <label for="tipe_supplier">Tipe Supplier</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select supplier_id" name="supplier_id" id="supplier_id"></select>
+                                        <label for="supplier_id">Supplier</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="date" class="form-control name" id="payment_date" name="payment_date" placeholder="Tanggal">
-                                <label for="payment_date">Tanggal Transaksi</label>
-                            </div>
+                    <!-- Child Form (Details) -->
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5>Detail Panjar & Pinjaman</h5>
                         </div>
-
-                        <!-- Field-field spesifik akan ditampilkan berdasarkan pilihan -->
-                        <div class="col-md-6">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select jenis_panjar" name="jenis_panjar" id="jenis_panjar">
-                                        <option value=""></option>
-                                        <option value="PANJAR">PANJAR</option>
-                                        <option value="PANJAR_TB">PANJAR TB</option>
-                                    </select>
-                                    <label for="jenis_panjar">Jenis Panjar</label>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select" name="akun_kas" id="akun_kas" >
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Debit</label>
+                                    </div>
                                 </div>
-                        </div>
-
-                        <div class="col-md-6">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select tipe" name="tipe" id="tipe">
-                                        <option value=""></option>    
-                                        <option value="MERAH">Merah</option>
-                                        <option value="PUTIH">Putih</option>
-                                    </select>
-                                    <label for="tipe" id="tipe-label" data-panjar="Tipe Panjar" data-pinjaman="Tipe Pinjaman">Tipe Panjar</label>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select" name="akun_selisih" id="akun_selisih" >
+                                         </select>
+                                        <label for="floatingInput" style="z-index: 1;">Kredit</label>
+                                    </div>
                                 </div>
-                        </div>
-
-                        <!-- Field yang sama untuk kedua form -->
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select tipe_supplier" name="tipe_supplier" id="tipe_supplier">
-                                    <option value=""></option>
-                                    <option value="INTERNASIONAL">INTERNASIONAL</option>
-                                    <option value="BAHAN PENOLONG">BAHAN PENOLONG</option>
-                                    <option value="BAHAN BAKU">BAHAN BAKU</option>
-                                </select>
-                                <label for="tipe_supplier">Tipe Supplier</label>
                             </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select supplier_id" name="supplier_id" id="supplier_id"></select>
-                                <label for="supplier_id">Supplier</label>
+                            <div class="row">
+                               <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select jenis_transaksi" name="jenis_transaksi" id="jenis_transaksi">
+                                            <option value=""></option>
+                                            <option value="PANJAR">PANJAR</option>
+                                            <option value="PANJAR_TB">PANJAR TB</option>
+                                            <option value="PINJAMAN">PINJAMAN</option>
+                                        </select>
+                                        <label for="jenis_transaksi">Jenis Transaksi</label>
+                                    </div>
+                               </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" placeholder="Nominal Pembayaran">
+                                        <label for="floatingInput">Nominal Pembayaran</label>
+                                    </div>
+                                </div>
+                            </div>          
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group input-group-password">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Jatuh Tempo">
+                                            <label for="floatingInput">Tanggal Pembayaran</label>
+                                        </div>
+                                        <div class="input-group-prepend group-prepend-password align-items-center">
+                                            <i style="cursor: pointer; z-index: 99; margin-bottom: 6px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan" value="">
+                                        <label for="floatingInput">Keterangan</label>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <select class="form-select" name="akun_kas" id="akun_kas"></select>
-                                <label for="akun_kas" style="z-index: 1;">Debit (Opsional)</label>
+                            
+                            <div class="row">
+                                <div class="col-md-12 text-end">
+                                    <button type="button" class="btn btn-primary btn-add-detail">Tambah Detail</button>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <select class="form-select" name="akun_selisih" id="akun_selisih"></select>
-                                <label for="akun_selisih" style="z-index: 1;">Kredit</label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control keterangan" id="keterangan" name="keterangan">
-                                <label for="keterangan">Keterangan</label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control name" id="total" name="total" oninput="preventNegativeInput(this)" onkeyup="this.value = greatFormatRupiah(this.value)">
-                                <label for="total">Total</label>
+                            
+                            <!-- Table for showing added details -->
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <table class="table table-bordered" id="detail-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Tanggal</th>
+                                                <th>Jenis Transaksi</th>
+                                                <th>Nominal</th>
+                                                <th>Akun Debit</th>
+                                                <th>Akun Kredit</th>
+                                                <th>Keterangan</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Details will be added here dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -125,12 +158,12 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
-                <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
-                <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
+                <button type="submit" class="btn btn-submit-form">Simpan Semua</button>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Begin Page Content -->
 <section class="section">
@@ -181,14 +214,10 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="changeSort('no_panjar')">No. Panjar</th>
+                                <th onclick="changeSort('no_panjar')">No. Transaksi</th>
                                 <th onclick="changeSort('jenis_panjar')">Jenis</th>
                                 <th onclick="changeSort('supplier_id')">Supplier</th>
-                                <th>Akun Kas</th>
-                                <th>Akun Selisih</th>
-                                <th onclick="changeSort('payment_date')">Payment Date</th>
-                                <th onclick="changeSort('payment_amount')">Total Panjar</th>
-                                <th onclick="changeSort('payment_amt_left')">Sisa Panjar</th>
+                                <th onclick="changeSort('payment_date')">Tanggal Di Buat</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -263,6 +292,7 @@
     let sort = "no_panjar";
     let sortType = "desc";
     let trigger = true;
+    let details = [];
 
     const table = $('.dataTable').DataTable({
 
@@ -307,12 +337,12 @@
                 width: "5%"
             },
             {
-                data: "no_panjar",
+                data: "no_transaction",
                 className: "text-center",
                 // width: "10%"
             },
             {
-                data: "jenis_panjar",
+                data: "type",
                 className: "text-center"
             },
             {
@@ -320,23 +350,7 @@
                 className: "text-center"
             },
             {
-                data: "akun_kas_nama",
-                className: "text-center"
-            },
-            {
-                data: "akun_selisih_nama",
-                className: "text-center"
-            },
-            {
-                data: "payment_date",
-                className: "text-center"
-            },
-            {
-                data: "total_panjar",
-                className: "text-center"
-            },
-            {
-                data: "sisa_panjar",
+                data: "createdAt",
                 className: "text-center"
             },
             {
@@ -398,79 +412,73 @@
     // INIT VALIDATOR
     var validator = $(".create-form").validate({
         rules: {
-            total: {
-                required: true,
-            },
-            tipe: {
-                required: true,
-            },
-            jenis_panjar: {
-                required: true,
-            },
-            payment_date: {
+            no_transaksi: {
                 required: true
             },
-            name: {
+            jenis: {
                 required: true
             },
-            akun_kas: {
+            tipe_supplier: {
                 required: true
             },
-            akun_selisih: {
-                required: true
-            },
-            keterangan: {
+            supplier_id: {
                 required: true
             }
         },
         messages: {
-            akun_kas: {
-                required: "akun kas wajib diisi",
-
+            no_transaksi: {
+                required: "Nomor transaksi wajib diisi"
             },
-            akun_selisih: {
-                required: "akun selisih wajib diisi",
-
+            jenis: {
+                required: "Jenis (PUTIH/MERAH) wajib diisi"
             },
-            total: {
-                required: "total panjar wajib diisi",
-
+            tipe_supplier: {
+                required: "Tipe supplier wajib diisi"
             },
-            tipe: {
-                required: "tipe panjar wajib diisi",
-
-            },
-            jenis_panjar: {
-                required: "jenis panjar wajib diisi",
-
-            },
-            payment_date: {
-                required: "date have to be selected"
-            },
-            keterangan: {
-                required: "Keterangan wajib diisi"
+            supplier_id: {
+                required: "Supplier wajib dipilih"
             }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
         errorPlacement: function(error, element) {
             var elem = $(element);
+            // Handle Select2 elements
             if (elem.hasClass("select2-hidden-accessible")) {
-                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                element = elem.next().find(".select2-selection");
                 error.insertAfter(element);
-            } else {
+            } 
+            // Handle datepicker
+            else if (elem.hasClass("input-picker")) {
+                error.insertAfter(elem.closest('.input-group'));
+            }
+            // Handle other elements
+            else {
                 error.insertAfter(element);
             }
         },
         highlight: function(element) {
-            $(element).closest('.form-group').addClass('has-error');
-            $(element).addClass('select-class');
-
+            $(element).closest('.form-floating').addClass('has-error');
+            $(element).addClass('is-invalid');
+            
+            // Special handling for Select2
+            if ($(element).hasClass("select2-hidden-accessible")) {
+                $(element).next().find('.select2-selection').addClass('is-invalid');
+            }
         },
         unhighlight: function(element) {
-            $(element).closest('.form-group').removeClass('has-error');
-            $(element).removeClass('select-class');
+            $(element).closest('.form-floating').removeClass('has-error');
+            $(element).removeClass('is-invalid');
+            
+            // Special handling for Select2
+            if ($(element).hasClass("select2-hidden-accessible")) {
+                $(element).next().find('.select2-selection').removeClass('is-invalid');
+            }
         },
+        submitHandler: function(form) {
+            // This will be handled by our custom submit button click handler
+            return false;
+        }
     });
 
     function remove(id) {
@@ -586,8 +594,6 @@
     // HIDE MODAL
     $('.btn-discard').click(function() {
         // Reset form validation
-        validator.resetForm();
-        validator.reset();
 
         // Clear input fields
         $('.add-modal input').val('');
@@ -614,8 +620,14 @@
         dropdownParent: $(".add-modal .modal-content")
     });
 
-    $('#jenis_panjar').select2({
-        placeholder: "Pilih Jenis Panjar",
+    $('#jenis_transaksi').select2({
+        placeholder: "Pilih Jenis Transaksi",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
+    });
+
+    $('#jenis').select2({
+        placeholder: "Pilih Jenis",
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
     });
@@ -627,102 +639,115 @@
     });
 
 
-    $("#tipe_supplier, #supplier_id, #tipe, #jenis_panjar")
+    $("#tipe_supplier, #supplier_id, #tipe, #jenis_transaksi, #jenis")
         .parent('div')
         .find('label')
         .css('z-index', '1');
 
+    $("#tanggal").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true,
+            language: 'id', 
+            todayBtn: "linked"
+    }).on('changeDate', function(e) {
+            $(this).valid(); 
+    });
+
+            // Refresh details table
+    function refreshDetailsTable() {
+            const tbody = $('#detail-table tbody');
+            tbody.empty();
+            
+            details.forEach((detail, index) => {
+                tbody.append(`
+                    <tr data-detail-id="${detail.id || ''}">
+                        <td>${detail.tanggal}</td>
+                        <td>${detail.jenis_transaksi}</td>
+                        <td>${detail.nominal_pembayaran}</td>
+                        <td>${detail.akun_kas_name || detail.akun_kas}</td>
+                        <td>${detail.akun_selisih_name || detail.akun_selisih}</td>
+                        <td>${detail.keterangan}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm btn-remove-detail" data-index="${index}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            });
+    }
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        const isPinjaman = data.type === 'pinjaman';
+        const modal = $(".add-modal");
         
-        // Set form type dan title berdasarkan data
-        $("#form-type").val(isPinjaman ? "pinjaman" : "panjar");
-        $("#form-title").text(isPinjaman ? "Pinjaman Supplier" : "Panjar Supplier");
+        modal.modal("show");
         
-        // Tampilkan/sembunyikan field sesuai jenis
-        if (isPinjaman) {
-            $(".jenis_panjar").closest('.col-md-6').hide();
-            $("#tipe-label").text($("#tipe-label").data('pinjaman'));
-            $(".create-form").attr("action", "pinjaman-supplier/update");
-        } else {
-            $(".jenis_panjar").closest('.col-md-6').show();
-            $("#tipe-label").text($("#tipe-label").data('panjar'));
-            $(".create-form").attr("action", "panjar-supplier/update");
-        }
-        
-        // Tampilkan modal SEBELUM AJAX
-        $(".add-modal").modal("show");
-        
-        // AJAX untuk ambil detail
+        // AJAX to get details
         $.ajax({
-            url: (isPinjaman ? "pinjaman-supplier/id/" : "panjar-supplier/id/") + data.id,
+            url: "panjar-supplier/id/" + data.id,
             method: "GET",
             dataType: "json",
             success: function(res) {
-                console.log(res)
                 if (res.status) {
-                    // Isi data umum
-                    $("#id").val(res.data.id);
-                    $("#no_transaksi").val(isPinjaman ? res.data.no_pinjaman : res.data.no_panjar);
-                    $("#payment_date").val(res.data.payment_date);
-                    $("#keterangan").val(res.data.keterangan || "");
-                    $("#total").val(formatRupiah(isPinjaman ? res.data.total_pinjaman : res.data.total_panjar));
-                    $("#tipe_supplier").val(res.data.type || "").change();
-                    $("#tipe").val(isPinjaman ? res.data.type_pinjaman : res.data.type_panjar).change();
-                    // Handle supplier
-                    if (res.supplier) {
-                        appendDropdownSupplier(res.supplier);
-                        $("#supplier_id").val(res.data.supplier_id).trigger('change');
+                    // Restore original form
+                    modal.find('.modal-body').html($('#modal-template').html());
+                    
+                    // Clear existing details
+                    details = [];
+                    
+                    // Populate parent form
+                    $('#id').val(res.data.transaction.id);
+                    $('#no_transaksi').val(res.data.transaction.no_transaction);
+                    $('#jenis').val(res.data.transaction.type).trigger('change');
+                    console.log($('#jenis').val())
+                    $('#tipe_supplier').val(res.data.supplier?.type || '').trigger('change');
+                    
+                    // Populate supplier dropdown
+                    if (res.data.supplier) {
+                        const supplierOption = `<option value="${res.data.supplier.id}" selected>${res.data.supplier.name}</option>`;
+                        $('#supplier_id').html(supplierOption);
                     }
                     
-                    // Handle dropdown khusus
-                    if (!isPinjaman) {
-                        $("#jenis_panjar").val(res.data.jenis_panjar || "").change();
-                    }
+                    // Process and add each detail to the details array
+                    res.data.details.forEach(detail => {
+                        const newDetail = {
+                            id: detail.id, // Preserve original ID for updates
+                            tanggal: detail.payment_date,
+                            jenis_transaksi: detail.jenis_transaksi,
+                            nominal_pembayaran: greatFormatRupiah(detail.nominal_pembayaran),
+                            akun_kas: detail.akun_kas.id,
+                            akun_kas_name: detail.akun_kas.name || $('#akun_kas option[value="'+detail.akun_kas+'"]').text(),
+                            akun_selisih: detail.akun_selisih.id,
+                            akun_selisih_name: detail.akun_selisih.name || $('#akun_selisih option[value="'+detail.akun_selisih+'"]').text(),
+                            keterangan: detail.keterangan,
+                        };
+                        details.push(newDetail);
+                    });
                     
-                    // Handle akun kas dan selisih
-                    if (res.data.akun_kas) {
-                        const akunKasText = res.data.akun_kas_name || (isPinjaman ? "Kas Pinjaman" : "Kas Panjar");
-                        $("#akun_kas").append(new Option(akunKasText, res.data.akun_kas, true, true)).trigger('change');
-                    }
+                    // Refresh the table
+                    refreshDetailsTable();
                     
-                    if (res.data.akun_selisih) {
-                        const akunSelisihText = res.data.akun_selisih_name || "Akun Selisih";
-                        $("#akun_selisih").append(new Option(akunSelisihText, res.data.akun_selisih, true, true)).trigger('change');
-                    }
-                    
-                    if (res.data.no_panjar || res.data.no_pinjaman) {
-                        $('#auto_generate').prop('checked', false).prop('disabled', true);
-                    } else {
-                        $('#auto_generate').prop('checked', true).prop('disabled', false);
-                        if ($("#id").val() === '' && $('#auto_generate').is(':checked')) {
-                            changeStatus();
-                        }
-                    }
-                    
-                    // Handle status posting
-                    if (res.data.is_posted == 1) {
+                    // Handle posting status
+                    if (res.data.transaction.is_posted == 1) {
                         $(".delete-form, .btn-submit-form").hide();
-                        $(".create-form input, .create-form select").prop("disabled", true);
+                        $(".create-form input, .create-form select, .btn-add-detail").prop("disabled", true);
                     } else {
                         $(".delete-form, .btn-submit-form").show();
-                        $(".create-form input, .create-form select").prop("disabled", false);
+                        $(".create-form input, .create-form select, .btn-add-detail").prop("disabled", false);
                     }
                     
-                    // Tampilkan modal setelah semua data terisi
-                    $(".add-modal").modal("show");
-                    
                 } else {
+                    modal.modal("hide");
                     Swal.fire("Error", res.message, "error");
-                    $(".add-modal").modal("hide");
                 }
             },
             error: function(xhr) {
                 console.error("Error:", xhr.responseText);
+                modal.modal("hide");
                 Swal.fire("Error", "Gagal memuat data", "error");
-                $(".add-modal").modal("hide");
             }
         });
     });
@@ -784,167 +809,262 @@
         });
 
 
-        
-            // Tampilkan modal pilihan saat tombol tambah diklik
-            $("#btn-display-modal").click(function() {
-                $(".choice-modal").modal("show");
-            });
+        $('.btn-add-detail').click(function() {
+            if (!validateDetails()) {
+                refreshValidation();
+                return;
+            }
 
-            // Handle pilihan panjar
-            $(".btn-panjar").click(function() {
-                $("#form-type").val("panjar");
-                $("#form-title").text("Panjar Supplier");
-                $(".choice-modal").modal("hide");
-                
-                // Tampilkan field khusus panjar
-                $(".jenis_panjar").closest('.col-md-6').show(); 
-                $("#tipe-label").text($("#tipe-label").data('panjar'));
-                
-                // Set action form
-                $(".create-form").attr("action", "panjar-supplier/save");
-                
-                $(".add-modal").modal("show");
-            });
+            const jenisTransaksi = $('#jenis_transaksi').val();
 
-            // Handle pilihan pinjaman
-            $(".btn-pinjaman").click(function() {
-                $("#form-type").val("pinjaman");
-                $("#form-title").text("Pinjaman Supplier");
-                $(".choice-modal").modal("hide");
-                
-                // Sembunyikan seluruh kolom yang berisi field panjar
-                $(".jenis_panjar").closest('.col-md-6').hide(); // Sembunyikan div parent-nya
-                $("#tipe-label").text($("#tipe-label").data('pinjaman'));
+            const detail = {
+                tanggal: $('#tanggal').val(),
+                jenis_transaksi: jenisTransaksi,
+                nominal_pembayaran: $('#nominal_pembayaran').val(),
+                akun_kas: $('#akun_kas').val(),
+                akun_kas_name: $('#akun_kas option:selected').text(),
+                akun_selisih: $('#akun_selisih').val(),
+                akun_selisih_name: $('#akun_selisih option:selected').text(),
+                keterangan: $('#keterangan').val(),
+            };
 
-                // Ubah placeholder Select2 untuk pinjaman
-                $('#tipe').select2({
-                    placeholder: "Pilih Tipe Pinjaman",
-                    theme: "bootstrap-5",
-                    dropdownParent: $(".add-modal .modal-content")
+            details.push(detail);
+            refreshDetailsTable();
+            clearDetailForm();
+            refreshValidation();
+        });
+
+
+        // Remove detail
+        $(document).on('click', '.btn-remove-detail', function() {
+            const index = $(this).data('index');
+            details.splice(index, 1);
+            refreshDetailsTable();
+            refreshValidation();
+        });
+
+        // Clear detail form
+        function clearDetailForm() {
+            $('#tanggal, #nominal_pembayaran, #keterangan').val('');
+            $('#jenis_transaksi, #akun_kas, #akun_selisih').val('').trigger('change');
+        }
+
+
+        // Custom validation for details
+        function validateDetails() {
+            let isValid = true;
+            const nominalRaw = $('#nominal_pembayaran').val();
+            const nominalClean = nominalRaw ? destroyFormatRupiah(nominalRaw) : 0;
+
+            // Check if fields are empty or nominal is 0
+            if (
+                !$('#tanggal').val() ||
+                !$('#jenis_transaksi').val() ||
+                !nominalClean ||
+                nominalClean <= 0 ||
+                !$('#akun_kas').val() ||
+                !$('#akun_selisih').val()
+            ) {
+                isValid = false;
+
+                // Highlight all empty detail fields
+                $('#tanggal, #jenis_transaksi, #nominal_pembayaran, #akun_kas, #akun_selisih').each(function() {
+                    const value = $(this).val();
+                    const fieldId = $(this).attr('id');
+
+                    if (
+                        (fieldId === 'nominal_pembayaran' && (!nominalClean || nominalClean <= 0)) ||
+                        (fieldId !== 'nominal_pembayaran' && !value)
+                    ) {
+                        $(this).closest('.form-floating').addClass('has-error');
+                        $(this).addClass('is-invalid');
+                    }
                 });
+            }
 
+            return isValid;
+        }
 
-                // Set action form  
-                $(".create-form").attr("action", "pinjaman-supplier/save");
-                
-                $(".add-modal").modal("show");
-            });
-
-
-            $('.add-modal').on('hidden.bs.modal', function() {
-                $('.create-form')[0].reset();
-    
-                // Reset nilai khusus
-                $('#id').val('');
-                $('#form-type').val('panjar'); // Kembalikan ke default
-                $('#form-title').text('Panjar Supplier');
-                
-                // Reset field-field select
-                $('.form-select').val('').trigger('change');
-                
-                // Reset checkbox auto generate
-                $('#auto_generate').prop('checked', false);
-                
-                // Tampilkan semua field yang mungkin dihide
-                $('.jenis_panjar').closest('.col-md-6').show();
-                $('.tipe').closest('.col-md-6').show();
-                
-                // Reset label tipe
-                $('#tipe-label').text($('#tipe-label').data('panjar'));
-                
-                // Hapus validasi error (jika menggunakan plugin validation)
-                if ($('.create-form').validate) {
-                    $('.create-form').validate().resetForm();
+        // Update validation when adding/removing details
+        function refreshValidation() {
+            // Trigger validation on all fields
+            
+            // Special handling for detail fields
+            const hasDetails = $("#detail-table tbody tr").length > 0;
+            const detailFields = ['#tanggal', '#jenis_transaksi', '#nominal_pembayaran', '#akun_kas', '#akun_selisih'];
+            
+            detailFields.forEach(field => {
+                const element = $(field);
+                if (hasDetails) {
+                    // If details exist, remove error styling
+                    element.closest('.form-floating').removeClass('has-error');
+                    element.removeClass('is-invalid');
+                    element.next('span.text-danger').remove();
+                } else {
+                    // If no details, validate these fields
+                    element.valid();
                 }
-                
-                // Hapus class error dari input
-                $('.form-control, .form-select').removeClass('is-invalid');
-                $('.invalid-feedback').remove();
             });
+        }
 
+        // Handle final submission
+        $('.btn-submit-form').click(function() {
+            if (details.length === 0) {
+                alert('Tambahkan setidaknya satu detail pembayaran');
+                return;
+            }
+            
+            const formData = {
+                no_transaksi: $('#no_transaksi').val(),
+                jenis: $('#jenis').val(),
+                tipe_supplier: $('#tipe_supplier').val(),
+                supplier_id: $('#supplier_id').val(),
+                details: details
+            };
+            
+            // Submit via AJAX or form submission
+            // Here you would typically make an AJAX call to submit the data
+        });
+
+        // Modal close handler
+        $('#add_modal').on('hidden.bs.modal', function() {
+            // Reset all form fields
+            
+            // Clear the details table
+            $('#detail-table tbody').empty();
+            
+            // Clear any hidden fields
+            $('.hidden').val('');
+            
+            // Reset select2 elements
+            $('.form-select').val('').trigger('change');
+
+            // Clear details array
+            details = [];
+        });
+
+        // Show form handler
+        $(".btn-show-form").click(function() {
+            $(".id").val("");
+            $(".title-name").text("Tambah Data Panjar & Pinjaman");
+            $(".delete-btn").css('display', 'none');
+            $(".add-modal").modal("show");
+        });
+       
             // Handle submit form
-            $(".btn-submit-parent").click(function() {
-                if ($(".create-form").valid()) {
-                    const formType = $("#form-type").val();
-                    const isPanjar = formType === "panjar";
-                    
+        $(".btn-submit-form").click(function() {
+            console.log($('#jenis').val())
+            if ($(".create-form").valid()) {
+                // Validate if there are details
+                if (details.length === 0) {
                     Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data?',
+                        icon: 'error',
+                        title: 'Tambahkan setidaknya satu detail transaksi',
                         confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Kembali',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            const csrf = $(`[name="${csrfToken}"]`);
-                            let data = new FormData(document.querySelector(".create-form"));
-                            
-                            // Format total sesuai jenis form
-                            let total = destroyFormatRupiah($('#total').val());
-                            data.set(isPanjar ? 'total_panjar' : 'total_pinjaman', total);
-                            
-                            // Set field no transaksi sesuai jenis form
-                            let noTransaksi = $('#no_transaksi').val();
-                            data.set(isPanjar ? 'no_panjar' : 'no_pinjaman', noTransaksi);
-                            
-                            let id = $(".id").val();
-                            if (id) {
-                                // Mode edit
-                                endpoint = isPanjar ? "panjar-supplier/update" : "pinjaman-supplier/update";
-                            } else {
-                                // Mode create
-                                endpoint = isPanjar ? "panjar-supplier/save" : "pinjaman-supplier/save";
-                            }
+                    });
+                    return;
+                }
 
-                            $.ajax({
-                                url: endpoint,
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading();
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        }).then(() => {
-                                            $(".add-modal").modal("hide");
-                                            table.ajax.reload();
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        });
-                                        stopLoading();
-                                    }
-                                },
-                                error: function(response) {
-                                    csrf.val(response.responseJSON.token);
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Kembali',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const csrf = $('meta[name="csrf-token"]').attr('content');
+                        let data = new FormData();
+                        
+                        // Add main form data
+                        data.append('no_transaksi', $('#no_transaksi').val());
+                        data.append('jenis', $('#jenis').val());
+                        data.append('tipe_supplier', $('#tipe_supplier').val());
+                        data.append('supplier_id', $('#supplier_id').val());
+                        
+                        // Add details
+                        details.forEach((detail, index) => {
+                            data.append(`details[${index}][tanggal]`, detail.tanggal);
+                            data.append(`details[${index}][jenis_transaksi]`, detail.jenis_transaksi);
+                            data.append(`details[${index}][nominal_pembayaran]`, destroyFormatRupiah(detail.nominal_pembayaran));
+                            data.append(`details[${index}][akun_kas]`, detail.akun_kas);
+                            data.append(`details[${index}][akun_selisih]`, detail.akun_selisih);
+                            data.append(`details[${index}][keterangan]`, detail.keterangan);
+                        });
+
+                        let id = $("#id").val();
+                        let endpoint = id ? "panjar-supplier/update" : "panjar-supplier/save";
+                        
+                        if (id) {
+                            data.append('id', id);
+                        }
+
+                        $.ajax({
+                            url: endpoint,
+                            data: data,
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            headers: {
+                                "X-CSRF-TOKEN": csrf
+                            },
+                            beforeSend: function() {
+                                startLoading();
+                            },
+                            success: function(response) {
+                                if (response.status) {
+                                    stopLoading();
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    }).then(() => {
+                                        $(".add-modal").modal("hide");
+                                        table.ajax.reload();
+                                    });
+                                } else {
                                     Swal.fire({
                                         icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
+                                        title: response.message,
                                         confirmButtonColor: '#4e73df',
                                     });
                                     stopLoading();
                                 }
-                            });
-                        }
-                    });
-                }
-            });
+                            },
+                            error: function(response) {
+                                stopLoading();
+                                if (response.responseJSON) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.responseJSON.message || 'Data Gagal Disimpan, coba Lagi',
+                                        confirmButtonColor: '#4e73df',
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Terjadi kesalahan pada server',
+                                        confirmButtonColor: '#4e73df',
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
 
+        // Helper functions
+        function startLoading() {
+            $('.btn-submit-form').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...');
+        }
+
+        function stopLoading() {
+            $('.btn-submit-form').prop('disabled', false).html('Simpan Semua');
+        }
     });
 
 
@@ -1023,9 +1143,6 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
-                console.log("CSRF Token:", csrf.val()); // Debugging
-                console.log("ID:", id); // Debugging
-                console.log("Status:", status); // Debugging
                 $.ajax({
                     url: "<?= base_url("panjar-supplier/update-status"); ?>",
                     data: {

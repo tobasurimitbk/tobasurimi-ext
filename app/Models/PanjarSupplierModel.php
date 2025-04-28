@@ -17,6 +17,7 @@ class PanjarSupplierModel extends Model
 
     protected $allowedFields = [
         'company_id',
+        'transaction_id',
         'no_panjar',
         'supplier_id',
         'payment_date',
