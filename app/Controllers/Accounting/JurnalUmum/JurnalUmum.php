@@ -2061,7 +2061,7 @@ class JurnalUmum extends BaseController
                                 'kurs' => $kursData,
                                 'company_id' => $otherPayment->company_id,
                                 'divisi_id' => $otherPayment->divisi_id,
-                                'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                                'keterangan' => $otherPayment->bayar_ke,
                                 'id_inputer' => session()->get("login")->user_id
                             );
                         }
@@ -2076,7 +2076,7 @@ class JurnalUmum extends BaseController
                             'kurs' => $kursData,
                             'company_id' => $otherPayment->company_id,
                             'divisi_id' => $otherPayment->divisi_id,
-                            'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                            'keterangan' => $otherPayment->bayar_ke,
                             'id_inputer' => session()->get("login")->user_id
                         );
 
@@ -2092,7 +2092,7 @@ class JurnalUmum extends BaseController
                                 'kurs' => $kursData,
                                 'company_id' => $otherPayment->company_id,
                                 'divisi_id' => $otherPayment->divisi_id,
-                                'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                                'keterangan' => $otherPayment->bayar_ke,
                                 'id_inputer' => session()->get("login")->user_id
                             );
                         }
@@ -2107,7 +2107,7 @@ class JurnalUmum extends BaseController
                             'kurs' => $kursData,
                             'company_id' => $otherPayment->company_id,
                             'divisi_id' => $otherPayment->divisi_id,
-                            'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                            'keterangan' => $otherPayment->bayar_ke,
                             'id_inputer' => session()->get("login")->user_id
                         );
 
