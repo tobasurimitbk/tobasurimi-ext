@@ -2208,7 +2208,7 @@ class JurnalUmum extends BaseController
                 'kredit' => 0,
                 'valas' => '20',
                 'kurs' => 1,
-                'keterangan' => "$jenisTransaksi $noDokumen - " . $detail['keterangan'],
+                'keterangan' => $transaction->no_transaction,
                 'id_inputer' => session()->get("login")->user_id,
                 'createdAt' => date('Y-m-d H:i:s')
             ];
@@ -2224,7 +2224,7 @@ class JurnalUmum extends BaseController
                 'kredit' => $nominal,
                 'valas' => '20',
                 'kurs' => 1,
-                'keterangan' => "$jenisTransaksi $noDokumen - " . $detail['keterangan'],
+                'keterangan' => $transaction->no_transaction,
                 'id_inputer' => session()->get("login")->user_id,
                 'createdAt' => date('Y-m-d H:i:s')
             ];

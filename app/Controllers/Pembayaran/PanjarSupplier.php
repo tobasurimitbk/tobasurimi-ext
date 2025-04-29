@@ -110,7 +110,7 @@ class PanjarSupplier extends BaseController
                 "company_id" => $this->this_company_id,
                 "supplier_id" => $this->request->getVar('supplier_id'),
                 "type" => $this->request->getVar('jenis'),
-                "no_transaction" => $this->request->getPost("no_transaksi"),
+                "keterangan" => $this->request->getPost("keterangan"),
             ];
 
             // Start transaction
@@ -146,7 +146,6 @@ class PanjarSupplier extends BaseController
                         "total_pinjaman" => repairDouble($detail['nominal_pembayaran']),
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
-                        "keterangan" => $detail['keterangan'],
                     ];
 
                     $insert = $this->pinjamanSupplierModel->insert($detailData);
@@ -161,7 +160,6 @@ class PanjarSupplier extends BaseController
                         "total_panjar" => repairDouble($detail['nominal_pembayaran']),
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
-                        "keterangan" => $detail['keterangan'],
                     ];
 
                     $insert = $this->panjarSupplierModel->insert($detailData);
@@ -283,7 +281,8 @@ class PanjarSupplier extends BaseController
                 "supplier_id" => $this->request->getVar('supplier_id'),
                 "type" => $this->request->getVar('jenis'),
                 "no_transaction" => $this->request->getPost("no_transaksi"),
-                "updated_at" => date('Y-m-d H:i:s')
+                "updated_at" => date('Y-m-d H:i:s'),
+                "keterangan" => $this->request->getPost("keterangan"),
             ];
 
             // Start transaction
@@ -324,7 +323,6 @@ class PanjarSupplier extends BaseController
                         "total_pinjaman" => repairDouble($detail['nominal_pembayaran']),
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
-                        "keterangan" => $detail['keterangan'],
                     ];
 
                     $insert = $this->pinjamanSupplierModel->insert($detailData);
@@ -339,7 +337,6 @@ class PanjarSupplier extends BaseController
                         "total_panjar" => repairDouble($detail['nominal_pembayaran']),
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
-                        "keterangan" => $detail['keterangan'],
                     ];
 
                     $insert = $this->panjarSupplierModel->insert($detailData);
