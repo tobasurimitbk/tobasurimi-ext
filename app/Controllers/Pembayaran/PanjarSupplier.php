@@ -316,24 +316,38 @@ class PanjarSupplier extends BaseController
             $success = true;
     
             foreach ($details as $detail) {
-                $detailData = [
-                    "transaction_id" => $transactionId,
-                    "company_id" => $this->this_company_id,
-                    "supplier_id" => $this->request->getVar('supplier_id'),
-                    "payment_date" => date('Y-m-d', strtotime(str_replace('/', '-', $detail['tanggal']))),
-                    "jenis_transaksi" => $detail['jenis_transaksi'],
-                    "akun_kas" => $detail['akun_kas'],
-                    "akun_selisih" => $detail['akun_selisih'],
-                    "keterangan" => $detail['keterangan'],
-                    "updated_at" => date('Y-m-d H:i:s')
-                ];
-    
                 if ($detail['jenis_transaksi'] == 'PINJAMAN') {
-                    $detailData["total_pinjaman"] = repairDouble($detail['nominal_pembayaran']);
+
+                    $detailData = [
+                        "transaction_id" => $transactionId,
+                        "company_id" => $this->this_company_id,
+                        "supplier_id" => $this->request->getVar('supplier_id'),
+                        "payment_date" => date('Y-m-d', strtotime(str_replace('/', '-', $detail['tanggal']))),
+                        "jenis_transaksi" => $detail['jenis_transaksi'],
+                        "total_pinjaman" => repairDouble($detail['nominal_pembayaran']),
+                        "akun_kas" => $detail['akun_kas'],
+                        "akun_selisih" => $detail['akun_selisih'],
+                        "keterangan" => $detail['keterangan'],
+                    ];
+
                     $insert = $this->pinjamanSupplierModel->insert($detailData);
+
                 } else {
-                    $detailData["total_panjar"] = repairDouble($detail['nominal_pembayaran']);
+
+                    $detailData = [
+                        "transaction_id" => $transactionId,
+                        "company_id" => $this->this_company_id,
+                        "supplier_id" => $this->request->getVar('supplier_id'),
+                        "payment_date" => date('Y-m-d', strtotime(str_replace('/', '-', $detail['tanggal']))),
+                        "jenis_panjar" => $detail['jenis_transaksi'],
+                        "total_panjar" => repairDouble($detail['nominal_pembayaran']),
+                        "akun_kas" => $detail['akun_kas'],
+                        "akun_selisih" => $detail['akun_selisih'],
+                        "keterangan" => $detail['keterangan'],
+                    ];
+
                     $insert = $this->panjarSupplierModel->insert($detailData);
+                    
                 }
     
                 if (!$insert) {
