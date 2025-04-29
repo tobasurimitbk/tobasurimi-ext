@@ -734,6 +734,7 @@
                             akun_kas_name: detail.akun_kas.name || $('#akun_kas option[value="' + detail.akun_kas + '"]').text(),
                             akun_selisih: detail.akun_selisih.id,
                             akun_selisih_name: detail.akun_selisih.name || $('#akun_selisih option[value="' + detail.akun_selisih + '"]').text()
+                        }
                         details.push(newDetail);
                     });
 
