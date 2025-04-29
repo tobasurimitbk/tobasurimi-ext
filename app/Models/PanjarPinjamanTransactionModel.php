@@ -20,7 +20,8 @@ class PanjarPinjamanTransactionModel extends Model
         'supplier_id',
         'company_id',
         'no_transaction',
-        'is_posted'
+        'is_posted',
+        'keterangan'
     ];
     // Dates
     protected $useTimestamps = true;
