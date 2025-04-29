@@ -374,7 +374,7 @@ class RMImportPOModel extends Model
 
         $totalData = $poDataQry->countAllResults(false);
 
-        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['filter']) || !empty($addCondition['divisi'])) {
             $poDataQry->groupStart();
         }
 
@@ -390,7 +390,20 @@ class RMImportPOModel extends Model
             $poDataQry->where('rm_import_pos.po_date <=', $addCondition['dateEnd']);
         }
 
-        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+        if ($addCondition['filter'] && $addCondition['divisi']) {
+            $poDataQry->groupStart()
+                ->where('rm_purchase_orders.divisi_id', $addCondition['divisi'])
+                ->groupEnd()
+                ->whereIn('suppliers.id', $addCondition['filter']);
+        } elseif ($addCondition['divisi']) {
+            $poDataQry->groupStart()
+                ->where('rm_purchase_orders.divisi_id', $addCondition['divisi'])
+                ->groupEnd();
+        } elseif ($addCondition['filter']) {
+            $poDataQry->whereIn('suppliers.id', $addCondition['filter']);
+        }
+
+        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['filter']) || !empty($addCondition['divisi'])) {
             $poDataQry->groupEnd();
         }
 

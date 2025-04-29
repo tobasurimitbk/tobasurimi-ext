@@ -47,7 +47,7 @@
                                     if (!empty($divisis)) {
                                         foreach ($divisis as $item) {
                                     ?>
-                                            <option value="<?= $item->id; ?>"><?= $item->divisi.' ('.$item->company.')'; ?></option>
+                                            <option value="<?= $item->id; ?>"><?= $item->divisi . ' (' . $item->company . ')'; ?></option>
                                     <?php
                                         }
                                     }
@@ -64,7 +64,7 @@
                                     if (!empty($suppliers)) {
                                         foreach ($suppliers as $sub) {
                                     ?>
-                                            <option value="<?= $sub->id; ?>"><?= $sub->name.' ('.$sub->company.')'; ?></option>
+                                            <option value="<?= $sub->id; ?>"><?= $sub->name; ?></option>
                                     <?php
                                         }
                                     }
@@ -256,9 +256,14 @@
 
         $('.dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
+            var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
+            var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
+            var filter = $(".list_supplier").val() ? $(".list_supplier").val() : "all";
+            var filter_divisi = $(".list_divisi").val() ? $(".list_divisi").val() : "all";
+            var search = $(".search").val() ? $(".search").val() : "all";
             if (data) {
                 window.open(
-                    `<?= base_url("laporan-accounting/hutang/details/"); ?>${data.id}`,
+                    `<?= base_url("laporan-accounting/hutang/details/"); ?>${data.id}/${tanggal_awal}/${tanggal_akhir}/${filter}/${filter_divisi}/${search}`,
                     '_blank',
                     'width=1000,height=700,scrollbars=yes,resizable=yes'
                 );

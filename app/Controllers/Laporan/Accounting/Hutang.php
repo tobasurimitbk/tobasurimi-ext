@@ -71,10 +71,11 @@ class Hutang extends BaseController
         }
 
         $supplierData = $this->supplierModel
-            ->select('suppliers.id, suppliers.name, companies.company')
+            ->select('GROUP_CONCAT(suppliers.id) AS id, suppliers.name, companies.company')
             ->join('companies', 'companies.id = suppliers.company_id')
             ->whereIn('company_id', $companyId)
             ->asObject()
+            ->groupBy('suppliers.name')
             ->findAll();
 
         $divisiData = $this->divisisModel
@@ -90,21 +91,33 @@ class Hutang extends BaseController
         return view('Laporan/LaporanHutang/index', $data);
     }
 
-    public function detail($id)
+    public function detail($id, $tanggalAwal, $tanggalAkhir, $filter, $filterDivisi, $search)
     {
         $data = [
-            'id' => $id
+            'id'            => $id,
+            'tanggalAwal'   => $tanggalAwal,
+            'tanggalAkhir'  => $tanggalAkhir,
+            'filter'        => $filter,
+            "filterDivisi"  => $filterDivisi,
+            "search"        => $search
         ];
         return view('Laporan/LaporanHutang/detail', $data);
     }
 
     public function allHutang()
     {
+        $rawFilter = $this->request->getGet("filter");
+        $filter = [];
+
+        if ($rawFilter) {
+            $filter = explode(',', $rawFilter);
+        }
+
         $payload = [
             "pageSize"      => $this->request->getGet("length"),
             "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search"        => $this->request->getGet("search"),
-            "filter"        => $this->request->getGet("filter"),
+            "filter"        => $filter,
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "startdate"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
@@ -125,7 +138,7 @@ class Hutang extends BaseController
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
-            "filter"        => $this->request->getGet("filter"),
+            "filter"        => $filter,
             "divisi"        => $this->request->getGet("divisi"),
             "type_barang"   => $this->request->getGet("type_barang"),
             "sort"          => $this->request->getGet("sort"),
@@ -170,15 +183,22 @@ class Hutang extends BaseController
 
     public function allDetailsInvoice($id)
     {
+        $rawFilter = $this->request->getGet("filter");
+        $filter = [];
+
+        if ($rawFilter) {
+            $filter = explode(',', $rawFilter);
+        }
         $payload = [
             "pageSize"      => $this->request->getGet("length"),
             "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search"        => $this->request->getGet("search"),
-            "filter"        => $this->request->getGet("filter"),
+            "filter"        => $filter,
+            "divisi"        => $this->request->getGet("filter_divisi") == "all" ? "" : $this->request->getGet("filter_divisi"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "dateEnd"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
         $condition = [
@@ -189,11 +209,12 @@ class Hutang extends BaseController
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
-            "filter"        => $this->request->getGet("filter"),
+            "filter"        => $filter,
+            "divisi"        => $this->request->getGet("filter_divisi") == "all" ? "" : $this->request->getGet("filter_divisi"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "dateEnd"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
         $limit = $this->request->getGet("length");

@@ -177,14 +177,16 @@ class Pembelian extends BaseController
             $bp = "";
             if ($data->status_penerimaan == "LOKAL" && $data->tipe_bahan == "BAKU") {
                 $lokalbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangBakuDetail($data->id);
+                // var_dump($lokalbb);
                 foreach ($lokalbb as $value) {
-                    $totalxqty = $value['qty_barang_po'] * $value['total_barang_po'];
-                    $nominalTransaksi += $totalxqty;
+                    // $totalxqty = $value['qty_barang_po'] * $value['total_barang_po'];
+                    $nominalTransaksi += floatval($value['sub_total']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
             } else if ($data->status_penerimaan == "IMPORT" && $data->tipe_bahan == "BAKU") {
                 $importbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangImportBakuDetail($data->id);
+                // var_dump($importbb);
                 foreach ($importbb as $value) {
                     $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
                     if ($kursData) {
@@ -197,12 +199,13 @@ class Pembelian extends BaseController
                     } else {
                         $valasTransaksi = $value['currencyValue'];
                     }
-                    $nominalTransaksi += $value['total_po'];
+                    $nominalTransaksi += floatval($value['sub_total']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
             } else if ($data->tipe_bahan == "PENOLONG") {
                 $bp = $this->penerimaanBarangDetailModel->getPenerimaanBarangPenolongDetail($data->id);
+                // var_dump($bp);
                 foreach ($bp as $value) {
                     $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
                     if ($kursData) {
@@ -215,20 +218,22 @@ class Pembelian extends BaseController
                     } else {
                         $valasTransaksi = $value['currencyValue'] ? $value['currencyValue'] : "IDR";
                     }
-                    $nominalTransaksi += $value['total_po'];
+                    $nominalTransaksi += floatval($value['sub_total']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
             }
+            // exit;
 
             $grandTotal['nominal'] += floatval($nominalTransaksi) ?? 0;
             $grandTotal['nominal_idr'] += floatval($nominalIdrTransaksi) ?? 0;
             $grandTotal['paid_idr'] += floatval($paidIdrTransaksi) ?? 0;
 
             // var_dump($data);
-            // var_dump(floatval($nominalTransaksi) ?? 0);
-            // var_dump(floatval($nominalIdrTransaksi) ?? 0);
-            // var_dump(floatval($paidIdrTransaksi) ?? 0);
+            // var_dump(($nominalTransaksi));
+            // var_dump(($nominalIdrTransaksi));
+            // var_dump(($paidIdrTransaksi));
+            // exit;
 
             array_push($rdata, [
                 "no"                    => $no++,
@@ -242,13 +247,19 @@ class Pembelian extends BaseController
                 "po_num"                => $poNumberTransaksi,
                 "supplier_name"         => $supplierTransaksi,
                 "valas"                 => $valasTransaksi,
-                "exchange"              => floatval($exchangeTransaksi),
-                "nominal"               => floatval($nominalTransaksi),
-                "nominal_idr"           => floatval($nominalIdrTransaksi),
-                "paid_idr"              => floatval($paidIdrTransaksi),
+                "exchange"              => number_format(floatval($exchangeTransaksi), 2, '.', ','),
+                "nominal"               => number_format(floatval($nominalTransaksi), 2, '.', ','),
+                "nominal_idr"           => number_format(floatval($nominalIdrTransaksi), 2, '.', ','),
+                "paid_idr"              => number_format(floatval($paidIdrTransaksi), 2, '.', ','),
             ]);
         }
         // exit;
+
+        $grandTotalFormatted = [
+            'nominal'      => number_format($grandTotal['nominal'], 2, '.', ','),
+            'nominal_idr'  => number_format($grandTotal['nominal_idr'], 2, '.', ','),
+            'paid_idr'     => number_format($grandTotal['paid_idr'], 2, '.', ','),
+        ];
 
         $data = [
             "draw"              => intval($this->request->getGet("draw")),
@@ -256,7 +267,7 @@ class Pembelian extends BaseController
             "recordsFiltered"   => $res['totalFilteredData'],
             "data"              => $addCondition['startdate'] != "" && $addCondition['lastdate'] != "" ? $rdata : [],
             "payload"           => $payload,
-            "grandTotal"        => $grandTotal,
+            "grandTotal"        => $grandTotalFormatted,
         ];
 
         return response()->setJSON($data);
@@ -341,7 +352,7 @@ class Pembelian extends BaseController
                 $lokalbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangBakuDetail($data->id);
                 foreach ($lokalbb as $value) {
                     $totalxqty = $value['qty_barang_po'] * $value['total_barang_po'];
-                    $nominalTransaksi += $totalxqty;
+                    $nominalTransaksi += floatval($value['sub_total']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
@@ -357,7 +368,7 @@ class Pembelian extends BaseController
                             }
                         }
                     }
-                    $nominalTransaksi += $value['total_po'];
+                    $nominalTransaksi += floatval($value['sub_total']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
@@ -377,7 +388,7 @@ class Pembelian extends BaseController
                     }
                     // var_dump($valasTransaksi);
                     // var_dump($exchangeTransaksi);
-                    $nominalTransaksi += $value['total_po'];
+                    $nominalTransaksi += floatval($value['sub_total']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
@@ -582,14 +593,14 @@ class Pembelian extends BaseController
                 ->setCellValue('M' . $column, floatval($nominalIdrTransaksi))
                 ->setCellValue('N' . $column, floatval($paidIdrTransaksi));
 
-                $spreadsheet->getActiveSheet()->getStyle('K' . $column)
-                    ->getNumberFormat()->setFormatCode('#,##0.00');
-                $spreadsheet->getActiveSheet()->getStyle('L' . $column)
-                    ->getNumberFormat()->setFormatCode('#,##0.00');
-                $spreadsheet->getActiveSheet()->getStyle('M' . $column)
-                    ->getNumberFormat()->setFormatCode('#,##0.00');
-                $spreadsheet->getActiveSheet()->getStyle('N' . $column)
-                    ->getNumberFormat()->setFormatCode('#,##0.00');
+            $spreadsheet->getActiveSheet()->getStyle('K' . $column)
+                ->getNumberFormat()->setFormatCode('#,##0.00');
+            $spreadsheet->getActiveSheet()->getStyle('L' . $column)
+                ->getNumberFormat()->setFormatCode('#,##0.00');
+            $spreadsheet->getActiveSheet()->getStyle('M' . $column)
+                ->getNumberFormat()->setFormatCode('#,##0.00');
+            $spreadsheet->getActiveSheet()->getStyle('N' . $column)
+                ->getNumberFormat()->setFormatCode('#,##0.00');
 
             $column++;
         }

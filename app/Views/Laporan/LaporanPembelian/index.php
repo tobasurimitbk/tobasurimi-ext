@@ -168,9 +168,6 @@
             }, {
                 data: "tax_invoice",
                 className: "text-center",
-                render: function(data) {
-                    return greatFormatRupiah(data);
-                }
             }, {
                 data: "po_num",
                 className: "text-center",
@@ -183,27 +180,15 @@
             }, {
                 data: "exchange",
                 className: "text-center",
-                render: function(data) {
-                    return greatFormatRupiah(data);
-                }
             }, {
                 data: "nominal",
                 className: "text-center",
-                render: function(data) {
-                    return greatFormatRupiah(data);
-                }
             }, {
                 data: "nominal_idr",
                 className: "text-center",
-                render: function(data) {
-                    return greatFormatRupiah(data);
-                }
             }, {
                 data: "paid_idr",
                 className: "text-center",
-                render: function(data) {
-                    return greatFormatRupiah(data);
-                }
             }, ],
             columnDefs: [{
                 defaultContent: "-",
@@ -221,9 +206,9 @@
         // Tambahkan handler xhr
         table.on('xhr.dt', function(e, settings, json, xhr) {
             if (json.grandTotal) {
-                $('#gt-nominal').text(greatFormatRupiah(json.grandTotal.nominal));
-                $('#gt-nominal-idr').text(greatFormatRupiah(json.grandTotal.nominal_idr));
-                $('#gt-paid-idr').text(greatFormatRupiah(json.grandTotal.paid_idr));
+                $('#gt-nominal').text((json.grandTotal.nominal));
+                $('#gt-nominal-idr').text((json.grandTotal.nominal_idr));
+                $('#gt-paid-idr').text((json.grandTotal.paid_idr));
             }
         });
         //CSS SELECT2 FLOATING LABEL

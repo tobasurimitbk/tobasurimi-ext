@@ -1269,23 +1269,36 @@ class RMPurchaseOrderModel extends Model
 
         $totalData = $poDataQry->countAllResults(false);
 
-        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['filter']) || !empty($addCondition['divisi'])) {
             $poDataQry->groupStart();
         }
 
         if (!empty($addCondition['search'])) {
-            $poDataQry->like('am_purchase_orders.po_no', $addCondition['search']);
+            $poDataQry->like('rm_purchase_orders.po_no', $addCondition['search']);
         }
 
         if (!empty($addCondition['dateStart'])) {
-            $poDataQry->where('am_purchase_orders.po_date >=', $addCondition['dateStart']);
+            $poDataQry->where('rm_purchase_orders.po_date >=', $addCondition['dateStart']);
         }
 
         if (!empty($addCondition['dateEnd'])) {
-            $poDataQry->where('am_purchase_orders.po_date <=', $addCondition['dateEnd']);
+            $poDataQry->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
         }
 
-        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+        if ($addCondition['filter'] && $addCondition['divisi']) {
+            $poDataQry->groupStart()
+                ->where('rm_purchase_orders.divisi_id', $addCondition['divisi'])
+                ->groupEnd()
+                ->whereIn('suppliers.id', $addCondition['filter']);
+        } elseif ($addCondition['divisi']) {
+            $poDataQry->groupStart()
+                ->where('rm_purchase_orders.divisi_id', $addCondition['divisi'])
+                ->groupEnd();
+        } elseif ($addCondition['filter']) {
+            $poDataQry->whereIn('suppliers.id', $addCondition['filter']);
+        }
+
+        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['filter']) || !empty($addCondition['divisi'])) {
             $poDataQry->groupEnd();
         }
 
