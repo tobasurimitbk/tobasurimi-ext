@@ -139,22 +139,21 @@
                                         <label for="floatingInput" style="z-index: 1;">Debit</label>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan" value="">
                                         <label for="floatingInput">Keterangan (Opsional)</label>
                                     </div>
                                 </div>
                             </div>
-                            
+
+
                             <div class="row">
                                 <div class="col-md-12 text-end">
                                     <button type="button" class="btn btn-primary btn-add-detail">Tambah Detail</button>
                                 </div>
                             </div>
-                            
+
                             <!-- Table for showing added details -->
                             <div class="row mt-3">
                                 <div class="col-md-12">
@@ -204,7 +203,7 @@
             <div class="row justify-content-end row-col-spp">
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Pembayaran">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -212,7 +211,7 @@
                 </div>
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal Pembayaran">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
@@ -384,7 +383,7 @@
                 akun_selisih: {
                     required: true
                 },
-                
+
                 // Child/detail section rules
                 tanggal: {
                     required: function() {
@@ -545,11 +544,11 @@
             // ... your existing code ...
             refreshValidation();
         });
-        
+
         function refreshDetailsTable() {
             const tbody = $('#detail-table tbody');
             tbody.empty();
-            
+
             details.forEach((detail, index) => {
                 tbody.append(`
                     <tr>
@@ -565,46 +564,46 @@
                 `);
             });
         }
-        
+
         // Remove detail
         $(document).on('click', '.btn-remove-detail', function() {
             const index = $(this).data('index');
             details.splice(index, 1);
             refreshDetailsTable();
         });
-        
+
         // Function to update labels based on payment type
         function updateAccountLabels(jenis) {
             if (jenis === 'PUTIH') {
                 // Update label
                 $('#akun_kas').parent().find('label').text('Debit');
                 $('#akun_selisih').parent().find('label').text('Kredit');
-                
+
                 // Update placeholder Select2
                 $('#akun_kas').select2({
                     placeholder: "Pilih Akun Debit",
                     theme: "bootstrap-5",
                     dropdownParent: $('#add_modal .modal-content')
                 });
-                
+
                 $('#akun_selisih').select2({
                     placeholder: "Pilih Akun Kredit",
                     theme: "bootstrap-5",
                     dropdownParent: $('#add_modal .modal-content')
                 });
-                
+
             } else if (jenis === 'MERAH') {
                 // Update label
                 $('#akun_kas').parent().find('label').text('Kredit');
                 $('#akun_selisih').parent().find('label').text('Debit');
-                
+
                 // Update placeholder Select2
                 $('#akun_kas').select2({
                     placeholder: "Pilih Akun Kredit",
                     theme: "bootstrap-5",
                     dropdownParent: $('#add_modal .modal-content')
                 });
-                
+
                 $('#akun_selisih').select2({
                     placeholder: "Pilih Akun Debit",
                     theme: "bootstrap-5",
@@ -612,21 +611,21 @@
                 });
             }
         }
-    
+
 
         // Clear detail form
         function clearDetailForm() {
             $('#tanggal, #nominal_pembayaran, #keterangan').val('');
             $('#metode_pembayaran, #akun_kas, #akun_selisih').val('').trigger('change');
         }
-        
+
         // Handle final submission
         $('.btn-submit-form').click(function() {
             if (details.length === 0) {
                 alert('Tambahkan setidaknya satu detail pembayaran');
                 return;
             }
-            
+
             const formData = {
                 no_pembayaran: $('#no_pembayaran').val(),
                 divisi_id: $('#divisi_id').val(),
@@ -634,7 +633,7 @@
                 bayar_ke: $('#bayar_ke').val(),
                 details: details
             };
-            
+
             // Submit via AJAX or form submission
             // ...
         });
@@ -656,7 +655,7 @@
                 isValid = false;
 
                 // Highlight all detail fields (khususnya yang kosong)
-                $('#tanggal, #metode_pembayaran, #pembayaran_oleh, #akun_kas').each(function () {
+                $('#tanggal, #metode_pembayaran, #pembayaran_oleh, #akun_kas').each(function() {
                     const value = $(this).val();
                     const fieldId = $(this).attr('id');
 
@@ -679,11 +678,11 @@
         function refreshValidation() {
             // Trigger validation on all fields
             $(".create-form").validate().form();
-            
+
             // Special handling for detail fields
             const hasDetails = $("#detail-table tbody tr").length > 0;
             const detailFields = ['#tanggal', '#metode_pembayaran', '#nominal_pembayaran', '#pembayaran_oleh', '#akun_kas'];
-            
+
             detailFields.forEach(field => {
                 const element = $(field);
                 if (hasDetails) {
@@ -699,26 +698,25 @@
         }
 
 
-        
 
-        $('#add_modal').on('hidden.bs.modal', function () {
+
+        $('#add_modal').on('hidden.bs.modal', function() {
             // Reset all form fields
             $('.create-form')[0].reset();
-            
+
             // Clear the details table
             $('#detail-table tbody').empty();
-            
+
             // Clear any hidden fields or special inputs
             $('.hidden').val('');
-            
-            // Reset any select2 elements if you're using them
-            $('.form-select').val('').trigger('change');
 
+            // Reset any select2 elements if you're using them
+            resetForm();
             details = [];
         });
 
-        
-        $('.btn-add-detail').click(function () {
+
+        $('.btn-add-detail').click(function() {
             // Jalankan validasi detail dulu
             if (!validateDetails()) {
                 refreshValidation(); // buat update styling error
@@ -745,12 +743,12 @@
             refreshValidation(); // bersihin styling error kalau sudah valid
         });
 
-        
+
         // Refresh details table
         function refreshDetailsTable() {
             const tbody = $('#detail-table tbody');
             tbody.empty();
-            
+
             details.forEach((detail, index) => {
 
                 let debitAccount, creditAccount;
@@ -783,27 +781,27 @@
                 `);
             });
         }
-        
+
         // Remove detail
         $(document).on('click', '.btn-remove-detail', function() {
             const index = $(this).data('index');
             details.splice(index, 1);
             refreshDetailsTable();
         });
-        
+
         // Clear detail form
         function clearDetailForm() {
             $('#tanggal, #nominal_pembayaran, #keterangan').val('');
             $('#metode_pembayaran, #akun_kas').val('').trigger('change');
         }
-        
+
         // Handle final submission
         $('.btn-submit-form').click(function() {
             if (details.length === 0) {
                 alert('Tambahkan setidaknya satu detail pembayaran');
                 return;
             }
-            
+
             const formData = {
                 no_pembayaran: $('#no_pembayaran').val(),
                 divisi_id: $('#divisi_id').val(),
@@ -811,7 +809,7 @@
                 bayar_ke: $('#bayar_ke').val(),
                 details: details
             };
-            
+
             // Submit via AJAX or form submission
             // ...
         });
@@ -857,7 +855,9 @@
 
             $.ajax({
                 url: "<?= base_url("pembayaran-lain/get"); ?>",
-                data: { id: id },
+                data: {
+                    id: id
+                },
                 beforeSend: function() {
                     setLoading();
                 },
@@ -871,7 +871,7 @@
                         // Reset form and clear details
                         resetForm();
                         details = [];
-                        
+
                         // Set parent data
                         const parent = res.data.parent;
                         $('#id').val(parent.id);
@@ -883,7 +883,7 @@
 
                         // Handle jenis pembayaran dan akun
                         $('#jenis_pembayaran').val(parent.jenis_pembayaran).change();
-                        
+
                         // Untuk MERAH: akun_selisih parent sebenarnya adalah akun_kas
                         if (parent.jenis_pembayaran === 'MERAH' && parent.akun_kas) {
                             $('#akun_selisih').val(parent.akun_kas).change();
@@ -897,7 +897,7 @@
                         } else {
                             $("#no_pembayaran").attr('disabled', true);
                         }
-                        
+
                         // Set details data
                         if (res.data.details && res.data.details.length > 0) {
                             res.data.details.forEach(detail => {
@@ -916,7 +916,7 @@
                             });
                             refreshDetailsTable();
                         }
-                        
+
                         $(".add-modal").modal("show");
                     } else {
                         Swal.fire({
@@ -953,7 +953,7 @@
                         const csrf = $('meta[name="csrf-token"]').attr('content');
                         let id = $('#id').val();
                         const jenisPembayaran = $('#jenis_pembayaran').val();
-                        
+
                         // Prepare data with proper formatting
                         const requestData = {
                             id: id,
@@ -977,11 +977,11 @@
                         // Determine URL based on whether it's an update or create
                         let url = id ? "<?= base_url('pembayaran-lain/update'); ?>" : "<?= base_url('pembayaran-lain/save'); ?>";
                         let method = id ? "POST" : "POST";
-                        
+
                         $.ajax({
                             url: url,
                             data: JSON.stringify(requestData),
-                            contentType: "application/json", 
+                            contentType: "application/json",
                             headers: {
                                 "X-CSRF-TOKEN": csrf
                             },
@@ -1020,7 +1020,7 @@
                                 } else if (xhr.statusText) {
                                     errorMessage = xhr.statusText;
                                 }
-                                
+
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Terjadi kesalahan',
@@ -1033,7 +1033,7 @@
                 });
             }
         });
-        
+
     });
 
     const remove = function(id) {
@@ -1096,6 +1096,7 @@
         $('#akun_kas').attr('disabled', true);
         $('#akun_selisih').attr('disabled', true);
         $('#keterangan').attr('disabled', true);
+        $('#jenis_pembayaran').attr('disabled', true);
 
         $('.btn-submit-form').hide();
     }
@@ -1112,6 +1113,7 @@
         $('#akun_kas').attr('disabled', false);
         $('#akun_selisih').attr('disabled', false);
         $('#keterangan').attr('disabled', false);
+        $('#jenis_pembayaran').attr('disabled', false);
 
         $("#id").val(null).change();
         $("#no_pembayaran").val(null).change();
