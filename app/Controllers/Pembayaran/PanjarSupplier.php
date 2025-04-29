@@ -774,6 +774,7 @@ class PanjarSupplier extends BaseController
                     "no_transaction" => $transaction->no_transaction,
                     "type" => $transaction->type,
                     "createdAt" => $transaction->createdAt,
+                    "keterangan" => $transaction->keterangan,
                     "is_posted" => $transaction->is_posted ?? 0,
                     "total_panjar" => $totalPanjar,
                     "total_pinjaman" => $totalPinjaman,
