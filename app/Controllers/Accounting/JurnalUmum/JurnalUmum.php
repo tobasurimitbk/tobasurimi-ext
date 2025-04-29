@@ -2043,7 +2043,8 @@ class JurnalUmum extends BaseController
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
                     'no_bukti' => $no_transaksi_jurnal,
-                    'valas' => $otherPayment->valas,
+                    'valas_id' => $otherPayment->valas,
+                    'valas' => "IDR",
                     'exchange_rate' => $kursData,
                 );
 
