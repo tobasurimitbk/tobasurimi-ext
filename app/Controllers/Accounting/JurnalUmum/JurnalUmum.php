@@ -2027,26 +2027,31 @@ class JurnalUmum extends BaseController
                 }, 0);
                 $isFirstTransaction = true;
 
+                // 1. Buat transaksi jurnal per detail
+                $tanggal = "";
+                foreach ($detailPembayaran as $detail) {
+                    $tanggal = date('Y-m-d', strtotime(str_replace('/', '-', $detail['tanggal_pembayaran'])));
+                }
+
+                $no_transaksi_jurnal = $otherPayment->no_pembayaran;
+
+                $resultTransaksiJurnal = array(
+                    'no_transaksi' => $no_transaksi_jurnal,
+                    'tanggal_transaksi' => $tanggal,
+                    'total_debit' => $totalNominal,
+                    'total_kredit' => $totalNominal,
+                    'metode_input' => 'system',
+                    'type_transaksi' => $idTransaksi,
+                    'no_bukti' => $no_transaksi_jurnal,
+                    'valas' => $otherPayment->valas,
+                    'exchange_rate' => $kursData,
+                );
+
+                $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
+
                 foreach ($detailPembayaran as $detail) {
                     $nominal = floatval(str_replace([',', '.'], '', $detail['nominal']));
                     $tanggal = date('Y-m-d', strtotime(str_replace('/', '-', $detail['tanggal_pembayaran'])));
-
-                    // 1. Buat transaksi jurnal per detail
-                    $no_transaksi_jurnal = $otherPayment->no_pembayaran;
-
-                    $resultTransaksiJurnal = array(
-                        'no_transaksi' => $no_transaksi_jurnal,
-                        'tanggal_transaksi' => $tanggal,
-                        'total_debit' => $nominal,
-                        'total_kredit' => $nominal,
-                        'metode_input' => 'system',
-                        'type_transaksi' => $idTransaksi,
-                        'no_bukti' => $no_transaksi_jurnal,
-                        'valas' => $otherPayment->valas,
-                        'exchange_rate' => $kursData,
-                    );
-
-                    $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
 
                     // 2. Buat jurnal umum: kredit akun kas, debit akun selisih
                     $result = [];
