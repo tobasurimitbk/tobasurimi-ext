@@ -381,11 +381,11 @@ class PanjarSupplier extends BaseController
         $id = decrypt($this->request->getVar('id'));
         $status = $this->request->getVar('status');
 
-        $this->panjarSupplierModel->update($id, [
+        $this->panjarPinjamanTransactionModel->update($id, [
             'is_posted' => $status
         ]);
 
-        $this->jurnalController->insertDataPanjar($id, "PANJAR");
+        $this->jurnalController->insertDataPanjarPinjamanTransaction($id);
 
         return response()->setJSON([
             "status" => true,
@@ -811,7 +811,7 @@ class PanjarSupplier extends BaseController
     }
     public function generateNoPanjar()
     {
-        $noPanjar = $this->panjarSupplierModel->getNumber($this->this_company_id);
+        $noPanjar = $this->panjarPinjamanTransactionModel->getNumber($this->this_company_id);
         return json_encode($noPanjar);
     }
 
