@@ -110,6 +110,7 @@ class PanjarSupplier extends BaseController
                 "company_id" => $this->this_company_id,
                 "supplier_id" => $this->request->getVar('supplier_id'),
                 "type" => $this->request->getVar('jenis'),
+                "no_transaction" => $this->request->getPost("no_transaksi"),
                 "keterangan" => $this->request->getPost("keterangan"),
             ];
 
