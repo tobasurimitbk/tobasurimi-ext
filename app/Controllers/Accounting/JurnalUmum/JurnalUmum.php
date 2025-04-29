@@ -31,6 +31,7 @@ use App\Models\PembayaranInvoiceDetailModel;
 use App\Models\PembayaranInvoiceModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\SalesOrderLainDetailModel;
+use App\Models\PanjarPinjamanTransactionModel;
 use App\Models\SalesOrderLainModel;
 use App\Models\TutupBukuModel;
 use Config\Database;
@@ -44,7 +45,7 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 use App\Models\LocalPOPaymentPanjarModel;
 use App\Models\LocalPOPaymentPinjamanModel;
 use App\Models\PanjarSupplierModel;
-use App\Models\PinjamanKaryawanModel;
+use App\Models\PinjamanSupplierModel;
 use App\Models\EmployeesModel;
 use Carbon\Carbon;
 
@@ -85,6 +86,7 @@ class JurnalUmum extends BaseController
     protected $PanjarSupplierModel;
     protected $PinjamanSupplierModel;
     protected $EmployeeModel;
+    protected $panjarPinjamanTransactionModel;
 
     protected $salesOrderLainModel;
     protected $salesOrderLainDetailModel;
@@ -127,7 +129,7 @@ class JurnalUmum extends BaseController
         $this->tutupBukuModel = new TutupBukuModel();
         $this->localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
         $this->localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
-        $this->PinjamanSupplierModel = new PinjamanKaryawanModel();
+        $this->PinjamanSupplierModel = new PinjamanSupplierModel();
         $this->PanjarSupplierModel = new PanjarSupplierModel();
         $this->EmployeeModel = new EmployeesModel();
 
@@ -135,6 +137,7 @@ class JurnalUmum extends BaseController
         $this->salesOrderLainDetailModel = new SalesOrderLainDetailModel();
         $this->pembayaranInvoiceModel = new PembayaranInvoiceModel();
         $this->pembayaranInvoiceDetailModel = new PembayaranInvoiceDetailModel();
+        $this->panjarPinjamanTransactionModel = new PanjarPinjamanTransactionModel();
         $this->companiesModel = new CompaniesModel();
         $this->db = \Config\Database::connect();
     }
@@ -2061,7 +2064,7 @@ class JurnalUmum extends BaseController
                                 'kurs' => $kursData,
                                 'company_id' => $otherPayment->company_id,
                                 'divisi_id' => $otherPayment->divisi_id,
-                                'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                                'keterangan' => $otherPayment->bayar_ke,
                                 'id_inputer' => session()->get("login")->user_id
                             );
                         }
@@ -2076,7 +2079,7 @@ class JurnalUmum extends BaseController
                             'kurs' => $kursData,
                             'company_id' => $otherPayment->company_id,
                             'divisi_id' => $otherPayment->divisi_id,
-                            'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                            'keterangan' => $otherPayment->bayar_ke,
                             'id_inputer' => session()->get("login")->user_id
                         );
 
@@ -2092,7 +2095,7 @@ class JurnalUmum extends BaseController
                                 'kurs' => $kursData,
                                 'company_id' => $otherPayment->company_id,
                                 'divisi_id' => $otherPayment->divisi_id,
-                                'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                                'keterangan' => $otherPayment->bayar_ke,
                                 'id_inputer' => session()->get("login")->user_id
                             );
                         }
@@ -2107,7 +2110,7 @@ class JurnalUmum extends BaseController
                             'kurs' => $kursData,
                             'company_id' => $otherPayment->company_id,
                             'divisi_id' => $otherPayment->divisi_id,
-                            'keterangan' => "Pembayaran Lain " . $otherPayment->no_pembayaran . " - " . ($detail['keterangan'] ?? ''),
+                            'keterangan' => $otherPayment->bayar_ke,
                             'id_inputer' => session()->get("login")->user_id
                         );
 
@@ -2121,6 +2124,119 @@ class JurnalUmum extends BaseController
         }
     }
 
+
+    public function insertDataPanjarPinjamanTransaction($payID)
+    {
+            // Get division from employee
+            $divisi = $this->EmployeeModel->select('division_id')
+                ->asObject()
+                ->where('id', session()->get("login")->employee_id)
+                ->first();
+    
+            // Get parent transaction data
+            $transaction = $this->panjarPinjamanTransactionModel
+                ->asObject()
+                ->find($payID);
+    
+            if (!$transaction) {
+                throw new \Exception("Transaction not found");
+            }
+    
+            // Get all transaction details (both panjar and pinjaman)
+            $panjarDetails = $this->PanjarSupplierModel
+                ->where('transaction_id', $payID)
+                ->findAll();
+    
+            $pinjamanDetails = $this->PinjamanSupplierModel
+                ->where('transaction_id', $payID)
+                ->findAll();
+    
+            // Combine all details
+            $allDetails = array_merge($panjarDetails, $pinjamanDetails);
+    
+            // Initialize metadata
+            $metadataTipeTransaksi = $this->MetadataModel
+                ->asObject()
+                ->where('name', 'tipe_transaksi')
+                ->whereIn('value', ['PANJAR', 'PINJAMAN'])
+                ->findAll();
+    
+            $metadataMap = [];
+            foreach ($metadataTipeTransaksi as $meta) {
+                $metadataMap[$meta->value] = [
+                    'id' => $meta->id,
+                    'kode' => $meta->description
+                ];
+            }
+    
+            // Process each detail
+            foreach ($allDetails as $detail) {
+                $jenisTransaksi = isset($detail['total_panjar']) ? 'PANJAR' : 'PINJAMAN';
+                $nominal = $jenisTransaksi === 'PANJAR' ? $detail['total_panjar'] : $detail['total_pinjaman'];
+                $noDokumen = $jenisTransaksi === 'PANJAR' ? $detail['no_panjar'] : $detail['no_pinjaman'];
+    
+                // Generate journal number
+                $no_transaksi_jurnal = $this->transaksiJurnalModel
+                    ->getNoTransaksiLast($metadataMap[$jenisTransaksi]['kode']);
+    
+                // Create journal header
+                $jurnalHeader = [
+                    'no_transaksi' => $no_transaksi_jurnal,
+                    'tanggal_transaksi' => date('Y-m-d', strtotime($detail['payment_date'])),
+                    'total_debit' => $nominal,
+                    'total_kredit' => $nominal,
+                    'metode_input' => 'system',
+                    'type_transaksi' => $metadataMap[$jenisTransaksi]['id'],
+                    'no_bukti' => $transaction->no_transaction,
+                    'valas' => '20',
+                    'exchange_rate' => 1,
+                    'createdAt' => date('Y-m-d H:i:s'),
+                    'createdBy' => session()->get("login")->user_id
+                ];
+    
+                // Insert journal header and get ID
+                $id_transaksi_jurnal = $this->transaksiJurnalModel
+                    ->insertTransaksiJurnal($jurnalHeader);
+    
+                // Prepare journal entries
+                $jurnalEntries = [];
+    
+                // Debit entry (akun_kas)
+                $jurnalEntries[] = [
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' => $detail['akun_kas'],
+                    'company_id' => $transaction->company_id,
+                    'divisi_id' => $divisi->division_id,
+                    'tanggal_jurnal' => date('Y-m-d', strtotime($detail['payment_date'])),
+                    'debit' => $nominal,
+                    'kredit' => 0,
+                    'valas' => '20',
+                    'kurs' => 1,
+                    'keterangan' => "$jenisTransaksi $noDokumen - " . $detail['keterangan'],
+                    'id_inputer' => session()->get("login")->user_id,
+                    'createdAt' => date('Y-m-d H:i:s')
+                ];
+    
+                // Credit entry (akun_selisih)
+                $jurnalEntries[] = [
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' => $detail['akun_selisih'],
+                    'company_id' => $transaction->company_id,
+                    'divisi_id' => $divisi->division_id,
+                    'tanggal_jurnal' => date('Y-m-d', strtotime($detail['payment_date'])),
+                    'debit' => 0,
+                    'kredit' => $nominal,
+                    'valas' => '20',
+                    'kurs' => 1,
+                    'keterangan' => "$jenisTransaksi $noDokumen - " . $detail['keterangan'],
+                    'id_inputer' => session()->get("login")->user_id,
+                    'createdAt' => date('Y-m-d H:i:s')
+                ];
+    
+                // Insert journal entries
+                $this->jurnalUmumModel->insertJurnalBatch($jurnalEntries);
+            }
+    }
 
     public function insertDataPanjar($payID, $module)
     {

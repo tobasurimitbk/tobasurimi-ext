@@ -1,6 +1,11 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
-
+<style>
+    .form-switch-lg .form-check-input {
+        width: 4rem;
+        height: 1.5rem;
+    }
+</style>
 <section class="section">
     <div class="section-header">
         <h1 class="title-name"><?= !empty($jamKerja) ? "Update" : "Tambah"; ?> Jam Kerja</h1>
@@ -34,20 +39,57 @@
             <label class="form-label font-weight-bold lable-title mt-2">
                 Informasi Jam Kerja
             </label>
-            <form action="#" method="post" id="formPost" class="mt-4">
+            <form action="#" method="post" id="formPost" class="mt-4 detail-form">
                 <?= csrf_field() ?>
                 <input type="hidden" value="<?= ($jamKerja != null) ? encrypt($jamKerja['id']) : null ?>" id="jamKerjaID" class="jamKerjaID" name="jamKerjaID">
                 <div class="row mb-3">
-                    <div class="col-sm-6">
+                    <div class="col-sm-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= (!empty($jamKerja)) ? $jamKerja['jenis'] : '' ?>" autocomplete="one-time-code" type="text" class="form-control" name="jenisJamKerja" placeholder="Jenis Jam Kerja">
-                            <label for="floatingInput">Jenis Jam Kerja</label>
+                            <select class="form-select divisiId" id="divisiId" name="divisiId">
+                                <option value=""></option>
+                                <?php foreach ($divisi as $d) : ?>
+                                    <option <?= $jamKerja != null ? ($jamKerja['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                        <?= $d['divisi']; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Departemen</label>
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control" name="jenis" required value="<?= (!empty($jamKerja)) ? $jamKerja['jenis'] : '' ?> " placeholder="Cth : Jam Kerja Satpam">
+                            <label for="floatingInput">Nama (Cth : Jam Kerja Satpam)</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select shift" id="shift" name="shift">
+                                <option value=""></option>
+                                <?php foreach ($shift as $s): ?>
+                                    <option <?= $jamKerja != null ? ($jamKerja['shift'] == $s ? 'selected' : '') : '' ?> value="<?= $s ?>"><?= $s ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Shift (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control" name="jamTerlambat" required value="<?= (!empty($jamKerja)) ? $jamKerja['jam_terlambat'] : '09:00' ?> " placeholder="Batas Jam Keterlambatan">
                             <label for="floatingInput">Batas Jam Keterlambatan Absen Masuk</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form">
+                            <label class="mt-2 text-dark">
+                                <b>Jam Kerja Default,</b> (Jika Aktif Maka Akan Menjadi Jam Kerja Default di Departemen yang Sudah Dipilih)
+                            </label>
+                            <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
+                                <div class="form-check form-switch form-switch-lg">
+                                    <input <?= isset($jamKerjaDefault) ? ($jamKerjaDefault != null ? 'checked' : '')  : '' ?> class="form-check-input" type="checkbox" value="1" name="jamKerjaDefault" id="jamKerjaDefault">
+                                    <label class="form-check-label"></label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -58,7 +100,7 @@
                                 <th style="width: 10px;">No</th>
                                 <th rowspan="2" style="vertical-align : middle;text-align:center;">Hari</th>
                                 <th colspan="1">Jam Masuk</th>
-                                <th colspan="2">Jam Istirahat</th>
+                                <!-- <th colspan="2">Jam Istirahat</th> -->
                                 <th colspan="1">Jam Pulang</th>
                             </tr>
                         </thead>
@@ -80,7 +122,7 @@
                                             <label for="mulaiMasuk">Mulai Masuk</label>
                                         </div>
                                     </td>
-                                    <td>
+                                    <!-- <td>
                                         <div class="form-floating" style="height: 50px;">
                                             <input type="text" value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_istirahat_mulai'] : '' ?>" class="form-control time" name="<?= $v['value'] ?>_mulaiIstirahat" maxlength="30">
                                             <label for="checkout">Mulai Istirahat</label>
@@ -91,7 +133,7 @@
                                             <input type="text" class="form-control time" value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_istirahat_selesai'] : '' ?>" name="<?= $v['value'] ?>_selesaiIstirahat" maxlength="30">
                                             <label for="checkout">Selesai Istirahat</label>
                                         </div>
-                                    </td>
+                                    </td> -->
                                     <td>
                                         <div class="form-floating" style="height: 50px;">
                                             <input type="text" class="form-control time" value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_pulang'] : '' ?>" name="<?= $v['value'] ?>_mulaiPulang" maxlength="30">
@@ -116,7 +158,10 @@
     var validator = $("#formPost").validate({
         ignore: ":disabled", // Mengabaikan input yang disabled
         rules: {
-            jenisJamKerja: {
+            divisiId: {
+                required: true
+            },
+            jenis: {
                 required: true
             },
             jamTerlambat: {
@@ -125,22 +170,10 @@
             SENIN_mulaiMasuk: {
                 required: true
             },
-            SENIN_mulaiIstirahat: {
-                required: true
-            },
-            SENIN_selesaiIstirahat: {
-                required: true
-            },
             SENIN_mulaiPulang: {
                 required: true
             },
             SELASA_mulaiMasuk: {
-                required: true
-            },
-            SELASA_mulaiIstirahat: {
-                required: true
-            },
-            SELASA_selesaiIstirahat: {
                 required: true
             },
             SELASA_mulaiPulang: {
@@ -149,22 +182,10 @@
             RABU_mulaiMasuk: {
                 required: true
             },
-            RABU_mulaiIstirahat: {
-                required: true
-            },
-            RABU_selesaiIstirahat: {
-                required: true
-            },
             RABU_mulaiPulang: {
                 required: true
             },
             KAMIS_mulaiMasuk: {
-                required: true
-            },
-            KAMIS_mulaiIstirahat: {
-                required: true
-            },
-            KAMIS_selesaiIstirahat: {
                 required: true
             },
             KAMIS_mulaiPulang: {
@@ -173,22 +194,10 @@
             JUMAT_mulaiMasuk: {
                 required: true
             },
-            JUMAT_mulaiIstirahat: {
-                required: true
-            },
-            JUMAT_selesaiIstirahat: {
-                required: true
-            },
             JUMAT_mulaiPulang: {
                 required: true
             },
             SABTU_mulaiMasuk: {
-                required: true
-            },
-            SABTU_mulaiIstirahat: {
-                required: true
-            },
-            SABTU_selesaiIstirahat: {
                 required: true
             },
             SABTU_mulaiPulang: {
@@ -196,12 +205,15 @@
             },
         },
         messages: {
-            jenisJamKerja: {
-                required: "Jenis jam kerja wajib diisi"
+            divisiId: {
+                required: "Pilih Departemen"
+            },
+            jenis: {
+                required: "Jenis Penilaian Wajib Diisi"
             },
             jamTerlambat: {
-                required: "Jam terlambat wajib diisi"
-            }
+                required: "Jam Terlambat Wajib Diisi"
+            },
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -224,6 +236,27 @@
             $(element).removeClass('select-class');
         },
     });
+
+    $('#divisiId').select2({
+        placeholder: "Pilih Departemen",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {});
+
+    $('#shift').select2({
+        placeholder: "Pilih Shift (Opsional)",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {});
+
+    $("#divisiId,#shift")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
 
     $("input[name='jamTerlambat']").datetimepicker({
         format: 'HH:mm',

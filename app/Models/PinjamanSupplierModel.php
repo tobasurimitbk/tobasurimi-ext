@@ -17,6 +17,7 @@ class PinjamanSupplierModel extends Model
 
     protected $allowedFields = [
         'company_id',
+        'transaction_id',
         'no_pinjaman',
         'supplier_id',
         'keterangan',

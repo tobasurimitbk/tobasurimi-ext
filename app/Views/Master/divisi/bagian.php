@@ -23,11 +23,7 @@
                     <tr style="color: black; height: 20px;">
                         <td colspan="3"></td>
                     </tr>
-                    <tr style="color: black;">
-                        <td width="150px">Jam Kerja</td>
-                        <td width="25px">:</td>
-                        <td><?= $divisi['jenis'] ?></td>
-                    </tr>
+
                 </tbody>
             </table>
             <form class="form-data" role="form" method="POST" enctype="multipart/form-data">

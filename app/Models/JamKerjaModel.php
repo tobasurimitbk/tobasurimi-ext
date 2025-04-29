@@ -48,6 +48,7 @@ class JamKerjaModel extends Model
     {
         $availableSort = [
             'id'    => 'jam_kerja.id',
+            'divisi_id' => 'jam_kerja.divisi_id',
             'jenis'    => 'jam_kerja.jenis',
         ];
 
@@ -57,7 +58,8 @@ class JamKerjaModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $dataQry = $this->asObject()
-            ->select('*')
+            ->select('jam_kerja.*,divisis.divisi')
+            ->join('divisis', 'divisis.id = jam_kerja.divisi_id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
@@ -68,7 +70,8 @@ class JamKerjaModel extends Model
         }
 
         if ($addCondition['search']) {
-            $dataQry->like('jam_kerja.jenis', $addCondition['search']);
+            $dataQry->like('jam_kerja.jenis', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search']);
         }
 
         if ($addCondition['search']) {

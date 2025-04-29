@@ -136,6 +136,7 @@ class EmployeeJamKerjaModel extends Model
             $selectQry = "
                 jam_kerja.id AS jam_kerja_id,
                 jam_kerja.jenis,
+                jam_kerja.shift,
                 jam_kerja_detail.*
             ";
 

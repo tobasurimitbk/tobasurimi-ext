@@ -3,6 +3,7 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\DivisisModel;
 use App\Models\JamKerjaDetailModel;
 use App\Models\JamKerjaModel;
 use App\Models\MetadataModel;
@@ -41,7 +42,7 @@ class JamKerja extends BaseController
         ];
 
         $condition = [
-            'company_id' => $this->this_company_id
+            'jam_kerja.company_id' => $this->this_company_id
         ];
 
         $limit = $this->request->getGet("length");
@@ -58,7 +59,8 @@ class JamKerja extends BaseController
             array_push($dataJamKerja, [
                 "no" => $no++,
                 "id" => encrypt($j->id),
-                "jenis" => $j->jenis,
+                "jenis" => $j->jenis . " - " . $j->shift,
+                "divisi" => $j->divisi
             ]);
         }
 
@@ -77,10 +79,17 @@ class JamKerja extends BaseController
     public function createView()
     {
         $modelMetaData = new MetadataModel();
+        $divisiModel = new DivisisModel();
+        $shift = array("PAGI", "NORMAL", "SIANG");
+        foreach (range(1, 50) as $s) {
+            array_push($shift, "SHIFT " . $s);
+        }
 
         $data = [
             'jamKerja' => null,
-            'hari' => $modelMetaData->where('name', "hari")->findAll()
+            'hari' => $modelMetaData->where('name', "hari")->findAll(),
+            'divisi' => $divisiModel->asArray()->where('company_id', $this->this_company_id)->where('deletedAt', null)->orderBy('divisi', "asc")->findAll(),
+            'shift' => $shift
         ];
 
         return view('Master/jamKerja/form', $data);
@@ -91,22 +100,26 @@ class JamKerja extends BaseController
         $modelJamKerja = new JamKerjaModel();
         $modelJamKerjaDetail = new JamKerjaDetailModel();
         $modelMetaData = new MetadataModel();
+        $modelDivisis = new DivisisModel();
 
-        $jenisJamKerja = strtoupper($this->request->getVar('jenisJamKerja'));
-
-        // check duplikat
-        if ($modelJamKerja->where('company_id', $this->this_company_id)->where('jenis', $jenisJamKerja)->first() != null) {
-            return response()->setJSON([
-                'message' => "Jam Kerja $jenisJamKerja sudah ada, silahkan coba dengan nama lain",
-                'status' => false
-            ]);
-        }
+        $divisiId = $this->request->getVar('divisiId');
+        $shift = $this->request->getVar('shift');
+        $jamTerlambat = $this->request->getVar('jamTerlambat');
+        $jenis = $this->request->getVar('jenis');
+        $jamKerjaDefault = $this->request->getVar('jamKerjaDefault');
 
         $jamKerja = $modelJamKerja->insert([
-            'jenis' => strtoupper($this->request->getVar('jenisJamKerja')),
-            'jam_terlambat' => $this->request->getVar('jamTerlambat'),
-            'company_id' =>  $this->this_company_id
+            'company_id' =>  $this->this_company_id,
+            'divisi_id' => $divisiId,
+            'shift' => $shift,
+            'jenis' => $jenis,
+            'jam_terlambat' => $jamTerlambat,
         ]);
+
+        if ($jamKerjaDefault == 1) {
+            $modelDivisis->update($divisiId, ['jam_kerja_id' => null]);
+            $modelDivisis->update($divisiId, ['jam_kerja_id' => $jamKerja]);
+        }
 
         foreach ($modelMetaData->where('name', "hari")->findAll() as $h) {
             $modelJamKerjaDetail->insert([
@@ -119,7 +132,7 @@ class JamKerja extends BaseController
             ]);
         }
 
-        return \response()->setJSON([
+        return response()->setJSON([
             'message' => "Jam kerja berhasil disimpan",
             'status' => true
         ]);
@@ -145,13 +158,25 @@ class JamKerja extends BaseController
     {
         $modelJamKerja = new JamKerjaModel();
         $modelMetaData = new MetadataModel();
+        $divisiModel = new DivisisModel();
 
         $id = decrypt($id);
+        $shift = array("PAGI", "NORMAL", "SIANG");
+        foreach (range(1, 50) as $s) {
+            array_push($shift, "SHIFT " . $s);
+        }
 
         $data = [
-            'jamKerja' => $modelJamKerja->where('id', $id)->first(),
-            'hari' => $modelMetaData->where('name', "hari")->findAll()
+            'jamKerja' => $modelJamKerja->select('jam_kerja.*')
+                ->where('jam_kerja.id', $id)
+                ->first(),
+            'jamKerjaDefault' => $divisiModel->where('jam_kerja_id', $id)->first(),
+            'hari' => $modelMetaData->where('name', "hari")->findAll(),
+            'divisi' => $divisiModel->asArray()->where('company_id', $this->this_company_id)->where('deletedAt', null)->orderBy('divisi', "asc")->findAll(),
+            'shift' => $shift
         ];
+
+        // dd($data['jamKerja'], $id);
 
         if ($data['jamKerja'] == null) {
             return redirect()->to('jam-kerja');
@@ -165,33 +190,33 @@ class JamKerja extends BaseController
         $modelJamKerja = new JamKerjaModel();
         $modelJamKerjaDetail = new JamKerjaDetailModel();
         $modelMetaData = new MetadataModel();
+        $modelDivisis = new DivisisModel();
 
-        $jamKerjaSameName = $modelJamKerja
-            ->where('company_id', $this->this_company_id)
-            ->where('jenis', strtoupper($this->request->getVar('jenisJamKerja')))
-            ->where('id !=', decrypt($this->request->getVar('jamKerjaID')))
-            ->first();
+        $id = decrypt($this->request->getVar('jamKerjaID'));
+        $divisiId = $this->request->getVar('divisiId');
+        $shift = $this->request->getVar('shift');
+        $jamTerlambat = $this->request->getVar('jamTerlambat');
+        $jenis = $this->request->getVar('jenis');
+        $jamKerjaDefault = $this->request->getVar('jamKerjaDefault');
 
-        if ($jamKerjaSameName) {
-            return response()->setJSON([
-                'status' => false,
-                'message' => "Jam kerja sudah digunakan.",
-                'token' => csrf_hash()
-            ]);
+        $modelJamKerja->update($id, [
+            'divisi_id' => $divisiId,
+            'shift' => $shift,
+            'jenis' => $jenis,
+            'jam_terlambat' => $jamTerlambat,
+        ]);
+
+        if ($jamKerjaDefault == 1) {
+            $modelDivisis->update($divisiId, ['jam_kerja_id' => null]);
+            $modelDivisis->update($divisiId, ['jam_kerja_id' => $id]);
         }
 
-        $modelJamKerja->set('jenis', strtoupper($this->request->getVar('jenisJamKerja')))
-            ->set('company_id', $this->this_company_id)
-            ->set('jam_terlambat', $this->request->getVar('jamTerlambat'))
-            ->where('id', decrypt($this->request->getVar('jamKerjaID')))
-            ->update();
-
         // delete first
-        $modelJamKerjaDetail->where('jam_kerja_id', decrypt($this->request->getVar('jamKerjaID')))->delete();
+        $modelJamKerjaDetail->where('jam_kerja_id', $id)->delete();
 
         foreach ($modelMetaData->where('name', "hari")->findAll() as $h) {
             $modelJamKerjaDetail->insert([
-                'jam_kerja_id' => decrypt($this->request->getVar('jamKerjaID')),
+                'jam_kerja_id' => $id,
                 'hari' => $h['value'],
                 'jam_masuk' => $this->request->getVar($h['value'] . "_mulaiMasuk"),
                 'jam_istirahat_mulai' => $this->request->getVar($h['value'] . "_mulaiIstirahat"),
@@ -200,7 +225,7 @@ class JamKerja extends BaseController
             ]);
         }
 
-        return \response()->setJSON([
+        return response()->setJSON([
             'message' => "Jam kerja berhasil diupdate",
             'status' => true
         ]);
