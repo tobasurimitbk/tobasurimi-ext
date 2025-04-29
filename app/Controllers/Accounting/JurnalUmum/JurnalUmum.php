@@ -2187,7 +2187,7 @@ class JurnalUmum extends BaseController
                     'total_kredit' => $nominal,
                     'metode_input' => 'system',
                     'type_transaksi' => $metadataMap[$jenisTransaksi]['id'],
-                    'no_bukti' => $no_transaksi_jurnal,
+                    'no_bukti' => $transaction->no_transaction,
                     'valas' => '20',
                     'exchange_rate' => 1,
                     'createdAt' => date('Y-m-d H:i:s'),
