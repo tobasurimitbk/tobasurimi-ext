@@ -2173,8 +2173,7 @@ class JurnalUmum extends BaseController
             $noDokumen = $jenisTransaksi === 'PANJAR' ? $detail['no_panjar'] : $detail['no_pinjaman'];
 
             // Generate journal number
-            $no_transaksi_jurnal = $this->transaksiJurnalModel
-                ->getNoTransaksiLast($metadataMap[$jenisTransaksi]['kode']);
+            $no_transaksi_jurnal = $transaction->no_transaction;
 
             // Create journal header
             $jurnalHeader = [

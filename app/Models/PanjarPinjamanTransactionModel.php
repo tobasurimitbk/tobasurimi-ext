@@ -50,64 +50,73 @@ class PanjarPinjamanTransactionModel extends Model
     public function getPanjarPinjamanSupplierList($addCondition, $condition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'no_transaction'     => 'panjar_pinjaman_transaction.no_transaction',
-            'createdAt'  => 'panjar_pinjaman_transaction.createdAt',
-            'type'  => 'panjar_pinjaman_transaction.type',
-            'updatedAt'     => 'panjar_pinjaman_transaction.updatedAt'
-
+            'no_transaction' => 'ppt.no_transaction',
+            'createdAt'      => 'ppt.createdAt',
+            'type'           => 'ppt.type',
+            'updatedAt'      => 'ppt.updatedAt'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'panjar_pinjaman_transaction.createdAt';
+        $sort     = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'ppt.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "panjar_pinjaman_transaction.*,suppliers.name as supplier_name";
-        $supplierDataQry = $this->asObject()
-            ->select($selectQry)
-            ->join('suppliers', 'panjar_pinjaman_transaction.supplier_id = suppliers.id', 'left')
-            ->where($condition)
-            ->orderBy($sort, $sortType);
-        $totalData = $supplierDataQry->countAllResults(false);
+        $builder = $this->db->table('panjar_pinjaman_transaction ppt');
+        $builder->select('ppt.*, suppliers.name as supplier_name, 
+            COALESCE(ps.total_pinjaman, 0) as total_pinjaman,
+            COALESCE(pjs.total_panjar, 0) as total_panjar');
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || !empty($addCondition['panjar_status'])) {
-            $supplierDataQry->groupStart();
-        }
+        // Join suppliers
+        $builder->join('suppliers', 'ppt.supplier_id = suppliers.id', 'left');
 
+        $builder->join(
+            '(SELECT transaction_id, SUM(total_pinjaman) AS total_pinjaman 
+              FROM pinjaman_supplier 
+              WHERE deletedAt IS NULL 
+              GROUP BY transaction_id) ps',
+            'ps.transaction_id = ppt.id',
+            'left'
+        );
 
+        $builder->join(
+            '(SELECT transaction_id, SUM(total_panjar) AS total_panjar 
+              FROM panjar_supplier 
+              WHERE deletedAt IS NULL 
+              GROUP BY transaction_id) pjs',
+            'pjs.transaction_id = ppt.id',
+            'left'
+        );
+
+        // Filtering dari parameter $condition
+        $builder->where($condition);
+
+        // Filter tambahan
         if (!empty($addCondition['status'])) {
-            if ($addCondition['status'] == "ALL") {
-                // JIKA ALL
-                $supplierDataQry->whereIn('is_posted', ['1', '0']);
+            if ($addCondition['status'] == 'ALL') {
+                $builder->whereIn('is_posted', ['0', '1']);
             } else {
                 $status = $addCondition['status'] == "NOT_POSTING" ? '0' : '1';
-                $supplierDataQry->where('is_posted', $status);
+                $builder->where('is_posted', $status);
             }
         }
 
-
-
-        // $supplierDataQry->where('is_posted', '0');
-
-
-        if ($addCondition['search']) {
-            $supplierDataQry->like('no_transaction', $addCondition['search']);
+        if (!empty($addCondition['search'])) {
+            $builder->like('ppt.no_transaction', $addCondition['search']);
         }
 
-        if ($addCondition['dateStart']) {
-            $supplierDataQry->where('createdAt >=',  $addCondition['dateStart']);
-        }
-        if ($addCondition['dateEnd']) {
-            $supplierDataQry->where('createdAt <=', $addCondition['dateEnd']);
+        if (!empty($addCondition['dateStart'])) {
+            $builder->where('ppt.createdAt >=', $addCondition['dateStart']);
         }
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || !empty($addCondition['panjar_status'])) {
-            $supplierDataQry->groupEnd();
+        if (!empty($addCondition['dateEnd'])) {
+            $builder->where('ppt.createdAt <=', $addCondition['dateEnd']);
         }
 
+        $totalData = $builder->countAllResults(false); // total semua
 
+        $builder->orderBy($sort, $sortType);
+        $data = $builder->get($limit, $offset)->getResult();
 
-        $totalFilteredData = $supplierDataQry->countAllResults(false);
-        $data = $supplierDataQry->findAll($limit, $offset);
+        $totalFilteredData = $totalData; // jika pakai search lebih kompleks, bisa dihitung ulang
 
         return [
             'data'              => $data,
@@ -131,9 +140,9 @@ class PanjarPinjamanTransactionModel extends Model
         $month = date('m'); // Bulan saat ini (format: 01-12)
         $year = date('Y'); // Tahun saat ini (format: 2023)
         $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d'))); // Tanggal terakhir bulan ini
-    
+
         $lastStr = convertBulanToAngkaRomawi($month) . '/' . $year; // Format: III/2023
-    
+
         // Ambil no_transaction terakhir di bulan & tahun ini
         $builder = $this->asArray()->select('no_transaction')
             ->orderBy('no_transaction', "DESC")
@@ -141,13 +150,13 @@ class PanjarPinjamanTransactionModel extends Model
             ->where('createdAt >=', $year . "-" . $month . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59")
             ->first();
-    
+
         $kode = 'PJR'; // Kode awal: PJR
         $lastNumber = 1; // Nomor awal: 1
-    
+
         if ($builder != null && isset($builder['no_transaction'])) {
             $explode = explode('/', $builder['no_transaction']); // Pecah no_transaction menjadi array
-    
+
             // Pastikan format no_transaction sesuai: PJR/X/2023/00001
             if (count($explode) == 4) {
                 $numberStr = $explode[3]; // Ambil bagian nomor (00001)
@@ -157,12 +166,10 @@ class PanjarPinjamanTransactionModel extends Model
                 }
             }
         }
-    
+
         $formattedlastNumber = sprintf("%05d", $lastNumber); // Format nomor menjadi 5 digit (00001)
         $generatedNo = $kode . '/' . $lastStr . '/' . $formattedlastNumber; // Gabungkan semua bagian
-    
+
         return $generatedNo;
     }
-
 }
-
