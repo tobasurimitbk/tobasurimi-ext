@@ -126,5 +126,43 @@ class PanjarPinjamanTransactionModel extends Model
         return $panjarPinjamanSupplierData;
     }
 
+    public function getNumber($companyId)
+    {
+        $month = date('m'); // Bulan saat ini (format: 01-12)
+        $year = date('Y'); // Tahun saat ini (format: 2023)
+        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d'))); // Tanggal terakhir bulan ini
+    
+        $lastStr = convertBulanToAngkaRomawi($month) . '/' . $year; // Format: III/2023
+    
+        // Ambil no_transaction terakhir di bulan & tahun ini
+        $builder = $this->asArray()->select('no_transaction')
+            ->orderBy('no_transaction', "DESC")
+            ->where('company_id', $companyId)
+            ->where('createdAt >=', $year . "-" . $month . "-01" . " 00:00:00")
+            ->where('createdAt <=', $last_day . " 23:59:59")
+            ->first();
+    
+        $kode = 'PJR'; // Kode awal: PJR
+        $lastNumber = 1; // Nomor awal: 1
+    
+        if ($builder != null && isset($builder['no_transaction'])) {
+            $explode = explode('/', $builder['no_transaction']); // Pecah no_transaction menjadi array
+    
+            // Pastikan format no_transaction sesuai: PJR/X/2023/00001
+            if (count($explode) == 4) {
+                $numberStr = $explode[3]; // Ambil bagian nomor (00001)
+                $number = intval($numberStr); // Konversi ke integer
+                if ($number >= $lastNumber) {
+                    $lastNumber = $number + 1; // Increment nomor terakhir
+                }
+            }
+        }
+    
+        $formattedlastNumber = sprintf("%05d", $lastNumber); // Format nomor menjadi 5 digit (00001)
+        $generatedNo = $kode . '/' . $lastStr . '/' . $formattedlastNumber; // Gabungkan semua bagian
+    
+        return $generatedNo;
+    }
+
 }
 
