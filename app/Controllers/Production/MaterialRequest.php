@@ -132,15 +132,15 @@ class MaterialRequest extends BaseController
 
         $dataWarehouse = $this->warehousesModel->asObject()->where('company_id', $this->this_company_id)->find();
         $dataDivisi = $this->divisiModel->getDivisiAccess();
-        $dataWorkOrder = $this->workOrdersModel->asObject()
-            ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
-            ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
-            ->where('company_id', $this->this_company_id)
-            ->where('work_orders.is_posted', "0")
-            ->where('work_orders.deletedAt', null)
-            ->where('work_order_details.deletedAt', null)
-            ->groupBy('work_order_details.work_order_id')
-            ->find();
+        // $dataWorkOrder = $this->workOrdersModel->asObject()
+        //     ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
+        //     ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
+        //     ->where('company_id', $this->this_company_id)
+        //     ->where('work_orders.is_posted', "0")
+        //     ->where('work_orders.deletedAt', null)
+        //     ->where('work_order_details.deletedAt', null)
+        //     ->groupBy('work_order_details.work_order_id')
+        //     ->find();
 
         $data = [
             'tipeBarang' => $this->metaDataModel
@@ -155,12 +155,11 @@ class MaterialRequest extends BaseController
             "dataSatuan" => $dataSatuan,
             "dataDivisi" => $dataDivisi,
             "dataWarehouse" => $dataWarehouse,
-            "dataWorkOrder" => $dataWorkOrder,
         ];
 
         if (!empty($id)) {
             $dataMaterialRequests = $this->materialRequestModel->asObject()->find($id);
-            $dataMaterialRequestswithwo = $this->materialRequestModel->getMaterialWithWorkOrder($id);
+            $dataMaterialRequest = $this->materialRequestModel->getMaterial($id);
             $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()->select('material_request_details.*, barang_master.kode_barang, satuans.kode_satuan, warehouses.warehouse_name as warehouse_text, divisis.divisi as divisi_text')
                 ->join('barang_master', 'barang_master.id = material_request_details.barang1_id', 'left')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id', 'left')
@@ -192,10 +191,8 @@ class MaterialRequest extends BaseController
             }
             $data["dataMaterialRequests"] = $dataMaterialRequests;
             $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
-            $data["dataMaterialRequestswithwo"] = $dataMaterialRequestswithwo;
             $data["ids"] = $ids;
         }
-
 
 
         return view('Production/materialRequest/form', $data);

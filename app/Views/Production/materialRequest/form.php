@@ -48,40 +48,6 @@
                 <input autocomplete="one-time-code" type="hidden" value="<?= !empty($ids) ? $ids : ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
 
-                <!-- <div class="row mt-3">
-                    <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Data Produksi</label>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <?php if (isset($dataMaterialRequestswithwo)) { ?>
-                                <input value="<?= !empty($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo[0]->wo_no : "" ?>" autocomplete="one-time-code" type="text" class="form-control kode_produksi_detail" name="kode_produksi_detail" id="kode_produksi_detail" placeholder="Kode Produksi" readonly>
-                            <?php } else { ?>
-                                <select class="form-select kode_produksi" name="kode_produksi" id="kode_produksi" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
-                                        <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>"><?= $dataWO->wo_no ?> - <?= $dataWO->nama_barang ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            <?php } ?>
-                            <label for="floatingInput">Kode Produksi</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo[0]->nama_barang : "" ?>" autocomplete="one-time-code" type="text" class="form-control barang_jadi" name="barang_jadi" id="barang_jadi" placeholder="Barang Jadi" readonly>
-                            <label for="floatingInput">Barang Jadi</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control standart_production" name="standart_production" id="standart_production" placeholder="Jumlah Standart Produksi" readonly>
-                            <label for="floatingInput">Jumlah Standart Produksi</label>
-                        </div>
-                    </div>
-                </div> -->
                 <div class="row mt-3">
                     <div class="col mb-3">
                         <label class="form-label font-weight-bold lable-title">Header Request</label>
@@ -92,7 +58,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input value="<?= !empty($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo[0]->req_no : "AUTO GENERATE" ?>" readonly autocomplete="one-time-code" type="text" class="form-control req_no" id="req_no" name="req_no" placeholder="Kode Produksi">
+                                    <input value="<?= !empty($dataMaterialRequests) ? $dataMaterialRequests->req_no : "AUTO GENERATE" ?>" readonly autocomplete="one-time-code" type="text" class="form-control req_no" id="req_no" name="req_no" placeholder="Kode Produksi">
                                     <label for="floatingInput">Kode Request</label>
                                 </div>
                                 <!-- <div class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -103,13 +69,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataMaterialRequestswithwo) ? date('d/m/Y', strtotime($dataMaterialRequestswithwo[0]->request_date)) : "" ?>" <?= !empty($dataMaterialRequestswithwo) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_request" name="date_request" id="date_request" placeholder="Tanggal Request">
+                            <input value="<?= !empty($dataMaterialRequests) ? date('d/m/Y', strtotime($dataMaterialRequests->request_date)) : "" ?>" <?= !empty($dataMaterialRequests) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_request" name="date_request" id="date_request" placeholder="Tanggal Request">
                             <label for="floatingInput">Tanggal Request</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataMaterialRequestswithwo) ? date('d/m/Y', strtotime($dataMaterialRequestswithwo[0]->production_date)) : "" ?>" <?= !empty($dataMaterialRequestswithwo) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Produksi">
+                            <input value="<?= !empty($dataMaterialRequests) ? date('d/m/Y', strtotime($dataMaterialRequests->production_date)) : "" ?>" <?= !empty($dataMaterialRequests) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Produksi">
                             <label for="floatingInput">Tanggal Produksi</label>
                         </div>
                     </div>

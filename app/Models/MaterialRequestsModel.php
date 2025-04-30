@@ -301,6 +301,22 @@ class MaterialRequestsModel extends Model
         return $data;
     }
 
+    public function getMaterial($id)
+    {
+        $selectQry = "material_requests.*";
+
+        $data = $this->asObject()
+            ->select($selectQry)
+            ->where('material_requests.id', $id)
+            ->get()
+            ->getResult();
+
+        // var_dump($data);
+        // exit;
+
+        return $data;
+    }
+
 
     public function getAllMaterialRequestReport($addCondition, $limit = 10, $offset = 0)
     {
