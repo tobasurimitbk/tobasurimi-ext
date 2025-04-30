@@ -69,13 +69,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataMaterialRequests) ? date('d/m/Y', strtotime($dataMaterialRequests->request_date)) : "" ?>" <?= !empty($dataMaterialRequests) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_request" name="date_request" id="date_request" placeholder="Tanggal Request">
+                            <input value="<?= !empty($dataMaterialRequests) ? date('d/m/Y', strtotime($dataMaterialRequests->request_date)) : "" ?>" <?= $dataMaterialRequests->is_posted == 1 ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_request" name="date_request" id="date_request" placeholder="Tanggal Request">
                             <label for="floatingInput">Tanggal Request</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataMaterialRequests) ? date('d/m/Y', strtotime($dataMaterialRequests->production_date)) : "" ?>" <?= !empty($dataMaterialRequests) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Produksi">
+                            <input value="<?= !empty($dataMaterialRequests) ? date('d/m/Y', strtotime($dataMaterialRequests->production_date)) : "" ?>" <?= $dataMaterialRequests->is_posted == 1 ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Produksi">
                             <label for="floatingInput">Tanggal Produksi</label>
                         </div>
                     </div>
