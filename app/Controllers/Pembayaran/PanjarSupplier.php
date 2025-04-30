@@ -326,7 +326,7 @@ class PanjarSupplier extends BaseController
                         "total_pinjaman" => repairDouble($detail['nominal_pembayaran']),
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
-                        "keterangan" => $detail("keterangan"),
+                        "keterangan" => $detail["keterangan"],
                     ];
 
                     $insert = $this->pinjamanSupplierModel->insert($detailData);
@@ -341,7 +341,7 @@ class PanjarSupplier extends BaseController
                         "total_panjar" => repairDouble($detail['nominal_pembayaran']),
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
-                        "keterangan" => $detail("keterangan"),
+                        "keterangan" => $detail["keterangan"],
                     ];
 
                     $insert = $this->panjarSupplierModel->insert($detailData);
@@ -423,8 +423,9 @@ class PanjarSupplier extends BaseController
                 echo json_encode($data);
                 return;
             }
-
-            $this->panjarSupplierModel->delete($id);
+            $this->panjarPinjamanTransactionModel->delete($id);
+            $this->panjarSupplierModel->where('transaction_id', $id)->delete();
+            $this->pinjamanSupplierModel->where('transaction_id', $id)->delete();
             $data = [
                 "status"    => true,
                 "message"   => "Data Berhasil dihapus",
@@ -726,11 +727,11 @@ class PanjarSupplier extends BaseController
                 "nominal_pembayaran" => $detail['total_panjar'],
                 "akun_kas" => [
                     "id" => $detail['akun_kas'],
-                    "name" => $accounts[$detail['akun_kas']]['nama_sub'] ?? null
+                    "name" => $accounts[$detail['akun_kas']]['no_sub'] . " " . $accounts[$detail['akun_kas']]['nama_sub'] ?? null
                 ],
                 "akun_selisih" => [
                     "id" => $detail['akun_selisih'],
-                    "name" => $accounts[$detail['akun_selisih']]['nama_sub'] ?? null
+                    "name" => $accounts[$detail['akun_selisih']]['no_sub'] . " " . $accounts[$detail['akun_selisih']]['nama_sub'] ?? null
                 ],
                 "keterangan" => $detail['keterangan'],
                 "createdAt" => $detail['createdAt']
@@ -746,11 +747,11 @@ class PanjarSupplier extends BaseController
                 "nominal_pembayaran" => $detail['total_pinjaman'],
                 "akun_kas" => [
                     "id" => $detail['akun_kas'],
-                    "name" => $accounts[$detail['akun_kas']]['nama_sub']
+                    "name" => $accounts[$detail['akun_kas']]['no_sub'] . " " . $accounts[$detail['akun_kas']]['nama_sub']
                 ],
                 "akun_selisih" => [
                     "id" => $detail['akun_selisih'],
-                    "name" => $accounts[$detail['akun_selisih']]['nama_sub']
+                    "name" => $accounts[$detail['akun_selisih']]['no_sub'] . " " . $accounts[$detail['akun_selisih']]['nama_sub']
                 ],
                 "keterangan" => $detail['keterangan'],
                 "createdAt" => $detail['createdAt']
@@ -833,10 +834,11 @@ class PanjarSupplier extends BaseController
         $search = trim($this->request->getGet('search')); // Ambil & bersihkan input pencarian
 
         $subAkun = $Sub_AkunsModel
-            ->select('id, nama_sub')
+            ->select('id, no_sub, nama_sub')
             ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
             ->like('nama_sub', $search)
+            ->orLike('no_sub', $search)
             ->findAll(10); // Batasi hasil max 10 biar efisien
 
         return $this->response->setJSON($subAkun);

@@ -385,6 +385,11 @@ class JurnalUmum extends BaseController
                 $noLPB = $penerimaanBarang == null ? "" : $penerimaanBarang['no_penerimaan_barang'];
             }
 
+            if ($data->supplier_id != null) {
+                $supplier = $this->supplierModel->where('id', $data->supplier_id)->first();
+                $data->supplier_name = $supplier == null ? '' : $supplier['name'];
+            }
+
             $dataResult[] = [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
@@ -2131,67 +2136,74 @@ class JurnalUmum extends BaseController
 
     public function insertDataPanjarPinjamanTransaction($payID)
     {
-        // Get division from employee
-        $divisi = $this->EmployeeModel->select('division_id')
-            ->asObject()
-            ->where('id', session()->get("login")->employee_id)
-            ->first();
+        try {
+            // Get division from employee
+            $divisi = $this->EmployeeModel->select('division_id')
+                ->asObject()
+                ->where('id', session()->get("login")->employee_id)
+                ->first();
 
-        // Get parent transaction data
-        $transaction = $this->panjarPinjamanTransactionModel
-            ->asObject()
-            ->find($payID);
+            // Get parent transaction data
+            $transaction = $this->panjarPinjamanTransactionModel
+                ->asObject()
+                ->find($payID);
 
-        if (!$transaction) {
-            throw new \Exception("Transaction not found");
-        }
+            if (!$transaction) {
+                throw new \Exception("Transaction not found");
+            }
 
-        // Get all transaction details (both panjar and pinjaman)
-        $panjarDetails = $this->PanjarSupplierModel
-            ->where('transaction_id', $payID)
-            ->findAll();
+            // Get all transaction details (both panjar and pinjaman)
+            $panjarDetails = $this->PanjarSupplierModel
+                ->where('transaction_id', $payID)
+                ->findAll();
 
-        $pinjamanDetails = $this->PinjamanSupplierModel
-            ->where('transaction_id', $payID)
-            ->findAll();
+            $pinjamanDetails = $this->PinjamanSupplierModel
+                ->where('transaction_id', $payID)
+                ->findAll();
 
-        // Combine all details
-        $allDetails = array_merge($panjarDetails, $pinjamanDetails);
+            // Combine all details
+            $allDetails = array_merge($panjarDetails, $pinjamanDetails);
 
-        // Initialize metadata
-        $metadataTipeTransaksi = $this->MetadataModel
-            ->asObject()
-            ->where('name', 'tipe_transaksi')
-            ->whereIn('value', ['PANJAR', 'PINJAMAN'])
-            ->findAll();
+            // Initialize metadata
+            $metadataTipeTransaksi = $this->MetadataModel
+                ->asObject()
+                ->where('name', 'tipe_transaksi')
+                ->whereIn('value', ['PANJAR', 'PINJAMAN', 'PANJAR & PINJAMAN'])
+                ->findAll();
 
-        $metadataMap = [];
-        foreach ($metadataTipeTransaksi as $meta) {
-            $metadataMap[$meta->value] = [
-                'id' => $meta->id,
-                'kode' => $meta->description
-            ];
-        }
+            $metadataMap = [];
+            foreach ($metadataTipeTransaksi as $meta) {
+                $metadataMap[$meta->value] = [
+                    'id' => $meta->id,
+                    'kode' => $meta->description
+                ];
+            }
 
-        // Process each detail
-        foreach ($allDetails as $detail) {
-            $jenisTransaksi = isset($detail['total_panjar']) ? 'PANJAR' : 'PINJAMAN';
-            $nominal = $jenisTransaksi === 'PANJAR' ? $detail['total_panjar'] : $detail['total_pinjaman'];
-            $noDokumen = $jenisTransaksi === 'PANJAR' ? $detail['no_panjar'] : $detail['no_pinjaman'];
+            $tanggal = "";
+            $totalPanjar = 0;
+            $totalPinjaman = 0;
+            foreach ($allDetails as $detail) {
+                $tanggal = $detail['payment_date'];
+                $totalPanjar += isset($detail['total_panjar']) ? $detail['total_panjar'] : 0;
+                $totalPinjaman += isset($detail['total_pinjaman']) ? $detail['total_pinjaman'] : 0;
+            }
 
             // Generate journal number
             $no_transaksi_jurnal = $transaction->no_transaction;
+            $jenisTransaksi = $totalPanjar != 0 && $totalPinjaman != 0 ? 'PANJAR & PINJAMAN' : ($totalPanjar != 0 ? 'PANJAR' : 'PINJAMAN');
 
             // Create journal header
             $jurnalHeader = [
                 'no_transaksi' => $no_transaksi_jurnal,
-                'tanggal_transaksi' => date('Y-m-d', strtotime($detail['payment_date'])),
-                'total_debit' => $nominal,
-                'total_kredit' => $nominal,
+                'tanggal_transaksi' => date('Y-m-d', strtotime($tanggal)),
+                'total_debit' => $totalPanjar + $totalPinjaman,
+                'total_kredit' => $totalPanjar + $totalPinjaman,
                 'metode_input' => 'system',
                 'type_transaksi' => $metadataMap[$jenisTransaksi]['id'],
                 'no_bukti' => $transaction->no_transaction,
-                'valas' => '20',
+                'valas_id' => '30',
+                'valas' => "IDR",
+                'uraian_transaksi' => $transaction->keterangan,
                 'exchange_rate' => 1,
                 'createdAt' => date('Y-m-d H:i:s'),
                 'createdBy' => session()->get("login")->user_id
@@ -2200,45 +2212,53 @@ class JurnalUmum extends BaseController
             // Insert journal header and get ID
             $id_transaksi_jurnal = $this->transaksiJurnalModel
                 ->insertTransaksiJurnal($jurnalHeader);
-
-            // Prepare journal entries
             $jurnalEntries = [];
+            // Process each detail
+            foreach ($allDetails as $detail) {
+                $nominal =  isset($detail['total_pinjaman']) ? $detail['total_pinjaman'] : $detail['total_panjar'];
 
-            // Debit entry (akun_kas)
-            $jurnalEntries[] = [
-                'id_transaksi' => $id_transaksi_jurnal,
-                'id_coa' => $detail['akun_kas'],
-                'company_id' => $transaction->company_id,
-                'divisi_id' => $divisi->division_id,
-                'tanggal_jurnal' => date('Y-m-d', strtotime($detail['payment_date'])),
-                'debit' => $nominal,
-                'kredit' => 0,
-                'valas' => '20',
-                'kurs' => 1,
-                'keterangan' => $detail['keterangan'],
-                'supplier_id' => $detail['supplier_id'],
-                'id_inputer' => session()->get("login")->user_id,
-                'createdAt' => date('Y-m-d H:i:s')
-            ];
+                // Prepare journal entries
 
-            // Credit entry (akun_selisih)
-            $jurnalEntries[] = [
-                'id_transaksi' => $id_transaksi_jurnal,
-                'id_coa' => $detail['akun_selisih'],
-                'company_id' => $transaction->company_id,
-                'divisi_id' => $divisi->division_id,
-                'tanggal_jurnal' => date('Y-m-d', strtotime($detail['payment_date'])),
-                'debit' => 0,
-                'kredit' => $nominal,
-                'valas' => '20',
-                'kurs' => 1,
-                'supplier_id' => $detail['supplier_id'],
-                'id_inputer' => session()->get("login")->user_id,
-                'createdAt' => date('Y-m-d H:i:s')
-            ];
+                // Debit entry (akun_kas)
+                $jurnalEntries[] = [
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' => $detail['akun_kas'],
+                    'company_id' => $transaction->company_id,
+                    'divisi_id' => $divisi->division_id,
+                    'tanggal_jurnal' => date('Y-m-d', strtotime($detail['payment_date'])),
+                    'debit' => $nominal,
+                    'kredit' => 0,
+                    'valas' => '30',
+                    'kurs' => 1,
+                    'keterangan' => $detail['keterangan'],
+                    'supplier_id' => $detail['supplier_id'],
+                    'id_inputer' => session()->get("login")->user_id,
+                    'createdAt' => date('Y-m-d H:i:s')
+                ];
 
-            // Insert journal entries
+                // Credit entry (akun_selisih)
+                $jurnalEntries[] = [
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'id_coa' => $detail['akun_selisih'],
+                    'company_id' => $transaction->company_id,
+                    'divisi_id' => $divisi->division_id,
+                    'tanggal_jurnal' => date('Y-m-d', strtotime($detail['payment_date'])),
+                    'debit' => 0,
+                    'kredit' => $nominal,
+                    'valas' => '30',
+                    'kurs' => 1,
+                    'keterangan' => $detail['keterangan'],
+                    'supplier_id' => $detail['supplier_id'],
+                    'id_inputer' => session()->get("login")->user_id,
+                    'createdAt' => date('Y-m-d H:i:s')
+                ];
+
+                // Insert journal entries
+            }
             $this->jurnalUmumModel->insertJurnalBatch($jurnalEntries);
+        } catch (Exception $e) {
+            var_dump("Terjadi Keslahan Saat Input Jurnal : ", $e->getMessage());
+            die;
         }
     }
 
@@ -2281,7 +2301,7 @@ class JurnalUmum extends BaseController
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
                     'no_bukti' => $no_transaksi_jurnal,
-                    'valas' => '20',
+                    'valas' => '30',
                     'exchange_rate' => 1,
                 );
 
@@ -2360,7 +2380,7 @@ class JurnalUmum extends BaseController
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
                     'no_bukti' => $no_transaksi_jurnal,
-                    'valas' => '20',
+                    'valas' => '30',
                     'exchange_rate' => 1,
                 );
 
@@ -2443,7 +2463,7 @@ class JurnalUmum extends BaseController
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
                     'no_bukti' => $no_transaksi_jurnal,
-                    'valas' => '20',
+                    'valas' => '30',
                     'exchange_rate' => 1,
                 );
 
@@ -2528,7 +2548,7 @@ class JurnalUmum extends BaseController
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
                     'no_bukti' => $no_transaksi_jurnal,
-                    'valas' => '20',
+                    'valas' => '30',
                     'exchange_rate' => 1,
                 );
 

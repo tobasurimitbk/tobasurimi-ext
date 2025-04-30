@@ -392,14 +392,15 @@
                         <div>
                         `
                     }
+                    // <div class="mt-0">
+                    //             <button  data-toggle="tooltip" title="Histori LPB" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
+                    //                 <i class="fa-solid fa-clock-rotate-left"></i>
+                    //             </button>
+                    //         <div>
                     if (is_posted === '1') {
                         return `
-
-                            <div class="mt-0">
-                                <button  data-toggle="tooltip" title="Histori LPB" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
-                                    <i class="fa-solid fa-clock-rotate-left"></i>
-                                </button>
-                            <div>
+                            -
+                            
                         `
 
                     }
@@ -821,7 +822,7 @@
                         results: $.map(data, function(item) {
                             return {
                                 id: item.id,
-                                text: item.nama_sub
+                                text: item.no_sub + ' ' + item.nama_sub
                             };
                         })
                     };
