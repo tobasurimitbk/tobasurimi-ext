@@ -236,9 +236,9 @@ class MaterialRequest extends BaseController
                 "id"                    => encrypt($data->id),
                 "req_no"                 => $data->req_no,
                 "nama_barang"           => $data->nama_barang,
-                "wo_no"           => $data->wo_no,
                 "is_posted"           => $data->is_posted,
-                "request_status"           => $data->request_status,
+                "request_date"           => $data->request_date,
+                "production_date"           => $data->production_date,
             ]);
         }
 
@@ -318,7 +318,7 @@ class MaterialRequest extends BaseController
             $no = $this->materialRequestModel->get_no(date('d'), date('m'), date('Y'), $last_day, $this->this_company_id);
 
             $dataMaterial = [
-                "work_order_id" => $this->request->getPost("kode_produksi"),
+                // "work_order_id" => $this->request->getPost("kode_produksi"),
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar("department_id"),
                 'warehouse_id' => $this->request->getVar("warehouse_id"),

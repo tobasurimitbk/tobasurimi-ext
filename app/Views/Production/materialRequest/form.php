@@ -48,7 +48,7 @@
                 <input autocomplete="one-time-code" type="hidden" value="<?= !empty($ids) ? $ids : ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
 
-                <div class="row mt-3">
+                <!-- <div class="row mt-3">
                     <div class="col mb-3">
                         <label class="form-label font-weight-bold lable-title">Data Produksi</label>
                     </div>
@@ -75,13 +75,13 @@
                             <label for="floatingInput">Barang Jadi</label>
                         </div>
                     </div>
-                    <!-- <div class="col-md-4">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control standart_production" name="standart_production" id="standart_production" placeholder="Jumlah Standart Produksi" readonly>
                             <label for="floatingInput">Jumlah Standart Produksi</label>
                         </div>
-                    </div> -->
-                </div>
+                    </div>
+                </div> -->
                 <div class="row mt-3">
                     <div class="col mb-3">
                         <label class="form-label font-weight-bold lable-title">Header Request</label>
@@ -682,32 +682,32 @@
             .css('z-index', '1');
 
         // Kode Produksi
-        $('.kode_produksi').select2({
-            placeholder: "Pilih kode Produksi",
-            theme: "bootstrap-5",
-            allowClear: true
-        });
+        // $('.kode_produksi').select2({
+        //     placeholder: "Pilih kode Produksi",
+        //     theme: "bootstrap-5",
+        //     allowClear: true
+        // });
 
         //CSS SELECT2 FLOATING LABEL
-        $('.kode_produksi')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
+        // $('.kode_produksi')
+        //     .parent('div')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .css('height', ' calc(3.5rem + 2px)');
 
-        $('.kode_produksi')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+        // $('.kode_produksi')
+        //     .parent('div')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.kode_produksi')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+        // $('.kode_produksi')
+        //     .parent('div')
+        //     .find('label')
+        //     .css('z-index', '1');
 
         // KODE BARANG
         $('.kode_barang').select2({
@@ -816,9 +816,6 @@
 
         var validator = $(".create-form").validate({
             rules: {
-                kode_produksi: {
-                    required: true
-                },
                 date_request: {
                     required: true
                 },
@@ -836,9 +833,6 @@
                 }
             },
             messages: {
-                kode_produksi: {
-                    required: "Kode produksi wajib diisi"
-                },
                 date_request: {
                     required: "Tanggal request wajib diisi"
                 },
@@ -1015,18 +1009,18 @@
             }
         });
 
-        $(".kode_produksi").change(function() {
-            if ($(".kode_produksi option:selected").val()) {
-                let nama_barang = $(".kode_produksi option:selected").data("nama-barang") ? $(".kode_produksi option:selected").data("nama-barang") : "";
-                let standart_production = $(".kode_produksi option:selected").data("standart-production") ? $(".kode_produksi option:selected").data("standart-production") : "";
+        // $(".kode_produksi").change(function() {
+        //     if ($(".kode_produksi option:selected").val()) {
+        //         let nama_barang = $(".kode_produksi option:selected").data("nama-barang") ? $(".kode_produksi option:selected").data("nama-barang") : "";
+        //         let standart_production = $(".kode_produksi option:selected").data("standart-production") ? $(".kode_produksi option:selected").data("standart-production") : "";
 
-                $(".barang_jadi").val(nama_barang);
-                $(".standart_production").val(standart_production);
-            } else {
-                $(".barang_jadi").val("");
-                $(".standart_production").val("");
-            }
-        })
+        //         $(".barang_jadi").val(nama_barang);
+        //         $(".standart_production").val(standart_production);
+        //     } else {
+        //         $(".barang_jadi").val("");
+        //         $(".standart_production").val("");
+        //     }
+        // })
     });
 
     $('.btn-hide-detail').click(function() {
