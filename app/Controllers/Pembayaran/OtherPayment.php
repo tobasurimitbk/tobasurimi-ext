@@ -86,7 +86,9 @@ class OtherPayment extends BaseController
                 "no_pembayaran"     => $data['no_pembayaran'],
                 "valas"             => $data['valas_name'],
                 "status_posting"    => $data['status_posting'],
-                "nominal"           => number_format($data['nominal_all'], 2)
+                "nominal"           => number_format($data['nominal_all'], 2),
+                "bayar_ke"          => $data['bayar_ke'],
+
             ]);
         }
 
@@ -105,7 +107,7 @@ class OtherPayment extends BaseController
     {
         $payload = $this->request->getJSON(true);
 
-        $noPembayaran = $payload['no_pembayaran'];  
+        $noPembayaran = $payload['no_pembayaran'];
         $existing = $this->otherPaymentModel->where('no_pembayaran', $noPembayaran)->first();
 
         if ($existing !== null) {
@@ -115,7 +117,7 @@ class OtherPayment extends BaseController
                 'token' => csrf_hash()
             ]);
         }
-        
+
         $parentData = [
             'company_id'     => $this->this_company_id,
             'divisi_id'      => $payload['divisi_id'],
@@ -166,9 +168,9 @@ class OtherPayment extends BaseController
     {
         // Ambil data JSON dari body
         $payload = $this->request->getJSON(true);
-    
+
         $parentId = decrypt($payload['id']) ?? null;
-    
+
         if (!$parentId) {
             return $this->response->setJSON([
                 'token' => csrf_hash(),
@@ -176,7 +178,7 @@ class OtherPayment extends BaseController
                 'message' => 'ID tidak ditemukan'
             ]);
         }
-    
+
         // 1. Update Parent Data
         $parentData = [
             'divisi_id'     => $payload['divisi_id'],
@@ -187,12 +189,12 @@ class OtherPayment extends BaseController
             'akun_kas'         => ($payload['jenis_pembayaran'] === 'MERAH') ? $payload['akun_selisih'] : null,
         ];
         $this->otherPaymentModel->update($parentId, $parentData);
-    
+
         // 2. Handle Details
         $existingDetails   = $this->otherPaymentDetailModel->where('other_payment_id', $parentId)->findAll();
         $existingDetailIds = array_column($existingDetails, 'id');
         $submittedDetailIds = [];
-    
+
         foreach ($payload['details'] as $detail) {
 
             if ($payload['jenis_pembayaran'] === 'MERAH') {
@@ -213,7 +215,7 @@ class OtherPayment extends BaseController
                 'akun_selisih'         => $akunSelisih,
                 'keterangan'           => $detail['keterangan'] ?? null
             ];
-    
+
             if (!empty(decrypt($detail['id']))) {
                 // Update
                 $this->otherPaymentDetailModel->update(decrypt($detail['id']), $detailData);
@@ -223,20 +225,20 @@ class OtherPayment extends BaseController
                 $this->otherPaymentDetailModel->insert($detailData);
             }
         }
-    
+
         // 3. Delete removed details
         $detailsToDelete = array_diff($existingDetailIds, $submittedDetailIds);
         if (!empty($detailsToDelete)) {
             $this->otherPaymentDetailModel->whereIn('id', $detailsToDelete)->delete();
         }
-    
+
         return $this->response->setJSON([
             'token' => csrf_hash(),
             'status' => true,
             'message' => "Pembayaran lain-lain berhasil diupdate",
         ]);
     }
-    
+
 
     public function delete()
     {
@@ -253,7 +255,7 @@ class OtherPayment extends BaseController
     public function get()
     {
         $id = decrypt($this->request->getVar('id'));
-        
+
         // Get parent data
         $parentData = $this->otherPaymentModel->find($id);
         if (!$parentData) {
@@ -266,16 +268,16 @@ class OtherPayment extends BaseController
 
         // Get all child details
         $details = $this->otherPaymentDetailModel
-                    ->select('other_payment_detail.*, 
+            ->select('other_payment_detail.*, 
                             kas.nama_sub as akun_kas_name, 
                             selisih.nama_sub as akun_selisih_name,
                             kas.no_sub as akun_kas_no,
                             selisih.no_sub as akun_selisih_no')
-                    ->join('sub_akuns as kas', 'kas.id = other_payment_detail.akun_kas', 'left')
-                    ->join('sub_akuns as selisih', 'selisih.id = other_payment_detail.akun_selisih', 'left')
-                    ->where('other_payment_detail.other_payment_id', $id)
-                    ->findAll();
-        
+            ->join('sub_akuns as kas', 'kas.id = other_payment_detail.akun_kas', 'left')
+            ->join('sub_akuns as selisih', 'selisih.id = other_payment_detail.akun_selisih', 'left')
+            ->where('other_payment_detail.other_payment_id', $id)
+            ->findAll();
+
         // Format details data
         $formattedDetails = [];
         foreach ($details as $detail) {

@@ -237,6 +237,7 @@
                                 <th onclick="changeSort('no_pembayaran')">No. Pembayaran</th>
                                 <th onclick="changeSort('divisi_id')">Departemen</th>
                                 <th onclick="changeSort('valas')">Valas</th>
+                                <th onclick="changeSort('bayar_ke')">Uraian</th>
                                 <th onclick="changeSort('nominal_pembayaran')">Nominal</th>
                                 <th>Action</th>
                             </tr>
@@ -310,6 +311,10 @@
             },
             {
                 data: "valas",
+                className: "text-center"
+            },
+            {
+                data: "bayar_ke",
                 className: "text-center"
             },
             {
