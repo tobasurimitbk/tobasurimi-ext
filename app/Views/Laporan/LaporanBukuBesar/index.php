@@ -79,7 +79,7 @@
                             <label for="floatingInput">Pilih Jenis Akun</label>
                         </div>
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-3">
                         <div class="form-floating" style="height: 50px;">
                             <select class="form-select account_id" multiple name="account_id[]" id="account_id" onchange="changeAccount()">
                                 <?php foreach ($account as $a) : ?>
@@ -92,8 +92,17 @@
                             </select>
                             <label for="account_id">Pilih Akun (COA)</label>
                         </div>
-
-
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select supplier_id" name="supplier_id" id="supplier_id">
+                                <option value="">SEMUA</option>
+                                <?php foreach ($supplier ?? [] as $s) : ?>
+                                    <option <?= isset($_POST['supplier_id']) ? ($s['id'] == $_POST['supplier_id'] ? 'selected' : '') : '' ?> value="<?= $s['id']; ?>"><?= $s['name'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Pilih Supplier</label>
+                        </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -287,15 +296,20 @@
             theme: "bootstrap-5",
             allowClear: true
         });
+        $('.supplier_id').select2({
+            placeholder: "Pilih Supplier",
+            theme: "bootstrap-5",
+            allowClear: false
+        });
 
-        $('.divisi_id,.jenis_account,.range_account_start_id,.range_account_finish_id')
+        $('.divisi_id,.jenis_account,.range_account_start_id,.range_account_finish_id,.supplier_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.divisi_id,.jenis_account,.range_account_start_id,.range_account_finish_id')
+        $('.divisi_id,.jenis_account,.range_account_start_id,.range_account_finish_id,.supplier_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -303,7 +317,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px').css('z-index', '1');
 
-        $('.divisi_id,.jenis_account,.range_account_start_id,.range_account_finish_id')
+        $('.divisi_id,.jenis_account,.range_account_start_id,.range_account_finish_id,.supplier_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');

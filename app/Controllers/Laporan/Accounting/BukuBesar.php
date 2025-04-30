@@ -9,6 +9,7 @@ use App\Models\KategoriAkunsModel;
 use App\Models\HeaderAkunsModel;
 use App\Models\MetadataModel;
 use App\Models\JurnalUmumModel;
+use App\Models\SupplierModel;
 use Dompdf\Dompdf;
 
 class BukuBesar extends BaseController
@@ -21,6 +22,8 @@ class BukuBesar extends BaseController
     protected $HeaderAkunsModel;
     protected $MetadataModel;
     protected $divisiModel;
+    protected $this_role_id;
+    protected $supplierModel;
 
     public function __construct()
     {
@@ -33,10 +36,13 @@ class BukuBesar extends BaseController
         $this->MetadataModel = new MetadataModel();
         $this->jurnalUmumModel = new JurnalUmumModel();
         $this->divisiModel = new DivisisModel();
+        $this->supplierModel = new SupplierModel();
     }
     public function index()
     {
         $divisi = $this->divisiModel->getDivisiAccess();
+        $supplier = $this->supplierModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
+
         $account = [];
 
         if (@$_POST['jenis_account'] == "header_account") {
@@ -65,6 +71,7 @@ class BukuBesar extends BaseController
         }
 
         $data = [
+            "supplier" => $supplier,
             "account" => $account,
             "divisi" => $divisi,
             "jurnalUmum" => isset($dataJurnalUmum) ? $dataJurnalUmum : []
@@ -85,10 +92,11 @@ class BukuBesar extends BaseController
         $rangeAccountStartId = $this->request->getPost('range_account_start_id');
         $rangeAccountFinishId = $this->request->getPost('range_account_finish_id');
         $jenisAccount = $this->request->getPost('jenis_account');
+        $supplierId = $this->request->getPost('supplier_id');
 
 
         $result = [];
-        
+
         if ($this->this_company_id == 1 || $this->this_company_id == 2) {
             $companyId = [1, 2];
         } else if ($this->this_company_id == 15) {
@@ -101,6 +109,10 @@ class BukuBesar extends BaseController
         if ($this->this_role_id != '7') {
             $condition['jurnal_umum.id_transaksi !='] = '1404';
             $condition['transaksi_jurnal.type_transaksi !='] = '1404';
+        }
+
+        if (!empty($supplierId)) {
+            $condition['jurnal_umum.supplier_id'] = $supplierId;
         }
 
         // Fungsi umum untuk mendapatkan saldo lama dan data jurnal
