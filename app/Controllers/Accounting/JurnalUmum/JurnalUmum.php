@@ -2046,6 +2046,7 @@ class JurnalUmum extends BaseController
                     'valas_id' => $otherPayment->valas,
                     'valas' => "IDR",
                     'exchange_rate' => $kursData,
+                    'uraian_transaksi' => $otherPayment->bayar_ke,
                 );
 
                 $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
