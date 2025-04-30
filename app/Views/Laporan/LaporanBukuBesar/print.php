@@ -8,7 +8,7 @@
   <style>
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 5px;
+      font-size: 11px;
     }
 
     h5 {
@@ -29,11 +29,12 @@
       margin-bottom: 10px;
     }
 
+    /* 
     @page {
       size: 7.44in 10in portrait;
       margin: 5px;
       padding: 20px;
-    }
+    } */
 
     table {
       border-collapse: collapse !important;
@@ -57,12 +58,12 @@
       <div style="margin-top: 10px; margin-bottom:10px;">
         <b><?= $j['number'] ?> - <?= $j['name'] ?></b>
       </div>
-      <table width="100%" id="table1
+      <table id="table1
       style=" margin-top: -20px;">
         <thead>
           <tr>
             <th>Tanggal</th>
-            <th>Jenis Transaksi</th>
+            <!-- <th>Jenis Transaksi</th> -->
             <th>No Transaksi</th>
             <th>Supplier</th>
             <th>Desc</th>
@@ -93,7 +94,7 @@
             ?>
             <tr>
               <td><?= date('d/m/Y', strtotime($r['tanggal_jurnal'])) ?></td>
-              <td><?= $r['jenis_transaksi'] ?></td>
+              <!-- <td><?= $r['jenis_transaksi'] ?></td> -->
               <td><?= $r['no_transaksi'] ?></td>
               <td><?= $r['supplier_name'] ?></td>
               <td><?= $r['keterangan'] ?></td>
