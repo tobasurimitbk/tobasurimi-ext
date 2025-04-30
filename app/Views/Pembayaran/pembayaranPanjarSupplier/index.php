@@ -125,6 +125,12 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control keterangan_detail" name="keterangan_detail" id="keterangan_detail" placeholder="Keterangan" value="">
+                                        <label for="floatingInput">Keterangan</label>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="row">
@@ -144,6 +150,7 @@
                                                 <th>Nominal</th>
                                                 <th>Akun Debit</th>
                                                 <th>Akun Kredit</th>
+                                                <th>Keterangan</th>
                                                 <th>Aksi</th>
                                             </tr>
                                         </thead>
@@ -679,6 +686,7 @@
                         <td>${detail.nominal_pembayaran}</td>
                         <td>${detail.akun_kas_name || detail.akun_kas}</td>
                         <td>${detail.akun_selisih_name || detail.akun_selisih}</td>
+                         <td>${detail.keterangan}</td>
                         <td>
                             <button class="btn btn-danger btn-sm btn-remove-detail" data-index="${index}">
                                 <i class="fas fa-trash"></i>
@@ -733,7 +741,8 @@
                             akun_kas: detail.akun_kas.id,
                             akun_kas_name: detail.akun_kas.name || $('#akun_kas option[value="' + detail.akun_kas + '"]').text(),
                             akun_selisih: detail.akun_selisih.id,
-                            akun_selisih_name: detail.akun_selisih.name || $('#akun_selisih option[value="' + detail.akun_selisih + '"]').text()
+                            akun_selisih_name: detail.akun_selisih.name || $('#akun_selisih option[value="' + detail.akun_selisih + '"]').text(),
+                            keterangan: detail.keterangan,
                         }
                         details.push(newDetail);
                     });
@@ -839,6 +848,7 @@
                 akun_kas_name: $('#akun_kas option:selected').text(),
                 akun_selisih: $('#akun_selisih').val(),
                 akun_selisih_name: $('#akun_selisih option:selected').text(),
+                keterangan: $('#keterangan_detail').val(),
             };
 
             details.push(detail);
@@ -859,7 +869,7 @@
         // Clear detail form
         function clearDetailForm() {
             $('#tanggal, #nominal_pembayaran').val('');
-            $('#jenis_transaksi, #akun_kas, #akun_selisih').val('').trigger('change');
+            $('#jenis_transaksi, #akun_kas, #akun_selisih, #keterangan_detail').val('').trigger('change');
         }
 
 
@@ -904,7 +914,7 @@
 
             // Special handling for detail fields
             const hasDetails = $("#detail-table tbody tr").length > 0;
-            const detailFields = ['#tanggal', '#jenis_transaksi', '#nominal_pembayaran', '#akun_kas', '#akun_selisih'];
+            const detailFields = ['#tanggal', '#jenis_transaksi', '#nominal_pembayaran', '#akun_kas', '#akun_selisih', '#keterangan_detail'];
 
             detailFields.forEach(field => {
                 const element = $(field);
@@ -1008,6 +1018,7 @@
                             data.append(`details[${index}][nominal_pembayaran]`, destroyFormatRupiah(detail.nominal_pembayaran));
                             data.append(`details[${index}][akun_kas]`, detail.akun_kas);
                             data.append(`details[${index}][akun_selisih]`, detail.akun_selisih);
+                            data.append(`details[${index}][keterangan]`, detail.keterangan);
                         });
 
                         let id = $("#id").val();

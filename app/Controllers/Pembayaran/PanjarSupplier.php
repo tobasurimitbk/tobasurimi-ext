@@ -147,6 +147,7 @@ class PanjarSupplier extends BaseController
                         "total_pinjaman" => repairDouble($detail['nominal_pembayaran']),
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
+                        "keterangan" => $detail['keterangan'],
                     ];
 
                     $insert = $this->pinjamanSupplierModel->insert($detailData);
@@ -161,6 +162,7 @@ class PanjarSupplier extends BaseController
                         "total_panjar" => repairDouble($detail['nominal_pembayaran']),
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
+                        "keterangan" => $detail['keterangan'],
                     ];
 
                     $insert = $this->panjarSupplierModel->insert($detailData);
@@ -324,6 +326,7 @@ class PanjarSupplier extends BaseController
                         "total_pinjaman" => repairDouble($detail['nominal_pembayaran']),
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
+                        "keterangan" => $detail("keterangan"),
                     ];
 
                     $insert = $this->pinjamanSupplierModel->insert($detailData);
@@ -338,6 +341,7 @@ class PanjarSupplier extends BaseController
                         "total_panjar" => repairDouble($detail['nominal_pembayaran']),
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
+                        "keterangan" => $detail("keterangan"),
                     ];
 
                     $insert = $this->panjarSupplierModel->insert($detailData);
