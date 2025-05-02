@@ -183,11 +183,12 @@ class Hutang extends BaseController
 
     public function allDetailsInvoice($id)
     {
-        $rawFilter = $this->request->getGet("filter");
-        $filter = [];
+        $rawFilter = $this->request->getGet("filter") == "all" ? "" : $this->request->getGet("filter");
 
         if ($rawFilter) {
             $filter = explode(',', $rawFilter);
+        } else {
+            $filter = "";
         }
         $payload = [
             "pageSize"      => $this->request->getGet("length"),
