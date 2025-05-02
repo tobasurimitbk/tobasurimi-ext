@@ -25,7 +25,7 @@
                             <tr>
                                 <th>No.</th>
                                 <th onclick="changeSort('req_no')" class="sort">Kode Request</th>
-                                <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
+                                <!-- <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th> -->
                                 <th onclick="changeSort('request_date')" class="sort">Tanggal Permintaan</th>
                                 <th onclick="changeSort('production_date')" class="sort">Tanggal Produksi</th>
                                 <th>Action</th>
@@ -96,10 +96,10 @@
                 data: "req_no",
                 className: "text-center"
             },
-            {
-                data: "nama_barang",
-                className: "text-center"
-            },
+            // {
+            //     data: "nama_barang",
+            //     className: "text-center"
+            // },
             {
                 data: "request_date",
                 className: "text-center"

@@ -232,7 +232,7 @@ class MaterialRequest extends BaseController
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
                 "req_no"                 => $data->req_no,
-                "nama_barang"           => $data->nama_barang,
+                // "nama_barang"           => $data->nama_barang,
                 "is_posted"           => $data->is_posted,
                 "request_date"           => $data->request_date,
                 "production_date"           => $data->production_date,
