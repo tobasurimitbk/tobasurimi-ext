@@ -8,35 +8,35 @@
   <style>
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 5px;
-    }
-
-    h5 {
-      font-weight: normal;
-      font-size: 18px;
-      margin-bottom: 10px;
-      text-align: center;
-      font-weight: bold;
-      margin-top: 8px;
-    }
-
-    h6 {
-      font-weight: normal;
-      font-size: 13px;
-      text-align: center;
-      font-weight: bold;
-      margin-top: 10px;
-      margin-bottom: 10px;
+      font-size: 11px;
+      margin: 0;
+      /* Hilangkan margin body agar konsisten */
     }
 
     @page {
-      size: 7.44in 10in portrait;
-      margin: 5px;
-      padding: 20px;
+      size: auto;
+      margin: 0 10px;
+      /* 0 atas-bawah, 10px kiri-kanan */
+    }
+
+    h5 {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 10px;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    h6 {
+      font-weight: bold;
+      font-size: 13px;
+      margin: 10px 0;
+      text-align: center;
     }
 
     table {
       border-collapse: collapse !important;
+      width: 100%;
     }
 
     #table1,
@@ -45,6 +45,8 @@
       border: 1px solid #999;
     }
   </style>
+
+
 </head>
 
 <body>
@@ -57,19 +59,20 @@
       <div style="margin-top: 10px; margin-bottom:10px;">
         <b><?= $j['number'] ?> - <?= $j['name'] ?></b>
       </div>
-      <table width="100%" id="table1
+      <table id="table1
       style=" margin-top: -20px;">
         <thead>
           <tr>
-            <th>Tanggal</th>
-            <th>Jenis Transaksi</th>
-            <th>No Transaksi</th>
-            <th>Desc</th>
-            <th>Currency</th>
-            <th>Exchange Rate</th>
-            <th>Debit</th>
-            <th>Kredit</th>
-            <th>Balance</th>
+            <th style="width: 20px;">Tanggal</th>
+            <!-- <th>Jenis Transaksi</th> -->
+            <th style="width: 20px;">No Trx</th>
+            <th style="width: 20px;">Supplier</th>
+            <th style="width: 180px;">Desc</th>
+            <th style="width: 20px;">Currency</th>
+            <th style="width: 20px;">Exchange Rate</th>
+            <th style="width: 20px;">Debit</th>
+            <th style="width: 20px;">Kredit</th>
+            <th style="width: 20px;">Balance</th>
           </tr>
         </thead>
 
@@ -92,8 +95,9 @@
             ?>
             <tr>
               <td><?= date('d/m/Y', strtotime($r['tanggal_jurnal'])) ?></td>
-              <td><?= $r['jenis_transaksi'] ?></td>
+              <!-- <td><?= $r['jenis_transaksi'] ?></td> -->
               <td><?= $r['no_transaksi'] ?></td>
+              <td><?= $r['supplier_name'] ?></td>
               <td><?= $r['keterangan'] ?></td>
               <td><?= toRupiah(abs($r['debit'] - $r['kredit'])) . " " . "<b>" . $r['valas'] . "</b>" ?></td>
               <td><?= $r['kurs'] == "1" ? "" : toRupiah($r['kurs']) ?></td>

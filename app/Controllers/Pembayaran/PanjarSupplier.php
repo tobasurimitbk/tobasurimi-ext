@@ -60,7 +60,7 @@ class PanjarSupplier extends BaseController
     }
 
     public function savePanjarSupplier()
-    {   
+    {
         try {
             $rules = [
                 "no_transaksi" => [
@@ -79,7 +79,7 @@ class PanjarSupplier extends BaseController
                     "rules" => "required"
                 ],
             ];
-            
+
             if (!$this->validate($rules)) {
                 $errorList = $this->validator->getErrors();
                 $data = [
@@ -90,13 +90,13 @@ class PanjarSupplier extends BaseController
                 echo json_encode($data);
                 return;
             }
-    
+
             // Check if transaction number already exists
             $check = $this->panjarPinjamanTransactionModel
                 ->where('company_id', $this->this_company_id)
                 ->where('no_transaction', $this->request->getPost("no_transaksi"))
                 ->first();
-                
+
             if ($check != null) {
                 return response()->setJSON([
                     'token' => csrf_hash(),
@@ -104,21 +104,22 @@ class PanjarSupplier extends BaseController
                     'status' => false
                 ]);
             }
-    
+
             // Prepare parent transaction data
             $parentData = [
                 "company_id" => $this->this_company_id,
                 "supplier_id" => $this->request->getVar('supplier_id'),
                 "type" => $this->request->getVar('jenis'),
                 "no_transaction" => $this->request->getPost("no_transaksi"),
+                "keterangan" => $this->request->getPost("keterangan"),
             ];
-    
+
             // Start transaction
             $this->panjarPinjamanTransactionModel->db->transBegin();
-    
+
             // Insert parent transaction
             $parentId = $this->panjarPinjamanTransactionModel->insert($parentData, true);
-    
+
             if (!$parentId) {
                 $this->panjarPinjamanTransactionModel->db->transRollback();
                 return response()->setJSON([
@@ -127,14 +128,14 @@ class PanjarSupplier extends BaseController
                     'status' => false
                 ]);
             }
-    
+
             // Process details
             $details = $this->request->getVar('details');
             $success = true;
-    
+
             foreach ($details as $detail) {
-                
-    
+
+
                 if ($detail['jenis_transaksi'] == 'PINJAMAN') {
 
                     $detailData = [
@@ -150,7 +151,6 @@ class PanjarSupplier extends BaseController
                     ];
 
                     $insert = $this->pinjamanSupplierModel->insert($detailData);
-
                 } else {
 
                     $detailData = [
@@ -166,15 +166,14 @@ class PanjarSupplier extends BaseController
                     ];
 
                     $insert = $this->panjarSupplierModel->insert($detailData);
-                    
                 }
-    
+
                 if (!$insert) {
                     $success = false;
                     break;
                 }
             }
-    
+
             if (!$success) {
                 $this->panjarPinjamanTransactionModel->db->transRollback();
                 return response()->setJSON([
@@ -183,10 +182,10 @@ class PanjarSupplier extends BaseController
                     'status' => false
                 ]);
             }
-    
+
             // Commit transaction if all successful
             $this->panjarPinjamanTransactionModel->db->transCommit();
-    
+
             $data = [
                 "status" => true,
                 "message" => "Data Berhasil disimpan",
@@ -195,12 +194,11 @@ class PanjarSupplier extends BaseController
             ];
             echo json_encode($data);
             return;
-            
         } catch (\Exception $e) {
             if (isset($this->panjarPinjamanTransactionModel->db) && $this->panjarPinjamanTransactionModel->db->transStatus() !== false) {
                 $this->panjarPinjamanTransactionModel->db->transRollback();
             }
-            
+
             $data = [
                 "status" => false,
                 "message" => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -236,7 +234,7 @@ class PanjarSupplier extends BaseController
                     "rules" => "required"
                 ],
             ];
-            
+
             if (!$this->validate($rules)) {
                 $errorList = $this->validator->getErrors();
                 $data = [
@@ -246,17 +244,17 @@ class PanjarSupplier extends BaseController
                 ];
                 return $this->response->setJSON($data);
             }
-    
+
             // Get the transaction ID to update
             $transactionId = decrypt($this->request->getVar('id'));
 
-    
+
             // Check if transaction exists
             $existingTransaction = $this->panjarPinjamanTransactionModel
                 ->where('company_id', $this->this_company_id)
                 ->where('id', $transactionId)
                 ->first();
-                
+
             if (!$existingTransaction) {
                 return $this->response->setJSON([
                     'token' => csrf_hash(),
@@ -264,14 +262,14 @@ class PanjarSupplier extends BaseController
                     'status' => false
                 ]);
             }
-    
+
             // Check if transaction number is changed and already exists
             if ($existingTransaction['no_transaction'] != $this->request->getPost("no_transaksi")) {
                 $check = $this->panjarPinjamanTransactionModel
                     ->where('company_id', $this->this_company_id)
                     ->where('no_transaction', $this->request->getPost("no_transaksi"))
                     ->first();
-                    
+
                 if ($check != null) {
                     return $this->response->setJSON([
                         'token' => csrf_hash(),
@@ -280,24 +278,25 @@ class PanjarSupplier extends BaseController
                     ]);
                 }
             }
-    
+
             // Prepare parent transaction data
             $parentData = [
                 "supplier_id" => $this->request->getVar('supplier_id'),
                 "type" => $this->request->getVar('jenis'),
                 "no_transaction" => $this->request->getPost("no_transaksi"),
-                "updated_at" => date('Y-m-d H:i:s')
+                "updated_at" => date('Y-m-d H:i:s'),
+                "keterangan" => $this->request->getPost("keterangan"),
             ];
-    
+
             // Start transaction
             $this->panjarPinjamanTransactionModel->db->transBegin();
-    
+
             // Update parent transaction
             $updateParent = $this->panjarPinjamanTransactionModel
                 ->where('id', $transactionId)
                 ->set($parentData)
                 ->update();
-    
+
             if (!$updateParent) {
                 $this->panjarPinjamanTransactionModel->db->transRollback();
                 return $this->response->setJSON([
@@ -306,15 +305,15 @@ class PanjarSupplier extends BaseController
                     'status' => false
                 ]);
             }
-    
+
             // Process details - first delete existing details
             $this->panjarSupplierModel->where('transaction_id', $transactionId)->delete();
             $this->pinjamanSupplierModel->where('transaction_id', $transactionId)->delete();
-    
+
             // Then insert new details
             $details = $this->request->getVar('details');
             $success = true;
-    
+
             foreach ($details as $detail) {
                 if ($detail['jenis_transaksi'] == 'PINJAMAN') {
 
@@ -327,11 +326,10 @@ class PanjarSupplier extends BaseController
                         "total_pinjaman" => repairDouble($detail['nominal_pembayaran']),
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
-                        "keterangan" => $detail['keterangan'],
+                        "keterangan" => $detail["keterangan"],
                     ];
 
                     $insert = $this->pinjamanSupplierModel->insert($detailData);
-
                 } else {
 
                     $detailData = [
@@ -343,19 +341,18 @@ class PanjarSupplier extends BaseController
                         "total_panjar" => repairDouble($detail['nominal_pembayaran']),
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
-                        "keterangan" => $detail['keterangan'],
+                        "keterangan" => $detail["keterangan"],
                     ];
 
                     $insert = $this->panjarSupplierModel->insert($detailData);
-                    
                 }
-    
+
                 if (!$insert) {
                     $success = false;
                     break;
                 }
             }
-    
+
             if (!$success) {
                 $this->panjarPinjamanTransactionModel->db->transRollback();
                 return $this->response->setJSON([
@@ -364,10 +361,10 @@ class PanjarSupplier extends BaseController
                     'status' => false
                 ]);
             }
-    
+
             // Commit transaction if all successful
             $this->panjarPinjamanTransactionModel->db->transCommit();
-    
+
             $data = [
                 "status" => true,
                 "message" => "Data Berhasil diupdate",
@@ -375,12 +372,11 @@ class PanjarSupplier extends BaseController
                 'token' => csrf_hash()
             ];
             return $this->response->setJSON($data);
-            
         } catch (\Exception $e) {
             if (isset($this->panjarPinjamanTransactionModel->db) && $this->panjarPinjamanTransactionModel->db->transStatus() !== false) {
                 $this->panjarPinjamanTransactionModel->db->transRollback();
             }
-            
+
             $data = [
                 "status" => false,
                 "message" => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -427,8 +423,9 @@ class PanjarSupplier extends BaseController
                 echo json_encode($data);
                 return;
             }
-
-            $this->panjarSupplierModel->delete($id);
+            $this->panjarPinjamanTransactionModel->delete($id);
+            $this->panjarSupplierModel->where('transaction_id', $id)->delete();
+            $this->pinjamanSupplierModel->where('transaction_id', $id)->delete();
             $data = [
                 "status"    => true,
                 "message"   => "Data Berhasil dihapus",
@@ -459,7 +456,7 @@ class PanjarSupplier extends BaseController
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
-    
+
         $addCondition = [
             "search"        => $payload['search'],
             "sort"          => $payload['sort'],
@@ -468,7 +465,7 @@ class PanjarSupplier extends BaseController
             "dateStart"     => $payload['dateStart'],
             "dateEnd"       => $payload['dateEnd'],
         ];
-    
+
         $conditionPanjar = [
             'panjar_supplier.company_id' => $this->this_company_id,
             'panjar_supplier.deletedAt' => null
@@ -478,27 +475,27 @@ class PanjarSupplier extends BaseController
             'pinjaman_supplier.company_id' => $this->this_company_id,
             'pinjaman_supplier.deletedAt' => null
         ];
-    
+
         $limit = $payload["pageSize"];
         $offset = $this->request->getGet("start");
-    
+
         // Ambil data dari kedua model
         $pinjamanData = $this->pinjamanSupplierModel->getPinjamanSupplierList($addCondition, $conditionPinjaman, $limit, $offset);
         $panjarData = $this->panjarSupplierModel->getPanjarSupplierList($addCondition, $conditionPanjar, $limit, $offset);
-    
+
         $dataSupplier = [];
-    
+
         // Proses data panjar
         foreach ($panjarData['data'] as $data) {
             $bayar_panjar = $this->localPOPaymentPanjarModel
                 ->where('panjar_id', $data->id)
                 ->findAll();
-    
+
             $total_bayar_panjar = 0;
             foreach ($bayar_panjar as $b) {
                 $total_bayar_panjar += $b['bayar_panjar'];
             }
-    
+
             $dataSupplier[] = [
                 "id"            => encrypt($data->id),
                 "no_panjar"     => $data->no_panjar,
@@ -516,12 +513,12 @@ class PanjarSupplier extends BaseController
                 "type"          => 'panjar' // Tambahkan identifier
             ];
         }
-    
+
         // Proses data pinjaman (disesuaikan dengan struktur panjar)
         foreach ($pinjamanData['data'] as $data) {
             // Hitung total bayar pinjaman jika ada model pembayaran pinjaman
             $total_bayar_pinjaman = 0; // Anda perlu menyesuaikan ini dengan model pembayaran pinjaman
-            
+
             $dataSupplier[] = [
                 "id"            => encrypt($data->id),
                 "no_panjar"     => $data->no_pinjaman ?? '-',
@@ -543,14 +540,14 @@ class PanjarSupplier extends BaseController
         // Gabungkan total data
         $totalData = $pinjamanData['totalData'] + $panjarData['totalData'];
         $totalFilteredData = $pinjamanData['totalFilteredData'] + $panjarData['totalFilteredData'];
-    
+
         // Urutkan data gabungan berdasarkan payment_date DESC (default)
-        usort($dataSupplier, function($a, $b) {
+        usort($dataSupplier, function ($a, $b) {
             $dateA = strtotime(str_replace('/', '-', $a['payment_date']));
             $dateB = strtotime(str_replace('/', '-', $b['payment_date']));
             return $dateB - $dateA;
         });
-    
+
         // Potong data sesuai pagination
         $paginatedData = array_slice($dataSupplier, $offset, $limit);
 
@@ -567,7 +564,7 @@ class PanjarSupplier extends BaseController
             "data"              => $paginatedData,
             "payload"           => $payload
         ];
-        
+
         echo json_encode($data);
         return;
     }
@@ -575,71 +572,73 @@ class PanjarSupplier extends BaseController
 
     public function allPanjarPinjamanSupplier()
     {
-        
-            $payload = [
-                "pageSize"      => $this->request->getGet("length") ?? 10,
-                "currentPage"   => ($this->request->getGet("start") / ($this->request->getGet("length") ?? 10)) + 1,
-                "search"        => $this->request->getGet("search")['value'] ?? $this->request->getGet("search") ?? '',
-                "sort"          => $this->request->getGet("order")[0]['column'] ?? $this->request->getGet("sort") ?? 'payment_date',
-                "sortType"      => $this->request->getGet("order")[0]['dir'] ?? $this->request->getGet("sortType") ?? 'DESC',
-                "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : null,
-                "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : null,
-            ];
-    
-            $addCondition = [
-                "search"        => $payload['search'],
-                "sort"          => $payload['sort'],
-                "sortType"      => $payload['sortType'],
-                "dateStart"     => $payload['dateStart'],
-                "dateEnd"       => $payload['dateEnd'],
-            ];
-    
-            $conditionPanjarPinjaman = [
-                'panjar_pinjaman_transaction.company_id' => $this->this_company_id,
-                'panjar_pinjaman_transaction.deletedAt' => null
-            ];
-    
-            $limit = $payload["pageSize"];
-            $offset = $this->request->getGet("start") ?? 0;
-    
-            // Get data from the transaction model
-            $panjarPinjamanData = $this->panjarPinjamanTransactionModel
-                ->getPanjarPinjamanSupplierList($addCondition, $conditionPanjarPinjaman, $limit, $offset);
 
-            $dataPanjarPinjamanTransaction = [];
-    
-            // Process each transaction
-            foreach ($panjarPinjamanData['data'] as $data) {
-    
-                $dataPanjarPinjamanTransaction[] = [
-                    "id"            => encrypt($data->id),
-                    "no_transaction" => $data->no_transaction,
-                    "type"          => $data->type,
-                    "is_posted"          => $data->is_posted,
-                    "supplier"      => $data->supplier_name,
-                    "createdAt"    => date('d/m/Y H:i', strtotime($data->createdAt)),
-                ];
-            }
-    
-            // Paginate the sorted data
-            $paginatedData = array_slice($dataPanjarPinjamanTransaction, $offset, $limit);
-    
-            // Add row numbers
-            foreach ($paginatedData as $key => &$item) {
-                $item['no'] = $offset + $key + 1;
-            }
-    
-            $response = [
-                "draw"              => intval($this->request->getGet("draw") ?? 1),
-                "recordsTotal"      => $panjarPinjamanData['totalData'] ?? 0,
-                "recordsFiltered"   => $panjarPinjamanData['totalFilteredData'] ?? 0,
-                "data"              => $paginatedData,
-                "payload"           => $payload
+        $payload = [
+            "pageSize"      => $this->request->getGet("length") ?? 10,
+            "currentPage"   => ($this->request->getGet("start") / ($this->request->getGet("length") ?? 10)) + 1,
+            "search"        => $this->request->getGet("search")['value'] ?? $this->request->getGet("search") ?? '',
+            "sort"          => $this->request->getGet("order")[0]['column'] ?? $this->request->getGet("sort") ?? 'payment_date',
+            "sortType"      => $this->request->getGet("order")[0]['dir'] ?? $this->request->getGet("sortType") ?? 'DESC',
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : null,
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : null,
+        ];
+
+        $addCondition = [
+            "search"        => $payload['search'],
+            "sort"          => $payload['sort'],
+            "sortType"      => $payload['sortType'],
+            "dateStart"     => $payload['dateStart'],
+            "dateEnd"       => $payload['dateEnd'],
+        ];
+
+        $conditionPanjarPinjaman = [
+            'ppt.company_id'        => $this->this_company_id,
+            'ppt.deletedAt'         => null,
+        ];
+
+
+        $limit = $payload["pageSize"];
+        $offset = $this->request->getGet("start") ?? 0;
+
+        // Get data from the transaction model
+        $panjarPinjamanData = $this->panjarPinjamanTransactionModel
+            ->getPanjarPinjamanSupplierList($addCondition, $conditionPanjarPinjaman, $limit, $offset);
+
+        $dataPanjarPinjamanTransaction = [];
+
+        // Process each transaction
+        foreach ($panjarPinjamanData['data'] as $data) {
+
+            $dataPanjarPinjamanTransaction[] = [
+                "id"            => encrypt($data->id),
+                "no_transaction" => $data->no_transaction,
+                "type"          => $data->type,
+                "is_posted"          => $data->is_posted,
+                "supplier"      => $data->supplier_name,
+                "nominal" => $data->total_pinjaman + $data->total_panjar,
+                "createdAt"    => date('d/m/Y H:i', strtotime($data->createdAt)),
             ];
-    
-            return $this->response->setJSON($response);
+        }
+
+        // Paginate the sorted data
+        $paginatedData = array_slice($dataPanjarPinjamanTransaction, $offset, $limit);
+
+        // Add row numbers
+        foreach ($paginatedData as $key => &$item) {
+            $item['no'] = $offset + $key + 1;
+        }
+
+        $response = [
+            "draw"              => intval($this->request->getGet("draw") ?? 1),
+            "recordsTotal"      => $panjarPinjamanData['totalData'] ?? 0,
+            "recordsFiltered"   => $panjarPinjamanData['totalFilteredData'] ?? 0,
+            "data"              => $paginatedData,
+            "payload"           => $payload
+        ];
+
+        return $this->response->setJSON($response);
     }
-    
+
 
     public function getByIdPanjarSupplier($id)
     {
@@ -670,132 +669,132 @@ class PanjarSupplier extends BaseController
 
     public function getByIdPanjarPinjamanSupplier($id)
     {
-            // Decrypt ID if needed
-            $id = is_numeric($id) ? $id : decrypt($id);
-            
-            // Get main transaction data
-            $transaction = $this->panjarPinjamanTransactionModel->getPanjarPinjamanSupplierbyID($id);
-            
-            if (!$transaction) {
-                return $this->response->setJSON([
-                    "status" => false,
-                    "message" => 'Data transaksi tidak ditemukan'
-                ])->setStatusCode(404);
-            }
-    
-            // Get all panjar details for this transaction
-            $panjarDetails = $this->panjarSupplierModel
-                ->where('transaction_id', $id)
-                ->findAll();
-    
-            // Get all pinjaman details for this transaction
-            $pinjamanDetails = $this->pinjamanSupplierModel
-                ->where('transaction_id', $id)
-                ->findAll();
-    
-            // Get account information from sub_akuns table
-            $accountIds = [];
-            foreach ($panjarDetails as $detail) {
-                $accountIds[] = $detail['akun_kas'];
-                $accountIds[] = $detail['akun_selisih'];
-            }
-            foreach ($pinjamanDetails as $detail) {
-                $accountIds[] = $detail['akun_kas'];
-                $accountIds[] = $detail['akun_selisih'];
-            }
-            
-            $uniqueAccountIds = array_unique(array_filter($accountIds));
-            $accounts = [];
-            if (!empty($uniqueAccountIds)) {
-                $accounts = $this->sub_AkunsModel
-                    ->whereIn('id', $uniqueAccountIds)
-                    ->findAll();
-                $accounts = array_combine(
-                    array_column($accounts, 'id'),
-                    $accounts
-                );
-            }
-    
-            // Combine all details into one array with type indicator
-            $combinedDetails = [];
-            
-            // Add panjar details
-            foreach ($panjarDetails as $detail) {
-                $combinedDetails[] = [
-                    "id" => $detail['id'],
-                    "jenis_transaksi" => $detail['jenis_panjar'],
-                    "payment_date" => $detail['payment_date'],
-                    "nominal_pembayaran" => $detail['total_panjar'],
-                    "akun_kas" => [
-                        "id" => $detail['akun_kas'],
-                        "name" => $accounts[$detail['akun_kas']]['nama_sub'] ?? null
-                    ],
-                    "akun_selisih" => [
-                        "id" => $detail['akun_selisih'],
-                        "name" => $accounts[$detail['akun_selisih']]['nama_sub'] ?? null
-                    ],
-                    "keterangan" => $detail['keterangan'],
-                    "createdAt" => $detail['createdAt']
-                ];
-            }
-            
-            // Add pinjaman details
-            foreach ($pinjamanDetails as $detail) {
-                $combinedDetails[] = [
-                    "id" => $detail['id'],
-                    "jenis_transaksi" => "PINJAMAN",
-                    "payment_date" => $detail['payment_date'],
-                    "nominal_pembayaran" => $detail['total_pinjaman'],
-                    "akun_kas" => [
-                        "id" => $detail['akun_kas'],
-                        "name" => $accounts[$detail['akun_kas']]['nama_sub']
-                    ],
-                    "akun_selisih" => [
-                        "id" => $detail['akun_selisih'],
-                        "name" => $accounts[$detail['akun_selisih']]['nama_sub']
-                    ],
-                    "keterangan" => $detail['keterangan'],
-                    "createdAt" => $detail['createdAt']
-                ];
-            }
-    
-            // Calculate totals
-            $totalPanjar = array_reduce($panjarDetails, function($carry, $item) {
-                return $carry + ($item['total_panjar'] ?? 0);
-            }, 0);
-    
-            $totalPinjaman = array_reduce($pinjamanDetails, function($carry, $item) {
-                return $carry + ($item['total_pinjaman'] ?? 0);
-            }, 0);
-    
-            // Get supplier data
-            $supplier = $this->supplierModel->find($transaction->supplier_id);
+        // Decrypt ID if needed
+        $id = is_numeric($id) ? $id : decrypt($id);
 
-            // Prepare response data
-            $response = [
-                "status" => true,
-                "data" => [
-                    "transaction" => [
-                        "id" => encrypt($transaction->id),
-                        "no_transaction" => $transaction->no_transaction,
-                        "type" => $transaction->type,
-                        "createdAt" => $transaction->createdAt,
-                        "is_posted" => $transaction->is_posted ?? 0,
-                        "total_panjar" => $totalPanjar,
-                        "total_pinjaman" => $totalPinjaman,
-                        "grand_total" => $totalPanjar + $totalPinjaman
-                    ],
-                    "supplier" => $supplier ? [
-                        "id" => $supplier['id'],
-                        "name" => $supplier['name'],
-                        "type" => $supplier['type']
-                    ] : null,
-                    "details" => $combinedDetails
-                ]
+        // Get main transaction data
+        $transaction = $this->panjarPinjamanTransactionModel->getPanjarPinjamanSupplierbyID($id);
+
+        if (!$transaction) {
+            return $this->response->setJSON([
+                "status" => false,
+                "message" => 'Data transaksi tidak ditemukan'
+            ])->setStatusCode(404);
+        }
+
+        // Get all panjar details for this transaction
+        $panjarDetails = $this->panjarSupplierModel
+            ->where('transaction_id', $id)
+            ->findAll();
+
+        // Get all pinjaman details for this transaction
+        $pinjamanDetails = $this->pinjamanSupplierModel
+            ->where('transaction_id', $id)
+            ->findAll();
+
+        // Get account information from sub_akuns table
+        $accountIds = [];
+        foreach ($panjarDetails as $detail) {
+            $accountIds[] = $detail['akun_kas'];
+            $accountIds[] = $detail['akun_selisih'];
+        }
+        foreach ($pinjamanDetails as $detail) {
+            $accountIds[] = $detail['akun_kas'];
+            $accountIds[] = $detail['akun_selisih'];
+        }
+
+        $uniqueAccountIds = array_unique(array_filter($accountIds));
+        $accounts = [];
+        if (!empty($uniqueAccountIds)) {
+            $accounts = $this->sub_AkunsModel
+                ->whereIn('id', $uniqueAccountIds)
+                ->findAll();
+            $accounts = array_combine(
+                array_column($accounts, 'id'),
+                $accounts
+            );
+        }
+
+        // Combine all details into one array with type indicator
+        $combinedDetails = [];
+
+        // Add panjar details
+        foreach ($panjarDetails as $detail) {
+            $combinedDetails[] = [
+                "id" => $detail['id'],
+                "jenis_transaksi" => $detail['jenis_panjar'],
+                "payment_date" => $detail['payment_date'],
+                "nominal_pembayaran" => $detail['total_panjar'],
+                "akun_kas" => [
+                    "id" => $detail['akun_kas'],
+                    "name" => $accounts[$detail['akun_kas']]['no_sub'] . " " . $accounts[$detail['akun_kas']]['nama_sub'] ?? null
+                ],
+                "akun_selisih" => [
+                    "id" => $detail['akun_selisih'],
+                    "name" => $accounts[$detail['akun_selisih']]['no_sub'] . " " . $accounts[$detail['akun_selisih']]['nama_sub'] ?? null
+                ],
+                "keterangan" => $detail['keterangan'],
+                "createdAt" => $detail['createdAt']
             ];
-    
-            return $this->response->setJSON($response);
-    
+        }
+
+        // Add pinjaman details
+        foreach ($pinjamanDetails as $detail) {
+            $combinedDetails[] = [
+                "id" => $detail['id'],
+                "jenis_transaksi" => "PINJAMAN",
+                "payment_date" => $detail['payment_date'],
+                "nominal_pembayaran" => $detail['total_pinjaman'],
+                "akun_kas" => [
+                    "id" => $detail['akun_kas'],
+                    "name" => $accounts[$detail['akun_kas']]['no_sub'] . " " . $accounts[$detail['akun_kas']]['nama_sub']
+                ],
+                "akun_selisih" => [
+                    "id" => $detail['akun_selisih'],
+                    "name" => $accounts[$detail['akun_selisih']]['no_sub'] . " " . $accounts[$detail['akun_selisih']]['nama_sub']
+                ],
+                "keterangan" => $detail['keterangan'],
+                "createdAt" => $detail['createdAt']
+            ];
+        }
+
+        // Calculate totals
+        $totalPanjar = array_reduce($panjarDetails, function ($carry, $item) {
+            return $carry + ($item['total_panjar'] ?? 0);
+        }, 0);
+
+        $totalPinjaman = array_reduce($pinjamanDetails, function ($carry, $item) {
+            return $carry + ($item['total_pinjaman'] ?? 0);
+        }, 0);
+
+        // Get supplier data
+        $supplier = $this->supplierModel->find($transaction->supplier_id);
+
+        // Prepare response data
+        $response = [
+            "status" => true,
+            "data" => [
+                "transaction" => [
+                    "id" => encrypt($transaction->id),
+                    "no_transaction" => $transaction->no_transaction,
+                    "type" => $transaction->type,
+                    "createdAt" => $transaction->createdAt,
+                    "keterangan" => $transaction->keterangan,
+                    "is_posted" => $transaction->is_posted ?? 0,
+                    "total_panjar" => $totalPanjar,
+                    "total_pinjaman" => $totalPinjaman,
+                    "grand_total" => $totalPanjar + $totalPinjaman
+                ],
+                "supplier" => $supplier ? [
+                    "id" => $supplier['id'],
+                    "name" => $supplier['name'],
+                    "type" => $supplier['type']
+                ] : null,
+                "details" => $combinedDetails
+            ]
+        ];
+
+        return $this->response->setJSON($response);
     }
 
     public function dropDownHistoryPembayaranPanjar()
@@ -829,17 +828,19 @@ class PanjarSupplier extends BaseController
         return json_encode($noPanjar);
     }
 
-    public function getSubAkun() { 
+    public function getSubAkun()
+    {
         $Sub_AkunsModel = new Sub_AkunsModel();
         $search = trim($this->request->getGet('search')); // Ambil & bersihkan input pencarian
-    
+
         $subAkun = $Sub_AkunsModel
-            ->select('id, nama_sub')
+            ->select('id, no_sub, nama_sub')
             ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
             ->like('nama_sub', $search)
+            ->orLike('no_sub', $search)
             ->findAll(10); // Batasi hasil max 10 biar efisien
 
         return $this->response->setJSON($subAkun);
-    }     
+    }
 }

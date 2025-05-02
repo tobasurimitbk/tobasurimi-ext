@@ -218,6 +218,7 @@ class TransaksiJurnalModel extends Model
             transaksi_pembelian.id_local_bb,
             transaksi_pembelian.id_import_bb,
             transaksi_pembelian.id_po_bp,
+            jurnal_umum.supplier_id,
             suppliers.name as supplier_name,
             am_purchase_orders.po_type
         ";

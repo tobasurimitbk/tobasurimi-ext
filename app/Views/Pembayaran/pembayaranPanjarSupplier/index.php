@@ -14,7 +14,7 @@
                     <!-- Parent Form (Header) -->
                     <div class="card mb-4">
                         <div class="card-header bg-light">
-                            <h5>Informasi Panjar Dan Pinjaman</h5>
+                            <h5>Informasi Panjar & Pinjaman</h5>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -46,7 +46,7 @@
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <select class="form-select tipe_supplier" name="tipe_supplier" id="tipe_supplier">
-                                            <option value=""></option>
+                                            <option value="">Pilih Supplier</option>
                                             <option value="INTERNASIONAL">INTERNASIONAL</option>
                                             <option value="BAHAN PENOLONG">BAHAN PENOLONG</option>
                                             <option value="BAHAN BAKU">BAHAN BAKU</option>
@@ -58,6 +58,14 @@
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <select class="form-select supplier_id" name="supplier_id" id="supplier_id"></select>
                                         <label for="supplier_id">Supplier</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan" value="">
+                                        <label for="floatingInput">Keterangan</label>
                                     </div>
                                 </div>
                             </div>
@@ -73,21 +81,21 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select" name="akun_kas" id="akun_kas" >
+                                        <select class="form-select" name="akun_kas" id="akun_kas">
                                         </select>
                                         <label for="floatingInput" style="z-index: 1;">Debit</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select" name="akun_selisih" id="akun_selisih" >
-                                         </select>
+                                        <select class="form-select" name="akun_selisih" id="akun_selisih">
+                                        </select>
                                         <label for="floatingInput" style="z-index: 1;">Kredit</label>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                               <div class="col-md-6">
+                                <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <select class="form-select jenis_transaksi" name="jenis_transaksi" id="jenis_transaksi">
                                             <option value=""></option>
@@ -97,14 +105,14 @@
                                         </select>
                                         <label for="jenis_transaksi">Jenis Transaksi</label>
                                     </div>
-                               </div>
+                                </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" placeholder="Nominal Pembayaran">
                                         <label for="floatingInput">Nominal Pembayaran</label>
                                     </div>
                                 </div>
-                            </div>          
+                            </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="input-group input-group-password">
@@ -119,18 +127,18 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan" value="">
+                                        <input autocomplete="one-time-code" type="text" class="form-control keterangan_detail" name="keterangan_detail" id="keterangan_detail" placeholder="Keterangan" value="">
                                         <label for="floatingInput">Keterangan</label>
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="row">
                                 <div class="col-md-12 text-end">
                                     <button type="button" class="btn btn-primary btn-add-detail">Tambah Detail</button>
                                 </div>
                             </div>
-                            
+
                             <!-- Table for showing added details -->
                             <div class="row mt-3">
                                 <div class="col-md-12">
@@ -196,9 +204,9 @@
                 <div class="col-md-3">
                     <div class="form-floating spp-ptspp mb-3" style="height: 50px;">
                         <select class="form-select kategori panjar_status form-out-search" name="panjar_status" id="panjar_status" aria-label="Floating label select example">
-                            <option value="ALL">STATUS POSTING:SEMUA</option>
-                            <option value="NOT_POSTING">STATUS POSTING:BELUM POSTING</option>
-                            <option value="POSTING">STATUS POSTING:SUDAH POSTING</option>
+                            <option value="ALL">STATUS: SEMUA</option>
+                            <option value="NOT_POSTING">STATUS: BELUM POSTING</option>
+                            <option value="POSTING">STATUS: SUDAH POSTING</option>
 
                         </select>
                         <label for="floatingInput" class="l-spp-ptspp">Status Posting</label>
@@ -217,7 +225,7 @@
                                 <th onclick="changeSort('no_panjar')">No. Transaksi</th>
                                 <th onclick="changeSort('jenis_panjar')">Jenis</th>
                                 <th onclick="changeSort('supplier_id')">Supplier</th>
-                                <th onclick="changeSort('payment_date')">Tanggal Di Buat</th>
+                                <th>Nominal</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -350,8 +358,13 @@
                 className: "text-center"
             },
             {
-                data: "createdAt",
-                className: "text-center"
+                data: "nominal",
+                className: "text-center",
+                searchable: false,
+                sortable: false,
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
             },
             {
                 data: "id",
@@ -379,14 +392,15 @@
                         <div>
                         `
                     }
+                    // <div class="mt-0">
+                    //             <button  data-toggle="tooltip" title="Histori LPB" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
+                    //                 <i class="fa-solid fa-clock-rotate-left"></i>
+                    //             </button>
+                    //         <div>
                     if (is_posted === '1') {
                         return `
-
-                            <div class="mt-0">
-                                <button  data-toggle="tooltip" title="Histori LPB" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
-                                    <i class="fa-solid fa-clock-rotate-left"></i>
-                                </button>
-                            <div>
+                            -
+                            
                         `
 
                     }
@@ -423,6 +437,9 @@
             },
             supplier_id: {
                 required: true
+            },
+            keterangan: {
+                required: true
             }
         },
         messages: {
@@ -437,6 +454,9 @@
             },
             supplier_id: {
                 required: "Supplier wajib dipilih"
+            },
+            keterangan: {
+                required: "Keterangan wajib dipilih"
             }
         },
         errorElement: 'span',
@@ -447,7 +467,7 @@
             if (elem.hasClass("select2-hidden-accessible")) {
                 element = elem.next().find(".select2-selection");
                 error.insertAfter(element);
-            } 
+            }
             // Handle datepicker
             else if (elem.hasClass("input-picker")) {
                 error.insertAfter(elem.closest('.input-group'));
@@ -460,7 +480,7 @@
         highlight: function(element) {
             $(element).closest('.form-floating').addClass('has-error');
             $(element).addClass('is-invalid');
-            
+
             // Special handling for Select2
             if ($(element).hasClass("select2-hidden-accessible")) {
                 $(element).next().find('.select2-selection').addClass('is-invalid');
@@ -469,7 +489,7 @@
         unhighlight: function(element) {
             $(element).closest('.form-floating').removeClass('has-error');
             $(element).removeClass('is-invalid');
-            
+
             // Special handling for Select2
             if ($(element).hasClass("select2-hidden-accessible")) {
                 $(element).next().find('.select2-selection').removeClass('is-invalid');
@@ -600,19 +620,18 @@
         $('.add-modal textarea').val('');
         $('.add-modal select').val('').trigger('change');
 
-        // Reset other cached data or state
+        // // Reset other cached data or state
         $('.add-modal .error-message').text('');
         $('.add-modal .preview-image').attr('src', '');
-
         // Hide modal
         $('.add-modal').modal('hide');
     });
 
-    $('#tipe_supplier').select2({
-        placeholder: "Pilih Tipe Supplier",
-        theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
-    });
+    // $('#tipe_supplier').select2({
+    //     placeholder: "Pilih Tipe Supplier",
+    //     theme: "bootstrap-5",
+    //     dropdownParent: $(".add-modal .modal-content")
+    // });
 
     $('#tipe').select2({
         placeholder: "Pilih Tipe Panjar",
@@ -645,30 +664,30 @@
         .css('z-index', '1');
 
     $("#tanggal").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true,
-            language: 'id', 
-            todayBtn: "linked"
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true,
+        language: 'id',
+        todayBtn: "linked"
     }).on('changeDate', function(e) {
-            $(this).valid(); 
+        $(this).valid();
     });
 
-            // Refresh details table
+    // Refresh details table
     function refreshDetailsTable() {
-            const tbody = $('#detail-table tbody');
-            tbody.empty();
-            
-            details.forEach((detail, index) => {
-                tbody.append(`
+        const tbody = $('#detail-table tbody');
+        tbody.empty();
+
+        details.forEach((detail, index) => {
+            tbody.append(`
                     <tr data-detail-id="${detail.id || ''}">
                         <td>${detail.tanggal}</td>
                         <td>${detail.jenis_transaksi}</td>
                         <td>${detail.nominal_pembayaran}</td>
                         <td>${detail.akun_kas_name || detail.akun_kas}</td>
                         <td>${detail.akun_selisih_name || detail.akun_selisih}</td>
-                        <td>${detail.keterangan}</td>
+                         <td>${detail.keterangan}</td>
                         <td>
                             <button class="btn btn-danger btn-sm btn-remove-detail" data-index="${index}">
                                 <i class="fas fa-trash"></i>
@@ -676,15 +695,17 @@
                         </td>
                     </tr>
                 `);
-            });
+        });
     }
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
         const modal = $(".add-modal");
-        
+        $(".title-name").text("Edit Data Panjar & Pinjaman");
+
         modal.modal("show");
-        
+        $('#auto_generate').hide();
+
         // AJAX to get details
         $.ajax({
             url: "panjar-supplier/id/" + data.id,
@@ -694,23 +715,23 @@
                 if (res.status) {
                     // Restore original form
                     modal.find('.modal-body').html($('#modal-template').html());
-                    
+
                     // Clear existing details
                     details = [];
-                    
+
                     // Populate parent form
                     $('#id').val(res.data.transaction.id);
                     $('#no_transaksi').val(res.data.transaction.no_transaction);
                     $('#jenis').val(res.data.transaction.type).trigger('change');
-                    console.log($('#jenis').val())
-                    $('#tipe_supplier').val(res.data.supplier?.type || '').trigger('change');
-                    
+                    $('#tipe_supplier').val(res.data.supplier?.type || '');
+                    $('#keterangan').val(res.data.transaction.keterangan || '');
+
                     // Populate supplier dropdown
                     if (res.data.supplier) {
                         const supplierOption = `<option value="${res.data.supplier.id}" selected>${res.data.supplier.name}</option>`;
                         $('#supplier_id').html(supplierOption);
                     }
-                    
+
                     // Process and add each detail to the details array
                     res.data.details.forEach(detail => {
                         const newDetail = {
@@ -719,17 +740,17 @@
                             jenis_transaksi: detail.jenis_transaksi,
                             nominal_pembayaran: greatFormatRupiah(detail.nominal_pembayaran),
                             akun_kas: detail.akun_kas.id,
-                            akun_kas_name: detail.akun_kas.name || $('#akun_kas option[value="'+detail.akun_kas+'"]').text(),
+                            akun_kas_name: detail.akun_kas.name || $('#akun_kas option[value="' + detail.akun_kas + '"]').text(),
                             akun_selisih: detail.akun_selisih.id,
-                            akun_selisih_name: detail.akun_selisih.name || $('#akun_selisih option[value="'+detail.akun_selisih+'"]').text(),
+                            akun_selisih_name: detail.akun_selisih.name || $('#akun_selisih option[value="' + detail.akun_selisih + '"]').text(),
                             keterangan: detail.keterangan,
-                        };
+                        }
                         details.push(newDetail);
                     });
-                    
+
                     // Refresh the table
                     refreshDetailsTable();
-                    
+
                     // Handle posting status
                     if (res.data.transaction.is_posted == 1) {
                         $(".delete-form, .btn-submit-form").hide();
@@ -738,7 +759,7 @@
                         $(".delete-form, .btn-submit-form").show();
                         $(".create-form input, .create-form select, .btn-add-detail").prop("disabled", false);
                     }
-                    
+
                 } else {
                     modal.modal("hide");
                     Swal.fire("Error", res.message, "error");
@@ -756,24 +777,27 @@
     // GET SUPPLIER BY TYPE
     $('#tipe_supplier').change(function() {
         var typeSupplier = $('#tipe_supplier option:selected').val();
-        $.ajax({
-            url: `<?= base_url('panjar-supplier/list-supplier'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                type_supplier: typeSupplier,
-            },
-            dataType: "json",
-            success: function(res) {
-                // APPEND TO DROPDOWN
-                appendDropdownSupplier(res.data);
-            }
-        });
+        if (typeSupplier != '') {
+            $.ajax({
+                url: `<?= base_url('panjar-supplier/list-supplier'); ?>`,
+                method: "GET",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                data: {
+                    type_supplier: typeSupplier,
+                },
+                dataType: "json",
+                success: function(res) {
+                    // APPEND TO DROPDOWN
+                    appendDropdownSupplier(res.data);
+                }
+            });
+        }
+
     });
 
 
@@ -798,7 +822,7 @@
                         results: $.map(data, function(item) {
                             return {
                                 id: item.id,
-                                text: item.nama_sub
+                                text: item.no_sub + ' ' + item.nama_sub
                             };
                         })
                     };
@@ -825,7 +849,7 @@
                 akun_kas_name: $('#akun_kas option:selected').text(),
                 akun_selisih: $('#akun_selisih').val(),
                 akun_selisih_name: $('#akun_selisih option:selected').text(),
-                keterangan: $('#keterangan').val(),
+                keterangan: $('#keterangan_detail').val(),
             };
 
             details.push(detail);
@@ -845,8 +869,8 @@
 
         // Clear detail form
         function clearDetailForm() {
-            $('#tanggal, #nominal_pembayaran, #keterangan').val('');
-            $('#jenis_transaksi, #akun_kas, #akun_selisih').val('').trigger('change');
+            $('#tanggal, #nominal_pembayaran').val('');
+            $('#jenis_transaksi, #akun_kas, #akun_selisih, #keterangan_detail').val('').trigger('change');
         }
 
 
@@ -888,11 +912,11 @@
         // Update validation when adding/removing details
         function refreshValidation() {
             // Trigger validation on all fields
-            
+
             // Special handling for detail fields
             const hasDetails = $("#detail-table tbody tr").length > 0;
-            const detailFields = ['#tanggal', '#jenis_transaksi', '#nominal_pembayaran', '#akun_kas', '#akun_selisih'];
-            
+            const detailFields = ['#tanggal', '#jenis_transaksi', '#nominal_pembayaran', '#akun_kas', '#akun_selisih', '#keterangan_detail'];
+
             detailFields.forEach(field => {
                 const element = $(field);
                 if (hasDetails) {
@@ -913,15 +937,16 @@
                 alert('Tambahkan setidaknya satu detail pembayaran');
                 return;
             }
-            
+
             const formData = {
                 no_transaksi: $('#no_transaksi').val(),
                 jenis: $('#jenis').val(),
                 tipe_supplier: $('#tipe_supplier').val(),
                 supplier_id: $('#supplier_id').val(),
+                keterangan: $('#keterangan').val(),
                 details: details
             };
-            
+
             // Submit via AJAX or form submission
             // Here you would typically make an AJAX call to submit the data
         });
@@ -929,15 +954,16 @@
         // Modal close handler
         $('#add_modal').on('hidden.bs.modal', function() {
             // Reset all form fields
-            
+            $('#auto_generate').show();
+
             // Clear the details table
             $('#detail-table tbody').empty();
-            
+
             // Clear any hidden fields
             $('.hidden').val('');
-            
+
             // Reset select2 elements
-            $('.form-select').val('').trigger('change');
+            $('.create-form .form-select').val('').trigger('change');
 
             // Clear details array
             details = [];
@@ -950,8 +976,8 @@
             $(".delete-btn").css('display', 'none');
             $(".add-modal").modal("show");
         });
-       
-            // Handle submit form
+
+        // Handle submit form
         $(".btn-submit-form").click(function() {
             console.log($('#jenis').val())
             if ($(".create-form").valid()) {
@@ -978,13 +1004,14 @@
                     if (result.isConfirmed) {
                         const csrf = $('meta[name="csrf-token"]').attr('content');
                         let data = new FormData();
-                        
+
                         // Add main form data
                         data.append('no_transaksi', $('#no_transaksi').val());
                         data.append('jenis', $('#jenis').val());
                         data.append('tipe_supplier', $('#tipe_supplier').val());
                         data.append('supplier_id', $('#supplier_id').val());
-                        
+                        data.append('keterangan', $('#keterangan').val());
+
                         // Add details
                         details.forEach((detail, index) => {
                             data.append(`details[${index}][tanggal]`, detail.tanggal);
@@ -997,7 +1024,7 @@
 
                         let id = $("#id").val();
                         let endpoint = id ? "panjar-supplier/update" : "panjar-supplier/save";
-                        
+
                         if (id) {
                             data.append('id', id);
                         }
@@ -1070,7 +1097,7 @@
 
     // APPEND DATA SUPPLIER BY TYPE
     function appendDropdownSupplier(data) {
-        // $(".supplier_id").empty()
+        $(".supplier_id").empty()
         $(".supplier_id").append(`<option value=""></option>`)
         data.forEach(function(item) {
             $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`)
@@ -1081,13 +1108,13 @@
         const isPinjaman = $("#form-type").val() === "pinjaman";
         const checkbox = document.getElementById('auto_generate');
         const noTransaksiField = $("#no_transaksi");
-        
+
         if (checkbox.checked) {
             // Tentukan endpoint berdasarkan jenis form
-            const endpoint = isPinjaman 
-                ? "<?= base_url('/pinjaman-supplier/generate-no-pinjaman'); ?>" 
-                : "<?= base_url('/panjar-supplier/generate-no-panjar'); ?>";
-            
+            const endpoint = isPinjaman ?
+                "<?= base_url('/pinjaman-supplier/generate-no-pinjaman'); ?>" :
+                "<?= base_url('/panjar-supplier/generate-no-panjar'); ?>";
+
             $.ajax({
                 url: endpoint,
                 method: "GET",
@@ -1095,6 +1122,7 @@
                 success: function(res) {
                     if (res) {
                         noTransaksiField.val(res);
+                        $("#no_transaksi").attr('readonly', true);
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -1103,6 +1131,7 @@
                         });
                         checkbox.checked = false;
                         noTransaksiField.val("");
+                        $("#no_transaksi").attr('readonly', false);
                     }
                 },
                 error: function() {
@@ -1113,10 +1142,13 @@
                     });
                     checkbox.checked = false;
                     noTransaksiField.val("");
+                    $("#no_transaksi").attr('readonly', false);
+
                 }
             });
         } else {
             noTransaksiField.val("");
+            $("#no_transaksi").attr('readonly', false);
         }
     }
 

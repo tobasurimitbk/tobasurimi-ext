@@ -48,7 +48,8 @@ class OtherPaymentModel extends Model
             'tanggal' => 'tanggal',
             'valas' => 'valas',
             'metode_pembayaran' => 'metode_pembayaran',
-            'nominal_pembayaran' => 'nominal_pembayaran'
+            'nominal_pembayaran' => 'nominal_pembayaran',
+            'bayar_ke' => "bayar_ke"
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -84,7 +85,7 @@ class OtherPaymentModel extends Model
                 ->orLike('divisi', $addCondition['search'])
                 ->orLike('no_pembayaran', $addCondition['search'])
                 ->orLike('tanggal', $addCondition['search'])
-                ->orLike('nominal', $addCondition['search']);
+                ->orLike('bayar_ke', $addCondition['search']);
         }
 
         if ($addCondition['status_posting']) {
@@ -106,7 +107,7 @@ class OtherPaymentModel extends Model
         if ($addCondition['search']) {
             $dataQry->groupEnd();
         }
-        
+
         $totalFilteredData = $dataQry->countAllResults(false);
         $data = $dataQry->findAll($limit, $offset);
 
