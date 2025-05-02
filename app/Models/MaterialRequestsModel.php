@@ -70,7 +70,6 @@ class MaterialRequestsModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "material_requests.*,
-            barang_master.barang_name AS nama_barang,
             material_request_details.satuan,
             material_request_details.kimia,
             SUM(material_request_details.qty) as total,
@@ -82,7 +81,7 @@ class MaterialRequestsModel extends Model
             ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id')
             // ->join('work_orders', 'work_orders.id = material_requests.work_order_id')
             // ->join('barang_master', 'barang_master.id = material_request_details.barang1_id')
-            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
+            // ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
             ->where('material_requests.deletedAt', null)
             ->where('material_request_details.deletedAt', null)
             ->groupBy('material_request_details.material_request_id')
@@ -95,8 +94,8 @@ class MaterialRequestsModel extends Model
         }
         if ($addCondition['search']) {
             $materialRequestsDataQry
-                ->like('material_requests.req_no', $addCondition['search'])
-                ->orLike('material_request_details.nama_barang', $addCondition['search']);
+                ->like('material_requests.req_no', $addCondition['search']);
+                // ->orLike('material_request_details.nama_barang', $addCondition['search']);
         }
         if ($addCondition['search']) {
             $materialRequestsDataQry->groupEnd();
