@@ -720,7 +720,6 @@ class ProductionResult extends BaseController
 
     public function getListMaterialRequestByWOID()
     {
-        if (!empty($this->request->getVar('kode_produksi'))) {
             $dataMaterialRequest = $this->materialRequestModel->asObject()
                 ->select('material_requests.*, GROUP_CONCAT(material_request_details.nama_barang SEPARATOR \', \') AS nama_barang, users.name AS user_name')
                 ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
@@ -730,7 +729,7 @@ class ProductionResult extends BaseController
                 ->where('material_requests.deletedAt', null)
                 ->where('material_request_details.deletedAt', null)
                 ->where('material_request_details.qty_now >', 0)
-                ->where('material_requests.work_order_id', $this->request->getVar('kode_produksi'))
+                // ->where('material_requests.work_order_id', $this->request->getVar('kode_produksi'))
                 ->groupBy('material_request_details.material_request_id')
                 ->find();
             if ($dataMaterialRequest) {
@@ -745,7 +744,6 @@ class ProductionResult extends BaseController
                     'status' => false
                 ]);
             }
-        }
     }
 
     public function updateStatusPostedProductionResult()
