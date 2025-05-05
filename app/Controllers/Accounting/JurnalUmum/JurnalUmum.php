@@ -1829,6 +1829,7 @@ class JurnalUmum extends BaseController
                     'no_bukti' => $POlocal->payment_no,
                     'valas' => '30',
                     'exchange_rate' => 1,
+                    'uraian_transaksi' => $POlocal->keterangan
                 );
 
                 // ambil id dari transaksi jurnal untuk jurnal umum
