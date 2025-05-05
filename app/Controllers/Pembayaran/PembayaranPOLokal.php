@@ -704,10 +704,15 @@ class PembayaranPOLokal extends BaseController
 
             if (!empty($validPembayaranList)) {
                 foreach ($validPembayaranList as $l) {
+                    // Tentukan nilai yang akan di-insert
+                    $totalToPay = (isset($l["total_paid"]) && $l["total_paid"] > 0) 
+                        ? $l["total_paid"] 
+                        : $l["total_tagihan"];
+            
                     $localPOPaymentDetailModel->insert([
                         "local_po_payment_id" => $id,
                         "rm_purchase_order_id" => $l["rm_purchase_order_id"],
-                        "total" => $l["total_paid"],
+                        "total" => $totalToPay,  // Gunakan nilai yang sudah ditentukan
                     ]);
                 }
             }
