@@ -95,8 +95,8 @@ class Hutang extends BaseController
     {
         $data = [
             'id'            => $id,
-            'tanggalAwal'   => $tanggalAwal,
-            'tanggalAkhir'  => $tanggalAkhir,
+            'tanggalAwal'   => $tanggalAwal != "all" ? date("d/m/Y", strtotime($tanggalAwal)) : "",
+            'tanggalAkhir'  => $tanggalAkhir != "all" ? date("d/m/Y", strtotime($tanggalAkhir)) : "",
             'filter'        => $filter,
             "filterDivisi"  => $filterDivisi,
             "search"        => $search
@@ -165,6 +165,7 @@ class Hutang extends BaseController
                 "no"                    => $no++,
                 "id"                    => $data->id,
                 "supplier"              => $data->name,
+                "no_penerimaan_barang"              => $data->no_penerimaan_barang,
                 "nominal_idr"           => number_format($data->total, 2, '.', ''),
                 "remaining_idr"         => number_format($totalRemaining, 2, '.', ''),
             ]);
@@ -204,7 +205,6 @@ class Hutang extends BaseController
 
         $condition = [
             "suppliers.id"  => $id,
-            "status_penerimaan"  => 1,
             "suppliers.deletedAt" => NULL
         ];
 
@@ -248,6 +248,7 @@ class Hutang extends BaseController
                 "id"                    => $data->id,
                 "tanggal_invoice"       => $data->tanggal_invoice,
                 "no_invoice"            => $data->no_invoice,
+                "no_penerimaan_barang"  => $data->no_penerimaan_barang,
                 "divisi_invoice"        => $data->divisi,
                 "nominal_invoice"       => number_format($data->total, 2, '.', ''),
                 "remaining_invoice"     => number_format($totalRemaining, 2, '.', ''),

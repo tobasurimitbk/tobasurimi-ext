@@ -137,7 +137,8 @@ class SupplierModel extends Model
             WHEN suppliers.type = 'INTERNASIONAL' 
             THEN (import_po_payments.payment_amt * import_po_payments.current_exchange_rate)
             ELSE (local_po_payments.amount)
-        END AS remaining";
+        END AS remaining,
+        GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang) AS no_penerimaan_barang";
 
         $supplierDataQry = $this->asObject()
             ->select($selectQry)
@@ -146,6 +147,16 @@ class SupplierModel extends Model
             ->join('rm_import_pos', 'rm_import_pos.supplier_id = suppliers.id AND rm_import_pos.is_posted = 1 AND rm_import_pos.status_penerimaan = 1', 'left')
             ->join('local_po_payments', 'local_po_payments.supplier_id = suppliers.id AND local_po_payments.status_posting = 1', 'left')
             ->join('import_po_payments', 'import_po_payments.supplier_id = suppliers.id AND import_po_payments.status_posting = 1', 'left')
+            ->join(
+                'penerimaan_barang_detail',
+                "(
+                    (suppliers.type = 'BAHAN BAKU' AND penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id)
+                    OR (suppliers.type = 'INTERNASIONAL' AND penerimaan_barang_detail.purchase_order_id = rm_import_pos.id)
+                    OR (suppliers.type NOT IN ('BAHAN BAKU', 'INTERNASIONAL') AND penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id)
+                )",
+                'left'
+            )
+            ->join('penerimaan_barang', "penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id AND penerimaan_barang.supplier_id = suppliers.id", 'left')
             ->where($condition)
             ->whereIn('suppliers.company_id', $companyId)
             ->groupBy('suppliers.id')

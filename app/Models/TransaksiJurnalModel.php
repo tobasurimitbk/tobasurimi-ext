@@ -275,6 +275,7 @@ class TransaksiJurnalModel extends Model
                 $dataQry->groupStart();
                 $dataQry->like('transaksi_jurnal.no_transaksi', $addCondition['search']);
                 $dataQry->orLike('transaksi_jurnal.uraian_transaksi', $addCondition['search']);
+                $dataQry->orLike('transaksi_jurnal.total_debit', $addCondition['search']);
                 $dataQry->groupEnd();
             }
 
@@ -286,7 +287,12 @@ class TransaksiJurnalModel extends Model
         $totalFilteredData = $filteredQry->countAllResults(false);
 
         // Ambil data akhir
-        $data = $dataQry->orderBy($sort, $sortType)->findAll($limit, $offset);
+        $dataQry->orderBy($sort, $sortType);
+        if ($limit != 0 && $offset != 0) {
+            $data = $dataQry->findAll($limit, $offset);
+        } else {
+            $data = $dataQry->findAll();
+        }
 
         return [
             'data'              => $data,

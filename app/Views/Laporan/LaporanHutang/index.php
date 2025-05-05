@@ -96,10 +96,11 @@
             </div> -->
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
+                                <th>No LPB</th>
                                 <th>Supplier</th>
                                 <th>Amount(IDR)</th>
                                 <th>Remaining(IDR)</th>
@@ -159,6 +160,10 @@
                 className: "text-center",
                 sortable: false,
                 width: "5%"
+            }, {
+                data: "no_penerimaan_barang",
+                className: "text-left text-wrap text-break",
+                width: "40%"
             }, {
                 data: "supplier",
                 className: "text-center",
@@ -257,7 +262,7 @@
         $('.dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
-            var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
+            var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "all";
             var filter = $(".list_supplier").val() ? $(".list_supplier").val() : "all";
             var filter_divisi = $(".list_divisi").val() ? $(".list_divisi").val() : "all";
             var search = $(".search").val() ? $(".search").val() : "all";

@@ -180,6 +180,7 @@ class JurnalUmum extends BaseController
             "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
             "sort" => $this->request->getVar("sort"),
             "sorttype" => $this->request->getVar("sortType"),
+            "search" => $this->request->getVar("search"),
         ];
 
         $addCondition = [
@@ -212,116 +213,6 @@ class JurnalUmum extends BaseController
 
         return response()->setJSON($data);
     }
-
-    // private function getData($dataJurnal, $payload)
-    // {
-
-    //     $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-    //     $dataResult = [];
-    //     foreach ($dataJurnal as $data) {
-    //         // Cek Tutup Buku Per Transaksi
-    //         $tutupBuku = $this->tutupBukuModel
-    //             ->where('company_id', $this->this_company_id)
-    //             ->where('bulan', date('Y-m', strtotime($data->tanggal_transaksi)))
-    //             ->first();
-
-    //         // Untuk Mencari Transaksi Jurnal
-    //         $transaksiPembelian = $this->transaksiPembelianModel
-    //             ->where('id_transaksi_jurnal', $data->id)
-    //             ->first();
-
-    //         $tipePembelian = "";
-    //         $noLPB = "";
-    //         $supplierName = "";
-
-    //         if ($transaksiPembelian != null) {
-    //             if ($transaksiPembelian['id_local_bb'] != null) {
-    //                 $tipePembelian = "LOKAL BB";
-    //                 $penerimaanBarang = $this->penerimaanBarangModel
-    //                     ->select('penerimaan_barang.*,suppliers.name as supplier')
-    //                     ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-    //                     ->where('penerimaan_barang.company_id', $this->this_company_id)
-    //                     ->where('status_penerimaan', "LOKAL")
-    //                     ->where('tipe_bahan', "BAKU")
-    //                     ->like('multiple_po_id', $transaksiPembelian['id_local_bb'])
-    //                     ->first();
-
-    //                 if ($penerimaanBarang != null) {
-    //                     $supplierName = $penerimaanBarang['supplier'];
-    //                     $noLPB = $penerimaanBarang['no_penerimaan_barang'];
-    //                 }
-    //             } elseif ($transaksiPembelian['id_import_bb'] != null) {
-    //                 $tipePembelian = "IMPORT BB";
-    //                 $penerimaanBarang = $this->penerimaanBarangModel
-    //                     ->select('penerimaan_barang.*,suppliers.name as supplier')
-    //                     ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-    //                     ->where('penerimaan_barang.company_id', $this->this_company_id)
-    //                     ->where('status_penerimaan', "IMPORT")
-    //                     ->where('tipe_bahan', "BAKU")
-    //                     ->like('multiple_po_id', $transaksiPembelian['id_import_bb'])
-    //                     ->first();
-
-    //                 if ($penerimaanBarang != null) {
-    //                     $supplierName = $penerimaanBarang['supplier'];
-    //                     $noLPB = $penerimaanBarang['no_penerimaan_barang'];
-    //                 }
-    //             } else {
-    //                 // Lokal Bp / Import Bp
-    //                 $amPurchaseOrder = $this->aMPurchaseOrderModel->where('id', $transaksiPembelian['id_po_bp'])->first();
-    //                 if ($amPurchaseOrder != null) {
-    //                     if ($amPurchaseOrder['po_type'] == "Lokal") {
-    //                         $tipePembelian = "LOKAL BP";
-    //                         $penerimaanBarang = $this->penerimaanBarangModel
-    //                             ->select('penerimaan_barang.*,suppliers.name as supplier')
-    //                             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-    //                             ->where('penerimaan_barang.company_id', $this->this_company_id)
-    //                             ->where('status_penerimaan', "LOKAL")
-    //                             ->where('tipe_bahan', "PENOLONG")
-    //                             ->like('multiple_po_id', $transaksiPembelian['id_po_bp'])
-    //                             ->first();
-    //                         if ($penerimaanBarang != null) {
-    //                             $supplierName = $penerimaanBarang['supplier'];
-    //                             $noLPB = $penerimaanBarang['no_penerimaan_barang'];
-    //                         }
-    //                     } else {
-    //                         $tipePembelian = "IMPORT BP";
-    //                         $penerimaanBarang = $this->penerimaanBarangModel
-    //                             ->select('penerimaan_barang.*,suppliers.name as supplier')
-    //                             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-    //                             ->where('penerimaan_barang.company_id', $this->this_company_id)
-    //                             ->where('status_penerimaan', "IMPORT")
-    //                             ->where('tipe_bahan', "PENOLONG")
-    //                             ->like('multiple_po_id', $transaksiPembelian['id_po_bp'])
-    //                             ->first();
-    //                         if ($penerimaanBarang != null) {
-    //                             $supplierName = $penerimaanBarang['supplier'];
-    //                             $noLPB = $penerimaanBarang['no_penerimaan_barang'];
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-
-    //         array_push($dataResult, [
-    //             "no"                    => $no++,
-    //             "id"                    => encrypt($data->id),
-    //             "transaksi_type_name"   =>  $data->transaksi_type_name . " " . $tipePembelian,
-    //             "no_transaksi"          => $data->metode_input == 'system' ? $data->no_transaksi : $data->no_bukti,
-    //             "tanggal_transaksi"     => date('d/m/Y', strtotime($data->tanggal_transaksi)),
-    //             "uraian_transaksi"      => $data->uraian_transaksi,
-    //             "supplier"              => !empty($supplierName) ? "0 : " . $supplierName : "0 : ",
-    //             "no_lpb"                => $noLPB,
-    //             "metode_input"          => strtoupper($data->metode_input),
-    //             "valas"                 => $data->valas,
-    //             "exchange_rate"         => "",
-    //             "nilai"                 => $data->exchange_rate == 1 ? "" : $data->exchange_rate,
-    //             "nilai_idr"             => $data->total_debit * $data->exchange_rate,
-    //             "tutup_buku"            => $tutupBuku == null ? 0 : 1,
-    //         ]);
-    //     }
-
-    //     return $dataResult;
-    // }
 
     private function getData($dataJurnal, $payload)
     {
@@ -811,7 +702,7 @@ class JurnalUmum extends BaseController
             'transaksi_jurnal.deleted_at' => null,
         ];
 
-        $dataQry = $this->transaksiJurnalModel->getList($condition, $addCondition, 10000000, 0);
+        $dataQry = $this->transaksiJurnalModel->getList($condition, $addCondition, 0, 0);
         $dataJurnal = $this->getData($dataQry['data'], $payload);
 
         $spreadsheet = new Spreadsheet();
