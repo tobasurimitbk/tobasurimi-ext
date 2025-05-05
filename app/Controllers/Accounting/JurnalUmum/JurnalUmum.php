@@ -1869,7 +1869,7 @@ class JurnalUmum extends BaseController
                             'kredit'            => 0,
                             'valas'             => '30',
                             'kurs'              => 1,
-                            'keterangan'        => "Pembayaran PO " . $dataPO,
+                            'keterangan'        => $POlocal->keterangan,
                             'id_inputer'        => session()->get("login")->user_id
                         );
                         $result[] = array(
@@ -1883,7 +1883,7 @@ class JurnalUmum extends BaseController
                             'kredit'            => ($sumValue),
                             'valas'             => '30',
                             'kurs'              => 1,
-                            'keterangan'        => "Pembayaran PO " . $dataPO,
+                            'keterangan'        => $POlocal->keterangan,
                             'id_inputer'        => session()->get("login")->user_id
                         );
                     }

@@ -395,6 +395,11 @@ class PanjarSupplier extends BaseController
             'is_posted' => $status
         ]);
 
+        // Update di Pinjaman Supplier
+        $this->pinjamanSupplierModel->where('transaction_id', $id)->set('is_posted', $status)->update();
+        // Update di Panjar Supplier
+        $this->panjarSupplierModel->where('transaction_id', $id)->set('is_posted', $status)->update();
+
         $this->jurnalController->insertDataPanjarPinjamanTransaction($id);
 
         return response()->setJSON([
