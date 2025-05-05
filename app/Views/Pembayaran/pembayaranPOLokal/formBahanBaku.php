@@ -22,7 +22,7 @@
                     <?php endif; ?>
                     <?php if (can('Pembayaran', 'Lokal BB', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                            Update
+                            Simpan
                         </button>
                     <?php endif; ?>
                 <?php endif; ?>
@@ -30,7 +30,7 @@
 
                 <?php if (can('Pembayaran', 'Lokal BB', 'p')) : ?>
                     <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bb/print/' . encrypt($detail['pembayaranDetail']['id']) ?? '') ?>">
-                        <i class="fa-solid fa-print"></i> Print
+                        Print
                     </a>
                 <?php endif; ?>
 
@@ -60,11 +60,11 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($detail) ? (!empty($detail) ? 'disabled=true' : '')   : ''; ?> type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. PO" value="<?= !empty($detail) ? $detail['pembayaranDetail']['payment_no']: ""; ?>">
+                                    <input autocomplete="one-time-code" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'readonly=true' : '')   : ''; ?> type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. PO" value="<?= !empty($detail) ? $detail['pembayaranDetail']['payment_no'] : ""; ?>">
                                     <label for="floatingInput">No. Pembayaran</label>
                                 </div>
                                 <div style="<?= !empty($detail) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input  <?= empty($detail) ? "checked" : "" ?>  autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input <?= empty($detail) ? "checked" : "" ?> autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -152,12 +152,12 @@
 
                         </div>
                         <div class="harian-form">
-                                <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                    <select class="form-select" name="po[]" id="po">
-                                        <option disabled selected value="">Pilih No PO</option>
-                                    </select>
-                                    <label for="floatingInput" style="z-index: 1;">No PO</label>
-                                </div>
+                            <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                <select <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> class="form-select" name="po[]" id="po">
+                                    <option disabled selected value="">Pilih No PO</option>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">No PO</label>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -205,24 +205,27 @@
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" 
-                                    class="form-control input-picker due_date" 
-                                    id="payment_panjar_date" 
-                                    name="payment_panjar_date" 
+                                <input autocomplete="one-time-code"
+                                    class="form-control input-picker due_date"
+                                    id="payment_panjar_date"
+                                    name="payment_panjar_date"
                                     placeholder="Tanggal Pembayaran Panjar (Opsional)"
                                     <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?>
-                                    value="<?= !empty($detail['pembayaranDetail']['payment_panjar_date']) && $detail['pembayaranDetail']['payment_panjar_date'] != '1970-01-01' ? 
-                                            date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_panjar_date'])) : '' ?>">
+                                    value="<?= !empty($detail['pembayaranDetail']['payment_panjar_date']) && $detail['pembayaranDetail']['payment_panjar_date'] != '1970-01-01' ?
+                                                date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_panjar_date'])) : '' ?>">
                                 <label for="payment_panjar_date">Tanggal Pembayaran Panjar</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" 
-                                class="fa fa-calendar icon-form icon-po-date"></i>
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px"
+                                    class="fa fa-calendar icon-form icon-po-date"></i>
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <textarea <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="keterangan" class="form-control keterangan" id="keterangan" placeholder="Keterangan Transaksi Pembayaran" style="height: 100px;"><?= !empty($detail) ? $detail['pembayaranDetail']['keterangan'] : '' ?></textarea>
+                    </div>
                 </div>
-                
+
                 <div id="coa-panjar-section" style="display: none;">
                     <div class="row">
                         <div class="col mb-3">
@@ -234,8 +237,8 @@
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <input type="text" class="form-control" id="no_panjar" readonly>
-                                <label for="no_panjar" style="z-index: 1;">No Panjar</label>
+                                <input type="text" class="form-control" id="tgl_panjar" readonly>
+                                <label for="no_panjar" style="z-index: 1;">Tgl Panjar</label>
                             </div>
                         </div>
 
@@ -251,14 +254,14 @@
                                 <select class="form-select" name="akun_selisih_panjar" id="akun_selisih_panjar"></select>
                                 <label for="akun_selisih_panjar" style="z-index: 1;">Kredit</label>
                             </div>
-                        </div>  
+                        </div>
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                                 <input class="form-control" name="keterangan_panjar" id="keterangan_panjar">
                                 <label for="keterangan_panjar" style="z-index: 1;">Keterangan</label>
                             </div>
-                        </div>  
+                        </div>
                     </div>
                     <br>
                 </div>
@@ -275,8 +278,8 @@
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <input type="text" class="form-control" id="no_panjar_tb" readonly>
-                                <label for="no_panjar_tb" style="z-index: 1;">No Panjar</label>
+                                <input type="text" class="form-control" id="tgl_panjar_tb" readonly>
+                                <label for="no_panjar_tb" style="z-index: 1;">Tgl Panjar</label>
                             </div>
                         </div>
 
@@ -292,14 +295,14 @@
                                 <select class="form-select" name="akun_selisih_panjar_tb" id="akun_selisih_panjar_tb"></select>
                                 <label for="akun_selisih_panjar_tb" style="z-index: 1;">Kredit</label>
                             </div>
-                        </div>  
+                        </div>
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                                 <input class="form-control" name="keterangan_panjar_tb" id="keterangan_panjar_tb">
                                 <label for="keterangan_panjar_tb" style="z-index: 1;">Keterangan</label>
                             </div>
-                        </div>  
+                        </div>
                     </div>
                     <br>
                 </div>
@@ -316,8 +319,8 @@
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                <input type="text" class="form-control" id="no_pinjaman" readonly>
-                                <label for="no_pinjaman" style="z-index: 1;">No Panjar</label>
+                                <input type="text" class="form-control" id="tgl_pinjaman" readonly>
+                                <label for="tgl_pinjaman" style="z-index: 1;">Tgl Pinjaman</label>
                             </div>
                         </div>
 
@@ -333,21 +336,21 @@
                                 <select class="form-select" name="akun_selisih_pinjaman" id="akun_selisih_pinjaman"></select>
                                 <label for="akun_selisih_pinjaman" style="z-index: 1;">Kredit</label>
                             </div>
-                        </div>  
+                        </div>
 
                         <div class="col-md-3">
                             <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                                 <input class="form-control" name="keterangan_pinjaman" id="keterangan_pinjaman">
                                 <label for="keterangan_pinjaman" style="z-index: 1;">Keterangan</label>
                             </div>
-                        </div>  
+                        </div>
                     </div>
                     <br>
                 </div>
 
                 <div class="row">
                     <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Nominal & Status Pembayaran</label>
+                        <label class="form-label font-weight-bold lable-title">Detail Pembayaran</label>
                     </div>
                 </div>
                 <div class="row">
@@ -378,9 +381,9 @@
                                                     <th style="text-align: center;">Tanggal PO</th>
                                                     <th style="text-align: center;">No PO</th>
                                                     <th style="text-align: center;">Barang</th>
-                                                    <th style="text-align: center;">Qty</th>
-                                                    <th style="text-align: center; !important;">Total</th>
-                                                    <th style="text-align: center; !important;">Total Di bayar</th>
+                                                    <th style="text-align: center;">Qty (Kg)</th>
+                                                    <th style="text-align: center;">Total</th>
+                                                    <th style="text-align: center;">Total Di bayar</th>
                                                     <!-- <th style="text-align: center;">Sisa Bayar</th> -->
                                                     <th style="text-align: center;">Input Harga</th>
 
@@ -404,8 +407,8 @@
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th>No</th>
-                                                <th onclick="changeSort('no_panjar')">No. Panjar</th>
-                                                <th onclick="changeSort('payment_date')">Payment Date</th>
+                                                <!-- <th onclick="changeSort('no_panjar')">No. Panjar</th> -->
+                                                <th onclick="changeSort('payment_date')">Tgl Panjar</th>
                                                 <th onclick="changeSort('payment_amount')">Total Panjar</th>
                                                 <th>Sisa Panjar</th>
                                                 <th>Bayar Panjar </th>
@@ -414,7 +417,7 @@
                                         </thead>
                                         <tbody class="body-table" id="body-table-panjar" style="cursor: pointer;">
                                             <tr style="color: whitesmoke;">
-                                                <td colspan="7" style="text-align: center;">Tidak ada Panjar</td>
+                                                <td colspan="5" style="text-align: center;">Tidak ada Panjar</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -431,8 +434,8 @@
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th>No</th>
-                                                <th onclick="changeSort('no_pinjaman')">No. Pinjaman</th>
-                                                <th onclick="changeSort('payment_date')">Payment Date</th>
+                                                <!-- <th onclick="changeSort('no_pinjaman')">No. Pinjaman</th> -->
+                                                <th onclick="changeSort('payment_date')">Tgl Pinjaman</th>
                                                 <th onclick="changeSort('payment_amount')">Total Pinjaman</th>
                                                 <th>Sisa Pinjaman</th>
                                                 <th>Bayar Pinjaman </th>
@@ -441,7 +444,7 @@
                                         </thead>
                                         <tbody class="body-table" id="body-table-pinjaman" style="cursor: pointer;">
                                             <tr style="color: whitesmoke;">
-                                                <td colspan="7" style="text-align: center;">Tidak ada pinjaman</td>
+                                                <td colspan="5" style="text-align: center;">Tidak ada pinjaman</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -457,8 +460,8 @@
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th>No</th>
-                                                <th onclick="changeSort('no_panjar')">No. Panjar TB</th>
-                                                <th onclick="changeSort('payment_date')">Payment Date</th>
+                                                <!-- <th onclick="changeSort('no_panjar')">No. Panjar TB</th> -->
+                                                <th onclick="changeSort('payment_date')">Tgl Panjar TB</th>
                                                 <th onclick="changeSort('payment_amount')">Total Panjar TB</th>
                                                 <th>Sisa Panjar TB</th>
                                                 <th>Bayar Panjar TB </th>
@@ -467,7 +470,7 @@
                                         </thead>
                                         <tbody class="body-table" id="body-table-panjar-TB" style="cursor: pointer;">
                                             <tr style="color: whitesmoke;">
-                                                <td colspan="7" style="text-align: center;">Tidak ada Panjar TB</td>
+                                                <td colspan="5" style="text-align: center;">Tidak ada Panjar TB</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -517,7 +520,7 @@
         $('.bulanan-form,.harian-form').hide();
         $(document).ready(function() {
             changeStatus();
-            
+
         });
     </script>
 <?php endif; ?>
@@ -546,9 +549,6 @@
             no_bukti_pembayaran: {
                 required: true
             },
-            // bank_id: {
-            //     required: true
-            // },
             divisi_id: {
                 required: true
             },
@@ -579,17 +579,17 @@
             akun_selisih: {
                 required: true
             },
-            bayar_panjar: {
-                digits: true
+            // bayar_panjar: {
+            //     digits: true
+            // },
+            keterangan: {
+                required: true
             }
         },
         messages: {
             no_bukti_pembayaran: {
                 required: "No. Pembayaran wajib diisi"
             },
-            // bank_id: {
-            //     required: "Kode bank wajib diisi"
-            // },
             divisi_id: {
                 required: "Departemen wajib diisi"
             },
@@ -617,8 +617,11 @@
             akun_selisih: {
                 required: "Akun kredit wajib diisi"
             },
-            bayar_panjar: {
-                digits: "harus berupa angka"
+            // bayar_panjar: {
+            //     digits: "harus berupa angka"
+            // },
+            keterangan: {
+                required: "Keterangan Transaksi Wajib Diisi"
             }
         },
         errorElement: 'span',
@@ -645,7 +648,7 @@
             $(element).removeClass('select-class');
         },
     });
-    
+
 
     $(document).ready(function() {
         $("#akun_kas_panjar, #akun_selisih_panjar, #akun_kas_panjar_tb, #akun_selisih_panjar_tb, #akun_selisih_pinjaman, #akun_kas_pinjaman").select2({
@@ -673,7 +676,7 @@
                 },
                 cache: true
             },
-            minimumInputLength: 3 
+            minimumInputLength: 3
         });
     });
 
@@ -712,10 +715,10 @@
         theme: "bootstrap-5"
     });
 
-    $('#payment_method').select2({
-        placeholder: "Pilih metode pembayaran",
-        theme: "bootstrap-5"
-    })
+    // $('#payment_method').select2({
+    //     placeholder: "Pilih metode pembayaran",
+    //     theme: "bootstrap-5"
+    // })
 
     $('#divisi_id').select2({
         placeholder: "Pilih Departemen",
@@ -773,7 +776,7 @@
         formData.append("poID", poID);
         formData.append("tipeBayar", $('#tipe_pembayaran').val());
 
-        
+
         if (poID != "[]") {
             $.ajax({
                 url: "<?= base_url("pembayaran-po-lokal-bb/get-list-po-no-paid"); ?>",
@@ -791,10 +794,11 @@
                     csrf.val(response.token);
                     drawTable(listPembayaran);
                     $('#nominal_pembayaran').val(response.data.sisaNumber);
+                    generateKeteranganPembayaran(response.data)
                 }
             });
         }
-       
+
     });
 
     $(".btn-submit-form").click(function() {
@@ -807,7 +811,7 @@
         $.each(listPanjar, function(i, v) {
             var element = $('input[data-id="' + v.panjar_id + '"].bayar_panjar');
             var akun_kas_panjar = $("#akun_kas_panjar").val();
-            var akun_selisih_panjar =  $("#akun_selisih_panjar").val();
+            var akun_selisih_panjar = $("#akun_selisih_panjar").val();
             var keterangan_panjar = $("#keterangan_panjar").val();
             var input_user = (element.val());
             listPanjar[i].bayar_panjar = input_user;
@@ -820,7 +824,7 @@
         $.each(listPanjarTB, function(i, v) {
             var element = $('input[data-id="' + v.panjar_tb_id + '"].bayar_panjar_tb');
             var akun_kas_panjar_tb = $("#akun_kas_panjar_tb").val();
-            var akun_selisih_panjar_tb =  $("#akun_selisih_panjar_tb").val();
+            var akun_selisih_panjar_tb = $("#akun_selisih_panjar_tb").val();
             var keterangan_panjar_tb = $("#keterangan_panjar_tb").val();
             var input_user = (element.val());
             listPanjarTB[i].bayar_panjar_tb = input_user;
@@ -833,7 +837,7 @@
         $.each(listPinjaman, function(i, v) {
             var element = $('input[data-id="' + v.pinjaman_id + '"].bayar_pinjaman');
             var akun_kas_pinjaman = $("#akun_kas_pinjaman").val();
-            var akun_selisih_pinjaman =  $("#akun_selisih_pinjaman").val();
+            var akun_selisih_pinjaman = $("#akun_selisih_pinjaman").val();
             var keterangan_pinjaman = $("#keterangan_pinjaman").val();
             var input_user = (element.val());
             listPinjaman[i].bayar_pinjaman = input_user;
@@ -842,13 +846,13 @@
             listPinjaman[i].keterangan_pinjaman = keterangan_pinjaman;
         });
 
-        
-        $.each(listPembayaran, function(i, v) {
-            var element = $('input[data-id="' + v.rm_purchase_order_id + '"].total_po_dibayar'); 
-            var input_user = destroyFormatRupiahPayment(element.val()); 
 
-            listPembayaran[i].total_paid = parseInt(input_user) || 0; 
-        }); 
+        $.each(listPembayaran, function(i, v) {
+            var element = $('input[data-id="' + v.rm_purchase_order_id + '"].total_po_dibayar');
+            var input_user = destroyFormatRupiahPayment(element.val());
+
+            listPembayaran[i].total_paid = parseInt(input_user) || 0;
+        });
 
 
         if (id) {
@@ -1001,14 +1005,11 @@
                                     return item;
                                 });
                             };
-                            
 
                             // Pastikan pembayaranList berbentuk array
-                            let formattedPembayaranList = Array.isArray(listPembayaran)
-                                ? listPembayaran
-                                : Object.values(listPembayaran);
-                                
-                          
+                            let formattedPembayaranList = Array.isArray(listPembayaran) ?
+                                listPembayaran :
+                                Object.values(listPembayaran);
 
                             // Format semua list
                             let formattedPanjarList = formatList(listPanjar);
@@ -1232,14 +1233,14 @@
             success: function(response) {
 
                 csrf.val(response.token);
-                
+
                 // Kosongkan dan tambahkan opsi default
                 $("#po").empty().append(`<option value=""></option>`);
 
                 // Iterasi data PO yang belum dibayar
                 response.data.forEach(function(item) {
                     let itemPoID = Number(item.poID); // Pastikan item.poID jadi angka
-                    let isSelected = selectedPo.includes(itemPoID) ? "selected" : ""; 
+                    let isSelected = selectedPo.includes(itemPoID) ? "selected" : "";
                     $("#po").append(`<option value="${itemPoID}" ${isSelected}>${item.po_no}</option>`);
                 });
 
@@ -1263,17 +1264,20 @@
                 url: url,
                 method: "GET",
                 dataType: "json",
-                success: function (response) {
+                success: function(response) {
                     console.log("Nomor pembayaran berhasil di-generate:", response);
                     // Misalnya ingin menampilkan hasil ke input field
                     $("#no_bukti_pembayaran").val(response.paymentNo);
+                    $("#no_bukti_pembayaran").attr('readonly', true);
                 },
-                error: function (xhr, status, error) {
+                error: function(xhr, status, error) {
                     console.error("Terjadi kesalahan:", error);
+                    $("#no_bukti_pembayaran").attr('readonly', false);
                 }
             });
         } else {
             $("#no_bukti_pembayaran").val("");
+            $("#no_bukti_pembayaran").attr('readonly', false);
         }
     }
 
@@ -1414,13 +1418,13 @@
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_paid)));
             newRow.append($('<td class="hidden" style="display:none;">').html(
                 `
-                        <input  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="${v.total_tagihan}" name = "pembayaran" style="height:40px">
+                        <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="${v.total_tagihan}" name = "pembayaran" style="height:40px">
                                 `
             ));
 
             newRow.append($('<td style="text-align:center;">').html(
                 `
-                        <input  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan})" autocomplete="one-time-code" data-id="${v.rm_purchase_order_id}"  class="form-control total_po_dibayar" type="text" value="${v.sisa_tagihan}" name = "total_po_dibayar" style="height:40px">
+                        <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan})" autocomplete="one-time-code" data-id="${v.rm_purchase_order_id}"  class="form-control total_po_dibayar" type="text" value="${v.sisa_tagihan}" name = "total_po_dibayar" style="height:40px">
                                 `
             ));
 
@@ -1435,14 +1439,14 @@
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN  </b></td>'));
         newRow.append($('<td style="text-align:right;" ><b>' +
-            '<input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="'+ greatFormatRupiahPayment(TotalHarga) +'" name = "total_pembayaran"  readonly>' +
+            '<input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="' + greatFormatRupiahPayment(TotalHarga) + '" name = "total_pembayaran"  readonly>' +
             '</b></td>'));
         table.find('tbody').append(newRow);
 
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>POTONGAN/DISKON</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
-            '  <input onchange="this.value = greatFormatRupiahPayment(this.value)" oninput="preventNegativeInput(this)" name="potongan" id="potongan" autocomplete="one-time-code" type="text" class="form-control trigger-input" placeholder="Nominal Pembayaran">' +
+            '  <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'readonly' : '') : ""  ?> onchange="this.value = greatFormatRupiahPayment(this.value)" oninput="preventNegativeInput(this)" name="potongan" id="potongan" autocomplete="one-time-code" type="text" class="form-control trigger-input" placeholder="Nominal Pembayaran">' +
             '</b></td>'));
 
         table.find('tbody').append(newRow);
@@ -1450,7 +1454,7 @@
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PANJAR</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
-            '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text"  value="'+ greatFormatRupiahPayment(TotalPanjar) +'" name = "total_pembayaran_panjar" readonly>' +
+            '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text"  value="' + greatFormatRupiahPayment(TotalPanjar) + '" name = "total_pembayaran_panjar" readonly>' +
             '</b></td>'));
 
         table.find('tbody').append(newRow);
@@ -1459,7 +1463,7 @@
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PANJAR TB</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
-            '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar-tb trigger-input" type="text"  value="'+ greatFormatRupiahPayment(TotalPanjarTB) +'" name = "total_pembayaran_panjar_tb" readonly>' +
+            '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar-tb trigger-input" type="text"  value="' + greatFormatRupiahPayment(TotalPanjarTB) + '" name = "total_pembayaran_panjar_tb" readonly>' +
             '</b></td>'));
 
         table.find('tbody').append(newRow);
@@ -1468,7 +1472,7 @@
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN PINJAMAN</b></td>'));
         newRow.append($('<td style="text-align:center;"><b>' +
-            '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-pinjaman trigger-input" type="text"  value="'+ greatFormatRupiahPayment(TotalPinjaman) +'" name = "total_pembayaran_pinjaman" readonly>' +
+            '<input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-pinjaman trigger-input" type="text"  value="' + greatFormatRupiahPayment(TotalPinjaman) + '" name = "total_pembayaran_pinjaman" readonly>' +
             '</b></td>'));
 
         table.find('tbody').append(newRow);
@@ -1480,7 +1484,7 @@
             '</b></td>'));
 
         table.find('tbody').append(newRow);
-        
+
         if (TotalHarga > 0) {
             updateGrandTotal(TotalPanjarTB, TotalPinjaman, TotalPanjar)
         }
@@ -1498,8 +1502,7 @@
         }
     }
 
-    function getPanjarSupplier()
-    {   
+    function getPanjarSupplier() {
         var supplierId = $('#supplier_id option:selected').val();
         var pembayaranId = $("#id").val();
         $.ajax({
@@ -1515,9 +1518,9 @@
                 listPanjar = [];
                 listPanjarTB = [];
                 listPinjaman = [];
-                listPanjar = res.data.panjarList;      // Mengakses "panjarList"
+                listPanjar = res.data.panjarList; // Mengakses "panjarList"
                 listPanjarTB = res.data.panjarTBList; // Mengakses "panjarTBList"
-                listPinjaman = res.data.pinjamList;   // Mengakses "pinjamList"
+                listPinjaman = res.data.pinjamList; // Mengakses "pinjamList"
 
                 // drawPaidPanjarTable(listPanjar);
                 // drawPaidPinjamanTable(listPinjaman);
@@ -1548,14 +1551,14 @@
 
                     var newRow = $('<tr style="color:whitesmoke;">');
                     newRow.append($('<td style="width: 10px;">').text(no++));
-                    newRow.append($('<td>').text(v.no_panjar_tb));
+                    // newRow.append($('<td>').text(v.no_panjar_tb));
                     newRow.append($('<td>').text(formatDate(v.payment_date)));
                     newRow.append($('<td>').text((v.total_panjar_tb)));
                     newRow.append($('<td>').text((v.sisa_panjar_tb)));
 
                     newRow.append($('<td>').html(
                         `
-                        <input  class="form-control bayar_panjar_tb" onchange="this.value = greatFormatRupiahPayment(this.value)" oninput="limitInputBayar(this, ${v.sisa_panjar_tb_number})" autocomplete="one-time-code" data-no="${v.no_panjar_tb}" data-id="${v.panjar_tb_id}"  type="text" value="${v.bayar_panjar_tb}" name = "bayar_panjar_tb" style="height:40px">
+                        <input  class="form-control bayar_panjar_tb" onchange="this.value = greatFormatRupiahPayment(this.value)" oninput="limitInputBayar(this, ${v.sisa_panjar_tb_number})" autocomplete="one-time-code" data-tgl_panjar_tb="${v.payment_date}" data-id="${v.panjar_tb_id}"  type="text" value="${v.bayar_panjar_tb}" name = "bayar_panjar_tb" style="height:40px">
                             `
                     ));
                     tablePanjar.find('tbody').append(newRow);
@@ -1564,7 +1567,7 @@
                 if (v.bayar_panjar_tb && v.pembayaran_id != "NULL") {
                     $("#coa-panjar-tb-section").show();
 
-                    $("#id_panjar_tb").val(v.panjar_tb_id); 
+                    $("#id_panjar_tb").val(v.panjar_tb_id);
                     $("#no_panjar_tb").val(v.no_panjar_tb);
 
                     setTimeout(() => {
@@ -1586,7 +1589,7 @@
                             }
                         }
 
-                    }, 1000); 
+                    }, 1000);
                 }
 
             });
@@ -1608,7 +1611,7 @@
         tablePinjaman.find('tbody').empty();
         tablePinjaman.find('tfoot').empty();
 
-        
+
         if (data.length > 0) {
             let no = 1;
             let found = false;
@@ -1622,14 +1625,14 @@
 
                     var newRow = $('<tr style="color:whitesmoke;">');
                     newRow.append($('<td style="width: 10px;">').text(no++));
-                    newRow.append($('<td>').text(v.no_pinjaman));
+                    // newRow.append($('<td>').text(v.no_pinjaman));
                     newRow.append($('<td>').text(formatDate(v.payment_date)));
                     newRow.append($('<td>').text((v.total_pinjaman)));
                     newRow.append($('<td>').text((v.sisa_pinjaman)));
 
                     newRow.append($('<td>').html(
                         `
-                        <input  class="form-control bayar_pinjaman" onchange="this.value = greatFormatRupiahPayment(this.value)" oninput="limitInputBayar(this, ${v.sisa_pinjaman_number})" autocomplete="one-time-code" data-no="${v.no_pinjaman}" data-id="${v.pinjaman_id}"  type="text" value="${v.bayar_pinjaman}" name = "bayar_pinjaman" style="height:40px">
+                        <input  class="form-control bayar_pinjaman" onchange="this.value = greatFormatRupiahPayment(this.value)" oninput="limitInputBayar(this, ${v.sisa_pinjaman_number})" autocomplete="one-time-code" data-tgl_pinjaman="${v.payment_date}" data-id="${v.pinjaman_id}"  type="text" value="${v.bayar_pinjaman}" name = "bayar_pinjaman" style="height:40px">
                             `
                     ));
                     tablePinjaman.find('tbody').append(newRow);
@@ -1638,7 +1641,7 @@
                 if (v.bayar_pinjaman && v.pembayaran_id != "NULL") {
                     $("#coa-pinjaman-section").show();
 
-                    $("#id_pinjaman").val(v.pinjaman_id); 
+                    $("#id_pinjaman").val(v.pinjaman_id);
                     $("#no_pinjaman").val(v.no_pinjaman);
                     setTimeout(() => {
                         if (v.akun_kas_name) {
@@ -1659,7 +1662,7 @@
                             }
                         }
 
-                    }, 1000); 
+                    }, 1000);
                 }
 
             });
@@ -1690,20 +1693,20 @@
             tablePanjar.find('tbody').empty();
 
             $.each(data, function(i, v) {
-                
+
                 if (v.sisa_panjar_number > 0 || v.pembayaran_id != "NULL") {
                     found = true;
 
                     var newRow = $('<tr style="color:whitesmoke;">');
                     newRow.append($('<td style="width: 10px;">').text(no++));
-                    newRow.append($('<td>').text(v.no_panjar));
+                    // newRow.append($('<td>').text(v.no_panjar));
                     newRow.append($('<td>').text(formatDate(v.payment_date)));
                     newRow.append($('<td>').text((v.total_panjar)));
                     newRow.append($('<td>').text((v.sisa_panjar)));
 
                     newRow.append($('<td>').html(
                         `
-                        <input  class="form-control bayar_panjar" onchange="this.value = greatFormatRupiahPayment(this.value)" oninput="limitInputBayar(this, ${v.sisa_panjar_number})" autocomplete="one-time-code" data-no="${v.no_panjar}" data-id="${v.panjar_id}"  type="text" value="${v.bayar_panjar}" name = "bayar_panjar" style="height:40px">
+                        <input  class="form-control bayar_panjar" onchange="this.value = greatFormatRupiahPayment(this.value)" oninput="limitInputBayar(this, ${v.sisa_panjar_number})" autocomplete="one-time-code" data-tgl_panjar="${v.payment_date}" data-id="${v.panjar_id}"  type="text" value="${v.bayar_panjar}" name = "bayar_panjar" style="height:40px">
                             `
                     ));
                     tablePanjar.find('tbody').append(newRow);
@@ -1712,7 +1715,7 @@
                 if (v.bayar_panjar && v.pembayaran_id != "NULL") {
                     $("#coa-panjar-section").show();
 
-                    $("#id_panjar").val(v.panjar_id); 
+                    $("#id_panjar").val(v.panjar_id);
                     $("#no_panjar").val(v.no_panjar);
 
                     setTimeout(() => {
@@ -1734,7 +1737,7 @@
                             }
                         }
 
-                    }, 1000); 
+                    }, 1000);
                 }
             });
             if (!found) {
@@ -1829,8 +1832,8 @@
         if ($(this).val() > 0) {
             $("#coa-panjar-section").show();
 
-            $("#id_panjar").val($(this).data("id")); 
-            $("#no_panjar").val($(this).data("no"));
+            $("#id_panjar").val($(this).data("id"));
+            $("#tgl_panjar").val($(this).data("tgl_panjar"));
         } else {
             $("#coa-panjar-section").hide();
         }
@@ -1848,8 +1851,8 @@
         if ($(this).val() > 0) {
             $("#coa-pinjaman-section").show();
 
-            $("#id_pinjaman").val($(this).data("id")); 
-            $("#no_pinjaman").val($(this).data("no"));
+            $("#id_pinjaman").val($(this).data("id"));
+            $("#tgl_pinjaman").val($(this).data("tgl_pinjaman"));
         } else {
             $("#coa-pinjaman-section").hide();
         }
@@ -1867,8 +1870,8 @@
         if ($(this).val() > 0) {
             $("#coa-panjar-tb-section").show();
 
-            $("#id_panjar_tb").val($(this).data("id")); 
-            $("#no_panjar_tb").val($(this).data("no"));
+            $("#id_panjar_tb").val($(this).data("id"));
+            $("#tgl_panjar_tb").val($(this).data("tgl_panjar_tb"));
         } else {
             $("#coa-panjar-tb-section").hide();
         }
@@ -1886,7 +1889,7 @@
         var maxPotongan = totalPembayaran - totalBayarPanjar;
         limitInputBayar(this, maxPotongan);
 
-        updateGrandTotal(); 
+        updateGrandTotal();
     });
 
     function updateGrandTotal(TotalPanjarTB, TotalPinjaman, TotalPanjar) {
@@ -1901,7 +1904,7 @@
         if ($(".total-bayar-pinjaman").length) {
             totalBayarPinjaman = destroyFormatRupiahPayment($(".total-bayar-pinjaman").val()) || 0;
         }
-        
+
         if ($(".total-bayar-panjar-tb").length) {
             totalBayarPanjarTB = destroyFormatRupiahPayment($(".total-bayar-panjar-tb").val()) || 0;
         }
@@ -1910,7 +1913,19 @@
         var potongan = destroyFormatRupiahPayment($("#potongan").val()) || 0;
         var total = totalPembayaran - (totalBayarPanjar + totalBayarPinjaman + totalBayarPanjarTB + potongan);
 
-        $(".grand-total").val(greatFormatRupiahPayment(total)); 
+        $(".grand-total").val(greatFormatRupiahPayment(total));
+    }
+
+    function generateKeteranganPembayaran(data) {
+        var keterangan = "";
+        var supplierName = $('#supplier_id option:selected').text();
+        var poNoText = "";
+        $.each(data, function(i, v) {
+            poNoText += `${v.no_po} ${v.barang} Sebanyak ${v.total_qty_diterima} Kg, `;
+        });
+
+        keterangan = "Pembayaran " + supplierName + " " + poNoText;
+        $('#keterangan').val(keterangan);
     }
 </script>
 

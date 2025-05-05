@@ -210,7 +210,7 @@ class MaterialRequest extends BaseController
 
         $condition = [
             'material_requests.company_id' => $this->this_company_id,
-            'parent_barang.parent_name !=' => "KIMIA"
+            // 'parent_barang.parent_name !=' => "KIMIA"
         ];
 
         $addCondition = [

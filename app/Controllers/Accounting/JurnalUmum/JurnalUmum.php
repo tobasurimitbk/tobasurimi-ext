@@ -1709,7 +1709,7 @@ class JurnalUmum extends BaseController
                 }
                 // end inisialisasi kode transaksi
                 // input ke transaksi jurnal
-                $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
+                $no_transaksi_jurnal = $POlocal->payment_no;
                 $resultTransaksiJurnal = array(
                     'no_transaksi' => $no_transaksi_jurnal,
                     'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
@@ -1760,7 +1760,7 @@ class JurnalUmum extends BaseController
                             'kredit'            => 0,
                             'valas'             => '30',
                             'kurs'              => 1,
-                            'keterangan'        => "Pembayaran PO " . $dataPO,
+                            'keterangan'        => $POlocal->keterangan,
                             'id_inputer'        => session()->get("login")->user_id
                         );
                         $result[] = array(
@@ -1774,7 +1774,7 @@ class JurnalUmum extends BaseController
                             'kredit'            => ($sumValue),
                             'valas'             => '30',
                             'kurs'              => 1,
-                            'keterangan'        => "Pembayaran PO " . $dataPO,
+                            'keterangan'        => $POlocal->keterangan,
                             'id_inputer'        => session()->get("login")->user_id
                         );
                     }
@@ -1820,7 +1820,7 @@ class JurnalUmum extends BaseController
                 }
                 // end inisialisasi kode transaksi
                 // input ke transaksi jurnal
-                $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
+                $no_transaksi_jurnal = $POimport->payment_no;
                 $resultTransaksiJurnal = array(
                     'no_transaksi' => $no_transaksi_jurnal,
                     'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
