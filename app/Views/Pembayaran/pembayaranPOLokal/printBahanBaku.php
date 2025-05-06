@@ -131,8 +131,8 @@
                     <td><?= $no++; ?></td>
                     <td><?= date('d/m/Y', strtotime($d['po_date'])) ?></td>
                     <td><?= $d['po_no'] ?></td>
-                    <td><?= $d['barang'] ?></td>
-                    <td><?= $d['total_qty_diterima'] ?></td>
+                    <td><?= $d['barang'] ?> | <?= $d['spek'] ?></td>
+                    <td><?= number_format($d['total_qty_diterima'], 2) ?></td>
                     <td><?= number_format($d['total_dibayar'], 2) ?></td>
                 </tr>
             <?php endforeach; ?>
@@ -187,8 +187,8 @@
                     <td><?= $no++; ?></td>
                     <td><?= date('d/m/Y', strtotime($d['po_date'])) ?></td>
                     <td><?= $d['po_no'] ?></td>
-                    <td><?= $d['barang'] ?></td>
-                    <td><?= $d['total_qty_diterima'] ?></td>
+                    <td><?= $d['barang'] ?> | <?= $d['spek'] ?></td>
+                    <td><?= number_format($d['total_qty_diterima'], 2) ?></td>
                     <td><?= number_format($d['total_dibayar'], 2) ?></td>
                 </tr>
             <?php endforeach; ?>

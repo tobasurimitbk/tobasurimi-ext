@@ -1308,20 +1308,25 @@ class PembayaranPOLokal extends BaseController
             ->first();
 
         $childData = $localPOPaymentDetailModel
-            ->select('
+            ->select("
                 local_po_payment_details.*,
                 rm_purchase_orders.po_date,
                 rm_purchase_orders.po_no,
-                penerimaan_barang_detail.nama_barang_dok as barang,
-                penerimaan_barang_detail.qty as total_qty_diterima,
-                penerimaan_barang_detail.sub_total as total_dibayar
-            ')
+                rm_purchase_orders.id AS rm_purchase_order_id,
+                rm_purchase_orders.total AS total_dibayar,
+                barang_master.barang_name AS barang,
+                barang_master_spesifikasi.spesifikasi AS spek,
+                COALESCE(SUM(rm_purchase_order_details.qty_diterima), 0) AS total_qty_diterima,
+            ")
             ->where('local_po_payment_details.local_po_payment_id', $id)
             ->where('local_po_payment_details.deletedAt', null)
             ->join('rm_purchase_orders', 'local_po_payment_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
-            ->join('penerimaan_barang_detail', 'rm_purchase_orders.id = penerimaan_barang_detail.purchase_order_id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('barang_master', 'rm_purchase_order_details.barang1_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'rm_purchase_order_details.barang2_id = barang_master_spesifikasi.id', 'left')
+            ->groupBy('rm_purchase_orders.id') // Group by PO untuk aggregasi SUM
             ->findAll();
-
+            
         $data = [
             'company' => session()->get("login")->arr_company[0]['company'],
             "parentData" => $parentData,
