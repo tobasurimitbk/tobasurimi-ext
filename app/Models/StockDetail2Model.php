@@ -553,6 +553,58 @@ class StockDetail2Model extends Model
         return $dataQry;
     }
 
+    public function getStockListJasaVendorOut($condition)
+    {
+        // JIKA $isAdjusment = true MAKA STOK < 0 MUNCUL
+        // JIKA $isAdjusment = false MAKA STOK > 0 YANG MUNCUL
+        $selectQry = '
+            suppliers.name AS supplier_name,
+            stock_details2.id,
+            stock_details2.bc_id,
+            stock_details2.stock_detail_id,
+            stock_details2.no_aju,
+            stock_details2.stock_id,
+            stock_details2.stock_dokumen,
+            stock_details2.no_dokumen AS no_dokumen_2,
+            stock_details2.supplier_id,
+            stock_details2.harga_umum,
+            stock_details2.harga_harian,
+            stock_details2.harga_bulanan,
+            stock_details2.no_po,
+            stock_details.no_dokumen AS no_dokumen_1,
+            stock_details.stock_date,
+            stock_details.sumber,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            satuans.kode_satuan,
+            (SUM(CASE WHEN stock_details.status = "In" 
+            THEN stock_details2.qty ELSE 0 END) - 
+            SUM(CASE WHEN stock_details.status = "Out" 
+            THEN stock_details2.qty ELSE 0 END)) 
+            AS stok_total,        
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+            ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
+            ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->where($condition)
+            ->groupBy('stock_details2.stock_dokumen')
+            ->groupBy('stock_details2.bc_id')
+            ->groupBy('stock_details2.no_aju')
+            ->groupBy('stock_details2.id')
+            ->having('stok_total >', 0)
+            ->orderBy('stock_details.createdAt', "ASC")
+            ->findAll();
+
+        return $dataQry;
+    }
+
+
     public function getAverageHargaStockList($stockID)
     {
         // JIKA $isAdjusment = true MAKA STOK < 0 MUNCUL
