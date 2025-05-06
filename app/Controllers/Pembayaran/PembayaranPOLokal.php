@@ -1296,19 +1296,40 @@ class PembayaranPOLokal extends BaseController
     {
         $dompdf = new Dompdf();
         $localPOPaymentModel = new LocalPOPaymentModel();
+        $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
 
         $id = decrypt($id);
 
-        if ($localPOPaymentModel->where('id', $id)->first() == null) {
-            return redirect()->to('pembayaran-po-lokal-bb');
-        }
+        $parentData = $localPOPaymentModel
+            ->where('local_po_payments.id', $id)
+            ->where('local_po_payments.deletedAt', null)
+            ->join('suppliers', 'suppliers.id = local_po_payments.supplier_id', 'left')
+            ->select('local_po_payments.*, suppliers.name as supplier_name')
+            ->first();
+
+        $childData = $localPOPaymentDetailModel
+            ->select('
+                local_po_payment_details.*,
+                rm_purchase_orders.po_date,
+                rm_purchase_orders.po_no,
+                penerimaan_barang_detail.nama_barang_dok as barang,
+                penerimaan_barang_detail.qty as total_qty_diterima,
+                penerimaan_barang_detail.sub_total as total_dibayar
+            ')
+            ->where('local_po_payment_details.local_po_payment_id', $id)
+            ->where('local_po_payment_details.deletedAt', null)
+            ->join('rm_purchase_orders', 'local_po_payment_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('penerimaan_barang_detail', 'rm_purchase_orders.id = penerimaan_barang_detail.purchase_order_id', 'left')
+            ->findAll();
 
         $data = [
-            "detail" => $localPOPaymentModel->getBahanBaku($id, $this->this_company_id)
+            'company' => session()->get("login")->arr_company[0]['company'],
+            "parentData" => $parentData,
+            "childData" => $childData
         ];
 
 
-        if ($data['detail'] == null) {
+        if ($data['parentData'] == null) {
             return redirect()->to('pembayaran-po-lokal-bb');
         }
 
