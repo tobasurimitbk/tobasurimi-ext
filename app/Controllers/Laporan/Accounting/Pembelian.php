@@ -439,8 +439,8 @@ class Pembelian extends BaseController
 
     public function exportExcel($tglAwal, $tglAkhir, $filter, $search)
     {
-        set_time_limit(0); // disable batas waktu eksekusi
-        ini_set('memory_limit', '512M'); // tingkatkan batas memori jika diperlukan
+        set_time_limit(0);
+        ini_set('memory_limit', '512M');
 
         $spreadsheet = new Spreadsheet();
 

@@ -680,6 +680,9 @@ class JurnalUmum extends BaseController
 
     public function exportExcel()
     {
+        set_time_limit(0);
+        ini_set('memory_limit', '512M');
+
         $payload = [
             "pageSize"      => $this->request->getVar("length"),
             "sort" => $this->request->getVar("sort"),
