@@ -439,6 +439,8 @@ class Pembelian extends BaseController
 
     public function exportExcel($tglAwal, $tglAkhir, $filter, $search)
     {
+        set_time_limit(0); // disable batas waktu eksekusi
+        ini_set('memory_limit', '512M'); // tingkatkan batas memori jika diperlukan
 
         $spreadsheet = new Spreadsheet();
 
@@ -472,18 +474,19 @@ class Pembelian extends BaseController
         $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue('A3', 'No.')
             ->setCellValue('B3', 'Transaction Date')
-            ->setCellValue('C3', 'Document')
-            ->setCellValue('D3', 'Evidance Num')
-            ->setCellValue('E3', 'Invoice')
-            ->setCellValue('F3', 'Invoice Date')
-            ->setCellValue('G3', 'Tax Invoice')
-            ->setCellValue('H3', 'PO Num')
-            ->setCellValue('I3', 'Supplier')
-            ->setCellValue('J3', 'Valas')
-            ->setCellValue('K3', 'Exchange Rate')
-            ->setCellValue('L3', 'Nominal Value')
-            ->setCellValue('M3', 'Nominal Value(IDR)')
-            ->setCellValue('N3', 'Paid Value(IDR)');
+            ->setCellValue('C3', 'Department')
+            ->setCellValue('D3', 'Document')
+            ->setCellValue('E3', 'Evidance Num')
+            ->setCellValue('F3', 'Invoice')
+            ->setCellValue('G3', 'Invoice Date')
+            ->setCellValue('H3', 'Tax Invoice')
+            ->setCellValue('I3', 'PO Num')
+            ->setCellValue('J3', 'Supplier')
+            ->setCellValue('K3', 'Valas')
+            ->setCellValue('L3', 'Exchange Rate')
+            ->setCellValue('M3', 'Nominal Value')
+            ->setCellValue('N3', 'Nominal Value(IDR)')
+            ->setCellValue('O3', 'Paid Value(IDR)');
 
         $res = $this->penerimaanBarangModel->getPenerimaanBarangListForPrintAccounting($condition, $addCondition);
         $metaValuta = $this->metadataModel->get_by_name('Valuta');
@@ -580,18 +583,19 @@ class Pembelian extends BaseController
             $spreadsheet->setActiveSheetIndex(0)
                 ->setCellValue('A' . $column, $no++)
                 ->setCellValue('B' . $column, $tglTransaksi)
-                ->setCellValue('C' . $column, $dokumenTransaksi)
-                ->setCellValue('D' . $column, $buktiTransaksi)
-                ->setCellValue('E' . $column, $invoiceTransaksi)
-                ->setCellValue('F' . $column, $tglInvoiceTransaksi)
-                ->setCellValue('G' . $column, $taxInvoiceTransaksi)
-                ->setCellValue('H' . $column, $poNumberTransaksi)
-                ->setCellValue('I' . $column, $supplierTransaksi)
-                ->setCellValue('J' . $column, $valasTransaksi)
-                ->setCellValue('K' . $column, floatval($exchangeTransaksi))
-                ->setCellValue('L' . $column, floatval($nominalTransaksi))
-                ->setCellValue('M' . $column, floatval($nominalIdrTransaksi))
-                ->setCellValue('N' . $column, floatval($paidIdrTransaksi));
+                ->setCellValue('C' . $column, strtoupper($data->divisi))
+                ->setCellValue('D' . $column, $dokumenTransaksi)
+                ->setCellValue('E' . $column, $buktiTransaksi)
+                ->setCellValue('F' . $column, $invoiceTransaksi)
+                ->setCellValue('G' . $column, $tglInvoiceTransaksi)
+                ->setCellValue('H' . $column, $taxInvoiceTransaksi)
+                ->setCellValue('I' . $column, $poNumberTransaksi)
+                ->setCellValue('J' . $column, $supplierTransaksi)
+                ->setCellValue('K' . $column, $valasTransaksi)
+                ->setCellValue('L' . $column, floatval($exchangeTransaksi))
+                ->setCellValue('M' . $column, floatval($nominalTransaksi))
+                ->setCellValue('N' . $column, floatval($nominalIdrTransaksi))
+                ->setCellValue('O' . $column, floatval($paidIdrTransaksi));
 
             $spreadsheet->getActiveSheet()->getStyle('K' . $column)
                 ->getNumberFormat()->setFormatCode('#,##0.00');
