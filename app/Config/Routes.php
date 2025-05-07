@@ -210,6 +210,7 @@ $routes->post('/shift/update', 'Master\Shift::update', ['filter' => 'Auth']);
 $routes->get('/kurs', 'Master\Kurs::index', ['filter' => 'Auth']);
 $routes->get('/kurs/all', 'Master\Kurs::all', ['filter' => 'Auth']);
 $routes->get('/kurs/id/(:segment)', 'Master\Kurs::getById/$1', ['filter' => 'Auth']);
+$routes->get('/kurs/getNilaiKurs/(:segment)', 'Master\Kurs::getKurs/$1', ['filter' => 'Auth']);
 $routes->post('/kurs/save', 'Master\Kurs::save', ['filter' => 'Auth']);
 $routes->post('/kurs/update', 'Master\Kurs::update', ['filter' => 'Auth']);
 $routes->post('/kurs/delete', 'Master\Kurs::delete', ['filter' => 'Auth']);

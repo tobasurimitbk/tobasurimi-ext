@@ -84,7 +84,6 @@ class OtherPayment extends BaseController
                 "id"                => encrypt($data['id']),
                 "divisi"            => $data['divisi'],
                 "no_pembayaran"     => $data['no_pembayaran'],
-                "valas"             => $data['valas_name'],
                 "status_posting"    => $data['status_posting'],
                 "nominal"           => number_format($data['nominal_all'], 2),
                 "bayar_ke"          => $data['bayar_ke'],
@@ -123,7 +122,6 @@ class OtherPayment extends BaseController
             'divisi_id'      => $payload['divisi_id'],
             'no_pembayaran'  => $payload['no_pembayaran'],
             'bayar_ke'       => $payload['bayar_ke'],
-            'valas'          => $payload['valas'],
             'jenis_pembayaran'          => $payload['jenis_pembayaran'],
             'akun_selisih'         => $payload['akun_selisih'],
             'akun_selisih'     => ($payload['jenis_pembayaran'] === 'PUTIH') ? $payload['akun_selisih'] : null,
@@ -146,8 +144,12 @@ class OtherPayment extends BaseController
                 'other_payment_id'     => $parentId,
                 'tanggal_pembayaran'   => date("Y-m-d", strtotime(str_replace("/", "-", $detail['tanggal']))),
                 'metode_pembayaran'    => $detail['metode_pembayaran'],
-                'nominal'              => str_replace(['.', ','], '', $detail['nominal_pembayaran']),
+                'nominal'              => $detail['jumlah_idr'],
                 'pembayaran_oleh'      => $detail['pembayaran_oleh'],
+                'valas_id'             => $detail['valas_id'],
+                'kurs'                 => $detail['kurs'],
+                'jumlah'               => $detail['jumlah'],
+                'jumlah_idr'           => $detail['jumlah_idr'],
                 'akun_kas'             => $akunKas,
                 'akun_selisih'         => $akunSelisih,
                 'keterangan'           => $detail['keterangan'] ?? null
@@ -181,10 +183,12 @@ class OtherPayment extends BaseController
 
         // 1. Update Parent Data
         $parentData = [
-            'divisi_id'     => $payload['divisi_id'],
-            'no_pembayaran' => $payload['no_pembayaran'],
-            'bayar_ke'      => $payload['bayar_ke'],
-            'valas'         => $payload['valas'],
+            'company_id'     => $this->this_company_id,
+            'divisi_id'      => $payload['divisi_id'],
+            'no_pembayaran'  => $payload['no_pembayaran'],
+            'bayar_ke'       => $payload['bayar_ke'],
+            'jenis_pembayaran'          => $payload['jenis_pembayaran'],
+            'akun_selisih'         => $payload['akun_selisih'],
             'akun_selisih'     => ($payload['jenis_pembayaran'] === 'PUTIH') ? $payload['akun_selisih'] : null,
             'akun_kas'         => ($payload['jenis_pembayaran'] === 'MERAH') ? $payload['akun_selisih'] : null,
         ];
@@ -209,10 +213,14 @@ class OtherPayment extends BaseController
                 'other_payment_id'     => $parentId,
                 'tanggal_pembayaran'   => date("Y-m-d", strtotime(str_replace("/", "-", $detail['tanggal']))),
                 'metode_pembayaran'    => $detail['metode_pembayaran'],
-                'nominal'              => str_replace(['.', ','], '', $detail['nominal_pembayaran']),
+                'nominal'              => $detail['jumlah_idr'],
                 'pembayaran_oleh'      => $detail['pembayaran_oleh'],
                 'akun_kas'             => $akunKas,
                 'akun_selisih'         => $akunSelisih,
+                'valas_id'             => $detail['valas_id'],
+                'kurs'                 => $detail['kurs'],
+                'jumlah'               => $detail['jumlah'],
+                'jumlah_idr'           => $detail['jumlah_idr'],
                 'keterangan'           => $detail['keterangan'] ?? null
             ];
 
@@ -272,9 +280,11 @@ class OtherPayment extends BaseController
                             kas.nama_sub as akun_kas_name, 
                             selisih.nama_sub as akun_selisih_name,
                             kas.no_sub as akun_kas_no,
-                            selisih.no_sub as akun_selisih_no')
+                            selisih.no_sub as akun_selisih_no,
+                            metadata.value as valas')
             ->join('sub_akuns as kas', 'kas.id = other_payment_detail.akun_kas', 'left')
             ->join('sub_akuns as selisih', 'selisih.id = other_payment_detail.akun_selisih', 'left')
+            ->join('metadata', 'metadata.id = other_payment_detail.valas_id', 'left')
             ->where('other_payment_detail.other_payment_id', $id)
             ->findAll();
 
@@ -288,6 +298,11 @@ class OtherPayment extends BaseController
                 'nominal_pembayaran' => number_format($detail['nominal'], 0, ',', '.'),
                 'pembayaran_oleh' => $detail['pembayaran_oleh'],
                 'akun_kas' => $detail['akun_kas'],
+                'valas' => $detail['valas'],
+                'valas_id' => $detail['valas_id'],
+                'jumlah' => $detail['jumlah'],
+                'jumlah_idr' => $detail['jumlah_idr'],
+                'kurs' => $detail['kurs'],
                 'akun_selisih' => $detail['akun_selisih'],
                 'akun_kas_name' => $detail['akun_kas_no'] . ' ' . $detail['akun_kas_name'],
                 'akun_selisih_name' => $detail['akun_selisih_no'] . ' ' . $detail['akun_selisih_name'],
@@ -304,7 +319,6 @@ class OtherPayment extends BaseController
                     'no_pembayaran' => $parentData['no_pembayaran'],
                     'divisi_id' => $parentData['divisi_id'],
                     'bayar_ke' => $parentData['bayar_ke'],
-                    'valas' => $parentData['valas'],
                     'akun_selisih' => $parentData['akun_selisih'],
                     'akun_kas' => $parentData['akun_kas'],
                     'jenis_pembayaran' => $parentData['jenis_pembayaran'],

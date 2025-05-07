@@ -353,6 +353,35 @@ class Kurs extends BaseController
         return;
     }
 
+    public function getKurs($id = null)
+    {
+        if (!empty($id)) {
+            $dataKurs = $this->KursModel->getKurs($id);
+
+            if ($dataKurs) {
+                $data = [
+                    "status"  => true,
+                    "data"  => $dataKurs
+                ];
+                echo json_encode($data);
+            } else {
+                $message = 'Kurs dengan valas tersebut belum terdefinisikan';
+                $data = [
+                    "status" => false,
+                    "message"  => $message
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Tidak Ada Id"
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
     public function delete()
     {
         try {

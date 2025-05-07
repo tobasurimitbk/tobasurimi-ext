@@ -116,6 +116,22 @@ class KursModel extends Model
         return $data;
     }
 
+    public function getKurs($id)
+    {
+        $selectQry = "kurs.*";
+
+        $data = $this->asObject()
+        ->select($selectQry)
+        ->where('start_date <=', 'NOW()', false)  // Parameter false untuk menghindari escaping
+        ->where('end_date >=', 'NOW()', false)
+        ->where('metadata_id', $id)
+        ->where('deletedAt', NULL)
+        ->first();
+            
+
+        return $data;
+    }
+
     public function check_current($id, $metadata_id, $end_date)
     {
         $selectQry = "kurs.*";
