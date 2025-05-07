@@ -302,8 +302,6 @@ class JurnalUmum extends BaseController
         return $dataResult;
     }
 
-
-
     public function create()
     {
         $tipeTransaksi = $this->MetadataModel
