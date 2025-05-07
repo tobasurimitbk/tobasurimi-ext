@@ -63,16 +63,16 @@
       style=" margin-top: -20px;">
         <thead>
           <tr>
-            <th style="width: 20px;">Tanggal</th>
-            <!-- <th>Jenis Transaksi</th> -->
-            <th style="width: 20px;">No Trx</th>
-            <th style="width: 20px;">Supplier</th>
-            <th style="width: 180px;">Desc</th>
-            <th style="width: 20px;">Currency</th>
-            <th style="width: 20px;">Exchange Rate</th>
-            <th style="width: 20px;">Debit</th>
-            <th style="width: 20px;">Kredit</th>
-            <th style="width: 20px;">Balance</th>
+            <th style="width: 10%;">Tanggal</th>
+            <th style="width: 10%;">No Trx</th>
+            <th style="width: 10%;">Supplier</th>
+            <th style="width: 77%;">Desc</th>
+            <th style="width: 5%;">Currency</th>
+            <th style="width: 5%;">Exchange</th>
+            <th style="width: 5%;">Debit</th>
+            <th style="width: 5%;">Kredit</th>
+            <th style="width: 5%;">Balance</th>
+
           </tr>
         </thead>
 
