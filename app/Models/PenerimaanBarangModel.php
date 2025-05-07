@@ -285,12 +285,14 @@ class PenerimaanBarangModel extends Model
                     warehouses.warehouse_name, 
                     suppliers.name as supplier_name, 
                     COUNT(penerimaan_barang_detail.id) AS itemCount, 
-                    penerimaan_barang_detail.harga";
+                    penerimaan_barang_detail.harga,
+                    divisis.divisi,";
         $penerimaanBarangDataQry = $this->asObject()
             ->select($selectQry)
             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
             ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'right')
+            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'right')
             ->groupBy(('penerimaan_barang.id'))
             ->where($condition)
             ->orderBy($sort, $sortType);
@@ -311,7 +313,7 @@ class PenerimaanBarangModel extends Model
 
         if ($addCondition['startdate'] && $addCondition['lastdate']) {
             $penerimaanBarangDataQry->where('penerimaan_barang.tanggal >=', $addCondition['startdate'])
-            ->where('penerimaan_barang.tanggal <=', $addCondition['lastdate']);
+                ->where('penerimaan_barang.tanggal <=', $addCondition['lastdate']);
         }
 
         if ($addCondition['search'] || $addCondition['filter'] || $addCondition['startdate'] || $addCondition['lastdate']) {
