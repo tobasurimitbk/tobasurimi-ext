@@ -72,7 +72,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" <?= !empty($jasaVendorOut) ? 'disabled=true' : ''; ?> value="<?= !empty($jasaVendorOut) ? $jasaVendorOut['no_surat_jalan'] : "TOBA-VBK//" . date('m') . "/1/" . date('Y'); ?>" type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" placeholder="No. Surat Jalan">
+                                    <input autocomplete="one-time-code" <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'readonly' : '') : ''; ?> value="<?= !empty($jasaVendorOut) ? $jasaVendorOut['no_surat_jalan'] : "TOBA-VBK//" . date('m') . "/1/" . date('Y'); ?>" type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" placeholder="No. Surat Jalan">
                                     <label for="floatingInput">No. Nota Surat Jalan</label>
                                 </div>
                                 <div style="<?= !empty($jasaVendorOut) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -378,7 +378,8 @@
             data: {
                 type_barang: $(".type_barang option:selected").val(),
                 divisi_id: $(".divisi_id option:selected").val(),
-                warehouse_id: $(".warehouse_id option:selected").val()
+                warehouse_id: $(".warehouse_id option:selected").val(),
+                asal_barang: $(".type_asal_barang option:selected").val()
             },
             dataType: "json",
             success: function(res) {
@@ -592,13 +593,16 @@
         }).get();
         var id_selected = getIDListDataSelected();
 
+        console.log("Yang Di Checklist", dataIds);
+        console.log("Yang sudah masuk tabel bawah", id_selected);
         $.each(listStockAsal, function(i, v) {
-            var currentID = Number(v.id);
+            var currentID = v.id;
+            console.log("stok asal", currentID);
             if ($.inArray(currentID, dataIds) !== -1) {
                 var isIDSelected = $.grep(listStockSelected, function(item) {
-                    return item.id == Number(currentID);
+                    return item.id == currentID;
                 }).length > 0;
-
+                console.log("Selecteddddd", isIDSelected);
                 if (!isIDSelected) {
                     listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                     listStockAsal[i].qty = 0;
@@ -860,14 +864,15 @@
             data: {
                 type_barang: $(".type_barang option:selected").val(),
                 divisi_id: $(".divisi_id option:selected").val(),
-                warehouse_id: $(".warehouse_id option:selected").val()
+                warehouse_id: $(".warehouse_id option:selected").val(),
+                asal_barang: $(".type_asal_barang option:selected").val()
             },
             dataType: "json",
             success: function(res) {
                 $(".spesifikasi_id").empty()
                 $(".spesifikasi_id").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
-                    $(".spesifikasi_id").append(`<option data-stock_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.spesifikasi_id}">(${item.kode_barang}) ${item.barang}</option>`)
+                    $(".spesifikasi_id").append(`<option data-barang_master_id="${item.id}" data-stock_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.spesifikasi_id}">(${item.kode_barang}) ${item.barang}</option>`)
                 })
                 $(".spesifikasi_id").val();
             }
@@ -886,6 +891,7 @@
                 stopLoading();
             },
             data: {
+                barang_master_id: $(".spesifikasi_id option:selected").data('barang_master_id'),
                 stock_id: $(".spesifikasi_id option:selected").data('stock_id'),
                 supplier_id: $(".supplier_id option:selected").val(),
                 vendor_id: $('.vendor_barang_id option:selected').val()
@@ -1106,6 +1112,7 @@
         }
         $('#supplier_id').val(null).change();
         $('#vendor_barang_id').val(null).change();
+        $('#warehouse_id').change();
 
     }
 
