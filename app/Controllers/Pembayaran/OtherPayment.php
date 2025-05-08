@@ -123,6 +123,8 @@ class OtherPayment extends BaseController
             'no_pembayaran'  => $payload['no_pembayaran'],
             'bayar_ke'       => $payload['bayar_ke'],
             'jenis_pembayaran'          => $payload['jenis_pembayaran'],
+            'keterangan'          => $payload['keterangan_parent'],
+            'nominal'          => $payload['total_all_amount'],
             'akun_selisih'         => $payload['akun_selisih'],
             'akun_selisih'     => ($payload['jenis_pembayaran'] === 'PUTIH') ? $payload['akun_selisih'] : null,
             'akun_kas'         => ($payload['jenis_pembayaran'] === 'MERAH') ? $payload['akun_selisih'] : null,
@@ -188,6 +190,8 @@ class OtherPayment extends BaseController
             'no_pembayaran'  => $payload['no_pembayaran'],
             'bayar_ke'       => $payload['bayar_ke'],
             'jenis_pembayaran'          => $payload['jenis_pembayaran'],
+            'keterangan'          => $payload['keterangan_parent'],
+            'nominal'          => $payload['total_all_amount'],
             'akun_selisih'         => $payload['akun_selisih'],
             'akun_selisih'     => ($payload['jenis_pembayaran'] === 'PUTIH') ? $payload['akun_selisih'] : null,
             'akun_kas'         => ($payload['jenis_pembayaran'] === 'MERAH') ? $payload['akun_selisih'] : null,
@@ -322,6 +326,8 @@ class OtherPayment extends BaseController
                     'akun_selisih' => $parentData['akun_selisih'],
                     'akun_kas' => $parentData['akun_kas'],
                     'jenis_pembayaran' => $parentData['jenis_pembayaran'],
+                    'total_all_amount' => $parentData['nominal'],
+                    'keterangan_parent' => $parentData['keterangan'],
                     'status_posting' => $parentData['status_posting'] ?? '0'
                 ],
                 'details' => $formattedDetails

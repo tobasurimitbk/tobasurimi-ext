@@ -69,6 +69,20 @@
                                         <label for="floatingInput">Pembayaran Kepada</label>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control total_all_amount" name="total_all_amount" id="total_all_amount" placeholder="Total Keseluruhan" readonly>
+                                        <label for="floatingInput">Total Keseluruhan</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control keterangan_parent" name="keterangan_parent" id="keterangan_parent" placeholder="Keterangan">
+                                        <label for="floatingInput">Keterangan</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -125,7 +139,7 @@
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan" value="">
-                                        <label for="floatingInput">Keterangan (Opsional)</label>
+                                        <label for="floatingInput">Keterangan</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -403,6 +417,12 @@
                 akun_selisih: {
                     required: true
                 },
+                keterangan_parent: {
+                    required: true
+                },
+                total_all_amount: {
+                    required: true
+                },
 
                 // Child/detail section rules
                 tanggal: {
@@ -438,6 +458,12 @@
                 },
                 divisi_id: {
                     required: "Departemen wajib diisi"
+                },
+                keterangan_parent: {
+                    required: "Keterangan wajib diisi"
+                },
+                total_all_amount: {
+                    required: "Total wajib Terisi"
                 },
                 bayar_ke: {
                     required: "Pembayaran kepada wajib diisi"
@@ -600,11 +626,8 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        if (res.data.nilai_kurs) {
+                        if (res.data && res.data.nilai_kurs) {
                             $('#kurs').val(greatFormatRupiah(res.data.nilai_kurs));
-                            $('#kurs').prop('readonly', false);
-                        } else {
-                            $('#kurs').val(1);
                         }
                     } else {
                         Swal.fire({
@@ -612,6 +635,7 @@
                             title: res.message,
                             confirmButtonColor: '#4e73df',
                         });
+                        $('#kurs').val(greatFormatRupiah(1));
                     }
                 },
                 error: function(xhr) {
@@ -885,6 +909,16 @@
                     </tr>
                 `);
             });
+
+            // Menghitung total jumlah_idr
+            const totalAmount = details.reduce((sum, detail) => {
+                // Pastikan jumlah_idr adalah number, jika tidak konversi ke number
+                const amount = destroyFormatRupiah(detail.jumlah_idr) || 0;
+                return sum + amount;
+            }, 0);
+
+            // Memasukkan total ke input
+            $('#total_all_amount').val(greatFormatRupiah(totalAmount));
         }
 
         // Remove detail
@@ -984,6 +1018,8 @@
                         $('#divisi_id').val(parent.divisi_id).change();
                         $('#bayar_ke').val(parent.bayar_ke);
                         $('#akun_selisih').val(parent.akun_selisih).change();
+                        $('#keterangan_parent').val(parent.keterangan_parent);
+                        $('#total_all_amount').val(parent.total_all_amount);
 
                         // Handle jenis pembayaran dan akun
                         $('#jenis_pembayaran').val(parent.jenis_pembayaran).change();
@@ -1069,6 +1105,8 @@
                             no_pembayaran: $('#no_pembayaran').val(),
                             bayar_ke: $('#bayar_ke').val(),
                             akun_selisih: $('#akun_selisih').val(),
+                            total_all_amount: destroyFormatRupiah($('#total_all_amount').val()),
+                            keterangan_parent: $('#keterangan_parent').val(),
                             jenis_pembayaran: jenisPembayaran,
                             details: details.map(detail => ({
                                 id: detail.id || '',
