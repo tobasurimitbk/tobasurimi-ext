@@ -450,7 +450,6 @@
                 },
                 jumlah_idr: {
                     required: "Nominal pembayaran wajib diisi",
-                    min: "Nominal harus lebih dari 0"
                 },
                 pembayaran_oleh: {
                     required: "Pembayaran oleh wajib diisi"
@@ -604,6 +603,8 @@
                         if (res.data.nilai_kurs) {
                             $('#kurs').val(greatFormatRupiah(res.data.nilai_kurs));
                             $('#kurs').prop('readonly', false);
+                        } else {
+                            $('#kurs').val(1);
                         }
                     } else {
                         Swal.fire({
