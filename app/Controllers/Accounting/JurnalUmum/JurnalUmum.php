@@ -2733,7 +2733,8 @@ class JurnalUmum extends BaseController
                 'total_kredit' =>  $pembayaranInvoice['total_bayar'],
                 'metode_input' => 'system',
                 'type_transaksi' => $metaDataTypeTransaksi['id'],
-                'valas' => $metaDataValuta['value']
+                'valas' => $metaDataValuta['value'],
+                'uraian_transaksi' => $pembayaranInvoice['pembayaran_dari']
             );
 
             $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);

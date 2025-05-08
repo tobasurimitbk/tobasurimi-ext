@@ -111,7 +111,7 @@
 
 
 <script>
-    let sort = "no_pembayaran";
+    let sort = "pembayaran_invoice.id";
     let sortType = "desc";
     const csrfToken = '<?= csrf_token() ?>';
 
@@ -121,7 +121,7 @@
         serverSide: true,
         ordering: true,
         order: [
-            [1, 'asc']
+            [1, 'desc']
         ],
 
         fixedHeader: true,
@@ -398,7 +398,7 @@
 
     function showInvoice() {
         $("#showInvoiceModal").modal('show');
-        
+
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
         $.ajax({
@@ -416,7 +416,7 @@
                 let html = '';
                 let currentCustomer = '';
                 let customerRowCount = 0;
-                
+
                 // Group invoices by customer first
                 const customers = {};
                 response.data.forEach(item => {
@@ -426,21 +426,21 @@
                             invoices: []
                         };
                     }
-                    
+
                     // Convert string to number (remove commas and parse)
                     const amount = parseFloat(item.total_invoice.replace(/,/g, ''));
                     customers[item.nama_pelanggan].total += amount;
                     customers[item.nama_pelanggan].invoices.push(item);
                 });
-                
+
                 // Generate table rows
                 Object.keys(customers).forEach((customerName, index) => {
                     const customerData = customers[customerName];
                     customerRowCount++;
-                    
+
                     // Format total with thousand separators
                     const formattedTotal = customerData.total.toLocaleString('id-ID');
-                    
+
                     // Add customer summary row
                     html += `
                     <tr style="background-color: #f8f9fa; font-weight: bold;">
@@ -450,7 +450,7 @@
                         <td class="text-right">${formattedTotal}</td>
                         <td></td>
                     </tr>`;
-                    
+
                     // Add invoice detail rows
                     customerData.invoices.forEach(invoice => {
                         html += `
@@ -464,7 +464,7 @@
                         </tr>`;
                     });
                 });
-                
+
                 $('#body-table-invoice').html(html);
             },
             error: function(xhr, status, error) {
@@ -473,6 +473,5 @@
             }
         });
     }
-
 </script>
 <?= $this->endSection(); ?>
