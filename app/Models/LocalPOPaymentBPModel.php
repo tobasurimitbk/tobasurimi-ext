@@ -26,6 +26,8 @@ class LocalPOPaymentBPModel extends Model
         'payment_method',
         'status_pph',
         'pembayaran_oleh',
+        'supplier',
+        'keterangan',
         'amount',
         'status_posting',
         'akun_kas',
