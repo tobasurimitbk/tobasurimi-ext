@@ -79,7 +79,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" type="text" class="form-control keterangan_parent" name="keterangan_parent" id="keterangan_parent" placeholder="Keterangan">
+                                        <textarea autocomplete="one-time-code" style="height: 88px;" type="text" class="form-control keterangan_parent" name="keterangan_parent" id="keterangan_parent" placeholder="Keterangan"></textarea>
                                         <label for="floatingInput">Keterangan</label>
                                     </div>
                                 </div>
