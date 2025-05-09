@@ -135,7 +135,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">               
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan" value="">
@@ -155,7 +155,7 @@
                                 </div>
                             </div>
 
-                            <div class="row">                            
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" type="text" class="form-control jumlah" onkeyup="this.value = greatFormatRupiah(this.value)" id="jumlah" name="jumlah" placeholder="Jumlah Transaksi">
@@ -170,7 +170,7 @@
                                 </div>
                             </div>
 
-                            <div class="row">                       
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="input-group">
                                         <div class="form-floating mb-3" style="height: 50px;">
@@ -274,7 +274,7 @@
                                 <th onclick="changeSort('no_pembayaran')">No. Pembayaran</th>
                                 <th onclick="changeSort('divisi_id')">Departemen</th>
                                 <th onclick="changeSort('bayar_ke')">Uraian</th>
-                                <th >Nominal</th>
+                                <th>Nominal</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -535,8 +535,10 @@
             dropdownParent: $('#add_modal .modal-content')
         }).on('change', function() {
             let id = $(this).val();
-            if(id){
+            if (id && id != 30) {
                 getNilaiKurs(id);
+            } else {
+                $('#kurs').val(1);
             }
         });
 
@@ -630,11 +632,11 @@
                             $('#kurs').val(greatFormatRupiah(res.data.nilai_kurs));
                         }
                     } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        });
+                        // Swal.fire({
+                        //     icon: 'error',
+                        //     title: res.message,
+                        //     confirmButtonColor: '#4e73df',
+                        // });
                         $('#kurs').val(greatFormatRupiah(1));
                     }
                 },
@@ -796,14 +798,15 @@
 
             // Special handling for detail fields
             const hasDetails = $("#detail-table tbody tr").length > 0;
-            const detailFields = ['#tanggal', 
-                                '#metode_pembayaran', 
-                                '#pembayaran_oleh',
-                                '#valas',
-                                '#kurs',
-                                '#jumlah',
-                                '#jumlah_idr',
-                                '#akun_kas'];
+            const detailFields = ['#tanggal',
+                '#metode_pembayaran',
+                '#pembayaran_oleh',
+                '#valas',
+                '#kurs',
+                '#jumlah',
+                '#jumlah_idr',
+                '#akun_kas'
+            ];
 
             detailFields.forEach(field => {
                 const element = $(field);
@@ -840,12 +843,24 @@
 
         $('.btn-add-detail').click(function() {
             // Jalankan validasi detail dulu
+            const akunSelisih = $('#akun_selisih option:selected').val();
+            const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
+            let messageErr = '';
+            if (akunSelisih == '') {
+                if (jenisPembayaran == 'PUTIH') {
+                    messageErr = "Akun Kredit Wajib Diisi"
+                } else {
+                    messageErr = "Akun Debit Wajib Diisi";
+                }
+                alert(messageErr)
+                return;
+            }
+
             if (!validateDetails()) {
                 refreshValidation(); // buat update styling error
                 return; // stop proses kalau gak valid
             }
 
-            const jenisPembayaran = $('#jenis_pembayaran').val();
 
             const detail = {
                 tanggal: $('#tanggal').val(),
@@ -898,9 +913,9 @@
                         <td>${debitAccount}</td>
                         <td>${creditAccount}</td>
                         <td>${detail.valas}</td>
-                        <td>${detail.jumlah}</td>
-                        <td>${detail.kurs}</td>
-                        <td>${detail.jumlah_idr}</td>
+                        <td>${greatFormatRupiah(detail.jumlah)}</td>
+                        <td>${greatFormatRupiah(detail.kurs)}</td>
+                        <td>${greatFormatRupiah(detail.jumlah_idr)}</td>
                         <td>${detail.pembayaran_oleh}</td>
                         <td>${detail.keterangan}</td>
                         <td>
@@ -924,7 +939,7 @@
         // Remove detail
         $(document).on('click', '.btn-remove-detail', function() {
             const index = $(this).data('index');
-            details.splice(index, 1);
+            details.splice(index, -1);
             refreshDetailsTable();
         });
 
@@ -1033,9 +1048,8 @@
 
                         // Disable fields if needed
                         if (parent.status_posting === "1") {
-                            disabledForm();
-                        } else {
                             $("#no_pembayaran").attr('disabled', true);
+                            disabledForm();
                         }
 
                         // Set details data
@@ -1046,7 +1060,7 @@
                                     tanggal: detail.tanggal,
                                     metode_pembayaran: detail.metode_pembayaran,
                                     pembayaran_oleh: detail.pembayaran_oleh,
-                                    akun_kas: detail.akun_kas,
+                                    akun_kas: parent.jenis_pembayaran == "PUTIH" ? detail.akun_kas : detail.akun_selisih,
                                     akun_kas_name: detail.akun_kas_name,
                                     akun_selisih_name: detail.akun_selisih_name,
                                     keterangan: detail.keterangan,
@@ -1245,6 +1259,10 @@
         $('#akun_selisih').attr('disabled', true);
         $('#keterangan').attr('disabled', true);
         $('#jenis_pembayaran').attr('disabled', true);
+        $('#keterangan_parent').attr('disabled', true);
+        $('#jumlah').attr('disabled', true);
+        $('#kurs').attr('disabled', true);
+        $('#jumlah_idr').attr('disabled', true);
 
         $('.btn-submit-form').hide();
     }
@@ -1261,6 +1279,10 @@
         $('#akun_selisih').attr('disabled', false);
         $('#keterangan').attr('disabled', false);
         $('#jenis_pembayaran').attr('disabled', false);
+        $('#keterangan_parent').attr('disabled', false);
+        $('#jumlah').attr('disabled', false);
+        $('#kurs').attr('disabled', false);
+        $('#jumlah_idr').attr('disabled', false);
 
         $("#id").val(null).change();
         $("#no_pembayaran").val(null).change();

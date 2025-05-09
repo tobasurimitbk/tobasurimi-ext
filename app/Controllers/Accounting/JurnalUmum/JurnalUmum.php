@@ -294,7 +294,7 @@ class JurnalUmum extends BaseController
                 "valas"                 => $data->valas,
                 "exchange_rate"         => $data->exchange_rate == 1 ? "" : $data->exchange_rate,
                 "nilai"                 => $data->exchange_rate == 1 ? "" : $data->exchange_rate,
-                "nilai_idr"             => $data->total_debit * $data->exchange_rate,
+                "nilai_idr"             => $data->total_debit,
                 "tutup_buku"            => $tutupBuku ? 1 : 0,
             ];
         }
@@ -368,8 +368,8 @@ class JurnalUmum extends BaseController
                     'company_id' => $this->this_company_id,
                     'divisi_id' => $this->request->getVar('divisi_id') == "ALL" ? null : $this->request->getVar('divisi_id'),
                     'tanggal_jurnal' => $this->request->getVar("tanggal_transaksi") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_transaksi")))) : "",
-                    'debit' => $l->jenis_transaksi == "debit" ? $l->jumlah : 0,
-                    'kredit' => $l->jenis_transaksi == "kredit" ? $l->jumlah : 0,
+                    'debit' => $l->jenis_transaksi == "debit" ? $l->jumlah_idr : 0,
+                    'kredit' => $l->jenis_transaksi == "kredit" ? $l->jumlah_idr : 0,
                     'valas' => $l->valas_id,
                     'kurs' => $l->kurs,
                     'keterangan' => $l->keterangan,
@@ -445,8 +445,8 @@ class JurnalUmum extends BaseController
                     'company_id' => $this->this_company_id,
                     'divisi_id' => $this->request->getVar('divisi_id') == "ALL" ? null : $this->request->getVar('divisi_id'),
                     'tanggal_jurnal' => $this->request->getVar("tanggal_transaksi") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_transaksi")))) : "",
-                    'debit' => $l->jenis_transaksi == "debit" ? $l->jumlah : 0,
-                    'kredit' => $l->jenis_transaksi == "kredit" ? $l->jumlah : 0,
+                    'debit' => $l->jenis_transaksi == "debit" ? $l->jumlah_idr : 0,
+                    'kredit' => $l->jenis_transaksi == "kredit" ? $l->jumlah_idr : 0,
                     'valas' => $l->valas_id,
                     'kurs' => $l->kurs,
                     'keterangan' => $l->keterangan,
@@ -1878,43 +1878,15 @@ class JurnalUmum extends BaseController
                 ->first();
 
             if ($otherPayment) {
-                $kursData = 1;
+
                 $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()
                     ->where('name', 'tipe_transaksi')
                     ->where('value', 'PEMBAYARAN')
                     ->first();
 
-                $dataMetadataValuta = $this->MetadataModel->asArray()
-                    ->where('name', 'Valuta')
-                    ->where('id', $otherPayment->valas)
-                    ->first();
-
-                if ($dataMetadataValuta['value'] != "IDR") {
-                    // Ambil tanggal dari detail pertama sebagai acuan kurs
-                    $firstDetail = $this->otherPaymentDetailModel
-                        ->where('other_payment_id', $otherPayment->id)
-                        ->orderBy('tanggal_pembayaran', 'asc')
-                        ->first();
-
-
-
-                    $kursTanggal = $firstDetail['tanggal_pembayaran'] ?? date('Y-m-d');
-                    $kursData = $this->kursModel->getByMetaId($otherPayment->valas, $kursTanggal)['nilai_kurs'];
-
-                    if (!$kursData) {
-                        return response()->setJSON([
-                            'status' => false,
-                            'message' => "Data kurs untuk tanggal " . date('Y-m-d', strtotime($kursTanggal)) . " tidak tersedia.",
-                            'token' => csrf_hash()
-                        ]);
-                    }
-                }
-
                 // start inisialisasi kode transaksi
-                $kodeTransaksi = $dataMetadataTipeTransaksi->description;
                 $idTransaksi = $dataMetadataTipeTransaksi->id;
 
-                // ambil semua detail pembayaran
                 $detailPembayaran = $this->otherPaymentDetailModel
                     ->where('other_payment_id', $otherPayment->id)
                     ->findAll();
@@ -1922,14 +1894,20 @@ class JurnalUmum extends BaseController
                 $totalNominal = array_reduce($detailPembayaran, function ($carry, $item) {
                     return $carry + floatval(str_replace([',', '.'], '', $item['nominal']));
                 }, 0);
+
                 $isFirstTransaction = true;
 
                 // 1. Buat transaksi jurnal per detail
                 $tanggal = "";
+                $exchangeRate = 1;
+                $valasId = 30;
                 foreach ($detailPembayaran as $detail) {
                     $tanggal = date('Y-m-d', strtotime(str_replace('/', '-', $detail['tanggal_pembayaran'])));
+                    $exchangeRate = $detail['kurs'];
+                    $valasId = $detail['valas_id'];
                 }
 
+                $valas = $this->metadataModel->find($valasId);
                 $no_transaksi_jurnal = $otherPayment->no_pembayaran;
 
                 $resultTransaksiJurnal = array(
@@ -1940,9 +1918,9 @@ class JurnalUmum extends BaseController
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
                     'no_bukti' => $no_transaksi_jurnal,
-                    'valas_id' => $otherPayment->valas,
-                    'valas' => "IDR",
-                    'exchange_rate' => $kursData,
+                    'valas_id' => $valasId,
+                    'valas' => $valas['value'],
+                    'exchange_rate' => $exchangeRate,
                     'uraian_transaksi' => $otherPayment->bayar_ke,
                 );
 
@@ -1964,11 +1942,11 @@ class JurnalUmum extends BaseController
                                 'tanggal_jurnal' => $tanggal,
                                 'debit' => 0,
                                 'kredit' => $totalNominal, // Total semua nominal
-                                'valas' => $otherPayment->valas,
-                                'kurs' => $kursData,
+                                'valas' => $detail['valas_id'],
+                                'kurs' => $detail['kurs'],
                                 'company_id' => $otherPayment->company_id,
                                 'divisi_id' => $otherPayment->divisi_id,
-                                'keterangan' => $otherPayment->bayar_ke,
+                                'keterangan' => $otherPayment->keterangan,
                                 'id_inputer' => session()->get("login")->user_id
                             );
                         }
@@ -1979,8 +1957,8 @@ class JurnalUmum extends BaseController
                             'tanggal_jurnal' => $tanggal,
                             'debit' => $nominal,
                             'kredit' => 0,
-                            'valas' => $otherPayment->valas,
-                            'kurs' => $kursData,
+                            'valas' => $detail['valas_id'],
+                            'kurs' => $detail['kurs'],
                             'company_id' => $otherPayment->company_id,
                             'divisi_id' => $otherPayment->divisi_id,
                             'keterangan' => $detail['keterangan'],
@@ -1994,11 +1972,11 @@ class JurnalUmum extends BaseController
                                 'tanggal_jurnal' => $tanggal,
                                 'debit' => $totalNominal, // Total semua nominal
                                 'kredit' => 0,
-                                'valas' => $otherPayment->valas,
-                                'kurs' => $kursData,
+                                'valas' => $detail['valas_id'],
+                                'kurs' => $detail['kurs'],
                                 'company_id' => $otherPayment->company_id,
                                 'divisi_id' => $otherPayment->divisi_id,
-                                'keterangan' => $otherPayment->bayar_ke,
+                                'keterangan' => $otherPayment->keterangan,
                                 'id_inputer' => session()->get("login")->user_id
                             );
                         }
@@ -2009,8 +1987,8 @@ class JurnalUmum extends BaseController
                             'tanggal_jurnal' => $tanggal,
                             'debit' => 0,
                             'kredit' => $nominal,
-                            'valas' => $otherPayment->valas,
-                            'kurs' => $kursData,
+                            'valas' => $detail['valas_id'],
+                            'kurs' => $detail['kurs'],
                             'company_id' => $otherPayment->company_id,
                             'divisi_id' => $otherPayment->divisi_id,
                             'keterangan' => $detail['keterangan'],
