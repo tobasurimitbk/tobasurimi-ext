@@ -75,7 +75,7 @@
                             Identitas Karyawan
                         </label>
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30" value="<?= !empty($data) ? $data['name'] : '' ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Full Name" value="<?= !empty($data) ? $data['name'] : '' ?>">
                             <label for="floatingInput">Nama Lengkap </label>
                         </div>
                         <div class="input-group input-group-password">
