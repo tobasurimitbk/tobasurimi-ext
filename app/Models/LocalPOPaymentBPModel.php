@@ -26,6 +26,8 @@ class LocalPOPaymentBPModel extends Model
         'payment_method',
         'status_pph',
         'pembayaran_oleh',
+        'supplier',
+        'keterangan',
         'amount',
         'status_posting',
         'akun_kas',
@@ -63,25 +65,26 @@ class LocalPOPaymentBPModel extends Model
             'payment_no'        => 'local_po_payment_bp.payment_no',
             'suppliers.name'    => 'suppliers.name',
             'tanda_terima_faktur.faktur_no' => 'tanda_terima_faktur.faktur_no',
-
             'payment_date'      => 'local_po_payment_bp.payment_date',
             'payment_method'    => 'local_po_payment_bp.payment_method',
             'amount'            => 'local_po_payment_bp.amount',
             'createdAt'         => 'local_po_payment_bp.createdAt'
         ];
+
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'suppliers.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'local_po_payment_bp.id';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "local_po_payment_bp.id AS id,
-        local_po_payment_bp.status_posting,
-        local_po_payment_bp.payment_no AS payment_no, 
-        DATE_FORMAT(local_po_payment_bp.payment_date, '%d/%m/%Y') AS payment_date, 
-        local_po_payment_bp.amount AS amount,
-        local_po_payment_bp.payment_method AS payment_method,
-        suppliers.name AS supplierName,
-        tanda_terima_faktur.faktur_no,
-        DATE_FORMAT(tanda_terima_faktur.jatuh_tempo, '%d/%m/%Y') as due_date
+        $selectQry = "
+            local_po_payment_bp.id AS id,
+            local_po_payment_bp.status_posting,
+            local_po_payment_bp.payment_no, 
+            DATE_FORMAT(local_po_payment_bp.payment_date, '%d/%m/%Y') AS payment_date, 
+            local_po_payment_bp.amount,
+            local_po_payment_bp.payment_method,
+            suppliers.name AS supplierName,
+            tanda_terima_faktur.faktur_no,
+            DATE_FORMAT(tanda_terima_faktur.jatuh_tempo, '%d/%m/%Y') AS due_date
         ";
 
         $supplierDataQry = $this->asObject()
@@ -92,10 +95,41 @@ class LocalPOPaymentBPModel extends Model
             ->orderBy($sort, $sortType);
 
         $totalData = $supplierDataQry->countAllResults(false);
+
+        $hasFilter = !empty($addCondition['search']) || !empty($addCondition['dueDate']) || !empty($addCondition['paymentDate']) || (!empty($addCondition['statusPosting']) && $addCondition['statusPosting'] !== 'ALL');
+
+        if ($hasFilter) {
+            $supplierDataQry->groupStart();
+
+            if (!empty($addCondition['dueDate'])) {
+                $supplierDataQry->where('tanda_terima_faktur.jatuh_tempo', $addCondition['dueDate']);
+            }
+
+            if (!empty($addCondition['paymentDate'])) {
+                $supplierDataQry->where('local_po_payment_bp.payment_date', $addCondition['paymentDate']);
+            }
+
+            if (!empty($addCondition['search'])) {
+                $search = $addCondition['search'];
+                $supplierDataQry->groupStart()
+                    ->like('suppliers.name', $search)
+                    ->orLike('local_po_payment_bp.payment_no', $search)
+                    ->orLike('tanda_terima_faktur.faktur_no', $search)
+                    ->orLike('local_po_payment_bp.payment_method', $search)
+                    ->orLike('local_po_payment_bp.amount', $search)
+                    ->groupEnd();
+            }
+
+            if (!empty($addCondition['statusPosting']) && $addCondition['statusPosting'] !== 'ALL') {
+                $statusPosting = $addCondition['statusPosting'] === "SUDAH POSTING" ? '1' : '0';
+                $supplierDataQry->where('local_po_payment_bp.status_posting', $statusPosting);
+            }
+
+            $supplierDataQry->groupEnd();
+        }
+
         $totalFilteredData = $supplierDataQry->countAllResults(false);
         $data = $supplierDataQry->findAll($limit, $offset);
-
-
 
         return [
             'data'              => $data,
@@ -150,6 +184,7 @@ class LocalPOPaymentBPModel extends Model
             ->join('tanda_terima_faktur', 'tanda_terima_faktur.id = local_po_payment_bp.tanda_terima_faktur_id', 'left')
             ->join('tanda_terima_faktur_detail', 'tanda_terima_faktur_detail.tanda_terima_faktur_id = tanda_terima_faktur.id')
             ->where($conditionListBarang)
+            ->distinct()
             ->findAll();
 
         $result['itemLpbList'] = $listBarang;

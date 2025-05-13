@@ -34,7 +34,8 @@ class PembayaranInvoiceModel extends Model
         'akun_kas_lain',
         'akun_selisih_lain',
         'payment_method',
-        'jenis_data'
+        'jenis_data',
+        'pembayaran_dari'
 
     ];
 
@@ -73,11 +74,12 @@ class PembayaranInvoiceModel extends Model
             'updatedAt' => 'pembayaran_invoice.updatedAt'
         ];
 
-       
+
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
         $sort = $availableSort[$addCondition['sort'] ?? 'no_pembayaran'] ?? 'pembayaran_invoice.no_pembayaran';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'asc'] ?? 'ASC';     $selectQry = "pembayaran_invoice.*";
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'asc'] ?? 'ASC';
+        $selectQry = "pembayaran_invoice.*";
         $dataQry = $this
             ->select($selectQry)
             ->where($condition)

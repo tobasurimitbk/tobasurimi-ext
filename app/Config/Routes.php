@@ -210,6 +210,7 @@ $routes->post('/shift/update', 'Master\Shift::update', ['filter' => 'Auth']);
 $routes->get('/kurs', 'Master\Kurs::index', ['filter' => 'Auth']);
 $routes->get('/kurs/all', 'Master\Kurs::all', ['filter' => 'Auth']);
 $routes->get('/kurs/id/(:segment)', 'Master\Kurs::getById/$1', ['filter' => 'Auth']);
+$routes->get('/kurs/getNilaiKurs/(:segment)', 'Master\Kurs::getKurs/$1', ['filter' => 'Auth']);
 $routes->post('/kurs/save', 'Master\Kurs::save', ['filter' => 'Auth']);
 $routes->post('/kurs/update', 'Master\Kurs::update', ['filter' => 'Auth']);
 $routes->post('/kurs/delete', 'Master\Kurs::delete', ['filter' => 'Auth']);
@@ -429,7 +430,7 @@ $routes->post('/pembayaran-po-lokal-bp/update', 'Pembayaran\PembayaranPOLokal::u
 $routes->post('/pembayaran-po-lokal-bp/delete', 'Pembayaran\PembayaranPOLokal::deleteBP', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/id/(:segment)', 'Pembayaran\PembayaranPOLokal::getPembayaranPOLokalBP/$1', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/print/(:segment)', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBPPrint/$1', ['filter' => 'Auth']);
-$routes->post('/pembayaran-po-lokal-bp/posting', 'Pembayaran\PembayaranPOLokal::posting', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-lokal-bp/posting', 'Pembayaran\PembayaranPOLokal::postingPoLokalBP', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal/all', 'Pembayaran\PembayaranPOLokal::allPembayaranPOLokal', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/all', 'Pembayaran\PembayaranPOLokal::allPembayaranPOLokalBP', ['filter' => 'Auth']);
 
@@ -450,7 +451,7 @@ $routes->post('/pembayaran-po-lokal-bb/update', 'Pembayaran\PembayaranPOLokal::u
 $routes->post('/pembayaran-po-lokal-bb/delete', 'Pembayaran\PembayaranPOLokal::deleteBB', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bb/id/(:segment)', 'Pembayaran\PembayaranPOLokal::getPembayaranPOLokalBB/$1', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bb/print/(:segment)', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBBPrint/$1', ['filter' => 'Auth']);
-$routes->post('/pembayaran-po-lokal-bb/posting', 'Pembayaran\PembayaranPOLokal::posting', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-lokal-bb/posting', 'Pembayaran\PembayaranPOLokal::postingPoLokalBB', ['filter' => 'Auth']);
 
 // PEMBAYARAN PO LOKAL
 $routes->get('/pembayaran-po-lokal', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokal', ['filter' => 'Auth']);
@@ -2254,6 +2255,14 @@ $routes->post('/retur-po-import-bp/save', 'ReturPembelian\ReturPembelianLokalBB:
 $routes->post('/retur-po-import-bp/update', 'ReturPembelian\ReturPembelianLokalBB::updateAction', ['filter' => 'Auth']);
 $routes->get('/retur-po-import-bp/id/(:segment)', 'ReturPembelian\ReturPembelianImportBP::update/$1', ['filter' => 'Auth']);
 $routes->get('/retur-po-import-bp/print/(:segment)', 'ReturPembelian\ReturPembelianImportBP::print/$1', ['filter' => 'Auth']);
+// HR Outsourcing
+$routes->get('/hr-outsourcing-company', 'HROutsourcing\Company::index', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-company/all', 'HROutsourcing\Company::all', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/save', 'HROutsourcing\Company::store', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/update', 'HROutsourcing\Company::update', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/delete', 'HROutsourcing\Company::destroy', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-company/id/(:segment)', 'HROutsourcing\Company::get/$1', ['filter' => 'Auth']);
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing

@@ -768,7 +768,8 @@ class LocalPOPaymentModel extends Model
             'local_po_payments.id' => $pembayaranId,
             'local_po_payments.company_id' => $companyId,
             'local_po_payments.deletedAt'  => null,
-            'local_po_payment_details.deletedAt ' => null
+            'local_po_payment_details.deletedAt ' => null,
+            'local_po_payment_details.tipe ' => 'BB'
         ];
 
         $selectQry = " penerimaan_barang_detail.id AS penerimaan_barang_detail_id,penerimaan_barang.id AS penerimaan_barang_id, 
@@ -812,6 +813,7 @@ class LocalPOPaymentModel extends Model
                 ->where('penerimaan_barang_detail_id', $p['penerimaan_barang_detail_id'])
                 ->where('type_bayar', $p['type_bayar'])
                 ->where('local_po_payment_details.deletedAt', null)
+                ->where('local_po_payment_details.tipe', 'BB')
                 ->groupBy('penerimaan_barang_detail_id')
                 ->groupBy('penerimaan_barang_id')
                 ->first();

@@ -9,7 +9,7 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-invoice"); ?>">
                 Kembali
             </a>
-            
+
             <?php if (!empty($detail)) : ?>
                 <?php if ($detail['status_posting'] == "0") : ?>
                     <?php if (can('Pembayaran', 'Pembayaran Invoice', 'd')) : ?>
@@ -69,7 +69,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? 'value="' . $detail['no_pembayaran'] . '"' : '' ?>>
+                                    <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? 'value="' . $detail['no_pembayaran'] . '"' : '' ?>>
                                     <label for="floatingInput">No. Pembayaran</label>
                                 </div>
                                 <div class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -109,7 +109,7 @@
                                 <option value=""></option>
                                 <?php if (!empty($customers)): ?>
                                     <?php foreach ($customers as $cus): ?>
-                                        <option <?= !empty($detail) ?  ( encrypt($detail['customer_id']) == $cus['id'] ? "selected" : "") : '' ?> value="<?= encrypt($cus['id']); ?>"><?= $cus['name']; ?></option>
+                                        <option <?= !empty($detail) ?  (encrypt($detail['customer_id']) == $cus['id'] ? "selected" : "") : '' ?> value="<?= encrypt($cus['id']); ?>"><?= $cus['name']; ?></option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
@@ -140,8 +140,8 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="<?= session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
-                            <label for="floatingInput">Pembayaran Oleh</label>
+                            <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="pembayaran_dari" id="pembayaran_dari" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaran_dari'] : '' ?>" type="text" class="form-control" placeholder="Pembayaran Dari">
+                            <label for="floatingInput">Pembayaran Dari</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -168,7 +168,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <textarea <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> autocomplete="one-time-code" class="form-control keterangan" id="keterangan" name="keterangan"> </textarea>
+                            <textarea <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> autocomplete="one-time-code" class="form-control keterangan" id="keterangan" name="keterangan" style="height: 90px;"> </textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
@@ -242,7 +242,7 @@
                 payment_methods: {
                     required: true
                 },
-                pembayaran_oleh: {
+                pembayaran_dari: {
                     required: true
                 },
                 akun_kas: {
@@ -280,8 +280,8 @@
                 payment_methods: {
                     required: "Payment Method wajib diisi"
                 },
-                pembayaran_oleh: {
-                    required: "Pembayaran Oleh wajib diisi"
+                pembayaran_dari: {
+                    required: "Pembayaran Dari wajib diisi"
                 },
                 akun_kas: {
                     required: "Debit wajib diisi"
@@ -313,6 +313,38 @@
                 $(element).removeClass('select-class');
             },
         });
+
+        $('#customer').select2({
+            placeholder: "Pilih Customer",
+            theme: "bootstrap-5"
+        }).change(function() {
+            const table = $('#dataTable');
+            table.find('tbody').empty();
+            let customerId = $(this).val();
+            getDataDokumenInvoice(customerId);
+            updateKeterangan();
+        });
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.form-select')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.form-select')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.form-select')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         $('.jatuh_tempo_element').hide();
 
@@ -346,17 +378,6 @@
             theme: "bootstrap-5"
         });
 
-        $('#customer').select2({
-            placeholder: "Pilih Customer",
-            theme: "bootstrap-5"
-        }).change(function() {
-            const table = $('#dataTable');
-            table.find('tbody').empty();
-            let customerId = $(this).val();
-            getDataDokumenInvoice(customerId);
-            updateKeterangan();
-        });
-
         // Trigger event change jika sudah ada nilai default
         const selectedCustomerId = "<?= !empty($detail) ? encrypt($detail['customer_id']) : ''; ?>";
         if (selectedCustomerId) {
@@ -372,7 +393,7 @@
         $('#no_dokumen').select2({
             placeholder: "Pilih Nomor Dokumen",
             theme: "bootstrap-5",
-            allowClear: true
+            allowClear: false
         }).change(function() {
             const table = $('#dataTable');
             table.find('tbody').empty();
@@ -414,13 +435,13 @@
                             formData.append('total_amount_invoice', destroyFormatRupiah($(".total_amount_invoice").text()));
                             formData.append('total_bayar', destroyFormatRupiah($(".total-bayar").val()));
                             const cleanListBarang = dataList.map((item, index) => ({
-                                    ...item,
-                                    harga_barang_invoice: destroyFormatRupiah(item.harga_barang_invoice),
-                                    amount_invoice: destroyFormatRupiah(item.amount_invoice),
-                                    qty_invoice: destroyFormatRupiah(item.qty_invoice),
-                                    keterangan_pajak: $(`#keterangan_pajak_${index}`).val(), // Ambil dari input
-                                    nominal_pajak: $(`#nominal_pajak_${index}`).val() // Ambil dari input
-                                }));
+                                ...item,
+                                harga_barang_invoice: destroyFormatRupiah(item.harga_barang_invoice),
+                                amount_invoice: destroyFormatRupiah(item.amount_invoice),
+                                qty_invoice: destroyFormatRupiah(item.qty_invoice),
+                                keterangan_pajak: $(`#keterangan_pajak_${index}`).val(), // Ambil dari input
+                                nominal_pajak: $(`#nominal_pajak_${index}`).val() // Ambil dari input
+                            }));
                             formData.append('list_barang', JSON.stringify(cleanListBarang));
                             $.ajax({
 
@@ -488,13 +509,13 @@
                             formData.append('total_amount_invoice', destroyFormatRupiah($(".total_amount_invoice").text()));
                             formData.append('total_bayar', destroyFormatRupiah($(".total-bayar").val()));
                             const cleanListBarang = dataList.map((item, index) => ({
-                                    ...item,
-                                    harga_barang_invoice: destroyFormatRupiah(item.harga_barang_invoice),
-                                    amount_invoice: destroyFormatRupiah(item.amount_invoice),
-                                    qty_invoice: destroyFormatRupiah(item.qty_invoice),
-                                    keterangan_pajak: $(`#keterangan_pajak_${index}`).val(), // Ambil dari input
-                                    nominal_pajak: $(`#nominal_pajak_${index}`).val() // Ambil dari input
-                                }));
+                                ...item,
+                                harga_barang_invoice: destroyFormatRupiah(item.harga_barang_invoice),
+                                amount_invoice: destroyFormatRupiah(item.amount_invoice),
+                                qty_invoice: destroyFormatRupiah(item.qty_invoice),
+                                keterangan_pajak: $(`#keterangan_pajak_${index}`).val(), // Ambil dari input
+                                nominal_pajak: $(`#nominal_pajak_${index}`).val() // Ambil dari input
+                            }));
                             formData.append('list_barang', JSON.stringify(cleanListBarang));
                             $.ajax({
                                 url: "<?= base_url("pembayaran-invoice/save"); ?>",
@@ -761,7 +782,7 @@
                 <?php endif; ?>
 
 
-               },
+            },
             error: function(xhr, status, error) {
                 console.error("Error:", error);
             }
@@ -783,40 +804,40 @@
                 if (res.status && res.data.length > 0) {
                     if (res.isImport) {
                         res.data.forEach((data) => {
-                                dataList.push({
-                                    id: getID(),
-                                    qty_invoice: data.qty_invoice || "-",
-                                    document_type: data.document_type || "-",
-                                    harga_barang_invoice: data.harga_barang_invoice || null,
-                                    amount_invoice: data.amount_invoice || "-",
-                                    kode_barang: data.kode_barang || "-",
-                                    barang_name: data.barang_name || "-",
-                                    sales_order_invoice_id: data.sales_order_invoice_id || null,
-                                    sales_order_invoice_detail_id: data.sales_order_invoice_detail_id || null,
-                                    no_faktur: data.no_faktur || "-",
-                                    akun_kas_lain: data.id_akun_kas_lain || null,
-                                    akun_selisih_lain: data.id_akun_selisih_lain || null,
-                                    nama_akun_kas_lain: data.akun_kas_lain || "-",
-                                    nama_akun_selisih_lain: data.akun_selisih_lain || "-"
-                                });
+                            dataList.push({
+                                id: getID(),
+                                qty_invoice: data.qty_invoice || "-",
+                                document_type: data.document_type || "-",
+                                harga_barang_invoice: data.harga_barang_invoice || null,
+                                amount_invoice: data.amount_invoice || "-",
+                                kode_barang: data.kode_barang || "-",
+                                barang_name: data.barang_name || "-",
+                                sales_order_invoice_id: data.sales_order_invoice_id || null,
+                                sales_order_invoice_detail_id: data.sales_order_invoice_detail_id || null,
+                                no_faktur: data.no_faktur || "-",
+                                akun_kas_lain: data.id_akun_kas_lain || null,
+                                akun_selisih_lain: data.id_akun_selisih_lain || null,
+                                nama_akun_kas_lain: data.akun_kas_lain || "-",
+                                nama_akun_selisih_lain: data.akun_selisih_lain || "-"
+                            });
                         });
                     } else {
                         res.data.forEach((data) => {
-                                dataList.push({
-                                    id: getID(),
-                                    qty_invoice: data.qty_invoice,
-                                    harga_barang_invoice: data.harga_barang_invoice,
-                                    amount_invoice: data.amount_invoice,
-                                    kode_barang: data.kode_barang,
-                                    barang_name: data.barang_name,
-                                    sales_order_invoice_id: data.sales_order_invoice_id,
-                                    sales_order_invoice_detail_id: data.sales_order_invoice_detail_id,
-                                    no_faktur: data.no_faktur || "-",
-                                    akun_kas_lain: data.id_akun_kas_lain || null,
-                                    akun_selisih_lain: data.id_akun_selisih_lain || null,
-                                    nama_akun_kas_lain: data.akun_kas_lain || "-",
-                                    nama_akun_selisih_lain: data.akun_selisih_lain || "-"
-                                });
+                            dataList.push({
+                                id: getID(),
+                                qty_invoice: data.qty_invoice,
+                                harga_barang_invoice: data.harga_barang_invoice,
+                                amount_invoice: data.amount_invoice,
+                                kode_barang: data.kode_barang,
+                                barang_name: data.barang_name,
+                                sales_order_invoice_id: data.sales_order_invoice_id,
+                                sales_order_invoice_detail_id: data.sales_order_invoice_detail_id,
+                                no_faktur: data.no_faktur || "-",
+                                akun_kas_lain: data.id_akun_kas_lain || null,
+                                akun_selisih_lain: data.id_akun_selisih_lain || null,
+                                nama_akun_kas_lain: data.akun_kas_lain || "-",
+                                nama_akun_selisih_lain: data.akun_selisih_lain || "-"
+                            });
                         });
                     }
                 }
@@ -856,7 +877,7 @@
 
             group.forEach((item, index) => {
                 let newRow = $('<tr style="color:whitesmoke;">');
-                
+
                 if (isFirstRow) {
                     newRow.append(
                         $('<td rowspan="' + group.length + '" style="text-align:center;">').text(item.no_faktur)

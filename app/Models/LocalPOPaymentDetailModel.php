@@ -20,7 +20,8 @@ class LocalPOPaymentDetailModel extends Model
         'penerimaan_barang_detail_id',
         'rm_purchase_order_id',
         'rm_purchase_order_details_id',
-        'total'
+        'total',
+        'tipe'
     ];
 
     // Dates

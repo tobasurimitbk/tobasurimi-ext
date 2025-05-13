@@ -114,9 +114,6 @@ class PembayaranPOLokal extends BaseController
             'detail' => $tandaTerimaFakturModel->getByID($tandaTerimaFakturID),
             'paymentDetail' => $localPOPaymentBPModel->getPembayaranDetailByid($pembayaranId),
             'list' => $tandaTerimaFakturDetailModel->getListTandaTerimaItemFaktur($tandaTerimaFakturID),
-            'panjar_list' => $localPOPaymentPanjarModel->getPembayaranPanjarDetailsbyIdandType($pembayaranId, "BP", $supplierId),
-            'panjar_tb_list' => $localPOPaymentPanjarModel->getPembayaranPanjarTBDetailsbyIdandType($pembayaranId, "BP", $supplierId),
-            'pinjaman_list' => $localPOPaymentPinjamanModel->getPembayaranPinjamanDetailsbyIdandType($pembayaranId, "BP", $supplierId),
             'tax_dipungut_negara' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $tandaTerimaFakturID),
             'tax_dikembalikan_lagi' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dikembalikan lagi", $tandaTerimaFakturID),
             'pph' => $pphResult
@@ -128,47 +125,10 @@ class PembayaranPOLokal extends BaseController
     public function createPembayaranPOLokalBPAction()
     {
         try {
-            $localPOPaymentModel = new LocalPOPaymentModel();
             $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
-            $localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
             $localPOPaymentBPModel = new LocalPOPaymentBPModel();
-            $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
 
             $pembayaranList = json_decode($this->request->getVar('pembayaranList'));
-            $panjarList = json_decode($this->request->getVar('panjarList'));
-            $pinjamanList = json_decode($this->request->getVar('pinjamanList'));
-            $panjarTBList = json_decode($this->request->getVar('panjarTBList'));
-
-            $paymentPanjarDate = $this->request->getVar('payment_panjar_date');
-            $paymentDate = $this->request->getVar('payment_date');
-
-            if ($paymentPanjarDate === '1/1/1970') {
-                $paymentPanjarDate = null;
-            } else {
-                $paymentPanjarDate = date('Y-m-d', strtotime(str_replace('/', '-', $paymentPanjarDate)));
-            }
-
-            if ($paymentDate === '1/1/1970') {
-                $paymentDate = null;
-            } else {
-                $paymentDate = date('Y-m-d', strtotime(str_replace('/', '-', $paymentDate)));
-            }
-
-
-            $total_bayar_panjar = 0;
-            foreach ($panjarList as $p) {
-                $total_bayar_panjar += intval($p->bayar_panjar);
-            }
-
-            $total_bayar_panjar_tb = 0;
-            foreach ($panjarTBList as $p) {
-                $total_bayar_panjar_tb += intval($p->bayar_panjar);
-            }
-
-            $total_bayar_pinjaman = 0;
-            foreach ($pinjamanList as $p) {
-                $total_bayar_pinjaman += intval($p->bayar_pinjaman);
-            }
 
             // CHECK
             $check = $localPOPaymentBPModel->where('company_id', $this->this_company_id)->where('payment_no',  $this->request->getVar('no_bukti_pembayaran'))->first();
@@ -186,84 +146,25 @@ class PembayaranPOLokal extends BaseController
                 'payment_no' => $this->request->getVar('no_bukti_pembayaran'),
                 'supplier_id' => $this->request->getVar('supplier_id'),
                 'tanda_terima_faktur_id' => $this->request->getVar('tanda_terima_faktur_id'),
-
-                'amount' => repairDouble($this->request->getVar('nominal_pembayaran')),
-                'payment_panjar_date' => $paymentPanjarDate,
-                'payment_date' =>  $paymentDate,
+                'amount' => $this->request->getVar('nominal_pembayaran'),
                 'payment_method' => $this->request->getVar('payment_method'),
-
-                'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
+                'keterangan' => $this->request->getVar('keterangan'),
+                'supplier' => $this->request->getVar('supplier'),
                 'status_pph' => $this->request->getVar('status_pph'),
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
-                'status_posting' => '0'
+                'status_posting' => '0',
+                'pembayaran_oleh'   => $this->request->getVar('pembayaran_oleh'),
+                'payment_date'      => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
+                'supplier' => $this->request->getVar('supplier'),
             ]);
-
-            foreach ($panjarList as $p) {
-                if ($p->bayar_panjar != '') {
-
-                    if (intval($p->bayar_panjar) != 0) {
-                        $localPOPaymentPanjarModel->insert([
-                            "company_id" => $this->this_company_id,
-                            "local_po_payment_id" => $id,
-                            "jenis_panjar" => "PANJAR",
-                            "type" => "BP",
-                            "akun_kas" =>  $p->akun_kas,
-                            "akun_selisih" =>  $p->akun_selisih,
-                            "keterangan" =>  $p->keterangan,
-                            "panjar_id" => $p->panjar_id,
-                            "bayar_panjar" => repairDouble($p->bayar_panjar)
-
-                        ]);
-                    }
-                }
-            }
-
-
-            foreach ($panjarTBList as $p) {
-                if ($p->bayar_panjar != '') {
-
-                    if (intval($p->bayar_panjar) != 0) {
-                        $localPOPaymentPanjarModel->insert([
-                            "company_id" => $this->this_company_id,
-                            "local_po_payment_id" => $id,
-                            "jenis_panjar" => "PANJAR_TB",
-                            "type" => "BP",
-                            "akun_kas" =>  $p->akun_kas,
-                            "akun_selisih" =>  $p->akun_selisih,
-                            "keterangan" =>  $p->keterangan,
-                            "panjar_id" => $p->panjar_id,
-                            "bayar_panjar" => repairDouble($p->bayar_panjar)
-                        ]);
-                    }
-                }
-            }
-
-
-            foreach ($pinjamanList as $p) {
-                if ($p->bayar_pinjaman != '') {
-
-                    if (intval($p->bayar_pinjaman) != 0) {
-                        $localPOPaymentPinjamanModel->insert([
-                            "company_id" => $this->this_company_id,
-                            "local_po_payment_id" => $id,
-                            "type" => "BP",
-                            "akun_kas" =>  $p->akun_kas,
-                            "akun_selisih" =>  $p->akun_selisih,
-                            "keterangan" =>  $p->keterangan,
-                            "pinjaman_id" => $p->pinjaman_id,
-                            "bayar_pinjaman" => repairDouble($p->bayar_pinjaman)
-                        ]);
-                    }
-                }
-            }
-
 
             foreach ($pembayaranList as $l) {
                 if (intval($l->price != 0) && isset($l->price)) {
 
                     $insertLocalPoPaymentDetail = $localPOPaymentDetailModel->insert([
                         "local_po_payment_id"           => $id,
+                        "tipe" => "BP",
                         "penerimaan_barang_detail_id"   => intval($l->penerimaan_barang_detail_id),
                         "total"                         => repairDouble($l->price)
                     ]);
@@ -288,147 +189,111 @@ class PembayaranPOLokal extends BaseController
 
     public function updatePembayaranPOLokalBPAction()
     {
-
         try {
-
             $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
             $localPOPaymentBPModel = new LocalPOPaymentBPModel();
-            $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
-            $localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
+
+            // Validasi input
+            if (!$this->request->getVar('id') || !$this->request->getVar('pembayaranList')) {
+                throw new \Exception("Data input tidak lengkap");
+            }
+
             $id = decrypt($this->request->getVar('id'));
+            $pembayaranList = json_decode($this->request->getVar('pembayaranList'), true);
 
-            $paymentPanjarDate = $this->request->getVar('payment_panjar_date');
-            $paymentDate = $this->request->getVar('payment_date');
-
-            if ($paymentPanjarDate === '1/1/1970') {
-                $paymentPanjarDate = null;
-            } else {
-                $paymentPanjarDate = date('Y-m-d', strtotime(str_replace('/', '-', $paymentPanjarDate)));
+            // Validasi JSON
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception("Format data pembayaran tidak valid");
             }
 
-            if ($paymentDate === '1/1/1970') {
-                $paymentDate = null;
-            } else {
-                $paymentDate = date('Y-m-d', strtotime(str_replace('/', '-', $paymentDate)));
+            // CHECK
+            $check = $localPOPaymentBPModel
+                ->where('company_id', $this->this_company_id)
+                ->where('payment_no',  $this->request->getVar('no_bukti_pembayaran'))
+                ->where('id !=', $id)
+                ->first();
+
+            if ($check != null) {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'message' => "No pembayaran sudah digunakan",
+                    'status' => false
+                ]);
             }
 
-            $panjarList = json_decode($this->request->getVar('panjarList'));
-            $panjarTBList = json_decode($this->request->getVar('panjarTBList'));
-            $pinjamanList = json_decode($this->request->getVar('pinjamanList'));
+            // Mulai transaction
+            $db = \Config\Database::connect();
+            $db->transStart();
 
-
-            $total_bayar_panjar = 0;
-            foreach ($panjarList as $p) {
-                $total_bayar_panjar += intval($p->bayar_panjar);
-            }
-
-            $total_bayar_panjar_tb = 0;
-            foreach ($panjarTBList as $p) {
-                $total_bayar_panjar_tb += intval($p->bayar_panjar);
-            }
-
-
-            $total_bayar_pinjaman = 0;
-            foreach ($pinjamanList as $p) {
-                $total_bayar_pinjaman += intval($p->bayar_pinjaman);
-            }
-
-
-            $localPOPaymentBPModel->update($id, [
-
+            // Update data utama
+            $updateData = [
+                'payment_no' => $this->request->getVar('no_bukti_pembayaran'),
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar('divisi_id'),
-                // 'payment_no' => $this->request->getVar('no_bukti_pembayaran'),
                 'supplier_id' => $this->request->getVar('supplier_id'),
                 'tanda_terima_faktur_id' => $this->request->getVar('tanda_terima_faktur_id'),
-
-                'amount' => repairDouble($this->request->getVar('nominal_pembayaran')),
-                'payment_panjar_date' => $paymentPanjarDate,
-                'payment_date' => $paymentDate,
+                'amount' => $this->request->getVar('nominal_pembayaran'),
                 'payment_method' => $this->request->getVar('payment_method'),
-
-                'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
+                'keterangan' => $this->request->getVar('keterangan'),
+                'supplier' => $this->request->getVar('supplier'),
                 'status_pph' => $this->request->getVar('status_pph'),
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
-                'status_posting' => '0'
-            ]);
+                'supplier' => $this->request->getVar('supplier'),
+                'status_posting' => '0',
+                'pembayaran_oleh'   => $this->request->getVar('pembayaran_oleh'),
+                'payment_date'      => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
+            ];
 
+            if (!$localPOPaymentBPModel->update($id, $updateData)) {
+                throw new \Exception("Gagal mengupdate data pembayaran utama");
+            }
 
-            // Hapus data lama berdasarkan local_po_payment_id
-            $localPOPaymentPinjamanModel->where('local_po_payment_id', $id)->delete();
+            // Hapus detail lama sebelum insert yang baru
+            $localPOPaymentDetailModel->where('local_po_payment_id', $id)->delete();
 
-            // Insert ulang data yang baru
-            foreach ($panjarList as $p) {
-                if (isset($p->bayar_panjar) && intval($p->bayar_panjar) != 0) {
-                    $insertPanjar = $localPOPaymentPanjarModel->insert([
-                        "company_id" => $this->this_company_id,
+            // Insert detail pembayaran baru
+            foreach ($pembayaranList as $item) {
+                if (!isset($item['penerimaan_barang_detail_id']) || !isset($item['price'])) {
+                    continue; // Skip data tidak valid
+                }
+
+                $price = repairDouble($item['price']);
+                if ($price > 0) {
+                    $insertData = [
                         "local_po_payment_id" => $id,
-                        "type"  => "BP",
-                        "jenis_panjar" => "PANJAR",
-                        "panjar_id" => $p->panjar_id,
-                        "bayar_panjar" => $p->bayar_panjar,
-                        "akun_kas" => $p->akun_kas,
-                        "akun_selisih" => $p->akun_selisih,
-                        "keterangan" => $p->keterangan
-                    ]);
+                        "penerimaan_barang_detail_id" => intval($item['penerimaan_barang_detail_id']),
+                        "total" => $price,
+                        "tipe" => "BP",
+                    ];
+
+                    if (!$localPOPaymentDetailModel->insert($insertData)) {
+                        throw new \Exception("Gagal menyimpan detail pembayaran");
+                    }
                 }
             }
 
+            $db->transComplete();
 
-
-            // Hapus data lama berdasarkan local_po_payment_id
-            $localPOPaymentPanjarModel->where('local_po_payment_id', $id)->delete();
-
-            // Insert ulang data yang baru
-            foreach ($panjarList as $p) {
-                if (isset($p->bayar_panjar) && intval($p->bayar_panjar) != 0) {
-                    $insertPanjar = $localPOPaymentPanjarModel->insert([
-                        "company_id" => $this->this_company_id,
-                        "local_po_payment_id" => $id,
-                        "type"  => "BP",
-                        "jenis_panjar" => "PANJAR_TB",
-                        "panjar_id" => $p->panjar_id,
-                        "bayar_panjar" => $p->bayar_panjar,
-                        "akun_kas" => $p->akun_kas,
-                        "akun_selisih" => $p->akun_selisih,
-                        "keterangan" => $p->keterangan
-                    ]);
-                }
+            if ($db->transStatus() === false) {
+                throw new \Exception("Terjadi kesalahan dalam proses transaksi");
             }
-
-
-
-            // Hapus data lama berdasarkan local_po_payment_id
-            $localPOPaymentPinjamanModel->where('local_po_payment_id', $id)->delete();
-
-            // Insert ulang data yang baru
-            foreach ($pinjamanList as $p) {
-                if (isset($p->bayar_pinjaman) && intval($p->bayar_pinjaman) != 0) {
-                    $insertPinjaman = $localPOPaymentPinjamanModel->insert([
-                        "company_id" => $this->this_company_id,
-                        "local_po_payment_id" => $id,
-                        "type"  => "BP",
-                        "pinjaman_id" => $p->pinjaman_id,
-                        "bayar_pinjaman" => $p->bayar_pinjaman,
-                        "akun_kas" => $p->akun_kas,
-                        "akun_selisih" => $p->akun_selisih,
-                        "keterangan" => $p->keterangan
-                    ]);
-                }
-            }
-
 
             return response()->setJSON([
                 'message' => "Kwitansi pembayaran lokal bahan penolong berhasil diupdate",
                 'status' => true,
                 'token' => csrf_hash(),
-                'id' => \encrypt($id)
+                'id' => encrypt($id)
             ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            // Rollback transaction jika terjadi error
+            if (isset($db)) {
+                $db->transRollback();
+            }
+
             return response()->setJSON([
-                'message' => "terjadi kesalahan " . $e->getMessage(),
-                'status' => true,
+                'message' => "Terjadi kesalahan: " . $e->getMessage(),
+                'status' => false,
                 'token' => csrf_hash()
             ]);
         }
@@ -606,6 +471,7 @@ class PembayaranPOLokal extends BaseController
 
             foreach ($pembayaranList as $l) {
                 $localPOPaymentDetailModel->insert([
+                    'tipe' => "BB",
                     "local_po_payment_id"          => $id,
                     "rm_purchase_order_id"         => $l['rm_purchase_order_id'],
                     "total"                        => $l['total_paid']
@@ -705,11 +571,12 @@ class PembayaranPOLokal extends BaseController
             if (!empty($validPembayaranList)) {
                 foreach ($validPembayaranList as $l) {
                     // Tentukan nilai yang akan di-insert
-                    $totalToPay = (isset($l["total_paid"]) && $l["total_paid"] > 0) 
-                        ? $l["total_paid"] 
+                    $totalToPay = (isset($l["total_paid"]) && $l["total_paid"] > 0)
+                        ? $l["total_paid"]
                         : $l["total_tagihan"];
-            
+
                     $localPOPaymentDetailModel->insert([
+                        "tipe" => "BB",
                         "local_po_payment_id" => $id,
                         "rm_purchase_order_id" => $l["rm_purchase_order_id"],
                         "total" => $totalToPay,  // Gunakan nilai yang sudah ditentukan
@@ -885,9 +752,9 @@ class PembayaranPOLokal extends BaseController
             "search"    => $this->request->getGet("search"),
             "sort"      => $this->request->getGet("sort"),
             "sortType"  => $this->request->getGet("sortType"),
-            "startDate" =>  $this->request->getVar("startDate") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("startDate")))) : "",
+            "dueDate" =>  $this->request->getVar("dueDate") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dueDate")))) : "",
             "paymentDate" =>  $this->request->getVar("paymentDate") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("paymentDate")))) : "",
-            "status_posting" => $this->request->getGet('status_posting'),
+            "statusPosting" => $this->request->getGet('status_posting'),
         ];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
@@ -959,8 +826,6 @@ class PembayaranPOLokal extends BaseController
             "suppliers" => $supplierList,
             "detail" => $localPOPaymentBPModel->getBahanPenolong($id, $this->this_company_id),
             "subsAkuns" => $subAkunsModel,
-            // 'tax_dipungut_negara' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $detail['tandaTerimaSupplier']['id']),
-            // 'tax_dikembalikan_lagi' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dikembalikan lagi", $detail['tandaTerimaSupplier']['id']),
             "divisi" => $divisiList
         ];
 
@@ -1326,7 +1191,7 @@ class PembayaranPOLokal extends BaseController
             ->join('barang_master_spesifikasi', 'rm_purchase_order_details.barang2_id = barang_master_spesifikasi.id', 'left')
             ->groupBy('rm_purchase_orders.id') // Group by PO untuk aggregasi SUM
             ->findAll();
-            
+
         $data = [
             'company' => session()->get("login")->arr_company[0]['company'],
             "parentData" => $parentData,
@@ -1619,7 +1484,7 @@ class PembayaranPOLokal extends BaseController
         ]);
     }
 
-    public function posting()
+    public function postingPoLokalBB()
     {
         $localPOPaymentModel = new LocalPOPaymentModel();
         $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
@@ -1639,7 +1504,7 @@ class PembayaranPOLokal extends BaseController
             $this->jurnalController->inserDataPembayaranPinjaman($payPinjaman['id'], "PINJAMAN", $this->request->getVar('divisi_id'));
         }
 
-        $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL", $this->request->getVar('divisi_id'));
+        $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL BB", $this->request->getVar('divisi_id'));
 
         return response()->setJSON([
             'token' => csrf_hash(),
@@ -1647,6 +1512,24 @@ class PembayaranPOLokal extends BaseController
             'message' => "Pembayaran berhasil diposting"
         ]);
     }
+
+    public function postingPoLokalBP()
+    {
+        $localPoPaymentBpModel = new LocalPOPaymentBPModel();
+
+        $id = decrypt($this->request->getVar('id'));
+        $localPoPaymentBpModel->update($id, ['status_posting' => '1']);
+        $localPoPaymentBp = $localPoPaymentBpModel->where('id', $id)->first();
+
+        $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL BP", $id);
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'message' => "Pembayaran berhasil diposting"
+        ]);
+    }
+
     public function unposting()
     {
         $localPOPaymentModel = new LocalPOPaymentModel();

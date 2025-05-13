@@ -59,18 +59,16 @@ class OtherPaymentModel extends Model
         $selectQry = "
             other_payment.*,
             divisis.divisi,
-            metadata.value AS valas_name,
             SUM(other_payment_detail.nominal) AS nominal_all
         ";
 
         $dataQry = $this->asArray()
             ->select($selectQry)
             ->join('divisis', 'divisis.id = other_payment.divisi_id')
-            ->join('metadata', 'metadata.id = other_payment.valas')
             ->join('other_payment_detail', 'other_payment_detail.other_payment_id = other_payment.id', 'left')
             ->where($condition)
             ->where('other_payment_detail.deletedAt', null)
-            ->groupBy('other_payment.id, divisis.divisi, metadata.value')
+            ->groupBy('other_payment.id, divisis.divisi')
             ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);

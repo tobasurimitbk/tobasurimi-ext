@@ -3,7 +3,7 @@
 <meta name="csrf-token" content="<?= csrf_hash() ?>">
 
 <div class="modal add-modal" id="add_modal" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 1200px">
+    <div class="modal-dialog" style="min-width: 1800px">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label></h5>
@@ -65,19 +65,22 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select valas" id="valas" name="valas" aria-label="Floating label select example">
-                                            <option value=""></option>
-                                            <?php foreach ($dataValuta as $valuta) : ?>
-                                                <option value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
-                                            <?php endforeach ?>
-                                        </select>
-                                        <label for="floatingInput" style="z-index: 1;">Valas</label>
+                                        <input autocomplete="one-time-code" type="text" class="form-control bayar_ke" name="bayar_ke" id="bayar_ke" placeholder="Pembayaran Ke">
+                                        <label for="floatingInput">Pembayaran Kepada</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" type="text" class="form-control bayar_ke" name="bayar_ke" id="bayar_ke" placeholder="Pembayaran Ke">
-                                        <label for="floatingInput">Pembayaran Kepada</label>
+                                        <input autocomplete="one-time-code" type="text" class="form-control total_all_amount" name="total_all_amount" id="total_all_amount" placeholder="Total Keseluruhan" readonly>
+                                        <label for="floatingInput">Total Keseluruhan</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <textarea autocomplete="one-time-code" style="height: 88px;" type="text" class="form-control keterangan_parent" name="keterangan_parent" id="keterangan_parent" placeholder="Keterangan"></textarea>
+                                        <label for="floatingInput">Keterangan</label>
                                     </div>
                                 </div>
                             </div>
@@ -116,18 +119,10 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" placeholder="Nominal Pembayaran">
-                                        <label for="floatingInput">Nominal Pembayaran</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" type="text" class="form-control pembayaran_oleh" name="pembayaran_oleh" id="pembayaran_oleh" placeholder="Pembayaran Oleh" value="<?= session()->get("login")->name; ?>">
                                         <label for="floatingInput">Pembayaran Oleh</label>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <select class="form-select" name="akun_kas" id="akun_kas" required>
@@ -139,10 +134,49 @@
                                         <label for="floatingInput" style="z-index: 1;">Debit</label>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan" value="">
-                                        <label for="floatingInput">Keterangan (Opsional)</label>
+                                        <label for="floatingInput">Keterangan</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select valas" id="valas" name="valas" aria-label="Floating label select example">
+                                            <option value=""></option>
+                                            <?php foreach ($dataValuta as $valuta) : ?>
+                                                <option value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= $valuta["description"]; ?></option>
+                                            <?php endforeach ?>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Valas</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control jumlah" onkeyup="this.value = greatFormatRupiah(this.value)" id="jumlah" name="jumlah" placeholder="Jumlah Transaksi">
+                                        <label for="floatingInput">Jumlah Transaksi</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" value="1" class="form-control kurs" onkeyup="this.value = greatFormatRupiah(this.value)" id="kurs" name="kurs" placeholder="Kurs">
+                                        <label for="floatingInput">Kurs</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input autocomplete="one-time-code" type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control jumlah_idr" id="jumlah_idr" name="jumlah_idr" placeholder="Jumlah IDR">
+                                            <label for="floatingInput">Nominal Pembayaran IDR</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -162,9 +196,12 @@
                                             <tr>
                                                 <th>Tanggal</th>
                                                 <th>Metode</th>
-                                                <th>Nominal</th>
                                                 <th>Akun Debit</th>
                                                 <th>Akun Kredit</th>
+                                                <th>Valas</th>
+                                                <th>Jumlah Transaksi</th>
+                                                <th>Kurs</th>
+                                                <th>Nominal IDR</th>
                                                 <th>Pembayaran Oleh</th>
                                                 <th>Keterangan</th>
                                                 <th>Aksi</th>
@@ -236,9 +273,8 @@
                                 <th>No</th>
                                 <th onclick="changeSort('no_pembayaran')">No. Pembayaran</th>
                                 <th onclick="changeSort('divisi_id')">Departemen</th>
-                                <th onclick="changeSort('valas')">Valas</th>
                                 <th onclick="changeSort('bayar_ke')">Uraian</th>
-                                <th onclick="changeSort('nominal_pembayaran')">Nominal</th>
+                                <th>Nominal</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -310,10 +346,6 @@
                 className: "text-center"
             },
             {
-                data: "valas",
-                className: "text-center"
-            },
-            {
                 data: "bayar_ke",
                 className: "text-center"
             },
@@ -382,10 +414,13 @@
                 bayar_ke: {
                     required: true
                 },
-                valas: {
+                akun_selisih: {
                     required: true
                 },
-                akun_selisih: {
+                keterangan_parent: {
+                    required: true
+                },
+                total_all_amount: {
                     required: true
                 },
 
@@ -400,7 +435,7 @@
                         return $("#detail-table tbody tr").length === 0;
                     }
                 },
-                nominal_pembayaran: {
+                jumlah_idr: {
                     required: function() {
                         return $("#detail-table tbody tr").length === 0;
                     },
@@ -424,11 +459,14 @@
                 divisi_id: {
                     required: "Departemen wajib diisi"
                 },
+                keterangan_parent: {
+                    required: "Keterangan wajib diisi"
+                },
+                total_all_amount: {
+                    required: "Total wajib Terisi"
+                },
                 bayar_ke: {
                     required: "Pembayaran kepada wajib diisi"
-                },
-                valas: {
-                    required: "Mata uang wajib diisi"
                 },
                 tanggal: {
                     required: "Tanggal pembayaran wajib diisi"
@@ -436,9 +474,8 @@
                 metode_pembayaran: {
                     required: "Metode pembayaran wajib diisi"
                 },
-                nominal_pembayaran: {
+                jumlah_idr: {
                     required: "Nominal pembayaran wajib diisi",
-                    min: "Nominal harus lebih dari 0"
                 },
                 pembayaran_oleh: {
                     required: "Pembayaran oleh wajib diisi"
@@ -496,6 +533,13 @@
             placeholder: "Pilih Mata Uang",
             theme: "bootstrap-5",
             dropdownParent: $('#add_modal .modal-content')
+        }).on('change', function() {
+            let id = $(this).val();
+            if (id && id != 30) {
+                getNilaiKurs(id);
+            } else {
+                $('#kurs').val(1);
+            }
         });
 
         $('#metode_pembayaran').select2({
@@ -544,6 +588,69 @@
             refreshValidation();
         });
 
+        $('#jumlah').keyup(function() {
+            var jumlah = destroyFormatRupiah($('#jumlah').val() || 0);
+            var kurs = destroyFormatRupiah($('#kurs').val() || 1);
+            var jumlahIdr = destroyFormatRupiah($('#jumlah_idr').val() || 0);
+
+            $('#jumlah_idr').val(greatFormatRupiah(jumlah * kurs));
+        });
+
+        $('#kurs').keyup(function() {
+            var jumlah = destroyFormatRupiah($('#jumlah').val() || 0);
+            var kurs = destroyFormatRupiah($('#kurs').val() || 1);
+            var jumlahIdr = destroyFormatRupiah($('#jumlah_idr').val() || 0);
+
+            $('#jumlah').val(greatFormatRupiah(jumlahIdr / kurs));
+            $('#jumlah_idr').val(greatFormatRupiah(jumlah * kurs));
+
+        });
+
+        $('#jumlah_idr').keyup(function() {
+            var jumlah = destroyFormatRupiah($('#jumlah').val() || 0);
+            var kurs = destroyFormatRupiah($('#kurs').val() || 1);
+            var jumlahIdr = destroyFormatRupiah($('#jumlah_idr').val() || 0);
+
+            $('#jumlah').val(greatFormatRupiah(jumlahIdr / kurs));
+        });
+
+
+        function getNilaiKurs(id) {
+            $.ajax({
+                url: "/kurs/getNilaiKurs/" + id,
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res.status) {
+                        if (res.data && res.data.nilai_kurs) {
+                            $('#kurs').val(greatFormatRupiah(res.data.nilai_kurs));
+                        }
+                    } else {
+                        // Swal.fire({
+                        //     icon: 'error',
+                        //     title: res.message,
+                        //     confirmButtonColor: '#4e73df',
+                        // });
+                        $('#kurs').val(greatFormatRupiah(1));
+                    }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: xhr.responseJSON?.message || 'Failed to load data',
+                        confirmButtonColor: '#4e73df',
+                    });
+                }
+            });
+        }
+
         // When removing a detail
         $(document).on('click', '.btn-remove-detail', function() {
             // ... your existing code ...
@@ -559,7 +666,12 @@
                     <tr>
                         <td>${detail.tanggal}</td>
                         <td>${detail.metode_pembayaran}</td>
-                        <td>${detail.nominal_pembayaran}</td>
+                        <td>${debitAccount}</td>
+                        <td>${creditAccount}</td>
+                        <td>${detail.valas}</td>
+                        <td>${detail.jumlah}</td>
+                        <td>${detail.kurs}</td>
+                        <td>${detail.jumlah_idr}</td>
                         <td>${detail.pembayaran_oleh}</td>
                         <td>${detail.keterangan}</td>
                         <td>
@@ -620,8 +732,8 @@
 
         // Clear detail form
         function clearDetailForm() {
-            $('#tanggal, #nominal_pembayaran, #keterangan').val('');
-            $('#metode_pembayaran, #akun_kas, #akun_selisih').val('').trigger('change');
+            $('#tanggal, #keterangan, #kurs, #jumlah, #jumlah_idr').val('');
+            $('#metode_pembayaran, #akun_kas, #valas').val('').trigger('change');
         }
 
         // Handle final submission
@@ -646,7 +758,7 @@
         // Custom validation for details
         function validateDetails() {
             let isValid = true;
-            const nominalRaw = $('#nominal_pembayaran').val();
+            const nominalRaw = $('#jumlah_idr').val();
             const nominalClean = destroyFormatRupiah(nominalRaw);
 
             // Cek apakah field kosong atau nominal 0
@@ -666,8 +778,8 @@
 
                     // Untuk nominal, kita pakai hasil clean
                     if (
-                        (fieldId === 'nominal_pembayaran' && !nominalClean) ||
-                        (fieldId !== 'nominal_pembayaran' && !value)
+                        (fieldId === 'jumlah_idr' && !nominalClean) ||
+                        (fieldId !== 'jumlah_idr' && !value)
                     ) {
                         $(this).closest('.form-floating').addClass('has-error');
                         $(this).addClass('is-invalid');
@@ -686,7 +798,15 @@
 
             // Special handling for detail fields
             const hasDetails = $("#detail-table tbody tr").length > 0;
-            const detailFields = ['#tanggal', '#metode_pembayaran', '#nominal_pembayaran', '#pembayaran_oleh', '#akun_kas'];
+            const detailFields = ['#tanggal',
+                '#metode_pembayaran',
+                '#pembayaran_oleh',
+                '#valas',
+                '#kurs',
+                '#jumlah',
+                '#jumlah_idr',
+                '#akun_kas'
+            ];
 
             detailFields.forEach(field => {
                 const element = $(field);
@@ -723,22 +843,38 @@
 
         $('.btn-add-detail').click(function() {
             // Jalankan validasi detail dulu
+            const akunSelisih = $('#akun_selisih option:selected').val();
+            const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
+            let messageErr = '';
+            if (akunSelisih == '') {
+                if (jenisPembayaran == 'PUTIH') {
+                    messageErr = "Akun Kredit Wajib Diisi"
+                } else {
+                    messageErr = "Akun Debit Wajib Diisi";
+                }
+                alert(messageErr)
+                return;
+            }
+
             if (!validateDetails()) {
                 refreshValidation(); // buat update styling error
                 return; // stop proses kalau gak valid
             }
 
-            const jenisPembayaran = $('#jenis_pembayaran').val();
 
             const detail = {
                 tanggal: $('#tanggal').val(),
                 metode_pembayaran: $('#metode_pembayaran').val(),
-                nominal_pembayaran: $('#nominal_pembayaran').val(),
                 pembayaran_oleh: $('#pembayaran_oleh').val(),
                 akun_kas: $('#akun_kas').val(),
                 akun_kas_name: $('#akun_kas option:selected').text(),
                 akun_selisih_name: $('#akun_selisih option:selected').text(),
                 keterangan: $('#keterangan').val(),
+                valas: $('#valas option:selected').text(),
+                valas_id: $('#valas option:selected').val(),
+                jumlah: $('#jumlah').val(),
+                kurs: $('#kurs').val(),
+                jumlah_idr: $('#jumlah_idr').val(),
                 jenis_pembayaran: jenisPembayaran
             };
 
@@ -774,9 +910,12 @@
                     <tr>
                         <td>${detail.tanggal}</td>
                         <td>${detail.metode_pembayaran}</td>
-                        <td>${detail.nominal_pembayaran}</td>
                         <td>${debitAccount}</td>
                         <td>${creditAccount}</td>
+                        <td>${detail.valas}</td>
+                        <td>${greatFormatRupiah(detail.jumlah)}</td>
+                        <td>${greatFormatRupiah(detail.kurs)}</td>
+                        <td>${greatFormatRupiah(detail.jumlah_idr)}</td>
                         <td>${detail.pembayaran_oleh}</td>
                         <td>${detail.keterangan}</td>
                         <td>
@@ -785,22 +924,32 @@
                     </tr>
                 `);
             });
+
+            // Menghitung total jumlah_idr
+            const totalAmount = details.reduce((sum, detail) => {
+                // Pastikan jumlah_idr adalah number, jika tidak konversi ke number
+                const amount = destroyFormatRupiah(detail.jumlah_idr) || 0;
+                return sum + amount;
+            }, 0);
+
+            // Memasukkan total ke input
+            $('#total_all_amount').val(greatFormatRupiah(totalAmount));
         }
 
         // Remove detail
         $(document).on('click', '.btn-remove-detail', function() {
             const index = $(this).data('index');
-            details.splice(index, 1);
+            details.splice(index, -1);
             refreshDetailsTable();
         });
 
         // Clear detail form
         function clearDetailForm() {
-            $('#tanggal, #nominal_pembayaran, #keterangan').val('');
-            $('#metode_pembayaran, #akun_kas').val('').trigger('change');
+            $('#tanggal, #keterangan, #kurs, #jumlah, #jumlah_idr').val('');
+            $('#metode_pembayaran, #akun_kas, #valas').val('').trigger('change');
         }
 
-        // Handle final submission
+        // Handle final submissiono
         $('.btn-submit-form').click(function() {
             if (details.length === 0) {
                 alert('Tambahkan setidaknya satu detail pembayaran');
@@ -883,8 +1032,9 @@
                         $("#no_pembayaran").val(parent.no_pembayaran);
                         $('#divisi_id').val(parent.divisi_id).change();
                         $('#bayar_ke').val(parent.bayar_ke);
-                        $('#valas').val(parent.valas).change();
                         $('#akun_selisih').val(parent.akun_selisih).change();
+                        $('#keterangan_parent').val(parent.keterangan_parent);
+                        $('#total_all_amount').val(parent.total_all_amount);
 
                         // Handle jenis pembayaran dan akun
                         $('#jenis_pembayaran').val(parent.jenis_pembayaran).change();
@@ -898,9 +1048,8 @@
 
                         // Disable fields if needed
                         if (parent.status_posting === "1") {
-                            disabledForm();
-                        } else {
                             $("#no_pembayaran").attr('disabled', true);
+                            disabledForm();
                         }
 
                         // Set details data
@@ -910,12 +1059,16 @@
                                     id: detail.id,
                                     tanggal: detail.tanggal,
                                     metode_pembayaran: detail.metode_pembayaran,
-                                    nominal_pembayaran: detail.nominal_pembayaran,
                                     pembayaran_oleh: detail.pembayaran_oleh,
-                                    akun_kas: detail.akun_kas,
+                                    akun_kas: parent.jenis_pembayaran == "PUTIH" ? detail.akun_kas : detail.akun_selisih,
                                     akun_kas_name: detail.akun_kas_name,
                                     akun_selisih_name: detail.akun_selisih_name,
                                     keterangan: detail.keterangan,
+                                    valas: detail.valas,
+                                    valas_id: detail.valas_id,
+                                    kurs: detail.kurs,
+                                    jumlah: detail.jumlah,
+                                    jumlah_idr: detail.jumlah_idr,
                                     dataBE: true
                                 });
                             });
@@ -965,16 +1118,21 @@
                             divisi_id: $('#divisi_id').val(),
                             no_pembayaran: $('#no_pembayaran').val(),
                             bayar_ke: $('#bayar_ke').val(),
-                            valas: $('#valas').val(),
                             akun_selisih: $('#akun_selisih').val(),
+                            total_all_amount: destroyFormatRupiah($('#total_all_amount').val()),
+                            keterangan_parent: $('#keterangan_parent').val(),
                             jenis_pembayaran: jenisPembayaran,
                             details: details.map(detail => ({
                                 id: detail.id || '',
                                 tanggal: detail.tanggal,
                                 metode_pembayaran: detail.metode_pembayaran,
-                                nominal_pembayaran: detail.nominal_pembayaran.toString().replace(/\./g, ''),
                                 pembayaran_oleh: detail.pembayaran_oleh,
                                 akun_kas: detail.akun_kas,
+                                valas: detail.valas,
+                                valas_id: detail.valas_id,
+                                kurs: destroyFormatRupiah(detail.kurs),
+                                jumlah: destroyFormatRupiah(detail.jumlah),
+                                jumlah_idr: destroyFormatRupiah(detail.jumlah_idr),
                                 keterangan: detail.keterangan || ''
                             }))
                         };
@@ -1096,12 +1254,15 @@
         $('#bayar_ke').attr('disabled', true);
         $('#valas').attr('disabled', true);
         $('#metode_pembayaran').attr('disabled', true);
-        $('#nominal_pembayaran').attr('disabled', true);
         $('#pembayaran_oleh').attr('disabled', true);
         $('#akun_kas').attr('disabled', true);
         $('#akun_selisih').attr('disabled', true);
         $('#keterangan').attr('disabled', true);
         $('#jenis_pembayaran').attr('disabled', true);
+        $('#keterangan_parent').attr('disabled', true);
+        $('#jumlah').attr('disabled', true);
+        $('#kurs').attr('disabled', true);
+        $('#jumlah_idr').attr('disabled', true);
 
         $('.btn-submit-form').hide();
     }
@@ -1113,12 +1274,15 @@
         $('#bayar_ke').attr('disabled', false);
         $('#valas').attr('disabled', false);
         $('#metode_pembayaran').attr('disabled', false);
-        $('#nominal_pembayaran').attr('disabled', false);
         $('#pembayaran_oleh').attr('disabled', false);
         $('#akun_kas').attr('disabled', false);
         $('#akun_selisih').attr('disabled', false);
         $('#keterangan').attr('disabled', false);
         $('#jenis_pembayaran').attr('disabled', false);
+        $('#keterangan_parent').attr('disabled', false);
+        $('#jumlah').attr('disabled', false);
+        $('#kurs').attr('disabled', false);
+        $('#jumlah_idr').attr('disabled', false);
 
         $("#id").val(null).change();
         $("#no_pembayaran").val(null).change();
@@ -1127,7 +1291,6 @@
         $('#bayar_ke').val(null).change();
         $('#valas').val(null).change();
         $('#metode_pembayaran').val(null).change();
-        $('#nominal_pembayaran').val(null).change();
         $('#pembayaran_oleh').val(null).change();
         $('#akun_kas').val(null).change();
         $('#akun_selisih').val(null).change();
