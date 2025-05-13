@@ -452,7 +452,8 @@ class PembayaranPOLokal extends BaseController
                 $localPOPaymentDetailModel->insert([
                     "local_po_payment_id"          => $id,
                     "rm_purchase_order_id"         => $l['rm_purchase_order_id'],
-                    "total"                        => $l['total_paid']
+                    "total"                        => $l['total_paid'],
+                    "tipe"                       => 'BB'
                 ]);
             }
 
@@ -541,7 +542,7 @@ class PembayaranPOLokal extends BaseController
 
             // Hapus detail pembayaran lama sebelum insert baru
             // Hapus detail pembayaran lama sebelum insert baru
-            $localPOPaymentDetailModel->where('local_po_payment_id', $id)->delete();
+            $localPOPaymentDetailModel->where('local_po_payment_id', $id)->where('tipe', 'BB')->delete();
             $validPembayaranList = array_filter($pembayaranList, function ($item) {
                 return isset($item["rm_purchase_order_id"]);
             });
@@ -556,6 +557,7 @@ class PembayaranPOLokal extends BaseController
                     $localPOPaymentDetailModel->insert([
                         "local_po_payment_id" => $id,
                         "rm_purchase_order_id" => $l["rm_purchase_order_id"],
+                        "tipe" => 'BB',
                         "total" => $totalToPay,  // Gunakan nilai yang sudah ditentukan
                     ]);
                 }
