@@ -201,6 +201,7 @@ class JurnalUmum extends BaseController
         ];
 
         $dataQry = $this->transaksiJurnalModel->getList($condition, $addCondition, $limit, $offset);
+
         $dataJurnal = $this->getData($dataQry['data'], $payload);
 
         $data = [
@@ -231,54 +232,17 @@ class JurnalUmum extends BaseController
             $tipePembelian = "";
             if ($data->id_local_bb != null) {
                 $tipePembelian = "LOKAL BB";
-                // $penerimaanBarang = $this->penerimaanBarangModel
-                //     ->select('penerimaan_barang.*,suppliers.name as supplier')
-                //     ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-                //     ->where('penerimaan_barang.company_id', $this->this_company_id)
-                //     ->where('status_penerimaan', "LOKAL")
-                //     ->where('tipe_bahan', "BAKU")
-                //     ->like('multiple_po_id', $data->id_local_bb)
-                //     ->first();
-                // $noLPB = $penerimaanBarang['no_penerimaan_barang'];
+                $noLPB = $data->no_lpb_local_bb;
             } elseif ($data->id_import_bb != null) {
                 $tipePembelian = "IMPORT BB";
-                $penerimaanBarang = $this->penerimaanBarangModel
-                    ->select('penerimaan_barang.*,suppliers.name as supplier')
-                    ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-                    ->where('penerimaan_barang.company_id', $this->this_company_id)
-                    ->where('status_penerimaan', "IMPORT")
-                    ->where('tipe_bahan', "BAKU")
-                    ->like('multiple_po_id', $data->id_import_bb)
-                    ->first();
-                $noLPB = $penerimaanBarang == null ? "" : $penerimaanBarang['no_penerimaan_barang'];
+                $noLPB = $data->no_lpb_import_bb;
             } elseif ($data->id_po_bp != null) {
                 $tipePembelian = ($data->po_type === "Lokal") ? "LOKAL BP" : "IMPORT BP";
                 if ($tipePembelian == "LOKAL BP") {
-                    $penerimaanBarang = $this->penerimaanBarangModel
-                        ->select('penerimaan_barang.*,suppliers.name as supplier')
-                        ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-                        ->where('penerimaan_barang.company_id', $this->this_company_id)
-                        ->where('status_penerimaan', "LOKAL")
-                        ->where('tipe_bahan', "PENOLONG")
-                        ->like('multiple_po_id', $data->id_po_bp)
-                        ->first();
+                    $noLPB = $data->no_lpb_local_bp;
                 } else {
-                    $penerimaanBarang = $this->penerimaanBarangModel
-                        ->select('penerimaan_barang.*,suppliers.name as supplier')
-                        ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-                        ->where('penerimaan_barang.company_id', $this->this_company_id)
-                        ->where('status_penerimaan', "IMPORT")
-                        ->where('tipe_bahan', "PENOLONG")
-                        ->like('multiple_po_id', $data->id_po_bp)
-                        ->first();
+                    $noLPB = $data->no_lpb_import_bp;
                 }
-
-                $noLPB = $penerimaanBarang == null ? "" : $penerimaanBarang['no_penerimaan_barang'];
-            }
-
-            if ($data->supplier_id != null) {
-                $supplier = $this->supplierModel->where('id', $data->supplier_id)->first();
-                $data->supplier_name = $supplier == null ? '' : $supplier['name'];
             }
 
             $dataResult[] = [
