@@ -47,6 +47,7 @@ use App\Models\LocalPOPaymentPinjamanModel;
 use App\Models\PanjarSupplierModel;
 use App\Models\PinjamanSupplierModel;
 use App\Models\EmployeesModel;
+use App\Models\LocalPOPaymentBPModel;
 use Carbon\Carbon;
 
 class JurnalUmum extends BaseController
@@ -87,6 +88,7 @@ class JurnalUmum extends BaseController
     protected $PinjamanSupplierModel;
     protected $EmployeeModel;
     protected $panjarPinjamanTransactionModel;
+    protected $localPoPaymentBpModel;
 
     protected $salesOrderLainModel;
     protected $salesOrderLainDetailModel;
@@ -132,6 +134,7 @@ class JurnalUmum extends BaseController
         $this->PinjamanSupplierModel = new PinjamanSupplierModel();
         $this->PanjarSupplierModel = new PanjarSupplierModel();
         $this->EmployeeModel = new EmployeesModel();
+        $this->localPoPaymentBpModel = new LocalPOPaymentBPModel();
 
         $this->salesOrderLainModel = new SalesOrderLainModel();
         $this->salesOrderLainDetailModel = new SalesOrderLainDetailModel();
@@ -1680,7 +1683,7 @@ class JurnalUmum extends BaseController
         $barangAP = "";
         $barangAR = "";
         $dataPO = "";
-        if ($module == "LOKAL") {
+        if ($module == "LOKAL BB") {
             $result = array();
             $POlocal = $this->localPOPaymentModel->asObject()->find($payID);
             if ($POlocal) {
@@ -1781,6 +1784,65 @@ class JurnalUmum extends BaseController
                     }
                 }
                 $this->jurnalUmumModel->insertJurnalBatch($result);
+            }
+        } elseif ($module == "LOKAL BP") {
+            $result = array();
+            $POlocal = $this->localPoPaymentBpModel->where('id', $payID)->first();
+            if ($POlocal) {
+                $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'PEMBAYARAN')->findAll();
+                foreach ($dataMetadataTipeTransaksi as $val) {
+                    $idTransaksi = $val->id;
+                }
+                // Insert Transaksi
+                $resultTransaksiJurnal = array(
+                    'no_transaksi' => $POlocal['payment_no'],
+                    'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal['payment_date']))),
+                    'total_debit' => $POlocal['amount'],
+                    'total_kredit' => $POlocal['amount'],
+                    'metode_input' => 'system',
+                    'type_transaksi' => $idTransaksi,
+                    'no_bukti' => $POlocal['payment_no'],
+                    'valas' => '30',
+                    'exchange_rate' => 1,
+                    'uraian_transaksi' => $POlocal['supplier']
+                );
+
+                $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
+                // Debit
+                array_push($result, [
+                    'id_transaksi'      => $id_transaksi_jurnal,
+                    'id_coa'            => $POlocal['akun_kas'],
+                    'company_id'        => $POlocal['company_id'],
+                    'divisi_id'         => $divisi,
+                    'supplier_id'       => $POlocal['supplier_id'],
+                    'tanggal_jurnal'    =>  $POlocal['payment_date'],
+                    'debit'             => $POlocal['amount'],
+                    'kredit'            => 0,
+                    'valas'             => '30',
+                    'kurs'              => 1,
+                    'keterangan'        => $POlocal['keterangan'],
+                    'id_inputer'        => session()->get("login")->user_id
+                ]);
+
+                // Kredit
+                array_push($result, [
+                    'id_transaksi'      => $id_transaksi_jurnal,
+                    'id_coa'            => $POlocal['akun_kas'],
+                    'company_id'        => $POlocal['company_id'],
+                    'divisi_id'         => $divisi,
+                    'supplier_id'       => $POlocal['supplier_id'],
+                    'tanggal_jurnal'    => $POlocal['payment_date'],
+                    'debit'             => 0,
+                    'kredit'            => $POlocal['amount'],
+                    'valas'             => '30',
+                    'kurs'              => 1,
+                    'keterangan'        => $POlocal['keterangan'],
+                    'id_inputer'        => session()->get("login")->user_id
+                ]);
+                // Input Ke Jurnal Umum
+                $this->jurnalUmumModel->insertJurnalBatch($result);
+            } else {
+                throw new Exception("Tidak ada data pembayaran Lokal Bp");
             }
         } else if ($module == "IMPORT") {
             $POimport = $this->importPOPaymentModel->asObject()->where('deletedAt', null)->where('id', $payID)->first();

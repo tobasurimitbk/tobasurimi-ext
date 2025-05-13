@@ -50,8 +50,8 @@
                                 <th onclick="changeSort('payment_no')">No. Pembayaran</th>
                                 <th onclick="changeSort('tanda_terima_faktur.faktur_no')">No. Faktur</th>
                                 <th onclick="changeSort('suppliers.name')">Supplier</th>
-                                <th onclick="changeSort('due_date')">Tanggal Jatuh Tempo</th>
-                                <th onclick="changeSort('payment_date')">Tanggal Pembayaran</th>
+                                <th onclick="changeSort('due_date')">Tgl Jatuh Tempo</th>
+                                <th onclick="changeSort('payment_date')">Tgl Pembayaran</th>
                                 <th onclick="changeSort('payment_method')">Metode Pembayaran</th>
                                 <th onclick="changeSort('amount')">Jumlah</th>
                                 <th>Action</th>
@@ -68,7 +68,7 @@
 <?= csrf_field() ?>
 
 <script>
-    let sort = "id";
+    let sort = "local_po_payment_bp.id";
     let sortType = "desc";
     const csrfToken = '<?= csrf_token() ?>';
 
@@ -159,13 +159,13 @@
                     if (status_posting == '0') {
                         form += `
                             <?php if (can('Pembayaran', 'Lokal BP', 'd')) : ?>
-                                <button onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
 
                             <?php if (can('Pembayaran', 'Lokal BP', 'p')) : ?>
-                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
@@ -177,7 +177,7 @@
                             <?php endif; ?>
                         `;
                     } else {
-                        form += '-';
+                        form += '';
                     }
 
                     form += ` </div>`;

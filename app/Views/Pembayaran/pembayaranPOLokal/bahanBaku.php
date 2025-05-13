@@ -17,7 +17,7 @@
             <div class="row justify-content-end row-col-spp">
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker startDate" id="startDate" name="startDate" placeholder="Tanggal Jatuh Tempo">
+                        <input autocomplete="one-time-code" class="form-control input-picker startDate" id="startDate" name="startDate" placeholder="Tanggal Mulai">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -25,7 +25,7 @@
                 </div>
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker paymentDate" id="paymentDate" name="paymentDate" placeholder="Tanggal Pembayaran">
+                        <input value="<?= date('d/m/Y') ?>" autocomplete="one-time-code" class="form-control input-picker paymentDate" id="paymentDate" name="paymentDate" placeholder="Tanggal Selesai">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
@@ -182,7 +182,7 @@
                             <?php endif; ?>
                         `;
                     } else {
-                        form += '-';
+                        form += '';
                     }
 
                     form += ` </div>`;

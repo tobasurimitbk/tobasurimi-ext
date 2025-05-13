@@ -430,7 +430,7 @@ $routes->post('/pembayaran-po-lokal-bp/update', 'Pembayaran\PembayaranPOLokal::u
 $routes->post('/pembayaran-po-lokal-bp/delete', 'Pembayaran\PembayaranPOLokal::deleteBP', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/id/(:segment)', 'Pembayaran\PembayaranPOLokal::getPembayaranPOLokalBP/$1', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/print/(:segment)', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBPPrint/$1', ['filter' => 'Auth']);
-$routes->post('/pembayaran-po-lokal-bp/posting', 'Pembayaran\PembayaranPOLokal::posting', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-lokal-bp/posting', 'Pembayaran\PembayaranPOLokal::postingPoLokalBP', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal/all', 'Pembayaran\PembayaranPOLokal::allPembayaranPOLokal', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/all', 'Pembayaran\PembayaranPOLokal::allPembayaranPOLokalBP', ['filter' => 'Auth']);
 
@@ -451,7 +451,7 @@ $routes->post('/pembayaran-po-lokal-bb/update', 'Pembayaran\PembayaranPOLokal::u
 $routes->post('/pembayaran-po-lokal-bb/delete', 'Pembayaran\PembayaranPOLokal::deleteBB', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bb/id/(:segment)', 'Pembayaran\PembayaranPOLokal::getPembayaranPOLokalBB/$1', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bb/print/(:segment)', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBBPrint/$1', ['filter' => 'Auth']);
-$routes->post('/pembayaran-po-lokal-bb/posting', 'Pembayaran\PembayaranPOLokal::posting', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-lokal-bb/posting', 'Pembayaran\PembayaranPOLokal::postingPoLokalBB', ['filter' => 'Auth']);
 
 // PEMBAYARAN PO LOKAL
 $routes->get('/pembayaran-po-lokal', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokal', ['filter' => 'Auth']);

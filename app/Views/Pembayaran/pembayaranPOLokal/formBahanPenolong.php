@@ -11,6 +11,12 @@
             </a>
 
             <?php if (!empty($detail)) : ?>
+                <?php if (can('Pembayaran', 'Lokal BP', 'p')) : ?>
+                    <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bp/print/' . encrypt($detail['pembayaranDetail']['id']) ?? '') ?>">
+                        Print
+                    </a>
+                <?php endif; ?>
+
                 <?php if ($detail['pembayaranDetail']['status_posting'] == "0") : ?>
                     <?php if (can('Pembayaran', 'Lokal BP', 'd')) : ?>
                         <button onclick="remove('<?= encrypt($detail['pembayaranDetail']['id']) ?>')" class="btn btn-hapus delete-parent float-right">
@@ -24,14 +30,9 @@
                     <?php endif; ?>
                     <?php if (can('Pembayaran', 'Lokal BP', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                            Update
+                            Simpan
                         </button>
                     <?php endif; ?>
-                <?php endif; ?>
-                <?php if (can('Pembayaran', 'Lokal BP', 'p')) : ?>
-                    <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bp/print/' . encrypt($detail['pembayaranDetail']['id']) ?? '') ?>">
-                        <i class="fa-solid fa-print"></i> Print
-                    </a>
                 <?php endif; ?>
 
             <?php else : ?>
@@ -60,7 +61,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? 'disabled value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
+                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'readonly' : '') : '' ?> <?= !empty($detail) ? ' value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
                                     <label for="floatingInput">No. Pembayaran</label>
                                 </div>
                                 <div class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -180,24 +181,24 @@
                                     <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_selisih'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
                                 <?php endforeach ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Kredit (Opsional)</label>
+                            <label for="floatingInput" style="z-index: 1;">Kredit</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <textarea class="form-control" name="supplier" id="supplier" placeholder="supplier"></textarea>
+                            <textarea class="form-control" name="supplier" id="supplier" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'readonly' : '') : '' ?> placeholder="supplier"><?= !empty($detail) ? $detail['pembayaranDetail']['supplier'] : ''  ?></textarea>
                             <label for="floatingInput" style="z-index: 1;">Pembayaran Ke</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <textarea class="form-control" name="keterangan" id="keterangan" placeholder="Keterangan"></textarea>
+                            <textarea class="form-control" name="keterangan" id="keterangan" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'readonly' : '') : '' ?> placeholder="Keterangan" style="height: 220%;"><?= !empty($detail) ? $detail['pembayaranDetail']['keterangan'] : ''  ?></textarea>
                             <label for="floatingInput" style="z-index: 1;">Keterangan</label>
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row" style="margin-top: 50px;">
                     <div class="tab-content" id="myTabContent">
                         <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                             <div class="row">
@@ -296,6 +297,9 @@
                 akun_kas: {
                     required: true
                 },
+                akun_selisih: {
+                    required: true
+                },
                 divisi_id: {
                     required: true
                 },
@@ -334,6 +338,9 @@
                 },
                 akun_kas: {
                     required: "Akun kas wajib diisi"
+                },
+                akun_selisih: {
+                    required: "Akun selisih wajib diisi"
                 },
                 divisi_id: {
                     required: "Departemen wajib diisi"
@@ -519,9 +526,9 @@
                         cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            
+
                             let formData = new FormData(document.querySelector(".create-form"));
-                            let nominalPembayaran = destroyFormatRupiah($('.nominal_pembayaran').val());      
+                            let nominalPembayaran = destroyFormatRupiah($('.nominal_pembayaran').val());
 
                             const formatList = (list) => {
                                 if (!Array.isArray(list)) return []; // Pastikan `list` adalah array
@@ -535,7 +542,7 @@
                                 });
                             };
 
-                            
+
                             formData.set('nominal_pembayaran', nominalPembayaran);
                             formData.append("pembayaranList", JSON.stringify(listPembayaran));
                             $.ajax({
@@ -610,7 +617,7 @@
 
                 var detail = res.detail;
                 // var dateSplit = detail.jatuh_tempo.split('-');
-                var subTotal = Number(detail.nominal_faktur) + Number(res.tax_dipungut_negara.taxAmt) +  Number(res.tax_dikembalikan_lagi.taxAmt) + Number(res.pph) - Number(detail.total_amount);
+                var subTotal = Number(detail.nominal_faktur) + Number(res.tax_dipungut_negara.taxAmt) + Number(res.tax_dikembalikan_lagi.taxAmt) + Number(res.pph) - Number(detail.total_amount);
 
                 $('.nominal_pembayaran').val(greatFormatRupiah(subTotal));
                 // $('.jatuh_tempo').val(dateSplit[2] + '/' + dateSplit[1] + '/' + dateSplit[0]);
@@ -720,7 +727,7 @@
         newRow2.append($('<td style="text-align:right;" colspan="6">').text('Potongan'));
         newRow2.append($('<td>').text(greatFormatRupiah(detail.potongan)));
         table.find('tbody').append(newRow2);
-        
+
         var newRow3 = $('<tr>');
         newRow3.append($('<td style="text-align:right;" colspan="6">').text('Setelah Tambahan dan Potongan'));
         newRow3.append($('<td>').text(greatFormatRupiah(detail.nominal_faktur)));
@@ -730,7 +737,7 @@
         newRow6.append($('<td style="text-align:right;" colspan="6">').text('Pajak Penghasilan (2.5 %) (+)'));
         newRow6.append($('<td>').text(greatFormatRupiah(res.pph.toFixed(2))));
         table.find('tbody').append(newRow6);
-        
+
         var newRow4 = $('<tr>');
         newRow4.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dipungut Negara (' + res.tax_dipungut_negara.taxType + ')'));
         newRow4.append($('<td>').text(greatFormatRupiah(res.tax_dipungut_negara.taxAmt)));
@@ -766,7 +773,7 @@
         newRow11.append($('<td style="text-align:right;" colspan="6"><b>Input Pembayaran</b></td>'));
         newRow11.append($('<td>').html(
             `
-                        <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${Number(subTotal)})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="" name = "nominal_pembayaran" style="height:40px">
+                        <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> oninput="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${Number(subTotal)})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="" name = "nominal_pembayaran" style="height:40px">
                     `
         ));
         table.find('tbody').append(newRow11);
@@ -995,7 +1002,6 @@
         let formattedDate = reversedParts.join("/");
         return formattedDate;
     }
-
 </script>
 
 <?= $this->endSection(); ?>

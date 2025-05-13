@@ -186,44 +186,6 @@
         </tbody>
     </table>
 
-    <h6>
-        Rincian Panjar
-    </h6>
-    <table width="100%" border="1" id="dashed-border-table" style="margin-top:-20px">
-        <thead>
-            <tr>
-                <th style="text-align: center;">No</th>
-                <th style="text-align: center;">No. Panjar</th>
-                <th style="text-align: center;">Payment Date</th>
-
-                <th style="text-align: center;">Bayar Panjar </th>
-
-
-            </tr>
-        </thead>
-
-        <tbody>
-            <?php $no = 1; ?>
-
-            <?php if (!empty($detail['panjar'])) :  ?>
-
-                <?php foreach ($detail['panjar'] as $p) : ?>
-                    <tr>
-                        <td> <?= $no++; ?> </td>
-                        <td> <?= $p['no_panjar']; ?></td>
-                        <td> <?= $p['payment_date']; ?></td>
-                        <td> <?= number_format($p['bayar_panjar'], 2); ?></td>
-
-                    <?php endforeach; ?>
-                <?php else : ?>
-                    <tr>
-                        <td colspan="5">Tidak ada Pembayaran Panjar</td>
-                    </tr>
-
-                <?php endif; ?>
-        </tbody>
-    </table>
-
 </body>
 
 </html>
