@@ -760,6 +760,8 @@ $routes->post('/material-request/save', 'Production\MaterialRequest::create', ['
 $routes->post('/material-request/update', 'Production\MaterialRequest::update', ['filter' => 'Auth']);
 $routes->post('/material-request/update-status', 'Production\MaterialRequest::updateStatusPostedMaterialRequest', ['filter' => 'Auth']);
 $routes->get('/material-request/list-barang-stock-init', 'Production\MaterialRequest::getListBarangIsInit', ['filter' => 'Auth']);
+$routes->get('/material-request/list-supplier', 'Production\MaterialRequest::getListSupplier', ['filter' => 'Auth']);
+$routes->get('/material-request/list-stock-dokumen-bc', 'Production\MaterialRequest::getListStockByStockID', ['filter' => 'Auth']);
 
 // Material Request Penolong
 $routes->get('/material-request-penolong', 'Production\MaterialRequestPenolong::index', ['filter' => 'Auth']);

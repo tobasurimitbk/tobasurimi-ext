@@ -44,40 +44,40 @@
     </div>
     <div class="card">
         <div class="card-body">
-        <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-            <input autocomplete="one-time-code" type="hidden" value="<?= !empty($ids) ? $ids : ""; ?>" class="id" name="id" id="id" />
-            <?= csrf_field() ?>
+            <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+                <input autocomplete="one-time-code" type="hidden" value="<?= !empty($ids) ? $ids : ""; ?>" class="id" name="id" id="id" />
+                <?= csrf_field() ?>
 
-            <div class="row mt-3">
-                <div class="col mb-3">
-                    <label class="form-label font-weight-bold lable-title">Header Request</label>
+                <div class="row mt-3">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Header Request</label>
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input value="<?= !empty($dataMaterialRequests->req_no) ? $dataMaterialRequests->req_no : "AUTO GENERATE" ?>" readonly autocomplete="one-time-code" type="text" class="form-control req_no" id="req_no" name="req_no" placeholder="Kode Produksi">
-                                <label for="floatingInput">Kode Request</label>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input value="<?= !empty($dataMaterialRequests->req_no) ? $dataMaterialRequests->req_no : "AUTO GENERATE" ?>" readonly autocomplete="one-time-code" type="text" class="form-control req_no" id="req_no" name="req_no" placeholder="Kode Produksi">
+                                    <label for="floatingInput">Kode Request</label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input value="<?= !empty($dataMaterialRequests->request_date) ? date('d/m/Y', strtotime($dataMaterialRequests->request_date)) : "" ?>" <?= (!empty($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_request" name="date_request" id="date_request" placeholder="Tanggal Request">
-                        <label for="floatingInput">Tanggal Request</label>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input value="<?= !empty($dataMaterialRequests->request_date) ? date('d/m/Y', strtotime($dataMaterialRequests->request_date)) : "" ?>" <?= (!empty($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_request" name="date_request" id="date_request" placeholder="Tanggal Request">
+                            <label for="floatingInput">Tanggal Request</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input value="<?= !empty($dataMaterialRequests->production_date) ? date('d/m/Y', strtotime($dataMaterialRequests->production_date)) : "" ?>" <?= (!empty($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Produksi">
+                            <label for="floatingInput">Tanggal Produksi</label>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input value="<?= !empty($dataMaterialRequests->production_date) ? date('d/m/Y', strtotime($dataMaterialRequests->production_date)) : "" ?>" <?= (!empty($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : "" ?> autocomplete="one-time-code" type="text" class="form-control date_production" name="date_production" id="date_production" placeholder="Tanggal Produksi">
-                        <label for="floatingInput">Tanggal Produksi</label>
-                    </div>
-                </div>
-            </div>
-        </form>
+            </form>
             <div class="row mt-3">
                 <div class="col mb-3">
                     <label class="form-label font-weight-bold lable-title">Data Barang yang Dimutasikan</label>
@@ -189,6 +189,14 @@
                             <option value=""></option>
                         </select>
                         <label for="floatingInput">Nama Barang</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select select_supplier" name="select_supplier" id="select_supplier" disabled>
+                            <option value=""></option>
+                        </select>
+                        <label for="floatingInput">Supplier</label>
                     </div>
                 </div>
             </div>
@@ -584,11 +592,23 @@
             theme: "bootstrap-5",
             allowClear: true
         }).change(function() {
+            console.log($(this).val());
+
             $('#select_nama_barang').val(null).change();
             $("#select_nama_barang").prop('disabled', false);
             listStockAsal = [];
             drawTableAsalBarang();
             getListBarang();
+            if ($(this).val() == "bahan_baku") {
+                $('#select_supplier').val(null).change();
+                $("#select_supplier").prop('disabled', false);
+                $("#select_supplier").attr('disabled', false);
+                getListSupplier();
+            } else {
+                $('#select_supplier').val(null).change();
+                $("#select_supplier").prop('disabled', true);
+                $("#select_supplier").attr('disabled', true);
+            }
         });
 
         //CSS SELECT2 FLOATING LABEL
@@ -623,15 +643,25 @@
             getListDokumenPabean();
         });
 
+        $('.select_supplier').select2({
+            placeholder: "Pilih Supplier",
+            theme: "bootstrap-5",
+            allowClear: true
+        }).change(function() {
+            listStockAsal = [];
+            drawTableAsalBarang();
+            getListDokumenPabean();
+        });
+
         //CSS SELECT2 FLOATING LABEL
-        $('.select_nama_barang')
+        $('.select_nama_barang, .select_supplier')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.select_nama_barang')
+        $('.select_nama_barang, .select_supplier')
             .parent('div')
             .children('span')
             .children('span')
@@ -639,7 +669,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.select_nama_barang')
+        $('.select_nama_barang, .select_supplier')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -1061,10 +1091,37 @@
         });
     }
 
+    function getListSupplier() {
+        // GET LIST BARANG
+        $.ajax({
+            url: `<?= base_url('material-request/list-supplier'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                type_barang: $(".select_tipe_bahan option:selected").val()
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".select_supplier").empty()
+                $(".select_supplier").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    // console.log(item);
+                    $(".select_supplier").append(`<option value="${item.id}">(${item.kode}) ${item.name}</option>`)
+                })
+                $(".select_supplier").val();
+            }
+        });
+    }
+
     function getListDokumenPabean() {
         // GET LIST STOCK PER DOKUMEN PABEAN
         $.ajax({
-            url: `<?= base_url('mutasi/list-stock-dokumen-bc'); ?>`,
+            url: `<?= base_url('material-request/list-stock-dokumen-bc'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -1074,6 +1131,7 @@
             },
             data: {
                 stock_id: $(".select_nama_barang option:selected").data('stock_id'),
+                supplier_id: $(".select_supplier option:selected").val(),
             },
             dataType: "json",
             success: function(res) {

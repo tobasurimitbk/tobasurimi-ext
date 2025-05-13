@@ -349,60 +349,54 @@ class StockDetail2Model extends Model
         }
     }
 
-    public function getStockListWithBCDoc($stockID, $isAdjusment = false)
+    public function getStockListWithBCDoc($stockID, $isAdjusment = false, $supplierID = null)
     {
-        // JIKA $isAdjusment = true MAKA STOK < 0 MUNCUL
-        // JIKA $isAdjusment = false MAKA STOK > 0 YANG MUNCUL
         $selectQry = '
-            suppliers.name AS supplier_name,
-            stock_details2.id,
-            stock_details2.bc_id,
-            stock_details2.stock_detail_id,
-            stock_details2.no_aju,
-            stock_details2.stock_id,
-            stock_details2.stock_dokumen,
-            stock_details2.no_dokumen AS no_dokumen_2,
-            stock_details2.supplier_id,
-            stock_details2.harga_umum,
-            stock_details2.harga_harian,
-            stock_details2.harga_bulanan,
-            stock_details2.no_po,
-            stock_details.no_dokumen AS no_dokumen_1,
-            stock_details.stock_date,
-            stock_details.sumber,
-            (SUM(CASE WHEN stock_details.status = "In" 
-            THEN stock_details2.qty ELSE 0 END) - 
-            SUM(CASE WHEN stock_details.status = "Out" 
-            THEN stock_details2.qty ELSE 0 END)) 
-            AS stok_total,        
-        ';
+        suppliers.name AS supplier_name,
+        stock_details2.id,
+        stock_details2.bc_id,
+        stock_details2.stock_detail_id,
+        stock_details2.no_aju,
+        stock_details2.stock_id,
+        stock_details2.stock_dokumen,
+        stock_details2.no_dokumen AS no_dokumen_2,
+        stock_details2.supplier_id,
+        stock_details2.harga_umum,
+        stock_details2.harga_harian,
+        stock_details2.harga_bulanan,
+        stock_details2.no_po,
+        stock_details.no_dokumen AS no_dokumen_1,
+        stock_details.stock_date,
+        stock_details.sumber,
+        (SUM(CASE WHEN stock_details.status = "In" 
+        THEN stock_details2.qty ELSE 0 END) - 
+        SUM(CASE WHEN stock_details.status = "Out" 
+        THEN stock_details2.qty ELSE 0 END)) 
+        AS stok_total
+    ';
 
-        if ($isAdjusment == true) {
-            $dataQry = $this->asArray()
-                ->select($selectQry)
-                ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
-                ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
-                ->where('stock_details2.stock_id', $stockID)
-                ->groupBy('stock_details2.stock_dokumen')
-                ->groupBy('stock_details2.bc_id')
-                ->groupBy('stock_details2.no_aju')
-                ->orderBy('stock_details.createdAt', "ASC")
-                ->findAll();
-        } else {
-            $dataQry = $this->asArray()
-                ->select($selectQry)
-                ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
-                ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
-                ->where('stock_details2.stock_id', $stockID)
-                ->groupBy('stock_details2.stock_dokumen')
-                ->groupBy('stock_details2.bc_id')
-                ->groupBy('stock_details2.no_aju')
-                ->having('stok_total >', 0)
-                ->orderBy('stock_details.createdAt', "ASC")
-                ->findAll();
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+            ->where('stock_details2.stock_id', $stockID)
+            ->groupBy('stock_details2.stock_dokumen')
+            ->groupBy('stock_details2.bc_id')
+            ->groupBy('stock_details2.no_aju');
+
+        // Tambahkan filter supplier jika diberikan
+        if ($supplierID !== null) {
+            $builder->where('stock_details2.supplier_id', $supplierID);
         }
 
-        return $dataQry;
+        // Filter stok > 0 jika bukan untuk adjustment
+        if ($isAdjusment === false) {
+            $builder->having('stok_total >', 0);
+        }
+
+        $builder->orderBy('stock_details.createdAt', "ASC");
+
+        return $builder->findAll();
     }
 
     public function getStockListWithBCDocNoGroup($stockID, $isAdjusment = false)
