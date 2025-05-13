@@ -2253,6 +2253,14 @@ $routes->post('/retur-po-import-bp/save', 'ReturPembelian\ReturPembelianLokalBB:
 $routes->post('/retur-po-import-bp/update', 'ReturPembelian\ReturPembelianLokalBB::updateAction', ['filter' => 'Auth']);
 $routes->get('/retur-po-import-bp/id/(:segment)', 'ReturPembelian\ReturPembelianImportBP::update/$1', ['filter' => 'Auth']);
 $routes->get('/retur-po-import-bp/print/(:segment)', 'ReturPembelian\ReturPembelianImportBP::print/$1', ['filter' => 'Auth']);
+// HR Outsourcing
+$routes->get('/hr-outsourcing-company', 'HROutsourcing\Company::index', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-company/all', 'HROutsourcing\Company::all', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/save', 'HROutsourcing\Company::store', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/update', 'HROutsourcing\Company::update', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/delete', 'HROutsourcing\Company::destroy', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-company/id/(:segment)', 'HROutsourcing\Company::get/$1', ['filter' => 'Auth']);
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing
