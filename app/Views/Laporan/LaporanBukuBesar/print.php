@@ -99,10 +99,10 @@
               <td><?= $r['no_transaksi'] ?></td>
               <td><?= $r['supplier_name'] ?></td>
               <td><?= $r['keterangan'] ?></td>
-              <td><?= toRupiah(abs($r['debit'] - $r['kredit'])) . " " . "<b>" . $r['valas'] . "</b>" ?></td>
+              <td><?= toRupiah($r['kredit'] / $r['kurs']) . " " . "<b>" . $r['valas'] . "</b>" ?></td>
               <td><?= $r['kurs'] == "1" ? "" : toRupiah($r['kurs']) ?></td>
               <td><?= toRupiah($r['debit'] * $r['kurs']) ?></td>
-              <td><?= toRupiah($r['kredit'] * $r['kurs']) ?></td>
+              <td><?= toRupiah($r['kredit']) ?></td>
               <td><?= toRupiah($sisaSaldo) ?></td>
             </tr>
           <?php endforeach; ?>
