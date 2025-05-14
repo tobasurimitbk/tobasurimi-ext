@@ -204,7 +204,6 @@ class JurnalUmum extends BaseController
         ];
 
         $dataQry = $this->transaksiJurnalModel->getList($condition, $addCondition, $limit, $offset);
-
         $dataJurnal = $this->getData($dataQry['data'], $payload);
 
         $data = [
@@ -229,23 +228,22 @@ class JurnalUmum extends BaseController
                 ->where('company_id', $this->this_company_id)
                 ->where('bulan', date('Y-m', strtotime($data->tanggal_transaksi)))
                 ->first();
-            $noLPB = "";
 
             // Penentuan tipe pembelian
+            $noLpb = $data->no_penerimaan_barang;
             $tipePembelian = "";
             if ($data->id_local_bb != null) {
                 $tipePembelian = "LOKAL BB";
-                $noLPB = $data->no_lpb_local_bb;
+                $noLpb = "";
             } elseif ($data->id_import_bb != null) {
                 $tipePembelian = "IMPORT BB";
-                $noLPB = $data->no_lpb_import_bb;
             } elseif ($data->id_po_bp != null) {
                 $tipePembelian = ($data->po_type === "Lokal") ? "LOKAL BP" : "IMPORT BP";
-                if ($tipePembelian == "LOKAL BP") {
-                    $noLPB = $data->no_lpb_local_bp;
-                } else {
-                    $noLPB = $data->no_lpb_import_bp;
-                }
+            }
+
+            if ($data->supplier_id != null) {
+                $supplier = $this->supplierModel->where('id', $data->supplier_id)->first();
+                $data->supplier_name = $supplier == null ? '' : $supplier['name'];
             }
 
             $dataResult[] = [
@@ -256,7 +254,7 @@ class JurnalUmum extends BaseController
                 "tanggal_transaksi"     => date('d/m/Y', strtotime($data->tanggal_transaksi)),
                 "uraian_transaksi"      => $data->uraian_transaksi,
                 "supplier"              => "0 : " . $data->supplier_name, // tidak tersedia setelah relasi dihapus
-                "no_lpb"                => $noLPB, // tidak tersedia setelah relasi dihapus
+                "no_lpb"                => $noLpb, // tidak tersedia setelah relasi dihapus
                 "metode_input"          => strtoupper($data->metode_input),
                 "valas"                 => $data->valas,
                 "exchange_rate"         => $data->exchange_rate == 1 ? "" : $data->exchange_rate,
@@ -1114,7 +1112,7 @@ class JurnalUmum extends BaseController
         }
     }
 
-    public function insertDataPembelian($poID, $type, $kategori, $module)
+    public function insertDataPembelian($poID, $type, $kategori, $module, $penerimaanBarangId)
     {
         $KasAP = "";
         $KasAR = "";
@@ -1182,7 +1180,8 @@ class JurnalUmum extends BaseController
                                 'type_transaksi' => $idTransaksi,
                                 'valas' => 'IDR',
                                 'valas_id' => $dataMetadataValutaIDR->id,
-                                'uraian_transaksi' => $dataBB->po_no // Untuk transaksi_jurnal memakai po_no
+                                'uraian_transaksi' => $dataBB->po_no, // Untuk transaksi_jurnal memakai po_no
+                                'penerimaan_barang_id' => $penerimaanBarangId,
                             );
 
                             // ambil id dari transaksi jurnal untuk jurnal umum
@@ -1359,7 +1358,8 @@ class JurnalUmum extends BaseController
                                 'valas' => $valasTransaksi,
                                 'valas_id' => $dataBB->currency,
                                 'exchange_rate' => $exchangeTransaksi,
-                                'uraian_transaksi' => $dataBB->po_no // Untuk transaksi_jurnal memakai po_no
+                                'uraian_transaksi' => $dataBB->po_no, // Untuk transaksi_jurnal memakai po_no
+                                'penerimaan_barang_id' => $penerimaanBarangId,
                             );
 
                             // ambil id dari transaksi jurnal untuk jurnal umum
@@ -1525,7 +1525,8 @@ class JurnalUmum extends BaseController
                             'valas' => $valasTransaksi,
                             'valas_id' => $dataBP->currency, // Jika 0 Maka Idr (Untuk Po lokal Bp)
                             'exchange_rate' => $exchangeTransaksi,
-                            'uraian_transaksi' => $dataBP->po_no // Untuk transaksi_jurnal memakai po_no
+                            'uraian_transaksi' => $dataBP->po_no, // Untuk transaksi_jurnal memakai po_no
+                            'penerimaan_barang_id' => $penerimaanBarangId,
                         );
 
                         // ambil id dari transaksi jurnal untuk jurnal umum

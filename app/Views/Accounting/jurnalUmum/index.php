@@ -45,7 +45,7 @@
                     <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi" aria-label="Floating label select example">
                         <option value="">PILIH TIPE TRANSAKSI</option>
                         <?php foreach ($tipeTransaksi as $t): ?>
-                            <option value="<?= $t['id'] ?>"><?= $t['value'] ?></option>
+                            <option value="<?= $t['id'] ?>"><?= $t['value'] == "PEMBELIAN" ? "PEMBELIAN (ALL)" : $t['value'] ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -72,7 +72,7 @@
                                 <th onclick="changeSort('transaksi_jurnal.type_transaksi')" class="sort">Transaksi</th>
                                 <th onclick="changeSort('transaksi_jurnal.no_transaksi')" class="sort">Nomor</th>
                                 <th onclick="changeSort('transaksi_jurnal.tanggal_transaksi')">Tanggal</th>
-                                <th class="sort">No LPB</th>
+                                <th onclick="changeSort('transaksi_jurnal.penerimaan_barang_id')" class="sort">No LPB</th>
                                 <th onclick="changeSort('transaksi_jurnal.uraian_transaksi')" class="sort">Keterangan</th>
                                 <th>Invoice</th>
                                 <th onclick="changeSort('transaksi_jurnal.metode_input')">Metode Input</th>
@@ -173,8 +173,6 @@
             {
                 data: "no_lpb",
                 className: "text-left",
-                searchable: false,
-                sortable: false
             },
             {
                 data: "uraian_transaksi",

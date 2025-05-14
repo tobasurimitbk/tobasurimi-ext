@@ -16,6 +16,7 @@ class TransaksiJurnalModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
+        'penerimaan_barang_id',
         'no_transaksi',
         'tanggal_transaksi',
         'total_debit',
@@ -194,6 +195,7 @@ class TransaksiJurnalModel extends Model
         $availableSort = [
             'transaksi_jurnal.id' => 'transaksi_jurnal.id',
             'transaksi_jurnal.type_transaksi' => 'transaksi_jurnal.type_transaksi',
+            'transaksi_jurnal.penerimaan_barang_id' => 'transaksi_jurnal.penerimaan_barang_id',
             'transaksi_jurnal.no_transaksi' => 'transaksi_jurnal.no_transaksi',
             'transaksi_jurnal.tanggal_transaksi' => 'transaksi_jurnal.tanggal_transaksi',
             'transaksi_jurnal.uraian_transaksi' => 'transaksi_jurnal.uraian_transaksi',
@@ -213,7 +215,8 @@ class TransaksiJurnalModel extends Model
         transaksi_jurnal.valas,
         transaksi_jurnal.exchange_rate,
         transaksi_jurnal.total_debit,
-        transaksi_jurnal.no_bukti,                 
+        transaksi_jurnal.no_bukti,
+        penerimaan_barang.no_penerimaan_barang,                 
         metadata.value as transaksi_type_name,
         transaksi_pembelian.id_local_bb,
         transaksi_pembelian.id_import_bb,
@@ -230,6 +233,7 @@ class TransaksiJurnalModel extends Model
             ->join('transaksi_pembelian', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left')
             ->join('am_purchase_orders', 'am_purchase_orders.id = transaksi_pembelian.id_po_bp', 'left')
             ->join('suppliers', 'suppliers.id = transaksi_pembelian.id_supplier', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = transaksi_jurnal.penerimaan_barang_id', 'left')
             ->where($condition)
             ->groupBy('jurnal_umum.id_transaksi');
 
@@ -260,6 +264,7 @@ class TransaksiJurnalModel extends Model
                 ->like('transaksi_jurnal.no_transaksi', $addCondition['search'])
                 ->orLike('transaksi_jurnal.uraian_transaksi', $addCondition['search'])
                 ->orLike('transaksi_jurnal.total_debit', $addCondition['search'])
+                ->orLike('penerimaan_barang.no_penerimaan_barang', $addCondition['search'])
                 ->groupEnd();
         }
 
@@ -267,6 +272,7 @@ class TransaksiJurnalModel extends Model
         $filteredCountQry = $this->db->table('transaksi_jurnal')
             ->join('jurnal_umum', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('transaksi_pembelian', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = transaksi_jurnal.penerimaan_barang_id', 'left')
             ->where($condition);
 
         if (!empty($addCondition['start_date'])) {
@@ -295,6 +301,7 @@ class TransaksiJurnalModel extends Model
                 ->like('transaksi_jurnal.no_transaksi', $addCondition['search'])
                 ->orLike('transaksi_jurnal.uraian_transaksi', $addCondition['search'])
                 ->orLike('transaksi_jurnal.total_debit', $addCondition['search'])
+                ->orLike('penerimaan_barang.no_penerimaan_barang', $addCondition['search'])
                 ->groupEnd();
         }
 

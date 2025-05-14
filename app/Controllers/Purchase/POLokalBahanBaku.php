@@ -630,7 +630,7 @@ class POLokalBahanBaku extends BaseController
                     $detail = $this->RMPurchaseOrderModel->where('id', $id)->first();
                     // cek if warehouse_id != null
                     if ($detail['warehouse_id'] != null && $detail['warehouse_id'] != 0) {
-                        $result = $this->jurnalController->insertDataPembelian($id, "BAHAN BAKU", "LOKAL", "pembelian");
+                        $result = $this->jurnalController->insertDataPembelian($id, "BAHAN BAKU", "LOKAL", "pembelian", null);
                         if ($result) {
                             $responseBody = json_decode($result->getBody(), true);
                             if ($responseBody && isset($responseBody['status'])) {

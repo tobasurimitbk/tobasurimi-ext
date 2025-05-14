@@ -529,7 +529,7 @@ class PenerimaanBarangLokal extends BaseController
 
             $multiple_po_id = json_decode($dataPenerimaanBarang->multiple_po_id);
             foreach ($multiple_po_id as $key => $value) {
-                $result = $this->jurnalController->insertDataPembelian($value, "BAHAN " . $dataPenerimaanBarang->tipe_bahan, $dataPenerimaanBarang->status_penerimaan, "pembelian");
+                $result = $this->jurnalController->insertDataPembelian($value, "BAHAN " . $dataPenerimaanBarang->tipe_bahan, $dataPenerimaanBarang->status_penerimaan, "pembelian", $id);
                 if ($result) {
                     $responseBody = json_decode($result->getBody(), true);
                     if ($responseBody && isset($responseBody['status'])) {
