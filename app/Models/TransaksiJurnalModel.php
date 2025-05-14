@@ -265,6 +265,7 @@ class TransaksiJurnalModel extends Model
                 ->orLike('transaksi_jurnal.uraian_transaksi', $addCondition['search'])
                 ->orLike('transaksi_jurnal.total_debit', $addCondition['search'])
                 ->orLike('penerimaan_barang.no_penerimaan_barang', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
                 ->groupEnd();
         }
 

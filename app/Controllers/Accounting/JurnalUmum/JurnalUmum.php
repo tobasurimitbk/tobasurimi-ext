@@ -224,10 +224,10 @@ class JurnalUmum extends BaseController
 
         foreach ($dataJurnal as $data) {
             // Cek Tutup Buku per transaksi
-            $tutupBuku = $this->tutupBukuModel
-                ->where('company_id', $this->this_company_id)
-                ->where('bulan', date('Y-m', strtotime($data->tanggal_transaksi)))
-                ->first();
+            // $tutupBuku = $this->tutupBukuModel
+            //     ->where('company_id', $this->this_company_id)
+            //     ->where('bulan', date('Y-m', strtotime($data->tanggal_transaksi)))
+            //     ->first();
 
             // Penentuan tipe pembelian
             $noLpb = $data->no_penerimaan_barang;
@@ -239,11 +239,6 @@ class JurnalUmum extends BaseController
                 $tipePembelian = "IMPORT BB";
             } elseif ($data->id_po_bp != null) {
                 $tipePembelian = ($data->po_type === "Lokal") ? "LOKAL BP" : "IMPORT BP";
-            }
-
-            if ($data->supplier_id != null) {
-                $supplier = $this->supplierModel->where('id', $data->supplier_id)->first();
-                $data->supplier_name = $supplier == null ? '' : $supplier['name'];
             }
 
             $dataResult[] = [
@@ -260,7 +255,7 @@ class JurnalUmum extends BaseController
                 "exchange_rate"         => $data->exchange_rate == 1 ? "" : $data->exchange_rate,
                 "nilai"                 => $data->exchange_rate == 1 ? "" : $data->exchange_rate,
                 "nilai_idr"             => $data->total_debit,
-                "tutup_buku"            => $tutupBuku ? 1 : 0,
+                "tutup_buku"            => 0,
             ];
         }
 
