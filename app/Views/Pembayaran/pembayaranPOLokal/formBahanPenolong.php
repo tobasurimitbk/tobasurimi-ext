@@ -614,6 +614,8 @@
                 listPembayaran = [];
                 listPembayaran = res.list;
                 const table = $('#dataTable');
+                // List Pembaayaran
+                generateKeteranganPembayaran(listPembayaran);
 
                 var detail = res.detail;
                 // var dateSplit = detail.jatuh_tempo.split('-');
@@ -1001,6 +1003,19 @@
         let reversedParts = parts.reverse();
         let formattedDate = reversedParts.join("/");
         return formattedDate;
+    }
+
+    function generateKeteranganPembayaran(data) {
+        var keterangan = "";
+        var supplierName = $('#supplier_id option:selected').text();
+        var noTandaTerima = $('#tanda_terima_supplier option:selected').text();
+        var poNoText = "";
+        $.each(data, function(i, v) {
+            poNoText += `${v.item_name} Sebanyak ${v.qty} ${v.unit}, `;
+        });
+
+        keterangan = "Pembayaran " + supplierName + "; No TTS : " + noTandaTerima + "; " + poNoText;
+        $('#keterangan').val(keterangan);
     }
 </script>
 
