@@ -1787,7 +1787,7 @@ class JurnalUmum extends BaseController
                 // Kredit
                 array_push($result, [
                     'id_transaksi'      => $id_transaksi_jurnal,
-                    'id_coa'            => $POlocal['akun_kas'],
+                    'id_coa'            => $POlocal['akun_selisih'],
                     'company_id'        => $POlocal['company_id'],
                     'divisi_id'         => $divisi,
                     'supplier_id'       => $POlocal['supplier_id'],
