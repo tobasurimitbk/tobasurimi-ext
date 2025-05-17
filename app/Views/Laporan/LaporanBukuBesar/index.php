@@ -177,7 +177,7 @@
                                     ?>
                                     <?php foreach ($j['result'] as $r): ?>
                                         <?php
-                                        $sisaSaldo += ($r['debit'] * $r['kurs']) - ($r['kredit'] * $r['kurs']);
+                                        $sisaSaldo += ($r['debit']) - ($r['kredit']);
                                         $totalDebit += $r['debit'] * $r['kurs'];
                                         $totalKredit += $r['kredit'] * $r['kurs'];
                                         ?>
