@@ -175,7 +175,7 @@ class CustomerModel extends Model
             ->where($condition)
             ->whereIn('suppliers.company_id', $companyId)
             ->groupBy('suppliers.id')
-            ->having("total > 0") 
+            ->having("total > 0")
             ->orderBy($sort, $sortType);
 
         $totalData = $supplierDataQry->countAllResults(false);
@@ -192,11 +192,11 @@ class CustomerModel extends Model
         if ($addCondition['filter']) {
             $supplierDataQry->where('suppliers.id', $addCondition['filter']);
         }
-        
+
         if ($addCondition['divisi']) {
             $supplierDataQry->where('rm_purchase_orders.divisi_id', $addCondition['divisi'])
-            ->orwhere('am_purchase_orders.division_id', $addCondition['divisi'])
-            ->orwhere('rm_import_pos.division_id', $addCondition['divisi']);
+                ->orwhere('am_purchase_orders.division_id', $addCondition['divisi'])
+                ->orwhere('rm_import_pos.division_id', $addCondition['divisi']);
         }
 
         if ($addCondition['type_barang']) {
@@ -296,13 +296,13 @@ class CustomerModel extends Model
             ->select('customers.*, customers.sales_id AS salesName')
             ->where('customers.deletedAt', null)
             ->where('customers.tipe_customer', 'LOKAL');
-    
+
         if (!$is_admin) {
             $query->where('customers.user_id', $user_id);
         }
-    
+
         return $query->orderBy('createdAt', "DESC")->findAll();
-    }    
+    }
 
     public function getCustomerWithMetaData($idCustomer)
     {
@@ -332,19 +332,20 @@ class CustomerModel extends Model
         $lastStr = $thn2;
         $first_day = "$thn-01-01 00:00:00";
         $last_day = "$last_year 23:59:59";
-    
+
         $builder = $this->db->table('customers');
         $builder->select('kode');
         $builder->orderBy('kode', 'asc');
         $builder->where('createdAt >=', $first_day);
         $builder->where('createdAt <=', $last_day);
+        $builder->where('deletedAt', null);
         $builder->like('kode', $lastStr);
         $query = $builder->get();
-    
+
         $kodePrefix = 'CS/' . $bln . '/' . $thn2;
-    
+
         $existingNumbers = [];
-    
+
         // Ambil semua nomor urut yang sudah ada
         if (!empty($query->getResultArray())) {
             foreach ($query->getResultArray() as $string) {
@@ -354,12 +355,12 @@ class CustomerModel extends Model
                 }
             }
         }
-    
+
         // Sort dan cari celah nomor
         $lastKode = 1;
         sort($existingNumbers);
         $foundGap = false;
-    
+
         foreach ($existingNumbers as $number) {
             if ($number != $lastKode) {
                 $foundGap = true;
@@ -367,14 +368,14 @@ class CustomerModel extends Model
             }
             $lastKode++;
         }
-    
+
         if (!$foundGap) {
             $lastKode = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
         }
-    
+
         $formattedKode = sprintf("%04d", $lastKode);
         $generatedNo = $kodePrefix . '/' . $formattedKode;
-    
+
         return $generatedNo;
     }
 }
