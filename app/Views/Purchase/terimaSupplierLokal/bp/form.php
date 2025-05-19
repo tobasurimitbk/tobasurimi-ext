@@ -296,7 +296,7 @@
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <select class="form-select" name="tax_type" id="tax_type">
                                             <option value="" disabled selected></option>
-                                            <option value="PPN Masukan">PPN Masukan</option>
+                                            <option value="PPN Masukan">PPN Masukan 0%</option>
                                             <option value="PPN Masukan 11%">PPN Masukan 11%</option>
                                             <option value="PPh Pasal 21">PPh Pasal 21</option>
                                             <option value="PPh Pasal 23">PPh Pasal 23</option>
