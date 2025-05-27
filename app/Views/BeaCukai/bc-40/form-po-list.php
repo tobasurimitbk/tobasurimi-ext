@@ -275,7 +275,7 @@
             po_no: "<?= $d['po_no'] ?>",
             spp_no: "<?= $d['spp_no'] ?>",
             po_date: "<?= $d['po_date'] ?>",
-            barang_name: "<?= $d['barang_name'] ?>",
+            barang_name: "<?= str_replace('"', '\"', $d['barang_name'])  ?>",
             kode_barang: "<?= $d['kode_barang'] ?>",
             harga_number: "<?= $d['harga'] ?>",
         })
