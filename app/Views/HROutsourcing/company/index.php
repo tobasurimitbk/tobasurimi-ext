@@ -158,7 +158,7 @@
             render: function(data, type, row) {
                 let id = row.id;
                 return `
-                        <a class="btn btn-warning" href="<?= base_url(); ?>employee/${id}" style="box-shadow: none !important;">
+                        <a class="btn btn-warning" href="<?= base_url(); ?>hr-outsourcing-company/employee/id/${id}" style="box-shadow: none !important;">
                             Data Karyawan
                         </a>
                        
