@@ -132,7 +132,7 @@
                 sortable: false,
                 render: function(data, type, row) {
                     return `
-                        <button class="btn btn-warning mr-1 edit-table-detail" data-id="${row.id}" data-kode="${row.kode}" data-nama="${row.name}">
+                        <button class="btn btn-warning mr-1 edit-table-detail" data-id="${row.id}" data-kode="${row.kode}" data-nama="${row.nama}">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                         </button>
                         <button class="btn btn-danger" onclick="deleteForm('${row.id}')">
