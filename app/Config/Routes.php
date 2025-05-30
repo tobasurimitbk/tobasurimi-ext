@@ -2264,6 +2264,7 @@ $routes->post('/hr-outsourcing-company/delete', 'HROutsourcing\Company::destroy'
 $routes->get('/hr-outsourcing-company/id/(:segment)', 'HROutsourcing\Company::get/$1', ['filter' => 'Auth']);
 $routes->get('/hr-outsourcing-company/employee/id/(:segment)', 'HROutsourcing\Employee::create/$1', ['filter' => 'Auth']);
 $routes->get('/hr-outsourcing-company/employee/getByCompany', 'HROutsourcing\Employee::getAllEmployeeByCompany', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/employee/delete', 'HROutsourcing\Employee::destroy', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-company/employee/save', 'HROutsourcing\Employee::store', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-company/employee/update', 'HROutsourcing\Employee::update', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-company/employee/generateKode', 'HROutsourcing\Employee::generateKode', ['filter' => 'Auth']);

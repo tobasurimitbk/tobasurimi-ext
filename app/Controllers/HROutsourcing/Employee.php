@@ -160,4 +160,15 @@ class Employee extends BaseController
         ]);
     }
 
+    public function destroy()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->hrOutsourcingEmployeeModel->delete($id);
+        return response()->setJSON([
+            'status' => true,
+            'message' => "Employee Outsourcing Berhasil Dihapus",
+            'token' => csrf_hash()
+        ]);
+    }
+
 }
