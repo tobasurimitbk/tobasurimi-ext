@@ -5,18 +5,21 @@ namespace App\Controllers\HROutsourcing;
 use App\Controllers\BaseController;
 use App\Models\DivisisModel;
 use App\Models\HROutsourcingCompanyModel;
+use App\Models\HROutsourcingEmployeeModel;
 
 class Company extends BaseController
 {
     protected $this_company_id;
     protected $divisiModel;
     protected $hrOutsourcingCompanyModel;
+    protected $hrOutsourcingEmployeeModel;
 
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->divisiModel = new DivisisModel();
         $this->hrOutsourcingCompanyModel = new HROutsourcingCompanyModel();
+        $this->hrOutsourcingEmployeeModel = new HROutsourcingEmployeeModel();
     }
 
     public function index()
@@ -58,12 +61,13 @@ class Company extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($sppData['data'] as $data) {
+            $totalEmployee = count($this->hrOutsourcingEmployeeModel->where('company_id', $data->id)->findAll());
             array_push($dataSPP, [
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
                 "divisi"      => $data->divisi,
                 "name" => $data->name,
-                "total" => 0,
+                "total" => $totalEmployee,
             ]);
         }
 

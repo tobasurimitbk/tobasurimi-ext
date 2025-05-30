@@ -6,7 +6,7 @@
     <div class="section-header">
         <h1 class="title-name">Set Data Karyawan</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("/"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("/hr-outsourcing-company"); ?>">
                 Kembali
             </a>
         </div>
@@ -28,14 +28,15 @@
                     <tr style="color: black;">
                         <td width="150px">Alamat</td>
                         <td width="25px">:</td>
-                        <td><?= $company['address'] ?><td>
+                        <td><?= $company['address'] ?>
+                        <td>
                     </tr>
                 </tbody>
             </table>
-            <input type="hidden" name="id_company" id="id_company" value="<?= $company['id'] ?>" />
             <br>
             <form class="karyawan-form" role="form" method="POST">
                 <input type="hidden" name="id" id="id">
+                <input type="hidden" name="company_id" id="company_id" value="<?= $company['id'] ?>">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -45,7 +46,7 @@
                                     <label for="kode_karyawan">Kode Karyawan</label>
                                 </div>
                                 <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input style="z-index: 99; margin-bottom: 20px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -97,14 +98,19 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    
+
     var table = $('.dataTable').DataTable({
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [
+            [1, 'asc']
+        ],
         fixedHeader: true,
-        lengthMenu: [[25], [25]],
+        lengthMenu: [
+            [25],
+            [25]
+        ],
         pageLength: 25,
         ajax: {
             url: "<?= base_url("hr-outsourcing-company/employee/getByCompany"); ?>",
@@ -121,10 +127,21 @@
         },
         display: "stripe",
         searching: false,
-        columns: [
-            { data: "no", className: "text-center", sortable: false },
-            { data: "kode", className: "text-center", sortable: false },
-            { data: "nama", className: "text-center", sortable: false },
+        columns: [{
+                data: "no",
+                className: "text-center",
+                sortable: false
+            },
+            {
+                data: "kode",
+                className: "text-center",
+                sortable: false
+            },
+            {
+                data: "nama",
+                className: "text-center",
+                sortable: false
+            },
             {
                 data: "id",
                 className: "text-center actions",
@@ -142,7 +159,10 @@
                 }
             }
         ],
-        columnDefs: [{ defaultContent: "-", targets: "_all" }],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -169,12 +189,20 @@
 
     var validator = $(".karyawan-form").validate({
         rules: {
-            kode_karyawan: { required: true },
-            nama: { required: true }
+            kode_karyawan: {
+                required: true
+            },
+            nama: {
+                required: true
+            }
         },
         messages: {
-            kode_karyawan: { required: "Kode karyawan wajib diisi" },
-            nama: { required: "Nama wajib diisi" }
+            kode_karyawan: {
+                required: "Kode karyawan wajib diisi"
+            },
+            nama: {
+                required: "Nama wajib diisi"
+            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -194,12 +222,12 @@
             const csrf = $(`[name="${csrfToken}"]`);
             let id = $('#id').val();
             let url = id ? "<?= base_url("hr-outsourcing-company/employee/update"); ?>" : "<?= base_url("hr-outsourcing-company/employee/save"); ?>";
-            
+
             let data = {
                 id: id,
                 kode_karyawan: $('#kode_karyawan').val(),
                 nama: $('#nama').val(),
-                company_id: $('#id_company').val()
+                company_id: $('#company_id').val()
             };
 
             $.ajax({
@@ -234,13 +262,15 @@
     function changeStatus() {
         let value = $('#auto_generate').is(':checked');
         const csrf = $(`[name="${csrfToken}"]`);
-        
+
         if (value) {
             $(".kode_karyawan").attr("readonly", true);
             $.ajax({
                 url: "<?= base_url("hr-outsourcing-company/employee/generateKode"); ?>",
                 method: "POST",
-                data: { company_id: $('#id_company').val() },
+                data: {
+                    company_id: $('#company_id').val()
+                },
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                 },
@@ -277,7 +307,9 @@
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("hr-outsourcing-company/employee/delete"); ?>",
-                    data: { id: id },
+                    data: {
+                        id: id
+                    },
                     beforeSend: function(xhr) {
                         setLoading();
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());

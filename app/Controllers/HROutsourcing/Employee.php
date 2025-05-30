@@ -23,13 +23,10 @@ class Employee extends BaseController
     }
 
 
-    public function index()
-    {
-        
-    }
+    public function index() {}
 
     public function create($id)
-    {   
+    {
         $data = [
             'company' => $this->hrOutsourcingCompanyModel->where('id', decrypt($id))->first(),
         ];
@@ -37,7 +34,8 @@ class Employee extends BaseController
         return view('HROutsourcing/employee/form', $data);
     }
 
-    public function getAllEmployeeByCompany(){
+    public function getAllEmployeeByCompany()
+    {
         $payload = [
             "pageSize"         => $this->request->getVar("length"),
             "currentPage"      => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
@@ -53,7 +51,7 @@ class Employee extends BaseController
         ];
 
         $condition = [
-            'hr_outsourcing_employee.company_id' => $this->this_company_id,
+            'hr_outsourcing_employee.company_id' => $this->request->getVar('company_id'),
         ];
 
         $limit = $this->request->getVar("length");
@@ -87,7 +85,7 @@ class Employee extends BaseController
 
     public function generateKode()
     {
-        $companyId = $this->this_company_id;
+        $companyId = $this->request->getVar('company_id');
         $month = date('m'); // Bulan saat ini (format: 01-12)
         $year = date('Y'); // Tahun saat ini (format: 2023)
         $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d'))); // Tanggal terakhir bulan ini
@@ -126,10 +124,11 @@ class Employee extends BaseController
 
     public function store()
     {
+        $companyId = $this->request->getVar('company_id');
         $kode = $this->request->getVar('kode_karyawan');
         $nama = $this->request->getVar('nama');
         $this->hrOutsourcingEmployeeModel->insert([
-            'company_id' => $this->this_company_id,
+            'company_id' => $companyId,
             'kode' => $kode,
             'nama' => $nama
         ]);
@@ -144,11 +143,12 @@ class Employee extends BaseController
     public function update()
     {
         $id = decrypt($this->request->getVar('id'));
+        $companyId = $this->request->getVar('company_id');
         $kode = $this->request->getVar('kode_karyawan');
         $nama = $this->request->getVar('nama');
 
         $this->hrOutsourcingEmployeeModel->update($id, [
-            'company_id' => $this->this_company_id,
+            'company_id' => $companyId,
             'kode' => $kode,
             'nama' => $nama
         ]);
@@ -170,5 +170,4 @@ class Employee extends BaseController
             'token' => csrf_hash()
         ]);
     }
-
 }
