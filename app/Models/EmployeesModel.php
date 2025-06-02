@@ -42,6 +42,7 @@ class EmployeesModel extends Model
         'employee_img',
         'status',
         'tipe',
+        'attendance_sync',
         'bagian_id',
         'createdAt',
         'updatedAt',
