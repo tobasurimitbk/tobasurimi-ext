@@ -42,8 +42,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input type="text" class="form-control kode_karyawan" id="kode_karyawan" name="kode_karyawan" placeholder="Kode Karyawan" required>
-                                    <label for="kode_karyawan">Kode Karyawan</label>
+                                    <input type="text" class="form-control badge_karyawan" id="badge_karyawan" name="badge_karyawan" placeholder="badge Karyawan" required>
+                                    <label for="badge_karyawan">No Badge / Induk Karyawan</label>
                                 </div>
                                 <div class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input style="z-index: 99; margin-bottom: 20px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
@@ -55,6 +55,12 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" class="form-control nama" id="nama" name="nama" placeholder="Nama" required>
                             <label for="nama">Nama</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input type="date" class="form-control tanggal_masuk_kerja" id="tanggal_masuk_kerja" name="tanggal_masuk_kerja" placeholder="tanggal_masuk_kerja" required>
+                            <label for="tanggal_masuk_kerja">Tanggal Masuk Kerja</label>
                         </div>
                     </div>
                 </div>
@@ -75,7 +81,7 @@
             <div class="row">
                 <div class="row justify-content-end mb-3">
                     <div class="col-md-4">
-                        <input class="form-control search form-out-search" placeholder="Cari Nama / Kode Employee" />
+                        <input class="form-control search form-out-search" placeholder="Cari Nama / badge Employee" />
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -83,8 +89,9 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th width="10">No</th>
-                                <th>Kode</th>
+                                <th>badge</th>
                                 <th>Nama</th>
+                                <th>Tanggal Masuk Kerja</th>
                                 <th style="width: 100px;">Action</th>
                             </tr>
                         </thead>
@@ -133,12 +140,17 @@
                 sortable: false
             },
             {
-                data: "kode",
+                data: "badge",
                 className: "text-center",
                 sortable: false
             },
             {
                 data: "nama",
+                className: "text-center",
+                sortable: false
+            },
+            {
+                data: "tanggal_masuk_kerja",
                 className: "text-center",
                 sortable: false
             },
@@ -149,7 +161,7 @@
                 sortable: false,
                 render: function(data, type, row) {
                     return `
-                        <button class="btn btn-warning mr-1 edit-table-detail" data-id="${row.id}" data-kode="${row.kode}" data-nama="${row.nama}">
+                        <button class="btn btn-warning mr-1 edit-table-detail" data-id="${row.id}" data-badge="${row.badge}" data-nama="${row.nama}">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                         </button>
                         <button class="btn btn-danger" onclick="deleteForm('${row.id}')">
@@ -176,10 +188,11 @@
     $(document).ready(function() {
         $(document).on('click', '.edit-table-detail', function() {
             $('#id').val($(this).data('id'));
-            $('#kode_karyawan').val($(this).data('kode'));
+            $('#badge_karyawan').val($(this).data('badge'));
             $('#nama').val($(this).data('nama'));
+            $('#tanggal_masuk_kerja').val($(this).data('tanggal_masuk_kerja'));
             $('#auto_generate').prop('checked', false);
-            $(".kode_karyawan").attr("readonly", false);
+            $(".badge_karyawan").attr("readonly", false);
         });
     });
 
@@ -189,7 +202,7 @@
 
     var validator = $(".karyawan-form").validate({
         rules: {
-            kode_karyawan: {
+            badge_karyawan: {
                 required: true
             },
             nama: {
@@ -197,8 +210,8 @@
             }
         },
         messages: {
-            kode_karyawan: {
-                required: "Kode karyawan wajib diisi"
+            badge_karyawan: {
+                required: "badge karyawan wajib diisi"
             },
             nama: {
                 required: "Nama wajib diisi"
@@ -225,7 +238,8 @@
 
             let data = {
                 id: id,
-                kode_karyawan: $('#kode_karyawan').val(),
+                badge_karyawan: $('#badge_karyawan').val(),
+                tanggal_masuk_kerja: $('#tanggal_masuk_kerja').val(),
                 nama: $('#nama').val(),
                 company_id: $('#company_id').val()
             };
@@ -264,7 +278,7 @@
         const csrf = $(`[name="${csrfToken}"]`);
 
         if (value) {
-            $(".kode_karyawan").attr("readonly", true);
+            $(".badge_karyawan").attr("readonly", true);
             $.ajax({
                 url: "<?= base_url("hr-outsourcing-company/employee/generateKode"); ?>",
                 method: "POST",
@@ -276,7 +290,7 @@
                 },
                 dataType: "json",
                 success: function(response) {
-                    $(".kode_karyawan").val(response);
+                    $(".badge_karyawan").val(response);
                 },
                 error: function() {
                     Swal.fire({
@@ -287,8 +301,8 @@
                 }
             });
         } else {
-            $(".kode_karyawan").attr("readonly", false);
-            $(".kode_karyawan").val("");
+            $(".badge_karyawan").attr("readonly", false);
+            $(".badge_karyawan").val("");
         }
     }
 
@@ -332,10 +346,10 @@
     function resetForm() {
         validator.resetForm();
         $('#id').val('');
-        $('#kode_karyawan').val('');
+        $('#badge_karyawan').val('');
         $('#nama').val('');
         $('#auto_generate').prop('checked', false);
-        $(".kode_karyawan").attr("readonly", false);
+        $(".badge_karyawan").attr("readonly", false);
     }
 </script>
 

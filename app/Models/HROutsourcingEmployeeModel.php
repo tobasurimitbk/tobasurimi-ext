@@ -16,9 +16,10 @@ class HROutsourcingEmployeeModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
-        'kode',
+        'badge',
         'company_id',
         'nama',
+        'tanggal_masuk_kerja',
         'createdAt',
         'updatedAt',
         'deletedAt'

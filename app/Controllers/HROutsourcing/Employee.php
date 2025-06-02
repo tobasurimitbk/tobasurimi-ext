@@ -66,7 +66,8 @@ class Employee extends BaseController
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
                 "nama" => $data->nama,
-                "kode" => $data->kode,
+                "tanggal_masuk_kerja" => $data->tanggal_masuk_kerja,
+                "badge" => $data->badge,
                 "total" => 0,
             ]);
         }
@@ -93,18 +94,18 @@ class Employee extends BaseController
         $lastStr = convertBulanToAngkaRomawi($month) . '/' . $year; // Format: III/2023
 
         // Ambil hr_outsourcing_employee terakhir di bulan & tahun ini
-        $builder = $this->hrOutsourcingEmployeeModel->asArray()->select('kode')
-            ->orderBy('kode', "DESC")
+        $builder = $this->hrOutsourcingEmployeeModel->asArray()->select('badge')
+            ->orderBy('badge', "DESC")
             ->where('company_id', $companyId)
             ->where('createdAt >=', $year . "-" . $month . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59")
             ->first();
 
-        $kode = 'KAROSRC'; // Kode awal: PJR
+        $badge = 'KAROSRC'; // badge awal: PJR
         $lastNumber = 1; // Nomor awal: 1
 
-        if ($builder != null && isset($builder['kode'])) {
-            $explode = explode('/', $builder['kode']); // Pecah hr_outsourcing_employee menjadi array
+        if ($builder != null && isset($builder['badge'])) {
+            $explode = explode('/', $builder['badge']); // Pecah hr_outsourcing_employee menjadi array
 
             // Pastikan format hr_outsourcing_employee sesuai: PJR/X/2023/00001
             if (count($explode) == 4) {
@@ -117,7 +118,7 @@ class Employee extends BaseController
         }
 
         $formattedlastNumber = sprintf("%05d", $lastNumber); // Format nomor menjadi 5 digit (00001)
-        $generatedNo = $kode . '/' . $lastStr . '/' . $formattedlastNumber; // Gabungkan semua bagian
+        $generatedNo = $badge . '/' . $lastStr . '/' . $formattedlastNumber; // Gabungkan semua bagian
 
         return json_encode($generatedNo);
     }
@@ -125,12 +126,15 @@ class Employee extends BaseController
     public function store()
     {
         $companyId = $this->request->getVar('company_id');
-        $kode = $this->request->getVar('kode_karyawan');
+        $badge = $this->request->getVar('badge_karyawan');
         $nama = $this->request->getVar('nama');
+        $tanggal_masuk_kerja = $this->request->getVar('tanggal_masuk_kerja');
+
         $this->hrOutsourcingEmployeeModel->insert([
             'company_id' => $companyId,
-            'kode' => $kode,
-            'nama' => $nama
+            'badge' => $badge,
+            'nama' => $nama,
+            'tanggal_masuk_kerja' => $tanggal_masuk_kerja
         ]);
 
         return response()->setJSON([
@@ -144,13 +148,15 @@ class Employee extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $companyId = $this->request->getVar('company_id');
-        $kode = $this->request->getVar('kode_karyawan');
+        $badge = $this->request->getVar('badge_karyawan');
         $nama = $this->request->getVar('nama');
+        $tanggal_masuk_kerja = $this->request->getVar('tanggal_masuk_kerja');
 
         $this->hrOutsourcingEmployeeModel->update($id, [
             'company_id' => $companyId,
-            'kode' => $kode,
-            'nama' => $nama
+            'badge' => $badge,
+            'nama' => $nama,
+            'tanggal_masuk_kerja' => $tanggal_masuk_kerja
         ]);
 
         return response()->setJSON([
