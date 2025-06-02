@@ -165,6 +165,7 @@ class Employee extends BaseController
                 "name"                  => $data->name,
                 "divisionName"          => $data->divisi,
                 "dob"                   => $data->dob == "0000-00-00" ? '-' : date('d/m/Y', strtotime($data->dob)),
+                'attendance_sync'       => $data->attendance_sync,
                 "gender"                => strtoupper($data->gender),
                 "acc_no"                => strtoupper($data->acc_no),
                 "tipe"                  => strtoupper($data->tipe),

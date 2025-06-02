@@ -7,6 +7,7 @@ use CodeIgniter\API\ResponseTrait;
 use App\Models\EmployeesModel;
 use App\Models\AttendancesUnitModel;
 use App\Models\EmployeesFingerModel;
+use Exception;
 
 class Employees extends BaseController
 {
@@ -29,34 +30,52 @@ class Employees extends BaseController
 
     public function sync_employee_to_master()
     {
-        $res_unit = $this->AttendancesUnitModel->getByMaster(1);
+        try {
+            $res_unit = $this->AttendancesUnitModel->getByMaster(1);
 
-        for ($i = 0; $i < count($res_unit); $i++) {
-            $this->attendances_id = $res_unit[$i]["id"];
-            $this->ip = $res_unit[$i]["ip"];
-            $this->unit_key = $res_unit[$i]["unit_key"];
-            $res = $this->EmployeesModel->getEmployeesNotSyncAttendances($res_unit[$i]["company_id"]);
+            for ($i = 0; $i < count($res_unit); $i++) {
+                $this->attendances_id = $res_unit[$i]["id"];
+                $this->ip = $res_unit[$i]["ip"];
+                $this->unit_key = $res_unit[$i]["unit_key"];
+                $res = $this->EmployeesModel->getEmployeesNotSyncAttendances($res_unit[$i]["company_id"]);
+                // \var_dump($res);
+                // die;
 
-            for ($j = 0; $j < count($res); $j++) {
-                $this->add_employee($res[$j]["id"], $res[$j]["name"]);
-                $resfinger = $this->get_data_finger($res[$j]["id"]);
-                $total_finger = count($resfinger);
-                $total = $this->EmployeesFingerModel->getTotalByEmployeesId($res[$j]["id"]);
-                echo "TOTAL: " . $total_finger . " = " . $total . "\n";
-                if ($total_finger != $total) {
-                    //$this->EmployeesFingerModel->delete_by_EmployeesId($res[$j]["id"]);
-                    //$this->EmployeesFingerModel->delete("employees_id", $res[$j]["id"]);
-                    $this->EmployeesFingerModel->where("employees_id", $res[$j]["id"])->delete();
+                for ($j = 0; $j < count($res); $j++) {
+                    $this->add_employee($res[$j]["id"], $res[$j]["name"]);
+                    // Update Employee (set to 1)
+                    $this->EmployeesModel->update($res[$j]["id"], [
+                        'attendance_sync' => 1
+                    ]);
+                    $resfinger = $this->get_data_finger($res[$j]["id"]);
+                    $total_finger = count($resfinger);
+                    $total = $this->EmployeesFingerModel->getTotalByEmployeesId($res[$j]["id"]);
+                    echo "TOTAL: " . $total_finger . " = " . $total . "\n";
+                    if ($total_finger != $total) {
+                        //$this->EmployeesFingerModel->delete_by_EmployeesId($res[$j]["id"]);
+                        //$this->EmployeesFingerModel->delete("employees_id", $res[$j]["id"]);
+                        $this->EmployeesFingerModel->where("employees_id", $res[$j]["id"])->delete();
 
-                    for ($k = 0; $k < count($resfinger); $k++) {
-                        $values = [
-                            "employees_id"  => $res[$j]["id"],
-                            "finger"        => $resfinger[$k]["data"]
-                        ];
-                        $this->EmployeesFingerModel->insert($values);
+                        for ($k = 0; $k < count($resfinger); $k++) {
+                            $values = [
+                                "employees_id"  => $res[$j]["id"],
+                                "finger"        => $resfinger[$k]["data"]
+                            ];
+                            $this->EmployeesFingerModel->insert($values);
+                        }
                     }
                 }
             }
+
+            return response()->setJSON([
+                'status' => true,
+                'message' => "Berhasil sinkronisasi data karyawan ke mesin fingerprint master",
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
         }
     }
 

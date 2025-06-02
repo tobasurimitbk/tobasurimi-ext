@@ -294,14 +294,14 @@ class EmployeesModel extends Model
     public function getEmployeesNotSyncAttendances($company_id)
     {
         $arrCondition = [
-            //            'employees.deletedAt' => null,
+            'employees.deletedAt' => null,
             'employees.company_id' => $company_id,
             //            'users.deletedAt' => null
         ];
 
         $builder = $this->db->table('employees')
             ->select("employees.id,employees.attendance_sync,employees.name")
-            //->where('employees.attendance_sync', 0);
+            ->where('employees.attendance_sync', 0)
             ->where('employees.id >', 0);
         $builder->where($arrCondition);
         $query = $builder->get();

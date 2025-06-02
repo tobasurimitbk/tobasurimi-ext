@@ -5,11 +5,12 @@
 <section class="section">
     <div class="section-header">
         <h1>Karyawan</h1>
-        <div class="col-button-tambah-spp">
-            <a class="btn btn btn-show-form btn-save float-right" href="<?= base_url('employee/create') ?>">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-            </a>
-        </div>
+        <button class="btn btn-sync btn-add" float-right style="right:130px;">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Sync Karyawan ke Fingerprint
+        </button>
+        <a class="btn btn btn-show-form btn-save float-right" href="<?= base_url('employee/create') ?>">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </a>
     </div>
     <div class="card">
         <?= csrf_field() ?>
@@ -75,6 +76,7 @@
                                 <th onclick="changeSort('employees.tipe')" class="sort">Tipe/Gol</th>
                                 <th onclick="changeSort('employees.dob')" class="sort">Tanggal Lahir</th>
                                 <th onclick="changeSort('employees.gender')" class="sort">Jenis Kelamin</th>
+                                <th onclick="changeSort('employees.attendance_sync')" class="sort">Fingerprint</th>
                                 <th onclick="changeSort('employees.status')" class="sort">Status</th>
                                 <th style="width: 10px;">Jam Kerja</th>
                             </tr>
@@ -88,6 +90,30 @@
         </div>
     </div>
 </section>
+<div class="modal sync-fingerprint" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sinkronisasi Karyawan ke Fingerprint Master</h5>
+            </div>
+            <div class="modal-body">
+                <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
+                    <?= csrf_field() ?>
+                    <div class="row">
+                        <div class="col-md-12">
+                            Apakah anda yakin untuk Sinkronisasi Karyawan ke Fingerprint Master?
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-copy btn-discard mr-2">Kembali</button>
+                <button type="button" class="btn btn-submit-form btn-process-form">Process</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -158,6 +184,22 @@
         }, {
             data: "gender",
             className: "text-center"
+        }, {
+            data: "attendance_sync",
+            className: "text-center",
+            render: function(data, type, row) {
+                let attendance_sync = row.attendance_sync;
+                if (attendance_sync == 1) {
+                    return `
+                        <span class="badge badge-success">SINKRON</span>
+                    `
+                } else {
+                    return `
+                        <span class="badge badge-danger">BELUM SINKRON</span>
+                    `
+                }
+
+            }
         }, {
             data: "status",
             className: "text-center"
@@ -264,6 +306,59 @@
         $('#tipe').val(null).change();
         $('#search').val('');
     });
+
+    $('.btn-sync').click(function(e) {
+        e.preventDefault();
+        $('.sync-fingerprint').modal('show');
+    });
+
+    $('.btn-discard').click(function() {
+        $('.sync-fingerprint').modal('hide');
+
+    })
+
+    $(".btn-process-form").click(function() {
+        const csrf = $(`[name="${csrfToken}"]`);
+        $.ajax({
+            url: "<?= base_url("api/employees-sync-attendances"); ?>",
+            beforeSend: function(xhr) {
+                setLoading();
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            complete: function() {
+                stopLoading();
+            },
+            method: "GET",
+            success: function(response) {
+                csrf.val(response.token);
+                if (response.status) {
+                    Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        .then(() => {
+                            $(".sync-fingerprint").modal("hide")
+                        })
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            },
+            onError: function(response) {
+                csrf.val(response.token);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Data Gagal Disimpan, coba Lagi',
+                    confirmButtonColor: '#4e73df',
+                })
+            }
+        });
+    });
+
 
     const changeSort = function(val) {
         if (sort !== val) {
