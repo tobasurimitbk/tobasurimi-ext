@@ -50,7 +50,6 @@ class Employees extends BaseController
                     $resfinger = $this->get_data_finger($res[$j]["id"]);
                     $total_finger = count($resfinger);
                     $total = $this->EmployeesFingerModel->getTotalByEmployeesId($res[$j]["id"]);
-                    echo "TOTAL: " . $total_finger . " = " . $total . "\n";
                     if ($total_finger != $total) {
                         //$this->EmployeesFingerModel->delete_by_EmployeesId($res[$j]["id"]);
                         //$this->EmployeesFingerModel->delete("employees_id", $res[$j]["id"]);
@@ -144,7 +143,7 @@ class Employees extends BaseController
         } else echo "Koneksi Gagal";
 
         $buffer = $this->Parse_Data($buffer, "<Information>", "</Information>");
-        echo "<B>Result:</B><BR>";
-        echo $buffer;
+        // echo "<B>Result:</B><BR>";
+        // echo $buffer;
     }
 }
