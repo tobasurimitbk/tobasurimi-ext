@@ -161,7 +161,7 @@
                 sortable: false,
                 render: function(data, type, row) {
                     return `
-                        <button class="btn btn-warning mr-1 edit-table-detail" data-id="${row.id}" data-badge="${row.badge}" data-nama="${row.nama}">
+                        <button class="btn btn-warning mr-1 edit-table-detail" data-id="${row.id}" data-badge="${row.badge}" data-tanggal_masuk_kerja="${row.tanggal_masuk_kerja}" data-nama="${row.nama}">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                         </button>
                         <button class="btn btn-danger" onclick="deleteForm('${row.id}')">
