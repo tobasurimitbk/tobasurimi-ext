@@ -59,7 +59,7 @@ class HROutsourcingEmployeeModel extends Model
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'hr_outsourcing_employee.createdAt';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'asc'] ?? 'ASC';
 
         $selectQry = "hr_outsourcing_employee.*";
         $dataQry = $this->asObject()

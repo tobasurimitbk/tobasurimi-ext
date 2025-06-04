@@ -89,9 +89,9 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th width="10">No</th>
+                                <th>Tanggal Masuk Kerja</th>
                                 <th>badge</th>
                                 <th>Nama</th>
-                                <th>Tanggal Masuk Kerja</th>
                                 <th style="width: 100px;">Action</th>
                             </tr>
                         </thead>
@@ -140,17 +140,17 @@
                 sortable: false
             },
             {
+                data: "tanggal_masuk_kerja",
+                className: "text-center",
+                sortable: false
+            },
+            {
                 data: "badge",
                 className: "text-center",
                 sortable: false
             },
             {
                 data: "nama",
-                className: "text-center",
-                sortable: false
-            },
-            {
-                data: "tanggal_masuk_kerja",
                 className: "text-center",
                 sortable: false
             },
