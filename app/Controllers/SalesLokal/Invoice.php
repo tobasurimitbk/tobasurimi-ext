@@ -72,7 +72,7 @@ class Invoice extends BaseController
     public function index()
     {
         $data = [
-            'getCustomers' => $this->CustomerModel->where('deletedAt', NULL)->where('tipe_customer', 'LOKAL')->findAll(),
+            'getCustomers' => $this->CustomerModel->getCustomerLokal($this->userId, $this->is_admin),
         ];
         return view('SalesLokal/Invoice/index', $data);
     }
