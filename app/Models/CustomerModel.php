@@ -123,9 +123,9 @@ class CustomerModel extends Model
                 ->orLike('customers.kode', $addCondition['search']);
         }
 
-        if ($addCondition['company_id']) {
-            $customerDataQry->where('customers.company_id', $addCondition['company_id']);
-        }
+        // if ($addCondition['company_id']) {
+        //     $customerDataQry->where('customers.company_id', $addCondition['company_id']);
+        // }
 
         if ($addCondition['search'] || $addCondition['company_id']) {
             $customerDataQry->groupEnd();
