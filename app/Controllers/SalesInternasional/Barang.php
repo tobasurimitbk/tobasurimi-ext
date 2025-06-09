@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\BarangMasterSalesModel;
 use App\Models\MetadataModel;
 use App\Models\SatuansModel;
+use App\Models\DivisisModel;
 use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -17,6 +18,7 @@ class Barang extends BaseController
     protected $satuanModel;
     protected $barangMasterSalesModel;
     protected $metaDataModel;
+    protected $divisiModel;
 
     public function __construct()
     {
@@ -24,12 +26,14 @@ class Barang extends BaseController
         $this->satuanModel = new SatuansModel();
         $this->barangMasterSalesModel = new BarangMasterSalesModel();
         $this->metaDataModel = new MetadataModel();
+        $this->divisiModel = new DivisisModel();
     }
 
     public function bahanJadiView()
     {
         $data = [
             'satuan' => $this->satuanModel->findAll(),
+            'divisi' => $this->divisiModel->where('company_id', $this->this_company_id)->findAll(),
         ];
 
         return view('SalesInternasional/barangMaster/index', $data);

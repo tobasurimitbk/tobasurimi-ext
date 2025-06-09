@@ -131,7 +131,11 @@ class SuratJalan extends BaseController
                 $customerSales = "-";
             } else {
                 $getEmployee = $this->EmployeesModel->select("CONCAT(employees.nip, ' - ', employees.name) AS customerSales")->where('employees.id', $data->sales_id)->first();
-                $customerSales = $getEmployee['customerSales'];
+                if ($getEmployee && isset($getEmployee['customerSales'])) {
+                    $customerSales = $getEmployee['customerSales'];
+                } else {
+                    $customerSales = '-'; // atau null, atau string kosong, sesuai kebutuhan
+                }
             }
             array_push($dataAllSuratJalan, [
                 "no"            => $no++,
