@@ -58,7 +58,7 @@ class SuratJalanModel extends Model
     {
         $availableSort = [
             'no_surat_jalan'          => 'surat_jalan_so.no_surat_jalan',
-            'tipe_sales_order'          => 'surat_jalan_so.tipe_sales_order',
+            'tipe_sales_order'          => 'sales_order.tipe_sales_order',
             'no_so'            => 'surat_jalan_so.multiple_no_so',
             'kode_pelanggan'             => 'customers.kode',
             'nama_pelanggan'             => 'customers.name',
