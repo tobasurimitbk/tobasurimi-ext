@@ -80,7 +80,7 @@ class CustomerModel extends Model
     {
 
         $availableSort = [
-            'companyName'       => 'companies.company',
+            // 'companyName'       => 'companies.company',
             'namaSales'         => 'users.name',
             'kode'              => 'customers.kode',
             'name'              => 'customers.name',
@@ -98,23 +98,22 @@ class CustomerModel extends Model
 
         $selectQry = "customers.*, 
                     employees.name as namaSales,
-                    companies.company as companyName,
-                      metadata.value AS currencyName,
-                      country.country_name AS countryName";
+                    metadata.value AS currencyName,
+                    country.country_name AS countryName";
 
         $customerDataQry = $this->asObject()
             ->select($selectQry)
-            ->whereIn('customers.company_id', $companyAccessArr)
+            // ->whereIn('customers.company_id', $companyAccessArr)
             ->where($condition)
             ->join('metadata', 'customers.currency = metadata.id', 'left')
             ->join('country', 'country.id = customers.country_id', 'left')
             ->join('employees', 'employees.id = customers.sales_id', 'LEFT')
-            ->join('companies', 'companies.id = customers.company_id', 'LEFT')
+            // ->join('companies', 'companies.id = customers.company_id', 'LEFT')
             ->orderBy($sort, $sortType);
 
         $totalData = $customerDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['company_id']) {
+        if ($addCondition['search']) {
             $customerDataQry->groupStart();
         }
 
@@ -127,7 +126,7 @@ class CustomerModel extends Model
         //     $customerDataQry->where('customers.company_id', $addCondition['company_id']);
         // }
 
-        if ($addCondition['search'] || $addCondition['company_id']) {
+        if ($addCondition['search']) {
             $customerDataQry->groupEnd();
         }
 

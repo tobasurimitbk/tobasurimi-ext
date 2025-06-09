@@ -86,7 +86,6 @@ class Customer extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            'company_id' => ''
         ];
 
         $dataCompanyUserLogin = [$this->this_company_id];
