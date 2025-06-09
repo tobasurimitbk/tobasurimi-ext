@@ -53,7 +53,9 @@ class HROutsourcingEmployeeModel extends Model
     {
         $availableSort = [
             'hr_outsourcing_employee.id' => 'hr_outsourcing_employee.id',
+            'hr_outsourcing_employee.tanggal_masuk_kerja' => 'hr_outsourcing_employee.tanggal_masuk_kerja',
             'hr_outsourcing_employee.nama' => 'hr_outsourcing_employee.nama',
+            'hr_outsourcing_employee.badge' => 'hr_outsourcing_employee.badge'
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];

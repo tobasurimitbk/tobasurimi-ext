@@ -88,10 +88,10 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th width="10">No</th>
-                                <th>Tanggal Masuk Kerja</th>
-                                <th>badge</th>
-                                <th>Nama</th>
+                                <th width="10" onclick="changeSort('hr_outsourcing_employee.id')">No</th>
+                                <th onclick="changeSort('hr_outsourcing_employee.tanggal_masuk_kerja')">Tanggal Masuk Kerja</th>
+                                <th onclick="changeSort('hr_outsourcing_employee.badge')">Badge</th>
+                                <th onclick="changeSort('hr_outsourcing_employee.nama')">Nama</th>
                                 <th style="width: 100px;">Action</th>
                             </tr>
                         </thead>
@@ -105,6 +105,8 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+    let sort = "createdAt";
+    let sortType = "desc";
 
     var table = $('.dataTable').DataTable({
         processing: true,
@@ -125,6 +127,8 @@
             data: function(data) {
                 data.search = $(".search").val();
                 data.company_id = "<?= $company['id'] ?>";
+                data.sort = sort;
+                data.sortType = sortType;
             }
         },
         "initComplete": function(settings, json) {
@@ -137,22 +141,18 @@
         columns: [{
                 data: "no",
                 className: "text-center",
-                sortable: false
             },
             {
                 data: "tanggal_masuk_kerja",
                 className: "text-center",
-                sortable: false
             },
             {
                 data: "badge",
                 className: "text-center",
-                sortable: false
             },
             {
                 data: "nama",
                 className: "text-center",
-                sortable: false
             },
             {
                 data: "id",
@@ -350,6 +350,16 @@
         $('#nama').val('');
         $('#auto_generate').prop('checked', false);
         $(".badge_karyawan").attr("readonly", false);
+    }
+
+
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
     }
 </script>
 
