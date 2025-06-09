@@ -62,6 +62,7 @@ class Barang extends BaseController
         $this->barangMasterSalesModel->insert([
             'company_id' => $this->this_company_id,
             'kode_barang' => $this->request->getVar('kode_barang'),
+            'divisi_id' => $this->request->getVar('divisi_id'),
             'barang_name' => strtoupper($this->request->getVar('barang_name')),
             'type_barang_sales' => "EKSPOR",
             'type_barang' => $this->request->getVar('type_barang'),
@@ -101,6 +102,7 @@ class Barang extends BaseController
             'company_id' => $this->this_company_id,
             'kode_barang' => $this->request->getVar('kode_barang'),
             'barang_name' => strtoupper($this->request->getVar('barang_name')),
+            'divisi_id' => $this->request->getVar('divisi_id'),
             'type_barang_sales' => "EKSPOR",
             'satuan_id' => $this->request->getVar('satuan_id'),
             // 'harga_pokok' => repairDouble($this->request->getVar('harga_pokok')),
@@ -126,6 +128,18 @@ class Barang extends BaseController
     }
 
     public function get()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $data = $this->barangMasterSalesModel->find($id);
+        $data['id'] = encrypt($data['id']);
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'data' => $data
+        ]);
+    }
+
+    public function getBarangJadi()
     {
         $id = decrypt($this->request->getVar('id'));
         $data = $this->barangMasterSalesModel->find($id);

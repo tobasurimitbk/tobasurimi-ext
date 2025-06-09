@@ -643,7 +643,7 @@ $routes->post('/sales-kontrak/update-status', 'SalesInternasional\SalesKontrak::
 $routes->post('/sales-kontrak/delete', 'SalesInternasional\SalesKontrak::delete', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/get-sales-kontrak-no', 'SalesInternasional\SalesKontrak::getNo', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/customer', 'SalesInternasional\SalesKontrak::dropdownCustomer', ['filter' => 'Auth']);
-$routes->get('/sales-kontrak/master-barang', 'SalesInternasional\SalesKontrak::dropdownMasterBarang', ['filter' => 'Auth']);
+$routes->post('/sales-kontrak/master-barang', 'SalesInternasional\SalesKontrak::dropdownMasterBarang', ['filter' => 'Auth']);
 
 // Order Form Internasional
 $routes->get('/order-form-internasional', 'SalesInternasional\OrderForm::index', ['filter' => 'Auth']);
@@ -668,6 +668,7 @@ $routes->post('/master-barang-internasional/save', 'SalesInternasional\Barang::c
 $routes->post('/master-barang-internasional/update', 'SalesInternasional\Barang::update', ['filter' => 'Auth']);
 $routes->post('/master-barang-internasional/delete', 'SalesInternasional\Barang::delete', ['filter' => 'Auth']);
 $routes->post('/master-barang-internasional/get', 'SalesInternasional\Barang::get', ['filter' => 'Auth']);
+$routes->post('/master-barang-internasional/get-barang-jadi', 'SalesInternasional\Barang::getBarangJadi', ['filter' => 'Auth']);
 $routes->post('/master-barang-internasional/generate-new-code', 'SalesInternasional\Barang::generateNewCode', ['filter' => 'Auth']);
 $routes->post('/master-barang-internasional/import-excel', 'SalesInternasional\Barang::importExcel', ['filter' => 'Auth']);
 $routes->get('/master-barang-internasional/export-excel', 'SalesInternasional\Barang::exportExcel', ['filter' => 'Auth']);

@@ -91,19 +91,19 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control barang_name" name="barang_name" id="barang_name" placeholder="Nama Kemasan">
-                                <label for="floatingInput">Nama Barang</label>
+                                <select class="form-select divisi_id" name="divisi_id" id="divisi_id">
+                                    <option value=""></option>
+                                    <?php foreach ($divisi as $d) : ?>
+                                        <option value="<?= ($d['id']) ?>"><?= $d['divisi'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Department</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
-                                    <option value=""></option>
-                                    <?php foreach ($satuan as $kb) : ?>
-                                        <option value="<?= ($kb['id']) ?>"><?= $kb['kode_satuan'] ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Satuan</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control barang_name" name="barang_name" id="barang_name" placeholder="Nama Kemasan">
+                                <label for="floatingInput">Nama Barang</label>
                             </div>
                         </div>
 
@@ -115,6 +115,17 @@
                                 <label for="floatingInput">Harga Pokok</label>
                             </div>
                         </div> -->
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
+                                    <option value=""></option>
+                                    <?php foreach ($satuan as $kb) : ?>
+                                        <option value="<?= ($kb['id']) ?>"><?= $kb['kode_satuan'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Satuan</label>
+                            </div>
+                        </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input oninput="preventNegativeInput(this)" onkeyup="this.value=greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Harga Jual">
@@ -537,7 +548,7 @@
                 $('.barang_name').val(res.data.barang_name);
                 $('.type_barang').val(res.data.type_barang).change();
                 $('.satuan_id').val(res.data.satuan_id).change();
-                // $('.harga_pokok').val(greatFormatRupiah(res.data.harga_pokok));
+                  $('.divisi_id').val(res.data.divisi_id).change();
                 $('.harga_jual').val(greatFormatRupiah(res.data.harga_jual));
 
                 $('.input-generate').hide();
@@ -616,6 +627,7 @@
         table.ajax.reload();
     });
 
+    // Initialize select2 for type_barang
     $("#type_barang").select2({
         theme: "bootstrap-5",
         placeholder: 'Pilih Tipe Barang',
@@ -626,7 +638,72 @@
         if (value) {
             generateNewCode();
         }
+        
+        // Enable/disable divisi_id based on type_barang selection
+        if ($(this).val()) {
+            $("#divisi_id").prop('disabled', false);
+        } else {
+            $("#divisi_id").prop('disabled', true).val(null).trigger('change');
+            $("#barang_name").prop('disabled', true).val('');
+        }
     });
+
+    // Initialize select2 for divisi_id (initially disabled)
+    $("#divisi_id").select2({
+        theme: "bootstrap-5",
+        placeholder: 'Pilih Divisi',
+        allowClear: true,
+        dropdownParent: $(".add-modal .modal-content"),
+        disabled: true // Initially disabled
+    }).change(function() {
+        let divisiId = $(this).val();
+        // Clear and disable barang_name if no divisi selected
+        
+        $("#barang_name").prop('disabled', false);
+    });
+
+    // // Function to fetch barang data
+    // function fetchBarangData(divisiId) {
+    //     $.ajax({
+    //         url: '/path/to/your/barang-endpoint', // Replace with your actual endpoint
+    //         method: 'GET',
+    //         data: { divisi_id: divisiId },
+    //         dataType: 'json',
+    //         beforeSend: function() {
+    //             // Show loading state
+    //             $("#barang_name").prop('disabled', true).html('');
+    //         },
+    //         success: function(response) {
+    //             // Convert barang_name to select2 with the fetched data
+    //             $("#barang_name").replaceWith(`
+    //                 <select class="form-select barang_name" name="barang_name" id="barang_name" placeholder="Nama Barang">
+    //                     <option value=""></option>
+    //                     ${response.data.map(item => `<option value="${item.id}">${item.nama_barang}</option>`).join('')}
+    //                 </select>
+    //             `);
+                
+    //             // Initialize select2 for barang_name
+    //             $("#barang_name").select2({
+    //                 theme: "bootstrap-5",
+    //                 placeholder: 'Pilih Barang',
+    //                 allowClear: true,
+    //                 dropdownParent: $(".add-modal .modal-content")
+    //             });
+                
+    //             // Update the label to match the new element
+    //             $("label[for='barang_name']").text('Nama Barang');
+    //         },
+    //         error: function(xhr, status, error) {
+    //             console.error('Error fetching barang data:', error);
+    //             // Fallback to regular input if AJAX fails
+    //             $("#barang_name").replaceWith(`
+    //                 <input autocomplete="one-time-code" type="text" class="form-control barang_name" name="barang_name" id="barang_name" placeholder="Nama Barang">
+    //             `);
+    //             $("#barang_name").prop('disabled', false);
+    //             $("label[for='barang_name']").text('Nama Barang');
+    //         }
+    //     });
+    // }
 
 
     $("#satuan_id").select2({
