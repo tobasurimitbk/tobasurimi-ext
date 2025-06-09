@@ -76,11 +76,9 @@ class CustomerModel extends Model
         return $query->getResultArray();
     }
 
-    public function getList($condition, $companyAccessArr, $addCondition, $limit = 10, $offset = 0)
+    public function getList($condition, $companyAccessArr, $dataIsAdmin, $addCondition, $limit = 10, $offset = 0)
     {
-
         $availableSort = [
-            // 'companyName'       => 'companies.company',
             'namaSales'         => 'users.name',
             'kode'              => 'customers.kode',
             'name'              => 'customers.name',
@@ -91,6 +89,7 @@ class CustomerModel extends Model
             'createdAt'         => 'customers.createdAt',
             'updatedAt'         => 'customers.updatedAt',
         ];
+        
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'customers.createdAt';
@@ -103,42 +102,44 @@ class CustomerModel extends Model
 
         $customerDataQry = $this->asObject()
             ->select($selectQry)
-            // ->whereIn('customers.company_id', $companyAccessArr)
+            ->where('customers.address IS NOT NULL')
+            ->where('customers.address !=', '')
             ->where($condition)
             ->join('metadata', 'customers.currency = metadata.id', 'left')
             ->join('country', 'country.id = customers.country_id', 'left')
-            ->join('employees', 'employees.id = customers.sales_id', 'LEFT')
-            // ->join('companies', 'companies.id = customers.company_id', 'LEFT')
-            ->orderBy($sort, $sortType);
+            ->join('employees', 'employees.id = customers.sales_id', 'LEFT');
+
+        // Tambahan kondisi untuk company access
+    
+            if (in_array(16, $companyAccessArr)) {
+                // Jika ada akses ke company 16, hanya tampilkan data company 16
+                $customerDataQry->where('customers.company_id', 16);
+            } else {
+                // Jika tidak ada akses ke company 16, jangan tampilkan data company 16
+                $customerDataQry->where('customers.company_id !=', 16);
+            }
+        
+        // Jika admin (dataIsAdmin == 1), tampilkan semua data tanpa filter company
 
         $totalData = $customerDataQry->countAllResults(false);
 
         if ($addCondition['search']) {
-            $customerDataQry->groupStart();
-        }
-
-        if ($addCondition['search']) {
-            $customerDataQry->like('customers.name', $addCondition['search'])
-                ->orLike('customers.kode', $addCondition['search']);
-        }
-
-        // if ($addCondition['company_id']) {
-        //     $customerDataQry->where('customers.company_id', $addCondition['company_id']);
-        // }
-
-        if ($addCondition['search']) {
-            $customerDataQry->groupEnd();
+            $customerDataQry->groupStart()
+                ->like('customers.name', $addCondition['search'])
+                ->orLike('customers.kode', $addCondition['search'])
+                ->groupEnd();
         }
 
         $totalFilteredData = $customerDataQry->countAllResults(false);
-        $data = $customerDataQry->findAll($limit, $offset);
+        $data = $customerDataQry->orderBy($sort, $sortType)
+                            ->findAll($limit, $offset);
 
         return [
             'data'              => $data,
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData,
-            'sort'  => $sort,
-            'sortType'  => $sortType
+            'sort'              => $sort,
+            'sortType'          => $sortType
         ];
     }
 
