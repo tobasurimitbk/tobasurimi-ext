@@ -89,7 +89,7 @@ class CustomerModel extends Model
             'createdAt'         => 'customers.createdAt',
             'updatedAt'         => 'customers.updatedAt',
         ];
-        
+
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'customers.createdAt';
@@ -109,17 +109,6 @@ class CustomerModel extends Model
             ->join('country', 'country.id = customers.country_id', 'left')
             ->join('employees', 'employees.id = customers.sales_id', 'LEFT');
 
-        // Tambahan kondisi untuk company access
-    
-            if (in_array(16, $companyAccessArr)) {
-                // Jika ada akses ke company 16, hanya tampilkan data company 16
-                $customerDataQry->where('customers.company_id', 16);
-            } else {
-                // Jika tidak ada akses ke company 16, jangan tampilkan data company 16
-                $customerDataQry->where('customers.company_id !=', 16);
-            }
-        
-        // Jika admin (dataIsAdmin == 1), tampilkan semua data tanpa filter company
 
         $totalData = $customerDataQry->countAllResults(false);
 
@@ -132,7 +121,7 @@ class CustomerModel extends Model
 
         $totalFilteredData = $customerDataQry->countAllResults(false);
         $data = $customerDataQry->orderBy($sort, $sortType)
-                            ->findAll($limit, $offset);
+            ->findAll($limit, $offset);
 
         return [
             'data'              => $data,
