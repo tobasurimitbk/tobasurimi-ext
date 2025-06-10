@@ -71,6 +71,8 @@ class HROutsourcingEmployeeModel extends Model
 
         if ($addCondition['search']) {
             $dataQry->like('hr_outsourcing_employee.nama', $addCondition['search']);
+            $dataQry->orLike('hr_outsourcing_employee.badge', $addCondition['search']);
+            $dataQry->orLike('hr_outsourcing_employee.tanggal_masuk_kerja', $addCondition['search']);
         }
 
         $totalFilteredData = $dataQry->countAllResults(false);
