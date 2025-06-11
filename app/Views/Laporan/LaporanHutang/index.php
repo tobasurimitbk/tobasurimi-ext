@@ -10,8 +10,8 @@
                 Export
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <li><button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-accounting/penjualan/printPDF"); ?>')">PDF</button></li>
-                <li><button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/penjualan/printExcel"); ?>')">EXCEL</button></li>
+                <li><button class="dropdown-item" onclick="exportToPDF()">PDF</button></li>
+                <li><button class="dropdown-item" onclick="exportToExcel()">EXCEL</button></li>
             </ul>
         <?php endif; ?>
     </div>
@@ -285,23 +285,36 @@
 
         return formattedDate;
     }
-    const printPDF = function(url) {
-        var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
-        var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
-        var search = $(".search").val() ? $(".search").val() : "all";
-        var filter = $(".list_supplier").val() ? $(".list_supplier").val() : "all";
-        url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
-        // console.log(url2);
-        window.open(url2, "_blank");
+    // const printPDF = function(url) {
+    //     var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
+    //     var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
+    //     var search = $(".search").val() ? $(".search").val() : "all";
+    //     var filter = $(".list_supplier").val() ? $(".list_supplier").val() : "all";
+    //     url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
+    //     // console.log(url2);
+    //     window.open(url2, "_blank");
+    // }
+    function getFilterQuery() {
+        return {
+            search: $(".search").val(),
+            filter: $(".list_supplier").val(),
+            divisi: $(".list_divisi").val(),
+            type_barang: $(".list_type_barang").val(),
+            dateStart: $(".dateStart").val(),
+            dateEnd: $(".dateEnd").val(),
+            sort: sort,
+            sortType: sortType
+        };
     }
-    const printExcel = function(url) {
-        var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
-        var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
-        var search = $(".search").val() ? $(".search").val() : "all";
-        var filter = $(".list_supplier").val() ? $(".list_supplier").val() : "all";
-        url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
-        // console.log(url2);
-        window.open(url2, "_blank");
+
+    function exportToPDF() {
+        const params = new URLSearchParams(getFilterQuery()).toString();
+        window.open(`<?= base_url("laporan-accounting/hutang/print") ?>?${params}`, "_blank");
+    }
+
+    function exportToExcel() {
+        const params = new URLSearchParams(getFilterQuery()).toString();
+        window.open(`<?= base_url("laporan-accounting/hutang/export-excel") ?>?${params}`, "_blank");
     }
 </script>
 <?= $this->endSection(); ?>

@@ -202,7 +202,11 @@ class SupplierModel extends Model
         }
 
         $totalFilteredData = $supplierDataQry->countAllResults(false);
-        $data = $supplierDataQry->findAll($limit, $offset);
+        if ($limit != null && $offset != null) {
+            $data = $supplierDataQry->findAll($limit, $offset);
+        } else {
+            $data = $supplierDataQry->findAll();
+        }
 
         return [
             'data'              => $data,
