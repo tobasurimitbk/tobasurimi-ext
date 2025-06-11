@@ -16,6 +16,7 @@ class TransaksiJurnalModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
+        'penerimaan_barang_id',
         'no_transaksi',
         'tanggal_transaksi',
         'total_debit',
@@ -194,6 +195,7 @@ class TransaksiJurnalModel extends Model
         $availableSort = [
             'transaksi_jurnal.id' => 'transaksi_jurnal.id',
             'transaksi_jurnal.type_transaksi' => 'transaksi_jurnal.type_transaksi',
+            'transaksi_jurnal.penerimaan_barang_id' => 'transaksi_jurnal.penerimaan_barang_id',
             'transaksi_jurnal.no_transaksi' => 'transaksi_jurnal.no_transaksi',
             'transaksi_jurnal.tanggal_transaksi' => 'transaksi_jurnal.tanggal_transaksi',
             'transaksi_jurnal.uraian_transaksi' => 'transaksi_jurnal.uraian_transaksi',
@@ -213,8 +215,9 @@ class TransaksiJurnalModel extends Model
             transaksi_jurnal.valas,
             transaksi_jurnal.exchange_rate,
             transaksi_jurnal.total_debit,
-            transaksi_jurnal.no_bukti,                 
-            metadata.value as transaksi_type_name,
+            transaksi_jurnal.no_bukti,
+            penerimaan_barang.no_penerimaan_barang,                 
+        metadata.value as transaksi_type_name,
             transaksi_pembelian.id_local_bb,
             transaksi_pembelian.id_import_bb,
             transaksi_pembelian.id_po_bp,
@@ -234,64 +237,9 @@ class TransaksiJurnalModel extends Model
             ->join('transaksi_pembelian', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left')
             ->join('am_purchase_orders', 'am_purchase_orders.id = transaksi_pembelian.id_po_bp', 'left')
             ->join('suppliers', 'suppliers.id = transaksi_pembelian.id_supplier', 'left')
-
-            // Join LPB Lokal BB
-            ->join("
-                (
-                    SELECT 
-                        no_penerimaan_barang, 
-                        multiple_po_id, 
-                        company_id
-                    FROM penerimaan_barang
-                    WHERE status_penerimaan = 'LOKAL' AND tipe_bahan = 'BAKU'
-                ) AS pb_local_bb",
-                "pb_local_bb.multiple_po_id LIKE CONCAT('%', transaksi_pembelian.id_local_bb, '%')",
-                'left')
-
-            // Join LPB Import BB
-            ->join("
-                (
-                    SELECT 
-                        no_penerimaan_barang, 
-                        multiple_po_id, 
-                        company_id
-                    FROM penerimaan_barang
-                    WHERE status_penerimaan = 'IMPORT' AND tipe_bahan = 'BAKU'
-                ) AS pb_import_bb",
-                " pb_import_bb.multiple_po_id LIKE CONCAT('%', transaksi_pembelian.id_import_bb, '%')",
-                'left')
-
-            // Join LPB Lokal BP
-            ->join("
-                (
-                    SELECT 
-                        no_penerimaan_barang, 
-                        multiple_po_id, 
-                        company_id
-                    FROM penerimaan_barang
-                    WHERE status_penerimaan = 'LOKAL' AND tipe_bahan = 'PENOLONG'
-                ) AS pb_local_bp",
-                "am_purchase_orders.po_type = 'Lokal'
-                AND pb_local_bp.multiple_po_id LIKE CONCAT('%', transaksi_pembelian.id_po_bp, '%')",
-                'left')
-
-            // Join LPB Import BP
-            ->join("
-                (
-                    SELECT 
-                        no_penerimaan_barang, 
-                        multiple_po_id, 
-                        company_id
-                    FROM penerimaan_barang
-                    WHERE status_penerimaan = 'IMPORT' AND tipe_bahan = 'PENOLONG'
-                ) AS pb_import_bp",
-                "am_purchase_orders.po_type = 'Import'
-                AND pb_import_bp.multiple_po_id LIKE CONCAT('%', transaksi_pembelian.id_po_bp, '%')",
-                'left')
-
             ->where($condition)
             ->groupBy('jurnal_umum.id_transaksi');
-            
+
         if (!empty($addCondition['start_date'])) {
             $dataQry->where('transaksi_jurnal.tanggal_transaksi >=', $addCondition['start_date']);
         }
@@ -318,10 +266,6 @@ class TransaksiJurnalModel extends Model
                 ->like('transaksi_jurnal.no_transaksi', $addCondition['search'])
                 ->orLike('transaksi_jurnal.uraian_transaksi', $addCondition['search'])
                 ->orLike('transaksi_jurnal.total_debit', $addCondition['search'])
-                ->orLike('pb_local_bb.no_penerimaan_barang', $addCondition['search'])
-                ->orLike('pb_import_bb.no_penerimaan_barang', $addCondition['search'])
-                ->orLike('pb_local_bp.no_penerimaan_barang', $addCondition['search'])
-                ->orLike('pb_import_bp.no_penerimaan_barang', $addCondition['search'])
                 ->groupEnd();
         }
 
@@ -330,54 +274,6 @@ class TransaksiJurnalModel extends Model
             ->join('metadata', 'metadata.id = transaksi_jurnal.type_transaksi', 'left')
             ->join('jurnal_umum', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('transaksi_pembelian', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left')
-            ->join('am_purchase_orders', 'am_purchase_orders.id = transaksi_pembelian.id_po_bp', 'left')
-            ->join('suppliers', 'suppliers.id = transaksi_pembelian.id_supplier', 'left')
-            ->join("
-                (
-                    SELECT 
-                        no_penerimaan_barang, 
-                        multiple_po_id, 
-                        company_id
-                    FROM penerimaan_barang
-                    WHERE status_penerimaan = 'LOKAL' AND tipe_bahan = 'BAKU'
-                ) AS pb_local_bb",
-                "pb_local_bb.multiple_po_id LIKE CONCAT('%', transaksi_pembelian.id_local_bb, '%')",
-                'left')
-            ->join("
-                (
-                    SELECT 
-                        no_penerimaan_barang, 
-                        multiple_po_id, 
-                        company_id
-                    FROM penerimaan_barang
-                    WHERE status_penerimaan = 'IMPORT' AND tipe_bahan = 'BAKU'
-                ) AS pb_import_bb",
-                " pb_import_bb.multiple_po_id LIKE CONCAT('%', transaksi_pembelian.id_import_bb, '%')",
-                'left')
-            ->join("
-                (
-                    SELECT 
-                        no_penerimaan_barang, 
-                        multiple_po_id, 
-                        company_id
-                    FROM penerimaan_barang
-                    WHERE status_penerimaan = 'LOKAL' AND tipe_bahan = 'PENOLONG'
-                ) AS pb_local_bp",
-                "am_purchase_orders.po_type = 'Lokal'
-                AND pb_local_bp.multiple_po_id LIKE CONCAT('%', transaksi_pembelian.id_po_bp, '%')",
-                'left')
-            ->join("
-                (
-                    SELECT 
-                        no_penerimaan_barang, 
-                        multiple_po_id, 
-                        company_id
-                    FROM penerimaan_barang
-                    WHERE status_penerimaan = 'IMPORT' AND tipe_bahan = 'PENOLONG'
-                ) AS pb_import_bp",
-                "am_purchase_orders.po_type = 'Import'
-                AND pb_import_bp.multiple_po_id LIKE CONCAT('%', transaksi_pembelian.id_po_bp, '%')",
-                'left')
             ->where($condition);
 
         if (!empty($addCondition['start_date'])) {
@@ -406,6 +302,7 @@ class TransaksiJurnalModel extends Model
                 ->like('transaksi_jurnal.no_transaksi', $addCondition['search'])
                 ->orLike('transaksi_jurnal.uraian_transaksi', $addCondition['search'])
                 ->orLike('transaksi_jurnal.total_debit', $addCondition['search'])
+                ->orLike('penerimaan_barang.no_penerimaan_barang', $addCondition['search'])
                 ->groupEnd();
         }
 

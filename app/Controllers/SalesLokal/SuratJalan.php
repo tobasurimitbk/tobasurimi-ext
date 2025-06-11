@@ -54,7 +54,7 @@ class SuratJalan extends BaseController
     public function index()
     {
         $data = [
-            'getCustomers' => $this->CustomerModel->where('deletedAt', NULL)->where('tipe_customer', 'LOKAL')->findAll(),
+            'getCustomers' => $this->CustomerModel->getCustomerLokal($this->userId, $this->is_admin),
         ];
         return view('SalesLokal/SuratJalan/index', $data);
     }
@@ -131,7 +131,11 @@ class SuratJalan extends BaseController
                 $customerSales = "-";
             } else {
                 $getEmployee = $this->EmployeesModel->select("CONCAT(employees.nip, ' - ', employees.name) AS customerSales")->where('employees.id', $data->sales_id)->first();
-                $customerSales = $getEmployee['customerSales'];
+                if ($getEmployee && isset($getEmployee['customerSales'])) {
+                    $customerSales = $getEmployee['customerSales'];
+                } else {
+                    $customerSales = '-'; // atau null, atau string kosong, sesuai kebutuhan
+                }
             }
             array_push($dataAllSuratJalan, [
                 "no"            => $no++,

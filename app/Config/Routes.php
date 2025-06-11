@@ -643,7 +643,7 @@ $routes->post('/sales-kontrak/update-status', 'SalesInternasional\SalesKontrak::
 $routes->post('/sales-kontrak/delete', 'SalesInternasional\SalesKontrak::delete', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/get-sales-kontrak-no', 'SalesInternasional\SalesKontrak::getNo', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/customer', 'SalesInternasional\SalesKontrak::dropdownCustomer', ['filter' => 'Auth']);
-$routes->get('/sales-kontrak/master-barang', 'SalesInternasional\SalesKontrak::dropdownMasterBarang', ['filter' => 'Auth']);
+$routes->post('/sales-kontrak/master-barang', 'SalesInternasional\SalesKontrak::dropdownMasterBarang', ['filter' => 'Auth']);
 
 // Order Form Internasional
 $routes->get('/order-form-internasional', 'SalesInternasional\OrderForm::index', ['filter' => 'Auth']);
@@ -668,6 +668,8 @@ $routes->post('/master-barang-internasional/save', 'SalesInternasional\Barang::c
 $routes->post('/master-barang-internasional/update', 'SalesInternasional\Barang::update', ['filter' => 'Auth']);
 $routes->post('/master-barang-internasional/delete', 'SalesInternasional\Barang::delete', ['filter' => 'Auth']);
 $routes->post('/master-barang-internasional/get', 'SalesInternasional\Barang::get', ['filter' => 'Auth']);
+$routes->post('/master-barang-internasional/get-barang-jadi-master', 'SalesInternasional\Barang::getBarangJadiMaster', ['filter' => 'Auth']);
+$routes->post('/master-barang-internasional/get-barang-jadi', 'SalesInternasional\Barang::getBarangJadi', ['filter' => 'Auth']);
 $routes->post('/master-barang-internasional/generate-new-code', 'SalesInternasional\Barang::generateNewCode', ['filter' => 'Auth']);
 $routes->post('/master-barang-internasional/import-excel', 'SalesInternasional\Barang::importExcel', ['filter' => 'Auth']);
 $routes->get('/master-barang-internasional/export-excel', 'SalesInternasional\Barang::exportExcel', ['filter' => 'Auth']);
@@ -1897,7 +1899,7 @@ $routes->get('/get-employee-by-company/(:segment)', 'HR\Attendance::get_employee
 $routes->get('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master', ['filter' => 'Auth']);
 $routes->cli('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master');
 $routes->cli('/api/sync-attendances', 'API\Attendances::sync_attendance');
-$routes->get('/api/sync-attendances', 'API\Attendances::sync_attendance', ['filter' => 'Auth']);
+$routes->get('/api/sync-attendances', 'API\Attendances::sync_attendance');
 //$routes->get('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master', ['filter' => 'Auth']);
 
 //api
@@ -2255,13 +2257,24 @@ $routes->post('/retur-po-import-bp/save', 'ReturPembelian\ReturPembelianLokalBB:
 $routes->post('/retur-po-import-bp/update', 'ReturPembelian\ReturPembelianLokalBB::updateAction', ['filter' => 'Auth']);
 $routes->get('/retur-po-import-bp/id/(:segment)', 'ReturPembelian\ReturPembelianImportBP::update/$1', ['filter' => 'Auth']);
 $routes->get('/retur-po-import-bp/print/(:segment)', 'ReturPembelian\ReturPembelianImportBP::print/$1', ['filter' => 'Auth']);
-// HR Outsourcing
+
+// HR Outsourcing Company
 $routes->get('/hr-outsourcing-company', 'HROutsourcing\Company::index', ['filter' => 'Auth']);
 $routes->get('/hr-outsourcing-company/all', 'HROutsourcing\Company::all', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-company/save', 'HROutsourcing\Company::store', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-company/update', 'HROutsourcing\Company::update', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-company/delete', 'HROutsourcing\Company::destroy', ['filter' => 'Auth']);
 $routes->get('/hr-outsourcing-company/id/(:segment)', 'HROutsourcing\Company::get/$1', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-company/employee/id/(:segment)', 'HROutsourcing\Employee::create/$1', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-company/employee/getByCompany', 'HROutsourcing\Employee::getAllEmployeeByCompany', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/employee/delete', 'HROutsourcing\Employee::destroy', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/employee/save', 'HROutsourcing\Employee::store', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/employee/update', 'HROutsourcing\Employee::update', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/employee/generateKode', 'HROutsourcing\Employee::generateKode', ['filter' => 'Auth']);
+
+// HR Outsourcing Sallary Payment
+$routes->get('/hr-outsourcing-sallary-payment', 'HROutsourcing\SallaryPayment::index', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-sallary-payment/all', 'HROutsourcing\SallaryPayment::all', ['filter' => 'Auth']);
 
 /*
  * --------------------------------------------------------------------

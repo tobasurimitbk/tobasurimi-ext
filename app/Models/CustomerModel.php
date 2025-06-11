@@ -76,11 +76,9 @@ class CustomerModel extends Model
         return $query->getResultArray();
     }
 
-    public function getList($condition, $companyAccessArr, $addCondition, $limit = 10, $offset = 0)
+    public function getList($condition, $companyAccessArr, $dataIsAdmin, $addCondition, $limit = 10, $offset = 0)
     {
-
         $availableSort = [
-            'companyName'       => 'companies.company',
             'namaSales'         => 'users.name',
             'kode'              => 'customers.kode',
             'name'              => 'customers.name',
@@ -91,6 +89,7 @@ class CustomerModel extends Model
             'createdAt'         => 'customers.createdAt',
             'updatedAt'         => 'customers.updatedAt',
         ];
+
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'customers.createdAt';
@@ -98,48 +97,38 @@ class CustomerModel extends Model
 
         $selectQry = "customers.*, 
                     employees.name as namaSales,
-                    companies.company as companyName,
-                      metadata.value AS currencyName,
-                      country.country_name AS countryName";
+                    metadata.value AS currencyName,
+                    country.country_name AS countryName";
 
         $customerDataQry = $this->asObject()
             ->select($selectQry)
-            ->whereIn('customers.company_id', $companyAccessArr)
+            ->where('customers.address IS NOT NULL')
+            ->where('customers.address !=', '')
             ->where($condition)
             ->join('metadata', 'customers.currency = metadata.id', 'left')
             ->join('country', 'country.id = customers.country_id', 'left')
-            ->join('employees', 'employees.id = customers.sales_id', 'LEFT')
-            ->join('companies', 'companies.id = customers.company_id', 'LEFT')
-            ->orderBy($sort, $sortType);
+            ->join('employees', 'employees.id = customers.sales_id', 'LEFT');
+
 
         $totalData = $customerDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['company_id']) {
-            $customerDataQry->groupStart();
-        }
-
         if ($addCondition['search']) {
-            $customerDataQry->like('customers.name', $addCondition['search'])
-                ->orLike('customers.kode', $addCondition['search']);
-        }
-
-        if ($addCondition['company_id']) {
-            $customerDataQry->where('customers.company_id', $addCondition['company_id']);
-        }
-
-        if ($addCondition['search'] || $addCondition['company_id']) {
-            $customerDataQry->groupEnd();
+            $customerDataQry->groupStart()
+                ->like('customers.name', $addCondition['search'])
+                ->orLike('customers.kode', $addCondition['search'])
+                ->groupEnd();
         }
 
         $totalFilteredData = $customerDataQry->countAllResults(false);
-        $data = $customerDataQry->findAll($limit, $offset);
+        $data = $customerDataQry->orderBy($sort, $sortType)
+            ->findAll($limit, $offset);
 
         return [
             'data'              => $data,
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData,
-            'sort'  => $sort,
-            'sortType'  => $sortType
+            'sort'              => $sort,
+            'sortType'          => $sortType
         ];
     }
 
@@ -175,7 +164,7 @@ class CustomerModel extends Model
             ->where($condition)
             ->whereIn('suppliers.company_id', $companyId)
             ->groupBy('suppliers.id')
-            ->having("total > 0") 
+            ->having("total > 0")
             ->orderBy($sort, $sortType);
 
         $totalData = $supplierDataQry->countAllResults(false);
@@ -192,11 +181,11 @@ class CustomerModel extends Model
         if ($addCondition['filter']) {
             $supplierDataQry->where('suppliers.id', $addCondition['filter']);
         }
-        
+
         if ($addCondition['divisi']) {
             $supplierDataQry->where('rm_purchase_orders.divisi_id', $addCondition['divisi'])
-            ->orwhere('am_purchase_orders.division_id', $addCondition['divisi'])
-            ->orwhere('rm_import_pos.division_id', $addCondition['divisi']);
+                ->orwhere('am_purchase_orders.division_id', $addCondition['divisi'])
+                ->orwhere('rm_import_pos.division_id', $addCondition['divisi']);
         }
 
         if ($addCondition['type_barang']) {
@@ -296,13 +285,13 @@ class CustomerModel extends Model
             ->select('customers.*, customers.sales_id AS salesName')
             ->where('customers.deletedAt', null)
             ->where('customers.tipe_customer', 'LOKAL');
-    
+
         if (!$is_admin) {
             $query->where('customers.user_id', $user_id);
         }
-    
+
         return $query->orderBy('createdAt', "DESC")->findAll();
-    }    
+    }
 
     public function getCustomerWithMetaData($idCustomer)
     {
@@ -332,19 +321,20 @@ class CustomerModel extends Model
         $lastStr = $thn2;
         $first_day = "$thn-01-01 00:00:00";
         $last_day = "$last_year 23:59:59";
-    
+
         $builder = $this->db->table('customers');
         $builder->select('kode');
         $builder->orderBy('kode', 'asc');
         $builder->where('createdAt >=', $first_day);
         $builder->where('createdAt <=', $last_day);
+        $builder->where('deletedAt', null);
         $builder->like('kode', $lastStr);
         $query = $builder->get();
-    
+
         $kodePrefix = 'CS/' . $bln . '/' . $thn2;
-    
+
         $existingNumbers = [];
-    
+
         // Ambil semua nomor urut yang sudah ada
         if (!empty($query->getResultArray())) {
             foreach ($query->getResultArray() as $string) {
@@ -354,12 +344,12 @@ class CustomerModel extends Model
                 }
             }
         }
-    
+
         // Sort dan cari celah nomor
         $lastKode = 1;
         sort($existingNumbers);
         $foundGap = false;
-    
+
         foreach ($existingNumbers as $number) {
             if ($number != $lastKode) {
                 $foundGap = true;
@@ -367,14 +357,14 @@ class CustomerModel extends Model
             }
             $lastKode++;
         }
-    
+
         if (!$foundGap) {
             $lastKode = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
         }
-    
+
         $formattedKode = sprintf("%04d", $lastKode);
         $generatedNo = $kodePrefix . '/' . $formattedKode;
-    
+
         return $generatedNo;
     }
 }

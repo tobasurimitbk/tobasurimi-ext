@@ -7,6 +7,7 @@ use App\Models\CustomerModel;
 use App\Models\BarangMasterSalesModel;
 use App\Models\CountryModel;
 use App\Models\EmployeesModel;
+use App\Models\DivisisModel;
 use App\Models\MetadataModel;
 use App\Models\SalesKontrakModel;
 use App\Models\SalesKontrakDetailModel;
@@ -33,6 +34,7 @@ class SalesKontrak extends BaseController
     protected $salesOrderExportModel;
     protected $dompdf;
     protected $employessModel;
+    protected $divisiModel;
 
     public function __construct()
     {
@@ -51,6 +53,7 @@ class SalesKontrak extends BaseController
         $this->salesOrderExportModel = new SalesOrderExportModel();
         $this->employessModel = new EmployeesModel();
         $this->dompdf = new Dompdf();
+        $this->divisiModel = new DivisisModel();
     }
 
     public function index()
@@ -64,6 +67,7 @@ class SalesKontrak extends BaseController
         $dataCountry = $this->countryModel->findAll();
         $dataValuta = $this->metaDataModel->get_by_name('Valuta');
         $dataTipeHarga = $this->metaDataModel->get_by_name('Tipe Harga Sales Ekspor');
+        $dataDivisi = $this->divisiModel->where('company_id', $this->this_company_id)->findAll();
         $dataSatuan = $this->satuanModel->findAll();
         $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->where('type_barang_sales', 'EKSPOR')->orderBy('createdAt', "DESC")->findAll();
         $condition = [
@@ -74,6 +78,7 @@ class SalesKontrak extends BaseController
         $data = [
             "dataCustomer" => $dataCustomer,
             "dataCountry" => $dataCountry,
+            "dataDivisi" => $dataDivisi,
             "dataValuta" => $dataValuta,
             "dataTipeHarga" => $dataTipeHarga,
             'dataSatuan' => $dataSatuan,
@@ -91,6 +96,7 @@ class SalesKontrak extends BaseController
         $dataSalesKontrak = $this->salesKontrakModel->find($id);
         $dataSalesKontrakDetail = $this->salesKontrakDetailModel->detail($id);
         $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id, $this->this_company_id);
+        $dataDivisi = $this->divisiModel->where('company_id', $this->this_company_id)->findAll();
         $dataCountry = $this->countryModel->findAll();
         $dataValuta = $this->metaDataModel->get_by_name('Valuta');
         $dataTipeHarga = $this->metaDataModel->get_by_name('Tipe Harga Sales Ekspor');
@@ -111,6 +117,7 @@ class SalesKontrak extends BaseController
             "dataCountry" => $dataCountry,
             "dataValuta" => $dataValuta,
             "dataTipeHarga" => $dataTipeHarga,
+            "dataDivisi" => $dataDivisi,
             'dataSatuan' => $dataSatuan,
             'dataBarang' => $dataBarang,
             'dataSalesKontrak' => $dataSalesKontrak,
@@ -251,6 +258,7 @@ class SalesKontrak extends BaseController
         $id = $this->salesKontrakModel->insert([
             'company_id' => $this->this_company_id,
             'customer_id' => $this->request->getVar('customer_id'),
+            'divisi_id' => $this->request->getVar('divisi_id'),
             'sales_contract_no' => $this->request->getVar('sales_contract_no'),
             'currency' => $this->request->getVar('currency'),
             'customer_po_no' => $this->request->getVar('customer_po_no'),
@@ -312,6 +320,7 @@ class SalesKontrak extends BaseController
 
         $this->salesKontrakModel->update($id, [
             'customer_id' => $this->request->getVar('customer_id'),
+            'divisi_id' => $this->request->getVar('divisi_id'),
             'customer_po_no' => $this->request->getVar('customer_po_no'),
             'currency' => $this->request->getVar('currency'),
             'loading_port' => $this->request->getVar('loading_port'),
@@ -461,7 +470,11 @@ class SalesKontrak extends BaseController
 
     public function dropdownMasterBarang()
     {
-        $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->where('type_barang_sales', 'EKSPOR')->orderBy('createdAt', "DESC")->findAll();
+        $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)
+                                                ->where('divisi_id', $this->request->getVar('divisi_id'))
+                                                ->where('type_barang_sales', 'EKSPOR')
+                                                ->orderBy('createdAt', "DESC")
+                                                ->findAll();
         return response()->setJSON([
             'data' => $dataBarang,
             'token' => csrf_hash(),

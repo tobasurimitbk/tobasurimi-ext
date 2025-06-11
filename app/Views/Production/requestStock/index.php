@@ -34,9 +34,7 @@
                             <tr>
                                 <th>No.</th>
                                 <th onclick="changeSort('type')" class="sort">Material Type</th>
-                                <th onclick="changeSort('wo_no')" class="sort">Kode Work Order</th>
                                 <th onclick="changeSort('req_no')" class="sort">Kode Request</th>
-                                <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -122,15 +120,7 @@
                 className: "text-center"
             },
             {
-                data: "wo_no",
-                className: "text-center"
-            },
-            {
                 data: "req_no",
-                className: "text-center"
-            },
-            {
-                data: "nama_barang",
                 className: "text-center"
             },
             {

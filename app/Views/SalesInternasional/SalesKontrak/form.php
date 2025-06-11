@@ -76,6 +76,24 @@
                         </div>
                     </div>
                     <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting'] ? 'disabled=true' : '') : ''; ?> 
+                                    class="form-select divisi_id" 
+                                    aria-label="Floating label select example" 
+                                    name="divisi_id" 
+                                    id="divisi_id">
+                                <option value=""></option>
+                                <?php foreach ($dataDivisi as $d) : ?>
+                                    <option value="<?= $d['id'] ?>" 
+                                        <?= !empty($dataSalesKontrak['divisi_id']) && $dataSalesKontrak['divisi_id'] == $d['id'] ? 'selected' : '' ?>>
+                                        <?= $d['divisi'] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Department</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="input-group">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting'] ? 'disabled=true' : '') : ''; ?> class="form-select customer_id" id="customer_id" name="customer_id" aria-label="Floating label select example">
@@ -112,14 +130,14 @@
                         </div>
 
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['customer_po_no'] : ""; ?>" type="text" class="form-control customer_po_no" id="customer_po_no" name="customer_po_no" placeholder="No. PO">
                             <label for="floatingInput">No. PO (Opsional)</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['loading_port'] : ""; ?>" type="text" class="form-control loading_port" id="loading_port" name="loading_port" placeholder="Loading Port">
@@ -132,6 +150,8 @@
                             <label for="floatingInput">Dicharge Port</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
@@ -145,8 +165,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['payment_term'] : ""; ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Opsional)">
@@ -159,6 +177,8 @@
                             <label for="floatingInput">Tolerance</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
@@ -172,8 +192,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
@@ -336,11 +354,6 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select barang_master_sales_id" name="barang_master_sales_id" id="barang_master_sales_id" aria-label="Floating label select example">
                                         <option value=""></option>
-                                        <?php foreach ($dataBarang as $d) : ?>
-                                            <option value="<?= $d['id'] ?>" data-kode_barang="<?= $d['kode_barang'] ?>" data-barang_name="<?= $d['barang_name'] ?>" data-harga_jual="<?= ($d['harga_jual']) ?>" data-satuan_id="<?= $d['satuan_id'] ?>">
-                                                <?= "(" . $d['kode_barang'] . ") " . $d['barang_name'] ?>
-                                            </option>
-                                        <?php endforeach; ?>
                                     </select>
                                     <label for="floatingInput">Barang</label>
                                 </div>
@@ -683,6 +696,12 @@
     // BROKER
     $('.print_out_broker').select2({
         placeholder: "Pilih Print Out Broker",
+        theme: "bootstrap-5",
+    })
+
+     // DEPARTMENT
+    $('.divisi_id').select2({
+        placeholder: "Pilih Department",
         theme: "bootstrap-5",
     })
 
@@ -1069,8 +1088,10 @@
             let data = new FormData(document.querySelector(".create-form-master-barang"));
             let hargaPokok = destroyFormatRupiah($('#harga_pokok').val());
             let hargaJual = destroyFormatRupiah($('#harga_jual').val());
+            let divisiId = $("#divisi_id").val();
             data.set('harga_jual', hargaJual);
             data.set('harga_pokok', hargaPokok);
+            data.set('divisi_id', divisiId);
 
             Swal.fire({
                 icon: 'question',
@@ -1318,6 +1339,25 @@
 
     // MASTER BARANG
     $('.btn-barang-add').click(function() {
+
+        const divisiId = $("#divisi_id").val();
+
+        if (!divisiId) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Silakan pilih Divisi terlebih dahulu',
+                confirmButtonText: 'OK',
+                allowOutsideClick: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Focus on divisi select2
+                    $("#divisi_id").select2('open');
+                }
+            });
+            return false; // Stop execution
+        }
+
         $('#addMasterBarangModal').modal('show');
         $('.detail-modal').modal('hide');
         // reset form master barang
@@ -1329,6 +1369,7 @@
         $('.satuan_id').val(null).change();
         $('.harga_pokok').val(null);
         $('.harga_jual').val(null);
+        getListMasterBarang()
     })
 
     $('.btn-discard-master-barang').click(function() {
@@ -1338,11 +1379,28 @@
 
     // MODAL DETAIL
     $('.btn-show-detail').click(function() {
+        const divisiId = $("#divisi_id").val();
+        if (!divisiId) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Silakan pilih Divisi terlebih dahulu',
+                confirmButtonText: 'OK',
+                allowOutsideClick: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Focus on divisi select2
+                    $("#divisi_id").select2('open');
+                }
+            });
+            return false; // Stop execution
+        }
         $('.detail-modal').modal('show');
         $('.title-detail-name').text('Tambah');
         validatorDetail.resetForm();
         validatorDetail.reset();
         resetFormDetail();
+        getListMasterBarang()
     });
 
     $(".btn-hide-detail").click(function() {
@@ -1521,25 +1579,76 @@
     }
 
     function getListMasterBarang() {
+        // Get the selected divisi_id value
+        const csrf = $(`[name="${csrfToken}"]`);
+        const divisiId = $("#divisi_id").val();
+        
+        // Check if divisi_id is empty
+        if (!divisiId) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Silakan pilih Divisi terlebih dahulu',
+                confirmButtonText: 'OK',
+                allowOutsideClick: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Focus on divisi select2
+                    $("#divisi_id").select2('open');
+                }
+            });
+            return false; // Stop execution
+        }
+        
         $.ajax({
             url: `<?= base_url('sales-kontrak/master-barang'); ?>`,
-            method: "GET",
-            beforeSend: function() {
+            method: "POST",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                 setLoading();
             },
             complete: function() {
                 stopLoading();
             },
-            data: {},
+            data: {
+                divisi_id: divisiId
+            },
             dataType: "json",
             success: function(res) {
-                $(".barang_master_sales_id").empty()
-                $(".barang_master_sales_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".barang_master_sales_id").append(`<option value="${item.id}" data-harga_jual="${item.harga_jual}" data-satuan_id="${item.satuan_id}" data-kode_barang="${item.kode_barang}" data-barang_name="${item.barang_name}">(${item.kode_barang}) ${item.barang_name}</option>`)
-                })
-                $(".barang_master_sales_id").val();
-
+                if (res.data && res.data.length > 0) {
+                    $(".barang_master_sales_id").empty();
+                    $(".barang_master_sales_id").append(`<option value=""></option>`);
+                    
+                    res.data.forEach(function(item) {
+                        $(".barang_master_sales_id").append(
+                            `<option value="${item.id}" 
+                                data-harga_jual="${item.harga_jual}" 
+                                data-satuan_id="${item.satuan_id}" 
+                                data-kode_barang="${item.kode_barang}" 
+                                data-barang_name="${item.barang_name}">
+                                (${item.kode_barang}) ${item.barang_name}
+                            </option>`
+                        );
+                    });
+                    
+                    $(".barang_master_sales_id").val('').trigger('change');
+                } else {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Informasi',
+                        text: 'Tidak ada data barang untuk divisi yang dipilih',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching master barang:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Gagal memuat data barang. Silakan coba lagi.',
+                    confirmButtonText: 'OK'
+                });
             }
         });
     }

@@ -373,7 +373,7 @@ class AttendancesUnit extends BaseController
     {
         $res_master = $this->AttendancesUnitModel->getByCompany_id_and_master($this->this_company_id, 1);
         $res_child = $this->AttendancesUnitModel->getByCompany_id_and_master($this->this_company_id, 0);
-        $res_employees = $this->EmployeesModel->getEmployeesNotSyncAttendances($this->this_company_id);
+        $res_employees = $this->EmployeesModel->getEmployeesNotSyncAttendances2($this->this_company_id);
 
         //        $this->EmployeesModel = new EmployeesModel();
         //      $this->EmployeesFingerModel = new EmployeesFingerModel();

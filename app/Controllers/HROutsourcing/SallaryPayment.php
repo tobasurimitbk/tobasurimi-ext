@@ -7,7 +7,7 @@ use App\Models\DivisisModel;
 use App\Models\HROutsourcingCompanyModel;
 use App\Models\HROutsourcingEmployeeModel;
 
-class Employee extends BaseController
+class SallaryPayment extends BaseController
 {
     protected $this_company_id;
     protected $divisiModel;
@@ -23,7 +23,10 @@ class Employee extends BaseController
     }
 
 
-    public function index() {}
+    public function index() {
+
+         return view('HROutsourcing/sallary-payment/form');
+    }
 
     public function create($id)
     {

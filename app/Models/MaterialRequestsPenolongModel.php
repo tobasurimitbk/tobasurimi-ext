@@ -70,22 +70,19 @@ class MaterialRequestsPenolongModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "material_requests_penolong.*,
-            GROUP_CONCAT(material_request_penolong_details.nama_barang SEPARATOR ',') AS nama_barang,
             material_request_penolong_details.satuan,
             material_request_penolong_details.kimia,
             SUM(material_request_penolong_details.qty) as total,
-            work_orders.wo_no,
-            work_orders.request_status,
         ";
 
         $materialRequestsDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('material_request_penolong_details', 'material_request_penolong_details.material_request_id = material_requests_penolong.id', 'left')
-            ->join('work_orders', 'work_orders.id = material_requests_penolong.work_order_id', 'left')
-            ->join('barang_master', 'barang_master.id = material_request_penolong_details.barang1_id', 'left')
-            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
-            ->where('material_requests_penolong.deletedAt', null)
+            // ->join('work_orders', 'work_orders.id = material_requests_penolong.work_order_id', 'left')
+            // ->join('barang_master', 'barang_master.id = material_request_penolong_details.barang1_id', 'left')
+            // ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
+            // ->where('material_requests_penolong.deletedAt', null)
             ->where('material_request_penolong_details.deletedAt', null)
             ->groupBy('material_request_penolong_details.material_request_id')
             ->orderBy($sort, $sortType);

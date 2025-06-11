@@ -295,33 +295,35 @@ class PembayaranInvoice extends BaseController
     public function getDataDokumenInvoiceLokal($customer_id, $pembayaran_invoice_id = null)
     {
         if ($customer_id == "import") {
-            $this->salesOrderInvoiceModel
+            $query = $this->salesOrderInvoiceModel
                 ->select('sales_order_invoice.no_faktur, sales_order_invoice.id') // Pilih kolom yang dibutuhkan
                 ->where('sales_order_invoice.document_type', "import");
         } else {
             $customer_id_decrypt = decrypt($customer_id);
             $pembayaran_invoice_id_decrypt = $this->request->getVar('pembayaran_invoice_id') ? decrypt($this->request->getVar('pembayaran_invoice_id')) : null;
-            $this->salesOrderInvoiceModel
+            $query = $this->salesOrderInvoiceModel
                 ->select('sales_order_invoice.no_faktur, sales_order_invoice.id') // Pilih kolom yang dibutuhkan
                 ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_id = sales_order_invoice.id', 'left') // Relasi ke pembayaran_invoice_detail
                 ->where('sales_order_invoice.id_customer', $customer_id_decrypt)
                 ->where('sales_order_invoice.deletedAt', null);
+                
 
             // Jika dalam mode edit
             if ($pembayaran_invoice_id_decrypt) {
-                // Tampilkan semua data, termasuk yang terkait dengan pembayaran_invoice_id
-                $this->salesOrderInvoiceModel->groupStart()
-                    ->where('pembayaran_invoice_detail.id', null)
-                    ->where('pembayaran_invoice_detail.type_invoice', 'LOKAL')
-                    ->orWhere('pembayaran_invoice_detail.pembayaran_invoice_id', $pembayaran_invoice_id_decrypt)
-                    ->groupEnd();
+                // Tampilkan semua data, termasuk yang terkait dengan 
+              
+                   
+                $query->where('pembayaran_invoice_detail.type_invoice', 'LOKAL')
+                    ->where('pembayaran_invoice_detail.deletedAt', null)
+                    ->where('pembayaran_invoice_detail.pembayaran_invoice_id', $pembayaran_invoice_id_decrypt);
             } else {
                 // Non-edit mode: hanya data yang belum dibayar
-                $this->salesOrderInvoiceModel->where('pembayaran_invoice_detail.id', null);
+                $query->where('pembayaran_invoice_detail.deletedAt', null)
+                    ->where('pembayaran_invoice_detail.id', null);
             }
         }
 
-        $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel->findAll();
+        $salesOrderLokalInvoiceData = $query->findAll();
 
         return response()->setJSON([
             'data' => $salesOrderLokalInvoiceData,

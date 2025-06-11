@@ -158,7 +158,7 @@ class Customer extends BaseController
     }
 
     public function saveCustomer()
-    {   
+    {
         try {
             $rules = [
                 "name" => [
@@ -203,6 +203,19 @@ class Customer extends BaseController
             if ($this->validate($rules)) {
                 $last_year = date("Y-m-t", strtotime(date('Y') . "-12-31"));
                 $kode = $this->request->getPost("kode");
+                if (empty($kode)) {
+                    $bln = date('m');
+                    $thn = date('Y'); // Tahun awal, full (contoh: 2025)
+                    $thn2 = date('y'); // Untuk disisipkan dalam kode, biasanya tahun full
+                    $last_year = $thn . "-12-31"; // Batas akhir tahun ini
+
+                    $kode = $this->CustomerModel->get_kode(
+                        $bln,
+                        $thn,
+                        $thn2,
+                        $last_year
+                    );
+                }
                 $values = [
                     "company_id" => $this->this_company_id,
                     "user_id" => $this->this_user_id,
@@ -312,7 +325,7 @@ class Customer extends BaseController
                 $values = [
                     "company_id" => $this->this_company_id,
                     "user_id" => $this->this_user_id,
-                    "kode" => $this->request->getPost("kode"),
+                    // "kode" => $this->request->getPost("kode"),
                     "name" => strtoupper($this->request->getVar("name")),
                     "address" => strtoupper($this->request->getVar("address")),
                     "nik" => $this->request->getPost("nik"),

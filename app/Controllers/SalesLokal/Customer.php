@@ -86,14 +86,14 @@ class Customer extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            'company_id' => ''
         ];
 
         $dataCompanyUserLogin = [$this->this_company_id];
+        $dataIsAdmin = $this->is_admin;
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $customerData = $this->CustomerModel->getList($condition, $dataCompanyUserLogin, $addCondition, $limit, $offset);
+        $customerData = $this->CustomerModel->getList($condition, $dataCompanyUserLogin, $dataIsAdmin, $addCondition, $limit, $offset);
 
         $dataCustomer = [];
 

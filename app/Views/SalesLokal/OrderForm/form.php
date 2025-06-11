@@ -120,6 +120,87 @@
                     </div>
                 </div>
                 <!-- Repeat similar logic for other fields -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control customerphone" id="customerphone" name="customerphone" value="<?= $data->customerPhone ?? ''; ?>">
+                            <label for="floatingInput">No. Telp</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control" id="tagihan_ke" name="tagihan_ke" value="<?= $data->address ?? '' ?>">
+                            <label for="floatingInput">Alamat Konsumen</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select termin " name="termin" id="termin_order_form">
+                                <option value=""></option>
+                                <?php foreach ($dataTermin ?? [] as $termin) : ?>
+                                    <option value="<?= $termin['id']; ?>" <?= !empty($data) ? ($data->payment_terms == $termin['id'] ? "selected" : "") : ""; ?>><?= $termin['value']; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <!-- <input autocomplete="one-time-code" type="text" class="form-control" id="termin" name="termin" readonly value="<?= $data->termin ?? '' ?>"> -->
+                            <label for="floatingInput">Termin</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input type="hidden" class="hidden_tipe_pelanggan" id="hidden_tipe_pelanggan" name="hidden_tipe_pelanggan" value="<?= $data->tipe_pelanggan ?? '' ?>">
+                            <input autocomplete="one-time-code" class="form-control input-picker tipe_pelanggan" id="tipe_pelanggan" name="tipe_pelanggan" placeholder="Tipe Pelanggan" value="<?= $data->tipe_pelanggan_value ?? '' ?>">
+                            <label for="floatingInput">Tipe Pelanggan</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input placeholder="Tanggal Pengiriman" autocomplete="one-time-code" name="shipping_date" type="text" value="<?= !empty($data) ? $data->shipping_date : '' ?>" class="form-control shipping_date" id="shipping_date">
+                                <label>Tanggal Pengiriman</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 25px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');formatNumber(this)" autocomplete="one-time-code" class="form-control input-picker" id="estimated_freight" name="estimated_freight" value="<?= number_format($data->estimated_freight ?? 0); ?>" placeholder="Biaya Kirim">
+                            <label for="floatingInput">Biaya Kirim</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating ff-ket mb-3" style="height: 80px;">
+                            <textarea autocomplete="one-time-code" class="form-control parent_keterangan text-area-all" style="height: 100%" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
+                            <label for="floatingInput">Keterangan (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control 
+                            no_po" id="no_po" name="no_po" value="<?= !empty($data) ? $data->no_po : ""; ?>">
+                            <label for="floatingInput">No PO (Opsional)</label>
+                        </div>
+                    </div>
+                    <?php if (session()->get("login")->this_company_id != 16) { ?>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select company_id" name="company_id" id="company_id">
+                                    <option value="1">KIM 1</option>
+                                    <option value="2">KIM 2</option>
+                                    <option value="15">GLOBAL</option>
+                                </select>
+                                <label for="floatingInput">Pilih Company</label>
+                            </div>
+                        </div>
+                    <?php } ?>
+                </div>
             </form>
 
             <!-- list barang -->
@@ -131,7 +212,7 @@
 
                     <div class="col-md-6">
                         <button class="btn btn-show-detail btn-add btn-block float-right <?= (!empty($data) && $data->posting == 1) ? 'disabled' : '' ?> <?= !empty($data) ? ((($data->used == "USED") or ($data->surat_jalan_so_id != NULL) or ($data->sales_order_invoice_id != NULL)) ? 'disabled' : '') : '' ?>" data-btn="detail-modal">
-                            <i class="fa fa-plus fa-sm mr-2 "  aria-hidden="true"></i>Tambah
+                            <i class="fa fa-plus fa-sm mr-2 " aria-hidden="true"></i>Tambah
                         </button>
                     </div>
                 </div>
@@ -938,14 +1019,14 @@
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.id_customer, .satuan_id, .sales_id, .termin, .id_sales, .jenis_penjualan, .id_barang, .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer')
+        $('.id_customer, .satuan_id, .sales_id, .termin, .id_sales, .jenis_penjualan, .id_barang, .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer,#company_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.id_customer, .satuan_id, .sales_id, .termin, .id_sales, .jenis_penjualan, .id_barang,  .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer')
+        $('.id_customer, .satuan_id, .sales_id, .termin, .id_sales, .jenis_penjualan, .id_barang,  .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer,#company_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -953,7 +1034,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.id_customer, .satuan_id, .sales_id, .termin, .id_sales, .jenis_penjualan, .id_barang,  .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer')
+        $('.id_customer, .satuan_id, .sales_id, .termin, .id_sales, .jenis_penjualan, .id_barang,  .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer,#company_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');

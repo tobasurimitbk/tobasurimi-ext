@@ -42,6 +42,7 @@ class EmployeesModel extends Model
         'employee_img',
         'status',
         'tipe',
+        'attendance_sync',
         'bagian_id',
         'createdAt',
         'updatedAt',
@@ -294,20 +295,40 @@ class EmployeesModel extends Model
     public function getEmployeesNotSyncAttendances($company_id)
     {
         $arrCondition = [
-            //            'employees.deletedAt' => null,
+            'employees.deletedAt' => null,
             'employees.company_id' => $company_id,
             //            'users.deletedAt' => null
         ];
 
         $builder = $this->db->table('employees')
             ->select("employees.id,employees.attendance_sync,employees.name")
-            //->where('employees.attendance_sync', 0);
+            ->where('employees.attendance_sync', 0)
             ->where('employees.id >', 0);
         $builder->where($arrCondition);
         $query = $builder->get();
 
         return $query->getResultArray();
     }
+
+
+    public function getEmployeesNotSyncAttendances2($company_id)
+    {
+        $arrCondition = [
+            'employees.deletedAt' => null,
+            'employees.company_id' => $company_id,
+            //            'users.deletedAt' => null
+        ];
+
+        $builder = $this->db->table('employees')
+            ->select("employees.id,employees.attendance_sync,employees.name")
+            ->where('employees.attendance_sync', 1)
+            ->where('employees.id >', 0);
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
+
 
     public function getEmployeesWithPagination($companyID, $employeesID = null, $divisiID = null, $tipe = null,  $perPage = 10)
     {
