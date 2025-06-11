@@ -237,6 +237,7 @@ class TransaksiJurnalModel extends Model
             ->join('transaksi_pembelian', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left')
             ->join('am_purchase_orders', 'am_purchase_orders.id = transaksi_pembelian.id_po_bp', 'left')
             ->join('suppliers', 'suppliers.id = transaksi_pembelian.id_supplier', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = transaksi_jurnal.penerimaan_barang_id', 'left')
             ->where($condition)
             ->groupBy('jurnal_umum.id_transaksi');
 
@@ -266,6 +267,8 @@ class TransaksiJurnalModel extends Model
                 ->like('transaksi_jurnal.no_transaksi', $addCondition['search'])
                 ->orLike('transaksi_jurnal.uraian_transaksi', $addCondition['search'])
                 ->orLike('transaksi_jurnal.total_debit', $addCondition['search'])
+                ->orLike('penerimaan_barang.no_penerimaan_barang', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
                 ->groupEnd();
         }
 
@@ -274,6 +277,7 @@ class TransaksiJurnalModel extends Model
             ->join('metadata', 'metadata.id = transaksi_jurnal.type_transaksi', 'left')
             ->join('jurnal_umum', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('transaksi_pembelian', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = transaksi_jurnal.penerimaan_barang_id', 'left')
             ->where($condition);
 
         if (!empty($addCondition['start_date'])) {
