@@ -89,17 +89,17 @@ class Company extends BaseController
         $divisiId = $this->request->getVar('divisi_id');
         $address = $this->request->getVar('address');
 
-        $check = $this->hrOutsourcingCompanyModel->where('company_id', $this->this_company_id)
-            ->where('name', $name)
-            ->first();
+        // $check = $this->hrOutsourcingCompanyModel->where('company_id', $this->this_company_id)
+        //     ->where('name', $name)
+        //     ->first();
 
-        if ($check != null) {
-            return response()->setJSON([
-                'message' => "Data Company Sudah ada",
-                'status' => false,
-                'token' => csrf_hash()
-            ]);
-        }
+        // if ($check != null) {
+        //     return response()->setJSON([
+        //         'message' => "Data Company Sudah ada",
+        //         'status' => false,
+        //         'token' => csrf_hash()
+        //     ]);
+        // }
 
         $this->hrOutsourcingCompanyModel->insert([
             'company_id' => $this->this_company_id,
@@ -122,19 +122,19 @@ class Company extends BaseController
         $divisiId = $this->request->getVar('divisi_id');
         $address = $this->request->getVar('address');
 
-        $check = $this->hrOutsourcingCompanyModel
-            ->where('company_id', $this->this_company_id)
-            ->where('name', $name)
-            ->where('id !=', $id)
-            ->first();
+        // $check = $this->hrOutsourcingCompanyModel
+        //     ->where('company_id', $this->this_company_id)
+        //     ->where('name', $name)
+        //     ->where('id !=', $id)
+        //     ->first();
 
-        if ($check != null) {
-            return response()->setJSON([
-                'message' => "Data Company Sudah ada",
-                'status' => false,
-                'token' => csrf_hash()
-            ]);
-        }
+        // if ($check != null) {
+        //     return response()->setJSON([
+        //         'message' => "Data Company Sudah ada",
+        //         'status' => false,
+        //         'token' => csrf_hash()
+        //     ]);
+        // }
 
         $this->hrOutsourcingCompanyModel->update($id, [
             'company_id' => $this->this_company_id,
