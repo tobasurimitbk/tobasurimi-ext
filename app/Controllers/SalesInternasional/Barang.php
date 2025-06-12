@@ -8,6 +8,7 @@ use App\Models\MetadataModel;
 use App\Models\SatuansModel;
 use App\Models\BarangMasterModel;
 use App\Models\DivisisModel;
+use App\Models\KemasanModel;
 use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -21,6 +22,7 @@ class Barang extends BaseController
     protected $metaDataModel;
     protected $divisiModel;
     protected $barangMasterModel;
+    protected $kemasanModel;
 
     public function __construct()
     {
@@ -30,6 +32,7 @@ class Barang extends BaseController
         $this->metaDataModel = new MetadataModel();
         $this->divisiModel = new DivisisModel();
         $this->barangMasterModel = new BarangMasterModel();
+        $this->kemasanModel = new KemasanModel();
     }
 
     public function bahanJadiView()
@@ -156,8 +159,19 @@ class Barang extends BaseController
 
     public function getBarangJadiMaster()
     {
-        $divisi_id = decrypt($this->request->getVar('divisi_id'));
-        $data = $this->barangMasterModel->where('company_id', $this->this_company_id)->where('type_barang', 'bahan_jadi')->findAll();
+        $typeBarang = $this->request->getVar('type_barang');
+
+        if ($typeBarang == 'kemasan') {
+            $data = $this->kemasanModel->select('kemasan.id, kemasan.name as barang_name_master')->where('company_id', $this->this_company_id)->findAll();
+        } else {
+            $data = $this->barangMasterModel->getBarangByTypeWithSpec([
+                'barang_master.type_barang'  => 'bahan_jadi',
+                'barang_master.company_id' => $this->this_company_id,
+                'barang_master.deletedAt' => null,
+                'barang_master_spesifikasi.deletedAt' => null
+            ]);
+        }
+
         return response()->setJSON([
             'token' => csrf_hash(),
             'status' => true,
