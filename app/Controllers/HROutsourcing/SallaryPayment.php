@@ -25,16 +25,16 @@ class SallaryPayment extends BaseController
 
     public function index() {
 
-         return view('HROutsourcing/sallary-payment/form');
+         return view('HROutsourcing/sallary-payment/index');
     }
 
-    public function create($id)
+    public function create()
     {
         $data = [
-            'company' => $this->hrOutsourcingCompanyModel->where('id', decrypt($id))->first(),
+            'departement' => $this->divisiModel->where('company_id', $this->this_company_id)->select('id, divisi')->findAll(),
         ];
 
-        return view('HROutsourcing/employee/form', $data);
+        return view('HROutsourcing/sallary-payment/form', $data);
     }
 
     public function getAllEmployeeByCompany()
@@ -179,4 +179,29 @@ class SallaryPayment extends BaseController
             'token' => csrf_hash()
         ]);
     }
+
+    public function getHrCompanyOutSourcing() {
+        $departemen_id = $this->request->getVar('departemen_id');
+        $company = $this->hrOutsourcingCompanyModel->where('divisi_id', $departemen_id)->select('id, name')->findAll();
+
+        return response()->setJSON([
+            'status' => true,
+            'data' => $company,
+            'message' => "Company Outsourcing Berhasil Di GET",
+            'token' => csrf_hash()
+        ]);
+    }
+
+    public function getHrEmployeeOutSourcing() {
+        $company_id = $this->request->getVar('company_id');
+        $employee = $this->hrOutsourcingEmployeeModel->where('company_id', $company_id)->select('id, nama')->findAll();
+
+        return response()->setJSON([
+            'status' => true,
+            'data' => $employee,
+            'message' => "Employee Outsourcing Berhasil Di GET",
+            'token' => csrf_hash()
+        ]);
+    }
+
 }

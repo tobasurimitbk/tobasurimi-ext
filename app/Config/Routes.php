@@ -2275,6 +2275,10 @@ $routes->post('/hr-outsourcing-company/employee/generateKode', 'HROutsourcing\Em
 // HR Outsourcing Sallary Payment
 $routes->get('/hr-outsourcing-sallary-payment', 'HROutsourcing\SallaryPayment::index', ['filter' => 'Auth']);
 $routes->get('/hr-outsourcing-sallary-payment/all', 'HROutsourcing\SallaryPayment::all', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-sallary-payment/create', 'HROutsourcing\SallaryPayment::create', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-sallary-payment/getHrCompanyOutSourcing', 'HROutsourcing\SallaryPayment::getHrCompanyOutSourcing', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-sallary-payment/getHrEmployeeOutSourcing', 'HROutsourcing\SallaryPayment::getHrEmployeeOutSourcing', ['filter' => 'Auth']);
+
 
 /*
  * --------------------------------------------------------------------
