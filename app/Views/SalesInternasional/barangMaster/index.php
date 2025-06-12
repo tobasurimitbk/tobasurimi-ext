@@ -97,24 +97,26 @@
                                         <option value="<?= ($d['id']) ?>"><?= $d['divisi'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Department</label>
+                                <label for="floatingInput" style="z-index: 1;">Departemen</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control barang_name" name="barang_name" id="barang_name" placeholder="Nama Kemasan">
-                                <label for="floatingInput">Nama Barang</label>
+                                <select class="form-select spesifikasi_id" name="spesifikasi_id" id="spesifikasi_id">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Pilih Dari Master Barang</label>
                             </div>
                         </div>
 
                     </div>
                     <div class="row">
-                        <!-- <div class="col-md-6">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input oninput="preventNegativeInput(this)" onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_pokok" name="harga_pokok" id="harga_pokok" placeholder="Harga Pokok">
-                                <label for="floatingInput">Harga Pokok</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control barang_name" name="barang_name" id="barang_name" placeholder="Nama Barang">
+                                <label for="floatingInput">Nama Barang</label>
                             </div>
-                        </div> -->
+                        </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
@@ -548,7 +550,7 @@
                 $('.barang_name').val(res.data.barang_name);
                 $('.type_barang').val(res.data.type_barang).change();
                 $('.satuan_id').val(res.data.satuan_id).change();
-                  $('.divisi_id').val(res.data.divisi_id).change();
+                $('.divisi_id').val(res.data.divisi_id).change();
                 $('.harga_jual').val(greatFormatRupiah(res.data.harga_jual));
 
                 $('.input-generate').hide();
@@ -638,13 +640,12 @@
         if (value) {
             generateNewCode();
         }
-        
+        fetchBarangData();
         // Enable/disable divisi_id based on type_barang selection
         if ($(this).val()) {
             $("#divisi_id").prop('disabled', false);
         } else {
             $("#divisi_id").prop('disabled', true).val(null).trigger('change');
-            $("#barang_name").prop('disabled', true).val('');
         }
     });
 
@@ -655,81 +656,51 @@
         allowClear: true,
         dropdownParent: $(".add-modal .modal-content"),
         disabled: true // Initially disabled
-    }).change(function() {
-        let divisiId = $(this).val();
-        fetchBarangData(divisiId);
-        
-        $("#barang_name").prop('disabled', false);
-    });
+    }).change(function() {});
 
     // // Function to fetch barang data
-    function fetchBarangData(divisiId) {
+    function fetchBarangData() {
         let csrfToken = '<?= csrf_token() ?>';
         let csrf = $(`[name="${csrfToken}"]`);
-        
+
         $.ajax({
             url: 'master-barang-internasional/get-barang-jadi-master',
             method: 'POST',
-            data: { divisi_id: divisiId },
+            data: {
+                type_barang: $('#type_barang option:selected').val()
+            },
             dataType: 'json',
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                $("#barang_name").prop('disabled', true).html('');
             },
             success: function(response) {
+                var typeBarang = $('#type_barang option:selected').val();
+                var spesifikasiIdSelect = $("select[name='spesifikasi_id']");
+                spesifikasiIdSelect.empty();
+
+                var emptyOption = $("<option></option>")
+                    .attr("value", "")
+                    .text("Pilih Dari Master Barang");
                 // Replace with select element
-                $("#barang_name").replaceWith(`
-                    <select class="form-select barang_name" name="barang_name" id="barang_name" placeholder="Nama Barang">
-                        <option value=""></option>
-                        ${response.data.map(item => `<option value="${item.id}">${item.barang_name}</option>`).join('')}
-                    </select>
-                `);
-                
-                // Initialize select2 with tags option for editable selection
-                $("#barang_name").select2({
-                    theme: "bootstrap-5",
-                    placeholder: 'Pilih Barang',
-                    allowClear: true,
-                    dropdownParent: $(".add-modal .modal-content"),
-                    tags: true, // Allow custom entries
-                    createTag: function(params) {
-                        // Don't create tags for empty input
-                        if (params.term === '') {
-                            return null;
-                        }
-                        return {
-                            id: params.term,
-                            text: params.term,
-                            newTag: true // Add additional parameter
-                        };
-                    },
-                    insertTag: function(data, tag) {
-                        // Insert the tag at the end of the results
-                        data.push(tag);
-                    }
-                });
-                
-                // Enable typing in the search box even after selection
-                $("#barang_name").on('select2:select', function(e) {
-                    if (e.params.data.newTag) {
-                        // This is a newly created tag (custom entry)
-                        // You can handle the new value here if needed
-                        console.log("New custom entry:", e.params.data.text);
-                    }
-                });
-                
-                $("label[for='barang_name']").text('Nama Barang');
+                if (typeBarang == 'kemasan') {
+                    spesifikasiIdSelect.append(emptyOption);
+                    $.each(response.data, function(index, data) {
+                        var option = $("<option></option>")
+                            .attr("value", data.id)
+                            .text(data.barang_name_master);
+                        spesifikasiIdSelect.append(option);
+                    });
+                } else {
+                    spesifikasiIdSelect.append(emptyOption);
+                    $.each(response.data, function(index, data) {
+                        var option = $("<option></option>")
+                            .attr("value", data.id)
+                            .text(data.barang_name_master + " - " + data.spesifikasi);
+                        spesifikasiIdSelect.append(option);
+                    });
+                }
+
             },
-            error: function(xhr, status, error) {
-                console.error('Error fetching barang data:', error);
-                // Fallback to regular input if AJAX fails
-                $("#barang_name").replaceWith(`
-                    <input autocomplete="one-time-code" type="text" class="form-control barang_name" 
-                        name="barang_name" id="barang_name" placeholder="Nama Barang">
-                `);
-                $("#barang_name").prop('disabled', false);
-                $("label[for='barang_name']").text('Nama Barang');
-            }
         });
     }
 
@@ -739,6 +710,24 @@
         placeholder: 'Pilih Satuan',
         allowClear: true,
         dropdownParent: $(".add-modal .modal-content")
+    });
+
+    $("#spesifikasi_id").select2({
+        theme: "bootstrap-5",
+        placeholder: 'Pilih Dari Master Barang',
+        allowClear: true,
+        dropdownParent: $(".add-modal .modal-content"),
+    }).change(function() {
+        var id = $('#spesifikasi_id option:selected').val();
+        var selectedText = $('#spesifikasi_id option:selected').text();
+
+        if (id != '') {
+            $('#barang_name').val(selectedText);
+
+        } else {
+            $('#barang_name').val(null);
+
+        }
     });
 
     function resetForm() {
