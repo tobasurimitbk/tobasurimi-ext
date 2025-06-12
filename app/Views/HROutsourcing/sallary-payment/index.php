@@ -9,85 +9,25 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("hr-outsourcing-sallary-payment/create"); ?>">
                 Kembali
             </a>
+            <a class="btn btn-success float-right" href="<?= base_url("hr-outsourcing-sallary-payment/create"); ?>">
+                Tambah
+            </a>
         </div>
     </div>
 
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
-                <!-- <div class="col-md-4">
-                    <div class="form-floating mb-3">
-                        <select class="form-select filter_bc_type" name="filter_bc_type" id="filter_bc_type">
-                            <option selected value="all" data-code="">All</option>
-                            <option value="BC 2.3" data-code="">BC 2.3</option>
-                            <option value="BC 2.7" data-code="">BC 2.7</option>
-                            <option value="BC 4.0" data-code="">BC 4.0</option>
-                            <option value="PPB KB" data-code="">PPB KB</option>
-                            <option value="Non Pabean" data-code="">Non Pabean</option>
-                        </select>
-                        <label for="floatingInput">Filter Tipe BC</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
-                        </div>
-                    </div>
-                </div> -->
+              
             </div>
-            <!-- <div class="row justify-content-end row-col-spp">
-                <div class="col-md-4">
-                    <div class="form-floating mb-3">
-                        <select class="form-select filter_divisi" name="filter_divisi" id="filter_divisi">
-                            <option selected value="">Semua Divisi</option>
-                            <?php foreach ($divisis as $divisi) : ?>
-                                <option value="<?= $divisi['id']; ?>"><?= $divisi['divisi']; ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label for="floatingInput">Filter Divisi</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-3">
-                        <select class="form-select filter_supplier" name="filter_supplier" id="filter_supplier">
-                            <option selected value="">Semua Supplier</option>
-                            <?php foreach ($suppliers as $supplier) : ?>
-                                <option value="<?= $supplier['id']; ?>"><?= $supplier['name']; ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label for="floatingInput">Filter Supplier</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-3">
-                        <select class="form-select filter_barang" name="filter_barang" id="filter_barang">
-                            <option selected value="">Semua Barang</option>
-                            <?php foreach ($barangs as $barang) : ?>
-                                <option value="<?= $barang['barang_master_spesifikasi_id']; ?>"><?= $barang['barang_name_master'] . ' ' . $barang['spesifikasi']; ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label for="floatingInput">Filter Barang</label>
-                    </div>
-                </div>
-            </div> -->
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="changeSort('bc_type')" class="sort">Jenis Doc</th>
-                                <th onclick="changeSort('tanggal_bc')" class="sort">Tanggal Doc</th>
+                                <th  class="sort">Jenis Doc</th>
+                                <th class="sort">Tanggal Doc</th>
                             </tr>
 
                         </thead>
