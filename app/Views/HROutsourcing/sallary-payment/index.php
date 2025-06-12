@@ -6,7 +6,7 @@
     <div class="section-header">
         <h1>HR Outsourcing Sallary Payment</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-warehouse"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("hr-outsourcing-sallary-payment/create"); ?>">
                 Kembali
             </a>
         </div>
@@ -15,7 +15,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
-                <div class="col-md-4">
+                <!-- <div class="col-md-4">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_bc_type" name="filter_bc_type" id="filter_bc_type">
                             <option selected value="all" data-code="">All</option>
@@ -43,9 +43,9 @@
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
-            <div class="row justify-content-end row-col-spp">
+            <!-- <div class="row justify-content-end row-col-spp">
                 <div class="col-md-4">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_divisi" name="filter_divisi" id="filter_divisi">
@@ -79,7 +79,7 @@
                         <label for="floatingInput">Filter Barang</label>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
@@ -88,19 +88,6 @@
                                 <th>No</th>
                                 <th onclick="changeSort('bc_type')" class="sort">Jenis Doc</th>
                                 <th onclick="changeSort('tanggal_bc')" class="sort">Tanggal Doc</th>
-                                <th onclick="changeSort('no_daftar')" class="sort">No Daftar</th>
-                                <th onclick="changeSort('no_aju')" class="sort">No Aju</th>
-                                <th onclick="changeSort('no_penerimaan_barang')" class="sort">No LPB</th>
-                                <th onclick="changeSort('tanggal_lpb')" class="sort">Tanggal Bukti</th>
-                                <th onclick="changeSort('po_no')" class="sort">No Order</th>
-                                <th onclick="changeSort('po_date')" class="sort">Tanggal Order</th>
-                                <th onclick="changeSort('divisi')" class="sort">Departemen</th>
-                                <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
-                                <th onclick="changeSort('nama_barang_dok')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('kode_satuan')" class="sort">Kode Satuan</th>
-                                <th onclick="changeSort('qty')" class="sort">Jumlah Order</th>
-                                <th onclick="changeSort('jml_masuk')" class="sort">Jumlah Diterima</th>
-
                             </tr>
 
                         </thead>
@@ -113,7 +100,7 @@
     </div>
 </section>
 
-<script>
+<!-- <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "tanggal_lpb";
     let sortType = "desc";
@@ -315,6 +302,6 @@
 
         window.open(url + `?filter_bc_type=${filter_bc_type}&filter_divisi=${filter_divisi}&filter_supplier=${filter_supplier}&filter_barang=${filter_barang}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
-</script>
+</script> -->
 
 <?= $this->endSection(); ?>

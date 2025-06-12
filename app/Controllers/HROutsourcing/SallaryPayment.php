@@ -25,7 +25,7 @@ class SallaryPayment extends BaseController
 
     public function index() {
 
-         return view('HROutsourcing/sallary-payment/form');
+         return view('HROutsourcing/sallary-payment/index');
     }
 
     public function create()
