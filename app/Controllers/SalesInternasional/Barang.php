@@ -157,7 +157,7 @@ class Barang extends BaseController
     public function getBarangJadiMaster()
     {
         $divisi_id = decrypt($this->request->getVar('divisi_id'));
-        $data = $this->barangMasterModel->where('type_barang', 'bahan_jadi')->findAll();
+        $data = $this->barangMasterModel->where('company_id', $this->this_company_id)->where('type_barang', 'bahan_jadi')->findAll();
         return response()->setJSON([
             'token' => csrf_hash(),
             'status' => true,
