@@ -112,7 +112,7 @@ class CustomerModel extends Model
 
         $totalData = $customerDataQry->countAllResults(false);
 
-        if ($addCondition['search']) {
+        if (isset($addCondition['search']) && !empty($addCondition['search'])) {
             $customerDataQry->groupStart()
                 ->like('customers.name', $addCondition['search'])
                 ->orLike('customers.kode', $addCondition['search'])
