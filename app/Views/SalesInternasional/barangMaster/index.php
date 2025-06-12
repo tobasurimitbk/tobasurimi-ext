@@ -657,53 +657,81 @@
         disabled: true // Initially disabled
     }).change(function() {
         let divisiId = $(this).val();
-        // Clear and disable barang_name if no divisi selected
+        fetchBarangData(divisiId);
         
         $("#barang_name").prop('disabled', false);
     });
 
     // // Function to fetch barang data
-    // function fetchBarangData(divisiId) {
-    //     $.ajax({
-    //         url: '/path/to/your/barang-endpoint', // Replace with your actual endpoint
-    //         method: 'GET',
-    //         data: { divisi_id: divisiId },
-    //         dataType: 'json',
-    //         beforeSend: function() {
-    //             // Show loading state
-    //             $("#barang_name").prop('disabled', true).html('');
-    //         },
-    //         success: function(response) {
-    //             // Convert barang_name to select2 with the fetched data
-    //             $("#barang_name").replaceWith(`
-    //                 <select class="form-select barang_name" name="barang_name" id="barang_name" placeholder="Nama Barang">
-    //                     <option value=""></option>
-    //                     ${response.data.map(item => `<option value="${item.id}">${item.nama_barang}</option>`).join('')}
-    //                 </select>
-    //             `);
+    function fetchBarangData(divisiId) {
+        let csrfToken = '<?= csrf_token() ?>';
+        let csrf = $(`[name="${csrfToken}"]`);
+        
+        $.ajax({
+            url: 'master-barang-internasional/get-barang-jadi-master',
+            method: 'POST',
+            data: { divisi_id: divisiId },
+            dataType: 'json',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                $("#barang_name").prop('disabled', true).html('');
+            },
+            success: function(response) {
+                // Replace with select element
+                $("#barang_name").replaceWith(`
+                    <select class="form-select barang_name" name="barang_name" id="barang_name" placeholder="Nama Barang">
+                        <option value=""></option>
+                        ${response.data.map(item => `<option value="${item.id}">${item.barang_name}</option>`).join('')}
+                    </select>
+                `);
                 
-    //             // Initialize select2 for barang_name
-    //             $("#barang_name").select2({
-    //                 theme: "bootstrap-5",
-    //                 placeholder: 'Pilih Barang',
-    //                 allowClear: true,
-    //                 dropdownParent: $(".add-modal .modal-content")
-    //             });
+                // Initialize select2 with tags option for editable selection
+                $("#barang_name").select2({
+                    theme: "bootstrap-5",
+                    placeholder: 'Pilih Barang',
+                    allowClear: true,
+                    dropdownParent: $(".add-modal .modal-content"),
+                    tags: true, // Allow custom entries
+                    createTag: function(params) {
+                        // Don't create tags for empty input
+                        if (params.term === '') {
+                            return null;
+                        }
+                        return {
+                            id: params.term,
+                            text: params.term,
+                            newTag: true // Add additional parameter
+                        };
+                    },
+                    insertTag: function(data, tag) {
+                        // Insert the tag at the end of the results
+                        data.push(tag);
+                    }
+                });
                 
-    //             // Update the label to match the new element
-    //             $("label[for='barang_name']").text('Nama Barang');
-    //         },
-    //         error: function(xhr, status, error) {
-    //             console.error('Error fetching barang data:', error);
-    //             // Fallback to regular input if AJAX fails
-    //             $("#barang_name").replaceWith(`
-    //                 <input autocomplete="one-time-code" type="text" class="form-control barang_name" name="barang_name" id="barang_name" placeholder="Nama Barang">
-    //             `);
-    //             $("#barang_name").prop('disabled', false);
-    //             $("label[for='barang_name']").text('Nama Barang');
-    //         }
-    //     });
-    // }
+                // Enable typing in the search box even after selection
+                $("#barang_name").on('select2:select', function(e) {
+                    if (e.params.data.newTag) {
+                        // This is a newly created tag (custom entry)
+                        // You can handle the new value here if needed
+                        console.log("New custom entry:", e.params.data.text);
+                    }
+                });
+                
+                $("label[for='barang_name']").text('Nama Barang');
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching barang data:', error);
+                // Fallback to regular input if AJAX fails
+                $("#barang_name").replaceWith(`
+                    <input autocomplete="one-time-code" type="text" class="form-control barang_name" 
+                        name="barang_name" id="barang_name" placeholder="Nama Barang">
+                `);
+                $("#barang_name").prop('disabled', false);
+                $("label[for='barang_name']").text('Nama Barang');
+            }
+        });
+    }
 
 
     $("#satuan_id").select2({

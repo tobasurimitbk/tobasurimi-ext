@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\BarangMasterSalesModel;
 use App\Models\MetadataModel;
 use App\Models\SatuansModel;
+use App\Models\BarangMasterModel;
 use App\Models\DivisisModel;
 use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -19,6 +20,7 @@ class Barang extends BaseController
     protected $barangMasterSalesModel;
     protected $metaDataModel;
     protected $divisiModel;
+    protected $barangMasterModel;
 
     public function __construct()
     {
@@ -27,6 +29,7 @@ class Barang extends BaseController
         $this->barangMasterSalesModel = new BarangMasterSalesModel();
         $this->metaDataModel = new MetadataModel();
         $this->divisiModel = new DivisisModel();
+        $this->barangMasterModel = new BarangMasterModel();
     }
 
     public function bahanJadiView()
@@ -144,6 +147,17 @@ class Barang extends BaseController
         $id = decrypt($this->request->getVar('id'));
         $data = $this->barangMasterSalesModel->find($id);
         $data['id'] = encrypt($data['id']);
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'data' => $data
+        ]);
+    }
+
+    public function getBarangJadiMaster()
+    {
+        $divisi_id = decrypt($this->request->getVar('divisi_id'));
+        $data = $this->barangMasterModel->where('type_barang', 'bahan_jadi')->findAll();
         return response()->setJSON([
             'token' => csrf_hash(),
             'status' => true,
