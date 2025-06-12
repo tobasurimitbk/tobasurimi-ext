@@ -217,6 +217,9 @@
                     if (tutupBuku === 0) {
                         return `
                         <div class="mt-0">
+                            <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Detail" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
                             <a href="javascript:void(0)" onclick="detail('${id}')" data-toggle="tooltip" title="Detail" class="btn btn-success posting-spp actions">
                                 <i class="fas fa-eye"></i>
                             </a>
@@ -268,10 +271,9 @@
         }
     });
 
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        const data = table.row(this).data();
-        location.replace(`<?= base_url("jurnal/id"); ?>/${data.id}`);
-    });
+    // $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+    //     const data = table.row(this).data();
+    // });
 
     $("#start_date").datepicker({
         todayHighlight: true,
@@ -467,6 +469,10 @@
         })
 
 
+    }
+
+    function edit(id) {
+        location.replace(`<?= base_url("jurnal/id"); ?>/${id}`);
     }
 
     function detail(id) {

@@ -224,11 +224,6 @@ class TransaksiJurnalModel extends Model
             jurnal_umum.supplier_id,
             suppliers.name as supplier_name,
             am_purchase_orders.po_type,
-            
-            pb_local_bb.no_penerimaan_barang as no_lpb_local_bb,
-            pb_import_bb.no_penerimaan_barang as no_lpb_import_bb,
-            pb_local_bp.no_penerimaan_barang as no_lpb_local_bp,
-            pb_import_bp.no_penerimaan_barang as no_lpb_import_bp
         ";
 
         $dataQry = $this->asObject()->select($selectQry)
