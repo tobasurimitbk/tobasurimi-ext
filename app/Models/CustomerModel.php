@@ -102,7 +102,6 @@ class CustomerModel extends Model
 
         $customerDataQry = $this->asObject()
             ->select($selectQry)
-            ->where('customers.address IS NOT NULL')
             // ->where('customers.address !=', '')
             ->where($condition)
             ->join('metadata', 'customers.currency = metadata.id', 'left')
@@ -110,7 +109,8 @@ class CustomerModel extends Model
             ->join('employees', 'employees.id = customers.sales_id', 'LEFT');
 
         if ($condition['tipe_customer'] == "LOKAL") {
-            $customerDataQry->where('customers.address !=', '');
+            $customerDataQry->where('customers.address !=', '')
+                ->where('customers.address IS NOT NULL');
         }
 
         $totalData = $customerDataQry->countAllResults(false);
