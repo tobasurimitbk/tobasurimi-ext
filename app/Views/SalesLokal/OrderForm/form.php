@@ -894,12 +894,11 @@
             const tipePelanggan = $(this).find(':selected').data('tipepelanggan') ? $(this).find(':selected').data('tipepelanggan') : "";
             const jenis_penjualan = $(this).find(':selected').data('jenis_penjualan') ? $(this).find(':selected').data('jenis_penjualan') : "";
 
-
             $('#customerphone').val(decodeURIComponent(customerPhone));
             $('#tagihan_ke').val(decodeURIComponent(customerAddress));
             $('#termin_order_form').val(decodeURIComponent(termin)).change();
 
-            $('#id_sales').val(decodeURIComponent(salesName)).trigger('change');
+            $('#id_sales').val(decodeURIComponent(salesName)).change();
             $('#hidden_tipe_pelanggan').val(decodeURIComponent(tipePelanggan)).change();
             $('#jenis_penjualan').val(decodeURIComponent(jenis_penjualan)).change();
         });
@@ -949,6 +948,8 @@
             let isi = $(this).val();
             if (isi == 1) {
                 $('.id_sales').prop('disabled', false);
+                const salesName = $('#id_customer').find(':selected').data('salesname') ? $('#id_customer').find(':selected').data('salesname') : "";
+                $('#id_sales').val(decodeURIComponent(salesName)).change();
                 $('.nama_ecommerce').prop('readonly', true);
                 $('.nama_ecommerce').val('');
             } else if (isi == 2) {
