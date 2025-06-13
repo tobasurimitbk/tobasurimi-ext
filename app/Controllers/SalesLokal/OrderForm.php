@@ -96,7 +96,7 @@ class OrderForm extends BaseController
         //Get Customers
         $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->is_admin);
         $condition = [
-            'jabatan_name' => "SALES LOKAL"
+            'jabatan_name' => "MARKETING LOKAL"
         ];
 
         $sales = $this->employeeModel->getEmployeesComplete($condition);
@@ -215,7 +215,7 @@ class OrderForm extends BaseController
             "data"              => $dataSalesOrder,
             "payload"           => $payload
         ];
-        
+
         echo json_encode($data);
         return;
     }
@@ -964,26 +964,26 @@ class OrderForm extends BaseController
         $currentMonth = date('n'); // 1-12
         $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
         $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
-    
+
         $listData = $this->SalesOrderModel->asObject()
             ->like('no_sales_order', $numberTemplate)
             ->orderBy('no_sales_order', 'ASC') // penting: ASC buat gap detect
             ->findAll();
-    
+
         $existingNumbers = [];
-    
+
         foreach ($listData as $data) {
             $parts = explode('/', $data->no_sales_order);
             if (isset($parts[3]) && is_numeric($parts[3])) {
                 $existingNumbers[] = intval($parts[3]);
             }
         }
-    
+
         sort($existingNumbers);
-    
+
         $nextNumber = 1;
         $foundGap = false;
-    
+
         foreach ($existingNumbers as $num) {
             if ($num != $nextNumber) {
                 $foundGap = true;
@@ -991,21 +991,21 @@ class OrderForm extends BaseController
             }
             $nextNumber++;
         }
-    
+
         if (!$foundGap) {
             $nextNumber = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
         }
-    
+
         $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
         $invNumber = $numberTemplate . $paddedNumber;
-    
+
         return response()->setJSON([
             'data' => $invNumber,
             'token' => csrf_hash(),
             'status' => true
         ]);
     }
-    
+
 
     public function getMetaData($id)
     {
@@ -1095,7 +1095,6 @@ class OrderForm extends BaseController
             ];
 
             echo json_encode($data);
-
         } catch (Exception $e) {
             $data = [
                 "status"            => false,
