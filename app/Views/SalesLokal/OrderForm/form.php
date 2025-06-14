@@ -130,7 +130,7 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control" id="tagihan_ke" name="tagihan_ke" value="<?= $data->address ?? '' ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control" id="destination" name="destination" value="<?= $data->address ?? '' ?>">
                             <label for="floatingInput">Alamat Konsumen</label>
                         </div>
                     </div>
@@ -895,7 +895,7 @@
             const jenis_penjualan = $(this).find(':selected').data('jenis_penjualan') ? $(this).find(':selected').data('jenis_penjualan') : "";
 
             $('#customerphone').val(decodeURIComponent(customerPhone));
-            $('#tagihan_ke').val(decodeURIComponent(customerAddress));
+            $('#destination').val(decodeURIComponent(customerAddress));
             $('#termin_order_form').val(decodeURIComponent(termin)).change();
 
             $('#id_sales').val(decodeURIComponent(salesName)).change();

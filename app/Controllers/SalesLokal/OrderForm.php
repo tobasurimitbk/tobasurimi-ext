@@ -240,12 +240,12 @@ class OrderForm extends BaseController
                     'required' => 'Tanggal pemesananan tidak boleh kosong',
                 ]
             ],
-            // "shipping_date" => [
-            //     "rules" => "required|valid_date[d/m/Y]",
-            //     'errors' => [
-            //         'required' => 'tanggal pengiriman tidak boleh kosong',
-            //     ]
-            // ],
+            "shipping_date" => [
+                "rules" => "required|valid_date[d/m/Y]",
+                'errors' => [
+                    'required' => 'tanggal pengiriman tidak boleh kosong',
+                ]
+            ],
             // "estimated_freight" => [
             //     "rules" => "permit_empty",
             //     'errors' => [
@@ -347,6 +347,8 @@ class OrderForm extends BaseController
                 "no_sales_order"        => strtoupper($postData['no_sales_order']),
                 "id_user"               => $this->userId,
                 "id_customer"           => $postData['id_customer'],
+                "shipping_date"           => $postData['shipping_date'],
+                "destination"           => $postData['destination'],
                 "jenis_penjualan"           => $postData['jenis_penjualan'],
                 "sales_id"              => isset($postData['id_sales']) ? $postData['id_sales'] : NULL,
                 "nama_ecommerce"           => $postData['nama_ecommerce'] ? $postData['nama_ecommerce'] : "",
@@ -645,7 +647,14 @@ class OrderForm extends BaseController
                 }
             }
 
-            $this->SalesOrderModel->update($id, ['qty_barang' => $totalQty, 'ppn' => $status_ppn, 'total_harga' => $total_harga]);
+            $this->SalesOrderModel->update($id, 
+            [
+                'qty_barang' => $totalQty,
+                'shipping_date' => $shippingDate,
+                'destination' =>  $postData['destination'],
+                'ppn' => $status_ppn,
+                'total_harga' => $total_harga
+            ]);
 
             $this->SalesOrderModel->db->transComplete();
 
