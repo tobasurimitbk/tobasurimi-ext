@@ -876,16 +876,16 @@
 
     // Mengaktifkan datepicker
     $('#date_production').datepicker({
-        autoclose: true,
         todayHighlight: true,
-        format: 'dd/mm/yyyy',
-        enableOnReadonly: false
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
     });
     $('#date_request').datepicker({
-        autoclose: true,
         todayHighlight: true,
-        format: 'dd/mm/yyyy',
-        enableOnReadonly: false
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
     });
 
     //CSS SELECT2 FLOATING LABEL
