@@ -19,15 +19,15 @@
                 <!-- Header Section -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h5>Employee Information</h5>
+                        <h5>Header Pembayaran</h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="departemen">Department</label>
+                                    <label for="departemen">Departemen</label>
                                     <select class="form-control select2" id="departemen" name="departemen" required>
-                                        <option value="">Select Department</option>
+                                        <option value="">Pilih Department</option>
                                         <?php foreach ($departement as $d): ?>
                                             <option value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
                                         <?php endforeach; ?>
@@ -36,155 +36,35 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="company">Company</label>
+                                    <label for="company">Perusahaan</label>
                                     <select class="form-control select2" id="company" name="company" required disabled>
-                                        <option value="">Select Company</option>
+                                        <option value="">Pilih Perusahaan</option>
                                     </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="employee">Employee</label>
-                                    <select class="form-control select2" id="employee" name="employee" required disabled>
-                                        <option value="">Select Employee</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="tanggal_masuk_kerja">Employment Date</label>
-                                    <input type="date" class="form-control" id="tanggal_masuk_kerja" name="tanggal_masuk_kerja" required>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Production Data Section -->
-                <div class="card mb-4">
+
+
+                 <div class="card mb-4">
                     <div class="card-header">
-                        <h5>Production Data</h5>
-                    </div>
-                    <div class="card-body">
-                        <!-- Shrimp Section -->
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="udang_ac_2850">Shrimp AC 2,850</label>
-                                    <input type="number" step="0.01" class="form-control" id="udang_ac_2850" name="udang_ac_2850">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="udang">Shrimp</label>
-                                    <input type="number" step="0.01" class="form-control" id="udang" name="udang">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="to_tau_udang">TO TAU Shrimp</label>
-                                    <input type="number" step="0.01" class="form-control" id="to_tau_udang" name="to_tau_udang">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Clam Section -->
-                        <div class="row mt-3">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="kepahi_sk_1800">Clam SK 1,800</label>
-                                    <input type="number" step="0.01" class="form-control" id="kepahi_sk_1800" name="kepahi_sk_1800">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="kepahi">Clam</label>
-                                    <input type="number" step="0.01" class="form-control" id="kepahi" name="kepahi">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="to_tau_kepahi">TO TAU Clam</label>
-                                    <input type="number" step="0.01" class="form-control" id="to_tau_kepahi" name="to_tau_kepahi">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="kg_jan_kepahi">KG/JAN Clam</label>
-                                    <input type="number" step="0.01" class="form-control" id="kg_jan_kepahi" name="kg_jan_kepahi">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Crab Section -->
-                        <div class="row mt-3">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="kptg_mb_10500">Crab MB 10,500</label>
-                                    <input type="number" step="0.01" class="form-control" id="kptg_mb_10500" name="kptg_mb_10500">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="kptg">Crab</label>
-                                    <input type="number" step="0.01" class="form-control" id="kptg" name="kptg">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="to_tau_kptg">TO TAU Crab</label>
-                                    <input type="number" step="0.01" class="form-control" id="to_tau_kptg" name="to_tau_kptg">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="kptg_2">Crab (2)</label>
-                                    <input type="number" step="0.01" class="form-control" id="kptg_2" name="kptg_2">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Work Summary Section -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5>Work Summary</h5>
+                        <h5>Detail Karyawan</h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="jan_kerja">Work Days</label>
-                                    <input type="number" step="0.01" class="form-control" id="jan_kerja" name="jan_kerja">
+                                    <label for="employee">Karyawan</label>
+                                    <select class="form-control select2" id="employee" name="employee">
+                                        <option value="">Pilih Karyawan</option>
+                                    </select>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="jlh">Total</label>
-                                    <input type="number" step="0.01" class="form-control" id="jlh" name="jlh">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="bp">BP</label>
-                                    <input type="number" step="0.01" class="form-control" id="bp" name="bp">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="subsidi_bp_40000">BP Subsidy 40,000</label>
-                                    <input type="number" step="0.01" class="form-control" id="subsidi_bp_40000" name="subsidi_bp_40000">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="bor_jan_ro_10500">BOR/JAN RO 10,500</label>
-                                    <input type="number" step="0.01" class="form-control" id="bor_jan_ro_10500" name="bor_jan_ro_10500">
+                                    <label for="tanggal_masuk_kerja">Tanggal Masuk Kerja</label>
+                                    <input type="date" class="form-control" id="tanggal_masuk_kerja" name="tanggal_masuk_kerja">
                                 </div>
                             </div>
                         </div>
@@ -213,32 +93,51 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>NO</th>
-                                <th>TMK</th>
-                                <th>NO BADGE</th>
-                                <th>NAMA</th>
-                                <th>UDANG AC 2850</th>
-                                <th>KEPAHI SK 1,800</th>
-                                <th>KPTG MB 10,500</th>
-                                <th>UDANG</th>
-                                <th>KEPAHI</th>
-                                <th>KPTG</th>
-                                <th>JAN KERJA</th>
-                                <th>TO TAU UDANG</th>
-                                <th>TO TAU KEPAHI</th>
-                                <th>TO TAU KPTG</th>
-                                <th>JLH</th>
-                                <th>BP</th>
-                                <th>SUBSIDI BP 40,000</th>
-                                <th>BOR/JAN RO 10,500</th>
-                                <th>KG/JAN KEPAHI</th>
-                                <th>KPTG</th>
+                                <th class="text-center" rowspan="3">NO</th>
+                                <th class="text-center" rowspan="3">TMK</th>
+                                <th class="text-center" rowspan="3">NO BADGE</th>
+                                <th class="text-center" rowspan="3">NAMA</th>
+                                <th class="text-center" colspan="4">UDANG</th>
+                                <th class="text-center" colspan="4">KEPAH</th>
+                                <th class="text-center" colspan="4">KPTG</th>
+                                <th class="text-center" colspan="4">JAM KERJA</th>
+                                <th class="text-center" rowspan="3">TOTAL KG</th>
+                                <th class="text-center" rowspan="3">TOTAL JAM</th>
+                                <th class="text-center" rowspan="3">JLH ORG</th>
+                                <th class="text-center" rowspan="3">(Rp)</th>
+                                <th class="text-center" rowspan="3">SUBSIDI RP.</th>
+                                <th class="text-center" rowspan="3">BOR. / JAM (Rp)</th>
+                                <th class="text-center" colspan="4">KG / JAM</th>
+                            </tr>
+                            <tr>
+                                <th colspan="1">AC</th>
+                                <th colspan="1">SK</th>
+                                <th colspan="1">MB</th>
+                                <th colspan="1">ML</th>
+                                <th colspan="1">AC</th>
+                                <th colspan="1">SK</th>
+                                <th colspan="1">MB</th>
+                                <th colspan="1">ML</th>
+                                <th colspan="1">AC</th>
+                                <th colspan="1">SK</th>
+                                <th colspan="1">MB</th>
+                                <th colspan="1">ML</th>
+                                <th colspan="1">UDANG</th>
+                                <th colspan="1">KEPAH</th>
+                                <th colspan="1">KPTG</th>
+                                <th colspan="1">ML</th>
+                                <th colspan="1">AC</th>
+                                <th colspan="1">SK</th>
+                                <th colspan="1">MB</th>
+                                <th colspan="1">ML</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table">
+                            <!-- Data rows inserted here -->
                         </tbody>
                     </table>
                 </div>
+
             </div>
         </div>
     </div>
@@ -251,32 +150,10 @@ var headerData = {
     company: null,
 };
 
-var detailData = {
-    employee: null,
-    tanggal_masuk_kerja: null,
-    udang: {},
-    kepahi: {},
-    kptg: {},
-    lainnya: {}
-};
-
 // Initialize Select2 and event handlers
 $(document).ready(function() {
     // Initialize Select2
-    $('#departemen').select2({
-        placeholder: "Pilih Departemen",
-        theme: "bootstrap-5",
-        allowClear: true
-    });
-
-    $('#company').select2({
-        placeholder: "Pilih Perusahaan",
-        theme: "bootstrap-5",
-        allowClear: true
-    });
-
-    $('#employee').select2({
-        placeholder: "Pilih Karyawan",
+    $('.select2').select2({
         theme: "bootstrap-5",
         allowClear: true
     });
@@ -286,29 +163,23 @@ $(document).ready(function() {
         var departemen_id = $(this).val();
         $('#company').val(null).trigger('change');
         $('#employee').val(null).trigger('change').prop('disabled', true);
-        headerData.departemen = $(this).find('option:selected').text();
+        headerData.departemen = $(this).val();
 
         if(departemen_id) {
             $('#company').prop('disabled', false);
             
-            $('#company').on('select2:open', function() {
-                var companySelect = $(this);
-                if (!companySelect.hasClass('loaded')) {
-                    $.ajax({
-                        url: '<?= base_url('/hr-outsourcing-sallary-payment/getHrCompanyOutSourcing') ?>',
-                        type: 'POST',
-                        dataType: 'json',
-                        data: {
-                            departemen_id: departemen_id,
-                            <?= csrf_token() ?>: '<?= csrf_hash() ?>'
-                        },
-                        success: function(response) {
-                            var options = $.map(response.data, function(item) {
-                                return new Option(item.name, item.id, false, false);
-                            });
-                            companySelect.empty().append(options).trigger('change');
-                            companySelect.addClass('loaded');
-                        }
+            $.ajax({
+                url: '<?= base_url('/hr-outsourcing-sallary-payment/getHrCompanyOutSourcing') ?>',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    departemen_id: departemen_id,
+                    <?= csrf_token() ?>: '<?= csrf_hash() ?>'
+                },
+                success: function(response) {
+                    $('#company').empty().append('<option value="">Select Company</option>');
+                    $.each(response.data, function(index, item) {
+                        $('#company').append('<option value="'+item.id+'">'+item.name+'</option>');
                     });
                 }
             });
@@ -321,29 +192,23 @@ $(document).ready(function() {
     $('#company').on('change', function() {
         var company_id = $(this).val();
         $('#employee').val(null).trigger('change');
-        headerData.company = $(this).find('option:selected').text();
+        headerData.company = $(this).val();
 
         if(company_id) {
             $('#employee').prop('disabled', false);
             
-            $('#employee').on('select2:open', function() {
-                var employeeSelect = $(this);
-                if (!employeeSelect.hasClass('loaded')) {
-                    $.ajax({
-                        url: '<?= base_url('/hr-outsourcing-sallary-payment/getHrEmployeeOutSourcing') ?>',
-                        type: 'POST',
-                        dataType: 'json',
-                        data: {
-                            company_id: company_id,
-                            <?= csrf_token() ?>: '<?= csrf_hash() ?>'
-                        },
-                        success: function(response) {
-                            var options = $.map(response.data, function(item) {
-                                return new Option(item.nama, item.id, false, false);
-                            });
-                            employeeSelect.empty().append(options).trigger('change');
-                            employeeSelect.addClass('loaded');
-                        }
+            $.ajax({
+                url: '<?= base_url('/hr-outsourcing-sallary-payment/getHrEmployeeOutSourcing') ?>',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    company_id: company_id,
+                    <?= csrf_token() ?>: '<?= csrf_hash() ?>'
+                },
+                success: function(response) {
+                    $('#employee').empty().append('<option value="">Select Employee</option>');
+                    $.each(response.data, function(index, item) {
+                        $('#employee').append('<option data-badge="'+item.badge+'" data-tanggal_masuk_kerja="'+item.tanggal_masuk_kerja+'" value="'+item.id+'">'+item.nama+'</option>');
                     });
                 }
             });
@@ -354,34 +219,14 @@ $(document).ready(function() {
 
     // Employee change event
     $('#employee').on('change', function() {
-        headerData.employee = $(this).find('option:selected').text();
-    });
-
-    // Tanggal Masuk Kerja change event
-    $('#tanggal_masuk_kerja').on('change', function() {
-        headerData.tanggal_masuk_kerja = $(this).val();
-    });
-
-    // Collect detail data when inputs change
-    $('input[type="number"]').on('change', function() {
-        var id = $(this).attr('id');
-        var value = $(this).val();
-        
-        if (id.includes('udang')) {
-            detailData.udang[id] = value;
-        } else if (id.includes('kepahi')) {
-            detailData.kepahi[id] = value;
-        } else if (id.includes('kptg')) {
-            detailData.kptg[id] = value;
-        } else {
-            detailData.lainnya[id] = value;
-        }
+        let tanggal_masuk_kerja = $(this).find(':selected').data('tanggal_masuk_kerja');
+        $('#tanggal_masuk_kerja').val(tanggal_masuk_kerja);
     });
 
     // Submit button click event
     $('.btn-submit').on('click', function() {
         // Validate header data
-        if (!headerData.departemen || !headerData.company || !headerData.employee || !headerData.tanggal_masuk_kerja) {
+        if (!headerData.departemen || !headerData.company) {
             alert('Harap lengkapi data header terlebih dahulu!');
             return;
         }
@@ -389,76 +234,72 @@ $(document).ready(function() {
         // Add data to table
         addToTable();
     });
-
-    // Reset loaded state when parent changes
-    $('#departemen').on('change', function() {
-        $('#company').removeClass('loaded');
-    });
-
-    $('#company').on('change', function() {
-        $('#employee').removeClass('loaded');
-    });
 });
 
 // Function to add data to table
 function addToTable() {
-    var table = $('#dataTable').DataTable();
-    var rowData = [
-        table.rows().count() + 1, // NO
-        detailData.tanggal_masuk_kerja, // TMK
-        $('#employee').val(), // NO BADGE (using employee ID)
-        detailData.employee, // NAMA
-        detailData.udang.udang_ac_2850 || '', // UDANG AC 2850
-        detailData.kepahi.kepahi_sk_1800 || '', // KEPAHI SK 1,800
-        detailData.kptg.kptg_mb_10500 || '', // KPTG MB 10,500
-        detailData.udang.udang || '', // UDANG
-        detailData.kepahi.kepahi || '', // KEPAHI
-        detailData.kptg.kptg || '', // KPTG
-        detailData.lainnya.jan_kerja || '', // JAN KERJA
-        detailData.udang.to_tau_udang || '', // TO TAU UDANG
-        detailData.kepahi.to_tau_kepahi || '', // TO TAU KEPAHI
-        detailData.kptg.to_tau_kptg || '', // TO TAU KPTG
-        detailData.lainnya.jlh || '', // JLH
-        detailData.lainnya.bp || '', // BP
-        detailData.lainnya.subsidi_bp_40000 || '', // SUBSIDI BP 40,000
-        detailData.lainnya.bor_jan_ro_10500 || '', // BOR/JAN RO 10,500
-        detailData.kepahi.kg_jan_kepahi || '', // KG/JAN KEPAHI
-        detailData.kptg.kptg_2 || '' // KPTG
-    ];
+    var employeeName = $('#employee option:selected').text();
+    var employeeId = $('#employee').val();
+    var tanggalMasuk = $('#tanggal_masuk_kerja').val();
+    var badge = $('#employee').find(':selected').data('badge');
 
-    // Add row to table
-    table.row.add(rowData).draw();
+    var newRow = `
+        <tr>
+            <td>${$('#dataTable tbody tr').length + 1}</td>w
+            <td><input type="text" class="form-control form-control-sm" style="min-width: 120px;" value="${tanggalMasuk}" readonly></td>
+            <td><input type="text" class="form-control form-control-sm" style="min-width: 120px;" value="${badge}" readonly></td>
+            <td><input type="text" class="form-control form-control-sm" style="min-width: 150px;" data-id="${employeeId}" value="${employeeName}" readonly></td>
 
-    // Reset form after submission
+            <!-- UDANG -->
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+
+            <!-- KEPAH -->
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+
+            <!-- KPTG -->
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+
+            <!-- JAM KERJA -->
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+
+            <!-- TOTAL & KALKULASI -->
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 120px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 120px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 120px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 120px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 120px;"></td>
+
+            <!-- KG / JAM -->
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 90px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 90px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 90px;"></td>
+            <td><input type="number" class="form-control form-control-sm" style="min-width: 90px;"></td>
+        </tr>
+    `;
+
+    $('#dataTable tbody').append(newRow);
     resetForm();
 }
 
+
 // Reset form function
 function resetForm() {
-    $('.karyawan-form').trigger('reset');
-    $('.select2').val(null).trigger('change');
-    $('#company, #employee').prop('disabled', true);
-    
-    // Reset global variables
-    headerData = {
-        departemen: null,
-        company: null,
-        employee: null,
-        tanggal_masuk_kerja: null
-    };
-    
-    detailData = {
-        udang: {},
-        kepahi: {},
-        kptg: {},
-        lainnya: {}
-    };
+    $('#tanggal_masuk_kerja').val('');
+    $('#employee').val(null).trigger('change');
 }
-
-
-    function resetForm() {
-        document.querySelector('.karyawan-form').reset();
-    }
 </script>
 
 <?= $this->endSection(); ?>
