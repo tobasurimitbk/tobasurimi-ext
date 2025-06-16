@@ -136,10 +136,10 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select termin " name="termin" id="termin_order_form">
+                            <select class="form-select termin" name="termin" id="termin_order_form">
                                 <option value=""></option>
                                 <?php foreach ($dataTermin ?? [] as $termin) : ?>
-                                    <option value="<?= $termin['id']; ?>" <?= !empty($data) ? ($data->payment_terms == $termin['id'] ? "selected" : "") : ""; ?>><?= $termin['value']; ?></option>
+                                    <option value="<?= $termin['value']; ?>"><?= $termin['value']; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <!-- <input autocomplete="one-time-code" type="text" class="form-control" id="termin" name="termin" readonly value="<?= $data->termin ?? '' ?>"> -->
@@ -901,7 +901,7 @@
             $('#id_sales').val(decodeURIComponent(salesName)).change();
             $('#hidden_tipe_pelanggan').val(decodeURIComponent(tipePelanggan)).change();
             $('#jenis_penjualan').val(decodeURIComponent(jenis_penjualan)).change();
-        });
+        }).trigger('change');
 
         $("#hidden_tipe_pelanggan").on('input change keyup paste', function() {
             // if ($(".hidden_tipe_pelanggan").val()) {
