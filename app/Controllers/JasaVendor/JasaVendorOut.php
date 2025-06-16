@@ -703,6 +703,7 @@ class JasaVendorOut extends BaseController
                         $dataResult[$i]['stock_dokumen']
                     );
 
+                    $noDaftar = $this->stockDetail2Model->getNomorDaftar($dataResult[$i]['no_aju'], $dataResult[$i]['bc_id']);
 
                     $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
                     $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
@@ -715,6 +716,7 @@ class JasaVendorOut extends BaseController
                     $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
                     $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
                     $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
+                    $dataResult[$i]['no_daftar'] = $noDaftar;
 
                     if ($stockDetail['stok_total'] > 0) {
                         array_push($resultArr, $dataResult[$i]);
@@ -742,7 +744,10 @@ class JasaVendorOut extends BaseController
                             'id' => [],
                             'barang_name' => $barang_name,
                             'spesifikasi_list' => [],
-                            'bc_id' => $item['bc_id']
+                            'bc_id' => $item['bc_id'],
+                            'no_daftar' => $item['no_daftar'],
+                            'type_barang' => $item['type_barang'],
+                            'type_barang_text' => $item['type_barang_text']
                         ];
                     }
 
@@ -791,6 +796,7 @@ class JasaVendorOut extends BaseController
                         ->first();
 
                     $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
+                    $noDaftar = $this->stockDetail2Model->getNomorDaftar($dataResult[$i]['no_aju'], $dataResult[$i]['bc_id']);
 
                     $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
                     $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
@@ -804,6 +810,7 @@ class JasaVendorOut extends BaseController
                     $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
                     $dataResult[$i]['supplier_name'] = $jasaVendorIn == null ? "-" : $supplierName . ' / ' . $jasaVendorIn['nama_vendor'];
                     $dataResult[$i]['id'] = encrypt($dataResult[$i]['id']);
+                    $dataResult[$i]['no_daftar'] = $noDaftar;
 
                     if ($jasaVendorIn != null && $dataResult[$i]['stok_total'] > 0) {
                         array_push($resultArr, $dataResult[$i]);

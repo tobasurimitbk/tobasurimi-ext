@@ -647,187 +647,20 @@ class Penomoran_ extends BaseController
             'DATE(tanggal_transaksi) <=' => '2025-03-31',
         ];
 
-        $transaksiJurnalModel = new TransaksiJurnalModel();
-        $jurnalUmumModel = new JurnalUmumModel();
-        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
-        $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
-        $rmImportPoDetailModel = new RMImportPODetailModel();
         $total = 0;
 
         $db = \Config\Database::connect();
+        $penerimaanBarangModel = new PenerimaanBarangModel();
 
         try {
             $db->transBegin();
 
-            // lOKAL BAHAN BAKU
-            // $poLokalBahanBaku = $transaksiJurnalModel->select('transaksi_jurnal.*,transaksi_pembelian.id_local_bb,rm_purchase_orders.po_no,rm_purchase_orders.total')
-            //     ->join('transaksi_pembelian', 'transaksi_jurnal.id = transaksi_pembelian.id_transaksi_jurnal', 'left')
-            //     ->join('rm_purchase_orders', 'rm_purchase_orders.id = transaksi_pembelian.id_local_bb', 'left')
-            //     ->where('transaksi_jurnal.deleted_at', null)
-            //     ->where('transaksi_pembelian.id_local_bb is not', null)
-            //     ->where('rm_purchase_orders.company_id', $companyId)
-            //     ->where('rm_purchase_orders.is_posted', 1)
-            //     ->where('rm_purchase_orders.deletedAt', null)
-            //     ->where($condition)
-            //     ->findAll();
-
-            // // dd($poLokalBahanBaku);
-
-
-            // foreach ($poLokalBahanBaku as $p) {
-            //     // Update Transaksi Jurnal
-            //     $transaksiJurnalModel->update($p['id'], [
-            //         'valas' => "IDR",
-            //         'valas_id' => 30,
-            //         'exchange_rate' => 1,
-            //         'uraian_transaksi' => $p['po_no'],
-            //         'total_debit' => $p['total'],
-            //         'total_kredit' => $p['total']
-            //     ]);
-            //     // Update Jurnal Umum
-            //     $jurnalUmum = $jurnalUmumModel->where('id_transaksi', $p['id'])
-            //         ->where('company_id', $companyId)
-            //         ->where('deletedAt', null)
-            //         ->findAll();
-
-            //     $keteranganJurnal = $rmPurchaseOrderDetailModel->getSpesifikasiBarangAsString($p['id_local_bb']);
-            //     $totalAkun = count($jurnalUmum) - 1;
-
-            //     foreach ($jurnalUmum as $j) {
-            //         $lastJurnalUmum = $jurnalUmumModel->find($j['id']);
-            //         $jurnalUmumModel->update($j['id'], [
-            //             'valas' => 30,
-            //             'kurs' => 1,
-            //             'keterangan' => $keteranganJurnal,
-            //             'debit' => $lastJurnalUmum['debit'] == 0 ? 0 : round($p['total'] / $totalAkun, 0),
-            //             'kredit' => $p['total']
-            //         ]);
-            //     }
-
-            //     $total++;
-            // }
-
-            // // LOKAL BAHAN PENOLONG
-            $poLokalBahanPenolong = $transaksiJurnalModel->select('transaksi_jurnal.*,transaksi_pembelian.id_po_bp,am_purchase_orders.po_no,am_purchase_orders.total')
-                ->join('transaksi_pembelian', 'transaksi_jurnal.id = transaksi_pembelian.id_transaksi_jurnal', 'left')
-                ->join('am_purchase_orders', 'am_purchase_orders.id = transaksi_pembelian.id_po_bp', 'left')
-                ->where('transaksi_jurnal.deleted_at', null)
-                ->where('transaksi_pembelian.id_po_bp IS NOT NULL')
-                ->where('am_purchase_orders.company_id', $companyId)
-                ->where('am_purchase_orders.is_posted', 1)
-                ->where('am_purchase_orders.po_type', "Lokal")
-                ->where($condition)
-                ->findAll();
-
-            foreach ($poLokalBahanPenolong as $p) {
-                // Update Transaksi Jurnal
-                $transaksiJurnalModel->update($p['id'], [
-                    'valas' => "IDR",
-                    'valas_id' => 30,
-                    'exchange_rate' => 1,
-                    'uraian_transaksi' => $p['po_no'],
-                    'total_debit' => $p['total'],
-                    'total_kredit' => $p['total']
-                ]);
-                // Update Jurnal Umum
-                $jurnalUmum = $jurnalUmumModel->where('id_transaksi', $p['id'])
-                    ->where('company_id', $companyId)
-                    ->where('deletedAt', null)
-                    ->findAll();
-
-                $keteranganJurnal = $amPurchaseOrderDetailModel->getSpesifikasiBarangAsString($p['id_po_bp']);
-                $totalAkun = count($jurnalUmum) - 1;
-
-                foreach ($jurnalUmum as $j) {
-                    $lastJurnalUmum = $jurnalUmumModel->find($j['id']);
-
-                    $jurnalUmumModel->update($j['id'], [
-                        'valas' => 30,
-                        'kurs' => 1,
-                        'keterangan' => $keteranganJurnal,
-                        'debit' => $lastJurnalUmum['debit'] == 0 ? 0 : round($p['total'] / $totalAkun, 0),
-                        'kredit' => $p['total']
-                    ]);
-                }
-
-                $total++;
-            }
-
-            // // IMPORT BAHAN PENOLONG
-            // $poLokalBahanPenolong = $transaksiJurnalModel->select('transaksi_jurnal.*,transaksi_pembelian.id_po_bp,am_purchase_orders.po_no,am_purchase_orders.total')
-            //     ->join('transaksi_pembelian', 'transaksi_jurnal.id = transaksi_pembelian.id_transaksi_jurnal', 'left')
-            //     ->join('am_purchase_orders', 'am_purchase_orders.id = transaksi_pembelian.id_po_bp', 'left')
-            //     ->where('transaksi_jurnal.deleted_at', null)
-            //     ->where('transaksi_pembelian.id_po_bp IS NOT NULL')
-            //     ->where('am_purchase_orders.company_id', $companyId)
-            //     ->where('am_purchase_orders.is_posted', 1)
-            //     ->where('am_purchase_orders.po_type', "Import")
-            //     ->findAll();
-
-            // foreach ($poLokalBahanPenolong as $p) {
-            //     // Update Transaksi Jurnal
-            //     $transaksiJurnalModel->update($p['id'], [
-            //         'uraian_transaksi' => $p['po_no'],
-            //         'total_debit' => $p['total'],
-            //         'total_kredit' => $p['total']
-            //     ]);
-            //     // Update Jurnal Umum
-            //     $jurnalUmum = $jurnalUmumModel->where('id_transaksi', $p['id'])
-            //         ->where('company_id', $companyId)
-            //         ->where('deletedAt', null)
-            //         ->findAll();
-            //     $totalAkun = count($jurnalUmum) - 1;
-
-            //     $keteranganJurnal = $amPurchaseOrderDetailModel->getSpesifikasiBarangAsString($p['id_po_bp']);
-
-            //     foreach ($jurnalUmum as $j) {
-            //         $lastJurnalUmum = $jurnalUmumModel->find($j['id']);
-
-            //         $jurnalUmumModel->update($j['id'], [
-            //             'keterangan' => $keteranganJurnal,
-            //             'debit' => $lastJurnalUmum['debit'] == 0 ? 0 : round($p['total'] / $totalAkun, 0),
-            //             'kredit' => $p['total']
-            //         ]);
-            //     }
-
-            //     $total++;
-            // }
-            // IMPORT BAHAN BAKU
-            // $poImportBahanBaku = $transaksiJurnalModel->select('transaksi_jurnal.*,transaksi_pembelian.id_import_bb,rm_import_pos.po_no,rm_import_pos.total')
-            //     ->join('transaksi_pembelian', 'transaksi_jurnal.id = transaksi_pembelian.id_transaksi_jurnal', 'left')
-            //     ->join('rm_import_pos', 'rm_import_pos.id = transaksi_pembelian.id_import_bb', 'left')
-            //     ->where('transaksi_jurnal.deleted_at', null)
-            //     ->where('transaksi_pembelian.id_import_bb IS NOT NULL')
-            //     ->where('rm_import_pos.company_id', $companyId)
-            //     ->where('rm_import_pos.is_posted', 1)
-            //     ->findAll();
-
-            // foreach ($poImportBahanBaku as $p) {
-            //     // Update Transaksi Jurnal
-            //     $transaksiJurnalModel->update($p['id'], [
-            //         'uraian_transaksi' => $p['po_no'],
-            //         'total_debit' => $p['total'],
-            //         'total_kredit' => $p['total']
-            //     ]);
-            //     // Update Jurnal Umum
-            //     $jurnalUmum = $jurnalUmumModel->where('id_transaksi', $p['id'])
-            //         ->where('company_id', $companyId)
-            //         ->where('deletedAt', null)
-            //         ->findAll();
-
-            //     $keteranganJurnal = $rmImportPoDetailModel->getSpesifikasiBarangAsString($p['id_import_bb']);
-            //     $totalAkun = count($jurnalUmum) - 1;
-
-            //     foreach ($jurnalUmum as $j) {
-            //         $jurnalUmumModel->update($j['id'], [
-            //             'keterangan' => $keteranganJurnal,
-            //             'debit' => $lastJurnalUmum['debit'] == 0 ? 0 : round($p['total'] / $totalAkun, 0),
-            //             'kredit' => $p['total']
-            //         ]);
-            //     }
-
-            //     $total++;
-            // }
+            $penerimaanBarang = $db->query("
+                SELECT *FROM
+                penerimaan_barang
+                WHERE company_id=$companyId
+                 
+            ");
 
             $db->transCommit();
 
@@ -985,7 +818,111 @@ class Penomoran_ extends BaseController
 
         dd("OK", $arrJamKerja);
     }
+
+    public function repairJurnalUmumLpbBp()
+    {
+        $transaksiJurnalModel = new TransaksiJurnalModel();
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        // Loop
+        $companyId = 2;
+        $startDate = "2025-04-01";
+        $endDate = "2025-05-31";
+        $tipeTransaksi = "1406"; // PEMBELIAN
+
+        $selectQry = "
+            transaksi_jurnal.id,
+            transaksi_jurnal.tanggal_transaksi,
+            transaksi_jurnal.no_transaksi,
+            transaksi_jurnal.uraian_transaksi,
+            transaksi_jurnal.metode_input,
+            transaksi_jurnal.valas,
+            transaksi_jurnal.exchange_rate,
+            transaksi_jurnal.total_debit,
+            transaksi_jurnal.no_bukti,                 
+            metadata.value as transaksi_type_name,
+            transaksi_pembelian.id_local_bb,
+            transaksi_pembelian.id_import_bb,
+            transaksi_pembelian.id_po_bp,
+            jurnal_umum.supplier_id,
+            suppliers.name as supplier_name,
+            am_purchase_orders.po_type
+        ";
+
+        $dataQry = $transaksiJurnalModel->asObject()->select($selectQry)
+            ->join('metadata', 'metadata.id = transaksi_jurnal.type_transaksi', 'left')
+            ->join('jurnal_umum', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
+            ->join('transaksi_pembelian', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left')
+            ->join('am_purchase_orders', 'am_purchase_orders.id = transaksi_pembelian.id_po_bp', 'left')
+            ->join('suppliers', 'suppliers.id = transaksi_pembelian.id_supplier', 'left')
+            ->where('transaksi_jurnal.tanggal_transaksi >=', $startDate)
+            ->where('transaksi_jurnal.tanggal_transaksi <=', $endDate)
+            ->where('transaksi_jurnal.type_transaksi', $tipeTransaksi)
+            ->where('jurnal_umum.company_id', $companyId)
+            ->groupBy('jurnal_umum.id_transaksi')
+            ->findAll();
+
+        $total = 0;
+
+        foreach ($dataQry as $d) {
+            $penerimaanBarangId = null;
+
+            if ($d->id_local_bb != null) {
+                $penerimaanBarang = $penerimaanBarangModel
+                    ->select('penerimaan_barang.*,suppliers.name as supplier')
+                    ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+                    ->where('penerimaan_barang.company_id', $companyId)
+                    ->where('status_penerimaan', "LOKAL")
+                    ->where('tipe_bahan', "BAKU")
+                    ->like('multiple_po_id', $d->id_local_bb)
+                    ->first();
+                $penerimaanBarangId = $penerimaanBarang == null ? null : $penerimaanBarang['id'];
+            } elseif ($d->id_import_bb != null) {
+                $penerimaanBarang = $penerimaanBarangModel
+                    ->select('penerimaan_barang.*,suppliers.name as supplier')
+                    ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+                    ->where('penerimaan_barang.company_id', $companyId)
+                    ->where('status_penerimaan', "IMPORT")
+                    ->where('tipe_bahan', "BAKU")
+                    ->like('multiple_po_id', $d->id_import_bb)
+                    ->first();
+                $penerimaanBarangId = $penerimaanBarang == null ? null : $penerimaanBarang['id'];
+            } elseif ($d->id_po_bp != null) {
+                if ($d->po_type === "Lokal") {
+                    $penerimaanBarang = $penerimaanBarangModel
+                        ->select('penerimaan_barang.*,suppliers.name as supplier')
+                        ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+                        ->where('penerimaan_barang.company_id', $companyId)
+                        ->where('status_penerimaan', "LOKAL")
+                        ->where('tipe_bahan', "PENOLONG")
+                        ->like('multiple_po_id', $d->id_po_bp)
+                        ->first();
+                    $penerimaanBarangId = $penerimaanBarang == null ? null : $penerimaanBarang['id'];
+                } else {
+                    $penerimaanBarang = $penerimaanBarangModel
+                        ->select('penerimaan_barang.*,suppliers.name as supplier')
+                        ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+                        ->where('penerimaan_barang.company_id', $companyId)
+                        ->where('status_penerimaan', "IMPORT")
+                        ->where('tipe_bahan', "PENOLONG")
+                        ->like('multiple_po_id', $d->id_po_bp)
+                        ->first();
+                    $penerimaanBarangId = $penerimaanBarang == null ? null : $penerimaanBarang['id'];
+                }
+            }
+
+            $transaksiJurnalModel->update($d->id, [
+                'penerimaan_barang_id' => $penerimaanBarangId
+            ]);
+
+            $total++;
+        }
+
+        \var_dump("Total Updated", $total);
+        die;
+    }
 }
+
+
 
 // [
 //     "BAHAN PENOLONG",

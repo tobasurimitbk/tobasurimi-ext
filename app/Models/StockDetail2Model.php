@@ -460,6 +460,7 @@ class StockDetail2Model extends Model
     {
 
         $selectQry = '
+            CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
             suppliers.name AS supplier_name,
             stock.company_id,
             stock.barang1_id,
@@ -491,6 +492,8 @@ class StockDetail2Model extends Model
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id', 'left')
             ->join('stock', 'stock.id = stock_details.stock_id', 'left')
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+            ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
             ->where('stock_details2.stock_id', $stockID)
             ->where('stock_details2.bc_id', $bcID)
             ->where('stock_details2.no_aju', $noAju)

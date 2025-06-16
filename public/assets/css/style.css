@@ -2655,7 +2655,7 @@ a.dropdown-item.active {
   padding: 0;
 }
 .tab-content > .tab-pane {
-  line-height: 28px;
+  /* line-height: 28px; */
 }
 
 ul.nav-tabs li.nav-item a.nav-link i {
