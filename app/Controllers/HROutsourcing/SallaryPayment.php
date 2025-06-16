@@ -194,7 +194,7 @@ class SallaryPayment extends BaseController
 
     public function getHrEmployeeOutSourcing() {
         $company_id = $this->request->getVar('company_id');
-        $employee = $this->hrOutsourcingEmployeeModel->where('company_id', $company_id)->select('id, nama')->findAll();
+        $employee = $this->hrOutsourcingEmployeeModel->where('company_id', $company_id)->select('id, nama, badge, tanggal_masuk_kerja')->findAll();
 
         return response()->setJSON([
             'status' => true,
