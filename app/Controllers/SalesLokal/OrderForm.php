@@ -455,7 +455,7 @@ class OrderForm extends BaseController
             ->findAll();
 
         $condition = [
-            'jabatan_name' => "SALES"
+            'jabatan_name' => "MARKETING LOKAL"
         ];
 
         $sales = $this->employeeModel->getEmployeesComplete($condition);
