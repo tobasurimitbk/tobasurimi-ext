@@ -1751,7 +1751,7 @@ class BC40 extends BaseController
         $startDate = $this->request->getVar('start_date');
         $endDate = $this->request->getVar('end_date');
 
-        if (empty($endDate) || empty($poType)) {
+        if (empty($endDate) || empty($poType) || empty($supplierId)) {
             return response()->setJSON([
                 'data' => [],
                 'token' => csrf_hash(),
