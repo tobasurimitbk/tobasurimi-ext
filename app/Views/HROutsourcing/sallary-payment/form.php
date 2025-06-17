@@ -202,7 +202,7 @@ $(document).ready(function() {
         $('.body-detail-table').empty();
         var headerHtml = '';
         
-        if (department == '6') {
+        if (department == '5') {
             headerHtml = `
                 <tr>
                     <th class="text-center" rowspan="3">NO</th>
@@ -306,7 +306,7 @@ $(document).ready(function() {
                 var department = $('#departemen option:selected').val();
                 var rowHtml = '';
                 
-                if (department == '6') {
+                if (department == '5') {
                     // CANNING department table structure
                     $('#dataTable tbody').empty();
     
@@ -430,7 +430,7 @@ $(document).ready(function() {
 
     // Create table row based on department
     function createTableRow(department, employeeId, employeeName, tanggalMasuk, badge, payment) {
-        if (department == '6') {
+        if (department == '5') {
             return `
                 <tr data-employee-id="${employeeId}">
                     <td>${$('#dataTable tbody tr').length + 1}</td>
