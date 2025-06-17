@@ -26,10 +26,10 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th  class="sort">Jenis Doc</th>
-                                <th class="sort">Tanggal Doc</th>
+                                <th class="sort">Departemen</th>
+                                <th class="sort">Perusahaan</th>
+                                <th class="sort">Aksi</th>
                             </tr>
-
                         </thead>
                         <tbody class="body-table" id="body-table">
                         </tbody>
@@ -40,9 +40,9 @@
     </div>
 </section>
 
-<!-- <script>
+<script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "tanggal_lpb";
+    let sort = "createdAt";
     let sortType = "desc";
     var row = 0;
 
@@ -61,7 +61,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("/laporan-warehouse/penerimaan-barang/all-penerimaan-barang"); ?>",
+            url: "<?= base_url("/hr-outsourcing-sallary-payment/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.dateStart = $(".dateStart").val();
@@ -69,10 +69,6 @@
                 data.filter_bc_type = $(".filter_bc_type").val();
                 data.sort = sort;
                 data.sortType = sortType;
-                data.filter_divisi = $(".filter_divisi").val();
-                data.filter_supplier = $(".filter_supplier").val();
-                data.filter_barang = $(".filter_barang").val();
-                console.log(data);
             },
         },
         // scrollX: true,
@@ -90,63 +86,29 @@
                 sortable: false
             },
             {
-                data: "bc_type",
+                data: "department",
                 className: "text-center",
 
             },
             {
-                data: "tanggal_bc",
+                data: "company",
                 className: "text-center",
-            },
-            {
-                data: "no_daftar",
-                className: "text-center",
-            },
-            {
-                data: "no_aju",
-                className: "text-center",
-            },
-            {
-                data: "no_penerimaan_barang",
-                className: "text-center",
-            },
-            {
-                data: "tanggal_lpb",
-                className: "text-center",
-            },
-            {
-                data: "po_no",
-                className: "text-center",
-            },
-            {
-                data: "po_date",
-                className: "text-center",
-            },
-            {
-                data: "divisi",
-                className: "text-center",
-            },
-            {
-                data: "kode_barang",
-                className: "text-center",
-            },
-            {
-                data: "nama_barang_dok",
-                className: "text-center",
-            },
-            {
-                data: "kode_satuan",
-                className: "text-center",
-            },
-            {
-                data: "qty",
-                className: "text-center",
-            },
-            {
-                data: "jml_masuk",
-                className: "text-center",
-            },
 
+            },
+            {
+                data: "id",
+                className: "text-center",
+                render: function(data, type, row) {
+                    return `
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-danger delete-btn" data-id="${data}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                },
+                orderable: false
+            }
         ],
         columnDefs: [{
             defaultContent: "-",
@@ -184,6 +146,57 @@
         orientation: "bottom auto",
         autoclose: true
     })
+
+    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+        const data = table.row(this).data();
+        location.replace(`<?= base_url("hr-outsourcing-sallary-payment/id/"); ?>${data.id}`);
+    })
+
+    // Event delete dengan Swal
+    $('#dataTable tbody').on('click', '.delete-btn', function(e) {
+        e.stopPropagation(); // Biar ga trigger redirect dari event 'tr'
+
+        const id = $(this).data('id');
+
+        Swal.fire({
+            title: 'Apakah kamu yakin?',
+            text: "Data akan dihapus secara permanen!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `<?= base_url("/hr-outsourcing-sallary-payment/delete/") ?>${id}`,
+                    method: 'POST',
+                    data: {
+                        <?= csrf_token() ?>: '<?= csrf_hash() ?>'
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Data berhasil dihapus.',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                        table.ajax.reload();
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: 'Terjadi kesalahan saat menghapus data.'
+                        });
+                    }
+                });
+            }
+        });
+    });
+
 
     $('.icon-dateStart').click(function() {
         $(".dateStart").focus();
@@ -230,18 +243,6 @@
         .parent('div')
         .find('label')
         .css('z-index', '1');
-
-    const pdf = function(url) {
-
-        let dateStart = $(".dateStart").val();
-        let dateEnd = $(".dateEnd").val();
-        let filter_bc_type = $(".filter_bc_type").val();
-        let filter_divisi = $(".filter_divisi").val();
-        let filter_supplier = $(".filter_supplier").val();
-        let filter_barang = $(".filter_barang").val();
-
-        window.open(url + `?filter_bc_type=${filter_bc_type}&filter_divisi=${filter_divisi}&filter_supplier=${filter_supplier}&filter_barang=${filter_barang}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
-    }
-</script> -->
+</script>
 
 <?= $this->endSection(); ?>
