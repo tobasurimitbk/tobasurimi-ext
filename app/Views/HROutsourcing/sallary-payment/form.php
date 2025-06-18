@@ -206,9 +206,9 @@ $(document).ready(function() {
             headerHtml = `
                 <tr>
                     <th class="text-center" rowspan="3">NO</th>
-                    <th class="text-center" rowspan="3">TMK/MASA SUBSIDI</th>
-                    <th class="text-center" rowspan="3">BET</th>
-                    <th class="text-center" rowspan="3">NAMA</th>
+                    <th class="text-center" rowspan="3">TMK</th>
+                    <th class="text-center" rowspan="3">BADGE</th>
+                    <th class="text-center" style="min-width: 150px;" rowspan="3">NAMA</th>
                     <th class="text-center" colspan="15">DATA PEKERJAAN (KG)</th>
                     <th class="text-center" rowspan="3">JLH/KG</th>
                     <th class="text-center" rowspan="3">JLH ORG</th>
@@ -252,21 +252,21 @@ $(document).ready(function() {
                     <th rowspan="2">10,500</th>
                 </tr>
                 <tr>
-                    <th>2,500</th>
-                    <th>1,700</th>
+                    <th>2,800</th>
+                    <th>1,900</th>
+                    <th>3,200</th>
+                    <th>4,500</th>
+                    <th>6,500</th>
+                    <th>6,250</th>
                     <th>2,900</th>
-                    <th>4,000</th>
-                    <th>5,800</th>
-                    <th>5,600</th>
-                    <th>2,600</th>
-                    <th>2,300</th>
-                    <th>4,100</th>
-                    <th>5,500</th>
+                    <th>2,550</th>
+                    <th>4,600</th>
+                    <th>6,100</th>
                     <th>8,500</th>
-                    <th>600</th>
-                    <th>2,600</th>
+                    <th>700</th>
+                    <th>2,900</th>
                     <th>5,000</th>
-                    <th>5,600</th>
+                    <th>6,250</th>
                     <th style="display: none;">8,000</th>
                     <th style="display: none;">4,000</th>
                     <th style="display: none;">8,000</th>
