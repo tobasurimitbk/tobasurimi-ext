@@ -139,7 +139,7 @@
                             <select class="form-select termin" name="termin" id="termin_order_form">
                                 <option value=""></option>
                                 <?php foreach ($dataTermin ?? [] as $termin) : ?>
-                                    <option value="<?= $termin['value']; ?>"><?= $termin['value']; ?></option>
+                                    <option value="<?= $termin['id']; ?>"><?= $termin['value']; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <!-- <input autocomplete="one-time-code" type="text" class="form-control" id="termin" name="termin" readonly value="<?= $data->termin ?? '' ?>"> -->
@@ -893,6 +893,8 @@
             const salesName = $(this).find(':selected').data('salesname') ? $(this).find(':selected').data('salesname') : "";
             const tipePelanggan = $(this).find(':selected').data('tipepelanggan') ? $(this).find(':selected').data('tipepelanggan') : "";
             const jenis_penjualan = $(this).find(':selected').data('jenis_penjualan') ? $(this).find(':selected').data('jenis_penjualan') : "";
+
+            console.log(termin)
 
             $('#customerphone').val(decodeURIComponent(customerPhone));
             $('#destination').val(decodeURIComponent(customerAddress));
