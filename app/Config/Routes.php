@@ -765,9 +765,9 @@ $routes->post('/material-request/update-status', 'Production\MaterialRequest::up
 $routes->get('/material-request/list-barang-stock-init', 'Production\MaterialRequest::getListBarangIsInit', ['filter' => 'Auth']);
 $routes->get('/material-request/list-supplier', 'Production\MaterialRequest::getListSupplier', ['filter' => 'Auth']);
 $routes->get('/material-request/list-stock-dokumen-bc', 'Production\MaterialRequest::getListStockByStockID', ['filter' => 'Auth']);
-$routes->get('/material-request/list-barang-stock-init-bahan-baku', 'JasaVendor\JasaVendorOut::dropdownListBarangIsInit', ['filter' => 'Auth']);
+$routes->get('/material-request/list-barang-stock-init-bahan-baku', 'Production\MaterialRequest::dropdownListBarangIsInit', ['filter' => 'Auth']);
 $routes->get('/material-request/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
-$routes->get('/material-request/list-stock-dokumen-bc-bahan-baku', 'JasaVendor\JasaVendorOut::getListStockJasaVendorOut', ['filter' => 'Auth']);
+$routes->get('/material-request/list-stock-dokumen-bc-bahan-baku', 'Production\MaterialRequest::getListStockMaterialRequestBahanBaku', ['filter' => 'Auth']);
 // Material Request Penolong
 $routes->get('/material-request-penolong', 'Production\MaterialRequestPenolong::index', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/generate-kode-request', 'Production\MaterialRequestPenolong::generateKodeRequest', ['filter' => 'Auth']);

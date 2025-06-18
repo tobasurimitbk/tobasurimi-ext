@@ -346,8 +346,67 @@ class MaterialRequestDetailsModel extends Model
             }
         } else {
             // Untuk Stok Jasa Vendor
-            for ($i = 0; $i < count($result); $i++) {
-                $result[$i]['id'] = encrypt($result[$i]['stock_id']);
+            $grouped = [];
+
+            foreach ($result as $item) {
+                $key = $item['stock_dokumen'] . '|' . $item['stock_date'];
+
+                if (!isset($grouped[$key])) {
+                    $grouped[$key] = [
+                        'id' => [],
+                        'bc_id' => $item['bc_id'],
+                        'stock_dokumen' => $item['stock_dokumen'],
+                        'sumber' => $item['sumber'],
+                        'supplier_name' => $item['supplier_name'],
+                        'stock_detail_id' => $item['stock_detail_id'],
+                        'no_aju' => $item['no_aju'],
+                        'stock_id' => $item['stock_id'],
+                        'stok_total' => 0, // inisialisasi stok_total
+                        'bc_type' => $item['bc_type'],
+                        'satuan' => $item['satuan'],
+                        'type_barang' => $item['type_barang'],
+                        'type_barang_text' => $item['type_barang_text'],
+                        'stock_date' => $item['stock_date'],
+                        'divisi_id' => $item['divisi_id'],
+                        'divisi_asal_text' => $item['divisi_asal_text'],
+                        'divisi_tujuan_id' => $item['divisi_tujuan_id'],
+                        'divisi_tujuan_text' => $item['divisi_tujuan_text'],
+                        'qty2' => 0,
+                        'qty_isi' => 0,
+                        'kode_satuan' => $item['kode_satuan'],
+                        'warehouse_id' => $item['warehouse_id'],
+                        'warehouse_asal_text' => $item['warehouse_asal_text'],
+                        'warehouse_tujuan_text' => $item['warehouse_tujuan_text'],
+                        'warehouse_tujuan_id' => $item['warehouse_tujuan_id'],
+                        'no_daftar' => $item['no_daftar'],
+                        'supplier_name' => $item['supplier_name'],
+                        'supplier_id' => $item['supplier_id'],
+                        'harga_umum' => $item['harga_umum'],
+                        'harga_harian' => $item['harga_harian'],
+                        'harga_bulanan' => $item['harga_bulanan'],
+
+                        'qty' => 0, // inisialisasi qty,
+                        'barang' => [],
+                    ];
+                }
+
+                $grouped[$key]['qty'] += floatval($item['qty']);
+                $grouped[$key]['qty2'] += floatval($item['qty2']);
+                $grouped[$key]['qty_isi'] += floatval($item['qty_isi']);
+
+                $grouped[$key]['stok_total'] += floatval($item['stok_total']);
+                $grouped[$key]['id'][] = $item['stock_id'];
+
+                if (!in_array($item['barang'], $grouped[$key]['barang'])) {
+                    $grouped[$key]['barang'][] = $item['barang'];
+                }
+            }
+
+            $result = [];
+            foreach ($grouped as $item) {
+                $item['barang'] = implode(', ', $item['barang']);
+                $item['id'] = encrypt(json_encode($item['id']));
+                $result[] = $item;
             }
         }
 

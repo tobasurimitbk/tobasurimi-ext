@@ -2680,7 +2680,9 @@
                 barang_master_id: $(".spesifikasi_id option:selected").data('barang_master_id'),
                 stock_id: $(".spesifikasi_id option:selected").data('stock_id'),
                 supplier_id: $(".supplier_id option:selected").val(),
-                vendor_id: $('.vendor_barang_id option:selected').val()
+                vendor_id: $('.vendor_barang_id option:selected').val(),
+                divisi_asal_bahan_baku_id: $(".divisi_asal_bahan_baku_id").val(),
+                warehouse_asal_bahan_baku_id: $(".warehouse_asal_bahan_baku_id").val()
             },
             dataType: "json",
             success: function(res) {
