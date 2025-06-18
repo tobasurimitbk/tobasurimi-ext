@@ -254,14 +254,14 @@ $(document).ready(function() {
                 <tr>
                     <th>2,800</th>
                     <th>1,900</th>
-                    <th>3,200</th>
+                    <th>3,250</th>
                     <th>4,500</th>
                     <th>6,500</th>
                     <th>6,250</th>
                     <th>2,900</th>
                     <th>2,550</th>
                     <th>4,600</th>
-                    <th>6,100</th>
+                    <th>6,150</th>
                     <th>8,500</th>
                     <th>700</th>
                     <th>2,900</th>
