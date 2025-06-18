@@ -209,7 +209,7 @@ $(document).ready(function() {
                     <th class="text-center" rowspan="3">TMK/MASA SUBSIDI</th>
                     <th class="text-center" rowspan="3">BET</th>
                     <th class="text-center" rowspan="3">NAMA</th>
-                    <th class="text-center" colspan="10">DATA PEKERJAAN (KG)</th>
+                    <th class="text-center" colspan="15">DATA PEKERJAAN (KG)</th>
                     <th class="text-center" rowspan="3">JLH/KG</th>
                     <th class="text-center" rowspan="3">JLH ORG</th>
                     <th class="text-center" rowspan="3">TTL JAM SRT</th>
@@ -220,20 +220,64 @@ $(document).ready(function() {
                     <th class="text-center" rowspan="3">TOTAL KG</th>
                 </tr>
                 <tr>
-                    <th rowspan="2">SJB</th>
-                    <th rowspan="2">SJL</th>
-                    <th rowspan="2">SJBMT</th>
-                    <th rowspan="2">S.LEL</th>
-                    <th rowspan="2">S.LIM</th>
-                    <th rowspan="2">S.SPP</th>
-                    <th rowspan="2">S.CM / S.CT</th>
-                    <th rowspan="2">S.CCT</th>
-                    <th rowspan="2">S.MH</th>
-                    <th rowspan="2">S.LEL (Ulang)</th>
+                    <th rowspan="1">SJB</th>
+                    <th rowspan="1">SJL</th>
+                    <th rowspan="1">MT</th>
+                    <th rowspan="1">SEL</th>
+                    <th rowspan="1">SLM</th>
+                    <th rowspan="1">SSP</th>
+                    <th rowspan="1">SCM</th>
+                    <th rowspan="1">CTT</th>
+                    <th rowspan="1">CCT</th>
+                    <th rowspan="1">SMH</th>
+                    <th rowspan="1">DM</th>
+                    <th rowspan="1">SCF</th>
+                    <th rowspan="1">LEL</th>
+                    <th rowspan="1">GC</th>
+                    <th rowspan="1">SSPK</th>
+                    <th rowspan="1" style="display: none;">KJB</th>
+                    <th rowspan="1" style="display: none;">KJL</th>
+                    <th rowspan="1" style="display: none;">KLP</th>
+                    <th rowspan="1" style="display: none;">KSP</th>
+                    <th rowspan="1" style="display: none;">KCL</th>
+                    <th rowspan="1" style="display: none;">KCM</th>
+                    <th rowspan="1" style="display: none;">KLG</th>
+                    <th rowspan="1" style="display: none;">LM</th>
+                    <th rowspan="1" style="display: none;">KEL</th>
+                    <th rowspan="1" style="display: none;">KCF</th>
+                    <th rowspan="1" style="display: none;">CU</th>
                     <th rowspan="2">Kilo 400</th>
                     <th rowspan="2">Kilo 600</th>
-                    <th rowspan="2">TOTAL</th> 
+                    <th rowspan="2">TOTAL</th>
                     <th rowspan="2">10,500</th>
+                </tr>
+                <tr>
+                    <th>2,500</th>
+                    <th>1,700</th>
+                    <th>2,900</th>
+                    <th>4,000</th>
+                    <th>5,800</th>
+                    <th>5,600</th>
+                    <th>2,600</th>
+                    <th>2,300</th>
+                    <th>4,100</th>
+                    <th>5,500</th>
+                    <th>8,500</th>
+                    <th>600</th>
+                    <th>2,600</th>
+                    <th>5,000</th>
+                    <th>5,600</th>
+                    <th style="display: none;">8,000</th>
+                    <th style="display: none;">4,000</th>
+                    <th style="display: none;">8,000</th>
+                    <th style="display: none;">4,000</th>
+                    <th style="display: none;">8,000</th>
+                    <th style="display: none;">5,000</th>
+                    <th style="display: none;">10,000</th>
+                    <th style="display: none;">5,500</th>
+                    <th style="display: none;">12,000</th>
+                    <th style="display: none;">8,000</th>
+                    <th style="display: none;">440</th>
                 </tr>
             `;
         } else {
@@ -309,7 +353,7 @@ $(document).ready(function() {
                 if (department == '5') {
                     // CANNING department table structure
                     $('#dataTable tbody').empty();
-    
+
                     rowHtml = `
                         <tr data-employee-id="${employeeId}">
                             <td>${$('#dataTable tbody tr').length + 1}</td>
@@ -317,19 +361,35 @@ $(document).ready(function() {
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${badge}" readonly></td>
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${employeeName}" readonly></td>
                             
-                            <!-- CANNING specific fields -->
+                            <!-- DATA PEKERJAAN (26 columns) -->
                             <td><input type="number" class="form-control form-control-sm" name="sjb" style="min-width: 100px;" value="${payment.sjb || ''}"></td>
                             <td><input type="number" class="form-control form-control-sm" name="sjl" style="min-width: 100px;" value="${payment.sjl || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="sjbmt" style="min-width: 100px;" value="${payment.sjbmt || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="slel" style="min-width: 100px;" value="${payment.slel || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="slim" style="min-width: 100px;" value="${payment.slim || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="sspp" style="min-width: 100px;" value="${payment.sspp || ''}"></td>
+                            <td><input type="number" class="form-control form-control-sm" name="mt" style="min-width: 100px;" value="${payment.mt || ''}"></td>
+                            <td><input type="number" class="form-control form-control-sm" name="sel" style="min-width: 100px;" value="${payment.sel || ''}"></td>
+                            <td><input type="number" class="form-control form-control-sm" name="slm" style="min-width: 100px;" value="${payment.slm || ''}"></td>
+                            <td><input type="number" class="form-control form-control-sm" name="ssp" style="min-width: 100px;" value="${payment.ssp || ''}"></td>
                             <td><input type="number" class="form-control form-control-sm" name="scm" style="min-width: 100px;" value="${payment.scm || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="scct" style="min-width: 100px;" value="${payment.scct || ''}"></td>
+                            <td><input type="number" class="form-control form-control-sm" name="ctt" style="min-width: 100px;" value="${payment.ctt || ''}"></td>
+                            <td><input type="number" class="form-control form-control-sm" name="cct" style="min-width: 100px;" value="${payment.cct || ''}"></td>
                             <td><input type="number" class="form-control form-control-sm" name="smh" style="min-width: 100px;" value="${payment.smh || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="slel2" style="min-width: 100px;" value="${payment.slel2 || ''}"></td>
+                            <td><input type="number" class="form-control form-control-sm" name="dm" style="min-width: 100px;" value="${payment.dm || ''}"></td>
+                            <td><input type="number" class="form-control form-control-sm" name="scf" style="min-width: 100px;" value="${payment.scf || ''}"></td>
+                            <td><input type="number" class="form-control form-control-sm" name="lel" style="min-width: 100px;" value="${payment.lel || ''}"></td>
+                            <td><input type="number" class="form-control form-control-sm" name="gc" style="min-width: 100px;" value="${payment.gc || ''}"></td>
+                            <td><input type="number" class="form-control form-control-sm" name="sspk" style="min-width: 100px;" value="${payment.sspk || ''}"></td>
+                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kjb" style="min-width: 100px; display: none;" value="${payment.kjb || ''}"></td>
+                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kjl" style="min-width: 100px; display: none;" value="${payment.kjl || ''}"></td>
+                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="klp" style="min-width: 100px; display: none;" value="${payment.klp || ''}"></td>
+                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="ksp" style="min-width: 100px; display: none;" value="${payment.ksp || ''}"></td>
+                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kcl" style="min-width: 100px; display: none;" value="${payment.kcl || ''}"></td>
+                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kcm" style="min-width: 100px; display: none;" value="${payment.kcm || ''}"></td>
+                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="klg" style="min-width: 100px; display: none;" value="${payment.klg || ''}"></td>
+                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="lm" style="min-width: 100px; display: none;" value="${payment.lm || ''}"></td>
+                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kel" style="min-width: 100px; display: none;" value="${payment.kel || ''}"></td>
+                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kcf" style="min-width: 100px; display: none;" value="${payment.kcf || ''}"></td>
+                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="cu" style="min-width: 100px; display: none;" value="${payment.cu || ''}"></td>
                             
-                            <!-- Calculations -->
+                            <!-- Summary columns -->
                             <td><input type="number" class="form-control form-control-sm" name="jlhkg" style="min-width: 100px;" value="${payment.jlhkg || ''}"></td>
                             <td><input type="number" class="form-control form-control-sm" name="jlh_org" style="min-width: 100px;" value="${payment.jlh_org || ''}"></td>
                             <td><input type="number" class="form-control form-control-sm" name="ttl_jam" style="min-width: 100px;" value="${payment.ttl_jam || ''}"></td>
@@ -341,7 +401,7 @@ $(document).ready(function() {
                             <td><input type="number" class="form-control form-control-sm" name="subsidik600" style="min-width: 100px;" value="${payment.subsidik600 || ''}"></td>
                             <td><input type="number" class="form-control form-control-sm" name="subsiditotal" style="min-width: 100px;" value="${payment.subsiditotal || ''}"></td>
                             
-                            <!-- Final style="min-width: 100px;" values -->
+                            <!-- Final values -->
                             <td><input type="number" class="form-control form-control-sm" name="perjam" style="min-width: 100px;" value="${payment.perjam || ''}"></td>
                             <td><input type="number" class="form-control form-control-sm" name="total_kg" style="min-width: 100px;" value="${payment.total_kg || ''}"></td>
                         </tr>
@@ -432,39 +492,55 @@ $(document).ready(function() {
     function createTableRow(department, employeeId, employeeName, tanggalMasuk, badge, payment) {
         if (department == '5') {
             return `
-                <tr data-employee-id="${employeeId}">
+                 <tr data-employee-id="${employeeId}">
                     <td>${$('#dataTable tbody tr').length + 1}</td>
-                    <td><input type="text" class="form-control form-control-sm" value="${tanggalMasuk}" readonly></td>
-                    <td><input type="text" class="form-control form-control-sm" value="${badge}" readonly></td>
-                    <td><input type="text" class="form-control form-control-sm" value="${employeeName}" data-id="${employeeId}" readonly></td>
-
-                    <!-- SJB - S.LEL -->
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="sjb"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="sjl"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="sjbmt"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="slel"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="slim"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="sspp"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="scm"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="scct"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="smh"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="slel2"></td>
-
-                    <!-- JLH/KG, ORG, JAM, RP -->
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="jlhkg"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="jlh_org"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="ttl_jam"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="rp"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="total_rp_org"></td>
-
-                    <!-- Subsidi -->
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="subsidik400"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="subsidik600"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="subsiditotal"></td>
-
-                    <!-- Perjam, Total KG -->
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="perjam"></td>
-                    <td><input type="number" class="form-control form-control-sm" style="min-width: 100px;" name="total_kg"></td>
+                    <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${tanggalMasuk}" readonly></td>
+                    <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${badge}" readonly></td>
+                    <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${employeeName}" readonly></td>
+                    
+                    <!-- DATA PEKERJAAN (26 columns) -->
+                    <td><input type="number" class="form-control form-control-sm" name="sjb" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="sjl" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="mt" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="sel" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="slm" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="ssp" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="scm" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="ctt" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="cct" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="smh" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="dm" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="scf" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="lel" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="gc" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="sspk" style="min-width: 100px;"></td>
+                    <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kjb" style="min-width: 100px; display: none;"></td>
+                    <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kjl" style="min-width: 100px; display: none;"></td>
+                    <td style="display: none;"><input type="number" class="form-control form-control-sm" name="klp" style="min-width: 100px; display: none;"></td>
+                    <td style="display: none;"><input type="number" class="form-control form-control-sm" name="ksp" style="min-width: 100px; display: none;"></td>
+                    <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kcl" style="min-width: 100px; display: none;"></td>
+                    <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kcm" style="min-width: 100px; display: none;"></td>
+                    <td style="display: none;"><input type="number" class="form-control form-control-sm" name="klg" style="min-width: 100px; display: none;"></td>
+                    <td style="display: none;"><input type="number" class="form-control form-control-sm" name="lm" style="min-width: 100px; display: none;"></td>
+                    <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kel" style="min-width: 100px; display: none;"></td>
+                    <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kcf" style="min-width: 100px; display: none;"></td>
+                    <td style="display: none;"><input type="number" class="form-control form-control-sm" name="cu" style="min-width: 100px; display: none;"></td>
+                    
+                    <!-- Summary columns -->
+                    <td><input type="number" class="form-control form-control-sm" name="jlhkg" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="jlh_org" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="ttl_jam" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="rp" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="total_rp_org" style="min-width: 100px;"></td>
+                    
+                    <!-- Subsidies -->
+                    <td><input type="number" class="form-control form-control-sm" name="subsidik400" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="subsidik600" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="subsiditotal" style="min-width: 100px;"></td>
+                    
+                    <!-- Final values -->
+                    <td><input type="number" class="form-control form-control-sm" name="perjam" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="total_kg" style="min-width: 100px;"></td>
                 </tr>
             `;
         } else {
@@ -520,33 +596,49 @@ $(document).ready(function() {
 
     function collectEmployeeData() {
         var employeeData = [];
-        var departmentText = $('#departemen option:selected').text();
+        var departmentText = $('#departemen option:selected').val();
         
         $('#dataTable tbody tr').each(function() {
             var $row = $(this);
             var employeeId = $row.data('employee-id');
             
-            if (departmentText === 'CANNING') {
-                // For CANNING department
+            if (departmentText === '5') {
+                // For PTS department
                 employeeData.push({
                     employee_id: employeeId,
                     employee_name: $row.find('td:eq(3) input').val(),
                     badge: $row.find('td:eq(2) input').val(),
                     tanggal_masuk_kerja: $row.find('td:eq(1) input').val(),
                     
-                    // CANNING specific fields
+                    // Job data columns (26)
                     sjb: parseFloat($row.find('[name="sjb"]').val()) || 0,
                     sjl: parseFloat($row.find('[name="sjl"]').val()) || 0,
-                    sjbmt: parseFloat($row.find('[name="sjbmt"]').val()) || 0,
-                    slel: parseFloat($row.find('[name="slel"]').val()) || 0,
-                    slim: parseFloat($row.find('[name="slim"]').val()) || 0,
-                    sspp: parseFloat($row.find('[name="sspp"]').val()) || 0,
+                    mt: parseFloat($row.find('[name="mt"]').val()) || 0,
+                    sel: parseFloat($row.find('[name="sel"]').val()) || 0,
+                    slm: parseFloat($row.find('[name="slm"]').val()) || 0,
+                    ssp: parseFloat($row.find('[name="ssp"]').val()) || 0,
                     scm: parseFloat($row.find('[name="scm"]').val()) || 0,
-                    scct: parseFloat($row.find('[name="scct"]').val()) || 0,
+                    ctt: parseFloat($row.find('[name="ctt"]').val()) || 0,
+                    cct: parseFloat($row.find('[name="cct"]').val()) || 0,
                     smh: parseFloat($row.find('[name="smh"]').val()) || 0,
-                    slel2: parseFloat($row.find('[name="slel2"]').val()) || 0,
+                    dm: parseFloat($row.find('[name="dm"]').val()) || 0,
+                    scf: parseFloat($row.find('[name="scf"]').val()) || 0,
+                    lel: parseFloat($row.find('[name="lel"]').val()) || 0,
+                    gc: parseFloat($row.find('[name="gc"]').val()) || 0,
+                    sspk: parseFloat($row.find('[name="sspk"]').val()) || 0,
+                    kjb: parseFloat($row.find('[name="kjb"]').val()) || 0,
+                    kjl: parseFloat($row.find('[name="kjl"]').val()) || 0,
+                    klp: parseFloat($row.find('[name="klp"]').val()) || 0,
+                    ksp: parseFloat($row.find('[name="ksp"]').val()) || 0,
+                    kcl: parseFloat($row.find('[name="kcl"]').val()) || 0,
+                    kcm: parseFloat($row.find('[name="kcm"]').val()) || 0,
+                    klg: parseFloat($row.find('[name="klg"]').val()) || 0,
+                    lm: parseFloat($row.find('[name="lm"]').val()) || 0,
+                    kel: parseFloat($row.find('[name="kel"]').val()) || 0,
+                    kcf: parseFloat($row.find('[name="kcf"]').val()) || 0,
+                    cu: parseFloat($row.find('[name="cu"]').val()) || 0,
                     
-                    // Calculations
+                    // Summary columns
                     jlhkg: parseFloat($row.find('[name="jlhkg"]').val()) || 0,
                     jlh_org: parseFloat($row.find('[name="jlh_org"]').val()) || 0,
                     ttl_jam: parseFloat($row.find('[name="ttl_jam"]').val()) || 0,
