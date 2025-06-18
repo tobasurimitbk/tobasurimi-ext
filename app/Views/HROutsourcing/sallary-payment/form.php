@@ -215,7 +215,8 @@ $(document).ready(function() {
                     <th class="text-center" rowspan="3">TTL JAM SRT</th>
                     <th class="text-center" rowspan="3">Rp</th>
                     <th class="text-center" rowspan="3">TOTAL Rp /ORG</th>
-                    <th class="text-center" colspan="3">SUBSIDI</th>
+                    <th class="text-center" rowspan="3">SUBSIDI</th>
+                    <th class="text-center" colspan="2">TARGET</th>
                     <th class="text-center" colspan="1">Perjam</th>
                     <th class="text-center" rowspan="3">TOTAL KG</th>
                 </tr>
@@ -248,7 +249,6 @@ $(document).ready(function() {
                     <th rowspan="1" style="display: none;">CU</th>
                     <th rowspan="2">Kilo 400</th>
                     <th rowspan="2">Kilo 600</th>
-                    <th rowspan="2">TOTAL</th>
                     <th rowspan="2">10,500</th>
                 </tr>
                 <tr>
@@ -354,14 +354,14 @@ $(document).ready(function() {
                     // CANNING department table structure
                     $('#dataTable tbody').empty();
 
-                    rowHtml = `
+                   rowHtml = `
                         <tr data-employee-id="${employeeId}">
                             <td>${$('#dataTable tbody tr').length + 1}</td>
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${tanggalMasuk}" readonly></td>
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${badge}" readonly></td>
-                            <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${employeeName}" readonly></td>
+                            <td><input type="text" class="form-control form-control-sm" style="min-width: 150px;" value="${employeeName}" readonly></td>
                             
-                            <!-- DATA PEKERJAAN (26 columns) -->
+                            <!-- DATA PEKERJAAN (15 columns) -->
                             <td><input type="number" class="form-control form-control-sm" name="sjb" style="min-width: 100px;" value="${payment.sjb || ''}"></td>
                             <td><input type="number" class="form-control form-control-sm" name="sjl" style="min-width: 100px;" value="${payment.sjl || ''}"></td>
                             <td><input type="number" class="form-control form-control-sm" name="mt" style="min-width: 100px;" value="${payment.mt || ''}"></td>
@@ -377,17 +377,6 @@ $(document).ready(function() {
                             <td><input type="number" class="form-control form-control-sm" name="lel" style="min-width: 100px;" value="${payment.lel || ''}"></td>
                             <td><input type="number" class="form-control form-control-sm" name="gc" style="min-width: 100px;" value="${payment.gc || ''}"></td>
                             <td><input type="number" class="form-control form-control-sm" name="sspk" style="min-width: 100px;" value="${payment.sspk || ''}"></td>
-                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kjb" style="min-width: 100px; display: none;" value="${payment.kjb || ''}"></td>
-                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kjl" style="min-width: 100px; display: none;" value="${payment.kjl || ''}"></td>
-                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="klp" style="min-width: 100px; display: none;" value="${payment.klp || ''}"></td>
-                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="ksp" style="min-width: 100px; display: none;" value="${payment.ksp || ''}"></td>
-                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kcl" style="min-width: 100px; display: none;" value="${payment.kcl || ''}"></td>
-                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kcm" style="min-width: 100px; display: none;" value="${payment.kcm || ''}"></td>
-                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="klg" style="min-width: 100px; display: none;" value="${payment.klg || ''}"></td>
-                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="lm" style="min-width: 100px; display: none;" value="${payment.lm || ''}"></td>
-                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kel" style="min-width: 100px; display: none;" value="${payment.kel || ''}"></td>
-                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="kcf" style="min-width: 100px; display: none;" value="${payment.kcf || ''}"></td>
-                            <td style="display: none;"><input type="number" class="form-control form-control-sm" name="cu" style="min-width: 100px; display: none;" value="${payment.cu || ''}"></td>
                             
                             <!-- Summary columns -->
                             <td><input type="number" class="form-control form-control-sm" name="jlhkg" style="min-width: 100px;" value="${payment.jlhkg || ''}"></td>
@@ -397,9 +386,11 @@ $(document).ready(function() {
                             <td><input type="number" class="form-control form-control-sm" name="total_rp_org" style="min-width: 100px;" value="${payment.total_rp_org || ''}"></td>
                             
                             <!-- Subsidies -->
-                            <td><input type="number" class="form-control form-control-sm" name="subsidik400" style="min-width: 100px;" value="${payment.subsidik400 || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="subsidik600" style="min-width: 100px;" value="${payment.subsidik600 || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="subsiditotal" style="min-width: 100px;" value="${payment.subsiditotal || ''}"></td>
+                            <td><input type="number" class="form-control form-control-sm" name="subsidi" style="min-width: 100px;" value="${payment.subsidi || ''}"></td>
+                            
+                            <!-- Target -->
+                            <td><input type="number" class="form-control form-control-sm" name="kilo400" style="min-width: 100px;" value="${payment.kilo400 || ''}"></td>
+                            <td><input type="number" class="form-control form-control-sm" name="kilo600" style="min-width: 100px;" value="${payment.kilo600 || ''}"></td>
                             
                             <!-- Final values -->
                             <td><input type="number" class="form-control form-control-sm" name="perjam" style="min-width: 100px;" value="${payment.perjam || ''}"></td>
@@ -534,10 +525,12 @@ $(document).ready(function() {
                     <td><input type="number" class="form-control form-control-sm" name="total_rp_org" style="min-width: 100px;"></td>
                     
                     <!-- Subsidies -->
-                    <td><input type="number" class="form-control form-control-sm" name="subsidik400" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm" name="subsidik600" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm" name="subsiditotal" style="min-width: 100px;"></td>
-                    
+                    <td><input type="number" class="form-control form-control-sm" name="subsidi" style="min-width: 100px;"></td>
+                            
+                    <!-- Target -->
+                    <td><input type="number" class="form-control form-control-sm" name="kilo400" style="min-width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="kilo600" style="min-width: 100px;"></td>
+                            
                     <!-- Final values -->
                     <td><input type="number" class="form-control form-control-sm" name="perjam" style="min-width: 100px;"></td>
                     <td><input type="number" class="form-control form-control-sm" name="total_kg" style="min-width: 100px;"></td>
@@ -646,9 +639,11 @@ $(document).ready(function() {
                     total_rp_org: parseFloat($row.find('[name="total_rp_org"]').val()) || 0,
                     
                     // Subsidies
-                    subsidik400: parseFloat($row.find('[name="subsidik400"]').val()) || 0,
-                    subsidik600: parseFloat($row.find('[name="subsidik600"]').val()) || 0,
-                    subsiditotal: parseFloat($row.find('[name="subsiditotal"]').val()) || 0,
+                    subsidi: parseFloat($row.find('[name="subsidi"]').val()) || 0,
+                    
+                    // Target
+                    kilo400: parseFloat($row.find('[name="kilo400"]').val()) || 0,
+                    kilo600: parseFloat($row.find('[name="kilo600"]').val()) || 0,
                     
                     // Final values
                     perjam: parseFloat($row.find('[name="perjam"]').val()) || 0,
