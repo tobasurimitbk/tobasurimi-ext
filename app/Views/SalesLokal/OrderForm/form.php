@@ -1704,6 +1704,9 @@
                                             } else if (result.isDenied) {
                                                 // Buat baru
                                                 window.location.reload();
+                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                // Tutup - redirect to order-form-lokal
+                                                window.location.href = `<?= base_url("order-form-lokal"); ?>`;
                                             }
                                         });
                                     } else {
@@ -1775,6 +1778,9 @@
                                             } else if (result.isDenied) {
                                                 // Buat baru
                                                 window.location.reload();
+                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                // Tutup - redirect to order-form-lokal
+                                                window.location.href = `<?= base_url("order-form-lokal"); ?>`;
                                             }
                                         });
                                     } else {
