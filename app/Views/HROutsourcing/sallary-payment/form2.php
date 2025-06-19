@@ -15,7 +15,7 @@
         <div class="card-body">
             <form class="karyawan-form" role="form" method="POST">
                 <input type="hidden" name="id" id="id">
-                
+
                 <!-- Header Section -->
                 <div class="card mb-4">
                     <div class="card-header">
@@ -47,7 +47,7 @@
                 </div>
 
 
-                 <div class="card mb-4">
+                <div class="card mb-4">
                     <div class="card-header">
                         <h5>Detail Karyawan</h5>
                     </div>
@@ -70,7 +70,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Form Actions -->
                 <div class="form-actions text-right">
                     <button type="button" class="btn btn-secondary mr-2" onclick="resetForm()">
@@ -81,7 +81,7 @@
                     </button>
                 </div>
             </form>
-            
+
             <!-- Data Table Section -->
             <div class="row mt-4">
                 <div class="row justify-content-end mb-3">
@@ -90,7 +90,7 @@
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">    
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th rowspan="3">NO</th>
@@ -120,7 +120,7 @@
                                 <th rowspan="2">S.LEL (Ulang)</th>
                                 <th rowspan="2">Kilo 400</th>
                                 <th rowspan="2">Kilo 600</th>
-                                <th rowspan="2">TOTAL</th> 
+                                <th rowspan="2">TOTAL</th>
                                 <th rowspan="2">10,500</th>
                             </tr>
                         </thead>
@@ -136,106 +136,106 @@
 </section>
 
 <script>
-// Global variables to store data
-var headerData = {
-    departemen: null,
-    company: null,
-};
+    // Global variables to store data
+    var headerData = {
+        departemen: null,
+        company: null,
+    };
 
-// Initialize Select2 and event handlers
-$(document).ready(function() {
-    // Initialize Select2
-    $('.select2').select2({
-        theme: "bootstrap-5",
-        allowClear: true
+    // Initialize Select2 and event handlers
+    $(document).ready(function() {
+        // Initialize Select2
+        $('.select2').select2({
+            theme: "bootstrap-5",
+            allowClear: true
+        });
+
+        // Departemen change event
+        $('#departemen').on('change', function() {
+            var departemen_id = $(this).val();
+            $('#company').val(null).trigger('change');
+            $('#employee').val(null).trigger('change').prop('disabled', true);
+            headerData.departemen = $(this).val();
+
+            if (departemen_id) {
+                $('#company').prop('disabled', false);
+
+                $.ajax({
+                    url: '<?= base_url('/hr-outsourcing-sallary-payment/getHrCompanyOutSourcing') ?>',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        departemen_id: departemen_id,
+                        <?= csrf_token() ?>: '<?= csrf_hash() ?>'
+                    },
+                    success: function(response) {
+                        $('#company').empty().append('<option value="">Select Company</option>');
+                        $.each(response.data, function(index, item) {
+                            $('#company').append('<option value="' + item.id + '">' + item.name + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#company').prop('disabled', true);
+            }
+        });
+
+        // Company change event
+        $('#company').on('change', function() {
+            var company_id = $(this).val();
+            $('#employee').val(null).trigger('change');
+            headerData.company = $(this).val();
+
+            if (company_id) {
+                $('#employee').prop('disabled', false);
+
+                $.ajax({
+                    url: '<?= base_url('/hr-outsourcing-sallary-payment/getHrEmployeeOutSourcing') ?>',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        company_id: company_id,
+                        <?= csrf_token() ?>: '<?= csrf_hash() ?>'
+                    },
+                    success: function(response) {
+                        $('#employee').empty().append('<option value="">Select Employee</option>');
+                        $.each(response.data, function(index, item) {
+                            $('#employee').append('<option data-badge="' + item.badge + '" data-tanggal_masuk_kerja="' + item.tanggal_masuk_kerja + '" value="' + item.id + '">' + item.nama + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#employee').prop('disabled', true);
+            }
+        });
+
+        // Employee change event
+        $('#employee').on('change', function() {
+            let tanggal_masuk_kerja = $(this).find(':selected').data('tanggal_masuk_kerja');
+            $('#tanggal_masuk_kerja').val(tanggal_masuk_kerja);
+        });
+
+        // Submit button click event
+        $('.btn-submit').on('click', function() {
+            // Validate header data
+            if (!headerData.departemen || !headerData.company) {
+                alert('Harap lengkapi data header terlebih dahulu!');
+                return;
+            }
+
+            // Add data to table
+            addToTable();
+        });
     });
 
-    // Departemen change event
-    $('#departemen').on('change', function() {
-        var departemen_id = $(this).val();
-        $('#company').val(null).trigger('change');
-        $('#employee').val(null).trigger('change').prop('disabled', true);
-        headerData.departemen = $(this).val();
+    // Function to add data to table
+    function addToTable() {
+        var employeeName = $('#employee option:selected').text();
+        var employeeId = $('#employee').val();
+        var tanggalMasuk = $('#tanggal_masuk_kerja').val();
+        var badge = $('#employee').find(':selected').data('badge');
 
-        if(departemen_id) {
-            $('#company').prop('disabled', false);
-            
-            $.ajax({
-                url: '<?= base_url('/hr-outsourcing-sallary-payment/getHrCompanyOutSourcing') ?>',
-                type: 'POST',
-                dataType: 'json',
-                data: {
-                    departemen_id: departemen_id,
-                    <?= csrf_token() ?>: '<?= csrf_hash() ?>'
-                },
-                success: function(response) {
-                    $('#company').empty().append('<option value="">Select Company</option>');
-                    $.each(response.data, function(index, item) {
-                        $('#company').append('<option value="'+item.id+'">'+item.name+'</option>');
-                    });
-                }
-            });
-        } else {
-            $('#company').prop('disabled', true);
-        }
-    });
-
-    // Company change event
-    $('#company').on('change', function() {
-        var company_id = $(this).val();
-        $('#employee').val(null).trigger('change');
-        headerData.company = $(this).val();
-
-        if(company_id) {
-            $('#employee').prop('disabled', false);
-            
-            $.ajax({
-                url: '<?= base_url('/hr-outsourcing-sallary-payment/getHrEmployeeOutSourcing') ?>',
-                type: 'POST',
-                dataType: 'json',
-                data: {
-                    company_id: company_id,
-                    <?= csrf_token() ?>: '<?= csrf_hash() ?>'
-                },
-                success: function(response) {
-                    $('#employee').empty().append('<option value="">Select Employee</option>');
-                    $.each(response.data, function(index, item) {
-                        $('#employee').append('<option data-badge="'+item.badge+'" data-tanggal_masuk_kerja="'+item.tanggal_masuk_kerja+'" value="'+item.id+'">'+item.nama+'</option>');
-                    });
-                }
-            });
-        } else {
-            $('#employee').prop('disabled', true);
-        }
-    });
-
-    // Employee change event
-    $('#employee').on('change', function() {
-        let tanggal_masuk_kerja = $(this).find(':selected').data('tanggal_masuk_kerja');
-        $('#tanggal_masuk_kerja').val(tanggal_masuk_kerja);
-    });
-
-    // Submit button click event
-    $('.btn-submit').on('click', function() {
-        // Validate header data
-        if (!headerData.departemen || !headerData.company) {
-            alert('Harap lengkapi data header terlebih dahulu!');
-            return;
-        }
-
-        // Add data to table
-        addToTable();
-    });
-});
-
-// Function to add data to table
-function addToTable() {
-    var employeeName = $('#employee option:selected').text();
-    var employeeId = $('#employee').val();
-    var tanggalMasuk = $('#tanggal_masuk_kerja').val();
-    var badge = $('#employee').find(':selected').data('badge');
-
-    var newRow = `
+        var newRow = `
         <tr>
             <td>${$('#dataTable tbody tr').length + 1}</td>
             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${tanggalMasuk}" readonly></td>
@@ -272,16 +272,16 @@ function addToTable() {
         </tr>
     `;
 
-    $('#dataTable tbody').append(newRow);
-    resetForm();
-}
+        $('#dataTable tbody').append(newRow);
+        resetForm();
+    }
 
 
-// Reset form function
-function resetForm() {
-    $('#tanggal_masuk_kerja').val('');
-    $('#employee').val(null).trigger('change');
-}
+    // Reset form function
+    function resetForm() {
+        $('#tanggal_masuk_kerja').val('');
+        $('#employee').val(null).trigger('change');
+    }
 </script>
 
 <?= $this->endSection(); ?>
