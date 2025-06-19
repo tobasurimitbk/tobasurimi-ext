@@ -143,6 +143,7 @@ class SalesKontrak extends BaseController
         $dataSatuan = $this->satuanModel->findAll();
         $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->orderBy('createdAt', "DESC")->findAll();
         $isClosed = $this->salesOrderExportModel->where('sales_contract_id', $id)->findAll();
+        $dataDivisi = $this->divisiModel->where('company_id', $this->this_company_id)->findAll();
         $condition = [
             'jabatan_name' => "SALES"
         ];
@@ -157,6 +158,7 @@ class SalesKontrak extends BaseController
             "dataCountry" => $dataCountry,
             "dataValuta" => $dataValuta,
             "dataTipeHarga" => $dataTipeHarga,
+            "dataDivisi" => $dataDivisi,
             'dataSatuan' => $dataSatuan,
             'dataBarang' => $dataBarang,
             'dataSalesKontrak' => $dataSalesKontrak,
@@ -255,6 +257,21 @@ class SalesKontrak extends BaseController
             ]);
         }
 
+        // Validasi Nomor Sales Kontrak
+        $salesContractNo = $this->request->getVar('sales_contract_no');
+        $salesContract = $this->salesKontrakModel->where('sales_contract_no', $salesContractNo)
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->first();
+
+        if ($salesContract != null) {
+            return response()->setJSON([
+                'message' => "Nomor sales kontrak sudah digunakan oleh anda atau sales lain",
+                'status' => false,
+                'token' => csrf_token()
+            ]);
+        }
+
         $id = $this->salesKontrakModel->insert([
             'company_id' => $this->this_company_id,
             'customer_id' => $this->request->getVar('customer_id'),
@@ -270,7 +287,7 @@ class SalesKontrak extends BaseController
             'due_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("due_date")), "Y-m-d") : "",
             'total_amount' => $this->request->getVar('total_amount'),
             'tolerance' => $this->request->getVar('tolerance'),
-            'shipment_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("shipment_date")), "Y-m-d") : "",
+            'shipment_date' => $this->request->getVar("shipment_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("shipment_date")), "Y-m-d") : "",
             'payment_term' => $this->request->getVar('payment_term'),
             'potongan_harga' => $this->request->getVar('potongan_harga'),
             'documents_required' => $this->request->getVar('documents_required'),
@@ -318,7 +335,25 @@ class SalesKontrak extends BaseController
             ]);
         }
 
+
+        // Validasi Nomor Sales Kontrak
+        $salesContractNo = $this->request->getVar('sales_contract_no');
+        $salesContract = $this->salesKontrakModel->where('sales_contract_no', $salesContractNo)
+            ->where('company_id', $this->this_company_id)
+            ->where('id !=', $id)
+            ->where('deletedAt', null)
+            ->first();
+
+        if ($salesContract != null) {
+            return response()->setJSON([
+                'message' => "Nomor sales kontrak sudah digunakan oleh anda atau sales lain",
+                'status' => false,
+                'token' => csrf_token()
+            ]);
+        }
+
         $this->salesKontrakModel->update($id, [
+            'sales_contract_no' => $this->request->getVar('sales_contract_no'),
             'customer_id' => $this->request->getVar('customer_id'),
             'divisi_id' => $this->request->getVar('divisi_id'),
             'customer_po_no' => $this->request->getVar('customer_po_no'),
@@ -331,7 +366,7 @@ class SalesKontrak extends BaseController
             'due_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("due_date")), "Y-m-d") : "",
             'total_amount' => $this->request->getVar('total_amount'),
             'tolerance' => $this->request->getVar('tolerance'),
-            'shipment_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("shipment_date")), "Y-m-d") : "",
+            'shipment_date' => $this->request->getVar("shipment_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("shipment_date")), "Y-m-d") : "",
             'payment_term' => $this->request->getVar('payment_term'),
             'potongan_harga' => $this->request->getVar('potongan_harga'),
             'documents_required' => $this->request->getVar('documents_required'),
@@ -437,7 +472,10 @@ class SalesKontrak extends BaseController
         $filename = "Sales Kontrak";
         $id = decrypt($id);
 
-        $salesKontrak = $this->salesKontrakModel->find($id);
+        $salesKontrak = $this->salesKontrakModel
+            ->select('sales_contract.*,customers.name as customer_name')
+            ->join('customers', 'sales_contract.customer_id = customers.id', 'left')
+            ->find($id);
         $salesKontrakDetail = $this->salesKontrakDetailModel->detail($id);
         if ($salesKontrak == null) {
             return redirect()->to('sales-kontrak');

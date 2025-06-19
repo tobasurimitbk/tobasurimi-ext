@@ -66,7 +66,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? 'readonly=true' : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['sales_contract_no'] : ""; ?>" type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
+                                    <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting'] == "1" ? 'readonly' : '') : 'readonly'; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['sales_contract_no'] : ""; ?>" type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
                                     <label for="floatingInput">No Sales Kontrak</label>
                                 </div>
                                 <div style="<?= !empty($dataSalesKontrak)  ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -227,7 +227,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <!-- <div class="row">
                     <div class="col mb-3">
                         <label class="form-label font-weight-bold lable-title">Broker</label>
                     </div>
@@ -255,7 +255,7 @@
                             <label for="floatingInput">Print Out Sales Kontak</label>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <div class="row">
                     <div class="col mb-3">
                         <label class="form-label font-weight-bold lable-title">Dokumen & Special Instructions</label>
@@ -265,13 +265,13 @@
                     <div class="col-md-6">
                         <div class="form-floating">
                             <textarea autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control documents_required" id="documents_required" name="documents_required" placeholder="Document Required"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['documents_required'] : ""; ?></textarea>
-                            <label for="floatingInput">Document Required</label>
+                            <label for="floatingInput">Document Required (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating">
                             <textarea autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Special Instructions"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['special_instructions'] : ""; ?></textarea>
-                            <label for="floatingInput">Special Instructions</label>
+                            <label for="floatingInput">Special Instructions (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -407,7 +407,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
                                 <input autocomplete="one-time-code" type="text" class="form-control remark" id="remark" name="remark" placeholder="Remark" oninput="capitalize()">
-                                <label for="floatingInput">Remark</label>
+                                <label for="floatingInput">Remark (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -575,7 +575,6 @@
 </div>
 
 
-
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     var listBarang = [];
@@ -600,6 +599,9 @@
             });
         <?php endforeach; ?>
         drawTable();
+
+    <?php else: ?>
+        changeStatus();
     <?php endif; ?>
 
     $(".due_date").datepicker({
@@ -810,12 +812,12 @@
             print_out_broker: {
                 required: true
             },
-            documents_required: {
-                required: true
-            },
-            special_instructions: {
-                required: true
-            },
+            // documents_required: {
+            //     required: true
+            // },
+            // special_instructions: {
+            //     required: true
+            // },
         },
         messages: {
             sales_contract_no: {
@@ -845,12 +847,12 @@
             print_out_broker: {
                 required: "Print out boker wajib diisi"
             },
-            documents_required: {
-                required: "Dokumen wajib diisi"
-            },
-            special_instructions: {
-                required: "Special instructions wajib diisi"
-            },
+            // documents_required: {
+            //     required: "Dokumen wajib diisi"
+            // },
+            // special_instructions: {
+            //     required: "Special instructions wajib diisi"
+            // },
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -889,9 +891,9 @@
             harga: {
                 required: true
             },
-            remark: {
-                required: true
-            },
+            // remark: {
+            //     required: true
+            // },
             total: {
                 required: true
             }
@@ -909,9 +911,9 @@
             harga: {
                 required: "Harga wajib diisi"
             },
-            remark: {
-                required: "Remark wajib diisi"
-            },
+            // remark: {
+            //     required: "Remark wajib diisi"
+            // },
             total: {
                 required: "Total wajib diisi"
             }
@@ -1302,16 +1304,25 @@
                                 processData: false,
                                 contentType: false,
                                 success: function(response) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                        confirmButtonText: 'Ok'
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            window.location.href = "<?= base_url('sales-kontrak') ?>"
-                                        }
-                                    });
+                                    if (response.status) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            confirmButtonText: 'Ok'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                window.location.href = "<?= base_url('sales-kontrak') ?>"
+                                            }
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            confirmButtonText: 'Ok'
+                                        });
+                                    }
                                 },
                             });
                         }
@@ -1344,16 +1355,25 @@
                                 processData: false,
                                 contentType: false,
                                 success: function(response) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                        confirmButtonText: 'Ok'
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            window.location.href = "<?= base_url('sales-kontrak') ?>"
-                                        }
-                                    });
+                                    if (response.status) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            confirmButtonText: 'Ok'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                window.location.href = "<?= base_url('sales-kontrak') ?>"
+                                            }
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                            confirmButtonText: 'Ok'
+                                        });
+                                    }
                                 },
                             });
                         }
@@ -1401,7 +1421,6 @@
     })
 
 
-    changeStatus();
     generateCodeMasterBarang();
 
     function print(url) {
