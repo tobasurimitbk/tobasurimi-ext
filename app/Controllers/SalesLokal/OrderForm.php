@@ -354,6 +354,7 @@ class OrderForm extends BaseController
                 "nama_ecommerce"           => $postData['nama_ecommerce'] ? $postData['nama_ecommerce'] : "",
                 "order_date"            => $orderDate,
                 "total_harga"           => $postData['total'],
+                "keterangan" => $postData['parent_keterangan'],
                 "id_company"            => $this->this_company_id,
                 "tipe_sales_order"      => 'LOKAL',
                 "ppn"      => $status_ppn
@@ -647,14 +648,17 @@ class OrderForm extends BaseController
                 }
             }
 
-            $this->SalesOrderModel->update($id, 
-            [
-                'qty_barang' => $totalQty,
-                'shipping_date' => $shippingDate,
-                'destination' =>  $postData['destination'],
-                'ppn' => $status_ppn,
-                'total_harga' => $total_harga
-            ]);
+            $this->SalesOrderModel->update(
+                $id,
+                [
+                    'qty_barang' => $totalQty,
+                    'shipping_date' => $shippingDate,
+                    'destination' =>  $postData['destination'],
+                    'ppn' => $status_ppn,
+                    'total_harga' => $total_harga,
+                    "keterangan" => $postData['parent_keterangan'],
+                ]
+            );
 
             $this->SalesOrderModel->db->transComplete();
 
