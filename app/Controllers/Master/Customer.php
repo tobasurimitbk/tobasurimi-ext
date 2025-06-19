@@ -324,7 +324,7 @@ class Customer extends BaseController
 
                 $values = [
                     "company_id" => $this->this_company_id,
-                    "user_id" => $this->this_user_id,
+                    // "user_id" => $this->this_user_id,
                     "kode" => $this->request->getPost("kode"),
                     "name" => strtoupper($this->request->getVar("name")),
                     "address" => strtoupper($this->request->getVar("address")),
