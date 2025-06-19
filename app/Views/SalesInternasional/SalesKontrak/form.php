@@ -77,14 +77,14 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting'] ? 'disabled=true' : '') : ''; ?> 
-                                    class="form-select divisi_id" 
-                                    aria-label="Floating label select example" 
-                                    name="divisi_id" 
-                                    id="divisi_id">
+                            <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting'] ? 'disabled=true' : '') : ''; ?>
+                                class="form-select divisi_id"
+                                aria-label="Floating label select example"
+                                name="divisi_id"
+                                id="divisi_id">
                                 <option value=""></option>
                                 <?php foreach ($dataDivisi as $d) : ?>
-                                    <option value="<?= $d['id'] ?>" 
+                                    <option value="<?= $d['id'] ?>"
                                         <?= !empty($dataSalesKontrak['divisi_id']) && $dataSalesKontrak['divisi_id'] == $d['id'] ? 'selected' : '' ?>>
                                         <?= $d['divisi'] ?>
                                     </option>
@@ -523,12 +523,6 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control barang_name" name="barang_name" id="barang_name" placeholder="Nama Kemasan">
-                                <label for="floatingInput">Nama Barang</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select type_barang" name="type_barang" id="type_barang">
                                     <option value="">Pilih Tipe Barang</option>
                                     <option value="bahan_jadi">BARANG JADI</option>
@@ -540,13 +534,27 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select spesifikasi_id" name="spesifikasi_id" id="spesifikasi_id">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Pilih Dari Master Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control barang_name" name="barang_name" id="barang_name" placeholder="Nama Kemasan">
+                                <label for="floatingInput">Nama Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
                                     <option value=""></option>
                                     <?php foreach ($dataSatuan as $d) : ?>
                                         <option value="<?= $d['id'] ?>"><?= $d['kode_satuan'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput">Satuan</label>
+                                <label for="floatingInput" style="z-index: 1;">Satuan Default (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -699,21 +707,39 @@
         theme: "bootstrap-5",
     })
 
-     // DEPARTMENT
+    // DEPARTMENT
     $('.divisi_id').select2({
         placeholder: "Pilih Department",
         theme: "bootstrap-5",
     })
 
+    $("#spesifikasi_id").select2({
+        theme: "bootstrap-5",
+        placeholder: 'Pilih Dari Master Barang',
+        allowClear: true,
+        dropdownParent: $(".add-modal .modal-content"),
+    }).change(function() {
+        var id = $('#spesifikasi_id option:selected').val();
+        var selectedText = $('#spesifikasi_id option:selected').text();
+
+        if (id != '') {
+            $('#barang_name').val(selectedText);
+
+        } else {
+            $('#barang_name').val(null);
+
+        }
+    });
+
     //CSS SELECT2 FLOATING LABEL
-    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id')
+    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id,#divisi_id,#spesifikasi_id')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id')
+    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id,#divisi_id,#spesifikasi_id')
         .parent('div')
         .children('span')
         .children('span')
@@ -721,7 +747,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.satuan_id')
+    $('.satuan_id,#divisi_id,#spesifikasi_id')
         .parent('div')
         .children('span')
         .children('span')
@@ -729,7 +755,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,#sales_id')
+    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,#sales_id,#divisi_id,#spesifikasi_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -924,15 +950,15 @@
             type_barang: {
                 required: true
             },
-            satuan_id: {
-                required: true
-            },
-            harga_pokok: {
-                required: true
-            },
-            harga_jual: {
-                required: true
-            }
+            // satuan_id: {
+            //     required: true
+            // },
+            // harga_pokok: {
+            //     required: true
+            // },
+            // harga_jual: {
+            //     required: true
+            // }
         },
         messages: {
             kode_barang: {
@@ -944,15 +970,15 @@
             type_barang: {
                 required: "Tipe barang wajib diisi"
             },
-            satuan_id: {
-                required: "Satuan wajib diisi"
-            },
-            harga_pokok: {
-                required: "Harga pokok wajib diisi"
-            },
-            harga_jual: {
-                required: "Harga jual wajib diisi"
-            }
+            // satuan_id: {
+            //     required: "Satuan wajib diisi"
+            // },
+            // harga_pokok: {
+            //     required: "Harga pokok wajib diisi"
+            // },
+            // harga_jual: {
+            //     required: "Harga jual wajib diisi"
+            // }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -1340,24 +1366,6 @@
     // MASTER BARANG
     $('.btn-barang-add').click(function() {
 
-        const divisiId = $("#divisi_id").val();
-
-        if (!divisiId) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Peringatan',
-                text: 'Silakan pilih Divisi terlebih dahulu',
-                confirmButtonText: 'OK',
-                allowOutsideClick: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Focus on divisi select2
-                    $("#divisi_id").select2('open');
-                }
-            });
-            return false; // Stop execution
-        }
-
         $('#addMasterBarangModal').modal('show');
         $('.detail-modal').modal('hide');
         // reset form master barang
@@ -1370,6 +1378,7 @@
         $('.harga_pokok').val(null);
         $('.harga_jual').val(null);
         getListMasterBarang()
+        fetchBarangData();
     })
 
     $('.btn-discard-master-barang').click(function() {
@@ -1379,22 +1388,6 @@
 
     // MODAL DETAIL
     $('.btn-show-detail').click(function() {
-        const divisiId = $("#divisi_id").val();
-        if (!divisiId) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Peringatan',
-                text: 'Silakan pilih Divisi terlebih dahulu',
-                confirmButtonText: 'OK',
-                allowOutsideClick: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Focus on divisi select2
-                    $("#divisi_id").select2('open');
-                }
-            });
-            return false; // Stop execution
-        }
         $('.detail-modal').modal('show');
         $('.title-detail-name').text('Tambah');
         validatorDetail.resetForm();
@@ -1582,24 +1575,7 @@
         // Get the selected divisi_id value
         const csrf = $(`[name="${csrfToken}"]`);
         const divisiId = $("#divisi_id").val();
-        
-        // Check if divisi_id is empty
-        if (!divisiId) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Peringatan',
-                text: 'Silakan pilih Divisi terlebih dahulu',
-                confirmButtonText: 'OK',
-                allowOutsideClick: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Focus on divisi select2
-                    $("#divisi_id").select2('open');
-                }
-            });
-            return false; // Stop execution
-        }
-        
+
         $.ajax({
             url: `<?= base_url('sales-kontrak/master-barang'); ?>`,
             method: "POST",
@@ -1610,15 +1586,12 @@
             complete: function() {
                 stopLoading();
             },
-            data: {
-                divisi_id: divisiId
-            },
             dataType: "json",
             success: function(res) {
                 if (res.data && res.data.length > 0) {
                     $(".barang_master_sales_id").empty();
                     $(".barang_master_sales_id").append(`<option value=""></option>`);
-                    
+
                     res.data.forEach(function(item) {
                         $(".barang_master_sales_id").append(
                             `<option value="${item.id}" 
@@ -1630,15 +1603,8 @@
                             </option>`
                         );
                     });
-                    
+
                     $(".barang_master_sales_id").val('').trigger('change');
-                } else {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Informasi',
-                        text: 'Tidak ada data barang untuk divisi yang dipilih',
-                        confirmButtonText: 'OK'
-                    });
                 }
             },
             error: function(xhr, status, error) {
@@ -1820,6 +1786,52 @@
     //handle print
     function print(url) {
         window.open(url, "_blank");
+    }
+
+    // // Function to fetch barang data
+    function fetchBarangData() {
+        let csrfToken = '<?= csrf_token() ?>';
+        let csrf = $(`[name="${csrfToken}"]`);
+
+        $.ajax({
+            url: "<?= base_url('master-barang-internasional/get-barang-jadi-master') ?>",
+            method: 'POST',
+            data: {
+                type_barang: $('#type_barang option:selected').val()
+            },
+            dataType: 'json',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            success: function(response) {
+                var typeBarang = $('#type_barang option:selected').val();
+                var spesifikasiIdSelect = $("select[name='spesifikasi_id']");
+                spesifikasiIdSelect.empty();
+
+                var emptyOption = $("<option></option>")
+                    .attr("value", "")
+                    .text("Pilih Dari Master Barang");
+                // Replace with select element
+                if (typeBarang == 'kemasan') {
+                    spesifikasiIdSelect.append(emptyOption);
+                    $.each(response.data, function(index, data) {
+                        var option = $("<option></option>")
+                            .attr("value", data.id)
+                            .text(data.barang_name_master);
+                        spesifikasiIdSelect.append(option);
+                    });
+                } else {
+                    spesifikasiIdSelect.append(emptyOption);
+                    $.each(response.data, function(index, data) {
+                        var option = $("<option></option>")
+                            .attr("value", data.id)
+                            .text(data.barang_name_master + " - " + data.spesifikasi);
+                        spesifikasiIdSelect.append(option);
+                    });
+                }
+
+            },
+        });
     }
 </script>
 <?= $this->endSection(); ?>

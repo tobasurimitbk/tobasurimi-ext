@@ -39,7 +39,6 @@ class Barang extends BaseController
     {
         $data = [
             'satuan' => $this->satuanModel->findAll(),
-            'divisi' => $this->divisiModel->where('company_id', $this->this_company_id)->findAll(),
         ];
 
         return view('SalesInternasional/barangMaster/index', $data);
@@ -56,25 +55,24 @@ class Barang extends BaseController
             ]);
         }
 
-        $namaBarang = $this->barangMasterSalesModel->where('barang_name', strtoupper($this->request->getVar('barang_name')))->where('company_id', $this->this_company_id)->where('type_barang_sales', "EKSPOR")->first();
-        if ($namaBarang != null) {
-            return response()->setJSON([
-                'status' => false,
-                'token' => csrf_hash(),
-                'message' => "Nama barang " . $namaBarang['barang_name'] . " sudah ada"
-            ]);
-        }
+        // $namaBarang = $this->barangMasterSalesModel->where('barang_name', $this->request->getVar('barang_name'))->where('company_id', $this->this_company_id)->where('type_barang_sales', "EKSPOR")->first();
+        // if ($namaBarang != null) {
+        //     return response()->setJSON([
+        //         'status' => false,
+        //         'token' => csrf_hash(),
+        //         'message' => "Nama barang " . $namaBarang['barang_name'] . " sudah ada"
+        //     ]);
+        // }
 
         $this->barangMasterSalesModel->insert([
             'company_id' => $this->this_company_id,
             'kode_barang' => $this->request->getVar('kode_barang'),
-            'divisi_id' => $this->request->getVar('divisi_id'),
-            'barang_name' => strtoupper($this->request->getVar('barang_name')),
+            'barang_name' => $this->request->getVar('barang_name'),
             'type_barang_sales' => "EKSPOR",
             'type_barang' => $this->request->getVar('type_barang'),
-            'satuan_id' => $this->request->getVar('satuan_id'),
+            'satuan_id' => empty($this->request->getVar('satuan_id')) ? null : $this->request->getVar('satuan_id'),
             // 'harga_pokok' => repairDouble($this->request->getVar('harga_pokok')),
-            'harga_jual' => $this->request->getVar('harga_jual')
+            'harga_jual' => empty($this->request->getVar('harga_jual')) ? null :  $this->request->getVar('harga_jual')
         ]);
 
         return response()->setJSON([
@@ -88,27 +86,38 @@ class Barang extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
 
-        $check = $this->barangMasterSalesModel
-            ->where('barang_name', strtoupper($this->request->getVar('barang_name')))
-            ->where('company_id', $this->this_company_id)->where('type_barang_sales', "EKSPOR")
+        $kodeBarang = $this->barangMasterSalesModel
+            ->where('kode_barang', $this->request->getVar('kode_barang'))
+            ->where('company_id', $this->this_company_id)
+            ->where('type_barang_sales', "EKSPOR")
             ->where('id !=', $id)
             ->first();
-
-
-        if ($check) {
+        if ($kodeBarang != null) {
             return response()->setJSON([
                 'status' => false,
-                'message' => "Nama barang sudah ada.",
-                'token' => csrf_hash()
+                'token' => csrf_hash(),
+                'message' => "Kode barang " . $kodeBarang['kode_barang'] . " sudah ada"
             ]);
         }
 
+        // $namaBarang = $this->barangMasterSalesModel
+        //     ->where('barang_name', $this->request->getVar('barang_name'))
+        //     ->where('company_id', $this->this_company_id)->where('type_barang_sales', "EKSPOR")
+        //     ->where('id !=', $id)
+        //     ->first();
+
+        // if ($namaBarang != null) {
+        //     return response()->setJSON([
+        //         'status' => false,
+        //         'token' => csrf_hash(),
+        //         'message' => "Nama barang " . $namaBarang['barang_name'] . " sudah ada"
+        //     ]);
+        // }
 
         $this->barangMasterSalesModel->update($id, [
             'company_id' => $this->this_company_id,
             'kode_barang' => $this->request->getVar('kode_barang'),
-            'barang_name' => strtoupper($this->request->getVar('barang_name')),
-            'divisi_id' => $this->request->getVar('divisi_id'),
+            'barang_name' => $this->request->getVar('barang_name'),
             'type_barang_sales' => "EKSPOR",
             'satuan_id' => $this->request->getVar('satuan_id'),
             // 'harga_pokok' => repairDouble($this->request->getVar('harga_pokok')),
@@ -218,10 +227,10 @@ class Barang extends BaseController
                 "kode_barang"       => $data['kode_barang'],
                 "barang_name"       => $data['barang_name'],
                 "type_barang_sales" => $data['type_barang_sales'],
-                'kode_satuan'       => $data['kode_satuan'] . " (" . $data['nama_satuan'] . ")",
+                'kode_satuan'       => $data['kode_satuan'] != null ? $data['kode_satuan'] . " (" . $data['nama_satuan'] . ")" : "",
                 "type_barang"       => strtoupper(str_replace('_', ' ', $data['type_barang'] == "bahan_jadi" ? "barang_jadi" : "kemasan")),
                 "harga_pokok"       => floatval($data['harga_pokok']),
-                "harga_jual"        => floatval($data['harga_jual']),
+                "harga_jual"        => $data['harga_jual'] != 0.00 ? floatval($data['harga_jual']) : '',
             ]);
         }
 

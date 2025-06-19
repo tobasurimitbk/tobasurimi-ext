@@ -91,26 +91,12 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select divisi_id" name="divisi_id" id="divisi_id">
-                                    <option value=""></option>
-                                    <?php foreach ($divisi as $d) : ?>
-                                        <option value="<?= ($d['id']) ?>"><?= $d['divisi'] ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Departemen</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select spesifikasi_id" name="spesifikasi_id" id="spesifikasi_id">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Pilih Dari Master Barang</label>
                             </div>
                         </div>
-
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control barang_name" name="barang_name" id="barang_name" placeholder="Nama Barang">
@@ -125,7 +111,7 @@
                                         <option value="<?= ($kb['id']) ?>"><?= $kb['kode_satuan'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Satuan</label>
+                                <label for="floatingInput" style="z-index: 1;">Satuan Default (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -339,15 +325,15 @@
             type_barang: {
                 required: true
             },
-            satuan_id: {
-                required: true
-            },
+            // satuan_id: {
+            //     required: true
+            // },
             // harga_pokok: {
             //     required: true
             // },
-            harga_jual: {
-                required: true
-            }
+            // harga_jual: {
+            //     required: true
+            // }
         },
         messages: {
             kode_barang: {
@@ -359,15 +345,15 @@
             type_barang: {
                 required: "Tipe barang wajib diisi"
             },
-            satuan_id: {
-                required: "Satuan wajib diisi"
-            },
+            // satuan_id: {
+            //     required: "Satuan wajib diisi"
+            // },
             // harga_pokok: {
             //     required: "Harga pokok wajib diisi"
             // },
-            harga_jual: {
-                required: "Harga jual wajib diisi"
-            }
+            // harga_jual: {
+            //     required: "Harga jual wajib diisi"
+            // }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -550,15 +536,15 @@
                 $('.barang_name').val(res.data.barang_name);
                 $('.type_barang').val(res.data.type_barang).change();
                 $('.satuan_id').val(res.data.satuan_id).change();
-                $('.divisi_id').val(res.data.divisi_id).change();
                 $('.harga_jual').val(greatFormatRupiah(res.data.harga_jual));
 
                 $('.input-generate').hide();
-                $('.kode_barang').attr('readonly', true);
+                // $('.kode_barang').attr('readonly', true);
                 $('.type_barang').attr('disabled', true);
                 $('#add_modal').modal('show');
                 $('.delete-btn').show();
                 $('.title-name').text('Update Barang')
+                $('#generate_new_code').prop('checked', false);
             }
         })
     });
@@ -618,6 +604,7 @@
         $('#add_modal').modal('show');
         $('.delete-btn').hide();
         $('.title-name').text('Tambah Barang')
+        $('#generate_new_code').prop('checked', true).trigger('change');
     });
 
     $('.btn-hide-form').click(function() {
@@ -641,22 +628,8 @@
             generateNewCode();
         }
         fetchBarangData();
-        // Enable/disable divisi_id based on type_barang selection
-        if ($(this).val()) {
-            $("#divisi_id").prop('disabled', false);
-        } else {
-            $("#divisi_id").prop('disabled', true).val(null).trigger('change');
-        }
     });
 
-    // Initialize select2 for divisi_id (initially disabled)
-    $("#divisi_id").select2({
-        theme: "bootstrap-5",
-        placeholder: 'Pilih Divisi',
-        allowClear: true,
-        dropdownParent: $(".add-modal .modal-content"),
-        disabled: true // Initially disabled
-    }).change(function() {});
 
     // // Function to fetch barang data
     function fetchBarangData() {
@@ -707,7 +680,7 @@
 
     $("#satuan_id").select2({
         theme: "bootstrap-5",
-        placeholder: 'Pilih Satuan',
+        placeholder: 'Pilih Satuan Default (Opsional)',
         allowClear: true,
         dropdownParent: $(".add-modal .modal-content")
     });
