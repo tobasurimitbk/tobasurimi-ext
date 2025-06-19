@@ -695,6 +695,7 @@
     $('.barang_master_sales_id').select2({
         placeholder: "Pilih Barang",
         theme: "bootstrap-5",
+        dropdownParent: $('.detail-modal')
     }).change(function() {
         var selected = $('.barang_master_sales_id option:selected');
         if (selected.val() != "") {
@@ -1422,6 +1423,7 @@
 
 
     generateCodeMasterBarang();
+    getListMasterBarang();
 
     function print(url) {
         window.open(url, "_blank");
@@ -1600,10 +1602,10 @@
             method: "POST",
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                setLoading();
+                // setLoading();
             },
             complete: function() {
-                stopLoading();
+                // stopLoading();
             },
             dataType: "json",
             success: function(res) {
