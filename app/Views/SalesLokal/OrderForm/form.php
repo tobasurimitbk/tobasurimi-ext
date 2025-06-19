@@ -139,7 +139,7 @@
                             <select class="form-select termin" name="termin" id="termin_order_form">
                                 <option value=""></option>
                                 <?php foreach ($dataTermin ?? [] as $termin) : ?>
-                                    <option value="<?= $termin['id']; ?>"><?= $termin['value']; ?></option>
+                                    <option <?= (!empty($data) && $data->termin_id == $termin['id'] ? 'selected' : '') ?> value="<?= $termin['id']; ?>"><?= $termin['value']; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <!-- <input autocomplete="one-time-code" type="text" class="form-control" id="termin" name="termin" readonly value="<?= $data->termin ?? '' ?>"> -->
@@ -903,7 +903,7 @@
             $('#id_sales').val(decodeURIComponent(salesName)).change();
             $('#hidden_tipe_pelanggan').val(decodeURIComponent(tipePelanggan)).change();
             $('#jenis_penjualan').val(decodeURIComponent(jenis_penjualan)).change();
-        }).trigger('change');
+        });
 
         $("#hidden_tipe_pelanggan").on('input change keyup paste', function() {
             // if ($(".hidden_tipe_pelanggan").val()) {
