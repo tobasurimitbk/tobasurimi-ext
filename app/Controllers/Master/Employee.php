@@ -546,7 +546,7 @@ class Employee extends BaseController
             'dataProvinces' => $this->ProvincesModel->search_list(array(), 'province_name'),
             'tipeEmployee' => $this->GolonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
             'jabatan' => $this->JabatanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll(),
-            'divisi' => $this->DivisionModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll(),
+            'divisi' => $this->DivisionModel->getDivisiAccess(),
             'dataPernikahan' => $this->MetaDataModel->getByName("status pernikahan"),
             'dataAgama' => $this->MetaDataModel->getByName("religion"),
             'dataPendidikan' => $this->MetaDataModel->getByName("pendidikan")
@@ -569,7 +569,7 @@ class Employee extends BaseController
             'dataProvinces' => $this->ProvincesModel->search_list(array(), 'province_name'),
             'tipeEmployee' => $this->GolonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
             'jabatan' => $this->JabatanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll(),
-            'divisi' => $this->DivisionModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll(),
+            'divisi' => $this->DivisionModel->getDivisiAccess(),
             'dataPernikahan' => $this->MetaDataModel->getByName("status pernikahan"),
             'dataAgama' => $this->MetaDataModel->getByName("religion"),
             'dataPendidikan' => $this->MetaDataModel->getByName("pendidikan"),
