@@ -72,6 +72,7 @@ class SallaryPayment extends BaseController
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
                 "department" => $data->department,
+                "payment_date" => $data->payment_date,
                 "company" => $data->company,
             ]);
         }
@@ -164,6 +165,7 @@ class SallaryPayment extends BaseController
                 'divisi_id' => $this->request->getPost('departemen'),
                 'company_id' => $this->request->getPost('company'),
                 'payment_data' => $this->request->getPost('employee_data'), // Store the JSON string directly
+                'payment_date' => $this->request->getPost('tanggal_pembayaran'),
             ];
 
             // Insert the data
@@ -214,7 +216,7 @@ class SallaryPayment extends BaseController
                 'divisi_id' => $this->request->getPost('departemen'),
                 'company_id' => $this->request->getPost('company'),
                 'payment_data' => $this->request->getPost('employee_data'),
-                'updatedAt' => date('Y-m-d H:i:s') // Update timestamp
+                'payment_date' => $this->request->getPost('tanggal_pembayaran'),
             ];
 
             // Update the record
