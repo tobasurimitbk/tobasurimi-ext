@@ -28,6 +28,7 @@
                                 <th>No</th>
                                 <th class="sort">Departemen</th>
                                 <th class="sort">Perusahaan</th>
+                                <th class="sort">Tanggal Pembayaran</th>
                                 <th class="sort">Aksi</th>
                             </tr>
                         </thead>
@@ -92,6 +93,11 @@
             },
             {
                 data: "company",
+                className: "text-center",
+
+            },
+            {
+                data: "payment_date",
                 className: "text-center",
 
             },
