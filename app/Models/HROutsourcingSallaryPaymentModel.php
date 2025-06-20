@@ -19,6 +19,7 @@ class HROutsourcingSallaryPaymentModel extends Model
         'divisi_id',
         'company_id',
         'payment_data',
+        'payment_date',
         'createdAt',
         'updatedAt',
         'deletedAt'
