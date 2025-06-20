@@ -494,7 +494,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('sjb', '${employeeId}', '${employeeName}', '2800')">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="sjb" value="${payment.sjb?.berat || ''}">
+                                    <input type="text" class="form-control" style="height:40px;" name="sjb" value="${payment.sjb?.berat || ''}" data-employee_id="${employeeId}" data-harga="2800">
                                 </div>
                             </td>
                             <td>
@@ -502,7 +502,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('sjl', '${employeeId}', '${employeeName}', '1900')">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="sjl" value="${payment.sjl?.berat || ''}">
+                                    <input type="text" class="form-control" style="height:40px;" name="sjl" value="${payment.sjl?.berat || ''}" data-employee_id="${employeeId}" data-harga="1900">
                                 </div>
                             </td>
                             <td>
@@ -510,7 +510,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('mt', '${employeeId}', '${employeeName}','3250')">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="mt" value="${payment.mt?.berat || ''}">
+                                    <input type="text" class="form-control" style="height:40px;" name="mt" value="${payment.mt?.berat || ''}" data-employee_id="${employeeId}" data-harga="3250">
                                 </div>
                             </td>
                             <td>
@@ -518,7 +518,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('sel', '${employeeId}', '${employeeName}', '4500')">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="sel" value="${payment.sel?.berat || ''}">
+                                    <input type="text" class="form-control" style="height:40px;" name="sel" value="${payment.sel?.berat || ''}" data-employee_id="${employeeId}" data-harga="4500">
                                 </div>
                             </td>
                             <td>
@@ -526,7 +526,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('slm', '${employeeId}', '${employeeName}', '6500')">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="slm" value="${payment.slm?.berat || ''}">
+                                    <input type="text" class="form-control" style="height:40px;" name="slm" value="${payment.slm?.berat || ''}" data-employee_id="${employeeId}" data-harga="6500">
                                 </div>
                             </td>
                             <td>
@@ -534,7 +534,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('ssp', '${employeeId}', '${employeeName}', '6250')">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="ssp" value="${payment.ssp?.berat || ''}">
+                                    <input type="text" class="form-control" style="height:40px;" name="ssp" value="${payment.ssp?.berat || ''}" data-employee_id="${employeeId}" data-harga="6250">
                                 </div>
                             </td>
                             <td>
@@ -542,7 +542,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('scm', '${employeeId}', '${employeeName}', '2900')">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="scm" value="${payment.scm?.berat || ''}">
+                                    <input type="text" class="form-control" style="height:40px;" name="scm" value="${payment.scm?.berat || ''}" data-employee_id="${employeeId}" data-harga="2900">
                                 </div>
                             </td>
                             <td>
@@ -550,7 +550,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('ctt', '${employeeId}', '${employeeName}', '2550')">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="ctt" value="${payment.ctt?.berat || ''}">
+                                    <input type="text" class="form-control" style="height:40px;" name="ctt" value="${payment.ctt?.berat || ''}" data-employee_id="${employeeId}" data-harga="2550">
                                 </div>
                             </td>
                             <td>
@@ -558,7 +558,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('cct', '${employeeId}', '${employeeName}', '4600')">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="cct" value="${payment.cct?.berat || ''}">
+                                    <input type="text" class="form-control" style="height:40px;" name="cct" value="${payment.cct?.berat || ''}" data-employee_id="${employeeId}" data-harga="4600">
                                 </div>
                             </td>
                             <td>
@@ -566,7 +566,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('smh', '${employeeId}', '${employeeName}', '6150')">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="smh" value="${payment.smh?.berat || ''}">
+                                    <input type="text" class="form-control" style="height:40px;" name="smh" value="${payment.smh?.berat || ''}" data-employee_id="${employeeId}" data-harga="6150">
                                 </div>
                             </td>
                             <td>
@@ -574,7 +574,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('dm', '${employeeId}', '${employeeName}', '8500')">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="dm" value="${payment.dm?.berat || ''}">
+                                    <input type="text" class="form-control" style="height:40px;" name="dm" value="${payment.dm?.berat || ''}" data-employee_id="${employeeId}" data-harga="8500">
                                 </div>
                             </td>
                             <td>
@@ -582,7 +582,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('scf', '${employeeId}', '${employeeName}', '700')">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="scf" value="${payment.scf?.berat || ''}">
+                                    <input type="text" class="form-control" style="height:40px;" name="scf" value="${payment.scf?.berat || ''}" data-employee_id="${employeeId}" data-harga="700">
                                 </div>
                             </td>
                             <td>
@@ -590,7 +590,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('lel', '${employeeId}', '${employeeName}', '2900')">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="lel" value="${payment.lel?.berat || ''}">
+                                    <input type="text" class="form-control" style="height:40px;" name="lel" value="${payment.lel?.berat || ''}" data-employee_id="${employeeId}" data-harga="2900">
                                 </div>
                             </td>
                             <td>
@@ -598,7 +598,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('gc', '${employeeId}', '${employeeName}', '5000')">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="gc" value="${payment.gc?.berat || ''}">
+                                    <input type="text" class="form-control" style="height:40px;" name="gc" value="${payment.gc?.berat || ''}" data-employee_id="${employeeId}" data-harga="5000">
                                 </div>
                             </td>
                             <td>
@@ -606,10 +606,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('sspk', '${employeeId}', '${employeeName}', '6250')">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="sspk" value="${payment.sspk?.berat || ''}">
+                                    <input type="text" class="form-control" style="height:40px;" name="sspk" value="${payment.sspk?.berat || ''}" data-employee_id="${employeeId}" data-harga="6250">
                                 </div>
                             </td>
-
 
 
                             <!-- Summary columns -->
@@ -727,124 +726,124 @@
                     <td>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('sjb', '${employeeId}', '${employeeName}', '2800')">+</span>
+                                <span class="input-group-text" onclick="showModalDetailHarga('sjb', '${employeeId}', '${employeeName}', '2800')" style="height:40px;cursor:pointer;">+</span>
                             </div>
-                            <input type="text" class="form-control" style="height:40px;" name="sjb">
+                            <input type="text" class="form-control" style="height:40px;" name="sjb" data-employee_id="${employeeId}" data-harga="2800">
                         </div>
                     </td>
                     <td>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('sjl', '${employeeId}', '${employeeName}', '1900')">+</span>
+                                <span class="input-group-text" onclick="showModalDetailHarga('sjl', '${employeeId}', '${employeeName}', '1900')" style="height:40px;cursor:pointer;">+</span>
                             </div>
-                            <input type="number" class="form-control" style="height:40px;" name="sjl">
+                            <input type="text" class="form-control" style="height:40px;" name="sjl" data-employee_id="${employeeId}" data-harga="1900">
                         </div>
                     </td>
                     <td>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('mt', '${employeeId}', '${employeeName}', '3250')">+</span>
+                                <span class="input-group-text" onclick="showModalDetailHarga('mt', '${employeeId}', '${employeeName}', '3250')" style="height:40px;cursor:pointer;">+</span>
                             </div>
-                            <input type="number" class="form-control" style="height:40px;" name="mt">
+                            <input type="text" class="form-control" style="height:40px;" name="mt" data-employee_id="${employeeId}" data-harga="3250">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('sel', '${employeeId}', '${employeeName}', '4500')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="sel" data-employee_id="${employeeId}" data-harga="4500">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('slm', '${employeeId}', '${employeeName}', '6500')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="slm" data-employee_id="${employeeId}" data-harga="6500">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('ssp', '${employeeId}', '${employeeName}', '6250')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="ssp" data-employee_id="${employeeId}" data-harga="6250">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('scm', '${employeeId}', '${employeeName}', '2900')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="scm" data-employee_id="${employeeId}" data-harga="2900">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('ctt', '${employeeId}', '${employeeName}', '2550')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="ctt" data-employee_id="${employeeId}" data-harga="2550">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('cct', '${employeeId}', '${employeeName}', '4600')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="cct" data-employee_id="${employeeId}" data-harga="4600">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('smh', '${employeeId}', '${employeeName}', '6150')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="smh" data-employee_id="${employeeId}" data-harga="6150">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('dm', '${employeeId}', '${employeeName}', '8500')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="dm" data-employee_id="${employeeId}" data-harga="8500">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('scf', '${employeeId}', '${employeeName}', '700')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="scf" data-employee_id="${employeeId}" data-harga="700">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('lel', '${employeeId}', '${employeeName}', '4000')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="lel" data-employee_id="${employeeId}" data-harga="4000">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('gc', '${employeeId}', '${employeeName}', '5000')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="gc" data-employee_id="${employeeId}" data-harga="5000">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('sspk', '${employeeId}', '${employeeName}', '6250')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="sspk" data-employee_id="${employeeId}" data-harga="6250">
                         </div>
                     </td>
 
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('sel', '${employeeId}', '${employeeName}', '4500')">+</span>
-                            </div>
-                            <input type="number" class="form-control" style="height:40px;" name="sel">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('slm', '${employeeId}', '${employeeName}', '6500')">+</span>
-                            </div>
-                            <input type="number" class="form-control" style="height:40px;" name="slm">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('ssp', '${employeeId}', '${employeeName}', '6250')">+</span>
-                            </div>
-                            <input type="number" class="form-control" style="height:40px;" name="ssp">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('scm', '${employeeId}', '${employeeName}', '2900')">+</span>
-                            </div>
-                            <input type="number" class="form-control" style="height:40px;" name="scm">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('ctt', '${employeeId}', '${employeeName}', '2550')">+</span>
-                            </div>
-                            <input type="number" class="form-control" style="height:40px;" name="ctt">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('cct', '${employeeId}', '${employeeName}', '4600')">+</span>
-                            </div>
-                            <input type="number" class="form-control" style="height:40px;" name="cct">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('smh', '${employeeId}', '${employeeName}', '6150')">+</span>
-                            </div>
-                            <input type="number" class="form-control" style="height:40px;" name="smh">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('dm', '${employeeId}', '${employeeName}', '8500')">+</span>
-                            </div>
-                            <input type="number" class="form-control" style="height:40px;" name="dm">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('scf', '${employeeId}', '${employeeName}', '700')">+</span>
-                            </div>
-                            <input type="number" class="form-control" style="height:40px;" name="scf">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('lel', '${employeeId}', '${employeeName}', '2900')">+</span>
-                            </div>
-                            <input type="number" class="form-control" style="height:40px;" name="lel">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('gc', '${employeeId}', '${employeeName}', '5000')">+</span>
-                            </div>
-                            <input type="number" class="form-control" style="height:40px;" name="gc">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="height:40px;cursor:pointer;" onclick="showModalDetailHarga('sspk', '${employeeId}', '${employeeName}', '6250')">+</span>
-                            </div>
-                            <input type="number" class="form-control" style="height:40px;" name="sspk">
-                        </div>
-                    </td>
 
                     <!-- Hidden fields -->
                     ${['kjb', 'kjl', 'klp', 'ksp', 'kcl', 'kcm', 'klg', 'lm', 'kel', 'kcf', 'cu'].map(field => `
@@ -1163,7 +1162,82 @@
                 e.preventDefault(); // Biar ga form submit atau reload
             }
         });
-        
+
+
+
+        $(document).on('keypress', 'input[name^="sjb"], input[name^="sjl"], input[name^="mt"], input[name^="sel"], input[name^="slm"], input[name^="ssp"], input[name^="scm"], input[name^="ctt"], input[name^="cct"], input[name^="smh"], input[name^="dm"], input[name^="scf"], input[name^="lel"], input[name^="gc"], input[name^="sspk"]', function (e) {
+            if (e.which === 13) {
+                e.preventDefault();
+
+                const input = $(this);
+                const val = input.val().trim();
+                const employeeId = input.closest('tr').data('employee-id');
+                const hargaSatuan = parseFloat(input.data('harga')) || 0;
+                const kodeBarang = input.attr('name');
+
+                // Fungsi parsing yang lebih sederhana dan pasti bekerja
+                function parseInput(inputStr) {
+                    // Ganti semua koma dengan titik
+                    const normalized = inputStr.replace(/,/g, '.');
+                    
+                    // Split hanya berdasarkan tanda + saja
+                    const parts = normalized.split('+').filter(Boolean);
+                    
+                    return parts.map(part => {
+                        // Parse angka, termasuk yang tanpa titik decimal
+                        const num = parseFloat(part);
+                        return isNaN(num) ? 0 : num; // Return 0 jika bukan angka
+                    });
+                }
+
+                const numbers = parseInput(val);
+                const total = numbers.reduce((sum, n) => sum + n, 0);
+                
+                if (total === 0 && val !== '0') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Format salah',
+                        text: 'Gunakan format seperti: 0.9+0.7 atau 0,9+0,7',
+                    });
+                    return;
+                }
+
+                input.val(total.toFixed(2));
+
+                // ✅ SIMPAN KE GLOBAL VARIABLE
+                const $row = input.closest('tr');
+                const key = `${employeeId}_${kodeBarang}`;
+                
+                employeeItemDetails[key] = {
+                    items: numbers.map(berat => ({ berat, harga: hargaSatuan })),
+                    totalBerat: total,
+                    totalHarga: total * hargaSatuan
+                };
+
+                // 🔁 Rehitung total jlhkg & rp
+                let jlhkg = 0;
+                let rp = 0;
+
+                Object.keys(employeeItemDetails).forEach(keyLoop => {
+                    if (keyLoop.startsWith(`${employeeId}_`) && keyLoop !== `${employeeId}_main`) {
+                        const data = employeeItemDetails[keyLoop];
+                        jlhkg += data.totalBerat || 0;
+                        rp += data.totalHarga || 0;
+                    }
+                });
+
+                const mainKey = `${employeeId}_main`;
+                employeeItemDetails[mainKey] = { jlhkg, rp };
+
+                // Update input field jlhkg & rp
+                $row.find(`input[name="jlhkg"]`).val(jlhkg.toFixed(2));
+                $row.find(`input[name="rp"]`).val(rp.toFixed());
+            }
+
+        });
+
+
+
         // Handle delete harga
         $(document).on('click', '.hapus-harga', function() {
             $(this).closest('tr').remove();
