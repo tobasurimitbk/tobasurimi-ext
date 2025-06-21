@@ -123,7 +123,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control customerphone" id="customerphone" name="customerphone" value="<?= $data->customerPhone ?? ''; ?>">
+                            <input autocomplete="one-time-code" type="text" readonly class="form-control customerphone" id="customerphone" name="customerphone" value="<?= $data->customerPhone ?? ''; ?>">
                             <label for="floatingInput">No. Telp</label>
                         </div>
                     </div>
@@ -1644,6 +1644,8 @@
                             })
                         }
                         // console.log(update_list_items)
+                        const estimatedFreightVal = $('#estimated_freight').val() || '0';
+                        const estimatedFreight = estimatedFreightVal.replace(/\,/g, '');
 
                         const taxStatus = $('#tax_status').is(':checked');
                         const includeTaxStatus = $('#include_tax').is(':checked');
@@ -1662,7 +1664,7 @@
                         data.append("tax_status", taxStatus)
                         data.append("include_tax", includeTaxStatus)
                         data.append("items", JSON.stringify(update_list_items))
-
+                        data.set("estimated_freight", estimatedFreight)
 
 
                         let id = $(".id").val();

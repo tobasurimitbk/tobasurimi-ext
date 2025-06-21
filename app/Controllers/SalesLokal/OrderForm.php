@@ -651,13 +651,21 @@ class OrderForm extends BaseController
             $this->SalesOrderModel->update(
                 $id,
                 [
-                    'qty_barang' => $totalQty,
+                    "no_sales_order"        => strtoupper($postData['no_sales_order']),
+                    "id_customer"           => $postData['id_customer'],
                     'shipping_date' => $shippingDate,
                     'destination' =>  $postData['destination'],
-                    'ppn' => $status_ppn,
+                    "jenis_penjualan"           => $postData['jenis_penjualan'],
+                    "sales_id"              => isset($postData['id_sales']) ? $postData['id_sales'] : NULL,
+                    "nama_ecommerce"           => $postData['nama_ecommerce'] ? $postData['nama_ecommerce'] : "",
+                    "order_date"            => $orderDate,
                     'total_harga' => $total_harga,
                     "keterangan" => $postData['parent_keterangan'],
                     "id_company"            => $this->this_company_id != 16 ? $this->request->getVar('company_id') : $this->this_company_id,
+                    'qty_barang' => $totalQty,
+                    'ppn' => $status_ppn,
+                    'no_po' => $this->request->getVar('no_po'),
+                    'estimated_freight' => $this->request->getVar('estimated_freight')
                 ]
             );
 
