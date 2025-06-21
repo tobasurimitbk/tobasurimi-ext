@@ -355,7 +355,7 @@ class OrderForm extends BaseController
                 "order_date"            => $orderDate,
                 "total_harga"           => $postData['total'],
                 "keterangan" => $postData['parent_keterangan'],
-                "id_company"            => $this->this_company_id,
+                "id_company"            => $this->this_company_id != 16 ? $this->request->getVar('company_id') : $this->this_company_id,
                 "tipe_sales_order"      => 'LOKAL',
                 "ppn"      => $status_ppn
             ];
@@ -657,6 +657,7 @@ class OrderForm extends BaseController
                     'ppn' => $status_ppn,
                     'total_harga' => $total_harga,
                     "keterangan" => $postData['parent_keterangan'],
+                    "id_company"            => $this->this_company_id != 16 ? $this->request->getVar('company_id') : $this->this_company_id,
                 ]
             );
 
