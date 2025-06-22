@@ -19,6 +19,7 @@ class DivisisModel extends Model
         'company_id',
         'jam_kerja_id',
         'divisi',
+        'type_divisi',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -74,6 +75,10 @@ class DivisisModel extends Model
             $requete .= "AND divisis.company_id = '" . $values["company_id"] . "' ";
         }
 
+        if (isset($values["type_divisi"]) && $values["type_divisi"] !== "") {
+            $requete .= "AND (divisis.type_divisi = '" . $values["type_divisi"] . "' OR divisis.type_divisi = 'GABUNGAN') ";
+        }
+
         if (isset($values["divisi"]) && $values["divisi"] !== "") {
             $requete .= "AND UPPER(divisis.divisi) LIKE '%" . strtoupper($values["divisi"]) . "%' ";
         }
@@ -96,23 +101,35 @@ class DivisisModel extends Model
 
     public function total_list($values)
     {
-        $requete  = "SELECT count(*) as total FROM divisis ";
-        $requete .= "INNER JOIN jam_kerja ON jam_kerja.id = divisis.jam_kerja_id ";
+        $requete  = "SELECT COUNT(*) AS total FROM divisis ";
+        $requete .= "LEFT JOIN jam_kerja ON jam_kerja.id = divisis.jam_kerja_id ";
         $requete .= "WHERE divisis.deletedAt IS NULL AND jam_kerja.deletedAt IS NULL ";
+
+        // Menyimpan parameter agar aman dari SQL Injection
+        $params = [];
+
         if (isset($values["company_id"]) && $values["company_id"] !== "") {
-            $requete .= "AND divisis.company_id = '" . $values["company_id"] . "' ";
+            $requete .= "AND divisis.company_id = ? ";
+            $params[] = $values["company_id"];
+        }
+
+        if (isset($values["type_divisi"]) && $values["type_divisi"] !== "") {
+            $requete .= "AND (divisis.type_divisi = ? OR divisis.type_divisi = 'GABUNGAN') ";
+            $params[] = $values["type_divisi"];
         }
 
         if (isset($values["divisi"]) && $values["divisi"] !== "") {
-            $requete .= "AND UPPER(divisis.divisi) LIKE '%" . strtoupper($values["divisi"]) . "%' ";
+            $requete .= "AND UPPER(divisis.divisi) LIKE ? ";
+            $params[] = '%' . strtoupper($values["divisi"]) . '%';
         }
 
         if (isset($values["search"]) && $values["search"] !== "") {
-            $requete .= "AND (UPPER(divisis.divisi) LIKE '%" . strtoupper($values["search"]) . "%') ";
+            $requete .= "AND (UPPER(divisis.divisi) LIKE ?) ";
+            $params[] = '%' . strtoupper($values["search"]) . '%';
         }
 
-        $result = $this->db->query($requete)->getResultArray();
-        return ($result[0]["total"]) ? $result[0]["total"] : 0;
+        $result = $this->db->query($requete, $params)->getResultArray();
+        return $result[0]["total"] ?? 0;
     }
 
     public function getTunjanganByDivisi($divisionID)

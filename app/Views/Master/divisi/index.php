@@ -13,33 +13,30 @@
                     <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control divisi" placeholder="Masukkan Divisi" id="divisi" name="divisi">
                                 <label for="floatingInput">Departemen</label>
                             </div>
                         </div>
-                        <!-- <div class="col-md-6">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select" name="jam_kerja_id" required>
-                                    <option value="">PILIH JAM KERJA</option>
-                                    <?php foreach ($jamKerja as $j) : ?>
-                                        <option value="<?= $j['id'] ?>">
-                                            <?= $j['jenis'] ?>
-                                        </option>
+                                <select class="form-select type_divisi" name="type_divisi" id="type_divisi" required>
+                                    <option value="">PILIH TIPE DEPARTEMEN</option>
+                                    <?php foreach ($dataTypeDivisi as $d): ?>
+                                        <option value="<?= $d ?>"><?= $d ?></option>
                                     <?php endforeach; ?>
-
                                 </select>
-                                <label for="floatingInput">Pilih Jam Kerja</label>
+                                <label for="floatingInput" style="z-index: 1;">Pilih Tipe Departemen</label>
                             </div>
-                        </div> -->
+                        </div>
                     </div>
                     <?php if ($isGajiPokok == null || $isCadangan == null) : ?>
                         <div class="alert alert-danger mt-2 mb-2" role="alert">
                             KOMPONEN GAJI POKOK DAN KOMPONEN CADANGAN BELUM ADA
                         </div>
                     <?php endif; ?>
-                    <div class="table-responsive mb-4">
+                    <div class="table-responsive mb-4" id="form_komponen_gaji">
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr style="text-align: center;">
@@ -78,7 +75,9 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
                 <button type="button" class="btn btn-submit-form">Simpan</button>
-                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                <?php if (can('Master Data', 'Departemen', 'd')): ?>
+                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -94,7 +93,34 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end mb-3">
+            <ul class="nav nav-tabs">
+                <?php if (session()->get("login")->is_admin == "1" && can('Personalia', 'Karyawan', 'r')): ?>
+                    <li class="nav-item" role="presentation">
+                        <button onclick="ubahTypeDivisiTab('UMUM')" class="nav-link active" id="home-tab" data-toggle="tab" data-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">
+                            Departemen Umum
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button onclick="ubahTypeDivisiTab('PERSONALIA')" class="nav-link" id="profile-tab" data-toggle="tab" data-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">
+                            Departemen Personalia
+                        </button>
+                    </li>
+
+                <?php elseif (session()->get("login")->is_admin == "0" && can('Personalia', 'Karyawan', 'r')): ?>
+                    <li class="nav-item" role="presentation">
+                        <button onclick="ubahTypeDivisiTab('PERSONALIA')" class="nav-link active" id="home-tab" data-toggle="tab" data-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">
+                            Departemen Personalia
+                        </button>
+                    </li>
+                <?php else: ?>
+                    <li class="nav-item" role="presentation">
+                        <button onclick="ubahTypeDivisiTab('UMUM')" class="nav-link active" id="home-tab" data-toggle="tab" data-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">
+                            Departemen Umum
+                        </button>
+                    </li>
+                <?php endif; ?>
+            </ul>
+            <div class="row justify-content-end mb-3 mt-3">
                 <div class="col-md-2">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
@@ -122,6 +148,24 @@
     </div>
 </section>
 
+
+<?php if (session()->get("login")->is_admin == "1" && can('Personalia', 'Karyawan', 'r')): ?>
+    <script>
+        // Admin dan Punya Akses Karyawan
+        var divisi_type = "UMUM";
+    </script>
+<?php elseif (session()->get("login")->is_admin == "0" && can('Personalia', 'Karyawan', 'r')): ?>
+    <script>
+        // Ga Punya Akses Personalia
+        var divisi_type = "PERSONALIA";
+    </script>
+<?php else: ?>
+    <script>
+        // Ga Punya Akses Personalia
+        var divisi_type = "UMUM";
+    </script>
+<?php endif; ?>
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "divisi";
@@ -148,6 +192,7 @@
                 data.search = $(".search").val();
                 data.sort = sort;
                 data.sortType = sortType;
+                data.divisiType = divisi_type;
             }
         },
         // scrollX: true,
@@ -226,6 +271,20 @@
         }
     });
 
+    $('#type_divisi').select2({
+        placeholder: "Pilih Tipe Departemen",
+        theme: "bootstrap-5",
+        dropdownParent: $('.add-modal')
+    }).change(function() {
+        var typeDivisi = $('#type_divisi option:selected').val();
+        if (typeDivisi == "UMUM") {
+            $('#form_komponen_gaji').hide();
+        } else {
+            $('#form_komponen_gaji').show();
+        }
+    });
+
+
     $(document).ready(function() {
 
         var validator = $(".create-form").validate({
@@ -233,7 +292,7 @@
                 divisi: {
                     required: true
                 },
-                jam_kerja_id: {
+                type_divisi: {
                     required: true
                 }
             },
@@ -241,8 +300,8 @@
                 divisi: {
                     required: "Departemen wajib diisi"
                 },
-                jam_kerja_id: {
-                    required: "Jam Kerja wajib diisi"
+                type_divisi: {
+                    required: "Tipe Departemen Wajib Diisi"
                 }
             },
             errorElement: 'span',
@@ -273,6 +332,7 @@
             validator.reset();
             $(".title-name").text("Tambah");
             $(".divisi").val('').change();
+            $(".type_divisi").val('').change();
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
             $(".add-modal").modal("show")
@@ -285,49 +345,61 @@
         $(".dataTable_info").addClass("pt-0");
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            $('.logo').rules('remove', 'required');
-            $(".create-form")[0].reset()
-            $(".delete-btn").css('display', '');
-            let id = data.id;
-            $(".title-name").text("Update");
+            var isAccessUpdate = "<?= can('Master Data', 'Departemen', 'u') ?>";
+            if (isAccessUpdate) {
+                const data = table.row(this).data();
+                $('.logo').rules('remove', 'required');
+                $(".create-form")[0].reset()
+                $(".delete-btn").css('display', '');
+                let id = data.id;
+                $(".title-name").text("Update");
 
-            $.ajax({
-                url: "<?= base_url("divisi/id"); ?>" + "/" + id,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        $(".id").val(id);
-                        $(".divisi").val(res.data.divisi);
-                        $("select[name='jam_kerja_id']").val(res.data.jam_kerja_id);
-                        validator.resetForm();
-                        validator.reset();
+                $.ajax({
+                    url: "<?= base_url("divisi/id"); ?>" + "/" + id,
+                    method: "GET",
+                    dataType: "json",
+                    success: function(res) {
+                        if (res.status) {
+                            $(".id").val(id);
+                            $(".divisi").val(res.data.divisi);
+                            $("select[name='jam_kerja_id']").val(res.data.jam_kerja_id);
+                            $(".type_divisi").val(res.data.type_divisi).change();
+                            validator.resetForm();
+                            validator.reset();
 
-                        $("input[name='komponenGaji[]']").each(function() {
-                            let komponenId = $(this).val();
-                            let isSelected = res.komponenGaji.some(function(komponen) {
-                                return komponen.id === komponenId;
+                            $("input[name='komponenGaji[]']").each(function() {
+                                let komponenId = $(this).val();
+                                let isSelected = res.komponenGaji.some(function(komponen) {
+                                    return komponen.id === komponenId;
+                                });
+                                if (isSelected) {
+                                    $(this).prop('checked', true);
+                                }
                             });
-                            if (isSelected) {
-                                $(this).prop('checked', true);
-                            }
-                        });
 
-                        $.each(res.komponenGaji, function(i, v) {
-                            $("input[name=" + v.id + "]").val(formatRupiah(v.nominal || '0'));
-                        });
+                            $.each(res.komponenGaji, function(i, v) {
+                                $("input[name=" + v.id + "]").val(formatRupiah(v.nominal || '0'));
+                            });
 
-                        $(".add-modal").modal("show")
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        })
+                            $(".add-modal").modal("show")
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
                     }
-                }
-            })
+                })
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Anda tidak punya hak akses update",
+                    confirmButtonColor: '#4e73df',
+                })
+            }
+
+
         })
 
         $(".search").keyup(function() {
@@ -551,6 +623,11 @@
         var reverse = ribuan.toString().split('').reverse().join('');
         var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
         return 'Rp. ' + ribuanFormatted + ',' + desimal;
+    }
+
+    function ubahTypeDivisiTab(type_divisi) {
+        divisi_type = type_divisi;
+        table.ajax.reload();
     }
 </script>
 
