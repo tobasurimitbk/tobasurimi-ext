@@ -228,26 +228,52 @@
             // 7. Process only if paymentData is an array
             if (Array.isArray(paymentData)) {
                 paymentData.forEach(employee => {
-                    if (employee && employee.employee_id) {
-                        const employeeId = employee.employee_id;
-                        
-                        // Process each code for the employee
-                        const codes = ['sjb', 'sjl', 'mt', 'sel', 'slm', 'ssp', 'scm', 'ctt', 'cct', 'smh', 
-                                    'dm', 'scf', 'lel', 'gc', 'sspk', 'kjb', 'kjl', 'klp', 'ksp', 'kcl', 
-                                    'kcm', 'klg', 'lm', 'kel', 'kcf', 'cu'];
-                        
-                        codes.forEach(kodeBarang => {
-                            const key = `${employeeId}_${kodeBarang}`;
+                    if ($('#departemen option:selected').val() == "5") {
+                        if (employee && employee.employee_id) {
+                            const employeeId = employee.employee_id;
                             
-                            if (employee[kodeBarang] && employee[kodeBarang].items) {
-                                employeeItemDetails[key] = {
-                                    items: employee[kodeBarang].items,
-                                    totalBerat: parseFloat(employee[kodeBarang].berat) || 0,
-                                    totalHarga: parseFloat(employee[kodeBarang].total) || 0
-                                };
-                            }
-                        });
-                    }
+                            // Process each code for the employee
+                            const codes = ['sjb', 'sjl', 'mt', 'sel', 'slm', 'ssp', 'scm', 'ctt', 'cct', 'smh', 
+                                        'dm', 'scf', 'lel', 'gc', 'sspk', 'kjb', 'kjl', 'klp', 'ksp', 'kcl', 
+                                        'kcm', 'klg', 'lm', 'kel', 'kcf', 'cu'];
+                            
+                            codes.forEach(kodeBarang => {
+                                const key = `${employeeId}_${kodeBarang}`;
+                                
+                                if (employee[kodeBarang] && employee[kodeBarang].items) {
+                                    employeeItemDetails[key] = {
+                                        items: employee[kodeBarang].items,
+                                        totalBerat: parseFloat(employee[kodeBarang].berat) || 0,
+                                        totalHarga: parseFloat(employee[kodeBarang].total) || 0
+                                    };
+                                }
+                            });
+                        }
+                    } else {
+                        if (employee && employee.employee_id) {
+                            const employeeId = employee.employee_id;
+                                
+                            const codes = [
+                                'SUAC', 'CUU', 'AU', 'MKU/MDU', 'BU', 'BBU', 'ATU', 'CBU', 'FU', 'BUMS', 'BUM',
+                                'KUM', 'SUM', 'SK', 'CKU', 'FKPH', 'BK', 'SKPL', 'SKPB', 'SKML', 'SKMB',
+                                'C1', 'C2', 'CUK', 'FK', 'SSSCG', 'IKSSCG', 'FSSCG', 'KSCG', 'CSCG',
+                                'MPA', 'LBL', 'SA', 'CU', 'HK'
+                            ];
+
+                            codes.forEach(kodeBarang => {
+                                const key = `${employeeId}_${kodeBarang}`;
+                                
+                                if (employee[kodeBarang] && employee[kodeBarang].items) {
+                                    employeeItemDetails[key] = {
+                                        items: employee[kodeBarang].items,
+                                        totalBerat: parseFloat(employee[kodeBarang].berat) || 0,
+                                        totalHarga: parseFloat(employee[kodeBarang].total) || 0
+                                    };
+                                }
+                            });
+                        }
+                    }   
+
                 });
             } else {
                 console.error('Payment data is not an array:', paymentData);
@@ -411,15 +437,17 @@
             `;
             } else {
                 headerHtml = `
-                <tr>
+                <tr">
                     <th class="text-center" rowspan="3">NO</th>
                     <th class="text-center" rowspan="3">TMK</th>
                     <th class="text-center" rowspan="3">NO BADGE</th>
                     <th class="text-center" rowspan="3">NAMA</th>
-                    <th class="text-center" colspan="4">UDANG</th>
+                    <th class="text-center" colspan="13">UDANG</th>
                     <th class="text-center" colspan="4">KEPAH</th>
-                    <th class="text-center" colspan="4">KPTG</th>
-                    <th class="text-center" colspan="4">JAM KERJA</th>
+                    <th class="text-center" colspan="8">KEPITING MERAH DAN PUTIH</th>
+                    <th class="text-center" colspan="5">SOKAT / CUMI / GURITA</th>
+                    <th class="text-center" colspan="5">ALL</th>
+                    <th class="text-center" colspan="3">JAM KERJA</th>
                     <th class="text-center" rowspan="3">TOTAL KG</th>
                     <th class="text-center" rowspan="3">TOTAL JAM</th>
                     <th class="text-center" rowspan="3">JLH ORG</th>
@@ -429,27 +457,87 @@
                     <th class="text-center" colspan="4">KG / JAM</th>
                 </tr>
                 <tr>
-                    <th colspan="1">AC</th>
+                    <th colspan="1">SUAC</th>
+                    <th colspan="1">CUU</th>
+                    <th colspan="1">AU</th>
+                    <th colspan="1">MKU/MDU</th>
+                    <th colspan="1">BU</th>
+                    <th colspan="1">BBU</th>
+                    <th colspan="1">ATU</th>
+                    <th colspan="1">CBU</th>
+                    <th colspan="1">FU</th>
+                    <th colspan="1">BUMS</th>
+                    <th colspan="1">BUM</th>
+                    <th colspan="1">KUM</th>
+                    <th colspan="1">SUM</th>
                     <th colspan="1">SK</th>
-                    <th colspan="1">MB</th>
-                    <th colspan="1">ML</th>
-                    <th colspan="1">AC</th>
-                    <th colspan="1">SK</th>
-                    <th colspan="1">MB</th>
-                    <th colspan="1">ML</th>
-                    <th colspan="1">AC</th>
-                    <th colspan="1">SK</th>
-                    <th colspan="1">MB</th>
-                    <th colspan="1">ML</th>
-                    <th colspan="1">UDANG</th>
-                    <th colspan="1">KEPAH</th>
-                    <th colspan="1">KPTG</th>
-                    <th colspan="1">ML</th>
-                    <th colspan="1">AC</th>
-                    <th colspan="1">SK</th>
-                    <th colspan="1">MB</th>
-                    <th colspan="1">ML</th>
+                    <th colspan="1">CKU</th>
+                    <th colspan="1">FKPH</th>
+                    <th colspan="1">BK</th>
+                    <th colspan="1">SKPL</th>
+                    <th colspan="1">SKPB</th>
+                    <th colspan="1">SKML</th>
+                    <th colspan="1">SKMB</th>
+                    <th colspan="1">C1</th>
+                    <th colspan="1">C2</th>
+                    <th colspan="1">CUK</th>
+                    <th colspan="1">FK</th>
+                    <th colspan="1">SSSCG</th>
+                    <th colspan="1">IKSSCG</th>
+                    <th colspan="1">FSSCG</th>
+                    <th colspan="1">KSCG</th>
+                    <th colspan="1">CSCG</th>
+                    <th colspan="1">MPA</th>
+                    <th colspan="1">LBL</th>
+                    <th colspan="1">SA</th>
+                    <th colspan="1">CU</th>
+                    <th colspan="1">HK</th>
+                    <th rowspan="2">UDANG</th>
+                    <th rowspan="2">KEPAH</th>
+                    <th rowspan="2">KPTG</th>
+                    <th rowspan="2">ML</th>
+                    <th rowspan="2">AC</th>
+                    <th rowspan="2">SK</th>
+                    <th rowspan="2">MB</th>
                 </tr>
+                <tr>
+                    <th style="min-width:100px;" colspan="1">2850</th> <!-- SUAC -->
+                    <th style="min-width:100px;" colspan="1">135</th>  <!-- CUU -->
+                    <th style="min-width:100px;" colspan="1">33</th>   <!-- AU -->
+                    <th style="min-width:100px;" colspan="1">20</th>   <!-- MKU/MDU -->
+                    <th style="min-width:100px;" colspan="1">13</th>   <!-- BU -->
+                    <th style="min-width:100px;" colspan="1">15</th>   <!-- BBU -->
+                    <th style="min-width:100px;" colspan="1">30</th>   <!-- ATU -->
+                    <th style="min-width:100px;" colspan="1">30</th>   <!-- CBU -->
+                    <th style="min-width:100px;" colspan="1">15</th>   <!-- FU -->
+                    <th style="min-width:100px;" colspan="1">4500</th> <!-- BUMS -->
+                    <th style="min-width:100px;" colspan="1">3750</th> <!-- BUM -->
+                    <th style="min-width:100px;" colspan="1">3750</th> <!-- KUM -->
+                    <th style="min-width:100px;" colspan="1">750</th>  <!-- SUM -->
+                    <th style="min-width:100px;" colspan="1">1800</th> <!-- SK -->
+                    <th style="min-width:100px;" colspan="1">525</th>  <!-- CKU -->
+                    <th style="min-width:100px;" colspan="1">23</th>   <!-- FKPH -->
+                    <th style="min-width:100px;" colspan="1">75</th>   <!-- BK -->
+                    <th style="min-width:100px;" colspan="1">10500</th> <!-- SKPL -->
+                    <th style="min-width:100px;" colspan="1">9000</th>  <!-- SKPB -->
+                    <th style="min-width:100px;" colspan="1">10500</th> <!-- SKML -->
+                    <th style="min-width:100px;" colspan="1">9000</th>  <!-- SKMB -->
+                    <th style="min-width:100px;" colspan="1">3000</th>  <!-- C1 -->
+                    <th style="min-width:100px;" colspan="1">1500</th>  <!-- C2 -->
+                    <th style="min-width:100px;" colspan="1">825</th>   <!-- CUK -->
+                    <th style="min-width:100px;" colspan="1">15</th>    <!-- FK -->
+                    <th style="min-width:100px;" colspan="1">150</th>   <!-- SSSCG -->
+                    <th style="min-width:100px;" colspan="1">2100</th>  <!-- IKSSCG -->
+                    <th style="min-width:100px;" colspan="1">30</th>    <!-- FSSCG -->
+                    <th style="min-width:100px;" colspan="1">1500</th>  <!-- KSCG -->
+                    <th style="min-width:100px;" colspan="1">450</th>   <!-- CSCG -->
+                    <th style="min-width:100px;" colspan="1">53</th>    <!-- MPA -->
+                    <th style="min-width:100px;" colspan="1">14</th>    <!-- LBL -->
+                    <th style="min-width:100px;" colspan="1">1.5</th>   <!-- SA -->
+                    <th style="min-width:100px;" colspan="1">3</th>     <!-- CU -->
+                    <th style="min-width:100px;" colspan="1">23</th>    <!-- HK -->
+                </tr>
+
             `;
             }
             $('#tableHeader').html(headerHtml);
@@ -639,43 +727,339 @@
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${badge}" readonly></td>
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${employeeName}" readonly></td>
                             
-                            <!-- Udang -->
-                            <td><input type="number" class="form-control form-control-sm udang-ac" style="min-width: 100px;" value="${payment.udang?.ac || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm udang-sk" style="min-width: 100px;" value="${payment.udang?.sk || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm udang-mb" style="min-width: 100px;" value="${payment.udang?.mb || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm udang-ml" style="min-width: 100px;" value="${payment.udang?.ml || ''}"></td>
-                            
-                            <!-- Kepah -->
-                            <td><input type="number" class="form-control form-control-sm kepah-ac" style="min-width: 100px;" value="${payment.kepah?.ac || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm kepah-sk" style="min-width: 100px;" value="${payment.kepah?.sk || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm kepah-mb" style="min-width: 100px;" value="${payment.kepah?.mb || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm kepah-ml" style="min-width: 100px;" value="${payment.kepah?.ml || ''}"></td>
-                            
-                            <!-- KPTG -->
-                            <td><input type="number" class="form-control form-control-sm kptg-ac" style="min-width: 100px;" value="${payment.kptg?.ac || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm kptg-sk" style="min-width: 100px;" value="${payment.kptg?.sk || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm kptg-mb" style="min-width: 100px;" value="${payment.kptg?.mb || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm kptg-ml" style="min-width: 100px;" value="${payment.kptg?.ml || ''}"></td>
-                            
-                            <!-- Jam Kerja -->
-                            <td><input type="number" class="form-control form-control-sm jam-kerja-udang" style="min-width: 100px;" value="${payment.jam_kerja?.udang || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm jam-kerja-kepah" style="min-width: 100px;" value="${payment.jam_kerja?.kepah || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm jam-kerja-kptg" style="min-width: 100px;" value="${payment.jam_kerja?.kptg || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm jam-kerja-ml" style="min-width: 100px;" value="${payment.jam_kerja?.ml || ''}"></td>
-                            
-                            <!-- Total & Kalkulasi -->
-                            <td><input type="number" class="form-control form-control-sm total-kg" style="min-width: 100px;" value="${payment.total?.kg || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm total-jam" style="min-width: 100px;" value="${payment.total?.jam || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm jlh-org" style="min-width: 100px;" value="${payment.total?.org || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm rupiah" style="min-width: 100px;" value="${payment.rupiah || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm subsidi-rupiah" style="min-width: 100px;" value="${payment.subsidi_rupiah || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm borongan-per-jam" style="min-width: 100px;" value="${payment.borongan_per_jam || ''}"></td>
-                            
-                            <!-- KG/Jam -->
-                            <td><input type="number" class="form-control form-control-sm kg-per-jam-ac" style="min-width: 100px;" value="${payment.kg_per_jam?.ac || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm kg-per-jam-sk" style="min-width: 100px;" value="${payment.kg_per_jam?.sk || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm kg-per-jam-mb" style="min-width: 100px;" value="${payment.kg_per_jam?.mb || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm kg-per-jam-ml" style="min-width: 100px;" value="${payment.kg_per_jam?.ml || ''}"></td>
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('SUAC', '${employeeId}', '${employeeName}', '2850')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="SUAC" value="${payment.SUAC?.berat || ''}" data-employee_id="${employeeId}" data-harga="2850">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('CUU', '${employeeId}', '${employeeName}', '135')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="CUU" value="${payment.CUU?.berat || ''}" data-employee_id="${employeeId}" data-harga="135">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('AU', '${employeeId}', '${employeeName}', '33')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="AU" value="${payment.AU?.berat || ''}" data-employee_id="${employeeId}" data-harga="33">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('MKU/MDU', '${employeeId}', '${employeeName}', '20')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="MKU/MDU" value="${employee['MKU/MDU']?.berat || ''}" data-employee_id="${employeeId}" data-harga="20">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('BU', '${employeeId}', '${employeeName}', '13')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="BU" value="${payment.BU?.berat || ''}" data-employee_id="${employeeId}" data-harga="13">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('BBU', '${employeeId}', '${employeeName}', '15')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="BBU" value="${payment.BBU?.berat || ''}" data-employee_id="${employeeId}" data-harga="15">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('ATU', '${employeeId}', '${employeeName}', '30')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="ATU" value="${payment.ATU?.berat || ''}" data-employee_id="${employeeId}" data-harga="30">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('CBU', '${employeeId}', '${employeeName}', '30')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="CBU" value="${payment.CBU?.berat || ''}" data-employee_id="${employeeId}" data-harga="30">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('FU', '${employeeId}', '${employeeName}', '15')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="FU" value="${payment.FU?.berat || ''}" data-employee_id="${employeeId}" data-harga="15">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('BUMS', '${employeeId}', '${employeeName}', '4500')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="BUMS" value="${payment.BUMS?.berat || ''}" data-employee_id="${employeeId}" data-harga="4500">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('BUM', '${employeeId}', '${employeeName}', '3750')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="BUM" value="${payment.BUM?.berat || ''}" data-employee_id="${employeeId}" data-harga="3750">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('KUM', '${employeeId}', '${employeeName}', '3750')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="KUM" value="${payment.KUM?.berat || ''}" data-employee_id="${employeeId}" data-harga="3750">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('SUM', '${employeeId}', '${employeeName}', '750')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="SUM" value="${payment.SUM?.berat || ''}" data-employee_id="${employeeId}" data-harga="750">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('SK', '${employeeId}', '${employeeName}', '1800')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="SK" value="${payment.SK?.berat || ''}" data-employee_id="${employeeId}" data-harga="1800">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('CKU', '${employeeId}', '${employeeName}', '525')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="CKU" value="${payment.CKU?.berat || ''}" data-employee_id="${employeeId}" data-harga="525">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('FKPH', '${employeeId}', '${employeeName}', '23')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="FKPH" value="${payment.FKPH?.berat || ''}" data-employee_id="${employeeId}" data-harga="23">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('BK', '${employeeId}', '${employeeName}', '75')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="BK" value="${payment.BK?.berat || ''}" data-employee_id="${employeeId}" data-harga="75">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('SKPL', '${employeeId}', '${employeeName}', '10500')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="SKPL" value="${payment.SKPL?.berat || ''}" data-employee_id="${employeeId}" data-harga="10500">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('SKPB', '${employeeId}', '${employeeName}', '9000')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="SKPB" value="${payment.SKPB?.berat || ''}" data-employee_id="${employeeId}" data-harga="9000">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('SKML', '${employeeId}', '${employeeName}', '10500')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="SKML" value="${payment.SKML?.berat || ''}" data-employee_id="${employeeId}" data-harga="10500">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('SKMB', '${employeeId}', '${employeeName}', '9000')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="SKMB" value="${payment.SKMB?.berat || ''}" data-employee_id="${employeeId}" data-harga="9000">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('C1', '${employeeId}', '${employeeName}', '3000')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="C1" value="${payment.C1?.berat || ''}" data-employee_id="${employeeId}" data-harga="3000">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('C2', '${employeeId}', '${employeeName}', '1500')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="C2" value="${payment.C2?.berat || ''}" data-employee_id="${employeeId}" data-harga="1500">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('CUK', '${employeeId}', '${employeeName}', '825')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="CUK" value="${payment.CUK?.berat || ''}" data-employee_id="${employeeId}" data-harga="825">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('FK', '${employeeId}', '${employeeName}', '15')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="FK" value="${payment.FK?.berat || ''}" data-employee_id="${employeeId}" data-harga="15">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('SSSCG', '${employeeId}', '${employeeName}', '150')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="SSSCG" value="${payment.SSSCG?.berat || ''}" data-employee_id="${employeeId}" data-harga="150">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('IKSSCG', '${employeeId}', '${employeeName}', '2100')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="IKSSCG" value="${payment.IKSSCG?.berat || ''}" data-employee_id="${employeeId}" data-harga="2100">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('FSSCG', '${employeeId}', '${employeeName}', '30')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="FSSCG" value="${payment.FSSCG?.berat || ''}" data-employee_id="${employeeId}" data-harga="30">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('KSCG', '${employeeId}', '${employeeName}', '1500')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="KSCG" value="${payment.KSCG?.berat || ''}" data-employee_id="${employeeId}" data-harga="1500">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('CSCG', '${employeeId}', '${employeeName}', '450')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="CSCG" value="${payment.CSCG?.berat || ''}" data-employee_id="${employeeId}" data-harga="450">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('MPA', '${employeeId}', '${employeeName}', '53')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="MPA" value="${payment.MPA?.berat || ''}" data-employee_id="${employeeId}" data-harga="53">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('LBL', '${employeeId}', '${employeeName}', '14')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="LBL" value="${payment.LBL?.berat || ''}" data-employee_id="${employeeId}" data-harga="14">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('SA', '${employeeId}', '${employeeName}', '1.5')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="SA" value="${payment.SA?.berat || ''}" data-employee_id="${employeeId}" data-harga="1.5">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('CU', '${employeeId}', '${employeeName}', '3')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="CU" value="${payment.CU?.berat || ''}" data-employee_id="${employeeId}" data-harga="3">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" onclick="showModalDetailHarga('HK', '${employeeId}', '${employeeName}', '23')" style="height:40px;cursor:pointer;">+</span>
+                                    </div>
+                                    <input type="text" class="form-control" style="height:40px;" name="HK" value="${payment.HK?.berat || ''}" data-employee_id="${employeeId}" data-harga="23">
+                                </div>
+                            </td>
+
+                            <!-- JAM KERJA -->
+                            <td><input type="number" name="jam_kerja_udang" class="form-control form-control-sm jam-kerja-udang" style="min-width: 90px;" value="${payment.jam_kerja_udang || ''}"></td>
+                            <td><input type="number" name="jam_kerja_kepah" class="form-control form-control-sm jam-kerja-kepah" style="min-width: 90px;" value="${payment.jam_kerja_kepah || ''}"></td>
+                            <td><input type="number" name="jam_kerja_kptg" class="form-control form-control-sm jam-kerja-kptg" style="min-width: 90px;" value="${payment.jam_kerja_kptg || ''}"></td>
+
+                            <!-- TOTAL & KALKULASI -->
+                            <td><input type="number" name="total_kg" class="form-control form-control-sm total-kg" style="min-width: 100px;" value="${payment.total_kg || ''}"></td>
+                            <td><input type="number" name="total_jam" class="form-control form-control-sm total-jam" style="min-width: 100px;" value="${payment.total_jam || ''}"></td>
+                            <td><input type="number" name="jumlah_org" class="form-control form-control-sm jlh-org" style="min-width: 100px;" value="${payment.jumlah_org || ''}"></td>
+                            <td><input type="number" name="rupiah" class="form-control form-control-sm rupiah" style="min-width: 120px;" value="${payment.rupiah || ''}"></td>
+                            <td><input type="number" name="subsidi_rupiah" class="form-control form-control-sm subsidi-rupiah" style="min-width: 120px;" value="${payment.subsidi_rupiah || ''}"></td>
+                            <td><input type="number" name="borongan_per_jam" class="form-control form-control-sm borongan-per-jam" style="min-width: 120px;" value="${payment.borongan_per_jam || ''}"></td>
+
+                            <!-- KG / JAM -->
+                            <td><input type="number" name="kg_per_jam_ml" class="form-control form-control-sm kg-per-jam-ml" style="min-width: 90px;" value="${payment.kg_per_jam_ml || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_ac" class="form-control form-control-sm kg-per-jam-ac" style="min-width: 90px;" value="${payment.kg_per_jam_ac || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_sk" class="form-control form-control-sm kg-per-jam-sk" style="min-width: 90px;" value="${payment.kg_per_jam_sk || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_mb" class="form-control form-control-sm kg-per-jam-mb" style="min-width: 90px;" value="${payment.kg_per_jam_mb || ''}"></td>
                         </tr>
                     `;
                     }
@@ -884,43 +1268,375 @@
                     <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${badge}" readonly></td>
                     <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${employeeName}" data-id="${employeeId}" readonly></td>
 
-                    <!-- UDANG -->
-                    <td><input type="number" class="form-control form-control-sm udang-ac" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm udang-sk" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm udang-mb" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm udang-ml" style="min-width: 100px;"></td>
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('SUAC', '${employeeId}', '${employeeName}', '2850')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="SUAC" data-employee_id="${employeeId}" data-harga="2850">
+                        </div>
+                    </td>
 
-                    <!-- KEPAH -->
-                    <td><input type="number" class="form-control form-control-sm kepah-ac" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm kepah-sk" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm kepah-mb" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm kepah-ml" style="min-width: 100px;"></td>
 
-                    <!-- KPTG -->
-                    <td><input type="number" class="form-control form-control-sm kptg-ac" style="min-width: 100px;" ></td>
-                    <td><input type="number" class="form-control form-control-sm kptg-sk" style="min-width: 100px;" ></td>
-                    <td><input type="number" class="form-control form-control-sm kptg-mb" style="min-width: 100px;" ></td>
-                    <td><input type="number" class="form-control form-control-sm kptg-ml" style="min-width: 100px;" ></td>
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('CUU', '${employeeId}', '${employeeName}', '135')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="CUU" data-employee_id="${employeeId}" data-harga="135">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('AU', '${employeeId}', '${employeeName}', '33')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="AU" data-employee_id="${employeeId}" data-harga="33">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('MKU/MDU', '${employeeId}', '${employeeName}', '20')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="MKU/MDU" data-employee_id="${employeeId}" data-harga="20">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('BU', '${employeeId}', '${employeeName}', '13')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="BU" data-employee_id="${employeeId}" data-harga="13">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('BBU', '${employeeId}', '${employeeName}', '15')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="BBU" data-employee_id="${employeeId}" data-harga="15">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('ATU', '${employeeId}', '${employeeName}', '30')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="ATU" data-employee_id="${employeeId}" data-harga="30">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('CBU', '${employeeId}', '${employeeName}', '30')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="CBU" data-employee_id="${employeeId}" data-harga="30">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('FU', '${employeeId}', '${employeeName}', '15')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="FU" data-employee_id="${employeeId}" data-harga="15">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('BUMS', '${employeeId}', '${employeeName}', '4500')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="BUMS" data-employee_id="${employeeId}" data-harga="4500">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('BUM', '${employeeId}', '${employeeName}', '3750')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="BUM" data-employee_id="${employeeId}" data-harga="3750">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('KUM', '${employeeId}', '${employeeName}', '3750')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="KUM" data-employee_id="${employeeId}" data-harga="3750">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('SUM', '${employeeId}', '${employeeName}', '750')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="SUM" data-employee_id="${employeeId}" data-harga="750">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('SK', '${employeeId}', '${employeeName}', '1800')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="SK" data-employee_id="${employeeId}" data-harga="1800">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('CKU', '${employeeId}', '${employeeName}', '525')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="CKU" data-employee_id="${employeeId}" data-harga="525">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('FKPH', '${employeeId}', '${employeeName}', '23')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="FKPH" data-employee_id="${employeeId}" data-harga="23">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('BK', '${employeeId}', '${employeeName}', '75')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="BK" data-employee_id="${employeeId}" data-harga="75">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('SKPL', '${employeeId}', '${employeeName}', '10500')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="SKPL" data-employee_id="${employeeId}" data-harga="10500">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('SKPB', '${employeeId}', '${employeeName}', '9000')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="SKPB" data-employee_id="${employeeId}" data-harga="9000">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('SKML', '${employeeId}', '${employeeName}', '10500')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="SKML" data-employee_id="${employeeId}" data-harga="10500">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('SKMB', '${employeeId}', '${employeeName}', '9000')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="SKMB" data-employee_id="${employeeId}" data-harga="9000">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('C1', '${employeeId}', '${employeeName}', '3000')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="C1" data-employee_id="${employeeId}" data-harga="3000">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('C2', '${employeeId}', '${employeeName}', '1500')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="C2" data-employee_id="${employeeId}" data-harga="1500">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('CUK', '${employeeId}', '${employeeName}', '825')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="CUK" data-employee_id="${employeeId}" data-harga="825">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('FK', '${employeeId}', '${employeeName}', '15')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="FK" data-employee_id="${employeeId}" data-harga="15">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('SSSCG', '${employeeId}', '${employeeName}', '150')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="SSSCG" data-employee_id="${employeeId}" data-harga="150">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('IKSSCG', '${employeeId}', '${employeeName}', '2100')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="IKSSCG" data-employee_id="${employeeId}" data-harga="2100">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('FSSCG', '${employeeId}', '${employeeName}', '30')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="FSSCG" data-employee_id="${employeeId}" data-harga="30">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('KSCG', '${employeeId}', '${employeeName}', '1500')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="KSCG" data-employee_id="${employeeId}" data-harga="1500">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('CSCG', '${employeeId}', '${employeeName}', '450')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="CSCG" data-employee_id="${employeeId}" data-harga="450">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('MPA', '${employeeId}', '${employeeName}', '53')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="MPA" data-employee_id="${employeeId}" data-harga="53">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('LBL', '${employeeId}', '${employeeName}', '14')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="LBL" data-employee_id="${employeeId}" data-harga="14">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('SA', '${employeeId}', '${employeeName}', '1.5')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="SA" data-employee_id="${employeeId}" data-harga="1.5">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('CU', '${employeeId}', '${employeeName}', '3')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="CU" data-employee_id="${employeeId}" data-harga="3">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" onclick="showModalDetailHarga('HK', '${employeeId}', '${employeeName}', '23')" style="height:40px;cursor:pointer;">+</span>
+                            </div>
+                            <input type="text" class="form-control" style="height:40px;" name="HK" data-employee_id="${employeeId}" data-harga="23">
+                        </div>
+                    </td>
+
 
                     <!-- JAM KERJA -->
-                    <td><input type="number" class="form-control form-control-sm jam-kerja-udang" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm jam-kerja-kepah" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm jam-kerja-kptg" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm jam-kerja-ml" style="min-width: 100px;"></td>
+                    <td><input type="number" name="jam_kerja_udang" class="form-control form-control-sm jam-kerja-udang" style="min-width: 90px;"></td>
+                    <td><input type="number" name="jam_kerja_kepah" class="form-control form-control-sm jam-kerja-kepah" style="min-width: 90px;"></td>
+                    <td><input type="number" name="jam_kerja_kptg" class="form-control form-control-sm jam-kerja-kptg" style="min-width: 90px;"></td>
 
                     <!-- TOTAL & KALKULASI -->
-                    <td><input type="number" class="form-control form-control-sm total-kg" style="min-width: 120px;"></td>
-                    <td><input type="number" class="form-control form-control-sm total-jam" style="min-width: 120px;"></td>
-                    <td><input type="number" class="form-control form-control-sm jlh-org" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm rupiah" style="min-width: 120px;"></td>
-                    <td><input type="number" class="form-control form-control-sm subsidi-rupiah" style="min-width: 120px;"></td>
-                    <td><input type="number" class="form-control form-control-sm borongan-per-jam" style="min-width: 120px;"></td>
+                    <td><input type="number" name="total_kg" class="form-control form-control-sm total-kg" style="min-width: 100px;"></td>
+                    <td><input type="number" name="total_jam" class="form-control form-control-sm total-jam" style="min-width: 100px;"></td>
+                    <td><input type="number" name="jumlah_org" class="form-control form-control-sm jlh-org" style="min-width: 100px;"></td>
+                    <td><input type="number" name="rupiah" class="form-control form-control-sm rupiah" style="min-width: 120px;"></td>
+                    <td><input type="number" name="subsidi_rupiah" class="form-control form-control-sm subsidi-rupiah" style="min-width: 120px;"></td>
+                    <td><input type="number" name="borongan_per_jam" class="form-control form-control-sm borongan-per-jam" style="min-width: 120px;"></td>
 
                     <!-- KG / JAM -->
-                    <td><input type="number" class="form-control form-control-sm kg-per-jam-ac" style="min-width: 90px;"></td>
-                    <td><input type="number" class="form-control form-control-sm kg-per-jam-sk" style="min-width: 90px;"></td>
-                    <td><input type="number" class="form-control form-control-sm kg-per-jam-mb" style="min-width: 90px;"></td>
-                    <td><input type="number" class="form-control form-control-sm kg-per-jam-ml" style="min-width: 90px;"></td>
+                    <td><input type="number" name="kg_per_jam_ml" class="form-control form-control-sm kg-per-jam-ml" style="min-width: 90px;"></td>
+                    <td><input type="number" name="kg_per_jam_ac" class="form-control form-control-sm kg-per-jam-ac" style="min-width: 90px;"></td>
+                    <td><input type="number" name="kg_per_jam_sk" class="form-control form-control-sm kg-per-jam-sk" style="min-width: 90px;"></td>
+                    <td><input type="number" name="kg_per_jam_mb" class="form-control form-control-sm kg-per-jam-mb" style="min-width: 90px;"></td>
+
                 </tr>
             `;
             }
@@ -934,90 +1650,186 @@
                 const $row = $(this);
                 const employeeId = $row.data('employee-id');
                 
-                const employee = {
-                    employee_id: employeeId,
-                    employee_name: $row.find('td:eq(3) input').val(),
-                    badge: $row.find('td:eq(2) input').val(),
-                    tanggal_masuk_kerja: $row.find('td:eq(1) input').val(),
+                if ($('#departemen option:selected').val() == "5") {
+                    // Format data untuk departemen 5 (Canning)
+                    const employee = {
+                        employee_id: employeeId,
+                        employee_name: $row.find('td:eq(3) input').val(),
+                        badge: $row.find('td:eq(2) input').val(),
+                        tanggal_masuk_kerja: $row.find('td:eq(1) input').val(),
 
-                    // Job data columns (26)
-                    sjb: parseFloat($row.find('[name="sjb"]').val()) || 0,
-                    sjl: parseFloat($row.find('[name="sjl"]').val()) || 0,
-                    mt: parseFloat($row.find('[name="mt"]').val()) || 0,
-                    sel: parseFloat($row.find('[name="sel"]').val()) || 0,
-                    slm: parseFloat($row.find('[name="slm"]').val()) || 0,
-                    ssp: parseFloat($row.find('[name="ssp"]').val()) || 0,
-                    scm: parseFloat($row.find('[name="scm"]').val()) || 0,
-                    ctt: parseFloat($row.find('[name="ctt"]').val()) || 0,
-                    cct: parseFloat($row.find('[name="cct"]').val()) || 0,
-                    smh: parseFloat($row.find('[name="smh"]').val()) || 0,
-                    dm: parseFloat($row.find('[name="dm"]').val()) || 0,
-                    scf: parseFloat($row.find('[name="scf"]').val()) || 0,
-                    lel: parseFloat($row.find('[name="lel"]').val()) || 0,
-                    gc: parseFloat($row.find('[name="gc"]').val()) || 0,
-                    sspk: parseFloat($row.find('[name="sspk"]').val()) || 0,
-                    kjb: parseFloat($row.find('[name="kjb"]').val()) || 0,
-                    kjl: parseFloat($row.find('[name="kjl"]').val()) || 0,
-                    klp: parseFloat($row.find('[name="klp"]').val()) || 0,
-                    ksp: parseFloat($row.find('[name="ksp"]').val()) || 0,
-                    kcl: parseFloat($row.find('[name="kcl"]').val()) || 0,
-                    kcm: parseFloat($row.find('[name="kcm"]').val()) || 0,
-                    klg: parseFloat($row.find('[name="klg"]').val()) || 0,
-                    lm: parseFloat($row.find('[name="lm"]').val()) || 0,
-                    kel: parseFloat($row.find('[name="kel"]').val()) || 0,
-                    kcf: parseFloat($row.find('[name="kcf"]').val()) || 0,
-                    cu: parseFloat($row.find('[name="cu"]').val()) || 0,
+                        // Job data columns (26)
+                        sjb: parseFloat($row.find('[name="sjb"]').val()) || 0,
+                        sjl: parseFloat($row.find('[name="sjl"]').val()) || 0,
+                        mt: parseFloat($row.find('[name="mt"]').val()) || 0,
+                        sel: parseFloat($row.find('[name="sel"]').val()) || 0,
+                        slm: parseFloat($row.find('[name="slm"]').val()) || 0,
+                        ssp: parseFloat($row.find('[name="ssp"]').val()) || 0,
+                        scm: parseFloat($row.find('[name="scm"]').val()) || 0,
+                        ctt: parseFloat($row.find('[name="ctt"]').val()) || 0,
+                        cct: parseFloat($row.find('[name="cct"]').val()) || 0,
+                        smh: parseFloat($row.find('[name="smh"]').val()) || 0,
+                        dm: parseFloat($row.find('[name="dm"]').val()) || 0,
+                        scf: parseFloat($row.find('[name="scf"]').val()) || 0,
+                        lel: parseFloat($row.find('[name="lel"]').val()) || 0,
+                        gc: parseFloat($row.find('[name="gc"]').val()) || 0,
+                        sspk: parseFloat($row.find('[name="sspk"]').val()) || 0,
+                        kjb: parseFloat($row.find('[name="kjb"]').val()) || 0,
+                        kjl: parseFloat($row.find('[name="kjl"]').val()) || 0,
+                        klp: parseFloat($row.find('[name="klp"]').val()) || 0,
+                        ksp: parseFloat($row.find('[name="ksp"]').val()) || 0,
+                        kcl: parseFloat($row.find('[name="kcl"]').val()) || 0,
+                        kcm: parseFloat($row.find('[name="kcm"]').val()) || 0,
+                        klg: parseFloat($row.find('[name="klg"]').val()) || 0,
+                        lm: parseFloat($row.find('[name="lm"]').val()) || 0,
+                        kel: parseFloat($row.find('[name="kel"]').val()) || 0,
+                        kcf: parseFloat($row.find('[name="kcf"]').val()) || 0,
+                        cu: parseFloat($row.find('[name="cu"]').val()) || 0,
 
-                    // Summary columns
-                    jlhkg: parseFloat($row.find('[name="jlhkg"]').val()) || 0,
-                    jlh_org: parseFloat($row.find('[name="jlh_org"]').val()) || 0,
-                    ttl_jam: parseFloat($row.find('[name="ttl_jam"]').val()) || 0,
-                    rp: parseFloat($row.find('[name="rp"]').val()) || 0,
-                    total_rp_org: parseFloat($row.find('[name="total_rp_org"]').val()) || 0,
+                        // Summary columns
+                        jlhkg: parseFloat($row.find('[name="jlhkg"]').val()) || 0,
+                        jlh_org: parseFloat($row.find('[name="jlh_org"]').val()) || 0,
+                        ttl_jam: parseFloat($row.find('[name="ttl_jam"]').val()) || 0,
+                        rp: parseFloat($row.find('[name="rp"]').val()) || 0,
+                        total_rp_org: parseFloat($row.find('[name="total_rp_org"]').val()) || 0,
 
-                    // Subsidies
-                    subsidi: parseFloat($row.find('[name="subsidi"]').val()) || 0,
+                        // Subsidies
+                        subsidi: parseFloat($row.find('[name="subsidi"]').val()) || 0,
 
-                    // Target
-                    kilo400: parseFloat($row.find('[name="kilo400"]').val()) || 0,
-                    kilo600: parseFloat($row.find('[name="kilo600"]').val()) || 0,
+                        // Target
+                        kilo400: parseFloat($row.find('[name="kilo400"]').val()) || 0,
+                        kilo600: parseFloat($row.find('[name="kilo600"]').val()) || 0,
 
-                    // Final values
-                    perjam: parseFloat($row.find('[name="perjam"]').val()) || 0,
-                    total_kg: parseFloat($row.find('[name="total_kg"]').val()) || 0,
+                        // Final values
+                        perjam: parseFloat($row.find('[name="perjam"]').val()) || 0,
+                        total_kg: parseFloat($row.find('[name="total_kg"]').val()) || 0,
+                        
+                        // Item details for each code
+                        item_details: {}
+                    };
+
+                    const codes = ['sjb', 'sjl', 'mt', 'sel', 'slm', 'ssp', 'scm', 'ctt', 'cct', 'smh', 
+                                'dm', 'scf', 'lel', 'gc', 'sspk', 'kjb', 'kjl', 'klp', 'ksp', 'kcl', 
+                                'kcm', 'klg', 'lm', 'kel', 'kcf', 'cu'];
+
+                    codes.forEach(code => {
+                        const key = `${employeeId}_${code}`;
+                        if (employeeItemDetails[key]) {
+                            employee[code] = {
+                                total: employeeItemDetails[key].totalHarga,
+                                berat: employeeItemDetails[key].totalBerat,
+                                count: employeeItemDetails[key].items.length,
+                                items: employeeItemDetails[key].items.map(item => ({
+                                    berat: item.berat,
+                                    harga: item.harga,
+                                    subtotal: item.berat * item.harga
+                                }))
+                            };
+                        } else {
+                            employee[code] = {
+                                total: 0,
+                                berat: 0,
+                                count: 0,
+                                items: []
+                            };
+                        }
+                    });
+
+                    employeeData.push(employee);
+                } else {
+                    // Format data untuk departemen lain (menggunakan struktur yang disimpan sebelumnya)
+                    const employee = {
+                        employee_id: employeeId,
+                        employee_name: $row.find('td:eq(3) input').val(),
+                        badge: $row.find('td:eq(2) input').val(),
+                        tanggal_masuk_kerja: $row.find('td:eq(1) input').val(),
+
+                        // Data pekerjaan untuk departemen lain
+                        SUAC: parseFloat($row.find('[name="SUAC"]').val()) || 0,
+                        CUU: parseFloat($row.find('[name="CUU"]').val()) || 0,
+                        AU: parseFloat($row.find('[name="AU"]').val()) || 0,
+                        'MKU/MDU': parseFloat($row.find('[name="MKU/MDU"]').val()) || 0,
+                        BU: parseFloat($row.find('[name="BU"]').val()) || 0,
+                        BBU: parseFloat($row.find('[name="BBU"]').val()) || 0,
+                        ATU: parseFloat($row.find('[name="ATU"]').val()) || 0,
+                        CBU: parseFloat($row.find('[name="CBU"]').val()) || 0,
+                        FU: parseFloat($row.find('[name="FU"]').val()) || 0,
+                        BUMS: parseFloat($row.find('[name="BUMS"]').val()) || 0,
+                        BUM: parseFloat($row.find('[name="BUM"]').val()) || 0,
+                        KUM: parseFloat($row.find('[name="KUM"]').val()) || 0,
+                        SUM: parseFloat($row.find('[name="SUM"]').val()) || 0,
+                        SK: parseFloat($row.find('[name="SK"]').val()) || 0,
+                        CKU: parseFloat($row.find('[name="CKU"]').val()) || 0,
+                        FKPH: parseFloat($row.find('[name="FKPH"]').val()) || 0,
+                        BK: parseFloat($row.find('[name="BK"]').val()) || 0,
+                        SKPL: parseFloat($row.find('[name="SKPL"]').val()) || 0,
+                        SKPB: parseFloat($row.find('[name="SKPB"]').val()) || 0,
+                        SKML: parseFloat($row.find('[name="SKML"]').val()) || 0,
+                        SKMB: parseFloat($row.find('[name="SKMB"]').val()) || 0,
+                        C1: parseFloat($row.find('[name="C1"]').val()) || 0,
+                        C2: parseFloat($row.find('[name="C2"]').val()) || 0,
+                        CUK: parseFloat($row.find('[name="CUK"]').val()) || 0,
+                        FK: parseFloat($row.find('[name="FK"]').val()) || 0,
+                        SSSCG: parseFloat($row.find('[name="SSSCG"]').val()) || 0,
+                        IKSSCG: parseFloat($row.find('[name="IKSSCG"]').val()) || 0,
+                        FSSCG: parseFloat($row.find('[name="FSSCG"]').val()) || 0,
+                        KSCG: parseFloat($row.find('[name="KSCG"]').val()) || 0,
+                        CSCG: parseFloat($row.find('[name="CSCG"]').val()) || 0,
+                        MPA: parseFloat($row.find('[name="MPA"]').val()) || 0,
+                        LBL: parseFloat($row.find('[name="LBL"]').val()) || 0,
+                        SA: parseFloat($row.find('[name="SA"]').val()) || 0,
+                        CU: parseFloat($row.find('[name="CU"]').val()) || 0,
+                        HK: parseFloat($row.find('[name="HK"]').val()) || 0,
+                        
+                        // Jam kerja dan kolom lainnya
+                        jam_kerja_udang: parseFloat($row.find('[name="jam_kerja_udang"]').val()) || 0,
+                        jam_kerja_kepah: parseFloat($row.find('[name="jam_kerja_kepah"]').val()) || 0,
+                        jam_kerja_kptg: parseFloat($row.find('[name="jam_kerja_kptg"]').val()) || 0,
+                        total_kg: parseFloat($row.find('[name="total_kg"]').val()) || 0,
+                        total_jam: parseFloat($row.find('[name="total_jam"]').val()) || 0,
+                        jumlah_org: parseFloat($row.find('[name="jumlah_org"]').val()) || 0,
+                        rupiah: parseFloat($row.find('[name="rupiah"]').val()) || 0,
+                        subsidi_rupiah: parseFloat($row.find('[name="subsidi_rupiah"]').val()) || 0,
+                        borongan_per_jam: parseFloat($row.find('[name="borongan_per_jam"]').val()) || 0,
+                        kg_per_jam_ml: parseFloat($row.find('[name="kg_per_jam_ml"]').val()) || 0,
+                        kg_per_jam_ac: parseFloat($row.find('[name="kg_per_jam_ac"]').val()) || 0,
+                        kg_per_jam_sk: parseFloat($row.find('[name="kg_per_jam_sk"]').val()) || 0,
+                        kg_per_jam_mb: parseFloat($row.find('[name="kg_per_jam_mb"]').val()) || 0,
+                        
+                        item_details: {}
+                    };
+
+                    // Tambahkan pengecekan employeeItemDetails untuk departemen lain jika diperlukan
+                    const otherCodes = ['SUAC', 'CUU', 'AU', 'MKU/MDU', 'BU', 'BBU', 'ATU', 'CBU', 'FU', 
+                                    'BUMS', 'BUM', 'KUM', 'SUM', 'SK', 'CKU', 'FKPH', 'BK', 'SKPL', 
+                                    'SKPB', 'SKML', 'SKMB', 'C1', 'C2', 'CUK', 'FK', 'SSSCG', 'IKSSCG', 
+                                    'FSSCG', 'KSCG', 'CSCG', 'MPA', 'LBL', 'SA', 'CU', 'HK'];
                     
-                    // Item details for each code
-                    item_details: {}
-                };
+                    otherCodes.forEach(code => {
+                        const key = `${employeeId}_${code}`;
+                        if (employeeItemDetails[key]) {
+                            employee[code] = {
+                                total: employeeItemDetails[key].totalHarga,
+                                berat: employeeItemDetails[key].totalBerat,
+                                count: employeeItemDetails[key].items.length,
+                                items: employeeItemDetails[key].items.map(item => ({
+                                    berat: item.berat,
+                                    harga: item.harga,
+                                    subtotal: item.berat * item.harga
+                                }))
+                            };
+                        } else {
+                            employee[code] = {
+                                total: 0,
+                                berat: 0,
+                                count: 0,
+                                items: []
+                            };
+                        }
+                    });
 
-                const codes = ['sjb', 'sjl', 'mt', 'sel', 'slm', 'ssp', 'scm', 'ctt', 'cct', 'smh', 
-                            'dm', 'scf', 'lel', 'gc', 'sspk', 'kjb', 'kjl', 'klp', 'ksp', 'kcl', 
-                            'kcm', 'klg', 'lm', 'kel', 'kcf', 'cu'];
-
-                codes.forEach(code => {
-                    const key = `${employeeId}_${code}`;
-                    if (employeeItemDetails[key]) {
-                        employee[code] = {
-                            total: employeeItemDetails[key].totalHarga,
-                            berat: employeeItemDetails[key].totalBerat,
-                            count: employeeItemDetails[key].items.length,
-                            items: employeeItemDetails[key].items.map(item => ({
-                                berat: item.berat,
-                                harga: item.harga,
-                                subtotal: item.berat * item.harga
-                            }))
-                        };
-                    } else {
-                        employee[code] = {
-                            total: 0,
-                            berat: 0,
-                            count: 0,
-                            items: []
-                        };
-                    }
-                });
-
-                employeeData.push(employee);
+                    employeeData.push(employee);
+                }
             });
             
             console.log('Collected Employee Data:', employeeData);
@@ -1165,6 +1977,7 @@
 
 
 
+        // CALCULATE PTS
         $(document).on('keypress', 'input[name^="sjb"], input[name^="sjl"], input[name^="mt"], input[name^="sel"], input[name^="slm"], input[name^="ssp"], input[name^="scm"], input[name^="ctt"], input[name^="cct"], input[name^="smh"], input[name^="dm"], input[name^="scf"], input[name^="lel"], input[name^="gc"], input[name^="sspk"]', function (e) {
             if (e.which === 13) {
                 e.preventDefault();
@@ -1237,6 +2050,69 @@
         });
 
 
+        //CALCULATE CANNING
+        $(document).on('keypress', 'input[name^="SUAC"], input[name^="CUU"], input[name^="AU"], input[name^="MKU/MDU"], input[name^="BU"], input[name^="BBU"], input[name^="ATU"], input[name^="CBU"], input[name^="FU"], input[name^="BUMS"], input[name^="BUM"], input[name^="KUM"], input[name^="SUM"], input[name^="SK"], input[name^="CKU"], input[name^="FKPH"], input[name^="BK"], input[name^="SKPL"], input[name^="SKPB"], input[name^="SKML"], input[name^="SKMB"], input[name^="C1"], input[name^="C2"], input[name^="CUK"], input[name^="FK"], input[name^="SSSCG"], input[name^="IKSSCG"], input[name^="FSSCG"], input[name^="KSCG"], input[name^="CSCG"], input[name^="MPA"], input[name^="LBL"], input[name^="SA"], input[name^="CU"], input[name^="HK"]', function (e) {
+            if (e.which === 13) {
+                e.preventDefault();
+
+                const input = $(this);
+                const val = input.val().trim();
+                const employeeId = input.closest('tr').data('employee-id');
+                const hargaSatuan = parseFloat(input.data('harga')) || 0;
+                const kodeBarang = input.attr('name');
+
+                function parseInput(inputStr) {
+                    const normalized = inputStr.replace(/,/g, '.');
+                    const parts = normalized.split('+').filter(Boolean);
+                    return parts.map(part => {
+                        const num = parseFloat(part);
+                        return isNaN(num) ? 0 : num;
+                    });
+                }
+
+                const numbers = parseInput(val);
+                const total = numbers.reduce((sum, n) => sum + n, 0);
+
+                if (total === 0 && val !== '0') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Format salah',
+                        text: 'Gunakan format seperti: 0.9+0.7 atau 0,9+0,7',
+                    });
+                    return;
+                }
+
+                input.val(total.toFixed(2));
+
+                const $row = input.closest('tr');
+                const key = `${employeeId}_${kodeBarang}`;
+
+                employeeItemDetails[key] = {
+                    items: numbers.map(berat => ({ berat, harga: hargaSatuan })),
+                    totalBerat: total,
+                    totalHarga: total * hargaSatuan
+                };
+
+                // Rehitung total total_kg & rp
+                let total_kg = 0;
+                let rupiah = 0;
+
+                Object.keys(employeeItemDetails).forEach(keyLoop => {
+                    if (keyLoop.startsWith(`${employeeId}_`) && keyLoop !== `${employeeId}_main`) {
+                        const data = employeeItemDetails[keyLoop];
+                        total_kg += data.totalBerat || 0;
+                        rupiah += data.totalHarga || 0;
+                    }
+                });
+
+                const mainKey = `${employeeId}_main`;
+                employeeItemDetails[mainKey] = { total_kg, rupiah };
+
+                $row.find(`input[name="total_kg"]`).val(total_kg.toFixed(2));
+                $row.find(`input[name="rupiah"]`).val(rupiah.toFixed());
+            }
+        });
+
 
         // Handle delete harga
         $(document).on('click', '.hapus-harga', function() {
@@ -1270,9 +2146,9 @@
             // Update field sesuai kodeBarang
             $(`tr[data-employee-id="${employeeId}"] input[name="${kodeBarang}"]`).val(totalBerat.toFixed(2));
 
-            // 🔥 Tambahan: update input jlhkg dan rp
-            $(`tr[data-employee-id="${employeeId}"] input[name="jlhkg"]`).val(totalBerat.toFixed(2));
-            $(`tr[data-employee-id="${employeeId}"] input[name="rp"]`).val(totalHarga.toFixed()); // tanpa koma desimal
+            // // 🔥 Tambahan: update input jlhkg dan rp
+            // $(`tr[data-employee-id="${employeeId}"] input[name="jlhkg"]`).val(totalBerat.toFixed(2));
+            // $(`tr[data-employee-id="${employeeId}"] input[name="rp"]`).val(totalHarga.toFixed()); // tanpa koma desimal
 
             // Tutup modal
             $('#modalDetailHarga').modal('hide');
@@ -1383,7 +2259,6 @@
                 const newRow = `
                     <tr>
                         <td>${parseFloat(item.berat).toFixed(2)}</td>
-                        <td>${parseFloat(item.harga).toLocaleString()}</td>
                         <td>
                             <button class="btn btn-sm btn-danger hapus-harga">
                                 <i class="fa fa-trash"></i>
