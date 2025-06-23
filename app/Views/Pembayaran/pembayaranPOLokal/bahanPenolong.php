@@ -153,6 +153,7 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row.id;
+                    let divisi_id = row.divisi_id;
                     let form = '';
                     let status_posting = row.status_posting;
                     form += ` <div class="mt-0">`;
@@ -171,7 +172,7 @@
                             <?php endif; ?>
 
                             <?php if (can('Pembayaran', 'Lokal BP', 'a')) : ?>
-                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
+                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}', '${divisi_id}')" class="btn btn-success posting-spp">
                                     <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
@@ -289,7 +290,7 @@
             }
         });
     }
-    const posting = function(id) {
+    const posting = function(id, divisi_id) {
         Swal.fire({
             icon: 'question',
             title: 'Posting Pembayaran ?',
@@ -306,6 +307,7 @@
                     url: "<?= base_url("pembayaran-po-lokal-bp/posting"); ?>",
                     data: {
                         id: id,
+                        divisi_id: divisi_id,
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());

@@ -72,6 +72,7 @@
                                 <th onclick="changeSort('transaksi_jurnal.type_transaksi')" class="sort">Transaksi</th>
                                 <th onclick="changeSort('transaksi_jurnal.no_transaksi')" class="sort">Nomor</th>
                                 <th onclick="changeSort('transaksi_jurnal.tanggal_transaksi')">Tanggal</th>
+                                <th onclick="changeSort('divisis.divisi')">Departemen</th>
                                 <th onclick="changeSort('transaksi_jurnal.penerimaan_barang_id')" class="sort">No LPB</th>
                                 <th onclick="changeSort('transaksi_jurnal.uraian_transaksi')" class="sort">Keterangan</th>
                                 <th>Invoice</th>
@@ -168,7 +169,10 @@
             {
                 data: "tanggal_transaksi",
                 className: "text-left",
-
+            },
+            {
+                data: "divisi_name",
+                className: "text-left",
             },
             {
                 data: "no_lpb",
