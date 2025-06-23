@@ -1146,7 +1146,7 @@ class MaterialRequest extends BaseController
                 // Hilangkan duplikat `id` dan `spesifikasi`, lalu susun ulang nama barang
                 foreach ($grouped as &$group) {
                     $group['stok_total'] = floatval(number_format($group['stok_total'], 2));
-                    $group['id'] = encrypt(json_encode(array_values(array_unique($group['id']))));
+                    $group['id'] = encrypt2(json_encode(array_values(array_unique($group['id']))));
                     $group['spesifikasi_list'] = array_unique($group['spesifikasi_list']);
                     $group['barang'] = trim($group['barang_name'] . ' ' . implode(', ', $group['spesifikasi_list']));
                     unset($group['barang_name'], $group['spesifikasi_list']); // opsional, kalau mau lebih ringkas
