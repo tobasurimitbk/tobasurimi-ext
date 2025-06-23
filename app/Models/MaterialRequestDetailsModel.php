@@ -405,7 +405,7 @@ class MaterialRequestDetailsModel extends Model
             $result = [];
             foreach ($grouped as $item) {
                 $item['barang'] = implode(', ', $item['barang']);
-                $item['id'] = encrypt(json_encode($item['id']));
+                $item['id'] = encrypt2(json_encode($item['id']));
                 $result[] = $item;
             }
         }

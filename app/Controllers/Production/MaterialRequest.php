@@ -387,7 +387,7 @@ class MaterialRequest extends BaseController
             foreach ($mr_detail as $s) {
                 if ($s->type_barang == "bahan_baku") {
                     // Bahan Baku Po
-                    $stockId = decrypt($s->id);
+                    $stockId = decrypt2($s->id);
                     $stockIdArr = json_decode($stockId);
                     if (is_array($stockIdArr)) {
                         // STOK DARI SUPPLIER
@@ -657,7 +657,7 @@ class MaterialRequest extends BaseController
                     } elseif ($s->type_barang == "bahan_baku") {
 
                         // Bahan Baku
-                        $stockId = decrypt($s->id);
+                        $stockId = decrypt2($s->id);
                         $stockIdArr = json_decode($stockId);
                         // Hapus Dulu
                         if (is_array($stockIdArr)) {
@@ -1061,7 +1061,6 @@ class MaterialRequest extends BaseController
                 $condition = [
                     'stock.divisi_id' => $divisiAsalId,
                     'stock.warehouse_id' => $warehouseAsalId,
-                    'stock_details.sumber' => "JASA VENDOR",
                     'stock.barang1_id' => $barangMasterId,
                     'vendor_id' => $vendorId
                 ];
@@ -1159,50 +1158,38 @@ class MaterialRequest extends BaseController
 
                 // Grupp
                 for ($i = 0; $i < count($dataResult); $i++) {
-                    $result = strstr($dataResult[$i]['stock_dokumen'], '(', true);
-                    $noJasaVendorIn = trim($result);
-                    $supplierName = $dataResult[$i]['supplier_name'];
 
-                    $stock = $this->stockModel->find($dataResult[$i]['stock_id']);
+                    $noDaftar = "";
 
-                    $jasaVendorIn = $this->jasaVendorInModel
-                        ->select('jasa_vendor_in.*,vendors.name as nama_vendor')
-                        ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
-                        ->where('no_penerimaan_surat_jalan', $noJasaVendorIn)
-                        ->where('jasa_vendor_in.company_id', $this->this_company_id)
-                        ->where('vendor_id', $vendorId)
-                        ->first();
-
-
-                    $stockDetail = $this->stockDetail2Model->getStockListDetail(
-                        $dataResult[$i]['stock_id'],
-                        $dataResult[$i]['bc_id'],
-                        $dataResult[$i]['no_aju'],
-                        $dataResult[$i]['stock_dokumen']
-                    );
-
-                    $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
-                    $noDaftar = $this->stockDetail2Model->getNomorDaftar($dataResult[$i]['no_aju'], $dataResult[$i]['bc_id']);
+                    if (!empty($dataResult[$i]['no_daftar_bc23'])) {
+                        $noDaftar = $dataResult[$i]['no_daftar_bc23'];
+                    } elseif (!empty($dataResult[$i]['no_daftar_bc27'])) {
+                        $noDaftar = $dataResult[$i]['no_daftar_bc27'];
+                    } elseif (!empty($dataResult[$i]['no_daftar_bc40'])) {
+                        $noDaftar = $dataResult[$i]['no_daftar_bc40'];
+                    } elseif (!empty($dataResult[$i]['no_daftar_ppbkb'])) {
+                        $noDaftar = $dataResult[$i]['no_daftar_ppbkb'];
+                    }
 
                     $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
                     $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
-                    $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+                    $dataResult[$i]['bc_type'] = $dataResult[$i]['bc_type'] == null ? "NON PABEAN" : $dataResult[$i]['bc_type'];
                     $dataResult[$i]['satuan'] = $dataResult[$i]['kode_satuan'];
                     $dataResult[$i]['barang'] = $dataResult[$i]['barang_name'];
-                    $dataResult[$i]['stock_date'] = $jasaVendorIn == null ? "-" : date('d/m/Y', strtotime($jasaVendorIn['tanggal']));
                     $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-                    $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
-                    $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-                    $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
-                    $dataResult[$i]['supplier_name'] = $jasaVendorIn == null ? "-" : $supplierName . ' / ' . $jasaVendorIn['nama_vendor'];
+                    $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+                    $dataResult[$i]['type_barang'] = "bahan_baku";
+                    $dataResult[$i]['type_barang_text'] = "BAHAN BAKU";
+                    $dataResult[$i]['supplier_name'] = $dataResult[$i]['supplier_name'] . ' / ' . $dataResult[$i]['nama_vendor'];
                     $dataResult[$i]['id'] = encrypt($dataResult[$i]['id']);
                     $dataResult[$i]['no_daftar'] = $noDaftar;
-                    $dataResult[$i]['stok_total'] = floatval($stockDetail['stok_total']);
 
-                    if ($jasaVendorIn != null && $dataResult[$i]['stok_total'] > 0) {
+                    if ($dataResult[$i]['stok_total'] > 0) {
                         array_push($resultArr, $dataResult[$i]);
                     }
                 }
+
+
 
                 $grouped = [];
 
@@ -1213,7 +1200,7 @@ class MaterialRequest extends BaseController
 
                     if (!isset($grouped[$key])) {
                         $grouped[$key] = [
-                            'sumber' => $item['sumber'],
+                            'sumber' => "JASA VENDOR",
                             'supplier_name' => $item['supplier_name'],
                             'bc_type' => $item['bc_type'],
                             'no_aju' => $item['no_aju'],
@@ -1239,7 +1226,7 @@ class MaterialRequest extends BaseController
                 // Hilangkan duplikat `id` dan `spesifikasi`, lalu susun ulang nama barang
                 foreach ($grouped as &$group) {
                     $group['stok_total'] = floatval(number_format($group['stok_total'], 2));
-                    $group['id'] = encrypt(json_encode(array_values(array_unique($group['id']))));
+                    $group['id'] = encrypt2(json_encode(array_values(array_unique($group['id']))));
                     $group['spesifikasi_list'] = array_unique($group['spesifikasi_list']);
                     $group['barang'] = trim($group['barang_name'] . ' ' . implode(', ', $group['spesifikasi_list']));
                     unset($group['barang_name'], $group['spesifikasi_list']); // opsional, kalau mau lebih ringkas

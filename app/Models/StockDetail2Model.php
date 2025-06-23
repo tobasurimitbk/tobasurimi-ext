@@ -603,15 +603,12 @@ class StockDetail2Model extends Model
 
     public function getStockListMaterialRequestFromJasaVendor($condition)
     {
-        // JIKA $isAdjusment = true MAKA STOK < 0 MUNCUL
-        // JIKA $isAdjusment = false MAKA STOK > 0 YANG MUNCUL
         $selectQry = '
+            stock_details2.stock_id,
             suppliers.name AS supplier_name,
             stock_details2.id,
             stock_details2.bc_id,
-            stock_details2.stock_detail_id,
             stock_details2.no_aju,
-            stock_details2.stock_id,
             stock_details2.stock_dokumen,
             stock_details2.no_dokumen AS no_dokumen_2,
             stock_details2.supplier_id,
@@ -619,39 +616,71 @@ class StockDetail2Model extends Model
             stock_details2.harga_harian,
             stock_details2.harga_bulanan,
             stock_details2.no_po,
-            stock_details.no_dokumen AS no_dokumen_1,
-            stock_details.stock_date,
-            stock_details.sumber,
             barang_master.barang_name,
             barang_master_spesifikasi.spesifikasi,
             satuans.kode_satuan,
-            (SUM(CASE WHEN stock_details.status = "In" 
-            THEN stock_details2.qty ELSE 0 END) - 
-            SUM(CASE WHEN stock_details.status = "Out" 
-            THEN stock_details2.qty ELSE 0 END)) 
-            AS stok_total,        
+            jasa_vendor_in.tanggal as stock_date,
+            vendors.name as nama_vendor,
+            (
+                SELECT value FROM metadata WHERE id = stock_details2.bc_id
+            ) AS bc_type,
+            (
+                SELECT no_daftar FROM bc_23 
+                JOIN bc_purchase_order ON bc_purchase_order.id = bc_23.bc_purchase_order_id
+                WHERE bc_23.no_aju = stock_details2.no_aju AND stock_details2.bc_id = 48
+            ) AS no_daftar_bc23,
+            (
+                SELECT no_daftar FROM bc_27
+                WHERE bc_27.no_aju = stock_details2.no_aju AND stock_details2.bc_id = 52
+            ) AS no_daftar_bc27,
+            (
+                SELECT no_daftar FROM bc_40 
+                JOIN bc_purchase_order ON bc_purchase_order.id = bc_40.bc_purchase_order_id
+                WHERE bc_40.no_aju = stock_details2.no_aju AND stock_details2.bc_id = 53
+            ) AS no_daftar_bc40,
+            (
+                SELECT no_daftar FROM ppbkb
+                WHERE ppbkb.no_ppbkb = stock_details2.no_aju AND stock_details2.bc_id = 1426
+            ) AS no_daftar_ppbkb,
+            (
+                SELECT 
+                    SUM(CASE WHEN sd.status = "In" THEN sd2.qty ELSE 0 END) -
+                    SUM(CASE WHEN sd.status = "Out" THEN sd2.qty ELSE 0 END)
+                FROM stock_details2 sd2
+                LEFT JOIN stock_details sd ON sd.id = sd2.stock_detail_id
+                WHERE 
+                    sd2.stock_id = stock_details2.stock_id AND
+                    sd2.bc_id = stock_details2.bc_id AND
+                    sd2.no_aju = stock_details2.no_aju AND
+                    sd2.stock_dokumen = stock_details2.stock_dokumen
+            ) AS stok_total
         ';
 
-        $dataQry = $this->asArray()
-            ->select($selectQry)
-            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+
+        $dataQry = $this->select($selectQry)
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id', 'left')
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
             ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->join('jasa_vendor_in', 'jasa_vendor_in.no_penerimaan_surat_jalan = stock_details2.no_dokumen', 'left')
+            ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
             ->where($condition)
-            ->groupBy('stock_details2.stock_dokumen')
-            ->groupBy('stock_details2.bc_id')
-            ->groupBy('stock_details2.no_aju')
-            ->groupBy('stock_details2.id')
-            ->having('stok_total >', 0)
-            ->orderBy('stock_details.createdAt', "ASC")
+            ->groupBy([
+                'stock_details2.stock_dokumen',
+                'stock_details2.bc_id',
+                'stock_details2.no_aju',
+                // 'stock_details2.id',
+                'stock_details2.stock_id'
+            ])
+            ->orderBy('stock_details2.createdAt', 'ASC')
             ->findAll();
 
         return $dataQry;
     }
+
+
 
     public function getAverageHargaStockList($stockID)
     {
