@@ -234,7 +234,9 @@ class PenerimaanBarangModel extends Model
         }
 
         if ($addCondition['search']) {
-            $penerimaanBarangDataQry->like('penerimaan_barang.no_penerimaan_barang', $addCondition['search']);
+            $penerimaanBarangDataQry->like('penerimaan_barang.no_penerimaan_barang', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike('penerimaan_barang.multiple_po_no', $addCondition['search']);
         }
 
         if ($addCondition['filter']) {
@@ -265,7 +267,7 @@ class PenerimaanBarangModel extends Model
         ];
     }
 
-    public function getPenerimaanBarangListForPrintAccounting($condition, $addCondition)
+    public function getPenerimaanBarangListForPrintAccounting($condition, $addCondition, $companyId)
     {
         $availableSort = [
             'no_penerimaan_barang'      => 'penerimaan_barang.no_penerimaan_barang',
@@ -295,6 +297,7 @@ class PenerimaanBarangModel extends Model
             ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'right')
             ->groupBy(('penerimaan_barang.id'))
             ->where($condition)
+            ->whereIn('penerimaan_barang.company_id', $companyId)
             ->orderBy($sort, $sortType);
 
         $totalData = $penerimaanBarangDataQry->countAllResults(false);

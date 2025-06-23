@@ -276,15 +276,19 @@ class Pembelian extends BaseController
     public function LaporanPembelianPrint($tglAwal, $tglAkhir, $filter, $search)
     {
         $dompdf = new Dompdf();
+
+        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+            $companyId = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $companyId = [15];
+        } else {
+            $companyId = [16];
+        }
+
         $condition = [
-            "penerimaan_barang.company_id"  => $this->this_company_id,
+            // "penerimaan_barang.company_id"  => $this->this_company_id,
             "penerimaan_barang.deletedAt" => NULL
         ];
-
-        // var_dump($tglAwal);
-        // var_dump($tglAkhir);
-        // var_dump($filterData);
-        // exit;
 
         $addCondition = [
             "search"        => $search != "all" ? $search : "",
@@ -296,7 +300,7 @@ class Pembelian extends BaseController
         ];
 
         // $res = $this->transaksiPembelianModel->getList($condition, $addCondition, $limit, $offset);
-        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForPrintAccounting($condition, $addCondition);
+        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForPrintAccounting($condition, $addCondition, $companyId);
         $metaValuta = $this->metadataModel->get_by_name('Valuta');
         // var_dump($res);
         // exit;
@@ -444,9 +448,16 @@ class Pembelian extends BaseController
 
         $spreadsheet = new Spreadsheet();
 
+        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+            $companyId = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $companyId = [15];
+        } else {
+            $companyId = [16];
+        }
 
         $condition = [
-            "penerimaan_barang.company_id"  => $this->this_company_id,
+            // "penerimaan_barang.company_id"  => $this->this_company_id,
             "penerimaan_barang.deletedAt" => NULL
         ];
 
@@ -488,7 +499,7 @@ class Pembelian extends BaseController
             ->setCellValue('N3', 'Nominal Value(IDR)')
             ->setCellValue('O3', 'Paid Value(IDR)');
 
-        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForPrintAccounting($condition, $addCondition);
+        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForPrintAccounting($condition, $addCondition, $companyId);
         $metaValuta = $this->metadataModel->get_by_name('Valuta');
 
         $rdata = [];
