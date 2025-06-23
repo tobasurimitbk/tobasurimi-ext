@@ -200,6 +200,7 @@ class TransaksiJurnalModel extends Model
             'transaksi_jurnal.tanggal_transaksi' => 'transaksi_jurnal.tanggal_transaksi',
             'transaksi_jurnal.uraian_transaksi' => 'transaksi_jurnal.uraian_transaksi',
             'transaksi_jurnal.metode_input' => 'transaksi_jurnal.metode_input',
+            'divisis.divisi' => 'divisis.divisi',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -217,13 +218,15 @@ class TransaksiJurnalModel extends Model
             transaksi_jurnal.total_debit,
             transaksi_jurnal.no_bukti,
             penerimaan_barang.no_penerimaan_barang,                 
-        metadata.value as transaksi_type_name,
+            metadata.value as transaksi_type_name,
             transaksi_pembelian.id_local_bb,
             transaksi_pembelian.id_import_bb,
             transaksi_pembelian.id_po_bp,
             jurnal_umum.supplier_id,
             suppliers.name as supplier_name,
             am_purchase_orders.po_type,
+            group_concat(DISTINCT jurnal_umum.keterangan SEPARATOR ', ') as keterangan_jurnal,
+            divisis.divisi as divisi_name,
         ";
 
         $dataQry = $this->asObject()->select($selectQry)
@@ -233,6 +236,7 @@ class TransaksiJurnalModel extends Model
             ->join('am_purchase_orders', 'am_purchase_orders.id = transaksi_pembelian.id_po_bp', 'left')
             ->join('suppliers', 'suppliers.id = transaksi_pembelian.id_supplier', 'left')
             ->join('penerimaan_barang', 'penerimaan_barang.id = transaksi_jurnal.penerimaan_barang_id', 'left')
+            ->join('divisis', 'divisis.id = jurnal_umum.divisi_id', 'left')
             ->where($condition)
             ->groupBy('jurnal_umum.id_transaksi');
 

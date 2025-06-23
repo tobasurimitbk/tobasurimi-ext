@@ -248,6 +248,7 @@ class JurnalUmum extends BaseController
                 "no_transaksi"          => $data->metode_input === 'system' ? $data->no_transaksi : $data->no_bukti,
                 "tanggal_transaksi"     => date('d/m/Y', strtotime($data->tanggal_transaksi)),
                 "uraian_transaksi"      => $data->uraian_transaksi,
+                "keterangan_jurnal"      => $data->keterangan_jurnal,
                 "supplier"              => "0 : " . $data->supplier_name, // tidak tersedia setelah relasi dihapus
                 "no_lpb"                => $noLpb, // tidak tersedia setelah relasi dihapus
                 "metode_input"          => strtoupper($data->metode_input),
@@ -256,6 +257,7 @@ class JurnalUmum extends BaseController
                 "nilai"                 => $data->exchange_rate == 1 ? "" : $data->exchange_rate,
                 "nilai_idr"             => $data->total_debit,
                 "tutup_buku"            => 0,
+                "divisi_name"           => $data->divisi_name ?? 'ALL',
             ];
         }
 
@@ -690,12 +692,13 @@ class JurnalUmum extends BaseController
             ->setCellValue('B1', 'Transaksi')
             ->setCellValue('C1', 'Nomor')
             ->setCellValue('D1', 'Tanggal')
-            ->setCellValue('E1', 'No LPB')
-            ->setCellValue('F1', 'Invoice')
-            ->setCellValue('G1', 'Keterangan')
-            ->setCellValue('H1', 'Nilai')
-            ->setCellValue('I1', 'Valas')
-            ->setCellValue('J1', 'Nilai (IDR)');
+            ->setCellValue('E1', 'Departemen')
+            ->setCellValue('F1', 'No LPB')
+            ->setCellValue('G1', 'Invoice')
+            ->setCellValue('H1', 'Keterangan')
+            ->setCellValue('I1', 'Nilai')
+            ->setCellValue('J1', 'Valas')
+            ->setCellValue('K1', 'Nilai (IDR)');
 
 
         $sheet->getStyle('A1:J1')->applyFromArray($headerStyleArray);
@@ -705,12 +708,13 @@ class JurnalUmum extends BaseController
                 ->setCellValue('B' . $column, $row['transaksi_type_name'])
                 ->setCellValue('C' . $column, $row['no_transaksi'])
                 ->setCellValue('D' . $column, $row['tanggal_transaksi'])
-                ->setCellValue('E' . $column, $row['no_lpb'])
-                ->setCellValue('F' . $column, $row['supplier'])
-                ->setCellValue('G' . $column, $row['uraian_transaksi'])
-                ->setCellValue('H' . $column, $row['nilai'])
-                ->setCellValue('I' . $column, $row['valas'])
-                ->setCellValue('J' . $column, $row['nilai_idr']);
+                ->setCellValue('E' . $column, $row['divisi_name'])
+                ->setCellValue('F' . $column, $row['no_lpb'])
+                ->setCellValue('G' . $column, $row['supplier'])
+                ->setCellValue('H' . $column, $row['keterangan_jurnal'])
+                ->setCellValue('I' . $column, $row['nilai'])
+                ->setCellValue('J' . $column, $row['valas'])
+                ->setCellValue('K' . $column, $row['nilai_idr']);
 
             $sheet->getStyle('A' . $column . ':J' . $column)->applyFromArray($dataStyleArray);
             $column++;
