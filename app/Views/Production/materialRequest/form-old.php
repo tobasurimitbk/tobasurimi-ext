@@ -58,11 +58,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataMaterialRequests) ? ($dataMaterialRequests->is_posted == "1" ? 'readonly' : '') : "readonly" ?> value="<?= !empty($dataMaterialRequests->req_no) ? $dataMaterialRequests->req_no : "AUTO GENERATE" ?>" autocomplete="one-time-code" type="text" class="form-control req_no" id="req_no" name="req_no" placeholder="Kode Produksi">
+                                    <input value="<?= !empty($dataMaterialRequests->req_no) ? $dataMaterialRequests->req_no : "AUTO GENERATE" ?>" readonly autocomplete="one-time-code" type="text" class="form-control req_no" id="req_no" name="req_no" placeholder="Kode Produksi">
                                     <label for="floatingInput">Kode Request</label>
-                                </div>
-                                <div <?= !empty($dataMaterialRequests) ? 'style="display:none;"' : ''; ?> class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 25px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -81,262 +78,128 @@
                     </div>
                 </div>
             </form>
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="home-tab" data-toggle="tab" data-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true" onclick="pindahTab('BAHAN BAKU')">Bahan Baku Dimutasikan</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="profile-tab" data-toggle="tab" data-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" onclick="pindahTab('LAIN')">Barang Scrap & Barang Setengah Jadi & Barang Jadi Dimutasikan</button>
-                </li>
-
-            </ul>
-            <div class="tab-content" id="myTabContent">
-                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                    <div class="row">
-
-                        <div class="col-md-2">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select type_barang" disabled id="type_barang" name="type_barang">
-                                    <option value=""></option>
-                                    <?php foreach ($tipeBarang as $t) : ?>
-                                        <?php if ($t['description'] == "bahan_baku") : ?>
-                                            <option selected value="<?= $t['description'] ?>">
-                                                <?= strtoupper($t['value']); ?>
-                                            </option>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select type_asal_barang" id="type_asal_barang" name="type_asal_barang">
-                                    <option value=""></option>
-                                    <option value="SUPPLIER" selected>SUPPLIER</option>
-                                    <option value="VENDOR">VENDOR</option>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Asal Barang</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select divisi_asal_bahan_baku_id" id="divisi_asal_bahan_baku_id" name="divisi_asal_bahan_baku_id">
-                                    <option value=""></option>
-                                    <?php foreach ($dataDivisi as $d) : ?>
-                                        <option value="<?= $d['id'] ?>">
-                                            <?= $d['divisi']; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Departemen Asal</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select warehouse_asal_bahan_baku_id" id="warehouse_asal_bahan_baku_id" name="warehouse_asal_bahan_baku_id">
-                                    <option value=""></option>
-
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Warehouse Asal</label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select divisi_tujuan_bahan_baku_id" id="divisi_tujuan_bahan_baku_id" name="divisi_tujuan_bahan_baku_id">
-                                    <option value=""></option>
-                                    <?php foreach ($dataDivisi as $d) : ?>
-                                        <option value="<?= $d['id'] ?>">
-                                            <?= $d['divisi']; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select warehouse_tujuan_bahan_baku_id" id="warehouse_tujuan_bahan_baku_id" name="warehouse_tujuan_bahan_baku_id">
-                                    <option value=""></option>
-
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Warehouse Tujuan</label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4" id="supplier_id_select">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select supplier_id" id="supplier_id" name="supplier_id">
-                                    <option value=""></option>
-                                    <?php foreach ($dataSupplierBahanBaku as $s): ?>
-                                        <option value="<?= $s['id'] ?>"><?= $s['name']  ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Supplier</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4" id="vendor_barang_id_select">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select vendor_barang_id" id="vendor_barang_id" name="vendor_barang_id">
-                                    <option value=""></option>
-                                    <?php foreach ($dataVendor as $v): ?>
-                                        <option value="<?= $v['id'] ?>"> <?= strtoupper($v['name']); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Vendor</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id">
-                                    <option value=""></option>
-
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Barang</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select type_pengambilan_stock_bahan_baku" id="type_pengambilan_stock_bahan_baku" name="type_pengambilan_stock_bahan_baku" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <option value="PABEAN">PABEAN</option>
-                                    <option value="FIFO">FIFO</option>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4 form-fifo">
-                            <div class="form-floating" style="height: 50px;">
-                                <input placeholder="Qty" oninput="preventNegativeInput(this)" class="form-control qty_keluar_fifo" id="qty_keluar_fifo" name="qty_keluar_fifo" />
-                                <label for="floatingInput" style="z-index: 1;">Qty Dikeluarkan</label>
-                            </div>
-                        </div>
+            <div class="row mt-3">
+                <div class="col mb-3">
+                    <label class="form-label font-weight-bold lable-title">Data Barang yang Dimutasikan</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_asal_id" id="divisi_asal_id" name="divisi_asal_id" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php foreach ($dataDivisi as $d) : ?>
+                                <option <?= !empty($mutasi) ? ($mutasi['divisi_asal_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                    <?= $d['divisi']; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Departemen Asal</label>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_asal_id" id="divisi_asal_id" name="divisi_asal_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($dataDivisi as $d) : ?>
-                                        <option <?= !empty($mutasi) ? ($mutasi['divisi_asal_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
-                                            <?= $d['divisi']; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Departemen Asal</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_asal_id" id="warehouse_asal_id" name="warehouse_asal_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php if (!empty($warehouseAsal)) : ?>
-                                        <?php foreach ($warehouseAsal as $w) : ?>
-                                            <option <?= !empty($mutasi) ? ($mutasi['warehouse_asal_id'] == $w['id'] ? 'selected' : '') : '' ?> value="<?= $w['id'] ?>">
-                                                <?= $w['warehouse_name']; ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    <?php endif ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Warehouse Asal</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_tujuan_id" id="divisi_tujuan_id" name="divisi_tujuan_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($dataDivisi as $d) : ?>
-                                        <option <?= !empty($mutasi) ? ($mutasi['divisi_tujuan_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
-                                            <?= $d['divisi']; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_tujuan_id" id="warehouse_tujuan_id" name="warehouse_tujuan_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php if (!empty($warehouseTujuan)) : ?>
-                                        <?php foreach ($warehouseTujuan as $w) : ?>
-                                            <option <?= !empty($mutasi) ? ($mutasi['warehouse_tujuan_id'] == $w['id'] ? 'selected' : '') : '' ?> value="<?= $w['id'] ?>">
-                                                <?= $w['warehouse_name']; ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    <?php endif ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Warehouse Tujuan</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <option value="PABEAN">PABEAN</option>
-                                    <option value="FIFO">FIFO</option>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating" style="height: 50px;">
-                                <input placeholder="Qty" readonly oninput="preventNegativeInput(this)" class="form-control qty_mutasi_fifo" id="qty_mutasi_fifo" name="qty_mutasi_fifo" aria-label="Floating label select example" />
-                                <label for="floatingInput" style="z-index: 1;">Qty Mutasi Keluar</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select select_tipe_bahan" name="select_tipe_bahan" id="select_tipe_bahan" disabled>
-                                    <option value=""></option>
-                                    <?php foreach ($tipeBarang as $t) : ?>
-                                        <?php if ($t['description'] != "bahan_baku" && $t['description'] != "bahan_penolong"): ?>
-                                            <option value="<?= $t['description'] ?>">
-                                                <?= strtoupper($t['value']); ?>
-                                            </option>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput">Tipe Bahan</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input placeholder="Keterangan (Optional)" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
-                                <label for="floatingInput" style="z-index: 1;">Keterangan (Optional)</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select select_nama_barang" name="select_nama_barang" id="select_nama_barang" disabled>
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Nama Barang</label>
-                            </div>
-                        </div>
-                        <!-- <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select select_supplier" name="select_supplier" id="select_supplier" disabled>
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Supplier</label>
-                            </div>
-                        </div> -->
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_asal_id" id="warehouse_asal_id" name="warehouse_asal_id" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php if (!empty($warehouseAsal)) : ?>
+                                <?php foreach ($warehouseAsal as $w) : ?>
+                                    <option <?= !empty($mutasi) ? ($mutasi['warehouse_asal_id'] == $w['id'] ? 'selected' : '') : '' ?> value="<?= $w['id'] ?>">
+                                        <?= $w['warehouse_name']; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif ?>
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Warehouse Asal</label>
                     </div>
                 </div>
             </div>
-
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_tujuan_id" id="divisi_tujuan_id" name="divisi_tujuan_id" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php foreach ($dataDivisi as $d) : ?>
+                                <option <?= !empty($mutasi) ? ($mutasi['divisi_tujuan_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                    <?= $d['divisi']; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_tujuan_id" id="warehouse_tujuan_id" name="warehouse_tujuan_id" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php if (!empty($warehouseTujuan)) : ?>
+                                <?php foreach ($warehouseTujuan as $w) : ?>
+                                    <option <?= !empty($mutasi) ? ($mutasi['warehouse_tujuan_id'] == $w['id'] ? 'selected' : '') : '' ?> value="<?= $w['id'] ?>">
+                                        <?= $w['warehouse_name']; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif ?>
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Warehouse Tujuan</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">PABEAN</option>
+                            <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO">FIFO</option>
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="Qty" readonly oninput="preventNegativeInput(this)" class="form-control qty_mutasi_fifo" id="qty_mutasi_fifo" name="qty_mutasi_fifo" aria-label="Floating label select example" />
+                        <label for="floatingInput" style="z-index: 1;">Qty Mutasi Keluar</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select select_tipe_bahan" name="select_tipe_bahan" id="select_tipe_bahan" disabled>
+                            <option value=""></option>
+                            <?php foreach ($tipeBarang as $t) : ?>
+                                <option value="<?= $t['description'] ?>">
+                                    <?= strtoupper($t['value']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Tipe Bahan</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input placeholder="Keterangan (Optional)" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
+                        <label for="floatingInput" style="z-index: 1;">Keterangan (Optional)</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select select_nama_barang" name="select_nama_barang" id="select_nama_barang" disabled>
+                            <option value=""></option>
+                        </select>
+                        <label for="floatingInput">Nama Barang</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select select_supplier" name="select_supplier" id="select_supplier" disabled>
+                            <option value=""></option>
+                        </select>
+                        <label for="floatingInput">Supplier</label>
+                    </div>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-12 col-table-button-tts">
                     <div class="table-responsive">
@@ -346,10 +209,10 @@
                                     <th style="text-align: center;">#</th>
                                     <th style="text-align: center;">Asal Barang</th>
                                     <th style="text-align: center;">No Dokumen</th>
-                                    <th style="text-align: center;">Supplier / Vendor</th>
+                                    <th style="text-align: center;">Supplier</th>
                                     <th style="text-align: center;">Dokumen Pabean</th>
                                     <th style="text-align: center;">No Aju / No Daftar</th>
-                                    <th style="text-align: center;">Tgl PO / Tgl Vendor Masuk</th>
+                                    <th style="text-align: center;">Tanggal Penerimaan</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Satuan</th>
                                     <th style="text-align: center;">Qty</th>
@@ -370,17 +233,17 @@
             </div>
             <ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="home-tab" data-toggle="tab" data-target="#home1" type="button" role="tab" aria-controls="home" aria-selected="true">
+                    <button class="nav-link active" id="home-tab" data-toggle="tab" data-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">
                         Data Bahan Baku Request
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="profile-tab" data-toggle="tab" data-target="#profile1" type="button" role="tab" aria-controls="profile" aria-selected="false">
+                    <button class="nav-link" id="profile-tab" data-toggle="tab" data-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">
                         Data Barang Scrap Request
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="contact-tab" data-toggle="tab" data-target="#contact2" type="button" role="tab" aria-controls="contact" aria-selected="false">
+                    <button class="nav-link" id="contact-tab" data-toggle="tab" data-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
                         Data Barang Setengah Jadi Request
                     </button>
                 </li>
@@ -391,20 +254,19 @@
                 </li>
             </ul>
             <div class="tab-content" id="myTabContent">
-                <div class="tab-pane fade show active" id="home1" role="tabpanel" aria-labelledby="home-tab">
+                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                     <div class="row mt-3">
                         <div class="table-responsive">
                             <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts dataTable" id="selectedItemTableBahanBaku" width="100%" cellspacing="0">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th style="text-align: center;">No</th>
-                                        <th style="text-align: center;">Departemen / Warehouse Asal</th>
-                                        <th style="text-align: center;">Departemen / Warehouse Tujuan</th>
-                                        <th style="text-align: center;">Supplier / Vendor</th>
+                                        <th style="text-align: center;">Department</th>
+                                        <th style="text-align: center;">Warehouse</th>
                                         <th style="text-align: center;">Tipe Barang</th>
                                         <th style="text-align: center;">Dokumen Pabean</th>
                                         <th style="text-align: center;">No Aju / No Daftar</th>
-                                        <th style="text-align: center;">Tgl PO / Tgl Vendor Masuk</th>
+                                        <th style="text-align: center;">Tanggal Penerimaan</th>
                                         <th style="text-align: center;">Barang - Spesifikasi</th>
                                         <th style="text-align: center;">Satuan</th>
                                         <th style="text-align: center;">Qty Awal</th>
@@ -424,15 +286,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="profile1" role="tabpanel" aria-labelledby="profile-tab">
+                <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                     <div class="row mt-3">
                         <div class="table-responsive">
                             <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts dataTable" id="selectedItemTableBahan" width="100%" cellspacing="0">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th style="text-align: center;">No</th>
-                                        <th style="text-align: center;">Departemen / Warehouse Asal</th>
-                                        <th style="text-align: center;">Departemen / Warehouse Tujuan</th>
+                                        <th style="text-align: center;">Department</th>
+                                        <th style="text-align: center;">Warehouse</th>
                                         <th style="text-align: center;">Tipe Barang</th>
                                         <th style="text-align: center;">Dokumen Pabean</th>
                                         <th style="text-align: center;">No Aju / No Daftar</th>
@@ -455,15 +317,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="contact2" role="tabpanel" aria-labelledby="contact-tab">
+                <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
                     <div class="row mt-3">
                         <div class="table-responsive">
                             <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts dataTable" id="selectedItemTableBahanSetengahJadi" width="100%" cellspacing="0">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th style="text-align: center;">No</th>
-                                        <th style="text-align: center;">Departemen / Warehouse Asal</th>
-                                        <th style="text-align: center;">Departemen / Warehouse Tujuan</th>
+                                        <th style="text-align: center;">Department</th>
+                                        <th style="text-align: center;">Warehouse</th>
                                         <th style="text-align: center;">Tipe Barang</th>
                                         <th style="text-align: center;">Dokumen Pabean</th>
                                         <th style="text-align: center;">No Aju / No Daftar</th>
@@ -493,8 +355,8 @@
                                 <thead class="thead-dark">
                                     <tr>
                                         <th style="text-align: center;">No</th>
-                                        <th style="text-align: center;">Departemen / Warehouse Asal</th>
-                                        <th style="text-align: center;">Departemen / Warehouse Tujuan</th>
+                                        <th style="text-align: center;">Department</th>
+                                        <th style="text-align: center;">Warehouse</th>
                                         <th style="text-align: center;">Tipe Barang</th>
                                         <th style="text-align: center;">Dokumen Pabean</th>
                                         <th style="text-align: center;">No Aju / No Daftar</th>
@@ -537,659 +399,622 @@
     let sortDataBarang = "createdAt";
     let sortTypeDataBarang = "DESC";
 
-    $('#vendor_barang_id_select').hide();
-    $('.form-fifo').hide();
-
-    <?php if (!empty($dataMaterialRequestDetailsBahanBaku)): ?>
-        <?php foreach ($dataMaterialRequestDetailsBahanBaku as $materialRequestDetails): ?>
-            listStockSelectedBahanBaku.push({
-                id: '<?= $materialRequestDetails['id'] ?>',
-                id_material_request_detail: undefined,
-                stock_detail_id: '<?= $materialRequestDetails['stock_detail_id'] ?>',
-                supplier_id: '<?= $materialRequestDetails['supplier_id'] ?>',
-                harga_umum: '<?= $materialRequestDetails['harga_umum'] ?>',
-                harga_harian: '<?= $materialRequestDetails['harga_harian'] ?>',
-                harga_bulanan: '<?= $materialRequestDetails['harga_bulanan'] ?>',
-                keterangan: '',
-                barang: '<?= $materialRequestDetails['barang'] ?>',
-                bc_id: '<?= $materialRequestDetails['bc_id'] ?>',
-                bc_type: '<?= $materialRequestDetails['bc_type'] ?>',
-                departmentID: '<?= $materialRequestDetails['divisi_id'] ?>',
-                departmentText: '<?= $materialRequestDetails['divisi_asal_text'] ?>',
-                departmentTujuanText: '<?= $materialRequestDetails['divisi_tujuan_text'] ?>',
-                departmentTujuanID: '<?= $materialRequestDetails['divisi_tujuan_id'] ?>',
-                warehouseTujuanID: '<?= $materialRequestDetails['warehouse_tujuan_id']  ?>',
-                no_aju: '<?= $materialRequestDetails['no_aju'] ?>',
-                no_dokumen_1: '-',
-                no_dokumen_2: '-',
-                qty: '<?= floatval($materialRequestDetails['qty']) ?>',
-                qty2: '<?= floatval($materialRequestDetails['qty2']) ?>',
-                qty_isi: '<?= floatval($materialRequestDetails['qty_isi']) ?>',
-                satuan: '<?= $materialRequestDetails['kode_satuan'] ?>',
-                stock_date: '<?= $materialRequestDetails['stock_date'] ?>',
-                stock_dokumen: '<?= $materialRequestDetails['stock_dokumen'] ?>',
-                stock_id: '<?= $materialRequestDetails['stock_id'] ?>',
-                stok_total: '<?= floatval($materialRequestDetails['stok_total']) ?>',
-                supplier_name: '<?= $materialRequestDetails['supplier_name'] ?>',
-                type_barang: '<?= $materialRequestDetails['type_barang'] ?>',
-                type_barang_text: '<?= $materialRequestDetails['type_barang_text'] ?>',
-                warehouseID: '<?= $materialRequestDetails['warehouse_id'] ?>',
-                warehouseText: '<?= $materialRequestDetails['warehouse_asal_text'] ?>',
-                warehouseTujuanText: '<?= $materialRequestDetails['warehouse_tujuan_text'] ?>',
-                no_daftar: '<?= $materialRequestDetails['no_daftar'] ?>'
-            });
-        <?php endforeach; ?>
-    <?php endif; ?>
-
     <?php if (!empty($dataMaterialRequestDetails)) : ?>
         <?php foreach ($dataMaterialRequestDetails as $materialRequestDetails) : ?>
-            <?php if ($materialRequestDetails->barang_type == "bahan_setengah_jadi") { ?>
-                listStockSelectedBahanSetengahJadi.push({
+            <?php if ($materialRequestDetails->barang_type == "bahan_baku") { ?>
+                listStockSelectedBahanBaku.push({
                     id_material_request_detail: '<?= $materialRequestDetails->id ?>',
                     barang: '<?= $materialRequestDetails->nama_barang ?>',
                     bc_id: '<?= $materialRequestDetails->bc_id ?>',
                     bc_type: '<?= $materialRequestDetails->ref_no ?>',
                     departmentID: '<?= $materialRequestDetails->divisi_id ?>',
-                    departmentText: '<?= $materialRequestDetails->divisi_asal_text ?>',
-                    departmentTujuanText: '<?= $materialRequestDetails->divisi_tujuan_text ?>',
-                    departmentTujuanID: '<?= $materialRequestDetails->divisi_tujuan_id ?>',
-                    warehouseTujuanID: '<?= $materialRequestDetails->warehouse_tujuan_id ?>',
+                    departmentText: '<?= $materialRequestDetails->divisi_text ?>',
                     no_aju: '<?= $materialRequestDetails->no_aju ?>',
                     no_dokumen_1: '-',
                     no_dokumen_2: '-',
-                    qty: '<?= floatval($materialRequestDetails->qty) ?>',
-                    qty2: '<?= floatval($materialRequestDetails->qty2) ?>',
-                    qty_isi: '<?= floatval($materialRequestDetails->qty_isi) ?>',
+                    qty: '<?= $materialRequestDetails->qty ?>',
+                    qty2: '<?= $materialRequestDetails->qty2 ?>',
+                    qty_isi: '<?= $materialRequestDetails->qty_isi ?>',
                     satuan: '<?= $materialRequestDetails->kode_satuan ?>',
                     stock_date: '<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>',
                     stock_dokumen: '<?= $materialRequestDetails->stock_dokumen ?>',
                     stock_id: '<?= $materialRequestDetails->stock_id ?>',
-                    stok_total: '<?= floatval($materialRequestDetails->qty) ?>',
+                    stok_total: '<?= $materialRequestDetails->qty ?>',
                     supplier_name: '-',
                     type_barang: '<?= $materialRequestDetails->barang_type ?>',
                     type_barang_text: '<?= $materialRequestDetails->barang_type_text ?>',
                     warehouseID: '<?= $materialRequestDetails->warehouse_id ?>',
-                    warehouseText: '<?= $materialRequestDetails->warehouse_tujuan_text ?>',
-                    warehouseTujuanText: '<?= $materialRequestDetails->warehouse_tujuan_text ?>',
+                    warehouseText: '<?= $materialRequestDetails->warehouse_text ?>',
                     no_daftar: '<?= $materialRequestDetails->no_daftar ?>'
                 });
-            <?php } elseif ($materialRequestDetails->barang_type == "bahan_jadi") { ?>
+            <?php } else if ($materialRequestDetails->barang_type == "bahan_jadi") { ?>
                 listStockSelectedBahanJadi.push({
                     id_material_request_detail: '<?= $materialRequestDetails->id ?>',
                     barang: '<?= $materialRequestDetails->nama_barang ?>',
                     bc_id: '<?= $materialRequestDetails->bc_id ?>',
                     bc_type: '<?= $materialRequestDetails->ref_no ?>',
                     departmentID: '<?= $materialRequestDetails->divisi_id ?>',
-                    departmentText: '<?= $materialRequestDetails->divisi_asal_text ?>',
-                    departmentTujuanText: '<?= $materialRequestDetails->divisi_tujuan_text ?>',
-                    departmentTujuanID: '<?= $materialRequestDetails->divisi_tujuan_id ?>',
-                    warehouseTujuanID: '<?= $materialRequestDetails->warehouse_tujuan_id ?>',
+                    departmentText: '<?= $materialRequestDetails->divisi_text ?>',
                     no_aju: '<?= $materialRequestDetails->no_aju ?>',
                     no_dokumen_1: '-',
                     no_dokumen_2: '-',
-                    qty: '<?= floatval($materialRequestDetails->qty) ?>',
-                    qty2: '<?= floatval($materialRequestDetails->qty2) ?>',
-                    qty_isi: '<?= floatval($materialRequestDetails->qty_isi) ?>',
+                    qty: '<?= $materialRequestDetails->qty ?>',
+                    qty2: '<?= $materialRequestDetails->qty2 ?>',
+                    qty_isi: '<?= $materialRequestDetails->qty_isi ?>',
                     satuan: '<?= $materialRequestDetails->kode_satuan ?>',
                     stock_date: '<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>',
                     stock_dokumen: '<?= $materialRequestDetails->stock_dokumen ?>',
                     stock_id: '<?= $materialRequestDetails->stock_id ?>',
-                    stok_total: '<?= floatval($materialRequestDetails->qty) ?>',
+                    stok_total: '<?= $materialRequestDetails->qty ?>',
                     supplier_name: '-',
                     type_barang: '<?= $materialRequestDetails->barang_type ?>',
                     type_barang_text: '<?= $materialRequestDetails->barang_type_text ?>',
                     warehouseID: '<?= $materialRequestDetails->warehouse_id ?>',
-                    warehouseText: '<?= $materialRequestDetails->warehouse_tujuan_text ?>',
-                    warehouseTujuanText: '<?= $materialRequestDetails->warehouse_tujuan_text ?>',
+                    warehouseText: '<?= $materialRequestDetails->warehouse_text ?>',
                     no_daftar: '<?= $materialRequestDetails->no_daftar ?>'
                 });
-            <?php } elseif ($materialRequestDetails->barang_type == "bahan_scrap") { ?>
+            <?php } else if ($materialRequestDetails->barang_type == "bahan_setengah_jadi") { ?>
+                listStockSelectedBahanSetengahJadi.push({
+                    id_material_request_detail: '<?= $materialRequestDetails->id ?>',
+                    barang: '<?= $materialRequestDetails->nama_barang ?>',
+                    bc_id: '<?= $materialRequestDetails->bc_id ?>',
+                    bc_type: '<?= $materialRequestDetails->ref_no ?>',
+                    departmentID: '<?= $materialRequestDetails->divisi_id ?>',
+                    departmentText: '<?= $materialRequestDetails->divisi_text ?>',
+                    no_aju: '<?= $materialRequestDetails->no_aju ?>',
+                    no_dokumen_1: '-',
+                    no_dokumen_2: '-',
+                    qty: '<?= $materialRequestDetails->qty ?>',
+                    qty2: '<?= $materialRequestDetails->qty2 ?>',
+                    qty_isi: '<?= $materialRequestDetails->qty_isi ?>',
+                    satuan: '<?= $materialRequestDetails->kode_satuan ?>',
+                    stock_date: '<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>',
+                    stock_dokumen: '<?= $materialRequestDetails->stock_dokumen ?>',
+                    stock_id: '<?= $materialRequestDetails->stock_id ?>',
+                    stok_total: '<?= $materialRequestDetails->qty ?>',
+                    supplier_name: '-',
+                    type_barang: '<?= $materialRequestDetails->barang_type ?>',
+                    type_barang_text: '<?= $materialRequestDetails->barang_type_text ?>',
+                    warehouseID: '<?= $materialRequestDetails->warehouse_id ?>',
+                    warehouseText: '<?= $materialRequestDetails->warehouse_text ?>',
+                    no_daftar: '<?= $materialRequestDetails->no_daftar ?>'
+                });
+            <?php } else { ?>
                 listStockSelectedBahan.push({
                     id_material_request_detail: '<?= $materialRequestDetails->id ?>',
                     barang: '<?= $materialRequestDetails->nama_barang ?>',
                     bc_id: '<?= $materialRequestDetails->bc_id ?>',
                     bc_type: '<?= $materialRequestDetails->ref_no ?>',
                     departmentID: '<?= $materialRequestDetails->divisi_id ?>',
-                    departmentText: '<?= $materialRequestDetails->divisi_asal_text ?>',
-                    departmentTujuanText: '<?= $materialRequestDetails->divisi_tujuan_text ?>',
-                    departmentTujuanID: '<?= $materialRequestDetails->divisi_tujuan_id ?>',
-                    warehouseTujuanID: '<?= $materialRequestDetails->warehouse_tujuan_id ?>',
+                    departmentText: '<?= $materialRequestDetails->divisi_text ?>',
                     no_aju: '<?= $materialRequestDetails->no_aju ?>',
                     no_dokumen_1: '-',
                     no_dokumen_2: '-',
-                    qty: '<?= floatval($materialRequestDetails->qty) ?>',
-                    qty2: '<?= floatval($materialRequestDetails->qty2) ?>',
-                    qty_isi: '<?= floatval($materialRequestDetails->qty_isi) ?>',
+                    qty: '<?= $materialRequestDetails->qty ?>',
+                    qty2: '<?= $materialRequestDetails->qty2 ?>',
+                    qty_isi: '<?= $materialRequestDetails->qty_isi ?>',
                     satuan: '<?= $materialRequestDetails->kode_satuan ?>',
                     stock_date: '<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>',
                     stock_dokumen: '<?= $materialRequestDetails->stock_dokumen ?>',
                     stock_id: '<?= $materialRequestDetails->stock_id ?>',
-                    stok_total: '<?= floatval($materialRequestDetails->qty) ?>',
+                    stok_total: '<?= $materialRequestDetails->qty ?>',
                     supplier_name: '-',
                     type_barang: '<?= $materialRequestDetails->barang_type ?>',
                     type_barang_text: '<?= $materialRequestDetails->barang_type_text ?>',
                     warehouseID: '<?= $materialRequestDetails->warehouse_id ?>',
-                    warehouseText: '<?= $materialRequestDetails->warehouse_tujuan_text ?>',
-                    warehouseTujuanText: '<?= $materialRequestDetails->warehouse_tujuan_text ?>',
+                    warehouseText: '<?= $materialRequestDetails->warehouse_text ?>',
                     no_daftar: '<?= $materialRequestDetails->no_daftar ?>'
                 });
             <?php } ?>
         <?php endforeach; ?>
+        // console.log(listStockSelectedBahan);
+        // console.log(listStockSelectedBahanJadi);
         drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
         drawTableSelectedItemBahan(listStockSelectedBahan);
         drawTableSelectedItemBahanSetengahJadi(listStockSelectedBahanSetengahJadi);
         drawTableSelectedItemBahanJadi(listStockSelectedBahanJadi);
     <?php endif; ?>
+    $(document).ready(function() {
 
-    $('#type_pengambilan_stock').select2({
-        placeholder: "Pilih Tipe Ambil Stok",
-        theme: "bootstrap-5",
-    }).change(function() {
-        // FIFO
-        if ($(this).val() == "FIFO") {
-            $('.qty_mutasi_fifo').removeAttr('readonly');
-        } else {
-            $('.qty_mutasi_fifo').attr('readonly', 'readonly');
-        }
-        $('#select_tipe_bahan').val(null).change();
-        $("#select_tipe_bahan").prop('disabled', false);
-        $('#select_nama_barang').val(null).change();
-        $("#select_nama_barang").prop('disabled', false);
-        listStockAsal = [];
-        drawTableAsalBarang();
-    });
-
-    $('#divisi_tujuan_id').select2({
-        placeholder: "Pilih Departemen Tujuan",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        // CARI WAREHOUSE TUJUAN
-        getListWarehouseTujuan();
-    });
-
-    $('#warehouse_tujuan_id').select2({
-        placeholder: "Pilih Warehouse Tujuan",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {});
-
-    $('#warehouse_asal_id').select2({
-        placeholder: "Pilih Warehouse Asal",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        // RESET TYPE BARANG
-        $('#select_tipe_bahan').val(null).change();
-        $("#select_tipe_bahan").prop('disabled', false);
-        // RESET SEMUA LIST
-        listStockAsal = [];
-        drawTableAsalBarang(listStockAsal);
-    });
-
-    $('#divisi_asal_id').select2({
-        placeholder: "Pilih Departemen Asal",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        // CARI DIVISI TUJUAN
-        // getListDivisiTujuan();
-        // CARI WAREHOUSE ASAL
-        getListWarehouseAsal()
-        // RESET TYPE BARANG
-        $('#select_tipe_bahan').val(null).change();
-        // RESET SEMUA LIST
-        listStockAsal = [];
-        drawTableAsalBarang(listStockAsal);
-    });
-
-    $('.select_tipe_bahan').select2({
-        placeholder: "Pilih Tipe Bahan",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        $('#select_nama_barang').val(null).change();
-        $("#select_nama_barang").prop('disabled', false);
-        listStockAsal = [];
-        drawTableAsalBarang();
-        getListBarang();
-
-    });
-
-    $('.select_nama_barang').select2({
-        placeholder: "Pilih Barang",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        listStockAsal = [];
-        drawTableAsalBarang();
-        getListDokumenPabean();
-    });
-
-    $('.select_supplier').select2({
-        placeholder: "Pilih Supplier",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        listStockAsal = [];
-        drawTableAsalBarang();
-        getListDokumenPabean();
-    });
-
-    $('.kode_barang').select2({
-        placeholder: "Pilih Kode Barang",
-        theme: "bootstrap-5",
-        dropdownParent: $(".detail-modal .modal-content"),
-        tags: false,
-        allowClear: true
-    });
-
-    $('#type_barang').select2({
-        placeholder: "Pilih Tipe Barang",
-        theme: "bootstrap-5",
-    });
-
-    $('#type_asal_barang').select2({
-        placeholder: "Pilih Asal Barang",
-        theme: "bootstrap-5",
-    }).change(function() {
-        getDropdownAsalBarang();
-        // GET LIST BARANG
-        getListBarangBahanBaku();
-    });
-
-    $('#supplier_id').select2({
-        placeholder: "Pilih Supplier",
-        theme: "bootstrap-5",
-    }).change(function() {
-        // LIST DOKUMEN PABEAN
-        getListDokumenPabeanBahanBaku();
-    });
-
-    $('#vendor_barang_id').select2({
-        placeholder: "Pilih Vendor",
-        theme: "bootstrap-5",
-    }).change(function() {
-        // LIST DOKUMEN PABEAN
-        getListDokumenPabeanBahanBaku();
-    });
-
-    $('#spesifikasi_id').select2({
-        placeholder: "Pilih Barang",
-        theme: "bootstrap-5",
-    }).change(function() {
-        // LIST DOKUMEN PABEAN
-        getListDokumenPabeanBahanBaku();
-    });
-
-    $('#divisi_asal_bahan_baku_id').select2({
-        placeholder: "Pilih Departemen Asal",
-        theme: "bootstrap-5",
-    }).change(function() {
-        // GET BARANG
-        getListBarangBahanBaku();
-        // GET WAREHOUSE
-        getListWarehouseAsalBahanBaku();
-    });
-
-    $('#divisi_tujuan_bahan_baku_id').select2({
-        placeholder: "Pilih Departemen Tujuan",
-        theme: "bootstrap-5",
-    }).change(function() {
-        // GET WAREHOUSE
-        getListWarehouseTujuanBahanBaku();
-    });
-
-
-    $('#warehouse_asal_bahan_baku_id').select2({
-        placeholder: "Pilih Warehouse Asal",
-        theme: "bootstrap-5",
-    }).change(function() {
-        // GET BARANG
-        getListBarangBahanBaku();
-    });
-
-    $('#warehouse_tujuan_bahan_baku_id').select2({
-        placeholder: "Pilih Warehouse Tujuan",
-        theme: "bootstrap-5",
-    }).change(function() {
-
-    });
-
-    $('#type_pengambilan_stock_bahan_baku').select2({
-        placeholder: "Pilih Tipe Ambil Stok",
-        theme: "bootstrap-5",
-    }).change(function() {
-        var typePengambilanStock = $('#type_pengambilan_stock_bahan_baku option:selected').val();
-        if (typePengambilanStock == "PABEAN") {
-            $('.form-fifo').hide();
-        } else if (typePengambilanStock == "FIFO") {
-            $('.form-fifo').show();
-        } else {
-            $('.form-fifo').hide();
-
-        }
-
-        drawTableAsalBarang(listStockAsal);
-    });
-
-
-    // Mengaktifkan datepicker
-    $('#date_production').datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true
-    });
-    $('#date_request').datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true
-    });
-
-    //CSS SELECT2 FLOATING LABEL
-    $('.select_tipe_bahan,.kode_barang,.select_nama_barang,.select_supplier,#type_asal_barang,#type_barang,#supplier_id,#vendor_barang_id,#spesifikasi_id,#divisi_asal_bahan_baku_id,#warehouse_asal_bahan_baku_id,#type_pengambilan_stock_bahan_baku,.divisi_tujuan_bahan_baku_id,.warehouse_tujuan_bahan_baku_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $('.select_tipe_bahan,.kode_barang,.select_nama_barang,.select_supplier,#type_asal_barang,#type_barang,#supplier_id,#vendor_barang_id,#spesifikasi_id,#divisi_asal_bahan_baku_id,#warehouse_asal_bahan_baku_id,#type_pengambilan_stock_bahan_baku,.divisi_tujuan_bahan_baku_id,.warehouse_tujuan_bahan_baku_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $('.select_tipe_bahan,.kode_barang,.select_nama_barang,.select_supplier,#type_asal_barang,#type_barang,#supplier_id,#vendor_barang_id,#spesifikasi_id,#divisi_asal_bahan_baku_id,#warehouse_asal_bahan_baku_id,#type_pengambilan_stock_bahan_baku,.divisi_tujuan_bahan_baku_id,.warehouse_tujuan_bahan_baku_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
-
-    $("#divisi_asal_id,#divisi_tujuan_id,#warehouse_asal_id,#warehouse_tujuan_id,#operasi,#type_pengambilan_stock,.select_tipe_bahan,.kode_barang,.select_nama_barang,.select_supplier,#type_asal_barang,#type_barang,#supplier_id,#vendor_barang_id,#spesifikasi_id,#divisi_asal_bahan_baku_id,#warehouse_asal_bahan_baku_id,#type_pengambilan_stock_bahan_baku,.divisi_tujuan_bahan_baku_id,.warehouse_tujuan_bahan_baku_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '30px').css('margin-left', '-7px');
-
-    var validator_detail = $(".detail-form").validate({
-        rules: {
-            kode_barang: {
-                required: true
-            },
-            nama_barang: {
-                required: true
-            },
-            qty: {
-                required: true
-            },
-            harga: {
-                required: true
-            },
-            satuan: {
-                required: true
-            }
-        },
-        messages: {
-            kode_barang: {
-                required: "Kode wajib diisi"
-            },
-            nama_barang: {
-                required: "Nama wajib diisi"
-            },
-            qty: {
-                required: "Qty wajib diisi"
-            },
-            harga: {
-                required: "Harga wajib diisi"
-            },
-            satuan: {
-                required: "Satuan wajib diisi"
-            }
-        },
-        errorElement: 'span',
-        errorClass: 'text-danger',
-        errorPlacement: function(error, element) {
-            var elem = $(element);
-            if (elem.hasClass("select2-hidden-accessible")) {
-                element = $("#select2-" + elem.attr("id") + "-container").parent();
-                error.insertAfter(element);
+        $('#type_pengambilan_stock').select2({
+            placeholder: "Pilih Tipe Ambil Stok",
+            theme: "bootstrap-5",
+        }).change(function() {
+            // FIFO
+            if ($(this).val() == "FIFO") {
+                $('.qty_mutasi_fifo').removeAttr('readonly');
             } else {
-                error.insertAfter(element);
+                $('.qty_mutasi_fifo').attr('readonly', 'readonly');
             }
-        },
-        highlight: function(element) {
-            $(element).closest('.form-group').addClass('has-error');
-            $(element).addClass('select-class');
+            $('#select_tipe_bahan').val(null).change();
+            $("#select_tipe_bahan").prop('disabled', false);
+            $('#select_nama_barang').val(null).change();
+            $("#select_nama_barang").prop('disabled', false);
+            listStockAsal = [];
+            drawTableAsalBarang();
+        });
 
-        },
-        unhighlight: function(element) {
-            $(element).closest('.form-group').removeClass('has-error');
-            $(element).removeClass('select-class');
-        },
-    });
+        $('#divisi_tujuan_id').select2({
+            placeholder: "Pilih Departemen Tujuan",
+            theme: "bootstrap-5",
+            allowClear: true
+        }).change(function() {
+            // CARI WAREHOUSE TUJUAN
+            getListWarehouseTujuan();
+        });
 
-    var validator = $(".create-form").validate({
-        rules: {
-            date_request: {
-                required: true
-            },
-            date_production: {
-                required: true
-            },
-            req_no: {
-                required: true
-            },
-            department_id: {
-                required: true
-            },
-            warehouse_id: {
-                required: true
-            }
-        },
-        messages: {
-            date_request: {
-                required: "Tanggal request wajib diisi"
-            },
-            date_production: {
-                required: "Tanggal produksi wajib diisi"
-            },
-            req_no: {
-                required: "Nomor request wajib diisi"
-            },
-            department_id: {
-                required: "Department wajib diisi"
-            },
-            warehouse_id: {
-                required: "Warehouse wajib diisi"
-            }
-        },
-        errorElement: 'span',
-        errorClass: 'text-danger',
-        errorPlacement: function(error, element) {
-            var elem = $(element);
-            // console.log(elem);
-            if (elem.hasClass("multiple_po_id")) {
-                element = $(".select2-selection--multiple").parent();
-                error.insertAfter(element);
-            } else if (elem.hasClass("select2-hidden-accessible")) {
-                element = $("#select2-" + elem.attr("id") + "-container").parent();
-                error.insertAfter(element);
+        $('#warehouse_tujuan_id').select2({
+            placeholder: "Pilih Warehouse Tujuan",
+            theme: "bootstrap-5",
+            allowClear: true
+        }).change(function() {});
+
+        $('#warehouse_asal_id').select2({
+            placeholder: "Pilih Warehouse Asal",
+            theme: "bootstrap-5",
+            allowClear: true
+        }).change(function() {
+            // RESET TYPE BARANG
+            $('#select_tipe_bahan').val(null).change();
+            $("#select_tipe_bahan").prop('disabled', false);
+            // RESET SEMUA LIST
+            listStockAsal = [];
+            drawTableAsalBarang(listStockAsal);
+        });
+
+        $('#divisi_asal_id').select2({
+            placeholder: "Pilih Departemen Asal",
+            theme: "bootstrap-5",
+            allowClear: true
+        }).change(function() {
+            // CARI DIVISI TUJUAN
+            // getListDivisiTujuan();
+            // CARI WAREHOUSE ASAL
+            getListWarehouseAsal()
+            // RESET TYPE BARANG
+            $('#select_tipe_bahan').val(null).change();
+            // RESET SEMUA LIST
+            listStockAsal = [];
+            drawTableAsalBarang(listStockAsal);
+        });
+
+        $("#divisi_asal_id,#divisi_tujuan_id,#warehouse_asal_id,#warehouse_tujuan_id,#operasi,#type_pengambilan_stock")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        // select tipe bahan
+        $('.select_tipe_bahan').select2({
+            placeholder: "Pilih Tipe Bahan",
+            theme: "bootstrap-5",
+            allowClear: true
+        }).change(function() {
+            console.log($(this).val());
+
+            $('#select_nama_barang').val(null).change();
+            $("#select_nama_barang").prop('disabled', false);
+            listStockAsal = [];
+            drawTableAsalBarang();
+            getListBarang();
+            if ($(this).val() == "bahan_baku") {
+                $('#select_supplier').val(null).change();
+                $("#select_supplier").prop('disabled', false);
+                $("#select_supplier").attr('disabled', false);
+                getListSupplier();
             } else {
-                error.insertAfter(element);
+                $('#select_supplier').val(null).change();
+                $("#select_supplier").prop('disabled', true);
+                $("#select_supplier").attr('disabled', true);
             }
-        },
-        highlight: function(element) {
-            $(element).closest('.col-md-6').addClass('has-error');
-            $(element).addClass('select-class');
+        });
 
-        },
-        unhighlight: function(element) {
-            $(element).closest('.col-md-6').removeClass('has-error');
-            $(element).removeClass('select-class');
-        },
-    });
+        //CSS SELECT2 FLOATING LABEL
+        $('.select_tipe_bahan')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
-    $('.btn-save').click(function() {
-        var listMaterialCheck = [].concat(listStockSelectedBahanBaku, listStockSelectedBahan, listStockSelectedBahanSetengahJadi, listStockSelectedBahanJadi);
+        $('.select_tipe_bahan, .keterangan')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
-        if (listMaterialCheck.length == 0) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Barang yang akan direquest tidak boleh kosong !',
-                confirmButtonColor: '#4e73df',
-                confirmButtonText: 'Ok'
-            });
-        } else {
-            if ($('.create-form').valid()) {
-                var isValid = true;
-                var dataError = null;
+        $('.select_tipe_bahan')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
-                $.each(listStockSelectedBahanBaku, function(i, v) {
-                    if (parseFloat(listStockSelectedBahanBaku[i].qty2) > parseFloat(listStockSelectedBahanBaku[i].stok_total) || isNaN(listStockSelectedBahanBaku[i].qty2) || listStockSelectedBahanBaku[i].qty2 == undefined || parseFloat(listStockSelectedBahanBaku[i].qty2) == 0) {
-                        dataError = listStockSelectedBahanBaku[i];
-                        console.log("Kesini", listStockSelectedBahanBaku[i]);
-                        isValid = false;
-                    }
-                });
+        // select nama barang
+        $('.select_nama_barang').select2({
+            placeholder: "Pilih Barang",
+            theme: "bootstrap-5",
+            allowClear: true
+        }).change(function() {
+            listStockAsal = [];
+            drawTableAsalBarang();
+            getListDokumenPabean();
+        });
 
-                $.each(listStockSelectedBahan, function(i, v) {
-                    if (parseFloat(listStockSelectedBahan[i].qty2) > parseFloat(listStockSelectedBahan[i].stok_total) || isNaN(listStockSelectedBahan[i].qty2) || listStockSelectedBahan[i].qty2 == undefined || parseFloat(listStockSelectedBahan[i].qty2) == 0) {
-                        dataError = listStockSelectedBahan[i];
-                        console.log("Kesin2");
+        $('.select_supplier').select2({
+            placeholder: "Pilih Supplier",
+            theme: "bootstrap-5",
+            allowClear: true
+        }).change(function() {
+            listStockAsal = [];
+            drawTableAsalBarang();
+            getListDokumenPabean();
+        });
 
-                        isValid = false;
-                    }
-                });
+        //CSS SELECT2 FLOATING LABEL
+        $('.select_nama_barang, .select_supplier')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
-                $.each(listStockSelectedBahanSetengahJadi, function(i, v) {
-                    if (parseFloat(listStockSelectedBahanSetengahJadi[i].qty2) > parseFloat(listStockSelectedBahanSetengahJadi[i].stok_total) || isNaN(listStockSelectedBahanSetengahJadi[i].qty2) || listStockSelectedBahanSetengahJadi[i].qty2 == undefined || parseFloat(listStockSelectedBahanSetengahJadi[i].qty2) == 0) {
-                        dataError = listStockSelectedBahanSetengahJadi[i];
-                        console.log("Kesin3");
+        $('.select_nama_barang, .select_supplier')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
-                        isValid = false;
-                    }
-                });
+        $('.select_nama_barang, .select_supplier')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
-                $.each(listStockSelectedBahanJadi, function(i, v) {
-                    if (parseFloat(listStockSelectedBahanJadi[i].qty2) > parseFloat(listStockSelectedBahanJadi[i].stok_total) || isNaN(listStockSelectedBahanJadi[i].qty2) || listStockSelectedBahanJadi[i].qty2 == undefined || parseFloat(listStockSelectedBahanJadi[i].qty2) == 0 || isNaN(listStockSelectedBahanJadi[i].qty_isi) || listStockSelectedBahanJadi[i].qty_isi == undefined || parseFloat(listStockSelectedBahanJadi[i].qty_isi) == 0) {
-                        dataError = listStockSelectedBahanJadi[i];
-                        console.log("Kesin4");
+        // Kode Produksi
+        // $('.kode_produksi').select2({
+        //     placeholder: "Pilih kode Produksi",
+        //     theme: "bootstrap-5",
+        //     allowClear: true
+        // });
 
-                        isValid = false;
-                    }
-                });
+        //CSS SELECT2 FLOATING LABEL
+        // $('.kode_produksi')
+        //     .parent('div')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .css('height', ' calc(3.5rem + 2px)');
 
-                console.log(listStockSelectedBahanBaku, listStockSelectedBahan);
+        // $('.kode_produksi')
+        //     .parent('div')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .css('margin-top', '22px').css('margin-left', '-7px');
 
+        // $('.kode_produksi')
+        //     .parent('div')
+        //     .find('label')
+        //     .css('z-index', '1');
 
-                if (!isValid) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Stok barang ' + dataError.barang + ' dengan dokumen ' + dataError.bc_type + ' / ' + dataError.no_aju + ' tidak valid!',
-                        confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
-                    });
+        // KODE BARANG
+        $('.kode_barang').select2({
+            placeholder: "Pilih Kode Barang",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content"),
+            tags: false,
+            allowClear: true
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.kode_barang')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.kode_barang')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.kode_barang')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // Mengaktifkan datepicker
+        $('#date_production').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: 'dd/mm/yyyy',
+            enableOnReadonly: false
+        });
+        $('#date_request').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: 'dd/mm/yyyy',
+            enableOnReadonly: false
+        });
+
+        // $(".select_nama_barang").change(function() {
+        //     dataTableBarang.ajax.reload();
+        // })
+
+        var validator_detail = $(".detail-form").validate({
+            rules: {
+                kode_barang: {
+                    required: true
+                },
+                nama_barang: {
+                    required: true
+                },
+                qty: {
+                    required: true
+                },
+                harga: {
+                    required: true
+                },
+                satuan: {
+                    required: true
+                }
+            },
+            messages: {
+                kode_barang: {
+                    required: "Kode wajib diisi"
+                },
+                nama_barang: {
+                    required: "Nama wajib diisi"
+                },
+                qty: {
+                    required: "Qty wajib diisi"
+                },
+                harga: {
+                    required: "Harga wajib diisi"
+                },
+                satuan: {
+                    required: "Satuan wajib diisi"
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
                 } else {
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data ?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Kembali',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            let id = $('#id').val();
-                            let data = new FormData(document.querySelector(".create-form"));
-                            var listMaterial = [].concat(listStockSelectedBahanBaku, listStockSelectedBahan, listStockSelectedBahanSetengahJadi, listStockSelectedBahanJadi);
-                            data.append('listMaterial', JSON.stringify(listMaterial));
-                            if (id) {
-                                // UPDATE
-                                $.ajax({
-                                    url: "<?= base_url("material-request/update"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        setLoading();
-                                    },
-                                    complete: function() {
-                                        stopLoading()
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            confirmButtonText: 'Ok'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                location.reload();
-                                            }
-                                        });
-                                    },
-                                });
-                            } else {
-                                // INSERT
-                                $.ajax({
-                                    url: "<?= base_url("material-request/save"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        setLoading();
-                                    },
-                                    complete: function() {
-                                        stopLoading()
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            confirmButtonText: 'Ok'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url('material-request') ?>"
-                                            }
-                                        });
-                                    },
-                                });
-                            }
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        var validator = $(".create-form").validate({
+            rules: {
+                date_request: {
+                    required: true
+                },
+                date_production: {
+                    required: true
+                },
+                req_no: {
+                    required: true
+                },
+                department_id: {
+                    required: true
+                },
+                warehouse_id: {
+                    required: true
+                }
+            },
+            messages: {
+                date_request: {
+                    required: "Tanggal request wajib diisi"
+                },
+                date_production: {
+                    required: "Tanggal produksi wajib diisi"
+                },
+                req_no: {
+                    required: "Nomor request wajib diisi"
+                },
+                department_id: {
+                    required: "Department wajib diisi"
+                },
+                warehouse_id: {
+                    required: "Warehouse wajib diisi"
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                // console.log(elem);
+                if (elem.hasClass("multiple_po_id")) {
+                    element = $(".select2-selection--multiple").parent();
+                    error.insertAfter(element);
+                } else if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.col-md-6').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.col-md-6').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        $('.btn-save').click(function() {
+            var listMaterialCheck = [].concat(listStockSelectedBahanBaku, listStockSelectedBahan, listStockSelectedBahanSetengahJadi, listStockSelectedBahanJadi);
+
+            if (listMaterialCheck.length == 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Barang yang akan direquest tidak boleh kosong !',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+            } else {
+                if ($('.create-form').valid()) {
+                    var isValid = true;
+                    var dataError = null;
+                    console.log(listStockSelectedBahanJadi);
+
+                    $.each(listStockSelectedBahanBaku, function(i, v) {
+                        if (parseFloat(listStockSelectedBahanBaku[i].qty2) > parseFloat(listStockSelectedBahanBaku[i].stok_total) || isNaN(listStockSelectedBahanBaku[i].qty2) || listStockSelectedBahanBaku[i].qty2 == undefined || parseFloat(listStockSelectedBahanBaku[i].qty2) == 0) {
+                            dataError = listStockSelectedBahanBaku[i];
+                            isValid = false;
                         }
                     });
+
+                    $.each(listStockSelectedBahan, function(i, v) {
+                        if (parseFloat(listStockSelectedBahan[i].qty2) > parseFloat(listStockSelectedBahan[i].stok_total) || isNaN(listStockSelectedBahan[i].qty2) || listStockSelectedBahan[i].qty2 == undefined || parseFloat(listStockSelectedBahan[i].qty2) == 0) {
+                            dataError = listStockSelectedBahan[i];
+                            isValid = false;
+                        }
+                    });
+
+                    $.each(listStockSelectedBahanSetengahJadi, function(i, v) {
+                        if (parseFloat(listStockSelectedBahanSetengahJadi[i].qty2) > parseFloat(listStockSelectedBahanSetengahJadi[i].stok_total) || isNaN(listStockSelectedBahanSetengahJadi[i].qty2) || listStockSelectedBahanSetengahJadi[i].qty2 == undefined || parseFloat(listStockSelectedBahanSetengahJadi[i].qty2) == 0) {
+                            dataError = listStockSelectedBahanSetengahJadi[i];
+                            isValid = false;
+                        }
+                    });
+
+                    $.each(listStockSelectedBahanJadi, function(i, v) {
+                        if (parseFloat(listStockSelectedBahanJadi[i].qty2) > parseFloat(listStockSelectedBahanJadi[i].stok_total) || isNaN(listStockSelectedBahanJadi[i].qty2) || listStockSelectedBahanJadi[i].qty2 == undefined || parseFloat(listStockSelectedBahanJadi[i].qty2) == 0 || isNaN(listStockSelectedBahanJadi[i].qty_isi) || listStockSelectedBahanJadi[i].qty_isi == undefined || parseFloat(listStockSelectedBahanJadi[i].qty_isi) == 0) {
+                            dataError = listStockSelectedBahanJadi[i];
+                            isValid = false;
+                        }
+                    });
+
+                    if (!isValid) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Stok barang ' + dataError.barang + ' dengan dokumen ' + dataError.bc_type + ' / ' + dataError.no_aju + ' tidak valid!',
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'question',
+                            title: 'Simpan Data ?',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            showCancelButton: true,
+                            reverseButtons: true,
+                            confirmButtonText: 'Simpan',
+                            cancelButtonText: 'Kembali',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                let id = $('#id').val();
+                                let data = new FormData(document.querySelector(".create-form"));
+                                var listMaterial = [].concat(listStockSelectedBahanBaku, listStockSelectedBahan, listStockSelectedBahanSetengahJadi, listStockSelectedBahanJadi);
+                                data.append('listMaterial', JSON.stringify(listMaterial));
+                                if (id) {
+                                    // UPDATE
+                                    $.ajax({
+                                        url: "<?= base_url("material-request/update"); ?>",
+                                        data: data,
+                                        beforeSend: function(xhr) {
+                                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                            setLoading();
+                                        },
+                                        complete: function() {
+                                            stopLoading()
+                                        },
+                                        method: "POST",
+                                        dataType: "json",
+                                        processData: false,
+                                        contentType: false,
+                                        success: function(response) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                                confirmButtonText: 'Ok'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    location.reload();
+                                                }
+                                            });
+                                        },
+                                    });
+                                } else {
+                                    // INSERT
+                                    $.ajax({
+                                        url: "<?= base_url("material-request/save"); ?>",
+                                        data: data,
+                                        beforeSend: function(xhr) {
+                                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                            setLoading();
+                                        },
+                                        complete: function() {
+                                            stopLoading()
+                                        },
+                                        method: "POST",
+                                        dataType: "json",
+                                        processData: false,
+                                        contentType: false,
+                                        success: function(response) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                                confirmButtonText: 'Ok'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    window.location.href = "<?= base_url('material-request/details/') ?>" + response.id
+                                                }
+                                            });
+                                        },
+                                    });
+                                }
+                            }
+                        });
+                    }
+
                 }
-
             }
-        }
+        });
+
+        // $(".kode_produksi").change(function() {
+        //     if ($(".kode_produksi option:selected").val()) {
+        //         let nama_barang = $(".kode_produksi option:selected").data("nama-barang") ? $(".kode_produksi option:selected").data("nama-barang") : "";
+        //         let standart_production = $(".kode_produksi option:selected").data("standart-production") ? $(".kode_produksi option:selected").data("standart-production") : "";
+
+        //         $(".barang_jadi").val(nama_barang);
+        //         $(".standart_production").val(standart_production);
+        //     } else {
+        //         $(".barang_jadi").val("");
+        //         $(".standart_production").val("");
+        //     }
+        // })
     });
-
-    // $(".kode_produksi").change(function() {
-    //     if ($(".kode_produksi option:selected").val()) {
-    //         let nama_barang = $(".kode_produksi option:selected").data("nama-barang") ? $(".kode_produksi option:selected").data("nama-barang") : "";
-    //         let standart_production = $(".kode_produksi option:selected").data("standart-production") ? $(".kode_produksi option:selected").data("standart-production") : "";
-
-    //         $(".barang_jadi").val(nama_barang);
-    //         $(".standart_production").val(standart_production);
-    //     } else {
-    //         $(".barang_jadi").val("");
-    //         $(".standart_production").val("");
-    //     }
-    // })
 
     $('.btn-hide-detail').click(function() {
         $('.detail-modal').modal('hide');
@@ -1434,18 +1259,10 @@
         }
         const table = $('#dataTable');
         var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
-        var typePengambilanStockBahanBaku = $('#type_pengambilan_stock_bahan_baku option:selected').val();
-        var typePengambilanStokFinal = '';
-
-        if (typePengambilanStok != '') {
-            typePengambilanStokFinal = typePengambilanStok;
-        } else {
-            typePengambilanStokFinal = typePengambilanStockBahanBaku;
-        }
 
         $.each(data, function(i, v) {
             var newRow = $('<tr style="color:whitesmoke;">');
-            if (typePengambilanStokFinal == "FIFO" || parseFloat(v.stok_total) == 0) {
+            if (typePengambilanStok == "FIFO" || parseFloat(v.stok_total) == 0) {
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                 `
@@ -1505,76 +1322,24 @@
 
     $('#select-item-btn').click(function() {
         var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
-        var typePengambilanStockBahanBaku = $('#type_pengambilan_stock_bahan_baku option:selected').val();
-        var divisiTujuanBahanBaku = $('#divisi_tujuan_bahan_baku_id option:selected').val();
-        var warehouseTujuanBahanBaku = $('#warehouse_tujuan_bahan_baku_id option:selected').val();
-
-        if (typePengambilanStock != '') {
-            // Bukan Bahan Baku
-            if (typePengambilanStock == "FIFO") {
-                insertListFifo();
-            } else {
-                insertListPabean();
-            }
-        } else if (typePengambilanStockBahanBaku != '') {
-            // Bukan Bahan Baku
-            if (divisiTujuanBahanBaku == '') {
-                Swal.fire({
-                    icon: 'error',
-                    title: "Pilih Departemen Tujuan",
-                    confirmButtonColor: '#4e73df',
-                });
-                return;
-            } else if (warehouseTujuanBahanBaku == '') {
-                Swal.fire({
-                    icon: 'error',
-                    title: "Pilih Warehouse Tujuan",
-                    confirmButtonColor: '#4e73df',
-                });
-                return;
-            }
-            if (typePengambilanStockBahanBaku == "FIFO") {
-                insertListFifo();
-            } else {
-                insertListPabean();
-            }
+        if (typePengambilanStock == "FIFO") {
+            insertListFifo();
         } else {
-            Swal.fire({
-                icon: 'error',
-                title: "Pilih Tipe Pengambilan Stok Dahulu",
-                confirmButtonColor: '#4e73df',
-            });
+            insertListPabean();
         }
+        console.log(listStockAsal);
     });
 
     function insertListPabean() {
-        var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
-        var typePengambilanStockBahanBaku = $('#type_pengambilan_stock_bahan_baku option:selected').val();
-
-        if (typePengambilanStock != '') {
-            // Bukan Bahan Baku
-            var departmentID = $("#divisi_asal_id").val();
-            var departmentText = $("#divisi_asal_id option:selected").text();
-            var warehouseID = $("#warehouse_asal_id").val();
-            var warehouseText = $("#warehouse_asal_id option:selected").text();
-            var departmentTujuanID = $("#divisi_tujuan_id").val();
-            var departmentTujuanText = $("#divisi_tujuan_id option:selected").text();
-            var warehouseTujuanID = $("#warehouse_tujuan_id").val();
-            var keterangan = $("#keterangan").val();
-            var warehouseTujuanText = $("#warehouse_tujuan_id option:selected").text();
-        } else if (typePengambilanStockBahanBaku != '') {
-            // Bahan Baku
-            var departmentID = $("#divisi_asal_bahan_baku_id").val();
-            var departmentText = $("#divisi_asal_bahan_baku_id option:selected").text();
-            var warehouseID = $("#warehouse_asal_bahan_baku_id").val();
-            var warehouseText = $("#warehouse_asal_bahan_baku_id option:selected").text();
-            var departmentTujuanID = $("#divisi_tujuan_bahan_baku_id").val();
-            var departmentTujuanText = $("#divisi_tujuan_bahan_baku_id option:selected").text();
-            var warehouseTujuanID = $("#warehouse_tujuan_bahan_baku_id").val();
-            var keterangan = $("#keterangan").val();
-            var warehouseTujuanText = $("#warehouse_tujuan_bahan_baku_id option:selected").text();
-        }
-
+        var departmentID = $("#divisi_asal_id").val();
+        var departmentText = $("#divisi_asal_id option:selected").text();
+        var warehouseID = $("#warehouse_asal_id").val();
+        var warehouseText = $("#warehouse_asal_id option:selected").text();
+        var departmentTujuanID = $("#divisi_tujuan_id").val();
+        var departmentTujuanText = $("#divisi_tujuan_id option:selected").text();
+        var warehouseTujuanID = $("#warehouse_tujuan_id").val();
+        var keterangan = $("#keterangan").val();
+        var warehouseTujuanText = $("#warehouse_tujuan_id option:selected").text();
         var checkedCheckboxes = $(".child:checked");
         var dataIds = checkedCheckboxes.map(function() {
             return $(this).data("id");
@@ -1582,15 +1347,14 @@
         var id_selected = getIDListDataSelected();
 
         $.each(listStockAsal, function(i, v) {
-            var currentID = v.id;
+            var currentID = Number(v.id);
 
             if (listStockAsal[i].type_barang == "bahan_baku") {
-                console.log(currentID, dataIds);
-
                 if ($.inArray(currentID, dataIds) !== -1) {
                     var isIDSelected = $.grep(listStockSelectedBahanBaku, function(item) {
-                        return item.id == currentID;
+                        return item.id == Number(currentID);
                     }).length > 0;
+
                     if (!isIDSelected) {
                         listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                         listStockAsal[i].qty = parseFloat(listStockAsal[i].stok_total);
@@ -1609,7 +1373,6 @@
                     }
                 }
             } else if (listStockAsal[i].type_barang == "bahan_jadi") {
-                currentID = Number(currentID);
                 if ($.inArray(currentID, dataIds) !== -1) {
                     var isIDSelected = $.grep(listStockSelectedBahanJadi, function(item) {
                         return item.id == Number(currentID);
@@ -1633,7 +1396,6 @@
                     }
                 }
             } else if (listStockAsal[i].type_barang == "bahan_setengah_jadi") {
-                currentID = Number(currentID);
                 if ($.inArray(currentID, dataIds) == -1) {
                     var isIDSelected = $.grep(listStockSelectedBahanSetengahJadi, function(item) {
                         return item.id == Number(currentID);
@@ -1659,7 +1421,6 @@
                 }
             } else {
                 if ($.inArray(currentID, dataIds) == -1) {
-                    currentID = Number(currentID);
                     var isIDSelected = $.grep(listStockSelectedBahan, function(item) {
                         return item.id == Number(currentID);
                     }).length > 0;
@@ -1691,37 +1452,18 @@
     }
 
     function insertListFifo() {
-        var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
-        var typePengambilanStockBahanBaku = $('#type_pengambilan_stock_bahan_baku option:selected').val();
-
-        if (typePengambilanStock != '') {
-            // Bukan Bahan Baku
-            var departmentID = $("#divisi_asal_id").val();
-            var departmentText = $("#divisi_asal_id option:selected").text();
-            var warehouseID = $("#warehouse_asal_id").val();
-            var warehouseText = $("#warehouse_asal_id option:selected").text();
-            var departmentTujuanID = $("#divisi_tujuan_id").val();
-            var departmentTujuanText = $("#divisi_tujuan_id option:selected").text();
-            var warehouseTujuanID = $("#warehouse_tujuan_id").val();
-            var keterangan = $("#keterangan").val();
-            var warehouseTujuanText = $("#warehouse_tujuan_id option:selected").text();
-            var qtyMutasiFifo = parseFloat($('#qty_mutasi_fifo').val());
-
-        } else if (typePengambilanStockBahanBaku != '') {
-            // Bahan Baku
-            var departmentID = $("#divisi_asal_bahan_baku_id").val();
-            var departmentText = $("#divisi_asal_bahan_baku_id option:selected").text();
-            var warehouseID = $("#warehouse_asal_bahan_baku_id").val();
-            var warehouseText = $("#warehouse_asal_bahan_baku_id option:selected").text();
-            var departmentTujuanID = $("#divisi_tujuan_bahan_baku_id").val();
-            var departmentTujuanText = $("#divisi_tujuan_bahan_baku_id option:selected").text();
-            var warehouseTujuanID = $("#warehouse_tujuan_bahan_baku_id").val();
-            var keterangan = $("#keterangan").val();
-            var warehouseTujuanText = $("#warehouse_tujuan_bahan_baku_id option:selected").text();
-            var qtyMutasiFifo = parseFloat($('#qty_keluar_fifo').val());
-        }
+        var departmentID = $("#divisi_asal_id").val();
+        var departmentText = $("#divisi_asal_id option:selected").text();
+        var warehouseID = $("#warehouse_asal_id").val();
+        var warehouseText = $("#warehouse_asal_id option:selected").text();
+        var keterangan = $("#keterangan").val();
+        var departmentTujuanID = $("#divisi_tujuan_id").val();
+        var departmentTujuanText = $("#divisi_tujuan_id option:selected").text();
+        var warehouseTujuanID = $("#warehouse_tujuan_id").val();
+        var warehouseTujuanText = $("#warehouse_tujuan_id option:selected").text();
 
         var dataIds = getIDListDataSelected();
+        var qtyMutasiFifo = parseFloat($('#qty_mutasi_fifo').val());
         var stockID = $(".select_nama_barang option:selected").data('stock_id');
 
         if (isNaN(qtyMutasiFifo)) {
@@ -1750,11 +1492,11 @@
                 })
             } else {
                 $.each(listStockAsal, function(i, v) {
-                    var currentID = v.id;
+                    var currentID = Number(v.id);
                     if (listStockAsal[i].type_barang == "bahan_baku") {
                         if ($.inArray(currentID, dataIds) == -1) {
                             var isIDSelected = $.grep(listStockSelectedBahanBaku, function(item) {
-                                return item.id == currentID;
+                                return item.id == Number(currentID);
                             }).length > 0;
                             if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
                                 var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
@@ -1776,7 +1518,6 @@
                             }
                         }
                     } else if (listStockAsal[i].type_barang == "bahan_jadi") {
-                        currentID = Number(currentID);
                         if ($.inArray(currentID, dataIds) == -1) {
                             var isIDSelected = $.grep(listStockSelectedBahanJadi, function(item) {
                                 return item.id == Number(currentID);
@@ -1801,7 +1542,6 @@
                             }
                         }
                     } else if (listStockAsal[i].type_barang == "bahan_setengah_jadi") {
-                        currentID = Number(currentID);
                         if ($.inArray(currentID, dataIds) == -1) {
                             var isIDSelected = $.grep(listStockSelectedBahanSetengahJadi, function(item) {
                                 return item.id == Number(currentID);
@@ -1827,7 +1567,6 @@
                         }
                     } else {
                         if ($.inArray(currentID, dataIds) == -1) {
-                            currentID = Number(currentID);
                             var isIDSelected = $.grep(listStockSelectedBahan, function(item) {
                                 return item.id == Number(currentID);
                             }).length > 0;
@@ -1882,9 +1621,8 @@
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align: center;">').html(`${no++}`));
-            newRow.append($('<td style="text-align: center;">').text(v.departmentText + ' / ' + v.warehouseText));
-            newRow.append($('<td style="text-align: center;">').text(v.departmentTujuanText + ' / ' + v.warehouseTujuanText));
-            newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
+            newRow.append($('<td style="text-align: center;">').text(v.departmentText));
+            newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
             newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
@@ -1907,7 +1645,7 @@
                 <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> 
                         type="button" 
                         class="btn btn-discard delete-btn btn-trash" 
-                        onclick="deleteDetailBahanBaku('${v.id}', ${v.id_material_request_detail})">
+                        onclick="deleteDetailBahanBaku(${v.id}, ${v.id_material_request_detail})">
                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                 </button>
             `));
@@ -1961,12 +1699,19 @@
         });
     }
 
+    // Fungsi untuk mencegah input negatif
+    function preventNegativeInput(input) {
+        if (input.value < 0) {
+            input.value = 0;
+        }
+    }
+
     function updateTotalQtyRequest() {
         var totalQty = 0;
         $.each(listStockSelectedBahanBaku, function(i, v) {
             totalQty += parseFloat(listStockSelectedBahanBaku[i].qty2) || 0;
         });
-        $('.nilai-total-bahan-baku-request').text(greatFormatRupiah(totalQty.toFixed(4)));
+        $('.nilai-total-bahan-baku-request').text(greatFormatRupiah(totalQty.toFixed(2)));
     }
 
     function drawTableSelectedItemBahanSetengahJadi(data) {
@@ -1984,8 +1729,8 @@
                ${no++} 
             `
             ));
-            newRow.append($('<td style="text-align: center;">').text(v.departmentText + ' / ' + v.warehouseText));
-            newRow.append($('<td style="text-align: center;">').text(v.departmentTujuanText + ' / ' + v.warehouseTujuanText));
+            newRow.append($('<td style="text-align: center;">').text(v.departmentText));
+            newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
             newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
@@ -2070,8 +1815,8 @@
                ${no++} 
             `
             ));
-            newRow.append($('<td style="text-align: center;">').text(v.departmentText + ' / ' + v.warehouseText));
-            newRow.append($('<td style="text-align: center;">').text(v.departmentTujuanText + ' / ' + v.warehouseTujuanText));
+            newRow.append($('<td style="text-align: center;">').text(v.departmentText));
+            newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
             newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
@@ -2156,8 +1901,8 @@
                ${no++} 
             `
             ));
-            newRow.append($('<td style="text-align: center;">').text(v.departmentText + ' / ' + v.warehouseText));
-            newRow.append($('<td style="text-align: center;">').text(v.departmentTujuanText + ' / ' + v.warehouseTujuanText));
+            newRow.append($('<td style="text-align: center;">').text(v.departmentText));
+            newRow.append($('<td style="text-align: center;">').text(v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
             newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
@@ -2558,166 +2303,6 @@
     function print(url) {
         window.open(url);
     }
-
-    // Tambahan Update Material Request
-    function changeStatus() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
-        if (value) {
-            $(".req_no").attr("readonly", true);
-            $(".req_no").val("AUTO GENERATE");
-        } else {
-            $(".req_no").attr("readonly", false);
-            $(".req_no").val("");
-        }
-    }
-
-    function getDropdownAsalBarang() {
-        var typeAsalBarang = $('#type_asal_barang option:selected').val();
-        if (typeAsalBarang == 'SUPPLIER') {
-            $('#supplier_id_select').show();
-            $('#vendor_barang_id_select').hide();
-        } else {
-            $('#supplier_id_select').hide();
-            $('#vendor_barang_id_select').show();
-        }
-        $('#supplier_id').val(null).change();
-        $('#vendor_barang_id').val(null).change();
-        $('#warehouse_asal_bahan_baku_id').change();
-    }
-
-    function getListBarangBahanBaku() {
-        // GET LIST BARANG
-        $.ajax({
-            url: `<?= base_url('material-request/list-barang-stock-init-bahan-baku'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                type_barang: $(".type_barang option:selected").val(),
-                divisi_id: $(".divisi_asal_bahan_baku_id option:selected").val(),
-                warehouse_id: $(".warehouse_asal_bahan_baku_id option:selected").val(),
-                asal_barang: $(".type_asal_barang option:selected").val()
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".spesifikasi_id").empty()
-                $(".spesifikasi_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".spesifikasi_id").append(`<option data-barang_master_id="${item.id}" data-stock_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.spesifikasi_id}">(${item.kode_barang}) ${item.barang}</option>`)
-                })
-                $(".spesifikasi_id").val();
-            }
-        });
-    }
-
-    function getListWarehouseAsalBahanBaku() {
-        $.ajax({
-            url: `<?= base_url('material-request/warehouse'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                divisi_id: $(".divisi_asal_bahan_baku_id option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".warehouse_asal_bahan_baku_id").empty()
-                $(".warehouse_asal_bahan_baku_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".warehouse_asal_bahan_baku_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
-                })
-                $(".warehouse_asal_bahan_baku_id").val();
-            }
-        });
-    }
-
-    function getListWarehouseTujuanBahanBaku() {
-        $.ajax({
-            url: `<?= base_url('material-request/warehouse'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                divisi_id: $(".divisi_tujuan_bahan_baku_id option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".warehouse_tujuan_bahan_baku_id").empty()
-                $(".warehouse_tujuan_bahan_baku_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".warehouse_tujuan_bahan_baku_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
-                })
-                $(".warehouse_tujuan_bahan_baku_id").val();
-            }
-        });
-    }
-
-
-    function getListDokumenPabeanBahanBaku() {
-        // GET LIST STOCK PER DOKUMEN PABEAN
-        $.ajax({
-            url: `<?= base_url('material-request/list-stock-dokumen-bc-bahan-baku'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                barang_master_id: $(".spesifikasi_id option:selected").data('barang_master_id'),
-                stock_id: $(".spesifikasi_id option:selected").data('stock_id'),
-                supplier_id: $(".supplier_id option:selected").val(),
-                vendor_id: $('.vendor_barang_id option:selected').val(),
-                divisi_asal_bahan_baku_id: $(".divisi_asal_bahan_baku_id").val(),
-                warehouse_asal_bahan_baku_id: $(".warehouse_asal_bahan_baku_id").val()
-            },
-            dataType: "json",
-            success: function(res) {
-                // LIST STOK PER BC
-                listStockAsal = [];
-                listStockAsal = res.data;
-                drawTableAsalBarang(res.data);
-            }
-        });
-    }
-
-    function pindahTab(type) {
-        if (type == "BAHAN BAKU") {
-            // Clear Form Bahan Baku
-            $('#type_pengambilan_stock_bahan_baku').val(null).change();
-            $('#qty_keluar_fifo').val(null);
-        } else {
-            // Clear Form Bahan Lain
-            $('#type_pengambilan_stock').val(null).change();
-            $('#qty_mutasi_fifo').val(null);
-        }
-
-        // Clear Stok Asal
-        listStockAsal = [];
-        drawTableAsalBarang([]);
-    }
-
-    // function clearBahanBakuForm() {
-    //     $('#divisi_id').val(null).change();
-    //     $('#warehouse_id').val(null).change();
-    //     $('#supplier_id').val(null).change();
-    //     $('#vendor_barang_id').val(null).change();
-    //     $('#spesifikasi_id').val(null).change();
-
-    // }
 </script>
 
 <?= $this->endSection(); ?>

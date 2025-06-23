@@ -417,7 +417,7 @@ class JasaVendorIn extends BaseController
                 $stok,
                 $qty,
                 "In",
-                date('Y-m-d'),
+                $jasaVendorIn['tanggal'],
                 $this->this_user_id,
                 "JASA VENDOR",
                 $jasaVendorOut['no_surat_jalan'],

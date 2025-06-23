@@ -123,23 +123,23 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control customerphone" id="customerphone" name="customerphone" value="<?= $data->customerPhone ?? ''; ?>">
+                            <input autocomplete="one-time-code" type="text" readonly class="form-control customerphone" id="customerphone" name="customerphone" value="<?= $data->customerPhone ?? ''; ?>">
                             <label for="floatingInput">No. Telp</label>
                         </div>
                     </div>
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control" id="tagihan_ke" name="tagihan_ke" value="<?= $data->address ?? '' ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control" id="destination" name="destination" value="<?= $data->address ?? '' ?>">
                             <label for="floatingInput">Alamat Konsumen</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select termin " name="termin" id="termin_order_form">
+                            <select class="form-select termin" name="termin" id="termin_order_form">
                                 <option value=""></option>
                                 <?php foreach ($dataTermin ?? [] as $termin) : ?>
-                                    <option value="<?= $termin['id']; ?>" <?= !empty($data) ? ($data->payment_terms == $termin['id'] ? "selected" : "") : ""; ?>><?= $termin['value']; ?></option>
+                                    <option <?= (!empty($data) && $data->termin_id == $termin['id'] ? 'selected' : '') ?> value="<?= $termin['id']; ?>"><?= $termin['value']; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <!-- <input autocomplete="one-time-code" type="text" class="form-control" id="termin" name="termin" readonly value="<?= $data->termin ?? '' ?>"> -->
@@ -192,9 +192,9 @@
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select company_id" name="company_id" id="company_id">
-                                    <option value="1">KIM 1</option>
-                                    <option value="2">KIM 2</option>
-                                    <option value="15">GLOBAL</option>
+                                    <option <?= !empty($data) ? ($data->id_company == "1" ? "selected" : "") : ""; ?> value="1">KIM 1</option>
+                                    <option <?= !empty($data) ? ($data->id_company == "2" ? "selected" : "") : ""; ?> value="2">KIM 2</option>
+                                    <option <?= !empty($data) ? ($data->id_company == "15" ? "selected" : "") : ""; ?> value="15">GLOBAL</option>
                                 </select>
                                 <label for="floatingInput">Pilih Company</label>
                             </div>
@@ -894,12 +894,13 @@
             const tipePelanggan = $(this).find(':selected').data('tipepelanggan') ? $(this).find(':selected').data('tipepelanggan') : "";
             const jenis_penjualan = $(this).find(':selected').data('jenis_penjualan') ? $(this).find(':selected').data('jenis_penjualan') : "";
 
+            console.log(termin)
 
             $('#customerphone').val(decodeURIComponent(customerPhone));
-            $('#tagihan_ke').val(decodeURIComponent(customerAddress));
+            $('#destination').val(decodeURIComponent(customerAddress));
             $('#termin_order_form').val(decodeURIComponent(termin)).change();
 
-            $('#id_sales').val(decodeURIComponent(salesName)).trigger('change');
+            $('#id_sales').val(decodeURIComponent(salesName)).change();
             $('#hidden_tipe_pelanggan').val(decodeURIComponent(tipePelanggan)).change();
             $('#jenis_penjualan').val(decodeURIComponent(jenis_penjualan)).change();
         });
@@ -949,6 +950,8 @@
             let isi = $(this).val();
             if (isi == 1) {
                 $('.id_sales').prop('disabled', false);
+                const salesName = $('#id_customer').find(':selected').data('salesname') ? $('#id_customer').find(':selected').data('salesname') : "";
+                $('#id_sales').val(decodeURIComponent(salesName)).change();
                 $('.nama_ecommerce').prop('readonly', true);
                 $('.nama_ecommerce').val('');
             } else if (isi == 2) {
@@ -1641,6 +1644,8 @@
                             })
                         }
                         // console.log(update_list_items)
+                        const estimatedFreightVal = $('#estimated_freight').val() || '0';
+                        const estimatedFreight = estimatedFreightVal.replace(/\,/g, '');
 
                         const taxStatus = $('#tax_status').is(':checked');
                         const includeTaxStatus = $('#include_tax').is(':checked');
@@ -1659,7 +1664,7 @@
                         data.append("tax_status", taxStatus)
                         data.append("include_tax", includeTaxStatus)
                         data.append("items", JSON.stringify(update_list_items))
-
+                        data.set("estimated_freight", estimatedFreight)
 
 
                         let id = $(".id").val();
@@ -1701,6 +1706,9 @@
                                             } else if (result.isDenied) {
                                                 // Buat baru
                                                 window.location.reload();
+                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                // Tutup - redirect to order-form-lokal
+                                                window.location.href = `<?= base_url("order-form-lokal"); ?>`;
                                             }
                                         });
                                     } else {
@@ -1772,6 +1780,9 @@
                                             } else if (result.isDenied) {
                                                 // Buat baru
                                                 window.location.reload();
+                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                // Tutup - redirect to order-form-lokal
+                                                window.location.href = `<?= base_url("order-form-lokal"); ?>`;
                                             }
                                         });
                                     } else {

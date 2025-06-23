@@ -7,12 +7,14 @@ use App\Models\JabatanModel;
 
 class Jabatan extends BaseController
 {
+    protected $this_company_id;
     protected $token;
     protected $JabatanModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
+        $this->this_company_id = session()->get("login")->this_company_id;
     }
 
     public function jabatan()
@@ -32,7 +34,9 @@ class Jabatan extends BaseController
 
         $JabatanModel = new JabatanModel();
 
-        $condition = [];
+        $condition = [
+            'company_id' => $this->this_company_id
+        ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -72,36 +76,35 @@ class Jabatan extends BaseController
 
     {
         $JabatanModel = new JabatanModel();
-        $jabatan_name = $this->request->getPost('jabatan_name');
-
-        $getJabatanNull = $JabatanModel->select('id')
-            ->where('jabatan_name', $jabatan_name)
-            ->where('deletedAt', null)
-            ->findAll();
-
-        //cek nama jabatan duplikatnya sama yang ada? jika ada is_unique, jika tidak ada lolosin
-        if (!empty($getJabatanNull)) {
-            $rule_is_unique = 'required|is_unique[jabatans.jabatan_name]';
-        } else {
-            $rule_is_unique = 'required';
-        }
 
         try {
             $rules = [
-                "jabatan_name" => [
-                    "rules" => $rule_is_unique,
+                'jabatan_name' => [
+                    'rules' => 'required',
                     'errors' => [
                         'required' => 'Nama Jabatan harus diisi',
-                        'is_unique' => 'Nama Jabatan sudah ada'
                     ]
                 ]
             ];
 
+            // Validasi Apakah Jabatan Name sudah ada di company
+            $jabatanFirst = $JabatanModel->where('company_id', $this->this_company_id)
+                ->where('deletedAt', null)
+                ->where('jabatan_name', $this->request->getPost('jabatan_name'))
+                ->first();
 
+            if ($jabatanFirst != null) {
+                return response()->setJSON([
+                    "status"            => false,
+                    "message"    => "'Nama Jabatan sudah ada di perusahaan ini",
+                    'token' => csrf_hash()
+                ]);
+            }
 
             if ($this->validate($rules)) {
                 $insertData = [
-                    "jabatan_name" => $this->request->getPost("jabatan_name")
+                    "jabatan_name" => $this->request->getPost("jabatan_name"),
+                    "company_id" => $this->this_company_id
                 ];
 
                 $payload = json_encode($insertData);
@@ -152,48 +155,33 @@ class Jabatan extends BaseController
     public function updateJabatan()
     {
         $JabatanModel = new JabatanModel();
-
         $id = $this->request->getPost("id");
 
-        $jabatan_name = $this->request->getPost('jabatan_name');
-
-        $getJabatanNull = $JabatanModel->select('id')
-            ->where('jabatan_name', $jabatan_name)
-            ->where('deletedAt', null)
-            ->where('id !=', $id)
-            ->findAll();
-
-        //cek jabatan duplikatnya sama yang ada? jika ada is_unique, jika tidak ada lolosin
-        if (!empty($getJabatanNull)) {
-
-            //cek jabatan yg diedit masih sama dengan yg di ID?
-            $getJabatanNow = $JabatanModel->select('id')
-                ->where('jabatan_name', $jabatan_name)
-                ->where('deletedAt', null)
-                ->where('id', $id)
-                ->first();
-
-            //jika sama
-            if (!empty($getJabatanNow)) {
-                $rule_is_unique = 'required';
-            } else {
-                $rule_is_unique = 'required|is_unique[jabatans.jabatan_name]';
-            }
-        } else {
-            $rule_is_unique = 'required';
-        }
 
         try {
             $rules = [
                 "jabatan_name" => [
-                    "rules" => $rule_is_unique,
+                    "rules" => 'required',
                     'errors' => [
                         'required' => 'Nama Jabatan harus diisi',
-                        'is_unique' => 'Nama Jabatan sudah ada'
                     ]
                 ]
             ];
 
+            // Validasi Apakah Jabatan Name sudah ada di company
+            $jabatanFirst = $JabatanModel->where('company_id', $this->this_company_id)
+                ->where('deletedAt', null)
+                ->where('jabatan_name', $this->request->getPost('jabatan_name'))
+                ->where('id !=', $id)
+                ->first();
+
+            if ($jabatanFirst != null) {
+                return response()->setJSON([
+                    "status"            => false,
+                    "message"    => "'Nama Jabatan sudah ada di perusahaan ini",
+                    'token' => csrf_hash()
+                ]);
+            }
 
 
             if ($this->validate($rules)) {

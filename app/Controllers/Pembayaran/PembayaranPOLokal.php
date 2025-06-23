@@ -702,6 +702,7 @@ class PembayaranPOLokal extends BaseController
             array_push($dataPembayaranPOLokal, [
                 "no"                => $no++,
                 "id"                => encrypt($data->id),
+                "divisi_id"         => encrypt($data->divisi_id),
                 "payment_no"        => $data->payment_no,
                 "supplier"          => $data->supplierName,
                 "po_number"         => $resultlpb,
@@ -772,6 +773,7 @@ class PembayaranPOLokal extends BaseController
             array_push($dataPembayaranPOLokal, [
                 "no"                => $no++,
                 "id"                => encrypt($p->id),
+                "divisi_id"                => encrypt($p->divisi_id),
                 "payment_no"        => $p->payment_no,
                 "faktur_no"         => $p->faktur_no,
                 "due_date"          => $p->due_date,
@@ -1504,7 +1506,7 @@ class PembayaranPOLokal extends BaseController
             $this->jurnalController->inserDataPembayaranPinjaman($payPinjaman['id'], "PINJAMAN", $this->request->getVar('divisi_id'));
         }
 
-        $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL BB", $this->request->getVar('divisi_id'));
+        $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL BB", decrypt($this->request->getVar('divisi_id')));
 
         return response()->setJSON([
             'token' => csrf_hash(),
@@ -1521,7 +1523,7 @@ class PembayaranPOLokal extends BaseController
         $localPoPaymentBpModel->update($id, ['status_posting' => '1']);
         $localPoPaymentBp = $localPoPaymentBpModel->where('id', $id)->first();
 
-        $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL BP", $id);
+        $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL BP", decrypt($this->request->getVar('divisi_id')));
 
         return response()->setJSON([
             'token' => csrf_hash(),

@@ -765,7 +765,9 @@ $routes->post('/material-request/update-status', 'Production\MaterialRequest::up
 $routes->get('/material-request/list-barang-stock-init', 'Production\MaterialRequest::getListBarangIsInit', ['filter' => 'Auth']);
 $routes->get('/material-request/list-supplier', 'Production\MaterialRequest::getListSupplier', ['filter' => 'Auth']);
 $routes->get('/material-request/list-stock-dokumen-bc', 'Production\MaterialRequest::getListStockByStockID', ['filter' => 'Auth']);
-
+$routes->get('/material-request/list-barang-stock-init-bahan-baku', 'Production\MaterialRequest::dropdownListBarangIsInit', ['filter' => 'Auth']);
+$routes->get('/material-request/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/material-request/list-stock-dokumen-bc-bahan-baku', 'Production\MaterialRequest::getListStockMaterialRequestBahanBaku', ['filter' => 'Auth']);
 // Material Request Penolong
 $routes->get('/material-request-penolong', 'Production\MaterialRequestPenolong::index', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/generate-kode-request', 'Production\MaterialRequestPenolong::generateKodeRequest', ['filter' => 'Auth']);
@@ -2275,10 +2277,13 @@ $routes->post('/hr-outsourcing-company/employee/generateKode', 'HROutsourcing\Em
 // HR Outsourcing Sallary Payment
 $routes->get('/hr-outsourcing-sallary-payment', 'HROutsourcing\SallaryPayment::index', ['filter' => 'Auth']);
 $routes->get('/hr-outsourcing-sallary-payment/all', 'HROutsourcing\SallaryPayment::all', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-sallary-payment/id/(:segment)', 'HROutsourcing\SallaryPayment::detail/$1', ['filter' => 'Auth']);
 $routes->get('/hr-outsourcing-sallary-payment/create', 'HROutsourcing\SallaryPayment::create', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/getHrCompanyOutSourcing', 'HROutsourcing\SallaryPayment::getHrCompanyOutSourcing', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/getHrEmployeeOutSourcing', 'HROutsourcing\SallaryPayment::getHrEmployeeOutSourcing', ['filter' => 'Auth']);
-
+$routes->post('/hr-outsourcing-sallary-payment/store', 'HROutsourcing\SallaryPayment::store', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-sallary-payment/update/(:segment)', 'HROutsourcing\SallaryPayment::update/$1', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-sallary-payment/delete/(:segment)', 'HROutsourcing\SallaryPayment::destroy/$1', ['filter' => 'Auth']);
 
 /*
  * --------------------------------------------------------------------

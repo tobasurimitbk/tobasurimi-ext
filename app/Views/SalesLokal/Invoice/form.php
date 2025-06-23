@@ -1080,10 +1080,13 @@
                                         }).then((result) => {
                                             if (result.isConfirmed) {
                                                 // Cetak
-                                                window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
+                                                window.location.href = `<?= base_url("invoice-penjualan-lokal/print"); ?>/${response.id}`;
                                             } else if (result.isDenied) {
                                                 // Buat baru
                                                 window.location.reload();
+                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                // Tutup - redirect to invoice-penjualan-lokal
+                                                window.location.href = `<?= base_url("invoice-penjualan-lokal"); ?>`;
                                             }
                                         });
                                     } else {
@@ -1136,10 +1139,13 @@
                                         }).then((result) => {
                                             if (result.isConfirmed) {
                                                 // Cetak
-                                                window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
+                                                window.location.href = `<?= base_url("invoice-penjualan-lokal/print"); ?>/${response.id}`;
                                             } else if (result.isDenied) {
                                                 // Buat baru
                                                 window.location.reload();
+                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                // Tutup - redirect to invoice-penjualan-lokal
+                                                window.location.href = `<?= base_url("invoice-penjualan-lokal"); ?>`;
                                             }
                                         });
                                     } else {

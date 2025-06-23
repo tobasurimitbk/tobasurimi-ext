@@ -329,6 +329,7 @@ function convertBulanToAngkaRomawi($bulanInteger)
    }
 }
 
+// Hasil Selalu Sama Ketika Value ebkrip sama
 function encrypt($str)
 {
    $secret_key = 'Tobasunami';
@@ -339,6 +340,7 @@ function encrypt($str)
    return base64_encode(openssl_encrypt($str, $encrypt_method, $key, 0, $iv));
 }
 
+// Hasil Selalu Sama Ketika Value ebkrip sama
 function decrypt($hashed)
 {
    $secret_key = 'Tobasunami';
@@ -349,6 +351,46 @@ function decrypt($hashed)
    $decrypt =  openssl_decrypt(base64_decode($hashed), $encrypt_method, $key, 0, $iv);
    return $decrypt == false ? 0 : $decrypt;
 }
+
+// Hasil Selalu Acak WAlaupun Yang Dienkrip sama
+function encrypt2($str)
+{
+   $secret_key = 'Tobasunami';
+   $encrypt_method = "AES-256-CBC";
+   $key = hash('sha256', $secret_key, true);
+
+   // Generate IV random
+   $iv_length = openssl_cipher_iv_length($encrypt_method);
+   $iv = openssl_random_pseudo_bytes($iv_length);
+
+   // Encrypt
+   $encrypted = openssl_encrypt($str, $encrypt_method, $key, OPENSSL_RAW_DATA, $iv);
+
+   // Gabungkan IV + hasil enkripsi, lalu base64 encode
+   return base64_encode($iv . $encrypted);
+}
+
+// Hasil Selalu Acak WAlaupun Yang Dienkrip sama
+function decrypt2($encrypted)
+{
+   $secret_key = 'Tobasunami';
+   $encrypt_method = "AES-256-CBC";
+   $key = hash('sha256', $secret_key, true);
+
+   // Decode base64
+   $data = base64_decode($encrypted);
+
+   // Ambil IV dan ciphertext
+   $iv_length = openssl_cipher_iv_length($encrypt_method);
+   $iv = substr($data, 0, $iv_length);
+   $ciphertext = substr($data, $iv_length);
+
+   // Decrypt
+   $decrypted = openssl_decrypt($ciphertext, $encrypt_method, $key, OPENSSL_RAW_DATA, $iv);
+
+   return $decrypted === false ? null : $decrypted;
+}
+
 
 function generateUniqueCode($codeLength)
 {

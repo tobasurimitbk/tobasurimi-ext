@@ -43,7 +43,7 @@ class Customer extends BaseController
         $dataBanks = $this->BanksModel->search_list(array(), 'name');
 
         $condition = [
-            'jabatan_name' => "SALES LOKAL"
+            'jabatan_name' => "MARKETING LOKAL"
         ];
 
         $sales = $this->employeeModel->getEmployeesComplete($condition);

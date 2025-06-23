@@ -77,6 +77,7 @@ class LocalPOPaymentBPModel extends Model
 
         $selectQry = "
             local_po_payment_bp.id AS id,
+            local_po_payment_bp.divisi_id AS divisi_id,
             local_po_payment_bp.status_posting,
             local_po_payment_bp.payment_no, 
             DATE_FORMAT(local_po_payment_bp.payment_date, '%d/%m/%Y') AS payment_date, 

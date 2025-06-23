@@ -16,6 +16,7 @@ class JabatanModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
+        'company_id',
         'jabatan_name'
     ];
 

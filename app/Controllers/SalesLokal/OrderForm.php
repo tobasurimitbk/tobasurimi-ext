@@ -96,7 +96,7 @@ class OrderForm extends BaseController
         //Get Customers
         $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->is_admin);
         $condition = [
-            'jabatan_name' => "SALES LOKAL"
+            'jabatan_name' => "MARKETING LOKAL"
         ];
 
         $sales = $this->employeeModel->getEmployeesComplete($condition);
@@ -215,7 +215,7 @@ class OrderForm extends BaseController
             "data"              => $dataSalesOrder,
             "payload"           => $payload
         ];
-        
+
         echo json_encode($data);
         return;
     }
@@ -240,12 +240,12 @@ class OrderForm extends BaseController
                     'required' => 'Tanggal pemesananan tidak boleh kosong',
                 ]
             ],
-            // "shipping_date" => [
-            //     "rules" => "required|valid_date[d/m/Y]",
-            //     'errors' => [
-            //         'required' => 'tanggal pengiriman tidak boleh kosong',
-            //     ]
-            // ],
+            "shipping_date" => [
+                "rules" => "required|valid_date[d/m/Y]",
+                'errors' => [
+                    'required' => 'tanggal pengiriman tidak boleh kosong',
+                ]
+            ],
             // "estimated_freight" => [
             //     "rules" => "permit_empty",
             //     'errors' => [
@@ -347,12 +347,15 @@ class OrderForm extends BaseController
                 "no_sales_order"        => strtoupper($postData['no_sales_order']),
                 "id_user"               => $this->userId,
                 "id_customer"           => $postData['id_customer'],
+                "shipping_date"           => $postData['shipping_date'],
+                "destination"           => $postData['destination'],
                 "jenis_penjualan"           => $postData['jenis_penjualan'],
                 "sales_id"              => isset($postData['id_sales']) ? $postData['id_sales'] : NULL,
                 "nama_ecommerce"           => $postData['nama_ecommerce'] ? $postData['nama_ecommerce'] : "",
                 "order_date"            => $orderDate,
                 "total_harga"           => $postData['total'],
-                "id_company"            => $this->this_company_id,
+                "keterangan" => $postData['parent_keterangan'],
+                "id_company"            => $this->this_company_id != 16 ? $this->request->getVar('company_id') : $this->this_company_id,
                 "tipe_sales_order"      => 'LOKAL',
                 "ppn"      => $status_ppn
             ];
@@ -453,7 +456,7 @@ class OrderForm extends BaseController
             ->findAll();
 
         $condition = [
-            'jabatan_name' => "SALES"
+            'jabatan_name' => "MARKETING LOKAL"
         ];
 
         $sales = $this->employeeModel->getEmployeesComplete($condition);
@@ -645,7 +648,26 @@ class OrderForm extends BaseController
                 }
             }
 
-            $this->SalesOrderModel->update($id, ['qty_barang' => $totalQty, 'ppn' => $status_ppn, 'total_harga' => $total_harga]);
+            $this->SalesOrderModel->update(
+                $id,
+                [
+                    "no_sales_order"        => strtoupper($postData['no_sales_order']),
+                    "id_customer"           => $postData['id_customer'],
+                    'shipping_date' => $shippingDate,
+                    'destination' =>  $postData['destination'],
+                    "jenis_penjualan"           => $postData['jenis_penjualan'],
+                    "sales_id"              => isset($postData['id_sales']) ? $postData['id_sales'] : NULL,
+                    "nama_ecommerce"           => $postData['nama_ecommerce'] ? $postData['nama_ecommerce'] : "",
+                    "order_date"            => $orderDate,
+                    'total_harga' => $total_harga,
+                    "keterangan" => $postData['parent_keterangan'],
+                    "id_company"            => $this->this_company_id != 16 ? $this->request->getVar('company_id') : $this->this_company_id,
+                    'qty_barang' => $totalQty,
+                    'ppn' => $status_ppn,
+                    'no_po' => $this->request->getVar('no_po'),
+                    'estimated_freight' => $this->request->getVar('estimated_freight')
+                ]
+            );
 
             $this->SalesOrderModel->db->transComplete();
 
@@ -964,26 +986,26 @@ class OrderForm extends BaseController
         $currentMonth = date('n'); // 1-12
         $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
         $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
-    
+
         $listData = $this->SalesOrderModel->asObject()
             ->like('no_sales_order', $numberTemplate)
             ->orderBy('no_sales_order', 'ASC') // penting: ASC buat gap detect
             ->findAll();
-    
+
         $existingNumbers = [];
-    
+
         foreach ($listData as $data) {
             $parts = explode('/', $data->no_sales_order);
             if (isset($parts[3]) && is_numeric($parts[3])) {
                 $existingNumbers[] = intval($parts[3]);
             }
         }
-    
+
         sort($existingNumbers);
-    
+
         $nextNumber = 1;
         $foundGap = false;
-    
+
         foreach ($existingNumbers as $num) {
             if ($num != $nextNumber) {
                 $foundGap = true;
@@ -991,21 +1013,21 @@ class OrderForm extends BaseController
             }
             $nextNumber++;
         }
-    
+
         if (!$foundGap) {
             $nextNumber = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
         }
-    
+
         $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
         $invNumber = $numberTemplate . $paddedNumber;
-    
+
         return response()->setJSON([
             'data' => $invNumber,
             'token' => csrf_hash(),
             'status' => true
         ]);
     }
-    
+
 
     public function getMetaData($id)
     {
@@ -1095,7 +1117,6 @@ class OrderForm extends BaseController
             ];
 
             echo json_encode($data);
-
         } catch (Exception $e) {
             $data = [
                 "status"            => false,

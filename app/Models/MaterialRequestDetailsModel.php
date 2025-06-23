@@ -172,4 +172,244 @@ class MaterialRequestDetailsModel extends Model
 
         return $dataQry;
     }
+
+
+    public function getMaterialRequestBahanBakuDetail($materialRequestId)
+    {
+        $stockDetail2Model = new StockDetail2Model();
+        $stockModel = new StockModel();
+        $barangMasterModel = new BarangMasterModel();
+        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $satuanModel = new SatuansModel();
+        $kemasanModel = new KemasanModel();
+        $metaDataModel = new MetadataModel();
+        $rmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $jasaVendorInModel = new JasaVendorInModel();
+
+        $jasaVendorIn = null;
+        $result = array();
+        $materialRequestDetail = $this->asArray()
+            ->select(
+                '
+                        material_request_details.*, 
+                        warehouse_asal.warehouse_name as warehouse_asal_text, 
+                        divisi_asal.divisi as divisi_asal_text,
+                        warehouse_tujuan.warehouse_name as warehouse_tujuan_text,
+                        divisi_tujuan.divisi as divisi_tujuan_text
+                    '
+            )
+            ->join('divisis as divisi_asal', 'divisi_asal.id = material_request_details.divisi_id', 'left')
+            ->join('divisis as divisi_tujuan', 'divisi_tujuan.id = material_request_details.divisi_tujuan_id', 'left')
+            ->join('warehouses as warehouse_asal', 'warehouse_asal.id = material_request_details.warehouse_id', 'left')
+            ->join('warehouses as warehouse_tujuan', 'warehouse_tujuan.id = material_request_details.warehouse_tujuan_id', 'left')
+            ->where('barang_type', "bahan_baku")
+            ->where('material_request_id', $materialRequestId)
+            ->findAll();
+
+        foreach ($materialRequestDetail as $m) {
+            $stockList = $stockDetail2Model->getStockListDetail(
+                $m['stock_id'],
+                $m['bc_id'],
+                $m['no_aju'],
+                $m['stock_dokumen']
+            );
+            $stock = $stockModel->find($m['stock_id']);
+
+            if ($stock['kemasan_id'] == 0) {
+                $barangMaster = $barangMasterModel->find($stock['barang1_id']);
+                $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stock['barang2_id']);
+                $satuan = $barangMasterSpesifikasi == null ? null : $satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+                $barangName = $barangMasterSpesifikasi != null && $barangMaster != null ? $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'] : '';
+            } else {
+                $kemasan = $kemasanModel->find($stock['kemasan_id']);
+                $satuan = $satuanModel->find($kemasan['satuan_id']);
+                $barangName = $kemasan['name'];
+            }
+
+            $rmPurchaseOrder = $rmPurchaseOrderModel->where('po_no', $m['stock_dokumen'])->where('company_id', $stockList['company_id'])->first();
+
+            $resultNoJasaVendorIn = strstr($m['stock_dokumen'], '(', true);
+            $noJasaVendorIn = trim($resultNoJasaVendorIn);
+            $supplierName = $stockList['supplier_name'];
+            $stockDate = $rmPurchaseOrder == null ? "" :  date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
+
+            $jasaVendorIn = $jasaVendorInModel
+                ->select('jasa_vendor_in.*,vendors.name as nama_vendor')
+                ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
+                ->where('no_penerimaan_surat_jalan', $noJasaVendorIn)
+                ->where('jasa_vendor_in.company_id',  session()->get("login")->this_company_id)
+                ->first();
+
+
+            $noDaftar = $stockDetail2Model->getNomorDaftar(
+                $m['no_aju'],
+                $m['bc_id']
+            );
+
+            $stockList['qty'] = $m['qty'];
+            $bcType = $metaDataModel->find($stockList['bc_id']);
+            $stockList['no_aju'] =  $stockList['no_aju'] == "-" ? "-" : $stockList['no_aju'];
+            $stockList['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+            $stockList['satuan'] = $satuan == null ? '' : $satuan['kode_satuan'];
+            $stockList['barang'] = strtoupper($barangName);
+            $stockList['stock_id'] = $stockList['stock_id'];
+            $stockList['type_barang'] = $stock['tipe_barang'];
+            $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
+            $stockList['stok_total'] = ($stockList['stok_total']);
+            $stockList['stock_date'] = $jasaVendorIn == null ? $stockDate :  date('d/m/Y', strtotime($jasaVendorIn['tanggal']));
+            $stockList['supplier_name'] = $jasaVendorIn == null ? $supplierName : $supplierName . ' / ' . $jasaVendorIn['nama_vendor'];
+
+            // Tambahan
+            $stockList['divisi_id'] = $m['divisi_id'];
+            $stockList['divisi_tujuan_id'] = $m['divisi_tujuan_id'];
+            $stockList['divisi_asal_text'] = $m['divisi_asal_text'];
+            $stockList['divisi_tujuan_text'] = $m['divisi_tujuan_text'];
+            $stockList['qty2'] = $m['qty2'];
+            $stockList['qty_isi'] = $m['qty_isi'];
+            $stockList['kode_satuan'] = $m['satuan'];
+            $stockList['warehouse_id'] = $m['warehouse_id'];
+            $stockList['warehouse_asal_text'] = $m['warehouse_asal_text'];
+            $stockList['warehouse_tujuan_text'] = $m['warehouse_tujuan_text'];
+            $stockList['warehouse_tujuan_id'] = $m['warehouse_tujuan_id'];
+            $stockList['no_daftar'] = $noDaftar;
+            $stockList['harga_umum'] = $m['harga_umum'];
+            $stockList['harga_harian'] = $m['harga_harian'];
+            $stockList['harga_bulanan'] = $m['harga_bulanan'];
+
+            array_push($result, $stockList);
+        }
+
+
+        if ($jasaVendorIn == null) {
+            // Untuk Stok Supplier
+            $grouped = [];
+
+            foreach ($result as $item) {
+                $key = $item['stock_dokumen'] . '|' . $item['stock_date'];
+
+                if (!isset($grouped[$key])) {
+                    $grouped[$key] = [
+                        'id' => [],
+                        'bc_id' => $item['bc_id'],
+                        'stock_dokumen' => $item['stock_dokumen'],
+                        'sumber' => $item['sumber'],
+                        'supplier_name' => $item['supplier_name'],
+                        'stock_detail_id' => $item['stock_detail_id'],
+                        'no_aju' => $item['no_aju'],
+                        'stock_id' => $item['stock_id'],
+                        'stok_total' => 0, // inisialisasi stok_total
+                        'bc_type' => $item['bc_type'],
+                        'satuan' => $item['satuan'],
+                        'type_barang' => $item['type_barang'],
+                        'type_barang_text' => $item['type_barang_text'],
+                        'stock_date' => $item['stock_date'],
+                        'divisi_id' => $item['divisi_id'],
+                        'divisi_asal_text' => $item['divisi_asal_text'],
+                        'divisi_tujuan_id' => $item['divisi_tujuan_id'],
+                        'divisi_tujuan_text' => $item['divisi_tujuan_text'],
+                        'qty2' => 0,
+                        'qty_isi' => 0,
+                        'kode_satuan' => $item['kode_satuan'],
+                        'warehouse_id' => $item['warehouse_id'],
+                        'warehouse_asal_text' => $item['warehouse_asal_text'],
+                        'warehouse_tujuan_text' => $item['warehouse_tujuan_text'],
+                        'warehouse_tujuan_id' => $item['warehouse_tujuan_id'],
+                        'no_daftar' => $item['no_daftar'],
+                        'supplier_name' => $item['supplier_name'],
+                        'supplier_id' => $item['supplier_id'],
+                        'harga_umum' => $item['harga_umum'],
+                        'harga_harian' => $item['harga_harian'],
+                        'harga_bulanan' => $item['harga_bulanan'],
+
+                        'qty' => 0, // inisialisasi qty,
+                        'barang' => [],
+                    ];
+                }
+
+                $grouped[$key]['qty'] += floatval($item['qty']);
+                $grouped[$key]['qty2'] += floatval($item['qty2']);
+                $grouped[$key]['qty_isi'] += floatval($item['qty_isi']);
+
+                $grouped[$key]['stok_total'] += floatval($item['stok_total']);
+                $grouped[$key]['id'][] = $item['stock_id'];
+
+                if (!in_array($item['barang'], $grouped[$key]['barang'])) {
+                    $grouped[$key]['barang'][] = $item['barang'];
+                }
+            }
+
+            $result = [];
+            foreach ($grouped as $item) {
+                $item['barang'] = implode(', ', $item['barang']);
+                $item['id'] = encrypt(json_encode($item['id']));
+                $result[] = $item;
+            }
+        } else {
+            // Untuk Stok Jasa Vendor
+            $grouped = [];
+
+            foreach ($result as $item) {
+                $key = $item['stock_dokumen'] . '|' . $item['stock_date'];
+
+                if (!isset($grouped[$key])) {
+                    $grouped[$key] = [
+                        'id' => [],
+                        'bc_id' => $item['bc_id'],
+                        'stock_dokumen' => $item['stock_dokumen'],
+                        'sumber' => $item['sumber'],
+                        'supplier_name' => $item['supplier_name'],
+                        'stock_detail_id' => $item['stock_detail_id'],
+                        'no_aju' => $item['no_aju'],
+                        'stock_id' => $item['stock_id'],
+                        'stok_total' => 0, // inisialisasi stok_total
+                        'bc_type' => $item['bc_type'],
+                        'satuan' => $item['satuan'],
+                        'type_barang' => $item['type_barang'],
+                        'type_barang_text' => $item['type_barang_text'],
+                        'stock_date' => $item['stock_date'],
+                        'divisi_id' => $item['divisi_id'],
+                        'divisi_asal_text' => $item['divisi_asal_text'],
+                        'divisi_tujuan_id' => $item['divisi_tujuan_id'],
+                        'divisi_tujuan_text' => $item['divisi_tujuan_text'],
+                        'qty2' => 0,
+                        'qty_isi' => 0,
+                        'kode_satuan' => $item['kode_satuan'],
+                        'warehouse_id' => $item['warehouse_id'],
+                        'warehouse_asal_text' => $item['warehouse_asal_text'],
+                        'warehouse_tujuan_text' => $item['warehouse_tujuan_text'],
+                        'warehouse_tujuan_id' => $item['warehouse_tujuan_id'],
+                        'no_daftar' => $item['no_daftar'],
+                        'supplier_name' => $item['supplier_name'],
+                        'supplier_id' => $item['supplier_id'],
+                        'harga_umum' => $item['harga_umum'],
+                        'harga_harian' => $item['harga_harian'],
+                        'harga_bulanan' => $item['harga_bulanan'],
+
+                        'qty' => 0, // inisialisasi qty,
+                        'barang' => [],
+                    ];
+                }
+
+                $grouped[$key]['qty'] += floatval($item['qty']);
+                $grouped[$key]['qty2'] += floatval($item['qty2']);
+                $grouped[$key]['qty_isi'] += floatval($item['qty_isi']);
+
+                $grouped[$key]['stok_total'] += floatval($item['stok_total']);
+                $grouped[$key]['id'][] = $item['stock_id'];
+
+                if (!in_array($item['barang'], $grouped[$key]['barang'])) {
+                    $grouped[$key]['barang'][] = $item['barang'];
+                }
+            }
+
+            $result = [];
+            foreach ($grouped as $item) {
+                $item['barang'] = implode(', ', $item['barang']);
+                $item['id'] = encrypt2(json_encode($item['id']));
+                $result[] = $item;
+            }
+        }
+
+        return $result;
+    }
 }

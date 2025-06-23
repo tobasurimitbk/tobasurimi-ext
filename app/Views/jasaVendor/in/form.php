@@ -862,7 +862,7 @@
         $('#barang1_id').val(barang1_id);
         $('#barang_keluar_name').val('(' + barangFirst.kode_barang_out + ') ' + barangFirst.barang_out);
         $('#satuan_barang_keluar').val(barangFirst.satuan_out);
-        $('#qty_barang_keluar').val(barangFirst.qty_out);
+        $('#qty_barang_keluar').val(parseFloat(barangFirst.qty_out).toFixed(2));
         if (barangFirst != null) {
             $.ajax({
                 url: `<?= base_url('jasa-vendor-in/list-barang-masuk'); ?>`,

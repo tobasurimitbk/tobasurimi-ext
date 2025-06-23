@@ -169,6 +169,7 @@ class SalesOrderModel extends Model
     {
         $selectQry = "sales_order.*,
                       users.name as seller_name,
+                      customers.termin as termin_id,
                       customers.name as customer_name ,
                       customers.address, customers.phone AS customerPhone,
                       customers.tipe_pelanggan as tipe_pelanggan,

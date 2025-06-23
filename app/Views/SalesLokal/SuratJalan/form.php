@@ -505,12 +505,15 @@
                                         denyButtonColor: '#28a745', // Hijau
                                         cancelButtonColor: '#dc3545', // Merah
                                     }).then((result) => {
-                                        if (result.isConfirmed) {
+                                       if (result.isConfirmed) {
                                             // Cetak
                                             window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
                                         } else if (result.isDenied) {
                                             // Buat baru
                                             window.location.reload();
+                                        } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                            // Tutup - redirect to surat-jalan
+                                            window.location.href = `<?= base_url("surat-jalan"); ?>`;
                                         }
                                     });
                                 } else {
@@ -567,6 +570,9 @@
                                         } else if (result.isDenied) {
                                             // Buat baru
                                             window.location.reload();
+                                        } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                            // Tutup - redirect to surat-jalan
+                                            window.location.href = `<?= base_url("surat-jalan"); ?>`;
                                         }
                                     });
                                 } else {

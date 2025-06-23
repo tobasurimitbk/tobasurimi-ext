@@ -34,15 +34,16 @@ class Divisi extends BaseController
         $dataDivisi = $this->DivisisModel->search_list(array(), 'divisi');
         $isGajiPokok = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_gaji_harian', '1')->first();
         $isCadangan = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_cadangan', '1')->first();
+        $dataTypeDivisi = array("PERSONALIA", "UMUM", "GABUNGAN");
 
         $data = [
             "dataDivisi" => $dataDivisi,
             "jamKerja" => $modelJamKerja->where('company_id', $this->this_company_id)->findAll(),
             "tunjangan" => $modelTunjangan->where('company_id', $this->this_company_id)->where('deletedAt', null)->orderBy('is_gaji_harian', "DESC")->findAll(),
             "isGajiPokok" => $isGajiPokok,
-            "isCadangan" => $isCadangan
+            "isCadangan" => $isCadangan,
+            "dataTypeDivisi" => $dataTypeDivisi
         ];
-
 
         return view('Master/divisi/index', $data);
     }
@@ -74,7 +75,8 @@ class Divisi extends BaseController
 
         $values = [
             "company_id"    => $this->this_company_id,
-            "search"        => $search
+            "search"        => $search,
+            "type_divisi"   => $this->request->getVar("divisiType")
         ];
 
         $totalRecords = $this->DivisisModel->total_list($values);
@@ -117,9 +119,9 @@ class Divisi extends BaseController
                 "divisi" => [
                     "rules" => "required"
                 ],
-                // "jam_kerja_id" => [
-                //     "rules" => "required"
-                // ]
+                "type_divisi" => [
+                    "rules" => "required"
+                ]
             ];
 
             if ($this->validate($rules)) {
@@ -157,7 +159,8 @@ class Divisi extends BaseController
                 $divisiInserted = $this->DivisisModel->insert([
                     "company_id" => $this->this_company_id,
                     "divisi" => strtoupper($this->request->getVar("divisi")),
-                    "jam_kerja_id" => $this->request->getPost('jam_kerja_id')
+                    "jam_kerja_id" => $this->request->getPost('jam_kerja_id'),
+                    "type_divisi"   => $this->request->getVar("type_divisi")
                 ]);
 
                 foreach ($komponenGaji as $k) {
@@ -202,9 +205,9 @@ class Divisi extends BaseController
                 "divisi" => [
                     "rules" => "required"
                 ],
-                // "jam_kerja_id" => [
-                //     "rules" => "required"
-                // ]
+                "type_divisi" => [
+                    "rules" => "required"
+                ]
             ];
 
             if ($this->validate($rules)) {
@@ -243,7 +246,8 @@ class Divisi extends BaseController
                 $this->DivisisModel->update($id, [
                     "company_id" => $this->this_company_id,
                     "divisi" => strtoupper($this->request->getVar("divisi")),
-                    "jam_kerja_id" => $this->request->getPost('jam_kerja_id')
+                    "jam_kerja_id" => $this->request->getPost('jam_kerja_id'),
+                    "type_divisi"   => $this->request->getVar("type_divisi")
                 ]);
 
                 $this->gajiDivisiModel->where('division_id', $id)->delete();

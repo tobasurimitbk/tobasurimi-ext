@@ -512,7 +512,8 @@ class SalesOrderInvoiceModel extends Model
     }
 
     public function getAllSalesOrderInvoiceReport($condition, $addCondition, $limit = 10, $offset = 0)
-    {
+    {   
+
         $availableSort = [
             'tgl_invoice'          => 'sales_order_invoice.tgl_faktur',
             'no_sales_order'          => 'sales_order.no_sales_order',
@@ -567,6 +568,12 @@ class SalesOrderInvoiceModel extends Model
 
         if ($addCondition['search'] || $addCondition['filter'] || $addCondition['startdate'] || $addCondition['lastdate']) {
             $salesOrderInvoiceLokal->groupEnd();
+        }
+
+        if (isset($addCondition['tipe_penjualan']) && !empty($addCondition['tipe_penjualan'])) {
+            if ($addCondition['tipe_penjualan'] !== 'semua') {
+                $salesOrderInvoiceLokal->where('tipe_invoice', $addCondition['tipe_penjualan']);
+            }
         }
 
         $totalFilteredData = $salesOrderInvoiceLokal->countAllResults(false);

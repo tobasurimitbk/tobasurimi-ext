@@ -53,6 +53,17 @@
                                 <label for="floatingInput">Buyer</label>
                             </div>
                         </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select tipe_penjualan" name="tipe_penjualan" id="tipe_penjualan">
+                                    <option value="">Pilih Tipe Penjualan</option>
+                                    <option value="semua">Semua</option>
+                                    <option value="LOKAL">Penjualan Lokal</option>
+                                    <option value="EXPORT">Penjualan Internasional</option>
+                                </select>
+                                <label for="floatingInput">Tipe Penjualan</label>
+                            </div>
+                        </div>
                         <div class="col-md-3" style="height: 50px;">
                             <input style="height: auto;" autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                         </div>
@@ -116,6 +127,7 @@
                     data.filter = $(".list_supplier").val();
                     data.dateStart = $(".dateStart").val();
                     data.dateEnd = $(".dateEnd").val();
+                    data.tipe_penjualan = $(".tipe_penjualan").val();
                     data.sort = sort;
                     data.sortType = sortType;
                 }
@@ -200,14 +212,21 @@
             theme: "bootstrap-5",
             allowClear: true
         });
-        $('.list_supplier, .dokumen')
+
+        $('.tipe_penjualan').select2({
+            placeholder: "Filter Tipe Penjualan",
+            theme: "bootstrap-5",
+            allowClear: true
+        });
+
+        $('.list_supplier, .dokumen, .tipe_penjualan')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.list_supplier, .dokumen')
+        $('.list_supplier, .dokumen, .tipe_penjualan')
             .parent('div')
             .children('span')
             .children('span')
@@ -215,7 +234,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.list_supplier, .dokumen')
+        $('.list_supplier, .dokumen, .tipe_penjualan')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -246,7 +265,7 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd, .list_supplier").change(function() {
+        $(".dateStart, .dateEnd, .list_supplier, .tipe_penjualan").change(function() {
             table.ajax.reload();
         })
 

@@ -65,7 +65,7 @@ class RekapBeaCukai extends BaseController
         return view("Dashboard/rekapBeaCukai/rekapBC23", $data);
     }
 
-    public function RekapBC23all()
+    public function rekapBC23all()
     {
         $month = $this->request->getVar('date');
         $bc23Model = new BC23Model();
@@ -202,7 +202,7 @@ class RekapBeaCukai extends BaseController
         ];
         return view("Dashboard/rekapBeaCukai/rekapBC25", $data);
     }
-    public function RekapBC25all()
+    public function rekapBC25all()
     {
         $month = $this->request->getVar('date');
         $bc25Model = new BC25Model();
@@ -368,7 +368,7 @@ class RekapBeaCukai extends BaseController
         ];
         return view("Dashboard/rekapBeaCukai/rekapBC27", $data);
     }
-    public function RekapBC27all()
+    public function rekapBC27all()
     {
         $month = $this->request->getVar('date');
         $bc27Model = new BC27Model();
@@ -527,7 +527,7 @@ class RekapBeaCukai extends BaseController
         ];
         return view("Dashboard/rekapBeaCukai/rekapBC30", $data);
     }
-    public function RekapBC30all()
+    public function rekapBC30all()
     {
         $month = $this->request->getVar('date');
         $bc30Model = new BC30Model();
@@ -683,7 +683,7 @@ class RekapBeaCukai extends BaseController
         ];
         return view("Dashboard/rekapBeaCukai/rekapBC40", $data);
     }
-    public function RekapBC40all()
+    public function rekapBC40all()
     {
         $month = $this->request->getVar('date');
         $bc40Model = new BC40Model();
@@ -819,7 +819,7 @@ class RekapBeaCukai extends BaseController
         ];
         return view("Dashboard/rekapBeaCukai/rekapBC41", $data);
     }
-    public function RekapBC41all()
+    public function rekapBC41all()
     {
         $month = $this->request->getVar('date');
         $bc41Model = new BC41Model();
@@ -988,7 +988,7 @@ class RekapBeaCukai extends BaseController
         ];
         return view("Dashboard/rekapBeaCukai/rekapPPBKB", $data);
     }
-    public function RekapPPBKBall()
+    public function rekapPPBKBall()
     {
         $month = $this->request->getVar('date');
         $ppbkbModel = new PPBKBModel();

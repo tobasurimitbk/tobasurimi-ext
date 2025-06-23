@@ -23,12 +23,16 @@ class Penjualan extends BaseController
     protected $penerimaanBarangModel;
     protected $penerimaanBarangDetailModel;
     protected $SalesOrderInvoiceModel;
+    protected $is_admin;
+    private $userId;
 
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->customerModel = new CustomerModel();
         $this->SalesOrderInvoiceModel = new SalesOrderInvoiceModel();
+        $this->userId = session()->get("login")->user_id;
+        $this->is_admin = session()->get("login")->is_admin;
     }
     public function index()
     {
@@ -45,6 +49,7 @@ class Penjualan extends BaseController
             "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search"        => $this->request->getGet("search"),
             "filter"        => $this->request->getGet("filter"),
+            "tipe_penjualan"        => $this->request->getGet("tipe_penjualan"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
@@ -56,6 +61,7 @@ class Penjualan extends BaseController
         $addCondition = [
             "search"        => $this->request->getGet("search"),
             "filter"        => $this->request->getGet("filter"),
+            "tipe_penjualan"        => $this->request->getGet("tipe_penjualan"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
@@ -64,6 +70,17 @@ class Penjualan extends BaseController
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
+
+        if ($this->is_admin == '1') {
+            $condition = [
+                "sales_order_invoice.deletedAt" => null,
+            ];
+        } elseif ($this->is_admin == '0') {
+            $condition = [
+                "sales_order_invoice.deletedAt" => null,
+                'sales_order_invoice.id_user' => $this->userId
+            ];
+        }
 
         // $res = $this->transaksiPembelianModel->getList($condition, $addCondition, $limit, $offset);
         $res = $this->SalesOrderInvoiceModel->getAllSalesOrderInvoiceReport($condition, $addCondition, $limit, $offset);

@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\DivisisModel;
 use App\Models\HROutsourcingCompanyModel;
 use App\Models\HROutsourcingEmployeeModel;
+use App\Models\HROutsourcingSallaryPaymentModel;
 
 class SallaryPayment extends BaseController
 {
@@ -13,6 +14,7 @@ class SallaryPayment extends BaseController
     protected $divisiModel;
     protected $hrOutsourcingCompanyModel;
     protected $hrOutsourcingEmployeeModel;
+    protected $hrOutsourcingSallaryPaymentModel;
 
     public function __construct()
     {
@@ -20,6 +22,7 @@ class SallaryPayment extends BaseController
         $this->divisiModel = new DivisisModel();
         $this->hrOutsourcingCompanyModel = new HROutsourcingCompanyModel();
         $this->hrOutsourcingEmployeeModel = new HROutsourcingEmployeeModel();
+        $this->hrOutsourcingSallaryPaymentModel = new HROutsourcingSallaryPaymentModel();
     }
 
 
@@ -37,7 +40,7 @@ class SallaryPayment extends BaseController
         return view('HROutsourcing/sallary-payment/form', $data);
     }
 
-    public function getAllEmployeeByCompany()
+    public function all()
     {
         $payload = [
             "pageSize"         => $this->request->getVar("length"),
@@ -54,12 +57,12 @@ class SallaryPayment extends BaseController
         ];
 
         $condition = [
-            'hr_outsourcing_employee.company_id' => $this->request->getVar('company_id'),
+            'hr_outsourcing_company.company_id' => $this->this_company_id,
         ];
 
         $limit = $this->request->getVar("length");
         $offset = $this->request->getVar("start");
-        $employee = $this->hrOutsourcingEmployeeModel->getList($condition, $addCondition, $limit, $offset);
+        $employee = $this->hrOutsourcingSallaryPaymentModel->getList($condition, $addCondition, $limit, $offset);
         $dataSPP = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
@@ -68,10 +71,9 @@ class SallaryPayment extends BaseController
             array_push($dataSPP, [
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
-                "nama" => $data->nama,
-                "tanggal_masuk_kerja" => $data->tanggal_masuk_kerja,
-                "badge" => $data->badge,
-                "total" => 0,
+                "department" => $data->department,
+                "payment_date" => $data->payment_date,
+                "company" => $data->company,
             ]);
         }
 
@@ -85,6 +87,16 @@ class SallaryPayment extends BaseController
 
         echo json_encode($data);
         return;
+    }
+
+    public function detail($id)
+    {
+        $id = decrypt($id);
+        $data = [
+            'departement' => $this->divisiModel->where('company_id', $this->this_company_id)->select('id, divisi')->findAll(),
+            'data' => $this->hrOutsourcingSallaryPaymentModel->find($id)
+        ];
+        return view('HROutsourcing/sallary-payment/form', $data);
     }
 
     public function generateKode()
@@ -128,54 +140,110 @@ class SallaryPayment extends BaseController
 
     public function store()
     {
-        $companyId = $this->request->getVar('company_id');
-        $badge = $this->request->getVar('badge_karyawan');
-        $nama = $this->request->getVar('nama');
-        $tanggal_masuk_kerja = $this->request->getVar('tanggal_masuk_kerja');
+        if (!$this->validate([
+            'departemen' => 'required',
+            'company' => 'required',
+            'employee_data' => 'required'
+        ])) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'errors' => $this->validator->getErrors(),
+                csrf_token() => csrf_hash()
+            ]);
+        }
 
-        $this->hrOutsourcingEmployeeModel->insert([
-            'company_id' => $companyId,
-            'badge' => $badge,
-            'nama' => $nama,
-            'tanggal_masuk_kerja' => $tanggal_masuk_kerja
-        ]);
+        try {
+            // Get the JSON data from the request
+            $employeeData = json_decode($this->request->getPost('employee_data'), true);
+            
+            // Validate the JSON data
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception('Invalid JSON data format');
+            }
 
-        return response()->setJSON([
-            'status' => true,
-            'message' => "Employee Outsourcing Berhasil Disimpan",
-            'token' => csrf_hash()
-        ]);
+            $data = [
+                'divisi_id' => $this->request->getPost('departemen'),
+                'company_id' => $this->request->getPost('company'),
+                'payment_data' => $this->request->getPost('employee_data'), // Store the JSON string directly
+                'payment_date' => $this->request->getPost('tanggal_pembayaran'),
+            ];
+
+            // Insert the data
+            $insertId =  $this->hrOutsourcingSallaryPaymentModel->insert($data);
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Data berhasil disimpan',
+                'id' => $insertId, // Return the ID of the newly created record
+                csrf_token() => csrf_hash()
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Gagal menyimpan data: ' . $e->getMessage(),
+                csrf_token() => csrf_hash()
+            ]);
+        }
     }
 
-    public function update()
+    public function update($id)
     {
-        $id = decrypt($this->request->getVar('id'));
-        $companyId = $this->request->getVar('company_id');
-        $badge = $this->request->getVar('badge_karyawan');
-        $nama = $this->request->getVar('nama');
-        $tanggal_masuk_kerja = $this->request->getVar('tanggal_masuk_kerja');
+        if (!$this->validate([
+            'departemen' => 'required',
+            'company' => 'required',
+            'employee_data' => 'required'
+        ])) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'errors' => $this->validator->getErrors(),
+                csrf_token() => csrf_hash()
+            ]);
+        }
 
-        $this->hrOutsourcingEmployeeModel->update($id, [
-            'company_id' => $companyId,
-            'badge' => $badge,
-            'nama' => $nama,
-            'tanggal_masuk_kerja' => $tanggal_masuk_kerja
-        ]);
+        // $id = $this->request->getPost('id');
+        
+        try {
+            // Get the JSON data from the request
+            $employeeData = json_decode($this->request->getPost('employee_data'), true);
+            
+            // Validate the JSON data
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception('Invalid JSON data format');
+            }
 
-        return response()->setJSON([
-            'status' => true,
-            'message' => "Employee Outsourcing Berhasil Diupdate",
-            'token' => csrf_hash()
-        ]);
+            // Prepare update data
+            $updateData = [
+                'divisi_id' => $this->request->getPost('departemen'),
+                'company_id' => $this->request->getPost('company'),
+                'payment_data' => $this->request->getPost('employee_data'),
+                'payment_date' => $this->request->getPost('tanggal_pembayaran'),
+            ];
+
+            // Update the record
+            $this->hrOutsourcingSallaryPaymentModel->update($id, $updateData);
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Data berhasil diperbarui',
+                'id' => $id,
+                csrf_token() => csrf_hash()
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Gagal memperbarui data: ' . $e->getMessage(),
+                csrf_token() => csrf_hash()
+            ]);
+        }
     }
 
-    public function destroy()
+    public function destroy($id)
     {
-        $id = decrypt($this->request->getVar('id'));
-        $this->hrOutsourcingEmployeeModel->delete($id);
+        $id = decrypt($id);
+        $this->hrOutsourcingSallaryPaymentModel->delete($id);
         return response()->setJSON([
             'status' => true,
-            'message' => "Employee Outsourcing Berhasil Dihapus",
+            'message' => "Sallary Payment Outsourcing Berhasil Dihapus",
             'token' => csrf_hash()
         ]);
     }
@@ -194,7 +262,7 @@ class SallaryPayment extends BaseController
 
     public function getHrEmployeeOutSourcing() {
         $company_id = $this->request->getVar('company_id');
-        $employee = $this->hrOutsourcingEmployeeModel->where('company_id', $company_id)->select('id, nama')->findAll();
+        $employee = $this->hrOutsourcingEmployeeModel->where('company_id', $company_id)->select('id, nama, badge, tanggal_masuk_kerja')->findAll();
 
         return response()->setJSON([
             'status' => true,

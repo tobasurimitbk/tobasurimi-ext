@@ -9,9 +9,9 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("sales-kontrak"); ?>">
                 Kembali
             </a>
-                <button class="btn btn-show-form btn-primary btn-save float-right btn-submit-parent">
-                    Duplikasi
-                </button>
+            <button class="btn btn-show-form btn-primary btn-save float-right btn-submit-parent">
+                Duplikasi
+            </button>
         </div>
     </div>
     <div class="card">
@@ -36,6 +36,24 @@
                                     <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting'] ? 'disabled=true' : '') : ''; ?>
+                                class="form-select divisi_id"
+                                aria-label="Floating label select example"
+                                name="divisi_id"
+                                id="divisi_id">
+                                <option value=""></option>
+                                <?php foreach ($dataDivisi as $d) : ?>
+                                    <option value="<?= $d['id'] ?>"
+                                        <?= !empty($dataSalesKontrak['divisi_id']) && $dataSalesKontrak['divisi_id'] == $d['id'] ? 'selected' : '' ?>>
+                                        <?= $d['divisi'] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Department</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -172,7 +190,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <!-- <div class="row">
                     <div class="col mb-3">
                         <label class="form-label font-weight-bold lable-title">Broker</label>
                     </div>
@@ -201,7 +219,7 @@
                         </div>
                     </div>
 
-                </div>
+                </div> -->
                 <div class="row">
                     <div class="col mb-3">
                         <label class="form-label font-weight-bold lable-title">Dokumen & Special Instructions</label>
@@ -211,13 +229,13 @@
                     <div class="col-md-6">
                         <div class="form-floating">
                             <textarea autocomplete="one-time-code" class="full-textarea form-control documents_required" id="documents_required" name="documents_required" placeholder="Document Required"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['documents_required'] : ""; ?></textarea>
-                            <label for="floatingInput">Document Required</label>
+                            <label for="floatingInput">Document Required (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating">
                             <textarea autocomplete="one-time-code" class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Special Instructions"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['special_instructions'] : ""; ?></textarea>
-                            <label for="floatingInput">Special Instructions</label>
+                            <label for="floatingInput">Special Instructions (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -229,9 +247,9 @@
                         <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
                     </div>
                     <div class="col-md-6">
-                            <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
-                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                            </button>
+                        <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                        </button>
                     </div>
                 </div>
             </div>
@@ -350,7 +368,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
                                 <input autocomplete="one-time-code" type="text" class="form-control remark" id="remark" name="remark" placeholder="Remark" oninput="capitalize()">
-                                <label for="floatingInput">Remark</label>
+                                <label for="floatingInput">Remark (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -466,12 +484,6 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control barang_name" name="barang_name" id="barang_name" placeholder="Nama Kemasan">
-                                <label for="floatingInput">Nama Barang</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select type_barang" name="type_barang" id="type_barang">
                                     <option value="">Pilih Tipe Barang</option>
                                     <option value="bahan_jadi">BARANG JADI</option>
@@ -483,19 +495,27 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select spesifikasi_id" name="spesifikasi_id" id="spesifikasi_id">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Pilih Dari Master Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control barang_name" name="barang_name" id="barang_name" placeholder="Nama Kemasan">
+                                <label for="floatingInput">Nama Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
                                     <option value=""></option>
                                     <?php foreach ($dataSatuan as $d) : ?>
                                         <option value="<?= $d['id'] ?>"><?= $d['kode_satuan'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput">Satuan</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="this.value=greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_pokok" name="harga_pokok" id="harga_pokok" placeholder="Harga Pokok">
-                                <label for="floatingInput">Harga Pokok</label>
+                                <label for="floatingInput" style="z-index: 1;">Satuan Default (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -648,15 +668,39 @@
         theme: "bootstrap-5",
     })
 
+    // DEPARTMENT
+    $('.divisi_id').select2({
+        placeholder: "Pilih Department",
+        theme: "bootstrap-5",
+    })
+
+    $("#spesifikasi_id").select2({
+        theme: "bootstrap-5",
+        placeholder: 'Pilih Dari Master Barang',
+        allowClear: true,
+        dropdownParent: $(".add-modal .modal-content"),
+    }).change(function() {
+        var id = $('#spesifikasi_id option:selected').val();
+        var selectedText = $('#spesifikasi_id option:selected').text();
+
+        if (id != '') {
+            $('#barang_name').val(selectedText);
+
+        } else {
+            $('#barang_name').val(null);
+
+        }
+    });
+
     //CSS SELECT2 FLOATING LABEL
-    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id')
+    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id,#divisi_id,#spesifikasi_id')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id')
+    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id,#divisi_id,#spesifikasi_id')
         .parent('div')
         .children('span')
         .children('span')
@@ -664,7 +708,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.satuan_id')
+    $('.satuan_id,#divisi_id,#spesifikasi_id')
         .parent('div')
         .children('span')
         .children('span')
@@ -672,10 +716,11 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,#sales_id')
+    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,#sales_id,#divisi_id,#spesifikasi_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');
+
 
     // QTY KEYUP
     $('.qty,.harga').keyup(function() {
@@ -730,12 +775,12 @@
             print_out_broker: {
                 required: true
             },
-            documents_required: {
-                required: true
-            },
-            special_instructions: {
-                required: true
-            },
+            // documents_required: {
+            //     required: true
+            // },
+            // special_instructions: {
+            //     required: true
+            // },
         },
         messages: {
             sales_contract_no: {
@@ -768,12 +813,12 @@
             print_out_broker: {
                 required: "Print out boker wajib diisi"
             },
-            documents_required: {
-                required: "Dokumen wajib diisi"
-            },
-            special_instructions: {
-                required: "Special instructions wajib diisi"
-            },
+            // documents_required: {
+            //     required: "Dokumen wajib diisi"
+            // },
+            // special_instructions: {
+            //     required: "Special instructions wajib diisi"
+            // },
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -812,9 +857,9 @@
             harga: {
                 required: true
             },
-            remark: {
-                required: true
-            },
+            // remark: {
+            //     required: true
+            // },
             total: {
                 required: true
             }
@@ -832,9 +877,9 @@
             harga: {
                 required: "Harga wajib diisi"
             },
-            remark: {
-                required: "Remark wajib diisi"
-            },
+            // remark: {
+            //     required: "Remark wajib diisi"
+            // },
             total: {
                 required: "Total wajib diisi"
             }
@@ -873,15 +918,15 @@
             type_barang: {
                 required: true
             },
-            satuan_id: {
-                required: true
-            },
-            harga_pokok: {
-                required: true
-            },
-            harga_jual: {
-                required: true
-            }
+            // satuan_id: {
+            //     required: true
+            // },
+            // harga_pokok: {
+            //     required: true
+            // },
+            // harga_jual: {
+            //     required: true
+            // }
         },
         messages: {
             kode_barang: {
@@ -893,15 +938,15 @@
             type_barang: {
                 required: "Tipe barang wajib diisi"
             },
-            satuan_id: {
-                required: "Satuan wajib diisi"
-            },
-            harga_pokok: {
-                required: "Harga pokok wajib diisi"
-            },
-            harga_jual: {
-                required: "Harga jual wajib diisi"
-            }
+            // satuan_id: {
+            //     required: "Satuan wajib diisi"
+            // },
+            // harga_pokok: {
+            //     required: "Harga pokok wajib diisi"
+            // },
+            // harga_jual: {
+            //     required: "Harga jual wajib diisi"
+            // }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -1195,47 +1240,47 @@
                 data.append("total_amount", totalAmount);
                 data.append("listBarang", listDataBarang);
 
-                 // CREATE
-                 Swal.fire({
-                        icon: 'question',
-                        title: 'Duplikasi Data?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Duplikasi',
-                        cancelButtonText: 'Kembali',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: "<?= base_url("sales-kontrak/save"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    setLoading();
-                                },
-                                complete: function() {
-                                    stopLoading();
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                        confirmButtonText: 'Ok'
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            window.location.href = "<?= base_url('sales-kontrak') ?>"
-                                        }
-                                    });
-                                },
-                            });
-                        }
-                    });
+                // CREATE
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Duplikasi Data?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Duplikasi',
+                    cancelButtonText: 'Kembali',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "<?= base_url("sales-kontrak/save"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    confirmButtonText: 'Ok'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = "<?= base_url('sales-kontrak') ?>"
+                                    }
+                                });
+                            },
+                        });
+                    }
+                });
             }
         }
     })
@@ -1253,6 +1298,8 @@
         $('.satuan_id').val(null).change();
         $('.harga_pokok').val(null);
         $('.harga_jual').val(null);
+        getListMasterBarang()
+        fetchBarangData();
     })
 
     $('.btn-discard-master-barang').click(function() {
@@ -1635,6 +1682,98 @@
     //handle print
     function print(url) {
         window.open(url, "_blank");
+    }
+
+    function fetchBarangData() {
+        let csrfToken = '<?= csrf_token() ?>';
+        let csrf = $(`[name="${csrfToken}"]`);
+
+        $.ajax({
+            url: "<?= base_url('master-barang-internasional/get-barang-jadi-master') ?>",
+            method: 'POST',
+            data: {
+                type_barang: $('#type_barang option:selected').val()
+            },
+            dataType: 'json',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            success: function(response) {
+                var typeBarang = $('#type_barang option:selected').val();
+                var spesifikasiIdSelect = $("select[name='spesifikasi_id']");
+                spesifikasiIdSelect.empty();
+
+                var emptyOption = $("<option></option>")
+                    .attr("value", "")
+                    .text("Pilih Dari Master Barang");
+                // Replace with select element
+                if (typeBarang == 'kemasan') {
+                    spesifikasiIdSelect.append(emptyOption);
+                    $.each(response.data, function(index, data) {
+                        var option = $("<option></option>")
+                            .attr("value", data.id)
+                            .text(data.barang_name_master);
+                        spesifikasiIdSelect.append(option);
+                    });
+                } else {
+                    spesifikasiIdSelect.append(emptyOption);
+                    $.each(response.data, function(index, data) {
+                        var option = $("<option></option>")
+                            .attr("value", data.id)
+                            .text(data.barang_name_master + " - " + data.spesifikasi);
+                        spesifikasiIdSelect.append(option);
+                    });
+                }
+
+            },
+        });
+    }
+
+    function getListMasterBarang() {
+        // Get the selected divisi_id value
+        const csrf = $(`[name="${csrfToken}"]`);
+
+        $.ajax({
+            url: `<?= base_url('sales-kontrak/master-barang'); ?>`,
+            method: "POST",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            dataType: "json",
+            success: function(res) {
+                if (res.data && res.data.length > 0) {
+                    $(".barang_master_sales_id").empty();
+                    $(".barang_master_sales_id").append(`<option value=""></option>`);
+
+                    res.data.forEach(function(item) {
+                        $(".barang_master_sales_id").append(
+                            `<option value="${item.id}" 
+                                data-harga_jual="${item.harga_jual}" 
+                                data-satuan_id="${item.satuan_id}" 
+                                data-kode_barang="${item.kode_barang}" 
+                                data-barang_name="${item.barang_name}">
+                                (${item.kode_barang}) ${item.barang_name}
+                            </option>`
+                        );
+                    });
+
+                    $(".barang_master_sales_id").val('').trigger('change');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching master barang:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Gagal memuat data barang. Silakan coba lagi.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
     }
 </script>
 <?= $this->endSection(); ?>
