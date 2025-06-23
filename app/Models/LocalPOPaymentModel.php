@@ -85,6 +85,7 @@ class LocalPOPaymentModel extends Model
 
         $selectQry = "local_po_payments.id AS id,
                 local_po_payments.status_posting,
+                local_po_payments.divisi_id,
                 local_po_payments.multiple_po_no,
                 local_po_payments.payment_no AS payment_no, 
                 local_po_payments.type_bayar,
