@@ -447,11 +447,13 @@
                     <th class="text-center" colspan="8">KEPITING MERAH DAN PUTIH</th>
                     <th class="text-center" colspan="5">SOKAT / CUMI / GURITA</th>
                     <th class="text-center" colspan="5">ALL</th>
-                    <th class="text-center" colspan="3">JAM KERJA</th>
+                    <th class="text-center" colspan="35">JAM</th>
                     <th class="text-center" rowspan="3">TOTAL KG</th>
                     <th class="text-center" rowspan="3">TOTAL JAM</th>
+                    <th class="text-center" rowspan="3">TOTAL BORONGAN JAM</th>
                     <th class="text-center" rowspan="3">JLH ORG</th>
                     <th class="text-center" rowspan="3">(Rp)</th>
+                    <th class="text-center" rowspan="3">Rp/Org</th>
                     <th class="text-center" rowspan="3">SUBSIDI RP.</th>
                     <th class="text-center" rowspan="3">BOR. / JAM (Rp)</th>
                     <th class="text-center" colspan="35">KG / JAM</th>
@@ -492,9 +494,11 @@
                     <th colspan="1">SA</th>
                     <th colspan="1">CU</th>
                     <th colspan="1">HK</th>
-                    <th rowspan="2">UDANG</th>
-                    <th rowspan="2">KEPAH</th>
-                    <th rowspan="2">KPTG</th>
+                    <th class="text-center" colspan="13">UDANG</th>
+                    <th class="text-center" colspan="4">KEPAH</th>
+                    <th class="text-center" colspan="8">KEPITING MERAH DAN PUTIH</th>
+                    <th class="text-center" colspan="5">SOKAT / CUMI / GURITA</th>
+                    <th class="text-center" colspan="5">ALL</th>
                     <th class="text-center" colspan="13">UDANG</th>
                     <th class="text-center" colspan="4">KEPAH</th>
                     <th class="text-center" colspan="8">KEPITING MERAH DAN PUTIH</th>
@@ -537,6 +541,41 @@
                     <th style="min-width:100px;" colspan="1">1.5</th>   <!-- SA -->
                     <th style="min-width:100px;" colspan="1">3</th>     <!-- CU -->
                     <th style="min-width:100px;" colspan="1">23</th>    <!-- HK -->
+                    <th colspan="1">SUAC</th>
+                    <th colspan="1">CUU</th>
+                    <th colspan="1">AU</th>
+                    <th colspan="1">MKU/MDU</th>
+                    <th colspan="1">BU</th>
+                    <th colspan="1">BBU</th>
+                    <th colspan="1">ATU</th>
+                    <th colspan="1">CBU</th>
+                    <th colspan="1">FU</th>
+                    <th colspan="1">BUMS</th>
+                    <th colspan="1">BUM</th>
+                    <th colspan="1">KUM</th>
+                    <th colspan="1">SUM</th>
+                    <th colspan="1">SK</th>
+                    <th colspan="1">CKU</th>
+                    <th colspan="1">FKPH</th>
+                    <th colspan="1">BK</th>
+                    <th colspan="1">SKPL</th>
+                    <th colspan="1">SKPB</th>
+                    <th colspan="1">SKML</th>
+                    <th colspan="1">SKMB</th>
+                    <th colspan="1">C1</th>
+                    <th colspan="1">C2</th>
+                    <th colspan="1">CUK</th>
+                    <th colspan="1">FK</th>
+                    <th colspan="1">SSSCG</th>
+                    <th colspan="1">IKSSCG</th>
+                    <th colspan="1">FSSCG</th>
+                    <th colspan="1">KSCG</th>
+                    <th colspan="1">CSCG</th>
+                    <th colspan="1">MPA</th>
+                    <th colspan="1">LBL</th>
+                    <th colspan="1">SA</th>
+                    <th colspan="1">CU</th>
+                    <th colspan="1">HK</th>
                     <th colspan="1">SUAC</th>
                     <th colspan="1">CUU</th>
                     <th colspan="1">AU</th>
@@ -736,22 +775,22 @@
 
 
                             <!-- Summary columns -->
-                            <td><input type="number" class="form-control form-control-sm" name="jlhkg" style="min-width: 100px;" value="${payment.jlhkg || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="jlh_org" style="min-width: 100px;" value="${payment.jlh_org || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="ttl_jam" style="min-width: 100px;" value="${payment.ttl_jam || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="rp" style="min-width: 100px;" value="${payment.rp || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="total_rp_org" style="min-width: 100px;" value="${payment.total_rp_org || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="jlhkg" style="min-width: 100px;" value="${payment.jlhkg || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="jlh_org" style="min-width: 100px;" value="${payment.jlh_org || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="ttl_jam" style="min-width: 100px;" value="${payment.ttl_jam || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="rp" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" style="min-width: 100px;" value="${payment.rp || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="total_rp_org" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" style="min-width: 100px;" value="${payment.total_rp_org || ''}"></td>
                             
                             <!-- Subsidies -->
-                            <td><input type="number" class="form-control form-control-sm" name="subsidi" style="min-width: 100px;" value="${payment.subsidi || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="subsidi" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" style="min-width: 100px;" value="${payment.subsidi || ''}"></td>
                             
                             <!-- Target -->
-                            <td><input type="number" class="form-control form-control-sm" name="kilo400" style="min-width: 100px;" value="${payment.kilo400 || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="kilo600" style="min-width: 100px;" value="${payment.kilo600 || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="kilo400" style="min-width: 100px;" value="${payment.kilo400 || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="kilo600" style="min-width: 100px;" value="${payment.kilo600 || ''}"></td>
                             
                             <!-- Final values -->
-                            <td><input type="number" class="form-control form-control-sm" name="perjam" style="min-width: 100px;" value="${payment.perjam || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="total_kg" style="min-width: 100px;" value="${payment.total_kg || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="perjam" style="min-width: 100px;" value="${payment.perjam || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="total_kg" style="min-width: 100px;" value="${payment.total_kg || ''}"></td>
                         </tr>
                     `;
                     } else {
@@ -1079,16 +1118,50 @@
                             </td>
 
                             <!-- JAM KERJA -->
-                            <td><input type="number" name="jam_kerja_udang" class="form-control form-control-sm jam-kerja-udang" style="min-width: 90px;" value="${payment.jam_kerja_udang || ''}"></td>
-                            <td><input type="number" name="jam_kerja_kepah" class="form-control form-control-sm jam-kerja-kepah" style="min-width: 90px;" value="${payment.jam_kerja_kepah || ''}"></td>
-                            <td><input type="number" name="jam_kerja_kptg" class="form-control form-control-sm jam-kerja-kptg" style="min-width: 90px;" value="${payment.jam_kerja_kptg || ''}"></td>
+                            <td><input type="number" name="jam_kerja_suac" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_suac || ''}"></td>
+                            <td><input type="number" name="jam_kerja_cuu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_cuu || ''}"></td>
+                            <td><input type="number" name="jam_kerja_au" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_au || ''}"></td>
+                            <td><input type="number" name="jam_kerja_mku_mdu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_mku_mdu || ''}"></td>
+                            <td><input type="number" name="jam_kerja_bu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_bu || ''}"></td>
+                            <td><input type="number" name="jam_kerja_bbu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_bbu || ''}"></td>
+                            <td><input type="number" name="jam_kerja_atu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_atu || ''}"></td>
+                            <td><input type="number" name="jam_kerja_cbu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_cbu || ''}"></td>
+                            <td><input type="number" name="jam_kerja_fu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_fu || ''}"></td>
+                            <td><input type="number" name="jam_kerja_bums" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_bums || ''}"></td>
+                            <td><input type="number" name="jam_kerja_bum" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_bum || ''}"></td>
+                            <td><input type="number" name="jam_kerja_kum" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_kum || ''}"></td>
+                            <td><input type="number" name="jam_kerja_sum" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_sum || ''}"></td>
+                            <td><input type="number" name="jam_kerja_sk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_sk || ''}"></td>
+                            <td><input type="number" name="jam_kerja_cku" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_cku || ''}"></td>
+                            <td><input type="number" name="jam_kerja_fkph" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_fkph || ''}"></td>
+                            <td><input type="number" name="jam_kerja_bk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_bk || ''}"></td>
+                            <td><input type="number" name="jam_kerja_skpl" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_skpl || ''}"></td>
+                            <td><input type="number" name="jam_kerja_skpb" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_skpb || ''}"></td>
+                            <td><input type="number" name="jam_kerja_skml" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_skml || ''}"></td>
+                            <td><input type="number" name="jam_kerja_skmb" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_skmb || ''}"></td>
+                            <td><input type="number" name="jam_kerja_c1" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_c1 || ''}"></td>
+                            <td><input type="number" name="jam_kerja_c2" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_c2 || ''}"></td>
+                            <td><input type="number" name="jam_kerja_cuk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_cuk || ''}"></td>
+                            <td><input type="number" name="jam_kerja_fk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_fk || ''}"></td>
+                            <td><input type="number" name="jam_kerja_ssscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_ssscg || ''}"></td>
+                            <td><input type="number" name="jam_kerja_iksscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_iksscg || ''}"></td>
+                            <td><input type="number" name="jam_kerja_fsscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_fsscg || ''}"></td>
+                            <td><input type="number" name="jam_kerja_kscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_kscg || ''}"></td>
+                            <td><input type="number" name="jam_kerja_cscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_cscg || ''}"></td>
+                            <td><input type="number" name="jam_kerja_mpa" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_mpa || ''}"></td>
+                            <td><input type="number" name="jam_kerja_lbl" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_lbl || ''}"></td>
+                            <td><input type="number" name="jam_kerja_sa" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_sa || ''}"></td>
+                            <td><input type="number" name="jam_kerja_cu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_cu || ''}"></td>
+                            <td><input type="number" name="jam_kerja_hk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_hk || ''}"></td>
 
                             <!-- TOTAL & KALKULASI -->
                             <td><input type="number" name="total_kg" class="form-control form-control-sm total-kg" style="min-width: 100px;" value="${payment.total_kg || ''}"></td>
                             <td><input type="number" name="total_jam" class="form-control form-control-sm total-jam" style="min-width: 100px;" value="${payment.total_jam || ''}"></td>
+                            <td><input type="number" name="total_borongan_jam" class="form-control form-control-sm total-borongan-jam" style="min-width: 100px;" value="${payment.total_borongan_jam || ''}"></td>
                             <td><input type="number" name="jumlah_org" class="form-control form-control-sm jlh-org" style="min-width: 100px;" value="${payment.jumlah_org || ''}"></td>
-                            <td><input type="number" name="rupiah" class="form-control form-control-sm rupiah" style="min-width: 120px;" value="${payment.rupiah || ''}"></td>
-                            <td><input type="number" name="subsidi_rupiah" class="form-control form-control-sm subsidi-rupiah" style="min-width: 120px;" value="${payment.subsidi_rupiah || ''}"></td>
+                            <td><input type="number" name="rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" class="form-control form-control-sm rupiah" style="min-width: 120px;" value="${payment.rupiah || ''}"></td>
+                            <td><input type="number" name="rupiah_org" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" class="form-control form-control-sm rupiah_org" style="min-width: 120px;" value="${payment.rupiah_org || ''}"></td>
+                            <td><input type="number" name="subsidi_rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" class="form-control form-control-sm subsidi-rupiah" style="min-width: 120px;" value="${payment.subsidi_rupiah || ''}"></td>
                             <td><input type="number" name="borongan_per_jam" class="form-control form-control-sm borongan-per-jam" style="min-width: 120px;" value="${payment.borongan_per_jam || ''}"></td>
 
                             <!-- KG / JAM -->
@@ -1309,22 +1382,22 @@
                     
                     
                     <!-- Summary columns -->
-                    <td><input type="number" class="form-control form-control-sm" name="jlhkg" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm" name="jlh_org" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm" name="ttl_jam" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm" name="rp" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm" name="total_rp_org" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="jlhkg" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="jlh_org" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="ttl_jam" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" name="rp" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" name="total_rp_org" style="min-width: 100px;"></td>
                     
                     <!-- Subsidies -->
-                    <td><input type="number" class="form-control form-control-sm" name="subsidi" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" name="subsidi" style="min-width: 100px;"></td>
                             
                     <!-- Target -->
-                    <td><input type="number" class="form-control form-control-sm" name="kilo400" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm" name="kilo600" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="kilo400" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="kilo600" style="min-width: 100px;"></td>
                             
                     <!-- Final values -->
-                    <td><input type="number" class="form-control form-control-sm" name="perjam" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm" name="total_kg" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="perjam" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="total_kg" style="min-width: 100px;"></td>
                 </tr>
             `;
             } else {
@@ -1686,17 +1759,52 @@
 
 
                     <!-- JAM KERJA -->
-                    <td><input type="number" name="jam_kerja_udang" class="form-control form-control-sm jam-kerja-udang" style="min-width: 90px;"></td>
-                    <td><input type="number" name="jam_kerja_kepah" class="form-control form-control-sm jam-kerja-kepah" style="min-width: 90px;"></td>
-                    <td><input type="number" name="jam_kerja_kptg" class="form-control form-control-sm jam-kerja-kptg" style="min-width: 90px;"></td>
+                    <td><input type="number" name="jam_kerja_suac" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_cuu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_au" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_mku_mdu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_bu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_bbu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_atu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_cbu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_fu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_bums" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_bum" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_kum" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_sum" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_sk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_cku" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_fkph" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_bk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_skpl" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_skpb" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_skml" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_skmb" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_c1" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_c2" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_cuk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_fk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_ssscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_iksscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_fsscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_kscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_cscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_mpa" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_lbl" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_sa" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_cu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="jam_kerja_hk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+ 
 
                     <!-- TOTAL & KALKULASI -->
-                    <td><input type="number" name="total_kg" class="form-control form-control-sm total-kg" style="min-width: 100px;"></td>
-                    <td><input type="number" name="total_jam" class="form-control form-control-sm total-jam" style="min-width: 100px;"></td>
-                    <td><input type="number" name="jumlah_org" class="form-control form-control-sm jlh-org" style="min-width: 100px;"></td>
-                    <td><input type="number" name="rupiah" class="form-control form-control-sm rupiah" style="min-width: 120px;"></td>
-                    <td><input type="number" name="subsidi_rupiah" class="form-control form-control-sm subsidi-rupiah" style="min-width: 120px;"></td>
-                    <td><input type="number" name="borongan_per_jam" class="form-control form-control-sm borongan-per-jam" style="min-width: 120px;"></td>
+                    <td><input type="text" name="total_kg" class="form-control form-control-sm total-kg" style="min-width: 100px;"></td>
+                    <td><input type="text" name="total_jam" class="form-control form-control-sm total-jam" style="min-width: 100px;"></td>
+                    <td><input type="text" name="total_borongan_jam" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'"  class="form-control form-control-sm total-borongan-jam" style="min-width: 100px;"></td>
+                    <td><input type="text" name="jumlah_org" class="form-control form-control-sm jlh-org" style="min-width: 100px;"></td>
+                    <td><input type="text" name="rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'"  class="form-control form-control-sm rupiah" style="min-width: 120px;"></td>
+                    <td><input type="text" name="rupiah_org" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'"  class="form-control form-control-sm rupiah_org" style="min-width: 120px;"></td>
+                    <td><input type="text" name="subsidi_rupiah" class="form-control form-control-sm subsidi-rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'"  style="min-width: 120px;"></td>
+                    <td><input type="text" name="borongan_per_jam" class="form-control form-control-sm borongan-per-jam" style="min-width: 120px;"></td>
 
                     <!-- KG / JAM -->
                     <td><input type="number" name="kg_per_jam_suac" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
@@ -1756,50 +1864,50 @@
                         tanggal_masuk_kerja: $row.find('td:eq(1) input').val(),
 
                         // Job data columns (26)
-                        sjb: parseFloat($row.find('[name="sjb"]').val()) || 0,
-                        sjl: parseFloat($row.find('[name="sjl"]').val()) || 0,
-                        mt: parseFloat($row.find('[name="mt"]').val()) || 0,
-                        sel: parseFloat($row.find('[name="sel"]').val()) || 0,
-                        slm: parseFloat($row.find('[name="slm"]').val()) || 0,
-                        ssp: parseFloat($row.find('[name="ssp"]').val()) || 0,
-                        scm: parseFloat($row.find('[name="scm"]').val()) || 0,
-                        ctt: parseFloat($row.find('[name="ctt"]').val()) || 0,
-                        cct: parseFloat($row.find('[name="cct"]').val()) || 0,
-                        smh: parseFloat($row.find('[name="smh"]').val()) || 0,
-                        dm: parseFloat($row.find('[name="dm"]').val()) || 0,
-                        scf: parseFloat($row.find('[name="scf"]').val()) || 0,
-                        lel: parseFloat($row.find('[name="lel"]').val()) || 0,
-                        gc: parseFloat($row.find('[name="gc"]').val()) || 0,
-                        sspk: parseFloat($row.find('[name="sspk"]').val()) || 0,
-                        kjb: parseFloat($row.find('[name="kjb"]').val()) || 0,
-                        kjl: parseFloat($row.find('[name="kjl"]').val()) || 0,
-                        klp: parseFloat($row.find('[name="klp"]').val()) || 0,
-                        ksp: parseFloat($row.find('[name="ksp"]').val()) || 0,
-                        kcl: parseFloat($row.find('[name="kcl"]').val()) || 0,
-                        kcm: parseFloat($row.find('[name="kcm"]').val()) || 0,
-                        klg: parseFloat($row.find('[name="klg"]').val()) || 0,
-                        lm: parseFloat($row.find('[name="lm"]').val()) || 0,
-                        kel: parseFloat($row.find('[name="kel"]').val()) || 0,
-                        kcf: parseFloat($row.find('[name="kcf"]').val()) || 0,
-                        cu: parseFloat($row.find('[name="cu"]').val()) || 0,
+                        sjb: destroyFormatRupiah($row.find('[name="sjb"]').val()) || 0,
+                        sjl: destroyFormatRupiah($row.find('[name="sjl"]').val()) || 0,
+                        mt: destroyFormatRupiah($row.find('[name="mt"]').val()) || 0,
+                        sel: destroyFormatRupiah($row.find('[name="sel"]').val()) || 0,
+                        slm: destroyFormatRupiah($row.find('[name="slm"]').val()) || 0,
+                        ssp: destroyFormatRupiah($row.find('[name="ssp"]').val()) || 0,
+                        scm: destroyFormatRupiah($row.find('[name="scm"]').val()) || 0,
+                        ctt: destroyFormatRupiah($row.find('[name="ctt"]').val()) || 0,
+                        cct: destroyFormatRupiah($row.find('[name="cct"]').val()) || 0,
+                        smh: destroyFormatRupiah($row.find('[name="smh"]').val()) || 0,
+                        dm: destroyFormatRupiah($row.find('[name="dm"]').val()) || 0,
+                        scf: destroyFormatRupiah($row.find('[name="scf"]').val()) || 0,
+                        lel: destroyFormatRupiah($row.find('[name="lel"]').val()) || 0,
+                        gc: destroyFormatRupiah($row.find('[name="gc"]').val()) || 0,
+                        sspk: destroyFormatRupiah($row.find('[name="sspk"]').val()) || 0,
+                        kjb: destroyFormatRupiah($row.find('[name="kjb"]').val()) || 0,
+                        kjl: destroyFormatRupiah($row.find('[name="kjl"]').val()) || 0,
+                        klp: destroyFormatRupiah($row.find('[name="klp"]').val()) || 0,
+                        ksp: destroyFormatRupiah($row.find('[name="ksp"]').val()) || 0,
+                        kcl: destroyFormatRupiah($row.find('[name="kcl"]').val()) || 0,
+                        kcm: destroyFormatRupiah($row.find('[name="kcm"]').val()) || 0,
+                        klg: destroyFormatRupiah($row.find('[name="klg"]').val()) || 0,
+                        lm: destroyFormatRupiah($row.find('[name="lm"]').val()) || 0,
+                        kel: destroyFormatRupiah($row.find('[name="kel"]').val()) || 0,
+                        kcf: destroyFormatRupiah($row.find('[name="kcf"]').val()) || 0,
+                        cu: destroyFormatRupiah($row.find('[name="cu"]').val()) || 0,
 
                         // Summary columns
-                        jlhkg: parseFloat($row.find('[name="jlhkg"]').val()) || 0,
-                        jlh_org: parseFloat($row.find('[name="jlh_org"]').val()) || 0,
-                        ttl_jam: parseFloat($row.find('[name="ttl_jam"]').val()) || 0,
-                        rp: parseFloat($row.find('[name="rp"]').val()) || 0,
-                        total_rp_org: parseFloat($row.find('[name="total_rp_org"]').val()) || 0,
+                        jlhkg: destroyFormatRupiah($row.find('[name="jlhkg"]').val()) || 0,
+                        jlh_org: destroyFormatRupiah($row.find('[name="jlh_org"]').val()) || 0,
+                        ttl_jam: destroyFormatRupiah($row.find('[name="ttl_jam"]').val()) || 0,
+                        rp: destroyFormatRupiah($row.find('[name="rp"]').val()) || 0,
+                        total_rp_org: destroyFormatRupiah($row.find('[name="total_rp_org"]').val()) || 0,
 
                         // Subsidies
-                        subsidi: parseFloat($row.find('[name="subsidi"]').val()) || 0,
+                        subsidi: destroyFormatRupiah($row.find('[name="subsidi"]').val()) || 0,
 
                         // Target
-                        kilo400: parseFloat($row.find('[name="kilo400"]').val()) || 0,
-                        kilo600: parseFloat($row.find('[name="kilo600"]').val()) || 0,
+                        kilo400: destroyFormatRupiah($row.find('[name="kilo400"]').val()) || 0,
+                        kilo600: destroyFormatRupiah($row.find('[name="kilo600"]').val()) || 0,
 
                         // Final values
-                        perjam: parseFloat($row.find('[name="perjam"]').val()) || 0,
-                        total_kg: parseFloat($row.find('[name="total_kg"]').val()) || 0,
+                        perjam: destroyFormatRupiah($row.find('[name="perjam"]').val()) || 0,
+                        total_kg: destroyFormatRupiah($row.find('[name="total_kg"]').val()) || 0,
                         
                         // Item details for each code
                         item_details: {}
@@ -1842,88 +1950,125 @@
                         tanggal_masuk_kerja: $row.find('td:eq(1) input').val(),
 
                         // Data pekerjaan untuk departemen lain
-                        SUAC: parseFloat($row.find('[name="SUAC"]').val()) || 0,
-                        CUU: parseFloat($row.find('[name="CUU"]').val()) || 0,
-                        AU: parseFloat($row.find('[name="AU"]').val()) || 0,
-                        'MKU/MDU': parseFloat($row.find('[name="MKU/MDU"]').val()) || 0,
-                        BU: parseFloat($row.find('[name="BU"]').val()) || 0,
-                        BBU: parseFloat($row.find('[name="BBU"]').val()) || 0,
-                        ATU: parseFloat($row.find('[name="ATU"]').val()) || 0,
-                        CBU: parseFloat($row.find('[name="CBU"]').val()) || 0,
-                        FU: parseFloat($row.find('[name="FU"]').val()) || 0,
-                        BUMS: parseFloat($row.find('[name="BUMS"]').val()) || 0,
-                        BUM: parseFloat($row.find('[name="BUM"]').val()) || 0,
-                        KUM: parseFloat($row.find('[name="KUM"]').val()) || 0,
-                        SUM: parseFloat($row.find('[name="SUM"]').val()) || 0,
-                        SK: parseFloat($row.find('[name="SK"]').val()) || 0,
-                        CKU: parseFloat($row.find('[name="CKU"]').val()) || 0,
-                        FKPH: parseFloat($row.find('[name="FKPH"]').val()) || 0,
-                        BK: parseFloat($row.find('[name="BK"]').val()) || 0,
-                        SKPL: parseFloat($row.find('[name="SKPL"]').val()) || 0,
-                        SKPB: parseFloat($row.find('[name="SKPB"]').val()) || 0,
-                        SKML: parseFloat($row.find('[name="SKML"]').val()) || 0,
-                        SKMB: parseFloat($row.find('[name="SKMB"]').val()) || 0,
-                        C1: parseFloat($row.find('[name="C1"]').val()) || 0,
-                        C2: parseFloat($row.find('[name="C2"]').val()) || 0,
-                        CUK: parseFloat($row.find('[name="CUK"]').val()) || 0,
-                        FK: parseFloat($row.find('[name="FK"]').val()) || 0,
-                        SSSCG: parseFloat($row.find('[name="SSSCG"]').val()) || 0,
-                        IKSSCG: parseFloat($row.find('[name="IKSSCG"]').val()) || 0,
-                        FSSCG: parseFloat($row.find('[name="FSSCG"]').val()) || 0,
-                        KSCG: parseFloat($row.find('[name="KSCG"]').val()) || 0,
-                        CSCG: parseFloat($row.find('[name="CSCG"]').val()) || 0,
-                        MPA: parseFloat($row.find('[name="MPA"]').val()) || 0,
-                        LBL: parseFloat($row.find('[name="LBL"]').val()) || 0,
-                        SA: parseFloat($row.find('[name="SA"]').val()) || 0,
-                        CU: parseFloat($row.find('[name="CU"]').val()) || 0,
-                        HK: parseFloat($row.find('[name="HK"]').val()) || 0,
+                        SUAC: destroyFormatRupiah($row.find('[name="SUAC"]').val()) || 0,
+                        CUU: destroyFormatRupiah($row.find('[name="CUU"]').val()) || 0,
+                        AU: destroyFormatRupiah($row.find('[name="AU"]').val()) || 0,
+                        'MKU/MDU': destroyFormatRupiah($row.find('[name="MKU/MDU"]').val()) || 0,
+                        BU: destroyFormatRupiah($row.find('[name="BU"]').val()) || 0,
+                        BBU: destroyFormatRupiah($row.find('[name="BBU"]').val()) || 0,
+                        ATU: destroyFormatRupiah($row.find('[name="ATU"]').val()) || 0,
+                        CBU: destroyFormatRupiah($row.find('[name="CBU"]').val()) || 0,
+                        FU: destroyFormatRupiah($row.find('[name="FU"]').val()) || 0,
+                        BUMS: destroyFormatRupiah($row.find('[name="BUMS"]').val()) || 0,
+                        BUM: destroyFormatRupiah($row.find('[name="BUM"]').val()) || 0,
+                        KUM: destroyFormatRupiah($row.find('[name="KUM"]').val()) || 0,
+                        SUM: destroyFormatRupiah($row.find('[name="SUM"]').val()) || 0,
+                        SK: destroyFormatRupiah($row.find('[name="SK"]').val()) || 0,
+                        CKU: destroyFormatRupiah($row.find('[name="CKU"]').val()) || 0,
+                        FKPH: destroyFormatRupiah($row.find('[name="FKPH"]').val()) || 0,
+                        BK: destroyFormatRupiah($row.find('[name="BK"]').val()) || 0,
+                        SKPL: destroyFormatRupiah($row.find('[name="SKPL"]').val()) || 0,
+                        SKPB: destroyFormatRupiah($row.find('[name="SKPB"]').val()) || 0,
+                        SKML: destroyFormatRupiah($row.find('[name="SKML"]').val()) || 0,
+                        SKMB: destroyFormatRupiah($row.find('[name="SKMB"]').val()) || 0,
+                        C1: destroyFormatRupiah($row.find('[name="C1"]').val()) || 0,
+                        C2: destroyFormatRupiah($row.find('[name="C2"]').val()) || 0,
+                        CUK: destroyFormatRupiah($row.find('[name="CUK"]').val()) || 0,
+                        FK: destroyFormatRupiah($row.find('[name="FK"]').val()) || 0,
+                        SSSCG: destroyFormatRupiah($row.find('[name="SSSCG"]').val()) || 0,
+                        IKSSCG: destroyFormatRupiah($row.find('[name="IKSSCG"]').val()) || 0,
+                        FSSCG: destroyFormatRupiah($row.find('[name="FSSCG"]').val()) || 0,
+                        KSCG: destroyFormatRupiah($row.find('[name="KSCG"]').val()) || 0,
+                        CSCG: destroyFormatRupiah($row.find('[name="CSCG"]').val()) || 0,
+                        MPA: destroyFormatRupiah($row.find('[name="MPA"]').val()) || 0,
+                        LBL: destroyFormatRupiah($row.find('[name="LBL"]').val()) || 0,
+                        SA: destroyFormatRupiah($row.find('[name="SA"]').val()) || 0,
+                        CU: destroyFormatRupiah($row.find('[name="CU"]').val()) || 0,
+                        HK: destroyFormatRupiah($row.find('[name="HK"]').val()) || 0,
                         
                         // Jam kerja dan kolom lainnya
-                        jam_kerja_udang: parseFloat($row.find('[name="jam_kerja_udang"]').val()) || 0,
-                        jam_kerja_kepah: parseFloat($row.find('[name="jam_kerja_kepah"]').val()) || 0,
-                        jam_kerja_kptg: parseFloat($row.find('[name="jam_kerja_kptg"]').val()) || 0,
-                        total_kg: parseFloat($row.find('[name="total_kg"]').val()) || 0,
-                        total_jam: parseFloat($row.find('[name="total_jam"]').val()) || 0,
-                        jumlah_org: parseFloat($row.find('[name="jumlah_org"]').val()) || 0,
-                        rupiah: parseFloat($row.find('[name="rupiah"]').val()) || 0,
-                        subsidi_rupiah: parseFloat($row.find('[name="subsidi_rupiah"]').val()) || 0,
-                        borongan_per_jam: parseFloat($row.find('[name="borongan_per_jam"]').val()) || 0,
-                        kg_per_jam_suac: parseFloat($row.find('[name="kg_per_jam_suac"]').val()) || 0,
-                        kg_per_jam_cuu: parseFloat($row.find('[name="kg_per_jam_cuu"]').val()) || 0,
-                        kg_per_jam_au: parseFloat($row.find('[name="kg_per_jam_au"]').val()) || 0,
-                        kg_per_jam_mku_mdu: parseFloat($row.find('[name="kg_per_jam_mku_mdu"]').val()) || 0,
-                        kg_per_jam_bu: parseFloat($row.find('[name="kg_per_jam_bu"]').val()) || 0,
-                        kg_per_jam_bbu: parseFloat($row.find('[name="kg_per_jam_bbu"]').val()) || 0,
-                        kg_per_jam_atu: parseFloat($row.find('[name="kg_per_jam_atu"]').val()) || 0,
-                        kg_per_jam_cbu: parseFloat($row.find('[name="kg_per_jam_cbu"]').val()) || 0,
-                        kg_per_jam_fu: parseFloat($row.find('[name="kg_per_jam_fu"]').val()) || 0,
-                        kg_per_jam_bums: parseFloat($row.find('[name="kg_per_jam_bums"]').val()) || 0,
-                        kg_per_jam_bum: parseFloat($row.find('[name="kg_per_jam_bum"]').val()) || 0,
-                        kg_per_jam_kum: parseFloat($row.find('[name="kg_per_jam_kum"]').val()) || 0,
-                        kg_per_jam_sum: parseFloat($row.find('[name="kg_per_jam_sum"]').val()) || 0,
-                        kg_per_jam_sk: parseFloat($row.find('[name="kg_per_jam_sk"]').val()) || 0,
-                        kg_per_jam_cku: parseFloat($row.find('[name="kg_per_jam_cku"]').val()) || 0,
-                        kg_per_jam_fkph: parseFloat($row.find('[name="kg_per_jam_fkph"]').val()) || 0,
-                        kg_per_jam_bk: parseFloat($row.find('[name="kg_per_jam_bk"]').val()) || 0,
-                        kg_per_jam_skpl: parseFloat($row.find('[name="kg_per_jam_skpl"]').val()) || 0,
-                        kg_per_jam_skpb: parseFloat($row.find('[name="kg_per_jam_skpb"]').val()) || 0,
-                        kg_per_jam_skml: parseFloat($row.find('[name="kg_per_jam_skml"]').val()) || 0,
-                        kg_per_jam_skmb: parseFloat($row.find('[name="kg_per_jam_skmb"]').val()) || 0,
-                        kg_per_jam_c1: parseFloat($row.find('[name="kg_per_jam_c1"]').val()) || 0,
-                        kg_per_jam_c2: parseFloat($row.find('[name="kg_per_jam_c2"]').val()) || 0,
-                        kg_per_jam_cuk: parseFloat($row.find('[name="kg_per_jam_cuk"]').val()) || 0,
-                        kg_per_jam_fk: parseFloat($row.find('[name="kg_per_jam_fk"]').val()) || 0,
-                        kg_per_jam_ssscg: parseFloat($row.find('[name="kg_per_jam_ssscg"]').val()) || 0,
-                        kg_per_jam_iksscg: parseFloat($row.find('[name="kg_per_jam_iksscg"]').val()) || 0,
-                        kg_per_jam_fsscg: parseFloat($row.find('[name="kg_per_jam_fsscg"]').val()) || 0,
-                        kg_per_jam_kscg: parseFloat($row.find('[name="kg_per_jam_kscg"]').val()) || 0,
-                        kg_per_jam_cscg: parseFloat($row.find('[name="kg_per_jam_cscg"]').val()) || 0,
-                        kg_per_jam_mpa: parseFloat($row.find('[name="kg_per_jam_mpa"]').val()) || 0,
-                        kg_per_jam_lbl: parseFloat($row.find('[name="kg_per_jam_lbl"]').val()) || 0,
-                        kg_per_jam_sa: parseFloat($row.find('[name="kg_per_jam_sa"]').val()) || 0,
-                        kg_per_jam_cu: parseFloat($row.find('[name="kg_per_jam_cu"]').val()) || 0,
-                        kg_per_jam_hk: parseFloat($row.find('[name="kg_per_jam_hk"]').val()) || 0,
-                        
+                        jam_kerja_udang: destroyFormatRupiah($row.find('[name="jam_kerja_udang"]').val()) || 0,
+                        jam_kerja_kepah: destroyFormatRupiah($row.find('[name="jam_kerja_kepah"]').val()) || 0,
+                        jam_kerja_kptg: destroyFormatRupiah($row.find('[name="jam_kerja_kptg"]').val()) || 0,
+                        total_kg: destroyFormatRupiah($row.find('[name="total_kg"]').val()) || 0,
+                        total_jam: destroyFormatRupiah($row.find('[name="total_jam"]').val()) || 0,
+                        total_borongan_jam: destroyFormatRupiah($row.find('[name="total_borongan_jam"]').val()) || 0,
+                        jumlah_org: destroyFormatRupiah($row.find('[name="jumlah_org"]').val()) || 0,
+                        rupiah: destroyFormatRupiah($row.find('[name="rupiah"]').val()) || 0,
+                        rupiah_org: destroyFormatRupiah($row.find('[name="rupiah_org"]').val()) || 0,
+                        subsidi_rupiah: destroyFormatRupiah($row.find('[name="subsidi_rupiah"]').val()) || 0,
+                        borongan_per_jam: destroyFormatRupiah($row.find('[name="borongan_per_jam"]').val()) || 0,
+                        jam_kerja_suac: destroyFormatRupiah($row.find('[name="jam_kerja_suac"]').val()) || 0,
+                        jam_kerja_cuu: destroyFormatRupiah($row.find('[name="jam_kerja_cuu"]').val()) || 0,
+                        jam_kerja_au: destroyFormatRupiah($row.find('[name="jam_kerja_au"]').val()) || 0,
+                        jam_kerja_mku_mdu: destroyFormatRupiah($row.find('[name="jam_kerja_mku_mdu"]').val()) || 0,
+                        jam_kerja_bu: destroyFormatRupiah($row.find('[name="jam_kerja_bu"]').val()) || 0,
+                        jam_kerja_bbu: destroyFormatRupiah($row.find('[name="jam_kerja_bbu"]').val()) || 0,
+                        jam_kerja_atu: destroyFormatRupiah($row.find('[name="jam_kerja_atu"]').val()) || 0,
+                        jam_kerja_cbu: destroyFormatRupiah($row.find('[name="jam_kerja_cbu"]').val()) || 0,
+                        jam_kerja_fu: destroyFormatRupiah($row.find('[name="jam_kerja_fu"]').val()) || 0,
+                        jam_kerja_bums: destroyFormatRupiah($row.find('[name="jam_kerja_bums"]').val()) || 0,
+                        jam_kerja_bum: destroyFormatRupiah($row.find('[name="jam_kerja_bum"]').val()) || 0,
+                        jam_kerja_kum: destroyFormatRupiah($row.find('[name="jam_kerja_kum"]').val()) || 0,
+                        jam_kerja_sum: destroyFormatRupiah($row.find('[name="jam_kerja_sum"]').val()) || 0,
+                        jam_kerja_sk: destroyFormatRupiah($row.find('[name="jam_kerja_sk"]').val()) || 0,
+                        jam_kerja_cku: destroyFormatRupiah($row.find('[name="jam_kerja_cku"]').val()) || 0,
+                        jam_kerja_fkph: destroyFormatRupiah($row.find('[name="jam_kerja_fkph"]').val()) || 0,
+                        jam_kerja_bk: destroyFormatRupiah($row.find('[name="jam_kerja_bk"]').val()) || 0,
+                        jam_kerja_skpl: destroyFormatRupiah($row.find('[name="jam_kerja_skpl"]').val()) || 0,
+                        jam_kerja_skpb: destroyFormatRupiah($row.find('[name="jam_kerja_skpb"]').val()) || 0,
+                        jam_kerja_skml: destroyFormatRupiah($row.find('[name="jam_kerja_skml"]').val()) || 0,
+                        jam_kerja_skmb: destroyFormatRupiah($row.find('[name="jam_kerja_skmb"]').val()) || 0,
+                        jam_kerja_c1: destroyFormatRupiah($row.find('[name="jam_kerja_c1"]').val()) || 0,
+                        jam_kerja_c2: destroyFormatRupiah($row.find('[name="jam_kerja_c2"]').val()) || 0,
+                        jam_kerja_cuk: destroyFormatRupiah($row.find('[name="jam_kerja_cuk"]').val()) || 0,
+                        jam_kerja_fk: destroyFormatRupiah($row.find('[name="jam_kerja_fk"]').val()) || 0,
+                        jam_kerja_ssscg: destroyFormatRupiah($row.find('[name="jam_kerja_ssscg"]').val()) || 0,
+                        jam_kerja_iksscg: destroyFormatRupiah($row.find('[name="jam_kerja_iksscg"]').val()) || 0,
+                        jam_kerja_fsscg: destroyFormatRupiah($row.find('[name="jam_kerja_fsscg"]').val()) || 0,
+                        jam_kerja_kscg: destroyFormatRupiah($row.find('[name="jam_kerja_kscg"]').val()) || 0,
+                        jam_kerja_cscg: destroyFormatRupiah($row.find('[name="jam_kerja_cscg"]').val()) || 0,
+                        jam_kerja_mpa: destroyFormatRupiah($row.find('[name="jam_kerja_mpa"]').val()) || 0,
+                        jam_kerja_lbl: destroyFormatRupiah($row.find('[name="jam_kerja_lbl"]').val()) || 0,
+                        jam_kerja_sa: destroyFormatRupiah($row.find('[name="jam_kerja_sa"]').val()) || 0,
+                        jam_kerja_cu: destroyFormatRupiah($row.find('[name="jam_kerja_cu"]').val()) || 0,
+                        jam_kerja_hk: destroyFormatRupiah($row.find('[name="jam_kerja_hk"]').val()) || 0,
+                        kg_per_jam_suac: destroyFormatRupiah($row.find('[name="kg_per_jam_suac"]').val()) || 0,
+                        kg_per_jam_cuu: destroyFormatRupiah($row.find('[name="kg_per_jam_cuu"]').val()) || 0,
+                        kg_per_jam_au: destroyFormatRupiah($row.find('[name="kg_per_jam_au"]').val()) || 0,
+                        kg_per_jam_mku_mdu: destroyFormatRupiah($row.find('[name="kg_per_jam_mku_mdu"]').val()) || 0,
+                        kg_per_jam_bu: destroyFormatRupiah($row.find('[name="kg_per_jam_bu"]').val()) || 0,
+                        kg_per_jam_bbu: destroyFormatRupiah($row.find('[name="kg_per_jam_bbu"]').val()) || 0,
+                        kg_per_jam_atu: destroyFormatRupiah($row.find('[name="kg_per_jam_atu"]').val()) || 0,
+                        kg_per_jam_cbu: destroyFormatRupiah($row.find('[name="kg_per_jam_cbu"]').val()) || 0,
+                        kg_per_jam_fu: destroyFormatRupiah($row.find('[name="kg_per_jam_fu"]').val()) || 0,
+                        kg_per_jam_bums: destroyFormatRupiah($row.find('[name="kg_per_jam_bums"]').val()) || 0,
+                        kg_per_jam_bum: destroyFormatRupiah($row.find('[name="kg_per_jam_bum"]').val()) || 0,
+                        kg_per_jam_kum: destroyFormatRupiah($row.find('[name="kg_per_jam_kum"]').val()) || 0,
+                        kg_per_jam_sum: destroyFormatRupiah($row.find('[name="kg_per_jam_sum"]').val()) || 0,
+                        kg_per_jam_sk: destroyFormatRupiah($row.find('[name="kg_per_jam_sk"]').val()) || 0,
+                        kg_per_jam_cku: destroyFormatRupiah($row.find('[name="kg_per_jam_cku"]').val()) || 0,
+                        kg_per_jam_fkph: destroyFormatRupiah($row.find('[name="kg_per_jam_fkph"]').val()) || 0,
+                        kg_per_jam_bk: destroyFormatRupiah($row.find('[name="kg_per_jam_bk"]').val()) || 0,
+                        kg_per_jam_skpl: destroyFormatRupiah($row.find('[name="kg_per_jam_skpl"]').val()) || 0,
+                        kg_per_jam_skpb: destroyFormatRupiah($row.find('[name="kg_per_jam_skpb"]').val()) || 0,
+                        kg_per_jam_skml: destroyFormatRupiah($row.find('[name="kg_per_jam_skml"]').val()) || 0,
+                        kg_per_jam_skmb: destroyFormatRupiah($row.find('[name="kg_per_jam_skmb"]').val()) || 0,
+                        kg_per_jam_c1: destroyFormatRupiah($row.find('[name="kg_per_jam_c1"]').val()) || 0,
+                        kg_per_jam_c2: destroyFormatRupiah($row.find('[name="kg_per_jam_c2"]').val()) || 0,
+                        kg_per_jam_cuk: destroyFormatRupiah($row.find('[name="kg_per_jam_cuk"]').val()) || 0,
+                        kg_per_jam_fk: destroyFormatRupiah($row.find('[name="kg_per_jam_fk"]').val()) || 0,
+                        kg_per_jam_ssscg: destroyFormatRupiah($row.find('[name="kg_per_jam_ssscg"]').val()) || 0,
+                        kg_per_jam_iksscg: destroyFormatRupiah($row.find('[name="kg_per_jam_iksscg"]').val()) || 0,
+                        kg_per_jam_fsscg: destroyFormatRupiah($row.find('[name="kg_per_jam_fsscg"]').val()) || 0,
+                        kg_per_jam_kscg: destroyFormatRupiah($row.find('[name="kg_per_jam_kscg"]').val()) || 0,
+                        kg_per_jam_cscg: destroyFormatRupiah($row.find('[name="kg_per_jam_cscg"]').val()) || 0,
+                        kg_per_jam_mpa: destroyFormatRupiah($row.find('[name="kg_per_jam_mpa"]').val()) || 0,
+                        kg_per_jam_lbl: destroyFormatRupiah($row.find('[name="kg_per_jam_lbl"]').val()) || 0,
+                        kg_per_jam_sa: destroyFormatRupiah($row.find('[name="kg_per_jam_sa"]').val()) || 0,
+                        kg_per_jam_cu: destroyFormatRupiah($row.find('[name="kg_per_jam_cu"]').val()) || 0,
+                        kg_per_jam_hk: destroyFormatRupiah($row.find('[name="kg_per_jam_hk"]').val()) || 0,
+ 
                         item_details: {}
                     };
 
@@ -2107,139 +2252,193 @@
 
         // CALCULATE PTS
         $(document).on('keypress', 'input[name^="sjb"], input[name^="sjl"], input[name^="mt"], input[name^="sel"], input[name^="slm"], input[name^="ssp"], input[name^="scm"], input[name^="ctt"], input[name^="cct"], input[name^="smh"], input[name^="dm"], input[name^="scf"], input[name^="lel"], input[name^="gc"], input[name^="sspk"]', function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+
+                    const input = $(this);
+                    const val = input.val().trim();
+                    const employeeId = input.closest('tr').data('employee-id');
+                    const hargaSatuan = parseFloat(input.data('harga')) || 0;
+                    const kodeBarang = input.attr('name');
+
+                    // Fungsi parsing yang lebih sederhana dan pasti bekerja
+                    function parseInput(inputStr) {
+                        // Ganti semua koma dengan titik
+                        const normalized = inputStr.replace(/,/g, '.');
+                        
+                        // Split hanya berdasarkan tanda + saja
+                        const parts = normalized.split('+').filter(Boolean);
+                        
+                        return parts.map(part => {
+                            // Parse angka, termasuk yang tanpa titik decimal
+                            const num = parseFloat(part);
+                            return isNaN(num) ? 0 : num; // Return 0 jika bukan angka
+                        });
+                    }
+
+                    const numbers = parseInput(val);
+                    const total = numbers.reduce((sum, n) => sum + n, 0);
+                    
+                    if (total === 0 && val !== '0') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Format salah',
+                            text: 'Gunakan format seperti: 0.9+0.7 atau 0,9+0,7',
+                        });
+                        return;
+                    }
+
+                    input.val(total.toFixed(2));
+
+                    // ✅ SIMPAN KE GLOBAL VARIABLE
+                    const $row = input.closest('tr');
+                    const key = `${employeeId}_${kodeBarang}`;
+                    
+                    employeeItemDetails[key] = {
+                        items: numbers.map(berat => ({ berat, harga: hargaSatuan })),
+                        totalBerat: total,
+                        totalHarga: total * hargaSatuan
+                    };
+
+                    // 🔁 Rehitung total jlhkg & rp
+                    let jlhkg = 0;
+                    let rp = 0;
+
+
+                    Object.keys(employeeItemDetails).forEach(keyLoop => {
+                        if (keyLoop.startsWith(`${employeeId}_`) && keyLoop !== `${employeeId}_main`) {
+                            const data = employeeItemDetails[keyLoop];
+                            jlhkg += data.totalBerat || 0;
+                            rp += data.totalHarga || 0;
+                        }
+                    });
+
+                    const mainKey = `${employeeId}_main`;
+                    employeeItemDetails[mainKey] = { jlhkg, rp };
+                    
+                    
+                    // Update input field jlhkg & rp
+                    $row.find(`input[name="jlhkg"]`).val(jlhkg.toFixed(2));
+                    $row.find(`input[name="rp"]`).val(greatFormatRupiah(rp) + ".00");
+                    
+
+                }
+
+        });
+
+        $(document).on('keypress', 'input[name^="jlh_org"]', function (e) {
             if (e.which === 13) {
                 e.preventDefault();
 
                 const input = $(this);
-                const val = input.val().trim();
-                const employeeId = input.closest('tr').data('employee-id');
-                const hargaSatuan = parseFloat(input.data('harga')) || 0;
-                const kodeBarang = input.attr('name');
+                const val = parseFloat(input.val().trim());
+                const $row = input.closest('tr');
+                const employeeId = $row.data('employee-id');
 
-                // Fungsi parsing yang lebih sederhana dan pasti bekerja
-                function parseInput(inputStr) {
-                    // Ganti semua koma dengan titik
-                    const normalized = inputStr.replace(/,/g, '.');
-                    
-                    // Split hanya berdasarkan tanda + saja
-                    const parts = normalized.split('+').filter(Boolean);
-                    
-                    return parts.map(part => {
-                        // Parse angka, termasuk yang tanpa titik decimal
-                        const num = parseFloat(part);
-                        return isNaN(num) ? 0 : num; // Return 0 jika bukan angka
-                    });
-                }
+                if (!isNaN(val) && val > 0) {
+                    const mainKey = `${employeeId}_main`;
+                    const rp = employeeItemDetails[mainKey]?.rp || 0;
+                    const total_rp_org = rp / val;
 
-                const numbers = parseInput(val);
-                const total = numbers.reduce((sum, n) => sum + n, 0);
-                
-                if (total === 0 && val !== '0') {
+                    $row.find(`input[name="total_rp_org"]`).val(greatFormatRupiah(total_rp_org) + ".00");
+                } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Format salah',
-                        text: 'Gunakan format seperti: 0.9+0.7 atau 0,9+0,7',
+                        title: 'Input tidak valid',
+                        text: 'Jumlah orang harus angka lebih dari 0',
                     });
-                    return;
                 }
-
-                input.val(total.toFixed(2));
-
-                // ✅ SIMPAN KE GLOBAL VARIABLE
-                const $row = input.closest('tr');
-                const key = `${employeeId}_${kodeBarang}`;
-                
-                employeeItemDetails[key] = {
-                    items: numbers.map(berat => ({ berat, harga: hargaSatuan })),
-                    totalBerat: total,
-                    totalHarga: total * hargaSatuan
-                };
-
-                // 🔁 Rehitung total jlhkg & rp
-                let jlhkg = 0;
-                let rp = 0;
-
-                Object.keys(employeeItemDetails).forEach(keyLoop => {
-                    if (keyLoop.startsWith(`${employeeId}_`) && keyLoop !== `${employeeId}_main`) {
-                        const data = employeeItemDetails[keyLoop];
-                        jlhkg += data.totalBerat || 0;
-                        rp += data.totalHarga || 0;
-                    }
-                });
-
-                const mainKey = `${employeeId}_main`;
-                employeeItemDetails[mainKey] = { jlhkg, rp };
-
-                // Update input field jlhkg & rp
-                $row.find(`input[name="jlhkg"]`).val(jlhkg.toFixed(2));
-                $row.find(`input[name="rp"]`).val(rp.toFixed());
             }
-
         });
-
 
         //CALCULATE CANNING
         $(document).on('keypress', 'input[name^="SUAC"], input[name^="CUU"], input[name^="AU"], input[name^="MKU/MDU"], input[name^="BU"], input[name^="BBU"], input[name^="ATU"], input[name^="CBU"], input[name^="FU"], input[name^="BUMS"], input[name^="BUM"], input[name^="KUM"], input[name^="SUM"], input[name^="SK"], input[name^="CKU"], input[name^="FKPH"], input[name^="BK"], input[name^="SKPL"], input[name^="SKPB"], input[name^="SKML"], input[name^="SKMB"], input[name^="C1"], input[name^="C2"], input[name^="CUK"], input[name^="FK"], input[name^="SSSCG"], input[name^="IKSSCG"], input[name^="FSSCG"], input[name^="KSCG"], input[name^="CSCG"], input[name^="MPA"], input[name^="LBL"], input[name^="SA"], input[name^="CU"], input[name^="HK"]', function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+
+                    const input = $(this);
+                    const val = input.val().trim();
+                    const employeeId = input.closest('tr').data('employee-id');
+                    const hargaSatuan = parseFloat(input.data('harga')) || 0;
+                    const kodeBarang = input.attr('name');
+
+                    function parseInput(inputStr) {
+                        const normalized = inputStr.replace(/,/g, '.');
+                        const parts = normalized.split('+').filter(Boolean);
+                        return parts.map(part => {
+                            const num = parseFloat(part);
+                            return isNaN(num) ? 0 : num;
+                        });
+                    }
+
+                    const numbers = parseInput(val);
+                    const total = numbers.reduce((sum, n) => sum + n, 0);
+
+                    if (total === 0 && val !== '0') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Format salah',
+                            text: 'Gunakan format seperti: 0.9+0.7 atau 0,9+0,7',
+                        });
+                        return;
+                    }
+
+                    input.val(total.toFixed(2));
+
+                    const $row = input.closest('tr');
+                    const key = `${employeeId}_${kodeBarang}`;
+
+                    employeeItemDetails[key] = {
+                        items: numbers.map(berat => ({ berat, harga: hargaSatuan })),
+                        totalBerat: total,
+                        totalHarga: total * hargaSatuan
+                    };
+
+                    // Rehitung total total_kg & rp
+                    let total_kg = 0;
+                    let rupiah = 0;
+
+                    Object.keys(employeeItemDetails).forEach(keyLoop => {
+                        if (keyLoop.startsWith(`${employeeId}_`) && keyLoop !== `${employeeId}_main`) {
+                            const data = employeeItemDetails[keyLoop];
+                            total_kg += data.totalBerat || 0;
+                            rupiah += data.totalHarga || 0;
+                        }
+                    });
+
+                    const mainKey = `${employeeId}_main`;
+                    employeeItemDetails[mainKey] = { total_kg, rupiah };
+
+                    $row.find(`input[name="total_kg"]`).val(total_kg.toFixed(2));
+                    $row.find(`input[name="rupiah"]`).val(rupiah.toFixed());
+                }
+        });
+
+        $(document).on('keypress', 'input[name^="total_jam"]', function (e) {
             if (e.which === 13) {
                 e.preventDefault();
 
                 const input = $(this);
-                const val = input.val().trim();
-                const employeeId = input.closest('tr').data('employee-id');
-                const hargaSatuan = parseFloat(input.data('harga')) || 0;
-                const kodeBarang = input.attr('name');
+                const val = parseFloat(input.val().trim());
+                const $row = input.closest('tr');
+                const employeeId = $row.data('employee-id');
 
-                function parseInput(inputStr) {
-                    const normalized = inputStr.replace(/,/g, '.');
-                    const parts = normalized.split('+').filter(Boolean);
-                    return parts.map(part => {
-                        const num = parseFloat(part);
-                        return isNaN(num) ? 0 : num;
-                    });
-                }
+                if (!isNaN(val) && val > 0) {
+                    const mainKey = `${employeeId}_main`;
+                    const rp = 10500;
+                    const total_borongan = val * rp;
 
-                const numbers = parseInput(val);
-                const total = numbers.reduce((sum, n) => sum + n, 0);
-
-                if (total === 0 && val !== '0') {
+                    $row.find(`input[name="total_borongan_jam"]`).val(greatFormatRupiah(total_borongan) + ".00");
+                } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Format salah',
-                        text: 'Gunakan format seperti: 0.9+0.7 atau 0,9+0,7',
+                        title: 'Input tidak valid',
+                        text: 'Jumlah orang harus angka lebih dari 0',
                     });
-                    return;
                 }
-
-                input.val(total.toFixed(2));
-
-                const $row = input.closest('tr');
-                const key = `${employeeId}_${kodeBarang}`;
-
-                employeeItemDetails[key] = {
-                    items: numbers.map(berat => ({ berat, harga: hargaSatuan })),
-                    totalBerat: total,
-                    totalHarga: total * hargaSatuan
-                };
-
-                // Rehitung total total_kg & rp
-                let total_kg = 0;
-                let rupiah = 0;
-
-                Object.keys(employeeItemDetails).forEach(keyLoop => {
-                    if (keyLoop.startsWith(`${employeeId}_`) && keyLoop !== `${employeeId}_main`) {
-                        const data = employeeItemDetails[keyLoop];
-                        total_kg += data.totalBerat || 0;
-                        rupiah += data.totalHarga || 0;
-                    }
-                });
-
-                const mainKey = `${employeeId}_main`;
-                employeeItemDetails[mainKey] = { total_kg, rupiah };
-
-                $row.find(`input[name="total_kg"]`).val(total_kg.toFixed(2));
-                $row.find(`input[name="rupiah"]`).val(rupiah.toFixed());
             }
         });
+
 
 
         // Handle delete harga

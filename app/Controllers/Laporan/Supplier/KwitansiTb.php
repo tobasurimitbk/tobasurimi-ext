@@ -88,7 +88,7 @@ class KwitansiTb extends BaseController
                         "id"            => encrypt($data->id),
                         "name"          => $data->name,
                         "no_kwitansi_hash" => encrypt($noKwitansi),
-                        "total"         => $kwitansiTB['total'] == 0 ? '-' : number_format($kwitansiTB['total']),
+                        "total"         => $kwitansiTB['total'] == 0 ? '-' : number_format($kwitansiTB['total'], 2),
                         "no_kwitansi"   => $kwitansiTB['total'] == 0 ? '-' : $noKwitansi,
                         "tanggal"       => $kwitansiTB['total'] == 0 ? '-' : $year . '-' . $month . '-' . date("t", strtotime("$year-$month-01")),
                         "is_print"      => $kwitansiTB['total'] == 0 ? '0' : '1',
@@ -101,7 +101,7 @@ class KwitansiTb extends BaseController
                         "id"            => encrypt($data->id),
                         "name"          => $data->name,
                         "no_kwitansi_hash" => encrypt($noKwitansi),
-                        "total"         => $kwitansiTB['total'] == 0 ? '-' : number_format($kwitansiTB['total']),
+                        "total"         => $kwitansiTB['total'] == 0 ? '-' : number_format($kwitansiTB['total'], 2),
                         "no_kwitansi"   => $kwitansiTB['total'] == 0 ? '-' : $noKwitansi,
                         "tanggal"       => $kwitansiTB['total'] == 0 ? '-' : $year . '-' . $month . '-' . date("t", strtotime("$year-$month-01")),
                         "is_print"      => $kwitansiTB['total'] == 0 ? '0' : '1',
@@ -113,7 +113,7 @@ class KwitansiTb extends BaseController
                     "id"            => encrypt($data->id),
                     "name"          => $data->name,
                     "no_kwitansi_hash" => encrypt($noKwitansi),
-                    "total"         => $kwitansiTB['total'] == 0 ? '-' : number_format($kwitansiTB['total']),
+                    "total"         => $kwitansiTB['total'] == 0 ? '-' : number_format($kwitansiTB['total'], 2),
                     "no_kwitansi"   => $kwitansiTB['total'] == 0 ? '-' : $noKwitansi,
                     "tanggal"       => $kwitansiTB['total'] == 0 ? '-' : $year . '-' . $month . '-' . date("t", strtotime("$year-$month-01")),
                     "is_print"      => $kwitansiTB['total'] == 0 ? '0' : '1',
@@ -154,6 +154,38 @@ class KwitansiTb extends BaseController
             $month
         );
 
+        $kwitansiTBMerged = array();
+        $namaBarang = "";
+        $kodeSatuan = "";
+        $qtyTotal = 0;
+        $hargaBulananTotal = 0;
+        $pphTotal = 0;
+        $hargaBulananPphTotal = 0;
+
+        foreach ($kwitansiTB['all'] as $k) {
+            $namaBarang = $k['nama_barang'];
+            $kodeSatuan = $k['kode_satuan'];
+
+            $qtyTotal += $k['qty'];
+            $hargaBulananTotal += $k['harga_bulanan'];
+            $pphTotal += $k['pph'];
+            $hargaBulananPphTotal += $k['harga_bulanan_pph'];
+        }
+
+        $kwitansiTBMerged[] = [
+            'nama_barang' => $namaBarang,
+            'kode_satuan' => $kodeSatuan,
+            'qty'          => $qtyTotal,
+            'harga_bulanan' =>  $hargaBulananTotal,
+            'pph'   => $pphTotal,
+            'harga_bulanan_pph' => $hargaBulananPphTotal
+        ];
+
+        $kwitansiTBFinal = [
+            'all' => $kwitansiTBMerged,
+            'supplier' => $kwitansiTB['supplier'],
+            'total' => $kwitansiTB['total']
+        ];
 
         // dd($kwitansiTB);
 
@@ -165,7 +197,7 @@ class KwitansiTb extends BaseController
             'tanggal' => $tanggal,
             'noKwitansi' => $noKwitansi,
             'company' => $company,
-            'kwitansis' => $kwitansiTB,
+            'kwitansis' => $kwitansiTBFinal,
             'provinsi' => $provinsiModel->where('id', $company['province_id'])->first()
         ];
 

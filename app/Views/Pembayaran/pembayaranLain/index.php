@@ -400,6 +400,30 @@
             }
         }
     });
+    $(".dateStart").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
+    $(".dateEnd").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+    $(".dateStart, .dateEnd").change(function() {
+        table.ajax.reload();
+    })
+
+    $('.icon-dateStart').click(function() {
+        $(".dateStart").focus();
+    });
+
+    $('.icon-dateEnd').click(function() {
+        $(".dateEnd").focus();
+    });
 
     $(document).ready(function() {
         var validator = $(".create-form").validate({

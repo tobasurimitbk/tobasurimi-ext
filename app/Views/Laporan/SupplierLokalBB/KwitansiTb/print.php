@@ -187,7 +187,7 @@
                 <tr>
                     <td style="vertical-align: top;">UNTUK PEMBAYARAN <br> (FOR PAYMENT)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;">PEMBELIAN <?= $kwitansi['nama_barang'] . " " . $kwitansi['spesifikasi'] ?> SEBANYAK <?= number_format($kwitansi['qty'], 2) ?> KG DARI <?= $kwitansis['supplier']['name'] ?></td>
+                    <td style="vertical-align: top;">PEMBELIAN <?= $kwitansi['nama_barang'] ?> SEBANYAK <?= number_format($kwitansi['qty'], 2) ?> KG DARI <?= $kwitansis['supplier']['name'] ?></td>
                 </tr>
             </table>
 
@@ -249,7 +249,7 @@
                     <tr>
                         <td style="vertical-align: top;">UNTUK PEMBAYARAN <br> (FOR PAYMENT)</td>
                         <td style="vertical-align: top;">: </td>
-                        <td style="vertical-align: top;">PEMBELIAN <?= $kwitansi['nama_barang'] . " " . $kwitansi['spesifikasi'] ?> SEBANYAK <?= number_format($kwitansi['qty'], 2) ?> KG DARI <?= $kwitansis['supplier']['name'] ?></td>
+                        <td style="vertical-align: top;">PEMBELIAN <?= $kwitansi['nama_barang'] ?> SEBANYAK <?= number_format($kwitansi['qty'], 2) ?> KG DARI <?= $kwitansis['supplier']['name'] ?></td>
                     </tr>
                 </table>
 
