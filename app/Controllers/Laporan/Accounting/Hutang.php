@@ -384,4 +384,133 @@ class Hutang extends BaseController
         $writer->save('php://output');
         exit;
     }
+
+    public function printHutangDetail()
+    {
+        $filterRaw = $this->request->getGet("filter");
+        $filter = ($filterRaw) ? array_filter(explode(',', $filterRaw)) : [];
+        $startDate = $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "";
+        $endDate = $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "";
+
+        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+            $companyId = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $companyId = [15];
+        } else {
+            $companyId = [16];
+        }
+
+        $condition = [
+            "suppliers.deletedAt" => NULL
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "filter"        => $filter,
+            "divisi"        => $this->request->getGet("divisi"),
+            "type_barang"   => $this->request->getGet("type_barang"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "startdate"     => $startDate,
+            "lastdate"      => $endDate,
+        ];
+
+        $res = $this->supplierModel->getSupplierHutangList($condition, $addCondition, null, null, $companyId);
+
+        $data = [
+            'data' => $res['data'],
+            'title' => 'Laporan Hutang Supplier',
+            'date_range' => ($startDate && $endDate) ? date("d/m/Y", strtotime($startDate)) . " - " . date("d/m/Y", strtotime($endDate)) : "Semua Periode"
+        ];
+
+        // Render view to HTML
+        $html = view('Laporan/LaporanHutang/print_pdf', $data);
+
+        // Dompdf setup
+        $options = new \Dompdf\Options();
+        $options->set('isRemoteEnabled', true);
+
+        $dompdf = new \Dompdf\Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        $dompdf->stream('laporan-hutang.pdf', ["Attachment" => false]);
+        exit;
+    }
+
+    public function exportExcelHutangDetail()
+    {
+        $id = $this->request->getGet("supplierId");
+        $rawFilter = $this->request->getGet("filter") == "all" ? "" : $this->request->getGet("filter");
+
+        $filter = $rawFilter ? explode(',', $rawFilter) : [];
+
+        $dateStart = $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "";
+        $dateEnd = $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "";
+
+        $condition = [
+            "suppliers.id" => $id,
+            "suppliers.deletedAt" => NULL
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "filter"        => $filter,
+            "divisi"        => $this->request->getGet("filter_divisi") == "all" ? "" : $this->request->getGet("filter_divisi"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "dateStart"     => $dateStart,
+            "dateEnd"       => $dateEnd,
+        ];
+
+        $checkSupplier = $this->supplierModel->find($id);
+
+        if ($checkSupplier['type'] == "BAHAN PENOLONG") {
+            $res = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else if ($checkSupplier['type'] == "BAHAN BAKU") {
+            $res = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else {
+            $res = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+            if (!$res) {
+                $res = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+            }
+        }
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Detail Hutang Supplier');
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Tanggal Invoice');
+        $sheet->setCellValue('C1', 'No Invoice');
+        $sheet->setCellValue('D1', 'No Penerimaan Barang');
+        $sheet->setCellValue('E1', 'Divisi');
+        $sheet->setCellValue('F1', 'Nominal (Rp)');
+        $sheet->setCellValue('G1', 'Remaining (Rp)');
+
+        $no = 1;
+        $row = 2;
+
+        foreach ($res['data'] as $item) {
+            $remaining = $item->total - $item->remaining;
+
+            $sheet->setCellValue("A$row", $no++);
+            $sheet->setCellValue("B$row", $item->tanggal_invoice);
+            $sheet->setCellValue("C$row", $item->no_invoice);
+            $sheet->setCellValue("D$row", $item->no_penerimaan_barang);
+            $sheet->setCellValue("E$row", $item->divisi);
+            $sheet->setCellValue("F$row", $item->total);
+            $sheet->setCellValue("G$row", $remaining);
+            $row++;
+        }
+
+        $filename = 'Detail-Hutang-Supplier.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment;filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
 }

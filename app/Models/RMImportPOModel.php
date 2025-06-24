@@ -413,7 +413,12 @@ class RMImportPOModel extends Model
         }
 
         $totalFilteredData = $poDataQry->countAllResults(false);
-        $data = $poDataQry->findAll($limit, $offset);
+
+        if ($limit != null && $offset != null) {
+            $data = $poDataQry->findAll($limit, $offset);
+        } else {
+            $data = $poDataQry->findAll();
+        }
 
         return [
             'data'              => $data,

@@ -5,6 +5,15 @@
 <section class="section">
     <div class="section-header">
         <h1>Laporan Detail Hutang</h1>
+        <?php if (can('Laporan', 'Accounting', 'p')) : ?>
+            <button style="right: 10px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <!-- <li><button class="dropdown-item" onclick="exportToPDF()">PDF</button></li> -->
+                <li><button class="dropdown-item" onclick="exportToExcel()">EXCEL</button></li>
+            </ul>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -178,6 +187,29 @@
         var formattedDate = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
 
         return formattedDate;
+    }
+
+    function getFilterQuery() {
+        return {
+            search: $(".search").val(),
+            filter: <?php echo json_encode($filter); ?>,
+            filter_divisi: <?php echo json_encode($filterDivisi); ?>,
+            supplierId: <?= json_encode($id) ?>,
+            dateStart: $(".dateStart").val(),
+            dateEnd: $(".dateEnd").val(),
+            sort: sort,
+            sortType: sortType
+        };
+    }
+
+    function exportToPDF() {
+        const params = new URLSearchParams(getFilterQuery()).toString();
+        window.open(`<?= base_url("laporan-accounting/hutang/detail/print") ?>?${params}`, "_blank");
+    }
+
+    function exportToExcel() {
+        const params = new URLSearchParams(getFilterQuery()).toString();
+        window.open(`<?= base_url("laporan-accounting/hutang/detail/export-excel") ?>?${params}`, "_blank");
     }
 </script>
 <?= $this->endSection(); ?>
