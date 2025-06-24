@@ -156,9 +156,13 @@ class OtherPayment extends BaseController
                 'akun_selisih'         => $akunSelisih,
                 'keterangan'           => $detail['keterangan'] ?? null
             ];
+            $tanggal = $detailData['tanggal_pembayaran'];
 
             $this->otherPaymentDetailModel->insert($detailData);
         }
+
+        // Update Tanggal
+        $this->otherPaymentModel->update($parentId, ['tanggal' => $tanggal]);
 
         return $this->response->setJSON([
             'token' => csrf_hash(),
@@ -236,6 +240,8 @@ class OtherPayment extends BaseController
                 // Insert
                 $this->otherPaymentDetailModel->insert($detailData);
             }
+
+            $tanggal = $detailData['tanggal_pembayaran'];
         }
 
         // 3. Delete removed details
@@ -243,6 +249,8 @@ class OtherPayment extends BaseController
         if (!empty($detailsToDelete)) {
             $this->otherPaymentDetailModel->whereIn('id', $detailsToDelete)->delete();
         }
+
+        $this->otherPaymentModel->update($parentId, ['tanggal' => $tanggal]);
 
         return $this->response->setJSON([
             'token' => csrf_hash(),
