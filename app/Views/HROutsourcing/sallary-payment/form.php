@@ -736,22 +736,22 @@
 
 
                             <!-- Summary columns -->
-                            <td><input type="number" class="form-control form-control-sm" name="jlhkg" style="min-width: 100px;" value="${payment.jlhkg || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="jlh_org" style="min-width: 100px;" value="${payment.jlh_org || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="ttl_jam" style="min-width: 100px;" value="${payment.ttl_jam || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="rp" style="min-width: 100px;" value="${payment.rp || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="total_rp_org" style="min-width: 100px;" value="${payment.total_rp_org || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="jlhkg" style="min-width: 100px;" value="${payment.jlhkg || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="jlh_org" style="min-width: 100px;" value="${payment.jlh_org || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="ttl_jam" style="min-width: 100px;" value="${payment.ttl_jam || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="rp" onkeyup="this.value = greatFormatRupiah(this.value)" style="min-width: 100px;" value="${payment.rp || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="total_rp_org" onkeyup="this.value = greatFormatRupiah(this.value)" style="min-width: 100px;" value="${payment.total_rp_org || ''}"></td>
                             
                             <!-- Subsidies -->
-                            <td><input type="number" class="form-control form-control-sm" name="subsidi" style="min-width: 100px;" value="${payment.subsidi || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="subsidi" onkeyup="this.value = greatFormatRupiah(this.value)" style="min-width: 100px;" value="${payment.subsidi || ''}"></td>
                             
                             <!-- Target -->
-                            <td><input type="number" class="form-control form-control-sm" name="kilo400" style="min-width: 100px;" value="${payment.kilo400 || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="kilo600" style="min-width: 100px;" value="${payment.kilo600 || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="kilo400" style="min-width: 100px;" value="${payment.kilo400 || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="kilo600" style="min-width: 100px;" value="${payment.kilo600 || ''}"></td>
                             
                             <!-- Final values -->
-                            <td><input type="number" class="form-control form-control-sm" name="perjam" style="min-width: 100px;" value="${payment.perjam || ''}"></td>
-                            <td><input type="number" class="form-control form-control-sm" name="total_kg" style="min-width: 100px;" value="${payment.total_kg || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="perjam" style="min-width: 100px;" value="${payment.perjam || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="total_kg" style="min-width: 100px;" value="${payment.total_kg || ''}"></td>
                         </tr>
                     `;
                     } else {
@@ -1309,22 +1309,22 @@
                     
                     
                     <!-- Summary columns -->
-                    <td><input type="number" class="form-control form-control-sm" name="jlhkg" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm" name="jlh_org" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm" name="ttl_jam" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm" name="rp" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm" name="total_rp_org" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="jlhkg" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="jlh_org" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="ttl_jam" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" onkeyup="this.value = greatFormatRupiah(this.value)" name="rp" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" onkeyup="this.value = greatFormatRupiah(this.value)" name="total_rp_org" style="min-width: 100px;"></td>
                     
                     <!-- Subsidies -->
-                    <td><input type="number" class="form-control form-control-sm" name="subsidi" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" onkeyup="this.value = greatFormatRupiah(this.value)" name="subsidi" style="min-width: 100px;"></td>
                             
                     <!-- Target -->
-                    <td><input type="number" class="form-control form-control-sm" name="kilo400" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm" name="kilo600" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="kilo400" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="kilo600" style="min-width: 100px;"></td>
                             
                     <!-- Final values -->
-                    <td><input type="number" class="form-control form-control-sm" name="perjam" style="min-width: 100px;"></td>
-                    <td><input type="number" class="form-control form-control-sm" name="total_kg" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="perjam" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="total_kg" style="min-width: 100px;"></td>
                 </tr>
             `;
             } else {
@@ -1756,50 +1756,50 @@
                         tanggal_masuk_kerja: $row.find('td:eq(1) input').val(),
 
                         // Job data columns (26)
-                        sjb: parseFloat($row.find('[name="sjb"]').val()) || 0,
-                        sjl: parseFloat($row.find('[name="sjl"]').val()) || 0,
-                        mt: parseFloat($row.find('[name="mt"]').val()) || 0,
-                        sel: parseFloat($row.find('[name="sel"]').val()) || 0,
-                        slm: parseFloat($row.find('[name="slm"]').val()) || 0,
-                        ssp: parseFloat($row.find('[name="ssp"]').val()) || 0,
-                        scm: parseFloat($row.find('[name="scm"]').val()) || 0,
-                        ctt: parseFloat($row.find('[name="ctt"]').val()) || 0,
-                        cct: parseFloat($row.find('[name="cct"]').val()) || 0,
-                        smh: parseFloat($row.find('[name="smh"]').val()) || 0,
-                        dm: parseFloat($row.find('[name="dm"]').val()) || 0,
-                        scf: parseFloat($row.find('[name="scf"]').val()) || 0,
-                        lel: parseFloat($row.find('[name="lel"]').val()) || 0,
-                        gc: parseFloat($row.find('[name="gc"]').val()) || 0,
-                        sspk: parseFloat($row.find('[name="sspk"]').val()) || 0,
-                        kjb: parseFloat($row.find('[name="kjb"]').val()) || 0,
-                        kjl: parseFloat($row.find('[name="kjl"]').val()) || 0,
-                        klp: parseFloat($row.find('[name="klp"]').val()) || 0,
-                        ksp: parseFloat($row.find('[name="ksp"]').val()) || 0,
-                        kcl: parseFloat($row.find('[name="kcl"]').val()) || 0,
-                        kcm: parseFloat($row.find('[name="kcm"]').val()) || 0,
-                        klg: parseFloat($row.find('[name="klg"]').val()) || 0,
-                        lm: parseFloat($row.find('[name="lm"]').val()) || 0,
-                        kel: parseFloat($row.find('[name="kel"]').val()) || 0,
-                        kcf: parseFloat($row.find('[name="kcf"]').val()) || 0,
-                        cu: parseFloat($row.find('[name="cu"]').val()) || 0,
+                        sjb: destroyFormatRupiah($row.find('[name="sjb"]').val()) || 0,
+                        sjl: destroyFormatRupiah($row.find('[name="sjl"]').val()) || 0,
+                        mt: destroyFormatRupiah($row.find('[name="mt"]').val()) || 0,
+                        sel: destroyFormatRupiah($row.find('[name="sel"]').val()) || 0,
+                        slm: destroyFormatRupiah($row.find('[name="slm"]').val()) || 0,
+                        ssp: destroyFormatRupiah($row.find('[name="ssp"]').val()) || 0,
+                        scm: destroyFormatRupiah($row.find('[name="scm"]').val()) || 0,
+                        ctt: destroyFormatRupiah($row.find('[name="ctt"]').val()) || 0,
+                        cct: destroyFormatRupiah($row.find('[name="cct"]').val()) || 0,
+                        smh: destroyFormatRupiah($row.find('[name="smh"]').val()) || 0,
+                        dm: destroyFormatRupiah($row.find('[name="dm"]').val()) || 0,
+                        scf: destroyFormatRupiah($row.find('[name="scf"]').val()) || 0,
+                        lel: destroyFormatRupiah($row.find('[name="lel"]').val()) || 0,
+                        gc: destroyFormatRupiah($row.find('[name="gc"]').val()) || 0,
+                        sspk: destroyFormatRupiah($row.find('[name="sspk"]').val()) || 0,
+                        kjb: destroyFormatRupiah($row.find('[name="kjb"]').val()) || 0,
+                        kjl: destroyFormatRupiah($row.find('[name="kjl"]').val()) || 0,
+                        klp: destroyFormatRupiah($row.find('[name="klp"]').val()) || 0,
+                        ksp: destroyFormatRupiah($row.find('[name="ksp"]').val()) || 0,
+                        kcl: destroyFormatRupiah($row.find('[name="kcl"]').val()) || 0,
+                        kcm: destroyFormatRupiah($row.find('[name="kcm"]').val()) || 0,
+                        klg: destroyFormatRupiah($row.find('[name="klg"]').val()) || 0,
+                        lm: destroyFormatRupiah($row.find('[name="lm"]').val()) || 0,
+                        kel: destroyFormatRupiah($row.find('[name="kel"]').val()) || 0,
+                        kcf: destroyFormatRupiah($row.find('[name="kcf"]').val()) || 0,
+                        cu: destroyFormatRupiah($row.find('[name="cu"]').val()) || 0,
 
                         // Summary columns
-                        jlhkg: parseFloat($row.find('[name="jlhkg"]').val()) || 0,
-                        jlh_org: parseFloat($row.find('[name="jlh_org"]').val()) || 0,
-                        ttl_jam: parseFloat($row.find('[name="ttl_jam"]').val()) || 0,
-                        rp: parseFloat($row.find('[name="rp"]').val()) || 0,
-                        total_rp_org: parseFloat($row.find('[name="total_rp_org"]').val()) || 0,
+                        jlhkg: destroyFormatRupiah($row.find('[name="jlhkg"]').val()) || 0,
+                        jlh_org: destroyFormatRupiah($row.find('[name="jlh_org"]').val()) || 0,
+                        ttl_jam: destroyFormatRupiah($row.find('[name="ttl_jam"]').val()) || 0,
+                        rp: destroyFormatRupiah($row.find('[name="rp"]').val()) || 0,
+                        total_rp_org: destroyFormatRupiah($row.find('[name="total_rp_org"]').val()) || 0,
 
                         // Subsidies
-                        subsidi: parseFloat($row.find('[name="subsidi"]').val()) || 0,
+                        subsidi: destroyFormatRupiah($row.find('[name="subsidi"]').val()) || 0,
 
                         // Target
-                        kilo400: parseFloat($row.find('[name="kilo400"]').val()) || 0,
-                        kilo600: parseFloat($row.find('[name="kilo600"]').val()) || 0,
+                        kilo400: destroyFormatRupiah($row.find('[name="kilo400"]').val()) || 0,
+                        kilo600: destroyFormatRupiah($row.find('[name="kilo600"]').val()) || 0,
 
                         // Final values
-                        perjam: parseFloat($row.find('[name="perjam"]').val()) || 0,
-                        total_kg: parseFloat($row.find('[name="total_kg"]').val()) || 0,
+                        perjam: destroyFormatRupiah($row.find('[name="perjam"]').val()) || 0,
+                        total_kg: destroyFormatRupiah($row.find('[name="total_kg"]').val()) || 0,
                         
                         // Item details for each code
                         item_details: {}
@@ -1842,87 +1842,87 @@
                         tanggal_masuk_kerja: $row.find('td:eq(1) input').val(),
 
                         // Data pekerjaan untuk departemen lain
-                        SUAC: parseFloat($row.find('[name="SUAC"]').val()) || 0,
-                        CUU: parseFloat($row.find('[name="CUU"]').val()) || 0,
-                        AU: parseFloat($row.find('[name="AU"]').val()) || 0,
-                        'MKU/MDU': parseFloat($row.find('[name="MKU/MDU"]').val()) || 0,
-                        BU: parseFloat($row.find('[name="BU"]').val()) || 0,
-                        BBU: parseFloat($row.find('[name="BBU"]').val()) || 0,
-                        ATU: parseFloat($row.find('[name="ATU"]').val()) || 0,
-                        CBU: parseFloat($row.find('[name="CBU"]').val()) || 0,
-                        FU: parseFloat($row.find('[name="FU"]').val()) || 0,
-                        BUMS: parseFloat($row.find('[name="BUMS"]').val()) || 0,
-                        BUM: parseFloat($row.find('[name="BUM"]').val()) || 0,
-                        KUM: parseFloat($row.find('[name="KUM"]').val()) || 0,
-                        SUM: parseFloat($row.find('[name="SUM"]').val()) || 0,
-                        SK: parseFloat($row.find('[name="SK"]').val()) || 0,
-                        CKU: parseFloat($row.find('[name="CKU"]').val()) || 0,
-                        FKPH: parseFloat($row.find('[name="FKPH"]').val()) || 0,
-                        BK: parseFloat($row.find('[name="BK"]').val()) || 0,
-                        SKPL: parseFloat($row.find('[name="SKPL"]').val()) || 0,
-                        SKPB: parseFloat($row.find('[name="SKPB"]').val()) || 0,
-                        SKML: parseFloat($row.find('[name="SKML"]').val()) || 0,
-                        SKMB: parseFloat($row.find('[name="SKMB"]').val()) || 0,
-                        C1: parseFloat($row.find('[name="C1"]').val()) || 0,
-                        C2: parseFloat($row.find('[name="C2"]').val()) || 0,
-                        CUK: parseFloat($row.find('[name="CUK"]').val()) || 0,
-                        FK: parseFloat($row.find('[name="FK"]').val()) || 0,
-                        SSSCG: parseFloat($row.find('[name="SSSCG"]').val()) || 0,
-                        IKSSCG: parseFloat($row.find('[name="IKSSCG"]').val()) || 0,
-                        FSSCG: parseFloat($row.find('[name="FSSCG"]').val()) || 0,
-                        KSCG: parseFloat($row.find('[name="KSCG"]').val()) || 0,
-                        CSCG: parseFloat($row.find('[name="CSCG"]').val()) || 0,
-                        MPA: parseFloat($row.find('[name="MPA"]').val()) || 0,
-                        LBL: parseFloat($row.find('[name="LBL"]').val()) || 0,
-                        SA: parseFloat($row.find('[name="SA"]').val()) || 0,
-                        CU: parseFloat($row.find('[name="CU"]').val()) || 0,
-                        HK: parseFloat($row.find('[name="HK"]').val()) || 0,
+                        SUAC: destroyFormatRupiah($row.find('[name="SUAC"]').val()) || 0,
+                        CUU: destroyFormatRupiah($row.find('[name="CUU"]').val()) || 0,
+                        AU: destroyFormatRupiah($row.find('[name="AU"]').val()) || 0,
+                        'MKU/MDU': destroyFormatRupiah($row.find('[name="MKU/MDU"]').val()) || 0,
+                        BU: destroyFormatRupiah($row.find('[name="BU"]').val()) || 0,
+                        BBU: destroyFormatRupiah($row.find('[name="BBU"]').val()) || 0,
+                        ATU: destroyFormatRupiah($row.find('[name="ATU"]').val()) || 0,
+                        CBU: destroyFormatRupiah($row.find('[name="CBU"]').val()) || 0,
+                        FU: destroyFormatRupiah($row.find('[name="FU"]').val()) || 0,
+                        BUMS: destroyFormatRupiah($row.find('[name="BUMS"]').val()) || 0,
+                        BUM: destroyFormatRupiah($row.find('[name="BUM"]').val()) || 0,
+                        KUM: destroyFormatRupiah($row.find('[name="KUM"]').val()) || 0,
+                        SUM: destroyFormatRupiah($row.find('[name="SUM"]').val()) || 0,
+                        SK: destroyFormatRupiah($row.find('[name="SK"]').val()) || 0,
+                        CKU: destroyFormatRupiah($row.find('[name="CKU"]').val()) || 0,
+                        FKPH: destroyFormatRupiah($row.find('[name="FKPH"]').val()) || 0,
+                        BK: destroyFormatRupiah($row.find('[name="BK"]').val()) || 0,
+                        SKPL: destroyFormatRupiah($row.find('[name="SKPL"]').val()) || 0,
+                        SKPB: destroyFormatRupiah($row.find('[name="SKPB"]').val()) || 0,
+                        SKML: destroyFormatRupiah($row.find('[name="SKML"]').val()) || 0,
+                        SKMB: destroyFormatRupiah($row.find('[name="SKMB"]').val()) || 0,
+                        C1: destroyFormatRupiah($row.find('[name="C1"]').val()) || 0,
+                        C2: destroyFormatRupiah($row.find('[name="C2"]').val()) || 0,
+                        CUK: destroyFormatRupiah($row.find('[name="CUK"]').val()) || 0,
+                        FK: destroyFormatRupiah($row.find('[name="FK"]').val()) || 0,
+                        SSSCG: destroyFormatRupiah($row.find('[name="SSSCG"]').val()) || 0,
+                        IKSSCG: destroyFormatRupiah($row.find('[name="IKSSCG"]').val()) || 0,
+                        FSSCG: destroyFormatRupiah($row.find('[name="FSSCG"]').val()) || 0,
+                        KSCG: destroyFormatRupiah($row.find('[name="KSCG"]').val()) || 0,
+                        CSCG: destroyFormatRupiah($row.find('[name="CSCG"]').val()) || 0,
+                        MPA: destroyFormatRupiah($row.find('[name="MPA"]').val()) || 0,
+                        LBL: destroyFormatRupiah($row.find('[name="LBL"]').val()) || 0,
+                        SA: destroyFormatRupiah($row.find('[name="SA"]').val()) || 0,
+                        CU: destroyFormatRupiah($row.find('[name="CU"]').val()) || 0,
+                        HK: destroyFormatRupiah($row.find('[name="HK"]').val()) || 0,
                         
                         // Jam kerja dan kolom lainnya
-                        jam_kerja_udang: parseFloat($row.find('[name="jam_kerja_udang"]').val()) || 0,
-                        jam_kerja_kepah: parseFloat($row.find('[name="jam_kerja_kepah"]').val()) || 0,
-                        jam_kerja_kptg: parseFloat($row.find('[name="jam_kerja_kptg"]').val()) || 0,
-                        total_kg: parseFloat($row.find('[name="total_kg"]').val()) || 0,
-                        total_jam: parseFloat($row.find('[name="total_jam"]').val()) || 0,
-                        jumlah_org: parseFloat($row.find('[name="jumlah_org"]').val()) || 0,
-                        rupiah: parseFloat($row.find('[name="rupiah"]').val()) || 0,
-                        subsidi_rupiah: parseFloat($row.find('[name="subsidi_rupiah"]').val()) || 0,
-                        borongan_per_jam: parseFloat($row.find('[name="borongan_per_jam"]').val()) || 0,
-                        kg_per_jam_suac: parseFloat($row.find('[name="kg_per_jam_suac"]').val()) || 0,
-                        kg_per_jam_cuu: parseFloat($row.find('[name="kg_per_jam_cuu"]').val()) || 0,
-                        kg_per_jam_au: parseFloat($row.find('[name="kg_per_jam_au"]').val()) || 0,
-                        kg_per_jam_mku_mdu: parseFloat($row.find('[name="kg_per_jam_mku_mdu"]').val()) || 0,
-                        kg_per_jam_bu: parseFloat($row.find('[name="kg_per_jam_bu"]').val()) || 0,
-                        kg_per_jam_bbu: parseFloat($row.find('[name="kg_per_jam_bbu"]').val()) || 0,
-                        kg_per_jam_atu: parseFloat($row.find('[name="kg_per_jam_atu"]').val()) || 0,
-                        kg_per_jam_cbu: parseFloat($row.find('[name="kg_per_jam_cbu"]').val()) || 0,
-                        kg_per_jam_fu: parseFloat($row.find('[name="kg_per_jam_fu"]').val()) || 0,
-                        kg_per_jam_bums: parseFloat($row.find('[name="kg_per_jam_bums"]').val()) || 0,
-                        kg_per_jam_bum: parseFloat($row.find('[name="kg_per_jam_bum"]').val()) || 0,
-                        kg_per_jam_kum: parseFloat($row.find('[name="kg_per_jam_kum"]').val()) || 0,
-                        kg_per_jam_sum: parseFloat($row.find('[name="kg_per_jam_sum"]').val()) || 0,
-                        kg_per_jam_sk: parseFloat($row.find('[name="kg_per_jam_sk"]').val()) || 0,
-                        kg_per_jam_cku: parseFloat($row.find('[name="kg_per_jam_cku"]').val()) || 0,
-                        kg_per_jam_fkph: parseFloat($row.find('[name="kg_per_jam_fkph"]').val()) || 0,
-                        kg_per_jam_bk: parseFloat($row.find('[name="kg_per_jam_bk"]').val()) || 0,
-                        kg_per_jam_skpl: parseFloat($row.find('[name="kg_per_jam_skpl"]').val()) || 0,
-                        kg_per_jam_skpb: parseFloat($row.find('[name="kg_per_jam_skpb"]').val()) || 0,
-                        kg_per_jam_skml: parseFloat($row.find('[name="kg_per_jam_skml"]').val()) || 0,
-                        kg_per_jam_skmb: parseFloat($row.find('[name="kg_per_jam_skmb"]').val()) || 0,
-                        kg_per_jam_c1: parseFloat($row.find('[name="kg_per_jam_c1"]').val()) || 0,
-                        kg_per_jam_c2: parseFloat($row.find('[name="kg_per_jam_c2"]').val()) || 0,
-                        kg_per_jam_cuk: parseFloat($row.find('[name="kg_per_jam_cuk"]').val()) || 0,
-                        kg_per_jam_fk: parseFloat($row.find('[name="kg_per_jam_fk"]').val()) || 0,
-                        kg_per_jam_ssscg: parseFloat($row.find('[name="kg_per_jam_ssscg"]').val()) || 0,
-                        kg_per_jam_iksscg: parseFloat($row.find('[name="kg_per_jam_iksscg"]').val()) || 0,
-                        kg_per_jam_fsscg: parseFloat($row.find('[name="kg_per_jam_fsscg"]').val()) || 0,
-                        kg_per_jam_kscg: parseFloat($row.find('[name="kg_per_jam_kscg"]').val()) || 0,
-                        kg_per_jam_cscg: parseFloat($row.find('[name="kg_per_jam_cscg"]').val()) || 0,
-                        kg_per_jam_mpa: parseFloat($row.find('[name="kg_per_jam_mpa"]').val()) || 0,
-                        kg_per_jam_lbl: parseFloat($row.find('[name="kg_per_jam_lbl"]').val()) || 0,
-                        kg_per_jam_sa: parseFloat($row.find('[name="kg_per_jam_sa"]').val()) || 0,
-                        kg_per_jam_cu: parseFloat($row.find('[name="kg_per_jam_cu"]').val()) || 0,
-                        kg_per_jam_hk: parseFloat($row.find('[name="kg_per_jam_hk"]').val()) || 0,
+                        jam_kerja_udang: destroyFormatRupiah($row.find('[name="jam_kerja_udang"]').val()) || 0,
+                        jam_kerja_kepah: destroyFormatRupiah($row.find('[name="jam_kerja_kepah"]').val()) || 0,
+                        jam_kerja_kptg: destroyFormatRupiah($row.find('[name="jam_kerja_kptg"]').val()) || 0,
+                        total_kg: destroyFormatRupiah($row.find('[name="total_kg"]').val()) || 0,
+                        total_jam: destroyFormatRupiah($row.find('[name="total_jam"]').val()) || 0,
+                        jumlah_org: destroyFormatRupiah($row.find('[name="jumlah_org"]').val()) || 0,
+                        rupiah: destroyFormatRupiah($row.find('[name="rupiah"]').val()) || 0,
+                        subsidi_rupiah: destroyFormatRupiah($row.find('[name="subsidi_rupiah"]').val()) || 0,
+                        borongan_per_jam: destroyFormatRupiah($row.find('[name="borongan_per_jam"]').val()) || 0,
+                        kg_per_jam_suac: destroyFormatRupiah($row.find('[name="kg_per_jam_suac"]').val()) || 0,
+                        kg_per_jam_cuu: destroyFormatRupiah($row.find('[name="kg_per_jam_cuu"]').val()) || 0,
+                        kg_per_jam_au: destroyFormatRupiah($row.find('[name="kg_per_jam_au"]').val()) || 0,
+                        kg_per_jam_mku_mdu: destroyFormatRupiah($row.find('[name="kg_per_jam_mku_mdu"]').val()) || 0,
+                        kg_per_jam_bu: destroyFormatRupiah($row.find('[name="kg_per_jam_bu"]').val()) || 0,
+                        kg_per_jam_bbu: destroyFormatRupiah($row.find('[name="kg_per_jam_bbu"]').val()) || 0,
+                        kg_per_jam_atu: destroyFormatRupiah($row.find('[name="kg_per_jam_atu"]').val()) || 0,
+                        kg_per_jam_cbu: destroyFormatRupiah($row.find('[name="kg_per_jam_cbu"]').val()) || 0,
+                        kg_per_jam_fu: destroyFormatRupiah($row.find('[name="kg_per_jam_fu"]').val()) || 0,
+                        kg_per_jam_bums: destroyFormatRupiah($row.find('[name="kg_per_jam_bums"]').val()) || 0,
+                        kg_per_jam_bum: destroyFormatRupiah($row.find('[name="kg_per_jam_bum"]').val()) || 0,
+                        kg_per_jam_kum: destroyFormatRupiah($row.find('[name="kg_per_jam_kum"]').val()) || 0,
+                        kg_per_jam_sum: destroyFormatRupiah($row.find('[name="kg_per_jam_sum"]').val()) || 0,
+                        kg_per_jam_sk: destroyFormatRupiah($row.find('[name="kg_per_jam_sk"]').val()) || 0,
+                        kg_per_jam_cku: destroyFormatRupiah($row.find('[name="kg_per_jam_cku"]').val()) || 0,
+                        kg_per_jam_fkph: destroyFormatRupiah($row.find('[name="kg_per_jam_fkph"]').val()) || 0,
+                        kg_per_jam_bk: destroyFormatRupiah($row.find('[name="kg_per_jam_bk"]').val()) || 0,
+                        kg_per_jam_skpl: destroyFormatRupiah($row.find('[name="kg_per_jam_skpl"]').val()) || 0,
+                        kg_per_jam_skpb: destroyFormatRupiah($row.find('[name="kg_per_jam_skpb"]').val()) || 0,
+                        kg_per_jam_skml: destroyFormatRupiah($row.find('[name="kg_per_jam_skml"]').val()) || 0,
+                        kg_per_jam_skmb: destroyFormatRupiah($row.find('[name="kg_per_jam_skmb"]').val()) || 0,
+                        kg_per_jam_c1: destroyFormatRupiah($row.find('[name="kg_per_jam_c1"]').val()) || 0,
+                        kg_per_jam_c2: destroyFormatRupiah($row.find('[name="kg_per_jam_c2"]').val()) || 0,
+                        kg_per_jam_cuk: destroyFormatRupiah($row.find('[name="kg_per_jam_cuk"]').val()) || 0,
+                        kg_per_jam_fk: destroyFormatRupiah($row.find('[name="kg_per_jam_fk"]').val()) || 0,
+                        kg_per_jam_ssscg: destroyFormatRupiah($row.find('[name="kg_per_jam_ssscg"]').val()) || 0,
+                        kg_per_jam_iksscg: destroyFormatRupiah($row.find('[name="kg_per_jam_iksscg"]').val()) || 0,
+                        kg_per_jam_fsscg: destroyFormatRupiah($row.find('[name="kg_per_jam_fsscg"]').val()) || 0,
+                        kg_per_jam_kscg: destroyFormatRupiah($row.find('[name="kg_per_jam_kscg"]').val()) || 0,
+                        kg_per_jam_cscg: destroyFormatRupiah($row.find('[name="kg_per_jam_cscg"]').val()) || 0,
+                        kg_per_jam_mpa: destroyFormatRupiah($row.find('[name="kg_per_jam_mpa"]').val()) || 0,
+                        kg_per_jam_lbl: destroyFormatRupiah($row.find('[name="kg_per_jam_lbl"]').val()) || 0,
+                        kg_per_jam_sa: destroyFormatRupiah($row.find('[name="kg_per_jam_sa"]').val()) || 0,
+                        kg_per_jam_cu: destroyFormatRupiah($row.find('[name="kg_per_jam_cu"]').val()) || 0,
+                        kg_per_jam_hk: destroyFormatRupiah($row.find('[name="kg_per_jam_hk"]').val()) || 0,
                         
                         item_details: {}
                     };
@@ -2174,7 +2174,7 @@
                     
                     // Update input field jlhkg & rp
                     $row.find(`input[name="jlhkg"]`).val(jlhkg.toFixed(2));
-                    $row.find(`input[name="rp"]`).val(rp.toFixed());
+                    $row.find(`input[name="rp"]`).val(greatFormatRupiah(rp) + ",00");
                     
 
                 }
@@ -2195,7 +2195,7 @@
                     const rp = employeeItemDetails[mainKey]?.rp || 0;
                     const total_rp_org = rp / val;
 
-                    $row.find(`input[name="total_rp_org"]`).val(total_rp_org.toFixed());
+                    $row.find(`input[name="total_rp_org"]`).val(greatFormatRupiah(total_rp_org) + ",00");
                 } else {
                     Swal.fire({
                         icon: 'error',
