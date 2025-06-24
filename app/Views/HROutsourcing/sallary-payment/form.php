@@ -454,7 +454,7 @@
                     <th class="text-center" rowspan="3">(Rp)</th>
                     <th class="text-center" rowspan="3">SUBSIDI RP.</th>
                     <th class="text-center" rowspan="3">BOR. / JAM (Rp)</th>
-                    <th class="text-center" colspan="4">KG / JAM</th>
+                    <th class="text-center" colspan="35">KG / JAM</th>
                 </tr>
                 <tr>
                     <th colspan="1">SUAC</th>
@@ -495,10 +495,11 @@
                     <th rowspan="2">UDANG</th>
                     <th rowspan="2">KEPAH</th>
                     <th rowspan="2">KPTG</th>
-                    <th rowspan="2">ML</th>
-                    <th rowspan="2">AC</th>
-                    <th rowspan="2">SK</th>
-                    <th rowspan="2">MB</th>
+                    <th class="text-center" colspan="13">UDANG</th>
+                    <th class="text-center" colspan="4">KEPAH</th>
+                    <th class="text-center" colspan="8">KEPITING MERAH DAN PUTIH</th>
+                    <th class="text-center" colspan="5">SOKAT / CUMI / GURITA</th>
+                    <th class="text-center" colspan="5">ALL</th>
                 </tr>
                 <tr>
                     <th style="min-width:100px;" colspan="1">2850</th> <!-- SUAC -->
@@ -536,6 +537,41 @@
                     <th style="min-width:100px;" colspan="1">1.5</th>   <!-- SA -->
                     <th style="min-width:100px;" colspan="1">3</th>     <!-- CU -->
                     <th style="min-width:100px;" colspan="1">23</th>    <!-- HK -->
+                    <th colspan="1">SUAC</th>
+                    <th colspan="1">CUU</th>
+                    <th colspan="1">AU</th>
+                    <th colspan="1">MKU/MDU</th>
+                    <th colspan="1">BU</th>
+                    <th colspan="1">BBU</th>
+                    <th colspan="1">ATU</th>
+                    <th colspan="1">CBU</th>
+                    <th colspan="1">FU</th>
+                    <th colspan="1">BUMS</th>
+                    <th colspan="1">BUM</th>
+                    <th colspan="1">KUM</th>
+                    <th colspan="1">SUM</th>
+                    <th colspan="1">SK</th>
+                    <th colspan="1">CKU</th>
+                    <th colspan="1">FKPH</th>
+                    <th colspan="1">BK</th>
+                    <th colspan="1">SKPL</th>
+                    <th colspan="1">SKPB</th>
+                    <th colspan="1">SKML</th>
+                    <th colspan="1">SKMB</th>
+                    <th colspan="1">C1</th>
+                    <th colspan="1">C2</th>
+                    <th colspan="1">CUK</th>
+                    <th colspan="1">FK</th>
+                    <th colspan="1">SSSCG</th>
+                    <th colspan="1">IKSSCG</th>
+                    <th colspan="1">FSSCG</th>
+                    <th colspan="1">KSCG</th>
+                    <th colspan="1">CSCG</th>
+                    <th colspan="1">MPA</th>
+                    <th colspan="1">LBL</th>
+                    <th colspan="1">SA</th>
+                    <th colspan="1">CU</th>
+                    <th colspan="1">HK</th>
                 </tr>
 
             `;
@@ -759,7 +795,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" onclick="showModalDetailHarga('MKU/MDU', '${employeeId}', '${employeeName}', '20')" style="height:40px;cursor:pointer;">+</span>
                                     </div>
-                                    <input type="text" class="form-control" style="height:40px;" name="MKU/MDU" value="${employee['MKU/MDU']?.berat || ''}" data-employee_id="${employeeId}" data-harga="20">
+                                    <input type="text" class="form-control" style="height:40px;" name="MKU/MDU" value="${payment['MKU/MDU']?.berat || ''}" data-employee_id="${employeeId}" data-harga="20">
                                 </div>
                             </td>
 
@@ -1056,10 +1092,41 @@
                             <td><input type="number" name="borongan_per_jam" class="form-control form-control-sm borongan-per-jam" style="min-width: 120px;" value="${payment.borongan_per_jam || ''}"></td>
 
                             <!-- KG / JAM -->
-                            <td><input type="number" name="kg_per_jam_ml" class="form-control form-control-sm kg-per-jam-ml" style="min-width: 90px;" value="${payment.kg_per_jam_ml || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_ac" class="form-control form-control-sm kg-per-jam-ac" style="min-width: 90px;" value="${payment.kg_per_jam_ac || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_sk" class="form-control form-control-sm kg-per-jam-sk" style="min-width: 90px;" value="${payment.kg_per_jam_sk || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_mb" class="form-control form-control-sm kg-per-jam-mb" style="min-width: 90px;" value="${payment.kg_per_jam_mb || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_suac" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_suac || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_cuu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cuu || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_au" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_au || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_mku_mdu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_mku_mdu || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_bu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_bu || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_bbu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_bbu || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_atu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_atu || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_cbu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cbu || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_fu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_fu || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_bums" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_bums || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_bum" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_bum || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_kum" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_kum || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_sum" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_sum || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_sk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_sk || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_cku" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cku || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_fkph" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_fkph || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_bk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_bk || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_skpl" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_skpl || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_skpb" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_skpb || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_skml" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_skml || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_skmb" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_skmb || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_c1" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_c1 || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_c2" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_c2 || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_cuk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cuk || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_fk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_fk || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_ssscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_ssscg || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_iksscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_iksscg || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_fsscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_fsscg || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_kscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_kscg || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_cscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cscg || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_mpa" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_mpa || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_lbl" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_lbl || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_sa" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_sa || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_cu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cu || ''}"></td>
+                            <td><input type="number" name="kg_per_jam_hk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_hk || ''}"></td>
                         </tr>
                     `;
                     }
@@ -1632,11 +1699,41 @@
                     <td><input type="number" name="borongan_per_jam" class="form-control form-control-sm borongan-per-jam" style="min-width: 120px;"></td>
 
                     <!-- KG / JAM -->
-                    <td><input type="number" name="kg_per_jam_ml" class="form-control form-control-sm kg-per-jam-ml" style="min-width: 90px;"></td>
-                    <td><input type="number" name="kg_per_jam_ac" class="form-control form-control-sm kg-per-jam-ac" style="min-width: 90px;"></td>
-                    <td><input type="number" name="kg_per_jam_sk" class="form-control form-control-sm kg-per-jam-sk" style="min-width: 90px;"></td>
-                    <td><input type="number" name="kg_per_jam_mb" class="form-control form-control-sm kg-per-jam-mb" style="min-width: 90px;"></td>
-
+                    <td><input type="number" name="kg_per_jam_suac" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_cuu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_au" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_mku_mdu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_bu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_bbu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_atu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_cbu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_fu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_bums" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_bum" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_kum" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_sum" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_sk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_cku" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_fkph" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_bk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_skpl" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_skpb" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_skml" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_skmb" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_c1" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_c2" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_cuk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_fk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_ssscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_iksscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_fsscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_kscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_cscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_mpa" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_lbl" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_sa" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_cu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="number" name="kg_per_jam_hk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
                 </tr>
             `;
             }
@@ -1791,10 +1888,41 @@
                         rupiah: parseFloat($row.find('[name="rupiah"]').val()) || 0,
                         subsidi_rupiah: parseFloat($row.find('[name="subsidi_rupiah"]').val()) || 0,
                         borongan_per_jam: parseFloat($row.find('[name="borongan_per_jam"]').val()) || 0,
-                        kg_per_jam_ml: parseFloat($row.find('[name="kg_per_jam_ml"]').val()) || 0,
-                        kg_per_jam_ac: parseFloat($row.find('[name="kg_per_jam_ac"]').val()) || 0,
+                        kg_per_jam_suac: parseFloat($row.find('[name="kg_per_jam_suac"]').val()) || 0,
+                        kg_per_jam_cuu: parseFloat($row.find('[name="kg_per_jam_cuu"]').val()) || 0,
+                        kg_per_jam_au: parseFloat($row.find('[name="kg_per_jam_au"]').val()) || 0,
+                        kg_per_jam_mku_mdu: parseFloat($row.find('[name="kg_per_jam_mku_mdu"]').val()) || 0,
+                        kg_per_jam_bu: parseFloat($row.find('[name="kg_per_jam_bu"]').val()) || 0,
+                        kg_per_jam_bbu: parseFloat($row.find('[name="kg_per_jam_bbu"]').val()) || 0,
+                        kg_per_jam_atu: parseFloat($row.find('[name="kg_per_jam_atu"]').val()) || 0,
+                        kg_per_jam_cbu: parseFloat($row.find('[name="kg_per_jam_cbu"]').val()) || 0,
+                        kg_per_jam_fu: parseFloat($row.find('[name="kg_per_jam_fu"]').val()) || 0,
+                        kg_per_jam_bums: parseFloat($row.find('[name="kg_per_jam_bums"]').val()) || 0,
+                        kg_per_jam_bum: parseFloat($row.find('[name="kg_per_jam_bum"]').val()) || 0,
+                        kg_per_jam_kum: parseFloat($row.find('[name="kg_per_jam_kum"]').val()) || 0,
+                        kg_per_jam_sum: parseFloat($row.find('[name="kg_per_jam_sum"]').val()) || 0,
                         kg_per_jam_sk: parseFloat($row.find('[name="kg_per_jam_sk"]').val()) || 0,
-                        kg_per_jam_mb: parseFloat($row.find('[name="kg_per_jam_mb"]').val()) || 0,
+                        kg_per_jam_cku: parseFloat($row.find('[name="kg_per_jam_cku"]').val()) || 0,
+                        kg_per_jam_fkph: parseFloat($row.find('[name="kg_per_jam_fkph"]').val()) || 0,
+                        kg_per_jam_bk: parseFloat($row.find('[name="kg_per_jam_bk"]').val()) || 0,
+                        kg_per_jam_skpl: parseFloat($row.find('[name="kg_per_jam_skpl"]').val()) || 0,
+                        kg_per_jam_skpb: parseFloat($row.find('[name="kg_per_jam_skpb"]').val()) || 0,
+                        kg_per_jam_skml: parseFloat($row.find('[name="kg_per_jam_skml"]').val()) || 0,
+                        kg_per_jam_skmb: parseFloat($row.find('[name="kg_per_jam_skmb"]').val()) || 0,
+                        kg_per_jam_c1: parseFloat($row.find('[name="kg_per_jam_c1"]').val()) || 0,
+                        kg_per_jam_c2: parseFloat($row.find('[name="kg_per_jam_c2"]').val()) || 0,
+                        kg_per_jam_cuk: parseFloat($row.find('[name="kg_per_jam_cuk"]').val()) || 0,
+                        kg_per_jam_fk: parseFloat($row.find('[name="kg_per_jam_fk"]').val()) || 0,
+                        kg_per_jam_ssscg: parseFloat($row.find('[name="kg_per_jam_ssscg"]').val()) || 0,
+                        kg_per_jam_iksscg: parseFloat($row.find('[name="kg_per_jam_iksscg"]').val()) || 0,
+                        kg_per_jam_fsscg: parseFloat($row.find('[name="kg_per_jam_fsscg"]').val()) || 0,
+                        kg_per_jam_kscg: parseFloat($row.find('[name="kg_per_jam_kscg"]').val()) || 0,
+                        kg_per_jam_cscg: parseFloat($row.find('[name="kg_per_jam_cscg"]').val()) || 0,
+                        kg_per_jam_mpa: parseFloat($row.find('[name="kg_per_jam_mpa"]').val()) || 0,
+                        kg_per_jam_lbl: parseFloat($row.find('[name="kg_per_jam_lbl"]').val()) || 0,
+                        kg_per_jam_sa: parseFloat($row.find('[name="kg_per_jam_sa"]').val()) || 0,
+                        kg_per_jam_cu: parseFloat($row.find('[name="kg_per_jam_cu"]').val()) || 0,
+                        kg_per_jam_hk: parseFloat($row.find('[name="kg_per_jam_hk"]').val()) || 0,
                         
                         item_details: {}
                     };

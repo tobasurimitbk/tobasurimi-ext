@@ -187,7 +187,7 @@
                 <tr>
                     <td style="vertical-align: top;">UNTUK PEMBAYARAN <br> (FOR PAYMENT)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;">PEMBELIAN <?= $kwitansi['nama_barang'] . " " . $kwitansi['spesifikasi'] ?> SEBANYAK <?= $kwitansi['qty'] ?> KG DARI <?= $kwitansis['supplier']['name'] ?></td>
+                    <td style="vertical-align: top;">PEMBELIAN <?= $kwitansi['nama_barang'] . " " . $kwitansi['spesifikasi'] ?> SEBANYAK <?= number_format($kwitansi['qty'], 2) ?> KG DARI <?= $kwitansis['supplier']['name'] ?></td>
                 </tr>
             </table>
 
@@ -195,7 +195,7 @@
                 <tr>
                     <td>Bruto</td>
                     <td>Rp.</td>
-                    <td class="txt-right"><?= number_format(formatter($kwitansi['harga_bulanan'], "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                    <td class="txt-right"><?= number_format($kwitansi['harga_bulanan'], 2, '.', ',') ?></td>
                 </tr>
                 <tr>
                     <td>PPh</td>
@@ -249,7 +249,7 @@
                     <tr>
                         <td style="vertical-align: top;">UNTUK PEMBAYARAN <br> (FOR PAYMENT)</td>
                         <td style="vertical-align: top;">: </td>
-                        <td style="vertical-align: top;">PEMBELIAN <?= $kwitansi['nama_barang'] . " " . $kwitansi['spesifikasi'] ?> SEBANYAK <?= $kwitansi['qty'] ?> KG DARI <?= $kwitansis['supplier']['name'] ?></td>
+                        <td style="vertical-align: top;">PEMBELIAN <?= $kwitansi['nama_barang'] . " " . $kwitansi['spesifikasi'] ?> SEBANYAK <?= number_format($kwitansi['qty'], 2) ?> KG DARI <?= $kwitansis['supplier']['name'] ?></td>
                     </tr>
                 </table>
 

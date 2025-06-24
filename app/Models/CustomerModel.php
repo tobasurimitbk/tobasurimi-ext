@@ -98,7 +98,8 @@ class CustomerModel extends Model
         $selectQry = "customers.*, 
                     employees.name as namaSales,
                     metadata.value AS currencyName,
-                    country.country_name AS countryName";
+                    country.country_name AS countryName,
+                    companies.company as companyName";
 
         $customerDataQry = $this->asObject()
             ->select($selectQry)
@@ -106,7 +107,8 @@ class CustomerModel extends Model
             ->where($condition)
             ->join('metadata', 'customers.currency = metadata.id', 'left')
             ->join('country', 'country.id = customers.country_id', 'left')
-            ->join('employees', 'employees.id = customers.sales_id', 'LEFT');
+            ->join('employees', 'employees.id = customers.sales_id', 'LEFT')
+            ->join('companies', 'companies.id = customers.company_id', 'left');
 
         if ($condition['tipe_customer'] == "LOKAL") {
             $customerDataQry->where('customers.address !=', '')
