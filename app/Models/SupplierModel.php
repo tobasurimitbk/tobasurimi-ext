@@ -464,8 +464,14 @@ class SupplierModel extends Model
                 }
             }
 
-            $hargaBulananPph = ($r->monthly_price * $r->qty_total) + $pph;
-            $hargaBulanan =  ($r->monthly_price * $r->qty_total);
+            if ($r->pph == "Company") {
+                $hargaBulananPph = ($r->monthly_price * $r->qty_total) - $pph;
+                $hargaBulanan =  ($r->monthly_price * $r->qty_total) + $pph;
+            } else {
+                $hargaBulananPph = ($r->monthly_price * $r->qty_total) + $pph;
+                $hargaBulanan =  ($r->monthly_price * $r->qty_total);
+            }
+
 
             $total += $hargaBulananPph;
 
