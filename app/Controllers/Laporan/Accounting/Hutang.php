@@ -162,14 +162,13 @@ class Hutang extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($res['data'] as $data) {
-            $totalRemaining = $data->total - $data->remaining;
             array_push($rdata, [
                 "no"                    => $no++,
-                "id"                    => $data->id,
-                "supplier"              => $data->name,
-                "no_penerimaan_barang"              => $data->no_penerimaan_barang,
-                "nominal_idr"           => number_format($data->total, 2, '.', ''),
-                "remaining_idr"         => number_format($totalRemaining, 2, '.', ''),
+                "id"                    => $data['id'],
+                "supplier"              => $data['supplier'],
+                "no_penerimaan_barang"  => $data['no_penerimaan_barang'],
+                "nominal_idr"           => number_format($data['nominal_idr'], 2, '.', ''),
+                "remaining_idr"         => number_format($data['remaining_idr'], 2, '.', ''),
             ]);
         }
 

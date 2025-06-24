@@ -62,6 +62,7 @@ class SupplierModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+    protected $supplierModel;
 
     public function getSupplierList($condition, $addCondition, $limit = 10, $offset = 0)
     {
@@ -109,109 +110,128 @@ class SupplierModel extends Model
 
     public function getSupplierHutangList($condition, $addCondition, $limit = 10, $offset = 0, $companyId)
     {
-        $availableSort = [
-            'kode'              => 'suppliers.kode',
-            'name'              => 'suppliers.name',
-            'address'           => 'suppliers.address',
-            'no_npwp'           => 'suppliers.no_npwp',
-            'phone'             => 'suppliers.phone',
-            'contact_person'    => 'suppliers.contact_person',
-            'fax'               => 'suppliers.fax',
-            'createdAt'         => 'suppliers.createdAt',
-            'updatedAt'         => 'suppliers.updatedAt',
-        ];
-        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+        $dataFinal = [];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'suppliers.createdAt';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+        $dateStart = !empty($addCondition['startdate']) ? $addCondition['startdate'] : null;
+        $dateEnd   = !empty($addCondition['lastdate']) ? $addCondition['lastdate'] : null;
+        $this->supplierModel = new SupplierModel();
 
-        $selectQry = "suppliers.*, 
-        CASE 
-            WHEN suppliers.type = 'BAHAN BAKU' 
-            THEN SUM(rm_purchase_orders.total)
-            WHEN suppliers.type = 'INTERNASIONAL' 
-            THEN SUM(rm_import_pos.total)
-            ELSE SUM(am_purchase_orders.total)
-        END AS total, 
-        CASE 
-            WHEN suppliers.type = 'INTERNASIONAL' 
-            THEN (import_po_payments.payment_amt * import_po_payments.current_exchange_rate)
-            ELSE (local_po_payments.amount)
-        END AS remaining,
-        GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang) AS no_penerimaan_barang";
-
-        $supplierDataQry = $this->asObject()
-            ->select($selectQry)
+        // === BAHAN BAKU ===
+        $dataBB = $this->supplierModel->asObject()
+            ->select("suppliers.id, suppliers.name,
+              SUM(rm_purchase_orders.total) AS total,
+              SUM(local_po_payments.amount) AS remaining,
+              (
+                  SELECT GROUP_CONCAT(DISTINCT pb.no_penerimaan_barang)
+                  FROM penerimaan_barang pb
+                  JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
+                  WHERE pb.supplier_id = suppliers.id
+                  AND pb.tipe_bahan = 'BAKU'
+              ) AS no_penerimaan_barang")
             ->join('rm_purchase_orders', 'rm_purchase_orders.supplier_id = suppliers.id AND rm_purchase_orders.is_posted = 1 AND rm_purchase_orders.status_penerimaan = 1', 'left')
-            ->join('am_purchase_orders', 'am_purchase_orders.supplier_id = suppliers.id AND am_purchase_orders.is_posted = 1 AND am_purchase_orders.status_penerimaan = 1', 'left')
-            ->join('rm_import_pos', 'rm_import_pos.supplier_id = suppliers.id AND rm_import_pos.is_posted = 1 AND rm_import_pos.status_penerimaan = 1', 'left')
-            ->join('local_po_payments', 'local_po_payments.supplier_id = suppliers.id AND local_po_payments.status_posting = 1', 'left')
-            ->join('import_po_payments', 'import_po_payments.supplier_id = suppliers.id AND import_po_payments.status_posting = 1', 'left')
-            ->join(
-                'penerimaan_barang_detail',
-                "(
-                    (suppliers.type = 'BAHAN BAKU' AND penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id)
-                    OR (suppliers.type = 'INTERNASIONAL' AND penerimaan_barang_detail.purchase_order_id = rm_import_pos.id)
-                    OR (suppliers.type NOT IN ('BAHAN BAKU', 'INTERNASIONAL') AND penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id)
-                )",
-                'left'
-            )
-            ->join('penerimaan_barang', "penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id AND penerimaan_barang.supplier_id = suppliers.id", 'left')
+            ->join('local_po_payments', 'FIND_IN_SET(rm_purchase_orders.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left')
+            ->where('suppliers.type', 'BAHAN BAKU')
             ->where($condition)
-            ->whereIn('suppliers.company_id', $companyId)
-            ->groupBy('suppliers.id')
-            ->having("total > 0")
-            ->orderBy($sort, $sortType);
+            ->whereIn('suppliers.company_id', $companyId);
 
-        $totalData = $supplierDataQry->countAllResults(false);
-
-        if ($addCondition['search'] || $addCondition['filter'] || $addCondition['divisi'] || $addCondition['type_barang']) {
-            $supplierDataQry->groupStart();
+        if (!empty($addCondition['filter'])) {
+            $dataBB->whereIn('suppliers.id', $addCondition['filter']);
         }
 
-        if ($addCondition['search']) {
-            $supplierDataQry->groupStart()
-                ->like('suppliers.name', $addCondition['search'])
-                ->orLike('suppliers.kode', $addCondition['search'])
-                ->groupEnd();
+        if (!empty($addCondition['divisi'])) {
+            $dataBB->where('rm_purchase_orders.divisi_id', $addCondition['divisi']);
         }
 
-        if ($addCondition['filter'] && $addCondition['divisi']) {
-            $supplierDataQry->groupStart()
-                ->where('rm_purchase_orders.divisi_id', $addCondition['divisi'])
-                ->orWhere('am_purchase_orders.division_id', $addCondition['divisi'])
-                ->orWhere('rm_import_pos.division_id', $addCondition['divisi'])
-                ->groupEnd()
-                ->whereIn('suppliers.id', $addCondition['filter']);
-        } elseif ($addCondition['divisi']) {
-            $supplierDataQry->groupStart()
-                ->where('rm_purchase_orders.divisi_id', $addCondition['divisi'])
-                ->orWhere('am_purchase_orders.division_id', $addCondition['divisi'])
-                ->orWhere('rm_import_pos.division_id', $addCondition['divisi'])
-                ->groupEnd();
-        } elseif ($addCondition['filter']) {
-            $supplierDataQry->whereIn('suppliers.id', $addCondition['filter']);
+        if ($dateStart) $dataBB->where('rm_purchase_orders.po_date >=', $dateStart);
+        if ($dateEnd)   $dataBB->where('rm_purchase_orders.po_date <=', $dateEnd);
+
+        $dataBB->groupBy('suppliers.id');
+        $dataFinal = array_merge($dataFinal, $dataBB->findAll());
+
+        // === BAHAN PENOLONG ===
+        $dataBP = $this->supplierModel->asObject()
+            ->select("suppliers.id, suppliers.name,
+              SUM(am_purchase_orders.total) AS total,
+              SUM(local_po_payments.amount) AS remaining,
+              (
+                  SELECT GROUP_CONCAT(DISTINCT pb.no_penerimaan_barang)
+                  FROM penerimaan_barang pb
+                  JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
+                  WHERE pb.supplier_id = suppliers.id
+                  AND pb.tipe_bahan = 'PENOLONG'
+              ) AS no_penerimaan_barang")
+            ->join('am_purchase_orders', 'am_purchase_orders.supplier_id = suppliers.id AND am_purchase_orders.is_posted = 1 AND am_purchase_orders.status_penerimaan = 1', 'left')
+            ->join('local_po_payments', 'FIND_IN_SET(am_purchase_orders.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left')
+            ->where('suppliers.type', 'BAHAN PENOLONG')
+            ->where($condition)
+            ->whereIn('suppliers.company_id', $companyId);
+
+        if (!empty($addCondition['filter'])) {
+            $dataBP->whereIn('suppliers.id', $addCondition['filter']);
         }
 
-        if ($addCondition['type_barang']) {
-            $supplierDataQry->where('suppliers.type', $addCondition['type_barang']);
+        if (!empty($addCondition['divisi'])) {
+            $dataBP->where('am_purchase_orders.division_id', $addCondition['divisi']);
         }
 
-        if ($addCondition['search'] || $addCondition['filter'] || $addCondition['divisi'] || $addCondition['type_barang']) {
-            $supplierDataQry->groupEnd();
+        if ($dateStart) $dataBP->where('am_purchase_orders.po_date >=', $dateStart);
+        if ($dateEnd)   $dataBP->where('am_purchase_orders.po_date <=', $dateEnd);
+
+        $dataBP->groupBy('suppliers.id');
+        $dataFinal = array_merge($dataFinal, $dataBP->findAll());
+
+        // === INTERNASIONAL ===
+        $dataIMP = $this->supplierModel->asObject()
+            ->select("suppliers.id, suppliers.name,
+              SUM(rm_import_pos.total) AS total,
+              SUM(import_po_payments.payment_amt * import_po_payments.current_exchange_rate) AS remaining,
+              (
+                  SELECT GROUP_CONCAT(DISTINCT pb.no_penerimaan_barang)
+                  FROM penerimaan_barang pb
+                  JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
+                  WHERE pb.supplier_id = suppliers.id
+                  AND pb.tipe_bahan = 'INTERNASIONAL'
+              ) AS no_penerimaan_barang")
+            ->join('rm_import_pos', 'rm_import_pos.supplier_id = suppliers.id AND rm_import_pos.is_posted = 1 AND rm_import_pos.status_penerimaan = 1', 'left')
+            ->join('import_po_payments', 'import_po_payments.supplier_id = suppliers.id AND import_po_payments.status_posting = 1', 'left')
+            ->where('suppliers.type', 'INTERNASIONAL')
+            ->where($condition)
+            ->whereIn('suppliers.company_id', $companyId);
+
+        if (!empty($addCondition['filter'])) {
+            $dataIMP->whereIn('suppliers.id', $addCondition['filter']);
         }
 
-        $totalFilteredData = $supplierDataQry->countAllResults(false);
-        if ($limit != null && $offset != null) {
-            $data = $supplierDataQry->findAll($limit, $offset);
-        } else {
-            $data = $supplierDataQry->findAll();
+        if (!empty($addCondition['divisi'])) {
+            $dataIMP->where('rm_import_pos.division_id', $addCondition['divisi']);
         }
+
+        if ($dateStart) $dataIMP->where('rm_import_pos.po_date >=', $dateStart);
+        if ($dateEnd)   $dataIMP->where('rm_import_pos.po_date <=', $dateEnd);
+
+        $dataIMP->groupBy('suppliers.id');
+        $dataFinal = array_merge($dataFinal, $dataIMP->findAll());
+
+        $filtered = [];
+        foreach ($dataFinal as $item) {
+            if (floatval($item->total) > 0) {
+                $filtered[] = [
+                    'id' => $item->id,
+                    'supplier' => $item->name,
+                    'no_penerimaan_barang' => $item->no_penerimaan_barang ?? '-',
+                    'nominal_idr' => number_format($item->total, 2, '.', ''),
+                    'remaining_idr' => number_format($item->total - $item->remaining, 2, '.', ''),
+                ];
+            }
+        }
+
+        $totalData = count($filtered);
+        $paged = array_slice($filtered, $offset, $limit);
 
         return [
-            'data'              => $data,
-            'totalData'         => $totalData,
-            'totalFilteredData' => $totalFilteredData
+            'data' => $paged,
+            'totalData' => $totalData,
+            'totalFilteredData' => $totalData
         ];
     }
 
