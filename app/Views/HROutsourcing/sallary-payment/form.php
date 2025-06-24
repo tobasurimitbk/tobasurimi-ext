@@ -2107,139 +2107,168 @@
 
         // CALCULATE PTS
         $(document).on('keypress', 'input[name^="sjb"], input[name^="sjl"], input[name^="mt"], input[name^="sel"], input[name^="slm"], input[name^="ssp"], input[name^="scm"], input[name^="ctt"], input[name^="cct"], input[name^="smh"], input[name^="dm"], input[name^="scf"], input[name^="lel"], input[name^="gc"], input[name^="sspk"]', function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+
+                    const input = $(this);
+                    const val = input.val().trim();
+                    const employeeId = input.closest('tr').data('employee-id');
+                    const hargaSatuan = parseFloat(input.data('harga')) || 0;
+                    const kodeBarang = input.attr('name');
+
+                    // Fungsi parsing yang lebih sederhana dan pasti bekerja
+                    function parseInput(inputStr) {
+                        // Ganti semua koma dengan titik
+                        const normalized = inputStr.replace(/,/g, '.');
+                        
+                        // Split hanya berdasarkan tanda + saja
+                        const parts = normalized.split('+').filter(Boolean);
+                        
+                        return parts.map(part => {
+                            // Parse angka, termasuk yang tanpa titik decimal
+                            const num = parseFloat(part);
+                            return isNaN(num) ? 0 : num; // Return 0 jika bukan angka
+                        });
+                    }
+
+                    const numbers = parseInput(val);
+                    const total = numbers.reduce((sum, n) => sum + n, 0);
+                    
+                    if (total === 0 && val !== '0') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Format salah',
+                            text: 'Gunakan format seperti: 0.9+0.7 atau 0,9+0,7',
+                        });
+                        return;
+                    }
+
+                    input.val(total.toFixed(2));
+
+                    // ✅ SIMPAN KE GLOBAL VARIABLE
+                    const $row = input.closest('tr');
+                    const key = `${employeeId}_${kodeBarang}`;
+                    
+                    employeeItemDetails[key] = {
+                        items: numbers.map(berat => ({ berat, harga: hargaSatuan })),
+                        totalBerat: total,
+                        totalHarga: total * hargaSatuan
+                    };
+
+                    // 🔁 Rehitung total jlhkg & rp
+                    let jlhkg = 0;
+                    let rp = 0;
+
+
+                    Object.keys(employeeItemDetails).forEach(keyLoop => {
+                        if (keyLoop.startsWith(`${employeeId}_`) && keyLoop !== `${employeeId}_main`) {
+                            const data = employeeItemDetails[keyLoop];
+                            jlhkg += data.totalBerat || 0;
+                            rp += data.totalHarga || 0;
+                        }
+                    });
+
+                    const mainKey = `${employeeId}_main`;
+                    employeeItemDetails[mainKey] = { jlhkg, rp };
+                    
+                    
+                    // Update input field jlhkg & rp
+                    $row.find(`input[name="jlhkg"]`).val(jlhkg.toFixed(2));
+                    $row.find(`input[name="rp"]`).val(rp.toFixed());
+                    
+
+                }
+
+        });
+
+        $(document).on('keypress', 'input[name^="jlh_org"]', function (e) {
             if (e.which === 13) {
                 e.preventDefault();
 
                 const input = $(this);
-                const val = input.val().trim();
-                const employeeId = input.closest('tr').data('employee-id');
-                const hargaSatuan = parseFloat(input.data('harga')) || 0;
-                const kodeBarang = input.attr('name');
+                const val = parseFloat(input.val().trim());
+                const $row = input.closest('tr');
+                const employeeId = $row.data('employee-id');
 
-                // Fungsi parsing yang lebih sederhana dan pasti bekerja
-                function parseInput(inputStr) {
-                    // Ganti semua koma dengan titik
-                    const normalized = inputStr.replace(/,/g, '.');
-                    
-                    // Split hanya berdasarkan tanda + saja
-                    const parts = normalized.split('+').filter(Boolean);
-                    
-                    return parts.map(part => {
-                        // Parse angka, termasuk yang tanpa titik decimal
-                        const num = parseFloat(part);
-                        return isNaN(num) ? 0 : num; // Return 0 jika bukan angka
-                    });
-                }
+                if (!isNaN(val) && val > 0) {
+                    const mainKey = `${employeeId}_main`;
+                    const rp = employeeItemDetails[mainKey]?.rp || 0;
+                    const total_rp_org = rp / val;
 
-                const numbers = parseInput(val);
-                const total = numbers.reduce((sum, n) => sum + n, 0);
-                
-                if (total === 0 && val !== '0') {
+                    $row.find(`input[name="total_rp_org"]`).val(total_rp_org.toFixed());
+                } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Format salah',
-                        text: 'Gunakan format seperti: 0.9+0.7 atau 0,9+0,7',
+                        title: 'Input tidak valid',
+                        text: 'Jumlah orang harus angka lebih dari 0',
                     });
-                    return;
                 }
-
-                input.val(total.toFixed(2));
-
-                // ✅ SIMPAN KE GLOBAL VARIABLE
-                const $row = input.closest('tr');
-                const key = `${employeeId}_${kodeBarang}`;
-                
-                employeeItemDetails[key] = {
-                    items: numbers.map(berat => ({ berat, harga: hargaSatuan })),
-                    totalBerat: total,
-                    totalHarga: total * hargaSatuan
-                };
-
-                // 🔁 Rehitung total jlhkg & rp
-                let jlhkg = 0;
-                let rp = 0;
-
-                Object.keys(employeeItemDetails).forEach(keyLoop => {
-                    if (keyLoop.startsWith(`${employeeId}_`) && keyLoop !== `${employeeId}_main`) {
-                        const data = employeeItemDetails[keyLoop];
-                        jlhkg += data.totalBerat || 0;
-                        rp += data.totalHarga || 0;
-                    }
-                });
-
-                const mainKey = `${employeeId}_main`;
-                employeeItemDetails[mainKey] = { jlhkg, rp };
-
-                // Update input field jlhkg & rp
-                $row.find(`input[name="jlhkg"]`).val(jlhkg.toFixed(2));
-                $row.find(`input[name="rp"]`).val(rp.toFixed());
             }
-
         });
-
 
         //CALCULATE CANNING
         $(document).on('keypress', 'input[name^="SUAC"], input[name^="CUU"], input[name^="AU"], input[name^="MKU/MDU"], input[name^="BU"], input[name^="BBU"], input[name^="ATU"], input[name^="CBU"], input[name^="FU"], input[name^="BUMS"], input[name^="BUM"], input[name^="KUM"], input[name^="SUM"], input[name^="SK"], input[name^="CKU"], input[name^="FKPH"], input[name^="BK"], input[name^="SKPL"], input[name^="SKPB"], input[name^="SKML"], input[name^="SKMB"], input[name^="C1"], input[name^="C2"], input[name^="CUK"], input[name^="FK"], input[name^="SSSCG"], input[name^="IKSSCG"], input[name^="FSSCG"], input[name^="KSCG"], input[name^="CSCG"], input[name^="MPA"], input[name^="LBL"], input[name^="SA"], input[name^="CU"], input[name^="HK"]', function (e) {
-            if (e.which === 13) {
-                e.preventDefault();
+                if (e.which === 13) {
+                    e.preventDefault();
 
-                const input = $(this);
-                const val = input.val().trim();
-                const employeeId = input.closest('tr').data('employee-id');
-                const hargaSatuan = parseFloat(input.data('harga')) || 0;
-                const kodeBarang = input.attr('name');
+                    const input = $(this);
+                    const val = input.val().trim();
+                    const employeeId = input.closest('tr').data('employee-id');
+                    const hargaSatuan = parseFloat(input.data('harga')) || 0;
+                    const kodeBarang = input.attr('name');
 
-                function parseInput(inputStr) {
-                    const normalized = inputStr.replace(/,/g, '.');
-                    const parts = normalized.split('+').filter(Boolean);
-                    return parts.map(part => {
-                        const num = parseFloat(part);
-                        return isNaN(num) ? 0 : num;
-                    });
-                }
-
-                const numbers = parseInput(val);
-                const total = numbers.reduce((sum, n) => sum + n, 0);
-
-                if (total === 0 && val !== '0') {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Format salah',
-                        text: 'Gunakan format seperti: 0.9+0.7 atau 0,9+0,7',
-                    });
-                    return;
-                }
-
-                input.val(total.toFixed(2));
-
-                const $row = input.closest('tr');
-                const key = `${employeeId}_${kodeBarang}`;
-
-                employeeItemDetails[key] = {
-                    items: numbers.map(berat => ({ berat, harga: hargaSatuan })),
-                    totalBerat: total,
-                    totalHarga: total * hargaSatuan
-                };
-
-                // Rehitung total total_kg & rp
-                let total_kg = 0;
-                let rupiah = 0;
-
-                Object.keys(employeeItemDetails).forEach(keyLoop => {
-                    if (keyLoop.startsWith(`${employeeId}_`) && keyLoop !== `${employeeId}_main`) {
-                        const data = employeeItemDetails[keyLoop];
-                        total_kg += data.totalBerat || 0;
-                        rupiah += data.totalHarga || 0;
+                    function parseInput(inputStr) {
+                        const normalized = inputStr.replace(/,/g, '.');
+                        const parts = normalized.split('+').filter(Boolean);
+                        return parts.map(part => {
+                            const num = parseFloat(part);
+                            return isNaN(num) ? 0 : num;
+                        });
                     }
-                });
 
-                const mainKey = `${employeeId}_main`;
-                employeeItemDetails[mainKey] = { total_kg, rupiah };
+                    const numbers = parseInput(val);
+                    const total = numbers.reduce((sum, n) => sum + n, 0);
 
-                $row.find(`input[name="total_kg"]`).val(total_kg.toFixed(2));
-                $row.find(`input[name="rupiah"]`).val(rupiah.toFixed());
-            }
+                    if (total === 0 && val !== '0') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Format salah',
+                            text: 'Gunakan format seperti: 0.9+0.7 atau 0,9+0,7',
+                        });
+                        return;
+                    }
+
+                    input.val(total.toFixed(2));
+
+                    const $row = input.closest('tr');
+                    const key = `${employeeId}_${kodeBarang}`;
+
+                    employeeItemDetails[key] = {
+                        items: numbers.map(berat => ({ berat, harga: hargaSatuan })),
+                        totalBerat: total,
+                        totalHarga: total * hargaSatuan
+                    };
+
+                    // Rehitung total total_kg & rp
+                    let total_kg = 0;
+                    let rupiah = 0;
+
+                    Object.keys(employeeItemDetails).forEach(keyLoop => {
+                        if (keyLoop.startsWith(`${employeeId}_`) && keyLoop !== `${employeeId}_main`) {
+                            const data = employeeItemDetails[keyLoop];
+                            total_kg += data.totalBerat || 0;
+                            rupiah += data.totalHarga || 0;
+                        }
+                    });
+
+                    const mainKey = `${employeeId}_main`;
+                    employeeItemDetails[mainKey] = { total_kg, rupiah };
+
+                    $row.find(`input[name="total_kg"]`).val(total_kg.toFixed(2));
+                    $row.find(`input[name="rupiah"]`).val(rupiah.toFixed());
+                }
         });
+
 
 
         // Handle delete harga
