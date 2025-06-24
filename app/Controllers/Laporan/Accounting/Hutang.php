@@ -162,14 +162,13 @@ class Hutang extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($res['data'] as $data) {
-            $totalRemaining = $data->total - $data->remaining;
             array_push($rdata, [
                 "no"                    => $no++,
-                "id"                    => $data->id,
-                "supplier"              => $data->name,
-                "no_penerimaan_barang"              => $data->no_penerimaan_barang,
-                "nominal_idr"           => number_format($data->total, 2, '.', ''),
-                "remaining_idr"         => number_format($totalRemaining, 2, '.', ''),
+                "id"                    => $data['id'],
+                "supplier"              => $data['supplier'],
+                "no_penerimaan_barang"  => $data['no_penerimaan_barang'],
+                "nominal_idr"           => number_format($data['nominal_idr'], 2, '.', ''),
+                "remaining_idr"         => number_format($data['remaining_idr'], 2, '.', ''),
             ]);
         }
 
@@ -366,12 +365,11 @@ class Hutang extends BaseController
         $no = 1;
         $row = 2;
         foreach ($res['data'] as $item) {
-            $remaining = $item->total - $item->remaining;
             $sheet->setCellValue("A$row", $no++);
-            $sheet->setCellValue("B$row", $item->no_penerimaan_barang);
-            $sheet->setCellValue("C$row", $item->name);
-            $sheet->setCellValue("D$row", $item->total);
-            $sheet->setCellValue("E$row", $remaining);
+            $sheet->setCellValue("B$row", $item['no_penerimaan_barang']);
+            $sheet->setCellValue("C$row", $item['supplier']);
+            $sheet->setCellValue("D$row", $item['nominal_idr']);
+            $sheet->setCellValue("E$row", $item['remaining_idr']);
             $row++;
         }
 
