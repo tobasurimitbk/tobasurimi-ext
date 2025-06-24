@@ -83,8 +83,16 @@ class RekapKopek extends BaseController
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
+        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+            $companyId = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $companyId = [15];
+        } else {
+            $companyId = [16];
+        }
+
         // $res = $this->transaksiPembelianModel->getList($condition, $addCondition, $limit, $offset);
-        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForAccounting($condition, $addCondition, $limit, $offset);
+        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForAccounting($condition, $addCondition, $limit, $offset, $companyId);
         $metaValuta = $this->metadataModel->get_by_name('Valuta');
 
         $rdata = [];
@@ -209,8 +217,16 @@ class RekapKopek extends BaseController
             "lastdate" => $tglAkhir != "now" ? $tglAkhir : "",
         ];
 
+        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+            $companyId = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $companyId = [15];
+        } else {
+            $companyId = [16];
+        }
+
         // $res = $this->transaksiPembelianModel->getList($condition, $addCondition, $limit, $offset);
-        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForPrintAccounting($condition, $addCondition);
+        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForAccounting($condition, $addCondition, null, null, $companyId);
         $metaValuta = $this->metadataModel->get_by_name('Valuta');
         // var_dump($res);
         // exit;
@@ -357,9 +373,15 @@ class RekapKopek extends BaseController
             ->setCellValue('M1', 'Nominal Value(IDR)')
             ->setCellValue('N1', 'Paid Value(IDR)');
 
+        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+            $companyId = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $companyId = [15];
+        } else {
+            $companyId = [16];
+        }
 
-
-        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForPrintAccounting($condition, $addCondition);
+        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForAccounting($condition, $addCondition, null, null, $companyId);
         $metaValuta = $this->metadataModel->get_by_name('Valuta');
 
         $rdata = [];

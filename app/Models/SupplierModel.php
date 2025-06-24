@@ -111,106 +111,62 @@ class SupplierModel extends Model
     public function getSupplierHutangList($condition, $addCondition, $limit = 10, $offset = 0, $companyId)
     {
         $dataFinal = [];
-
-        $dateStart = !empty($addCondition['startdate']) ? $addCondition['startdate'] : null;
-        $dateEnd   = !empty($addCondition['lastdate']) ? $addCondition['lastdate'] : null;
+        $dateStart = $addCondition['startdate'] ?? null;
+        $dateEnd   = $addCondition['lastdate'] ?? null;
         $this->supplierModel = new SupplierModel();
 
-        // === BAHAN BAKU ===
-        $dataBB = $this->supplierModel->asObject()
-            ->select("suppliers.id, suppliers.name,
-              SUM(rm_purchase_orders.total) AS total,
-              SUM(local_po_payments.amount) AS remaining,
-              (
-                  SELECT GROUP_CONCAT(DISTINCT pb.no_penerimaan_barang)
-                  FROM penerimaan_barang pb
-                  JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
-                  WHERE pb.supplier_id = suppliers.id
-                  AND pb.tipe_bahan = 'BAKU'
-              ) AS no_penerimaan_barang")
-            ->join('rm_purchase_orders', 'rm_purchase_orders.supplier_id = suppliers.id AND rm_purchase_orders.is_posted = 1 AND rm_purchase_orders.status_penerimaan = 1', 'left')
-            ->join('local_po_payments', 'FIND_IN_SET(rm_purchase_orders.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left')
-            ->where('suppliers.type', 'BAHAN BAKU')
-            ->where($condition)
-            ->whereIn('suppliers.company_id', $companyId);
+        // Helper for reusability
+        $buildQuery = function ($type, $poTable, $poAlias, $paymentTable, $tipeBahan) use ($condition, $addCondition, $companyId, $dateStart, $dateEnd) {
+            return $this->supplierModel->asObject()
+                ->select("suppliers.id, suppliers.name,
+                SUM(penerimaan_barang_detail.sub_total) AS total,
+                SUM($paymentTable.amount) AS remaining,
+                GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang) AS no_penerimaan_barang")
+                ->join("$poTable", "$poTable.supplier_id = suppliers.id AND $poTable.is_posted = 1", 'left')
+                ->join("$paymentTable", "FIND_IN_SET($poTable.id, REPLACE(REPLACE($paymentTable.multiple_po_id, '[', ''), ']', ''))", 'left')
+                ->join('penerimaan_barang_detail', "penerimaan_barang_detail.purchase_order_id = $poTable.id", 'left')
+                ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', 'left')
+                ->where('suppliers.type', $type)
+                ->where('penerimaan_barang.tipe_bahan', $tipeBahan)
+                ->where($condition)
+                ->whereIn('suppliers.company_id', $companyId)
+                ->when(!empty($addCondition['filter']), fn($q) => $q->whereIn('suppliers.id', $addCondition['filter']))
+                ->when(!empty($addCondition['divisi']), fn($q) => $q->where("$poTable.divisi_id", $addCondition['divisi']))
+                ->when($dateStart, fn($q) => $q->where("$poTable.po_date >=", $dateStart))
+                ->when($dateEnd, fn($q) => $q->where("$poTable.po_date <=", $dateEnd))
+                ->groupBy('suppliers.id');
+        };
 
-        if (!empty($addCondition['filter'])) {
-            $dataBB->whereIn('suppliers.id', $addCondition['filter']);
-        }
+        // Bahan Baku
+        $dataBB = $buildQuery('BAHAN BAKU', 'rm_purchase_orders', 'rm', 'local_po_payments', 'BAKU')->findAll();
+        $dataFinal = array_merge($dataFinal, $dataBB);
 
-        if (!empty($addCondition['divisi'])) {
-            $dataBB->where('rm_purchase_orders.divisi_id', $addCondition['divisi']);
-        }
+        // Bahan Penolong
+        $dataBP = $buildQuery('BAHAN PENOLONG', 'am_purchase_orders', 'am', 'local_po_payments', 'PENOLONG')->findAll();
+        $dataFinal = array_merge($dataFinal, $dataBP);
 
-        if ($dateStart) $dataBB->where('rm_purchase_orders.po_date >=', $dateStart);
-        if ($dateEnd)   $dataBB->where('rm_purchase_orders.po_date <=', $dateEnd);
-
-        $dataBB->groupBy('suppliers.id');
-        $dataFinal = array_merge($dataFinal, $dataBB->findAll());
-
-        // === BAHAN PENOLONG ===
-        $dataBP = $this->supplierModel->asObject()
-            ->select("suppliers.id, suppliers.name,
-              SUM(am_purchase_orders.total) AS total,
-              SUM(local_po_payments.amount) AS remaining,
-              (
-                  SELECT GROUP_CONCAT(DISTINCT pb.no_penerimaan_barang)
-                  FROM penerimaan_barang pb
-                  JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
-                  WHERE pb.supplier_id = suppliers.id
-                  AND pb.tipe_bahan = 'PENOLONG'
-              ) AS no_penerimaan_barang")
-            ->join('am_purchase_orders', 'am_purchase_orders.supplier_id = suppliers.id AND am_purchase_orders.is_posted = 1 AND am_purchase_orders.status_penerimaan = 1', 'left')
-            ->join('local_po_payments', 'FIND_IN_SET(am_purchase_orders.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left')
-            ->where('suppliers.type', 'BAHAN PENOLONG')
-            ->where($condition)
-            ->whereIn('suppliers.company_id', $companyId);
-
-        if (!empty($addCondition['filter'])) {
-            $dataBP->whereIn('suppliers.id', $addCondition['filter']);
-        }
-
-        if (!empty($addCondition['divisi'])) {
-            $dataBP->where('am_purchase_orders.division_id', $addCondition['divisi']);
-        }
-
-        if ($dateStart) $dataBP->where('am_purchase_orders.po_date >=', $dateStart);
-        if ($dateEnd)   $dataBP->where('am_purchase_orders.po_date <=', $dateEnd);
-
-        $dataBP->groupBy('suppliers.id');
-        $dataFinal = array_merge($dataFinal, $dataBP->findAll());
-
-        // === INTERNASIONAL ===
+        // Internasional
         $dataIMP = $this->supplierModel->asObject()
             ->select("suppliers.id, suppliers.name,
-              SUM(rm_import_pos.total) AS total,
-              SUM(import_po_payments.payment_amt * import_po_payments.current_exchange_rate) AS remaining,
-              (
-                  SELECT GROUP_CONCAT(DISTINCT pb.no_penerimaan_barang)
-                  FROM penerimaan_barang pb
-                  JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
-                  WHERE pb.supplier_id = suppliers.id
-                  AND pb.tipe_bahan = 'INTERNASIONAL'
-              ) AS no_penerimaan_barang")
-            ->join('rm_import_pos', 'rm_import_pos.supplier_id = suppliers.id AND rm_import_pos.is_posted = 1 AND rm_import_pos.status_penerimaan = 1', 'left')
+            SUM(penerimaan_barang_detail.sub_total) AS total,
+            SUM(import_po_payments.payment_amt * import_po_payments.current_exchange_rate) AS remaining,
+            GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang) AS no_penerimaan_barang")
+            ->join('rm_import_pos', 'rm_import_pos.supplier_id = suppliers.id AND rm_import_pos.is_posted = 1', 'left')
             ->join('import_po_payments', 'import_po_payments.supplier_id = suppliers.id AND import_po_payments.status_posting = 1', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_id = rm_import_pos.id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', 'left')
             ->where('suppliers.type', 'INTERNASIONAL')
+            ->where('penerimaan_barang.tipe_bahan', 'INTERNASIONAL')
             ->where($condition)
-            ->whereIn('suppliers.company_id', $companyId);
+            ->whereIn('suppliers.company_id', $companyId)
+            ->when(!empty($addCondition['filter']), fn($q) => $q->whereIn('suppliers.id', $addCondition['filter']))
+            ->when(!empty($addCondition['divisi']), fn($q) => $q->where('rm_import_pos.division_id', $addCondition['divisi']))
+            ->when($dateStart, fn($q) => $q->where('rm_import_pos.po_date >=', $dateStart))
+            ->when($dateEnd, fn($q) => $q->where('rm_import_pos.po_date <=', $dateEnd))
+            ->groupBy('suppliers.id')
+            ->findAll();
 
-        if (!empty($addCondition['filter'])) {
-            $dataIMP->whereIn('suppliers.id', $addCondition['filter']);
-        }
-
-        if (!empty($addCondition['divisi'])) {
-            $dataIMP->where('rm_import_pos.division_id', $addCondition['divisi']);
-        }
-
-        if ($dateStart) $dataIMP->where('rm_import_pos.po_date >=', $dateStart);
-        if ($dateEnd)   $dataIMP->where('rm_import_pos.po_date <=', $dateEnd);
-
-        $dataIMP->groupBy('suppliers.id');
-        $dataFinal = array_merge($dataFinal, $dataIMP->findAll());
+        $dataFinal = array_merge($dataFinal, $dataIMP);
 
         $filtered = [];
         foreach ($dataFinal as $item) {

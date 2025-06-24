@@ -612,19 +612,19 @@ class AMPurchaseOrderModel extends Model
                     suppliers.name AS supplier_name,
                     divisis.divisi AS divisi,
                     COUNT(am_purchase_order_details.id) AS itemCount,
-                    am_purchase_orders.total AS total, 
+                    penerimaan_barang_detail.sub_total AS total, 
                     local_po_payments.amount AS remaining,
                     penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang";
 
         $poDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->where('am_purchase_orders.status_penerimaan', 1)
+            // ->where('am_purchase_orders.status_penerimaan', 1)
             ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
             ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
             ->join('am_purchase_order_details', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
-            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id AND penerimaan_barang_detail.purchase_order_details_id = am_purchase_order_details.id', 'left')
-            ->join('penerimaan_barang', "penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id AND penerimaan_barang.tipe_bahan = 'PENOLONG'", 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id AND penerimaan_barang_detail.purchase_order_details_id = am_purchase_order_details.id', 'right')
+            ->join('penerimaan_barang', "penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id AND penerimaan_barang.tipe_bahan = 'PENOLONG'", 'right')
             ->join('local_po_payments', 'FIND_IN_SET(am_purchase_orders.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left') // Menyesuaikan jika multiple_po_id berbentuk JSON atau array sebagai string
             ->groupBy('am_purchase_orders.id')
             ->orderBy($sort, $sortType);

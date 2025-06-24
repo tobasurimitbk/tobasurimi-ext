@@ -360,14 +360,14 @@ class RMImportPOModel extends Model
                     suppliers.name AS supplier_name,
                     divisis.divisi AS divisi,
                     COUNT(rm_import_po_details.id) AS itemCount,
-                    rm_import_pos.total AS total, 
+                    penerimaan_barang_detail.sub_total AS total, 
                     local_po_payments.amount AS remaining,
                     penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang";
 
         $poDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->where('rm_import_pos.status_penerimaan', 1)
+            // ->where('rm_import_pos.status_penerimaan', 1)
             ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id')
             ->join('divisis', 'divisis.id = rm_import_pos.division_id', 'left')
             ->join('rm_import_po_details', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')

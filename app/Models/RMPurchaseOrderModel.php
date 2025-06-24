@@ -1254,14 +1254,14 @@ class RMPurchaseOrderModel extends Model
                     suppliers.name AS supplier_name,
                     divisis.divisi AS divisi,
                     COUNT(rm_purchase_order_details.id) AS itemCount,
-                    rm_purchase_orders.total AS total, 
+                    penerimaan_barang_detail.sub_total AS total, 
                     local_po_payments.amount AS remaining,
                     penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang";
 
         $poDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->where('rm_purchase_orders.status_penerimaan', 1)
+            // ->where('rm_purchase_orders.status_penerimaan', 1)
             ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id')
             ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
