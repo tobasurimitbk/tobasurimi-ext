@@ -842,8 +842,10 @@ class PanjarSupplier extends BaseController
             ->select('id, no_sub, nama_sub')
             ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
+            ->groupStart()
             ->like('nama_sub', $search)
             ->orLike('no_sub', $search)
+            ->groupEnd()
             ->findAll(10); // Batasi hasil max 10 biar efisien
 
         return $this->response->setJSON($subAkun);
