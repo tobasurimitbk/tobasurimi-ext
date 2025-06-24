@@ -365,12 +365,11 @@ class Hutang extends BaseController
         $no = 1;
         $row = 2;
         foreach ($res['data'] as $item) {
-            $remaining = $item->total - $item->remaining;
             $sheet->setCellValue("A$row", $no++);
-            $sheet->setCellValue("B$row", $item->no_penerimaan_barang);
-            $sheet->setCellValue("C$row", $item->name);
-            $sheet->setCellValue("D$row", $item->total);
-            $sheet->setCellValue("E$row", $remaining);
+            $sheet->setCellValue("B$row", $item['no_penerimaan_barang']);
+            $sheet->setCellValue("C$row", $item['supplier']);
+            $sheet->setCellValue("D$row", $item['nominal_idr']);
+            $sheet->setCellValue("E$row", $item['remaining_idr']);
             $row++;
         }
 
