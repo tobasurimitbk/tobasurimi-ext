@@ -194,7 +194,7 @@
                             <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'disabled=true' : '') : ''; ?> class="form-select bank_id" id="bank_id" name="bank_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataBank as $d) : ?>
-                                    <option <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['bank_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $v["id"]; ?>"><?= $v["name"] . " - " . $v['atas_nama'] . " " . $v['no_rekening']; ?></option>
+                                    <option <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['bank_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d["id"]; ?>"><?= $d["name"] . " - " . $d['atas_nama'] . " " . $d['no_rekening']; ?></option>
                                 <?php endforeach ?>
                             </select>
                             <label for="floatingInput">Pilih Bank (Opsional)</label>
@@ -661,6 +661,12 @@
         theme: "bootstrap-5",
     });
 
+    $('.bank_id').select2({
+        placeholder: "Pilih Bank (Opsional)",
+        theme: "bootstrap-5",
+    });
+
+
     // BARANG MASTER
     $('.barang_master_sales_id').select2({
         placeholder: "Pilih Barang",
@@ -704,14 +710,14 @@
     });
 
     //CSS SELECT2 FLOATING LABEL
-    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id,#divisi_id,#spesifikasi_id')
+    $('.bank_id,.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id,#divisi_id,#spesifikasi_id')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id,#divisi_id,#spesifikasi_id')
+    $('.bank_id,.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id,#divisi_id,#spesifikasi_id')
         .parent('div')
         .children('span')
         .children('span')
@@ -719,7 +725,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.satuan_id,#divisi_id,#spesifikasi_id')
+    $('.bank_id,.satuan_id,#divisi_id,#spesifikasi_id')
         .parent('div')
         .children('span')
         .children('span')
@@ -727,7 +733,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,#sales_id,#divisi_id,#spesifikasi_id')
+    $('.bank_id,.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,#sales_id,#divisi_id,#spesifikasi_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');
