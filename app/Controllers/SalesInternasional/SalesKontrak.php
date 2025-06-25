@@ -3,6 +3,7 @@
 namespace App\Controllers\SalesInternasional;
 
 use App\Controllers\BaseController;
+use App\Models\BanksModel;
 use App\Models\CustomerModel;
 use App\Models\BarangMasterSalesModel;
 use App\Models\CountryModel;
@@ -35,6 +36,7 @@ class SalesKontrak extends BaseController
     protected $dompdf;
     protected $employessModel;
     protected $divisiModel;
+    protected $bankModel;
 
     public function __construct()
     {
@@ -54,6 +56,7 @@ class SalesKontrak extends BaseController
         $this->employessModel = new EmployeesModel();
         $this->dompdf = new Dompdf();
         $this->divisiModel = new DivisisModel();
+        $this->bankModel = new BanksModel();
     }
 
     public function index()
@@ -74,6 +77,7 @@ class SalesKontrak extends BaseController
             'jabatan_name' => "SALES INTERNASIONAL"
         ];
         $sales = $this->employessModel->getEmployeesComplete($this->this_company_id, $condition);
+        $dataBank = $this->bankModel->where('company_id', $this->this_company_id)->findAll();
 
         $data = [
             "dataCustomer" => $dataCustomer,
@@ -84,7 +88,9 @@ class SalesKontrak extends BaseController
             'dataSatuan' => $dataSatuan,
             'dataBarang' => $dataBarang,
             "dataSales" => $sales,
+            "dataBank" => $dataBank
         ];
+
 
         return view('SalesInternasional/SalesKontrak/form', $data);
     }
@@ -104,9 +110,10 @@ class SalesKontrak extends BaseController
         $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->orderBy('createdAt', "DESC")->findAll();
         $isClosed = $this->salesOrderExportModel->where('sales_contract_id', $id)->findAll();
         $condition = [
-            'jabatan_name' => "SALES"
+            'jabatan_name' => "SALES INTERNASIONAL"
         ];
         $sales = $this->employessModel->getEmployeesComplete($this->this_company_id, $condition);
+        $dataBank = $this->bankModel->where('company_id', $this->this_company_id)->findAll();
 
         if ($dataSalesKontrak == null) {
             return redirect()->to('sales-kontrak');
@@ -124,6 +131,7 @@ class SalesKontrak extends BaseController
             'dataSalesKontrakDetail' => $dataSalesKontrakDetail,
             'isClosed' => count($isClosed) == 0 ? '0' : '1',
             "dataSales" => $sales,
+            "dataBank" => $dataBank
         ];
 
         return view('SalesInternasional/SalesKontrak/form', $data);
@@ -148,6 +156,7 @@ class SalesKontrak extends BaseController
             'jabatan_name' => "SALES"
         ];
         $sales = $this->employessModel->getEmployeesComplete($this->this_company_id, $condition);
+        $dataBank = $this->bankModel->where('company_id', $this->this_company_id)->findAll();
 
         if ($dataSalesKontrak == null) {
             return redirect()->to('sales-kontrak');
@@ -165,6 +174,7 @@ class SalesKontrak extends BaseController
             'dataSalesKontrakDetail' => $dataSalesKontrakDetail,
             'isClosed' => count($isClosed) == 0 ? '0' : '1',
             "dataSales" => $sales,
+            "dataBank" => $dataBank
         ];
 
         return view('SalesInternasional/SalesKontrak/form_duplicate', $data);
@@ -298,7 +308,8 @@ class SalesKontrak extends BaseController
             'print_out_broker' => $this->request->getVar('print_out_broker'),
             'createdBy' => $this->this_user_id,
             'keterangan' => $this->request->getVar('keterangan'),
-            'status_posting' => '0'
+            'status_posting' => '0',
+            'bank_id' => $this->request->getVar('bank_id')
         ]);
 
         foreach ($barangs as $b) {
@@ -377,6 +388,7 @@ class SalesKontrak extends BaseController
             'print_out_broker' => $this->request->getVar('print_out_broker'),
             'createdBy' => $this->this_user_id,
             'keterangan' => $this->request->getVar('keterangan'),
+            'bank_id' => $this->request->getVar('bank_id')
         ]);
 
         // get all id detail
@@ -473,8 +485,20 @@ class SalesKontrak extends BaseController
         $id = decrypt($id);
 
         $salesKontrak = $this->salesKontrakModel
-            ->select('sales_contract.*,customers.name as customer_name')
+            ->select(
+                '
+                sales_contract.*,
+                customers.name as customer_name,
+                banks.kode_bank,
+                banks.name as nama_bank,
+                banks.atas_nama,
+                banks.no_rekening,
+                metadata.value as mata_uang
+                '
+            )
             ->join('customers', 'sales_contract.customer_id = customers.id', 'left')
+            ->join('banks', 'banks.id = sales_contract.bank_id', 'left')
+            ->join('metadata', 'metadata.id = sales_contract.currency', 'left')
             ->find($id);
         $salesKontrakDetail = $this->salesKontrakDetailModel->detail($id);
         if ($salesKontrak == null) {

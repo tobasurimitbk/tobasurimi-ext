@@ -34,7 +34,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="number" min="0" class="form-control no_rekening" id="no_rekening" name="no_rekening" placeholder="No Rekening">
+                                <input autocomplete="one-time-code" type="text" class="form-control no_rekening" id="no_rekening" name="no_rekening" placeholder="No Rekening">
                                 <label for="floatingInput">No Rekening</label>
                             </div>
                         </div>

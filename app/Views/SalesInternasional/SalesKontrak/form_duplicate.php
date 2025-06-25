@@ -189,6 +189,17 @@
                             <label for="floatingInput">Keterangan (Opsional)</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'disabled=true' : '') : ''; ?> class="form-select bank_id" id="bank_id" name="bank_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataBank as $d) : ?>
+                                    <option <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['bank_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $v["id"]; ?>"><?= $v["name"] . " - " . $v['atas_nama'] . " " . $v['no_rekening']; ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput">Pilih Bank (Opsional)</label>
+                        </div>
+                    </div>
                 </div>
                 <!-- <div class="row">
                     <div class="col mb-3">
