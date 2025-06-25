@@ -653,6 +653,7 @@
     $('.satuan_order_id').select2({
         placeholder: "Pilih Satuan Order",
         theme: "bootstrap-5",
+        dropdownParent: $('.detail-modal')
     });
 
     // SATUAN
