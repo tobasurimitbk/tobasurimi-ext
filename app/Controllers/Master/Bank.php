@@ -98,29 +98,29 @@ class Bank extends BaseController
         }
 
         $kodeBank = strtoupper($this->request->getVar('kode_bank'));
-        $bankFirst = $this->banksModel->where('company_id', $this->this_company_id)->where('kode_bank', $kodeBank)->first();
+        // $bankFirst = $this->banksModel->where('company_id', $this->this_company_id)->where('kode_bank', $kodeBank)->first();
 
-        if ($bankFirst != null) {
-            return response()->setJSON([
-                'status' => false,
-                'message' => "Kode bank " . $bankFirst['kode_bank'] . " sudah ada",
-                'token' => csrf_hash()
-            ]);
-        } else {
-            $this->banksModel->insert([
-                'company_id' => $this->this_company_id,
-                'kode_bank' => $kodeBank,
-                'name' => $this->request->getVar('name'),
-                'atas_nama' => $this->request->getVar('atas_nama'),
-                'no_rekening' => $this->request->getVar('no_rekening')
-            ]);
+        // if ($bankFirst != null) {
+        //     return response()->setJSON([
+        //         'status' => false,
+        //         'message' => "Kode bank " . $bankFirst['kode_bank'] . " sudah ada",
+        //         'token' => csrf_hash()
+        //     ]);
+        // } else {
+        $this->banksModel->insert([
+            'company_id' => $this->this_company_id,
+            'kode_bank' => $kodeBank,
+            'name' => $this->request->getVar('name'),
+            'atas_nama' => $this->request->getVar('atas_nama'),
+            'no_rekening' => $this->request->getVar('no_rekening')
+        ]);
 
-            return response()->setJSON([
-                'status' => true,
-                'message' => "Bank berhasil disimpan",
-                'token' => csrf_hash()
-            ]);
-        }
+        return response()->setJSON([
+            'status' => true,
+            'message' => "Bank berhasil disimpan",
+            'token' => csrf_hash()
+        ]);
+        // }
     }
 
     public function update()
@@ -150,19 +150,19 @@ class Bank extends BaseController
         }
 
 
-        $bankWithSameCode = $this->banksModel
-            ->where('company_id', $this->this_company_id)
-            ->where('kode_bank', $kodeBank)
-            ->where('id !=', $id)
-            ->first();
+        // $bankWithSameCode = $this->banksModel
+        //     ->where('company_id', $this->this_company_id)
+        //     ->where('kode_bank', $kodeBank)
+        //     ->where('id !=', $id)
+        //     ->first();
 
-        if ($bankWithSameCode) {
-            return response()->setJSON([
-                'status' => false,
-                'message' => "Kode bank sudah digunakan oleh bank lain.",
-                'token' => csrf_hash()
-            ]);
-        }
+        // if ($bankWithSameCode) {
+        //     return response()->setJSON([
+        //         'status' => false,
+        //         'message' => "Kode bank sudah digunakan oleh bank lain.",
+        //         'token' => csrf_hash()
+        //     ]);
+        // }
         $this->banksModel->update($id, [
             'name' => $this->request->getVar('name'),
             'atas_nama' => $this->request->getVar('atas_nama'),
