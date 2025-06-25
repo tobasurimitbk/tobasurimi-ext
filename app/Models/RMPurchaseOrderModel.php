@@ -1261,12 +1261,12 @@ class RMPurchaseOrderModel extends Model
         $poDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            // ->where('rm_purchase_orders.status_penerimaan', 1)
+            ->where('rm_purchase_orders.is_posted', 1)
             ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id')
             ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
-            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id AND penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id', 'left')
-            ->join('penerimaan_barang', "penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id AND penerimaan_barang.status_penerimaan = 'LOKAL' AND penerimaan_barang.tipe_bahan = 'BAKU'", 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id AND penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id', 'right')
+            ->join('penerimaan_barang', "penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id AND penerimaan_barang.status_penerimaan = 'LOKAL' AND penerimaan_barang.tipe_bahan = 'BAKU'", 'right')
             ->join('local_po_payments', 'FIND_IN_SET(rm_purchase_orders.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left') // Menyesuaikan jika multiple_po_id berbentuk JSON atau array sebagai string
             ->groupBy('rm_purchase_orders.id')
             ->orderBy($sort, $sortType);

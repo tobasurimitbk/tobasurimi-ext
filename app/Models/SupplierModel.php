@@ -110,79 +110,88 @@ class SupplierModel extends Model
 
     public function getSupplierHutangList($condition, $addCondition, $limit = 10, $offset = 0, $companyId)
     {
-        $dataFinal = [];
         $dateStart = $addCondition['startdate'] ?? null;
         $dateEnd   = $addCondition['lastdate'] ?? null;
-        $this->supplierModel = new SupplierModel();
+        $result = [];
 
-        // Helper for reusability
-        $buildQuery = function ($type, $poTable, $poAlias, $paymentTable, $tipeBahan) use ($condition, $addCondition, $companyId, $dateStart, $dateEnd) {
-            return $this->supplierModel->asObject()
-                ->select("suppliers.id, suppliers.name,
-                SUM(penerimaan_barang_detail.sub_total) AS total,
-                SUM($paymentTable.amount) AS remaining,
-                GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang) AS no_penerimaan_barang")
-                ->join("$poTable", "$poTable.supplier_id = suppliers.id AND $poTable.is_posted = 1", 'left')
-                ->join("$paymentTable", "FIND_IN_SET($poTable.id, REPLACE(REPLACE($paymentTable.multiple_po_id, '[', ''), ']', ''))", 'left')
-                ->join('penerimaan_barang_detail', "penerimaan_barang_detail.purchase_order_id = $poTable.id", 'left')
-                ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', 'left')
-                ->where('suppliers.type', $type)
-                ->where('penerimaan_barang.tipe_bahan', $tipeBahan)
-                ->where($condition)
-                ->whereIn('suppliers.company_id', $companyId)
-                ->when(!empty($addCondition['filter']), fn($q) => $q->whereIn('suppliers.id', $addCondition['filter']))
-                ->when(!empty($addCondition['divisi']), fn($q) => $q->where("$poTable.divisi_id", $addCondition['divisi']))
-                ->when($dateStart, fn($q) => $q->where("$poTable.po_date >=", $dateStart))
-                ->when($dateEnd, fn($q) => $q->where("$poTable.po_date <=", $dateEnd))
-                ->groupBy('suppliers.id');
-        };
-
-        // Bahan Baku
-        $dataBB = $buildQuery('BAHAN BAKU', 'rm_purchase_orders', 'rm', 'local_po_payments', 'BAKU')->findAll();
-        $dataFinal = array_merge($dataFinal, $dataBB);
-
-        // Bahan Penolong
-        $dataBP = $buildQuery('BAHAN PENOLONG', 'am_purchase_orders', 'am', 'local_po_payments', 'PENOLONG')->findAll();
-        $dataFinal = array_merge($dataFinal, $dataBP);
-
-        // Internasional
-        $dataIMP = $this->supplierModel->asObject()
-            ->select("suppliers.id, suppliers.name,
-            SUM(penerimaan_barang_detail.sub_total) AS total,
-            SUM(import_po_payments.payment_amt * import_po_payments.current_exchange_rate) AS remaining,
-            GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang) AS no_penerimaan_barang")
-            ->join('rm_import_pos', 'rm_import_pos.supplier_id = suppliers.id AND rm_import_pos.is_posted = 1', 'left')
-            ->join('import_po_payments', 'import_po_payments.supplier_id = suppliers.id AND import_po_payments.status_posting = 1', 'left')
-            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_id = rm_import_pos.id', 'left')
-            ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', 'left')
-            ->where('suppliers.type', 'INTERNASIONAL')
-            ->where('penerimaan_barang.tipe_bahan', 'INTERNASIONAL')
+        $supplierModel = new SupplierModel();
+        $suppliers = $supplierModel->asObject()
+            ->select("suppliers.id, suppliers.name, suppliers.type")
             ->where($condition)
             ->whereIn('suppliers.company_id', $companyId)
             ->when(!empty($addCondition['filter']), fn($q) => $q->whereIn('suppliers.id', $addCondition['filter']))
-            ->when(!empty($addCondition['divisi']), fn($q) => $q->where('rm_import_pos.division_id', $addCondition['divisi']))
-            ->when($dateStart, fn($q) => $q->where('rm_import_pos.po_date >=', $dateStart))
-            ->when($dateEnd, fn($q) => $q->where('rm_import_pos.po_date <=', $dateEnd))
-            ->groupBy('suppliers.id')
             ->findAll();
 
-        $dataFinal = array_merge($dataFinal, $dataIMP);
+        foreach ($suppliers as $supplier) {
+            $supplierId = $supplier->id;
+            $supplierName = $supplier->name;
+            $supplierType = $supplier->type;
 
-        $filtered = [];
-        foreach ($dataFinal as $item) {
-            if (floatval($item->total) > 0) {
-                $filtered[] = [
-                    'id' => $item->id,
-                    'supplier' => $item->name,
-                    'no_penerimaan_barang' => $item->no_penerimaan_barang ?? '-',
-                    'nominal_idr' => number_format($item->total, 2, '.', ''),
-                    'remaining_idr' => number_format($item->total - $item->remaining, 2, '.', ''),
+            // Query total invoice
+            $invoiceBuilder = db_connect()->table('penerimaan_barang_detail')
+                ->selectSum('penerimaan_barang_detail.sub_total', 'total_invoice')
+                ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
+                ->where('penerimaan_barang_detail.deletedAt', null)
+                ->where('penerimaan_barang.deletedAt', null)
+                ->where('penerimaan_barang.supplier_id', $supplierId);
+
+            if ($supplierType == 'BAHAN BAKU') {
+                $invoiceBuilder->where('penerimaan_barang.tipe_bahan', 'BAKU');
+            } elseif ($supplierType == 'BAHAN PENOLONG') {
+                $invoiceBuilder->where('penerimaan_barang.tipe_bahan', 'PENOLONG');
+            } elseif ($supplierType == 'INTERNASIONAL') {
+                $invoiceBuilder->where('penerimaan_barang.tipe_bahan', 'INTERNASIONAL');
+            }
+
+            if ($dateStart) $invoiceBuilder->where('penerimaan_barang.tanggal >=', $dateStart);
+            if ($dateEnd) $invoiceBuilder->where('penerimaan_barang.tanggal <=', $dateEnd);
+
+            $totalInvoiceRow = $invoiceBuilder->get()->getRow();
+            $totalInvoice = floatval($totalInvoiceRow->total_invoice ?? 0);
+
+            // Query total payment
+            if ($supplierType == 'INTERNASIONAL') {
+                $paymentBuilder = db_connect()->table('import_po_payments')
+                    ->selectSum('(payment_amt * current_exchange_rate)', 'total_paid')
+                    ->where('supplier_id', $supplierId)
+                    ->where('status_posting', 1);
+            } else {
+                $paymentBuilder = db_connect()->table('local_po_payments')
+                    ->selectSum('amount', 'total_paid')
+                    ->where("FIND_IN_SET('$supplierId', REPLACE(REPLACE(supplier_id, '[', ''), ']', '')) != ", 0); // atau supplier_id langsung
+            }
+
+            $totalPaidRow = $paymentBuilder->get()->getRow();
+            $totalPaid = floatval($totalPaidRow->total_paid ?? 0);
+
+            // Query no_penerimaan_barang
+            $noPBRows = db_connect()->table('penerimaan_barang')
+                ->select("GROUP_CONCAT(DISTINCT no_penerimaan_barang SEPARATOR ', ') AS no_pb")
+                ->where('supplier_id', $supplierId)
+                ->where('deletedAt', null);
+
+            if ($supplierType == 'BAHAN BAKU') $noPBRows->where('tipe_bahan', 'BAKU');
+            elseif ($supplierType == 'BAHAN PENOLONG') $noPBRows->where('tipe_bahan', 'PENOLONG');
+            elseif ($supplierType == 'INTERNASIONAL') $noPBRows->where('tipe_bahan', 'INTERNASIONAL');
+
+            if ($dateStart) $noPBRows->where('tanggal >=', $dateStart);
+            if ($dateEnd) $noPBRows->where('tanggal <=', $dateEnd);
+
+            $noPB = $noPBRows->get()->getRow()->no_pb ?? '-';
+
+            if ($totalInvoice > 0) {
+                $result[] = [
+                    'id' => $supplierId,
+                    'supplier' => $supplierName,
+                    'no_penerimaan_barang' => $noPB,
+                    'nominal_idr' => $totalInvoice,
+                    'remaining_idr' => $totalInvoice - $totalPaid,
                 ];
             }
         }
 
-        $totalData = count($filtered);
-        $paged = array_slice($filtered, $offset, $limit);
+        $totalData = count($result);
+        $paged = array_slice($result, $offset, $limit);
 
         return [
             'data' => $paged,

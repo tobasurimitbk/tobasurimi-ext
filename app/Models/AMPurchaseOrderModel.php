@@ -619,7 +619,7 @@ class AMPurchaseOrderModel extends Model
         $poDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            // ->where('am_purchase_orders.status_penerimaan', 1)
+            ->where('am_purchase_orders.is_posted', 1)
             ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
             ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
             ->join('am_purchase_order_details', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')

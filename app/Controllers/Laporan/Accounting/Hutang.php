@@ -151,36 +151,32 @@ class Hutang extends BaseController
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
+        $allData = $this->getAllHutangSummary($condition, $addCondition, $companyId);
 
-        $res = $this->supplierModel->getSupplierHutangList($condition, $addCondition, $limit, $offset, $companyId);
-
-        // var_dump($res['data']);
-        // exit;
-
-        $rdata = [];
+        $totalData = count($allData);
+        $pagedData = array_slice($allData, $offset, $limit);
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-        foreach ($res['data'] as $data) {
-            array_push($rdata, [
-                "no"                    => $no++,
-                "id"                    => $data['id'],
-                "supplier"              => $data['supplier'],
-                "no_penerimaan_barang"  => $data['no_penerimaan_barang'],
-                "nominal_idr"           => number_format($data['nominal_idr'], 2, '.', ''),
-                "remaining_idr"         => number_format($data['remaining_idr'], 2, '.', ''),
-            ]);
+        $rdata = [];
+        foreach ($pagedData as $d) {
+            $rdata[] = [
+                'no' => $no++,
+                'id' => $d['id'],
+                'supplier' => $d['supplier'],
+                'no_penerimaan_barang' => $d['no_penerimaan_barang'],
+                'nominal_idr' => $d['nominal_idr'],
+                'remaining_idr' => $d['remaining_idr'],
+            ];
         }
 
-        $data = [
-            "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $res['totalData'],
-            "recordsFiltered"   => $res['totalFilteredData'],
-            "data"              => $rdata,
-            "payload"           => $payload,
-        ];
-
-        return response()->setJSON($data);
+        return response()->setJSON([
+            "draw" => intval($this->request->getGet("draw")),
+            "recordsTotal" => $totalData,
+            "recordsFiltered" => $totalData,
+            "data" => $rdata,
+            "payload" => $payload,
+        ]);
     }
 
     public function allDetailsInvoice($id)
@@ -265,6 +261,54 @@ class Hutang extends BaseController
         ];
 
         return response()->setJSON($data);
+    }
+
+    public function getAllHutangSummary($condition, $addCondition, $companyId)
+    {
+        $res = [];
+
+        $data = [];
+
+        $dataBB = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        $dataBP = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        $dataIMP = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+
+        $all = array_merge($dataBB['data'], $dataBP['data'], $dataIMP['data']);
+
+        foreach ($all as $item) {
+            $supplierId = $item->supplier_id;
+            $supplierName = $item->supplier_name;
+
+            if (!isset($data[$supplierId])) {
+                $data[$supplierId] = [
+                    'id' => $supplierId,
+                    'supplier' => $supplierName,
+                    'no_penerimaan_barang' => [],
+                    'nominal_idr' => 0,
+                    'remaining_idr' => 0
+                ];
+            }
+
+            $data[$supplierId]['nominal_idr'] += floatval($item->total ?? 0);
+            $data[$supplierId]['remaining_idr'] += floatval($item->total ?? 0) - floatval($item->remaining ?? 0);
+
+            if (!empty($item->no_penerimaan_barang)) {
+                $data[$supplierId]['no_penerimaan_barang'][] = $item->no_penerimaan_barang;
+            }
+        }
+
+        // Format hasil akhir
+        foreach ($data as $supplier) {
+            $res[] = [
+                'id' => $supplier['id'],
+                'supplier' => $supplier['supplier'],
+                'no_penerimaan_barang' => implode(', ', array_unique($supplier['no_penerimaan_barang'])),
+                'nominal_idr' => number_format($supplier['nominal_idr'], 2, '.', ''),
+                'remaining_idr' => number_format($supplier['remaining_idr'], 2, '.', ''),
+            ];
+        }
+
+        return $res;
     }
 
     public function printHutang()
