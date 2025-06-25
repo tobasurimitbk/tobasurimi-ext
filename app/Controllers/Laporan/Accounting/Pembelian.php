@@ -273,9 +273,14 @@ class Pembelian extends BaseController
         return response()->setJSON($data);
     }
 
-    public function LaporanPembelianPrint($tglAwal, $tglAkhir, $filter, $search)
+    public function LaporanPembelianPrint($tglAwal, $tglAkhir, $rawFilter, $search)
     {
         $dompdf = new Dompdf();
+        $filter = [];
+
+        if ($rawFilter) {
+            $filter = explode(',', $rawFilter);
+        }
 
         if ($this->this_company_id != 16 && $this->this_company_id != 15) {
             $companyId = [1, 2];
@@ -291,12 +296,12 @@ class Pembelian extends BaseController
         ];
 
         $addCondition = [
-            "search"        => $search != "all" ? $search : "",
-            "filter"        => $filter != "all" ? $filter : "",
+            "search"        => $search,
+            "filter"        => $filter,
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "startdate" => $tglAwal != "all" ? $tglAwal : "",
-            "lastdate" => $tglAkhir != "now" ? $tglAkhir : "",
+            "startdate"     => $tglAwal ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAwal))) : date("Y-m-d"),
+            "lastdate"      => $tglAkhir ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAkhir))) : date("Y-m-d"),
         ];
 
         // $res = $this->transaksiPembelianModel->getList($condition, $addCondition, $limit, $offset);
@@ -311,18 +316,18 @@ class Pembelian extends BaseController
         foreach ($res['data'] as $data) {
             // CARI BC NYA DI BC_PURCHASE ORDER
             $bc23PurchaseOrder = $this->bcPurchaseOrderModel->select('
-                bc_purchase_order.no_daftar,
-                bc_23.no_aju
-            ')
+                        bc_purchase_order.no_daftar,
+                        bc_23.no_aju
+                    ')
                 ->join('bc_23', 'bc_23.bc_purchase_order_id = bc_purchase_order.id')
                 ->like('multiple_lpb_id', $data->id)
                 ->where('bc_purchase_order.company_id', $this->this_company_id)
                 ->first();
 
             $bc40PurchaseOrder = $this->bcPurchaseOrderModel->select('
-                bc_purchase_order.no_daftar,
-                bc_40.no_aju
-            ')
+                        bc_purchase_order.no_daftar,
+                        bc_40.no_aju
+                    ')
                 ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_purchase_order.id')
                 ->like('multiple_lpb_id', $data->id)
                 ->where('bc_purchase_order.company_id', $this->this_company_id)
@@ -354,14 +359,16 @@ class Pembelian extends BaseController
             $bp = "";
             if ($data->status_penerimaan == "LOKAL" && $data->tipe_bahan == "BAKU") {
                 $lokalbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangBakuDetail($data->id);
+                // var_dump($lokalbb);
                 foreach ($lokalbb as $value) {
-                    $totalxqty = $value['qty_barang_po'] * $value['total_barang_po'];
+                    // $totalxqty = $value['qty_barang_po'] * $value['total_barang_po'];
                     $nominalTransaksi += floatval($value['sub_total']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
             } else if ($data->status_penerimaan == "IMPORT" && $data->tipe_bahan == "BAKU") {
                 $importbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangImportBakuDetail($data->id);
+                // var_dump($importbb);
                 foreach ($importbb as $value) {
                     $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
                     if ($kursData) {
@@ -371,6 +378,8 @@ class Pembelian extends BaseController
                                 $exchangeTransaksi = $kursData->nilai_kurs;
                             }
                         }
+                    } else {
+                        $valasTransaksi = $value['currencyValue'];
                     }
                     $nominalTransaksi += floatval($value['sub_total']);
                 }
@@ -378,10 +387,9 @@ class Pembelian extends BaseController
                 $nominalIdrTransaksi += $totalHargaAll;
             } else if ($data->tipe_bahan == "PENOLONG") {
                 $bp = $this->penerimaanBarangDetailModel->getPenerimaanBarangPenolongDetail($data->id);
+                // var_dump($bp);
                 foreach ($bp as $value) {
-                    // var_dump($valasTransaksi);
                     $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
-                    // var_dump($kursData);
                     if ($kursData) {
                         foreach ($metaValuta as $valueValuta) {
                             if ($value['currency'] == $valueValuta['id']) {
@@ -389,17 +397,14 @@ class Pembelian extends BaseController
                                 $exchangeTransaksi = $kursData->nilai_kurs;
                             }
                         }
+                    } else {
+                        $valasTransaksi = $value['currencyValue'] ? $value['currencyValue'] : "IDR";
                     }
-                    // var_dump($valasTransaksi);
-                    // var_dump($exchangeTransaksi);
                     $nominalTransaksi += floatval($value['sub_total']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
             }
-            // var_dump($lokalbb);
-            // var_dump($importbb);
-            // var_dump($bp);
 
             array_push($rdata, [
                 "no"                    => $no++,
@@ -441,12 +446,17 @@ class Pembelian extends BaseController
         exit(0);
     }
 
-    public function exportExcel($tglAwal, $tglAkhir, $filter, $search)
+    public function exportExcel($tglAwal, $tglAkhir, $rawFilter, $search)
     {
         set_time_limit(0);
         ini_set('memory_limit', '512M');
 
         $spreadsheet = new Spreadsheet();
+        $filter = [];
+
+        if ($rawFilter) {
+            $filter = explode(',', $rawFilter);
+        }
 
         if ($this->this_company_id != 16 && $this->this_company_id != 15) {
             $companyId = [1, 2];
@@ -458,16 +468,16 @@ class Pembelian extends BaseController
 
         $condition = [
             // "penerimaan_barang.company_id"  => $this->this_company_id,
-            "penerimaan_barang.deletedAt" => NULL
+            // "penerimaan_barang.deletedAt" => NULL
         ];
 
         $addCondition = [
-            "search"        => $search != "all" ? $search : "",
-            "filter"        => $filter != "all" ? $filter : "",
+            "search"        => $search == "all" ? "" : $search,
+            "filter"        => $rawFilter == "all" ? [] : $filter,
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "startdate" => $tglAwal != "all" ? $tglAwal : "",
-            "lastdate" => $tglAkhir != "now" ? $tglAkhir : "",
+            "startdate"     => $tglAwal ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAwal))) : date("Y-m-d"),
+            "lastdate"      => $tglAkhir ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAkhir))) : date("Y-m-d"),
         ];
 
         // Menggabungkan sel dari A1 hingga N1 dan mengisi dengan teks "Purchase Order"
@@ -509,18 +519,18 @@ class Pembelian extends BaseController
         foreach ($res['data'] as $data) {
             // CARI BC NYA DI BC_PURCHASE ORDER
             $bc23PurchaseOrder = $this->bcPurchaseOrderModel->select('
-                bc_purchase_order.no_daftar,
-                bc_23.no_aju
-            ')
+                        bc_purchase_order.no_daftar,
+                        bc_23.no_aju
+                    ')
                 ->join('bc_23', 'bc_23.bc_purchase_order_id = bc_purchase_order.id')
                 ->like('multiple_lpb_id', $data->id)
                 ->where('bc_purchase_order.company_id', $this->this_company_id)
                 ->first();
 
             $bc40PurchaseOrder = $this->bcPurchaseOrderModel->select('
-                bc_purchase_order.no_daftar,
-                bc_40.no_aju
-            ')
+                        bc_purchase_order.no_daftar,
+                        bc_40.no_aju
+                    ')
                 ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_purchase_order.id')
                 ->like('multiple_lpb_id', $data->id)
                 ->where('bc_purchase_order.company_id', $this->this_company_id)
@@ -552,14 +562,16 @@ class Pembelian extends BaseController
             $bp = "";
             if ($data->status_penerimaan == "LOKAL" && $data->tipe_bahan == "BAKU") {
                 $lokalbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangBakuDetail($data->id);
+                // var_dump($lokalbb);
                 foreach ($lokalbb as $value) {
-                    $totalxqty = $value['qty_barang_po'] * $value['total_barang_po'];
-                    $nominalTransaksi += $totalxqty;
+                    // $totalxqty = $value['qty_barang_po'] * $value['total_barang_po'];
+                    $nominalTransaksi += floatval($value['sub_total']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
             } else if ($data->status_penerimaan == "IMPORT" && $data->tipe_bahan == "BAKU") {
                 $importbb = $this->penerimaanBarangDetailModel->getPenerimaanBarangImportBakuDetail($data->id);
+                // var_dump($importbb);
                 foreach ($importbb as $value) {
                     $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
                     if ($kursData) {
@@ -569,13 +581,16 @@ class Pembelian extends BaseController
                                 $exchangeTransaksi = $kursData->nilai_kurs;
                             }
                         }
+                    } else {
+                        $valasTransaksi = $value['currencyValue'];
                     }
-                    $nominalTransaksi += $value['total_po'];
+                    $nominalTransaksi += floatval($value['sub_total']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
             } else if ($data->tipe_bahan == "PENOLONG") {
                 $bp = $this->penerimaanBarangDetailModel->getPenerimaanBarangPenolongDetail($data->id);
+                // var_dump($bp);
                 foreach ($bp as $value) {
                     $kursData = $this->kursModel->getByMetaId($value['currency'], $data->tanggal);
                     if ($kursData) {
@@ -585,8 +600,10 @@ class Pembelian extends BaseController
                                 $exchangeTransaksi = $kursData->nilai_kurs;
                             }
                         }
+                    } else {
+                        $valasTransaksi = $value['currencyValue'] ? $value['currencyValue'] : "IDR";
                     }
-                    $nominalTransaksi += $value['total_po'];
+                    $nominalTransaksi += floatval($value['sub_total']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;

@@ -212,7 +212,8 @@ class PenerimaanBarangModel extends Model
                     penerimaan_barang_detail.harga,
                     SUM(penerimaan_barang_detail.sub_total) as harga_sub_total,
                     bc_23.no_aju AS BC23_AJU,
-                    bc_40.no_aju AS BC40_AJU,";
+                    bc_40.no_aju AS BC40_AJU,
+                    divisis.divisi as divisi";
         $penerimaanBarangDataQry = $this->asObject()
             ->select($selectQry)
             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
@@ -222,6 +223,7 @@ class PenerimaanBarangModel extends Model
             ->join('bc_purchase_order bc_40_po', 'bc_40_po.id = penerimaan_barang.id', 'left')
             ->join('bc_23', 'bc_23.bc_purchase_order_id = bc_23_po.id', 'left')
             ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_40_po.id', 'left')
+            ->join('divisis', 'divisis.divisi = penerimaan_barang.divisi_id', 'left')
             ->groupBy(('penerimaan_barang.id'))
             ->where($condition)
             ->whereIn('penerimaan_barang.company_id', $companyId)
@@ -280,58 +282,75 @@ class PenerimaanBarangModel extends Model
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'penerimaan_barang.createdAt';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'asc'] ?? 'ASC';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "penerimaan_barang.*, 
-                    DATE_FORMAT(penerimaan_barang.tanggal, '%d/%m/%Y') AS tanggal_penerimaan,
-                    warehouses.warehouse_name, 
-                    suppliers.name as supplier_name, 
-                    COUNT(penerimaan_barang_detail.id) AS itemCount, 
-                    penerimaan_barang_detail.harga,
-                    divisis.divisi,";
+                DATE_FORMAT(penerimaan_barang.tanggal, '%d/%m/%Y') AS tanggal_penerimaan,
+                warehouses.warehouse_name, 
+                suppliers.name as supplier_name, 
+                COUNT(penerimaan_barang_detail.id) AS itemCount, 
+                penerimaan_barang_detail.harga,
+                SUM(penerimaan_barang_detail.sub_total) as harga_sub_total,
+                bc_23.no_aju AS BC23_AJU,
+                bc_40.no_aju AS BC40_AJU,
+                divisis.divisi as divisi";
+
+        // dd($condition, $addCondition, $companyId);
+
         $penerimaanBarangDataQry = $this->asObject()
             ->select($selectQry)
             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
             ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'right')
-            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'right')
-            ->groupBy(('penerimaan_barang.id'))
+            ->join('bc_purchase_order bc_23_po', 'bc_23_po.id = penerimaan_barang.id', 'left')
+            ->join('bc_purchase_order bc_40_po', 'bc_40_po.id = penerimaan_barang.id', 'left')
+            ->join('bc_23', 'bc_23.bc_purchase_order_id = bc_23_po.id', 'left')
+            ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_40_po.id', 'left')
+            ->join('divisis', 'divisis.divisi = penerimaan_barang.divisi_id', 'left')
+            ->groupBy('penerimaan_barang.id')
             ->where($condition)
             ->whereIn('penerimaan_barang.company_id', $companyId)
             ->orderBy($sort, $sortType);
-
-        $totalData = $penerimaanBarangDataQry->countAllResults(false);
 
         if ($addCondition['search'] || $addCondition['filter'] || $addCondition['startdate'] || $addCondition['lastdate']) {
             $penerimaanBarangDataQry->groupStart();
         }
 
         if ($addCondition['search']) {
-            $penerimaanBarangDataQry->like('penerimaan_barang.no_penerimaan_barang', $addCondition['search']);
+            $penerimaanBarangDataQry->like('penerimaan_barang.no_penerimaan_barang', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike('penerimaan_barang.multiple_po_no', $addCondition['search']);
         }
 
         if ($addCondition['filter']) {
-            $penerimaanBarangDataQry->where('suppliers.id', $addCondition['filter']);
+            $penerimaanBarangDataQry->whereIn('suppliers.id', $addCondition['filter']);
         }
 
-        if ($addCondition['startdate'] && $addCondition['lastdate']) {
-            $penerimaanBarangDataQry->where('penerimaan_barang.tanggal >=', $addCondition['startdate'])
-                ->where('penerimaan_barang.tanggal <=', $addCondition['lastdate']);
+        if ($addCondition['startdate']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.tanggal >=', $addCondition['startdate']);
+        }
+
+        if ($addCondition['lastdate']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.tanggal <=', $addCondition['lastdate']);
         }
 
         if ($addCondition['search'] || $addCondition['filter'] || $addCondition['startdate'] || $addCondition['lastdate']) {
             $penerimaanBarangDataQry->groupEnd();
         }
 
-        $totalFilteredData = $penerimaanBarangDataQry->countAllResults(false);
+        $totalData = $penerimaanBarangDataQry->countAllResults(false);
+        $totalFilteredData = $totalData;
         $data = $penerimaanBarangDataQry->findAll();
+        // $db = \Config\Database::connect();
+        // dd($db->getLastQuery()->getQuery());
+
 
         return [
             'data'              => $data,
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData,
-            'sort'  => $sort,
-            'sortType'  => $sortType
+            'sort'              => $sort,
+            'sortType'          => $sortType
         ];
     }
 
