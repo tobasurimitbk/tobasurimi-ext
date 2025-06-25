@@ -78,11 +78,9 @@ class Bank extends BaseController
     {
         $rules = [
             "no_rekening" => [
-                "rules" => "required|numeric|exact_length[10,15]",
+                "rules" => "required",
                 'errors' => [
                     'required' => 'No rekening harus diisi',
-                    'numeric' => 'No rekening wajib berupa angka',
-                    'exact_length' => 'Panjang digit no rekening harus 10 sampai 15 digit'
                 ]
             ],
 
@@ -132,11 +130,9 @@ class Bank extends BaseController
 
         $rules = [
             "no_rekening" => [
-                "rules" => "required|numeric|exact_length[10,15]",
+                "rules" => "required",
                 'errors' => [
-                    'required' => 'No rekening harus diisi',
-                    'numeric' => 'No rekening wajib berupa angka',
-                    'exact_length' => 'Panjang digit no rekening harus 10 sampai 15 digit'
+                    'required' => 'No rekening harus diisi'
                 ]
             ],
 

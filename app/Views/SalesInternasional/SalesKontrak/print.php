@@ -114,9 +114,21 @@
             <div class="txt-left">
                 <label class="label-header">BUYER: <?= $salesKontrak['customer_name']; ?></label>
             </div>
-            <div class="txt-right rev-customer">
-                <label class="label-header">Revision: <?= $salesKontrak['jumlah_unpost']; ?></label>
+            <div class="txt-left">
+                <label class="label-header">BANK: <?= $salesKontrak['nama_bank']; ?></label>
             </div>
+            <div class="txt-left">
+                <label class="label-header">SWIFT CODE: <?= $salesKontrak['kode_bank']; ?></label>
+            </div>
+            <div class="txt-left">
+                <label class="label-header">ACCOUNT # : <?= $salesKontrak['no_rekening']; ?></label>
+            </div>
+            <div class="txt-left">
+                <label class="label-header">BENEFICIARY # : <?= $salesKontrak['atas_nama']; ?></label>
+            </div>
+            <!-- <div class="txt-right rev-customer">
+                <label class="label-header">Revision: <?= $salesKontrak['jumlah_unpost']; ?></label>
+            </div> -->
         </div>
         <div class="mt-1 justify-content-center"><label class="label-header">THIS SALES CONTRACT
                 IS MADE BY AND BETWEEN THE BUYER AND SELLER, WHEREBY THE BUYER AGREES TO PURCHASE AND THE SELLER
@@ -141,7 +153,7 @@
                     <label class="label-header">UNIT PRICE</label>
                 </th>
                 <th>
-                    <label class="label-header">TOTAL AMOUNT (US$)</label>
+                    <label class="label-header">TOTAL AMOUNT <?= $salesKontrak['mata_uang'] ?></label>
                 </th>
             </tr>
         </thead>
