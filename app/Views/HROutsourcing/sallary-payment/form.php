@@ -1155,14 +1155,14 @@
                             <td><input type="number" name="jam_kerja_hk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.jam_kerja_hk || ''}"></td>
 
                             <!-- TOTAL & KALKULASI -->
-                            <td><input type="number" name="total_kg" class="form-control form-control-sm total-kg" style="min-width: 100px;" value="${payment.total_kg || ''}"></td>
-                            <td><input type="number" name="total_jam" class="form-control form-control-sm total-jam" style="min-width: 100px;" value="${payment.total_jam || ''}"></td>
-                            <td><input type="number" name="total_borongan_jam" class="form-control form-control-sm total-borongan-jam" style="min-width: 100px;" value="${payment.total_borongan_jam || ''}"></td>
-                            <td><input type="number" name="jumlah_org" class="form-control form-control-sm jlh-org" style="min-width: 100px;" value="${payment.jumlah_org || ''}"></td>
-                            <td><input type="number" name="rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" class="form-control form-control-sm rupiah" style="min-width: 120px;" value="${payment.rupiah || ''}"></td>
-                            <td><input type="number" name="rupiah_org" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" class="form-control form-control-sm rupiah_org" style="min-width: 120px;" value="${payment.rupiah_org || ''}"></td>
-                            <td><input type="number" name="subsidi_rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" class="form-control form-control-sm subsidi-rupiah" style="min-width: 120px;" value="${payment.subsidi_rupiah || ''}"></td>
-                            <td><input type="number" name="borongan_per_jam" class="form-control form-control-sm borongan-per-jam" style="min-width: 120px;" value="${payment.borongan_per_jam || ''}"></td>
+                            <td><input type="text" name="total_kg" class="form-control form-control-sm total-kg" style="min-width: 100px;" value="${payment.total_kg || ''}"></td>
+                            <td><input type="text" name="total_jam" class="form-control form-control-sm total-jam" style="min-width: 100px;" value="${payment.total_jam || ''}"></td>
+                            <td><input type="text" name="total_borongan_jam" class="form-control form-control-sm total-borongan-jam" style="min-width: 100px;" value="${payment.total_borongan_jam || ''}"></td>
+                            <td><input type="text" name="jumlah_org" class="form-control form-control-sm jlh-org" style="min-width: 100px;" value="${payment.jumlah_org || ''}"></td>
+                            <td><input type="text" name="rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" class="form-control form-control-sm rupiah" style="min-width: 120px;" value="${payment.rupiah || ''}"></td>
+                            <td><input type="text" name="rupiah_org" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" class="form-control form-control-sm rupiah_org" style="min-width: 120px;" value="${payment.rupiah_org || ''}"></td>
+                            <td><input type="text" name="subsidi_rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" class="form-control form-control-sm subsidi-rupiah" style="min-width: 120px;" value="${payment.subsidi_rupiah || ''}"></td>
+                            <td><input type="text" name="borongan_per_jam" class="form-control form-control-sm borongan-per-jam" style="min-width: 120px;" value="${payment.borongan_per_jam || ''}"></td>
 
                             <!-- KG / JAM -->
                             <td><input type="number" name="kg_per_jam_suac" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_suac || ''}"></td>
@@ -1799,7 +1799,7 @@
                     <!-- TOTAL & KALKULASI -->
                     <td><input type="text" name="total_kg" class="form-control form-control-sm total-kg" style="min-width: 100px;"></td>
                     <td><input type="text" name="total_jam" class="form-control form-control-sm total-jam" style="min-width: 100px;"></td>
-                    <td><input type="text" name="total_borongan_jam" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'"  class="form-control form-control-sm total-borongan-jam" style="min-width: 100px;"></td>
+                    <td><input type="text" name="total_borongan_jam"  class="form-control form-control-sm total-borongan-jam" style="min-width: 100px;"></td>
                     <td><input type="text" name="jumlah_org" class="form-control form-control-sm jlh-org" style="min-width: 100px;"></td>
                     <td><input type="text" name="rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'"  class="form-control form-control-sm rupiah" style="min-width: 120px;"></td>
                     <td><input type="text" name="rupiah_org" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'"  class="form-control form-control-sm rupiah_org" style="min-width: 120px;"></td>
@@ -2252,7 +2252,7 @@
 
         // CALCULATE PTS
         $(document).on('keypress', 'input[name^="sjb"], input[name^="sjl"], input[name^="mt"], input[name^="sel"], input[name^="slm"], input[name^="ssp"], input[name^="scm"], input[name^="ctt"], input[name^="cct"], input[name^="smh"], input[name^="dm"], input[name^="scf"], input[name^="lel"], input[name^="gc"], input[name^="sspk"]', function (e) {
-                if (e.which === 13) {
+            if (e.which === 13) {
                     e.preventDefault();
 
                     const input = $(this);
@@ -2322,8 +2322,7 @@
                     $row.find(`input[name="rp"]`).val(greatFormatRupiah(rp) + ".00");
                     
 
-                }
-
+            }
         });
 
         $(document).on('keypress', 'input[name^="jlh_org"]', function (e) {
@@ -2414,7 +2413,7 @@
                 }
         });
 
-        $(document).on('keypress', 'input[name^="total_jam"]', function (e) {
+        $(document).on('keypress', 'input[name^="jam_kerja_"]', function(e) {
             if (e.which === 13) {
                 e.preventDefault();
 
@@ -2425,10 +2424,32 @@
 
                 if (!isNaN(val) && val > 0) {
                     const mainKey = `${employeeId}_main`;
-                    const rp = 10500;
-                    const total_borongan = val * rp;
+                    const total = val;
+                    $row.find(`input[name="total_jam"]`).val(total);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Input tidak valid',
+                        text: 'Jumlah orang harus angka lebih dari 0',
+                    });
+                }
+            }
+        });
 
-                    $row.find(`input[name="total_borongan_jam"]`).val(greatFormatRupiah(total_borongan) + ".00");
+
+         $(document).on('keypress', 'input[name^="total_borongan_jam"]', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+
+                const input = $(this);
+                const val = parseFloat(input.val().trim());
+                const $row = input.closest('tr');
+                const employeeId = $row.data('employee-id');
+
+                if (!isNaN(val) && val > 0) {
+                    const mainKey = `${employeeId}_main`;
+                    const total = val * 105000;
+                    $row.find(`input[name="borongan_per_jam"]`).val(greatFormatRupiah(total) + ".00");
                 } else {
                     Swal.fire({
                         icon: 'error',
