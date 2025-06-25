@@ -1800,7 +1800,7 @@
                     <td><input type="text" name="total_kg" class="form-control form-control-sm total-kg" style="min-width: 100px;"></td>
                     <td><input type="text" name="total_jam" class="form-control form-control-sm total-jam" style="min-width: 100px;"></td>
                     <td><input type="text" name="total_borongan_jam"  class="form-control form-control-sm total-borongan-jam" style="min-width: 100px;"></td>
-                    <td><input type="text" name="jumlah_org" class="form-control form-control-sm jlh-org" style="min-width: 100px;"></td>
+                    <td><input type="text" name="jumlah_org" class="form-control form-control-sm jlh-org" value="1" style="min-width: 100px;"></td>
                     <td><input type="text" name="rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'"  class="form-control form-control-sm rupiah" style="min-width: 120px;"></td>
                     <td><input type="text" name="rupiah_org" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'"  class="form-control form-control-sm rupiah_org" style="min-width: 120px;"></td>
                     <td><input type="text" name="subsidi_rupiah" class="form-control form-control-sm subsidi-rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'"  style="min-width: 120px;"></td>
@@ -2352,89 +2352,143 @@
 
         //CALCULATE CANNING
         $(document).on('keypress', 'input[name^="SUAC"], input[name^="CUU"], input[name^="AU"], input[name^="MKU/MDU"], input[name^="BU"], input[name^="BBU"], input[name^="ATU"], input[name^="CBU"], input[name^="FU"], input[name^="BUMS"], input[name^="BUM"], input[name^="KUM"], input[name^="SUM"], input[name^="SK"], input[name^="CKU"], input[name^="FKPH"], input[name^="BK"], input[name^="SKPL"], input[name^="SKPB"], input[name^="SKML"], input[name^="SKMB"], input[name^="C1"], input[name^="C2"], input[name^="CUK"], input[name^="FK"], input[name^="SSSCG"], input[name^="IKSSCG"], input[name^="FSSCG"], input[name^="KSCG"], input[name^="CSCG"], input[name^="MPA"], input[name^="LBL"], input[name^="SA"], input[name^="CU"], input[name^="HK"]', function (e) {
-                if (e.which === 13) {
-                    e.preventDefault();
-
-                    const input = $(this);
-                    const val = input.val().trim();
-                    const employeeId = input.closest('tr').data('employee-id');
-                    const hargaSatuan = parseFloat(input.data('harga')) || 0;
-                    const kodeBarang = input.attr('name');
-
-                    function parseInput(inputStr) {
-                        const normalized = inputStr.replace(/,/g, '.');
-                        const parts = normalized.split('+').filter(Boolean);
-                        return parts.map(part => {
-                            const num = parseFloat(part);
-                            return isNaN(num) ? 0 : num;
-                        });
-                    }
-
-                    const numbers = parseInput(val);
-                    const total = numbers.reduce((sum, n) => sum + n, 0);
-
-                    if (total === 0 && val !== '0') {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Format salah',
-                            text: 'Gunakan format seperti: 0.9+0.7 atau 0,9+0,7',
-                        });
-                        return;
-                    }
-
-                    input.val(total.toFixed(2));
-
-                    const $row = input.closest('tr');
-                    const key = `${employeeId}_${kodeBarang}`;
-
-                    employeeItemDetails[key] = {
-                        items: numbers.map(berat => ({ berat, harga: hargaSatuan })),
-                        totalBerat: total,
-                        totalHarga: total * hargaSatuan
-                    };
-
-                    // Rehitung total total_kg & rp
-                    let total_kg = 0;
-                    let rupiah = 0;
-
-                    Object.keys(employeeItemDetails).forEach(keyLoop => {
-                        if (keyLoop.startsWith(`${employeeId}_`) && keyLoop !== `${employeeId}_main`) {
-                            const data = employeeItemDetails[keyLoop];
-                            total_kg += data.totalBerat || 0;
-                            rupiah += data.totalHarga || 0;
-                        }
-                    });
-
-                    const mainKey = `${employeeId}_main`;
-                    employeeItemDetails[mainKey] = { total_kg, rupiah };
-
-                    $row.find(`input[name="total_kg"]`).val(total_kg.toFixed(2));
-                    $row.find(`input[name="rupiah"]`).val(rupiah.toFixed());
-                }
+            if (e.which === 13) {
+                e.preventDefault();
+                handleWeightInput($(this));
+                calculateKgPerJam($(this).closest('tr'));
+            }
         });
 
         $(document).on('keypress', 'input[name^="jam_kerja_"]', function(e) {
             if (e.which === 13) {
                 e.preventDefault();
-
-                const input = $(this);
-                const val = parseFloat(input.val().trim());
-                const $row = input.closest('tr');
-                const employeeId = $row.data('employee-id');
-
-                if (!isNaN(val) && val > 0) {
-                    const mainKey = `${employeeId}_main`;
-                    const total = val;
-                    $row.find(`input[name="total_jam"]`).val(total);
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Input tidak valid',
-                        text: 'Jumlah orang harus angka lebih dari 0',
-                    });
-                }
+                handleWorkingHoursInput($(this));
+                calculateKgPerJam($(this).closest('tr'));
             }
         });
+
+        function handleWeightInput(input) {
+            const val = input.val().trim();
+            const employeeId = input.closest('tr').data('employee-id');
+            const hargaSatuan = parseFloat(input.data('harga')) || 0;
+            const kodeBarang = input.attr('name');
+
+            function parseInput(inputStr) {
+                const normalized = inputStr.replace(/,/g, '.');
+                const parts = normalized.split('+').filter(Boolean);
+                return parts.map(part => {
+                    const num = parseFloat(part);
+                    return isNaN(num) ? 0 : num;
+                });
+            }
+
+            const numbers = parseInput(val);
+            const total = numbers.reduce((sum, n) => sum + n, 0);
+
+            if (total === 0 && val !== '0') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Format salah',
+                    text: 'Gunakan format seperti: 0.9+0.7 atau 0,9+0,7',
+                });
+                return;
+            }
+
+            input.val(total.toFixed(2));
+
+            const $row = input.closest('tr');
+            const key = `${employeeId}_${kodeBarang}`;
+
+            employeeItemDetails[key] = {
+                items: numbers.map(berat => ({ berat, harga: hargaSatuan })),
+                totalBerat: total,
+                totalHarga: total * hargaSatuan
+            };
+
+            // Rehitung total total_kg & rp
+            let total_kg = 0;
+            let rupiah = 0;
+
+            Object.keys(employeeItemDetails).forEach(keyLoop => {
+                if (keyLoop.startsWith(`${employeeId}_`) && keyLoop !== `${employeeId}_main`) {
+                    const data = employeeItemDetails[keyLoop];
+                    total_kg += data.totalBerat || 0;
+                    rupiah += data.totalHarga || 0;
+                }
+            });
+
+            const mainKey = `${employeeId}_main`;
+            employeeItemDetails[mainKey] = { total_kg, rupiah };
+
+            $row.find(`input[name="total_kg"]`).val(total_kg.toFixed(2));
+            $row.find(`input[name="rupiah"]`).val(greatFormatRupiah(rupiah) + ".00");
+        }
+
+        function handleWorkingHoursInput(input) {
+            const val = input.val().trim();
+            const $row = input.closest('tr');
+            const employeeId = $row.data('employee-id');
+
+            // Parse input value
+            const parsedVal = parseFloat(val.replace(/,/g, '.'));
+            
+            if (!isNaN(parsedVal) && parsedVal >= 0) {
+                // Update the current input value (format to 2 decimal places)
+                input.val(parsedVal.toFixed(2));
+                
+                // Calculate total of all jam_kerja inputs
+                let totalJam = 0;
+                $row.find('input[name^="jam_kerja_"]').each(function() {
+                    const jamValue = parseFloat($(this).val().replace(/,/g, '.')) || 0;
+                    totalJam += jamValue;
+                });
+                
+                // Update total_jam field
+                $row.find('input[name="total_jam"]').val(totalJam.toFixed(2));
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Input tidak valid',
+                    text: 'Masukkan angka yang valid (≥ 0)',
+                });
+                input.val(''); // Clear invalid input
+            }
+        }
+
+        function calculateKgPerJam($row) {
+            const employeeId = $row.data('employee-id');
+            
+            // Daftar semua kode yang ada
+            const allCodes = [
+                'SUAC', 'CUU', 'AU', 'MKU/MDU', 'BU', 'BBU', 'ATU', 'CBU', 'FU', 'BUMS', 
+                'BUM', 'KUM', 'SUM', 'SK', 'CKU', 'FKPH', 'BK', 'SKPL', 'SKPB', 'SKML', 
+                'SKMB', 'C1', 'C2', 'CUK', 'FK', 'SSSCG', 'IKSSCG', 'FSSCG', 'KSCG', 
+                'CSCG', 'MPA', 'LBL', 'SA', 'CU', 'HK'
+            ];
+            
+            allCodes.forEach(code => {
+                const weightInput = $row.find(`input[name="${code}"]`);
+                const hoursInput = $row.find(`input[name="jam_kerja_${code.toLowerCase().replace('/', '_')}"]`);
+                const kgPerJamInput = $row.find(`input[name="kg_per_jam_${code.toLowerCase().replace('/', '_')}"]`);
+                
+                if (weightInput.length && hoursInput.length && kgPerJamInput.length) {
+                    const berat = parseFloat(weightInput.val()) || 0;
+                    const jam = parseFloat(hoursInput.val()) || 0;
+                    
+                    // Hitung kg/jam, hindari pembagian dengan 0
+                    const kgPerJam = jam > 0 ? (berat / jam) : 0;
+                    
+                    kgPerJamInput.val(kgPerJam.toFixed(2));
+                }
+            });
+            
+            // Hitung total kg/jam jika diperlukan
+            let totalKgPerJam = 0;
+            $row.find('input[name^="kg_per_jam_"]').each(function() {
+                totalKgPerJam += parseFloat($(this).val()) || 0;
+            });
+            $row.find('input[name="total_kg_per_jam"]').val(totalKgPerJam.toFixed(2));
+        }
 
 
          $(document).on('keypress', 'input[name^="total_borongan_jam"]', function(e) {
@@ -2448,7 +2502,7 @@
 
                 if (!isNaN(val) && val > 0) {
                     const mainKey = `${employeeId}_main`;
-                    const total = val * 105000;
+                    const total = val * 10500;
                     $row.find(`input[name="borongan_per_jam"]`).val(greatFormatRupiah(total) + ".00");
                 } else {
                     Swal.fire({
