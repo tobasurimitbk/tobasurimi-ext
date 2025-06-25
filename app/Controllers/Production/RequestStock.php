@@ -19,6 +19,7 @@ use App\Models\StockModel;
 use App\Models\SupplierModel;
 use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Models\AccountBarangModel;
+use Exception;
 
 class RequestStock extends BaseController
 {

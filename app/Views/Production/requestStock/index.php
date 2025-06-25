@@ -13,13 +13,13 @@
                 <div class="col-md-4 mb-3">
                     <div class="form-floating">
                         <input style="height: 50px" autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Kode Request / Nama Barang" value="" />
-                        <label style="z-index: 1;" style="z-index: 1;">Ketik Kode Request / Nama Barang </label>
+                        <label style="z-index: 1;" style="z-index: 1;">Ketik Kode Request </label>
                     </div>
                 </div>
                 <div class="col-md-4 mb-3">
                     <div class="form-floating">
                         <select class="form-select material_type" id="material_type" name="material_type" aria-label="Floating label select example">
-                            <option value="material_request">Material Request</option>
+                            <option value="material_request">Material Request Bahan Baku</option>
                             <option value="material_kimia">Material Kimia</option>
                             <option value="material_penolong">Material Penolong</option>
                         </select>
@@ -248,7 +248,7 @@
                     dataType: "json",
                     success: function(response) {
                         csrf.val(response.token);
-                        if (response) {
+                        if (response.status) {
                             Swal.fire({
                                     icon: 'success',
                                     title: response.message,

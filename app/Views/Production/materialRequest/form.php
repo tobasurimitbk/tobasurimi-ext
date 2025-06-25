@@ -344,11 +344,11 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="text-align: center;">#</th>
-                                    <th style="text-align: center;">Asal Barang</th>
-                                    <th style="text-align: center;">No Dokumen</th>
+                                    <!-- <th style="text-align: center;">Asal Barang</th> -->
+                                    <th style="text-align: center;">No PO / No VBM</th>
                                     <th style="text-align: center;">Supplier / Vendor</th>
-                                    <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">No Aju / No Daftar</th>
+                                    <!-- <th style="text-align: center;">Dokumen Pabean</th> -->
+                                    <!-- <th style="text-align: center;">No Aju / No Daftar</th> -->
                                     <th style="text-align: center;">Tgl PO / Tgl Vendor Masuk</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Satuan</th>
@@ -401,9 +401,10 @@
                                         <th style="text-align: center;">Departemen / Warehouse Asal</th>
                                         <th style="text-align: center;">Departemen / Warehouse Tujuan</th>
                                         <th style="text-align: center;">Supplier / Vendor</th>
-                                        <th style="text-align: center;">Tipe Barang</th>
-                                        <th style="text-align: center;">Dokumen Pabean</th>
-                                        <th style="text-align: center;">No Aju / No Daftar</th>
+                                        <th style="text-align: center;">No PO / No VBM</th>
+                                        <!-- <th style="text-align: center;">Tipe Barang</th> -->
+                                        <!-- <th style="text-align: center;">Dokumen Pabean</th> -->
+                                        <!-- <th style="text-align: center;">No Aju / No Daftar</th> -->
                                         <th style="text-align: center;">Tgl PO / Tgl Vendor Masuk</th>
                                         <th style="text-align: center;">Barang - Spesifikasi</th>
                                         <th style="text-align: center;">Satuan</th>
@@ -1460,11 +1461,11 @@
                 ));
             }
 
-            newRow.append($('<td style="text-align:center;">').text(v.sumber));
+            // newRow.append($('<td style="text-align:center;">').text(v.sumber));
             newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
             newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
-            newRow.append($('<td style="text-align:center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
+            // newRow.append($('<td style="text-align:center;">').text(v.bc_type));
+            // newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
             newRow.append($('<td style="text-align:center;">').text(v.stock_date));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
             newRow.append($('<td style="text-align:center;">').text(v.satuan));
@@ -1885,9 +1886,10 @@
             newRow.append($('<td style="text-align: center;">').text(v.departmentText + ' / ' + v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.departmentTujuanText + ' / ' + v.warehouseTujuanText));
             newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
-            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
-            newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
+            newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
+            // newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
+            // newRow.append($('<td style="text-align: center;">').text(v.bc_type));
+            // newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
