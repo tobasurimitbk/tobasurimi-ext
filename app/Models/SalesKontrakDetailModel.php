@@ -82,7 +82,8 @@ class SalesKontrakDetailModel extends Model
                 'total' => $q['total_harga'],
                 // print
                 'total_harga' => $q['total_harga'],
-                'nama_barang' => $q['barang_name']
+                'nama_barang' => $q['barang_name'],
+                'spesifikasi' => $q['spesifikasi']
             ];
         }
 

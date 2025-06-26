@@ -316,6 +316,7 @@
                                 <th>No</th>
                                 <th>Kode Barang</th>
                                 <th>Barang</th>
+                                <th>Spesifikasi Detail</th>
                                 <th>Satuan Order</th>
                                 <th>Kemasan</th>
                                 <th>Remark</th>
@@ -325,12 +326,12 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+                        <tbody class="body-detail-table" id="body-detail-table">
 
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td colspan="5"></td>
+                                <td colspan="6"></td>
                                 <td><b>TOTAL</b></td>
                                 <td><b>0,00</b></td>
                                 <td><b>0,00</b></td>
@@ -375,6 +376,12 @@
                                         </button>
                                     </div>
                                 <?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" type="text" class="form-control spesifikasi" id="spesifikasi" name="kemasan" placeholder="Sepsifikasi Detail" oninput="capitalize()">
+                                <label for="floatingInput">Spesifikasi Detail (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -606,7 +613,8 @@
                 qty: "<?= floatval($s['qty']) ?>",
                 harga: "<?= floatval($s['harga']) ?>",
                 remark: "<?= $s['remark'] ?>",
-                total: <?= floatval($s['total']) ?>
+                total: <?= floatval($s['total']) ?>,
+                spesifikasi: "<?= $s['spesifikasi'] ?>"
             });
         <?php endforeach; ?>
         drawTable();
@@ -831,9 +839,9 @@
             print_out_broker: {
                 required: true
             },
-            // documents_required: {
-            //     required: true
-            // },
+            divisi_id: {
+                required: true
+            },
             // special_instructions: {
             //     required: true
             // },
@@ -865,6 +873,9 @@
             },
             print_out_broker: {
                 required: "Print out boker wajib diisi"
+            },
+            divisi_id: {
+                required: "Pilih Departemen"
             },
             // documents_required: {
             //     required: "Dokumen wajib diisi"
@@ -1211,6 +1222,7 @@
             var harga = destroyFormatRupiah($('.harga').val());
             var remark = $('.remark').val();
             var total = (qty * harga);
+            var spesifikasi = $('.spesifikasi').val();
 
             if (id_detail) {
                 // UPDATE
@@ -1226,6 +1238,7 @@
                         listBarang[i].harga = harga;
                         listBarang[i].remark = remark;
                         listBarang[i].total = total;
+                        listBarang[i].spesifikasi = spesifikasi;
                     }
                 });
             } else {
@@ -1262,7 +1275,8 @@
                         qty: qty,
                         harga: harga,
                         remark: remark,
-                        total: total
+                        total: total,
+                        spesifikasi: spesifikasi
                     });
                 }
             }
@@ -1463,6 +1477,7 @@
         $('.harga').val(greatFormatRupiah(item.harga));
         $('.remark').val(item.remark);
         $('.total').val(greatFormatRupiah(item.total.toFixed(2)));
+        $('.spesifikasi').val(item.spesifikasi);
         $(".detail-modal").modal("show")
     }
 
@@ -1508,6 +1523,7 @@
                 newRow.append($('<td style="text-align:center;">').text(no++));
                 newRow.append($('<td>').text(item.kode_barang));
                 newRow.append($('<td>').text(item.barang_name));
+                newRow.append($('<td>').text(item.spesifikasi));
                 newRow.append($('<td>').text(item.satuan_order_name));
                 newRow.append($('<td>').text(item.kemasan));
                 newRow.append($('<td>').text(item.remark));
@@ -1544,7 +1560,7 @@
             $('.body-detail-table').append(row);
             table.find('tfoot').empty();
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="5"></td>'));
+            newRow.append($('<td colspan="6"></td>'));
             newRow.append($('<td><b>TOTAL</b></td>'));
             newRow.append($('<td><b>' + greatFormatRupiah(totalQty) + '</b></td>'));
             newRow.append($('<td><b>' + greatFormatRupiah(totalHarga.toFixed(2)) + '</b></td>'));
