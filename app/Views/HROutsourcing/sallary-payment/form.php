@@ -3165,57 +3165,41 @@
             const inputName = input.attr('name');
             const code = inputName.replace('jam_kerja_', '');
 
-            // Enhanced rounding function that applies to all calculations
-            const roundTime = (timeValue, isDeparture = false, isFinalResult = false) => {
-                // If it's already a number (from previous calculations)
-                if (typeof timeValue === 'number') {
-                    const hours = Math.floor(timeValue);
-                    const minutesDecimal = timeValue - hours;
-                    const minutes = Math.round(minutesDecimal * 60);
+            // Master rounding function for all cases
+            const masterRound = (timeValue, type = 'result') => {
+                const hours = Math.floor(timeValue);
+                const minutes = Math.round((timeValue - hours) * 60);
+                
+                // Departure rounding (jam masuk)
+                if (type === 'departure') {
+                    if (minutes >= 46) return hours + 1;
+                    if (minutes >= 31) return hours + 0.75;
+                    if (minutes >= 15) return hours + 0.5;
+                    return hours + 0.25;
+                }
+                // Return rounding (jam pulang)
+                else if (type === 'return') {
+                    if (minutes >= 45) return hours + 0.75;
+                    if (minutes >= 30) return hours + 0.5;
+                    if (minutes >= 15) return hours + 0.25;
+                    return hours;
+                }
+                // Final result rounding (hasil total)
+                else {
+                    if (minutes >= 46) return hours + 1;
+                    if (minutes >= 31) return hours + 0.75;
+                    if (minutes >= 15) return hours + 0.5;
+                    return hours + 0.25;
+                }
+            };
 
-                    if (isFinalResult) {
-                        // Final result rounding (applies to total working hours)
-                        if (minutes >= 46) return hours + 1;
-                        if (minutes >= 31 && minutes <= 45) return hours + 0.75;
-                        if (minutes >= 15 && minutes <= 30) return hours + 0.5;
-                        if (minutes >= 0 && minutes <= 14) return hours + 0.25;
-                    } else if (isDeparture) {
-                        // Departure time rounding
-                        if (minutes >= 46) return hours + 1;
-                        if (minutes >= 31 && minutes <= 45) return hours + 0.75;
-                        if (minutes >= 15 && minutes <= 30) return hours + 0.5;
-                        if (minutes >= 0 && minutes <= 14) return hours + 0.25;
-                    } else {
-                        // Return time rounding
-                        if (minutes >= 45) return hours + 0.75;
-                        if (minutes >= 30 && minutes <= 44) return hours + 0.5;
-                        if (minutes >= 15 && minutes <= 29) return hours + 0.25;
-                        return hours;
-                    }
-                }
+            // Parse time input with rounding
+            const parseTimeInput = (timeStr, type) => {
+                if (!timeStr.includes('.')) return parseFloat(timeStr) || 0;
                 
-                // If it's a string (original input)
-                if (typeof timeValue === 'string' && timeValue.includes('.')) {
-                    const [hoursStr, minutesStr] = timeValue.split('.');
-                    const hours = parseInt(hoursStr);
-                    const minutes = parseInt(minutesStr);
-                    
-                    if (isDeparture) {
-                        // Departure rounding
-                        if (minutes >= 46) return hours + 1;
-                        if (minutes >= 31 && minutes <= 45) return hours + 0.75;
-                        if (minutes >= 15 && minutes <= 30) return hours + 0.5;
-                        if (minutes >= 0 && minutes <= 14) return hours + 0.25;
-                    } else {
-                        // Return rounding
-                        if (minutes >= 45) return hours + 0.75;
-                        if (minutes >= 30 && minutes <= 44) return hours + 0.5;
-                        if (minutes >= 15 && minutes <= 29) return hours + 0.25;
-                        return hours;
-                    }
-                }
-                
-                return parseFloat(timeValue) || 0;
+                const [hours, minutes] = timeStr.split('.').map(Number);
+                const decimalTime = hours + (minutes / 60);
+                return masterRound(decimalTime, type);
             };
 
             if (val.includes('-')) {
@@ -3223,63 +3207,55 @@
                 
                 if (parts.length === 3) {
                     try {
-                        // Parse with rounding
-                        const departure = roundTime(parts[0], true);
-                        const returnTime = roundTime(parts[1], false);
-                        const breakTime = roundTime(parts[2], false);
+                        // Parse with proper rounding
+                        const departure = parseTimeInput(parts[0], 'departure');
+                        const returnTime = parseTimeInput(parts[1], 'return');
+                        const breakTime = parseTimeInput(parts[2], 'return'); // Break uses return rounding
                         
-                        // Validation
-                        if (isNaN(departure)) throw new Error('Format jam masuk tidak valid');
-                        if (isNaN(returnTime)) throw new Error('Format jam keluar tidak valid');
-                        if (isNaN(breakTime)) throw new Error('Format istirahat tidak valid');
-                        
-                        if (departure < 0 || departure >= 24 || 
-                            returnTime < 0 || returnTime >= 24 || 
-                            breakTime < 0) {
+                        // Validate
+                        if (isNaN(departure) || isNaN(returnTime) || isNaN(breakTime)) {
+                            throw new Error('Format waktu tidak valid');
+                        }
+                        if ([departure, returnTime, breakTime].some(t => t < 0 || t >= 24)) {
                             throw new Error('Waktu harus antara 0-24');
                         }
+
+                        // Calculate with overnight handling
+                        let workingHours = returnTime > departure 
+                            ? returnTime - departure - breakTime 
+                            : (24 - departure) + returnTime - breakTime;
                         
-                        // Calculate working hours with overnight handling
-                        let workingHours = 0;
-                        if (returnTime > departure) {
-                            workingHours = returnTime - departure - breakTime;
-                        } else {
-                            workingHours = (24 - departure) + returnTime - breakTime;
-                        }
-                        
-                        // Ensure positive and apply final rounding
                         workingHours = Math.max(0, workingHours);
-                        workingHours = roundTime(workingHours, false, true);
+                        
+                        // Apply final rounding to result
+                        const roundedTotal = masterRound(workingHours, 'result');
                         
                         // Store data
                         const key = `${employeeId}_${code}`;
                         window.employeeWorkingDetails = window.employeeWorkingDetails || {};
                         window.employeeWorkingDetails[key] = {
-                            departure: parts[0],
-                            return: parts[1],
-                            break: parts[2],
+                            raw_input: val,
                             rounded_departure: departure,
                             rounded_return: returnTime,
                             rounded_break: breakTime,
-                            total: workingHours
+                            total_before_round: workingHours,
+                            total: roundedTotal
                         };
                         
-                        // Format total (already rounded)
-                        const totalHours = Math.floor(workingHours);
-                        const totalMinutes = Math.round((workingHours - totalHours) * 60);
-                        const formattedTotal = totalMinutes > 0 ? 
-                            `${totalHours}.${totalMinutes.toString().padStart(2, '0')}` : 
-                            totalHours.toString();
-                        
-                        input.val(formattedTotal);
-                        
+                        // Format display (show .25, .5, .75 appropriately)
+                        const displayValue = Number.isInteger(roundedTotal) 
+                            ? roundedTotal.toString() 
+                            : roundedTotal.toFixed(2).replace('.', ',');
+                        input.val(displayValue);
+
                     } catch (error) {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Format tidak valid',
-                            html: `Error: ${error.message}<br>
-                                Contoh format: <strong>7.30-19.00-1</strong><br>
-                                <small>Gunakan titik (.) untuk desimal</small>`,
+                            title: 'Kesalahan Input',
+                            html: `<div>${error.message}</div>
+                                <div class="mt-2"><strong>Contoh format benar:</strong><br>
+                                7.30-16.00-0.5 (JamMasuk-JamPulang-Istirahat)</div>
+                                <div class="text-muted small mt-2">Gunakan format 24 jam</div>`,
                             confirmButtonText: 'Mengerti'
                         });
                         input.val('').focus();
@@ -3288,34 +3264,22 @@
                 }
             }
             
-            // Calculate totals with rounding
-            const parsedVal = parseFloat(input.val().replace(/,/g, '.')) || 0;
+            // Calculate and round totals
+            let totalJam = 0;
+            $row.find('input[name^="jam_kerja_"]').each(function() {
+                const val = $(this).val().replace(',', '.');
+                totalJam += parseFloat(val) || 0;
+            });
             
-            if (parsedVal >= 0) {
-                let totalJam = 0;
-                $row.find('input[name^="jam_kerja_"]').each(function() {
-                    const jamValue = parseFloat($(this).val().replace(/,/g, '.')) || 0;
-                    totalJam += jamValue;
-                });
-                
-                // Apply final rounding to total
-                totalJam = roundTime(totalJam, false, true);
-                const totalHours = Math.floor(totalJam);
-                const totalMinutes = Math.round((totalJam - totalHours) * 60);
-                const formattedTotal = totalMinutes > 0 ? 
-                    `${totalHours}.${totalMinutes.toString().padStart(2, '0')}` : 
-                    totalHours.toString();
-                
-                $row.find('input[name="total_jam"]').val(formattedTotal);
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Input tidak valid',
-                    text: 'Masukkan angka yang valid (≥ 0)',
-                });
-                input.val('').focus();
-            }
+            // Apply final rounding to total jam
+            const roundedTotalJam = masterRound(totalJam, 'result');
+            $row.find('input[name="total_jam"]').val(
+                Number.isInteger(roundedTotalJam) 
+                    ? roundedTotalJam.toString() 
+                    : roundedTotalJam.toFixed(2).replace('.', ',')
+            );
             
+            // Update productivity calculations
             calculateKgPerJam(input);
         }
 
