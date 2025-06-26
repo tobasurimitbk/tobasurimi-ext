@@ -1,6 +1,56 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
+
+<style>
+    /* SweetAlert Custom Styles */
+.working-hours-popup {
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.working-hours-title {
+    color: #2c3e50;
+    font-weight: 600;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 12px 0;
+    font-size: 15px;
+}
+
+.detail-label {
+    color: #7f8c8d;
+    margin-right: 15px;
+}
+
+.detail-value {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.detail-divider {
+    margin: 15px 0;
+    border-color: #eee;
+}
+
+.detail-row.total {
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px dashed #eee;
+}
+
+.detail-row.total .detail-value {
+    color: #27ae60;
+    font-size: 16px;
+}
+</style>
+
+
 <section class="section">
     <div class="section-header">
         <h1>HR Outsourcing Salary Payment</h1>
@@ -300,6 +350,34 @@
                                     };
                                 }
                             });
+
+                            window.employeeWorkingDetails = {};
+
+                            // 2. Langsung gunakan paymentData yang sudah ada
+                            if (Array.isArray(paymentData)) {
+                                paymentData.forEach(employee => {
+                                    // Loop melalui semua properti employee
+                                    Object.keys(employee).forEach(key => {
+                                        if (key.startsWith('jam_kerja_')) {
+                                            const code = key.replace('jam_kerja_', '');
+                                            const detail = employee[key];
+                                            
+                                            // Gunakan employee_id sebagai bagian dari key untuk keunikan
+                                            window.employeeWorkingDetails[`${employee.employee_id}_jam_kerja_${code}`] = {
+                                                departure: detail.departure || 0,
+                                                return: detail.return || 0,
+                                                break: detail.break || 0,
+                                                total: detail.total || 0
+                                            };
+                                        }
+                                    });
+                                });
+                            } else {
+                                console.error("PaymentData is not in expected array format");
+                            }
+
+                            console.log("Employee Working Details:", window.employeeWorkingDetails);
+                            
                         }
                     }   
 
@@ -1154,7 +1232,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_suac" class="form-control" style="height: 40px;" value="${payment.jam_kerja_suac.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_suac" class="form-control" style="height: 40px;" value="${payment.jam_kerja_suac.total || ''}">
                                 </div>
                             </td>
 
@@ -1165,7 +1243,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_cuu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_cuu.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_cuu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_cuu.total || ''}">
                                 </div>
                             </td>
 
@@ -1176,7 +1254,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_au" class="form-control" style="height: 40px;" value="${payment.jam_kerja_au.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_au" class="form-control" style="height: 40px;" value="${payment.jam_kerja_au.total || ''}">
                                 </div>
                             </td>
 
@@ -1187,7 +1265,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_mku_mdu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_mku_mdu.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_mku_mdu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_mku_mdu.total || ''}">
                                 </div>
                             </td>
 
@@ -1198,63 +1276,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_bu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_bu.total || ''}">
-                                </div>
-                            </td>
-
-
-                            <td>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="jam_kerja_bbu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_bbu.total || ''}">
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="jam_kerja_atu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_atu.total || ''}">
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="jam_kerja_cbu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_cbu.total || ''}">
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="jam_kerja_fu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_fu.total || ''}">
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="jam_kerja_bums" class="form-control" style="height: 40px;" value="${payment.jam_kerja_bums.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_bu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_bu.total || ''}">
                                 </div>
                             </td>
 
@@ -1266,7 +1288,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_bum" class="form-control" style="height: 40px;" value="${payment.jam_kerja_bum.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_bbu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_bbu.total || ''}">
                                 </div>
                             </td>
 
@@ -1277,7 +1299,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_kum" class="form-control" style="height: 40px;" value="${payment.jam_kerja_kum.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_atu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_atu.total || ''}">
                                 </div>
                             </td>
 
@@ -1288,7 +1310,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_sum" class="form-control" style="height: 40px;" value="${payment.jam_kerja_sum.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_cbu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_cbu.total || ''}">
                                 </div>
                             </td>
 
@@ -1299,7 +1321,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_sk" class="form-control" style="height: 40px;" value="${payment.jam_kerja_sk.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_fu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_fu.total || ''}">
                                 </div>
                             </td>
 
@@ -1310,63 +1332,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_cku" class="form-control" style="height: 40px;" value="${payment.jam_kerja_cku.total || ''}">
-                                </div>
-                            </td>
-
-
-                            <td>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="jam_kerja_fkph" class="form-control" style="height: 40px;" value="${payment.jam_kerja_fkph.total || ''}">
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="jam_kerja_bk" class="form-control" style="height: 40px;" value="${payment.jam_kerja_bk.total || ''}">
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="jam_kerja_skpl" class="form-control" style="height: 40px;" value="${payment.jam_kerja_skpl.total || ''}">
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="jam_kerja_skpb" class="form-control" style="height: 40px;" value="${payment.jam_kerja_skpb.total || ''}">
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="jam_kerja_skml" class="form-control" style="height: 40px;" value="${payment.jam_kerja_skml.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_bums" class="form-control" style="height: 40px;" value="${payment.jam_kerja_bums.total || ''}">
                                 </div>
                             </td>
 
@@ -1378,7 +1344,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_skmb" class="form-control" style="height: 40px;" value="${payment.jam_kerja_skmb.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_bum" class="form-control" style="height: 40px;" value="${payment.jam_kerja_bum.total || ''}">
                                 </div>
                             </td>
 
@@ -1389,7 +1355,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_c1" class="form-control" style="height: 40px;" value="${payment.jam_kerja_c1.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_kum" class="form-control" style="height: 40px;" value="${payment.jam_kerja_kum.total || ''}">
                                 </div>
                             </td>
 
@@ -1400,7 +1366,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_c2" class="form-control" style="height: 40px;" value="${payment.jam_kerja_c2.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_sum" class="form-control" style="height: 40px;" value="${payment.jam_kerja_sum.total || ''}">
                                 </div>
                             </td>
 
@@ -1411,7 +1377,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_cuk" class="form-control" style="height: 40px;" value="${payment.jam_kerja_cuk.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_sk" class="form-control" style="height: 40px;" value="${payment.jam_kerja_sk.total || ''}">
                                 </div>
                             </td>
 
@@ -1422,63 +1388,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_fk" class="form-control" style="height: 40px;" value="${payment.jam_kerja_fk.total || ''}">
-                                </div>
-                            </td>
-
-
-                            <td>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="jam_kerja_ssscg" class="form-control" style="height: 40px;" value="${payment.jam_kerja_ssscg.total || ''}">
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="jam_kerja_iksscg" class="form-control" style="height: 40px;" value="${payment.jam_kerja_iksscg.total || ''}">
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="jam_kerja_fsscg" class="form-control" style="height: 40px;" value="${payment.jam_kerja_fsscg.total || ''}">
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="jam_kerja_kscg" class="form-control" style="height: 40px;" value="${payment.jam_kerja_kscg.total || ''}">
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" name="jam_kerja_cscg" class="form-control" style="height: 40px;" value="${payment.jam_kerja_cscg.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_cku" class="form-control" style="height: 40px;" value="${payment.jam_kerja_cku.total || ''}">
                                 </div>
                             </td>
 
@@ -1490,7 +1400,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_mpa" class="form-control" style="height: 40px;" value="${payment.jam_kerja_mpa.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_fkph" class="form-control" style="height: 40px;" value="${payment.jam_kerja_fkph.total || ''}">
                                 </div>
                             </td>
 
@@ -1501,7 +1411,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_lbl" class="form-control" style="height: 40px;" value="${payment.jam_kerja_lbl.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_bk" class="form-control" style="height: 40px;" value="${payment.jam_kerja_bk.total || ''}">
                                 </div>
                             </td>
 
@@ -1512,7 +1422,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_sa" class="form-control" style="height: 40px;" value="${payment.jam_kerja_sa.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_skpl" class="form-control" style="height: 40px;" value="${payment.jam_kerja_skpl.total || ''}">
                                 </div>
                             </td>
 
@@ -1523,7 +1433,7 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_cu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_cu.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_skpb" class="form-control" style="height: 40px;" value="${payment.jam_kerja_skpb.total || ''}">
                                 </div>
                             </td>
 
@@ -1534,7 +1444,175 @@
                                             <i class="fa fa-eye"></i>
                                         </span>
                                     </div>
-                                    <input type="text" name="jam_kerja_hk" class="form-control" style="height: 40px;" value="${payment.jam_kerja_hk.total || ''}">
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_skml" class="form-control" style="height: 40px;" value="${payment.jam_kerja_skml.total || ''}">
+                                </div>
+                            </td>
+
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_skmb" class="form-control" style="height: 40px;" value="${payment.jam_kerja_skmb.total || ''}">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_c1" class="form-control" style="height: 40px;" value="${payment.jam_kerja_c1.total || ''}">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_c2" class="form-control" style="height: 40px;" value="${payment.jam_kerja_c2.total || ''}">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_cuk" class="form-control" style="height: 40px;" value="${payment.jam_kerja_cuk.total || ''}">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_fk" class="form-control" style="height: 40px;" value="${payment.jam_kerja_fk.total || ''}">
+                                </div>
+                            </td>
+
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_ssscg" class="form-control" style="height: 40px;" value="${payment.jam_kerja_ssscg.total || ''}">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_iksscg" class="form-control" style="height: 40px;" value="${payment.jam_kerja_iksscg.total || ''}">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_fsscg" class="form-control" style="height: 40px;" value="${payment.jam_kerja_fsscg.total || ''}">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_kscg" class="form-control" style="height: 40px;" value="${payment.jam_kerja_kscg.total || ''}">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_cscg" class="form-control" style="height: 40px;" value="${payment.jam_kerja_cscg.total || ''}">
+                                </div>
+                            </td>
+
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_mpa" class="form-control" style="height: 40px;" value="${payment.jam_kerja_mpa.total || ''}">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_lbl" class="form-control" style="height: 40px;" value="${payment.jam_kerja_lbl.total || ''}">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_sa" class="form-control" style="height: 40px;" value="${payment.jam_kerja_sa.total || ''}">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_cu" class="form-control" style="height: 40px;" value="${payment.jam_kerja_cu.total || ''}">
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" data-employee_id="${employeeId}" name="jam_kerja_hk" class="form-control" style="height: 40px;" value="${payment.jam_kerja_hk.total || ''}">
                                 </div>
                             </td>
 
@@ -1549,41 +1627,41 @@
                             <td><input type="text" name="borongan_per_jam" class="form-control form-control-sm borongan-per-jam" style="min-width: 120px;" value="${payment.borongan_per_jam || ''}"></td>
 
                             <!-- KG / JAM -->
-                            <td><input type="number" name="kg_per_jam_suac" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_suac || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_cuu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cuu || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_au" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_au || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_mku_mdu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_mku_mdu || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_bu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_bu || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_bbu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_bbu || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_atu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_atu || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_cbu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cbu || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_fu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_fu || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_bums" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_bums || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_bum" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_bum || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_kum" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_kum || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_sum" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_sum || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_sk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_sk || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_cku" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cku || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_fkph" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_fkph || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_bk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_bk || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_skpl" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_skpl || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_skpb" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_skpb || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_skml" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_skml || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_skmb" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_skmb || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_c1" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_c1 || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_c2" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_c2 || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_cuk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cuk || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_fk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_fk || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_ssscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_ssscg || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_iksscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_iksscg || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_fsscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_fsscg || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_kscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_kscg || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_cscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cscg || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_mpa" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_mpa || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_lbl" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_lbl || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_sa" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_sa || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_cu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cu || ''}"></td>
-                            <td><input type="number" name="kg_per_jam_hk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_hk || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_suac" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_suac || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_cuu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cuu || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_au" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_au || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_mku_mdu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_mku_mdu || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_bu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_bu || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_bbu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_bbu || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_atu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_atu || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_cbu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cbu || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_fu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_fu || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_bums" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_bums || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_bum" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_bum || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_kum" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_kum || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_sum" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_sum || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_sk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_sk || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_cku" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cku || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_fkph" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_fkph || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_bk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_bk || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_skpl" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_skpl || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_skpb" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_skpb || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_skml" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_skml || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_skmb" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_skmb || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_c1" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_c1 || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_c2" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_c2 || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_cuk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cuk || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_fk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_fk || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_ssscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_ssscg || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_iksscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_iksscg || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_fsscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_fsscg || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_kscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_kscg || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_cscg" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cscg || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_mpa" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_mpa || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_lbl" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_lbl || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_sa" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_sa || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_cu" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_cu || ''}"></td>
+                            <td><input type="text" name="kg_per_jam_hk" class="form-control form-control-sm" style="min-width: 90px;" value="${payment.kg_per_jam_hk || ''}"></td>
                         </tr>
                     `;
                     }
@@ -2148,7 +2226,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_suac" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_suac" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2157,7 +2235,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_cuu" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_cuu" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2166,7 +2244,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_au" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_au" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2175,7 +2253,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_mku_mdu" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_mku_mdu" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2184,53 +2262,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_bu" class="form-control" style="height: 40px;">
-                        </div>
-                    </td>
-
-
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
-                            </div>
-                            <input type="text" name="jam_kerja_bbu" class="form-control" style="height: 40px;">
-                        </div>
-                    </td>
-
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
-                            </div>
-                            <input type="text" name="jam_kerja_atu" class="form-control" style="height: 40px;">
-                        </div>
-                    </td>
-
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
-                            </div>
-                            <input type="text" name="jam_kerja_cbu" class="form-control" style="height: 40px;">
-                        </div>
-                    </td>
-
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
-                            </div>
-                            <input type="text" name="jam_kerja_fu" class="form-control" style="height: 40px;">
-                        </div>
-                    </td>
-
-                    <td>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
-                            </div>
-                            <input type="text" name="jam_kerja_bums" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_bu" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2240,7 +2272,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_bum" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_bbu" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2249,7 +2281,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_kum" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_atu" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2258,7 +2290,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_sum" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_cbu" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2267,7 +2299,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_sk" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_fu" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2276,7 +2308,17 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_cku" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_bums" class="form-control" style="height: 40px;">
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
+                            </div>
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_bum" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2285,7 +2327,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_fkph" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_kum" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2294,7 +2336,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_bk" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_sum" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2303,7 +2345,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_skpl" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_sk" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2312,7 +2354,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_skpb" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_cku" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2321,7 +2363,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_skml" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_fkph" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2330,7 +2372,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_skmb" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_bk" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2339,7 +2381,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_c1" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_skpl" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2348,7 +2390,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_c2" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_skpb" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2357,7 +2399,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_cuk" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_skml" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2366,7 +2408,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_fk" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_skmb" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2375,7 +2417,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_ssscg" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_c1" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2384,7 +2426,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_iksscg" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_c2" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2393,7 +2435,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_fsscg" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_cuk" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2402,7 +2444,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_kscg" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_fk" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2411,7 +2453,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_cscg" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_ssscg" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2420,7 +2462,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_mpa" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_iksscg" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2429,7 +2471,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_lbl" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_fsscg" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2438,7 +2480,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_sa" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_kscg" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2447,7 +2489,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_cu" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_cscg" class="form-control" style="height: 40px;">
                         </div>
                     </td>
 
@@ -2456,7 +2498,43 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
                             </div>
-                            <input type="text" name="jam_kerja_hk" class="form-control" style="height: 40px;">
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_mpa" class="form-control" style="height: 40px;">
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
+                            </div>
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_lbl" class="form-control" style="height: 40px;">
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
+                            </div>
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_sa" class="form-control" style="height: 40px;">
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
+                            </div>
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_cu" class="form-control" style="height: 40px;">
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text eye-btn" style="height:40px;cursor:pointer;"><i class="fa fa-eye"></i></span>
+                            </div>
+                            <input type="text" data-employee_id="${employeeId}" name="jam_kerja_hk" class="form-control" style="height: 40px;">
                         </div>
                     </td> 
 
@@ -2471,41 +2549,41 @@
                     <td><input type="text" name="borongan_per_jam" class="form-control form-control-sm borongan-per-jam" style="min-width: 120px;"></td>
 
                     <!-- KG / JAM -->
-                    <td><input type="number" name="kg_per_jam_suac" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_cuu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_au" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_mku_mdu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_bu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_bbu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_atu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_cbu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_fu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_bums" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_bum" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_kum" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_sum" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_sk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_cku" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_fkph" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_bk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_skpl" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_skpb" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_skml" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_skmb" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_c1" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_c2" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_cuk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_fk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_ssscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_iksscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_fsscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_kscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_cscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_mpa" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_lbl" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_sa" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_cu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
-                    <td><input type="number" name="kg_per_jam_hk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_suac" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_cuu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_au" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_mku_mdu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_bu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_bbu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_atu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_cbu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_fu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_bums" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_bum" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_kum" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_sum" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_sk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_cku" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_fkph" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_bk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_skpl" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_skpb" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_skml" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_skmb" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_c1" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_c2" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_cuk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_fk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_ssscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_iksscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_fsscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_kscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_cscg" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_mpa" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_lbl" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_sa" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_cu" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
+                    <td><input type="text" name="kg_per_jam_hk" class="form-control form-control-sm" style="min-width: 90px;" value=""></td>
                 </tr>
             `;
             }
@@ -3086,74 +3164,99 @@
             const employeeId = $row.data('employee-id');
             const inputName = input.attr('name');
             const code = inputName.replace('jam_kerja_', '');
-            
-            // Check if the input contains time components (e.g., "7.30-19.00-1" or "7.30-19.00-1.30")
+
+            // Master rounding function for all cases
+            const masterRound = (timeValue, type = 'result') => {
+                const hours = Math.floor(timeValue);
+                const minutes = Math.round((timeValue - hours) * 60);
+                
+                // Departure rounding (jam masuk)
+                if (type === 'departure') {
+                    if (minutes >= 46) return hours + 1;
+                    if (minutes >= 31) return hours + 0.75;
+                    if (minutes >= 15) return hours + 0.5;
+                    return hours + 0.25;
+                }
+                // Return rounding (jam pulang)
+                else if (type === 'return') {
+                    if (minutes >= 45) return hours + 0.75;
+                    if (minutes >= 30) return hours + 0.5;
+                    if (minutes >= 15) return hours + 0.25;
+                    return hours;
+                }
+                // Final result rounding (hasil total)
+                else {
+                    if (minutes >= 46) return hours + 1;
+                    if (minutes >= 31) return hours + 0.75;
+                    if (minutes >= 15) return hours + 0.5;
+                    return hours + 0.25;
+                }
+            };
+
+            // Parse time input with rounding
+            const parseTimeInput = (timeStr, type) => {
+                if (!timeStr.includes('.')) return parseFloat(timeStr) || 0;
+                
+                const [hours, minutes] = timeStr.split('.').map(Number);
+                const decimalTime = hours + (minutes / 60);
+                return masterRound(decimalTime, type);
+            };
+
             if (val.includes('-')) {
                 const parts = val.split('-').map(part => part.trim());
                 
                 if (parts.length === 3) {
                     try {
-                        // Parse each time component
-                        const parseTime = (timeStr) => {
-                            if (timeStr.includes('.')) {
-                                const [hours, minutes] = timeStr.split('.').map(Number);
-                                return hours + (minutes / 60);
-                            }
-                            return parseFloat(timeStr);
-                        };
+                        // Parse with proper rounding
+                        const departure = parseTimeInput(parts[0], 'departure');
+                        const returnTime = parseTimeInput(parts[1], 'return');
+                        const breakTime = parseTimeInput(parts[2], 'return'); // Break uses return rounding
                         
-                        const departure = parseTime(parts[0]);
-                        const returnTime = parseTime(parts[1]);
-                        const breakTime = parseTime(parts[2]);
-                        
-                        // Validate times
+                        // Validate
                         if (isNaN(departure) || isNaN(returnTime) || isNaN(breakTime)) {
                             throw new Error('Format waktu tidak valid');
                         }
-                        
-                        if (departure < 0 || departure >= 24 || 
-                            returnTime < 0 || returnTime >= 24 || 
-                            breakTime < 0) {
+                        if ([departure, returnTime, breakTime].some(t => t < 0 || t >= 24)) {
                             throw new Error('Waktu harus antara 0-24');
                         }
+
+                        // Calculate with overnight handling
+                        let workingHours = returnTime > departure 
+                            ? returnTime - departure - breakTime 
+                            : (24 - departure) + returnTime - breakTime;
                         
-                        // Calculate working hours (handle overnight work)
-                        let workingHours = 0;
-                        if (returnTime > departure) {
-                            workingHours = returnTime - departure - breakTime;
-                        } else {
-                            // Overnight work (e.g., 19-8)
-                            workingHours = (24 - departure) + returnTime - breakTime;
-                        }
-                        
-                        // Ensure working hours is not negative
                         workingHours = Math.max(0, workingHours);
                         
-                        // Store the detailed working hours
+                        // Apply final rounding to result
+                        const roundedTotal = masterRound(workingHours, 'result');
+                        
+                        // Store data
                         const key = `${employeeId}_${code}`;
-                        if (!window.employeeWorkingDetails) window.employeeWorkingDetails = {};
+                        window.employeeWorkingDetails = window.employeeWorkingDetails || {};
                         window.employeeWorkingDetails[key] = {
-                            departure: parts[0],
-                            return: parts[1],
-                            break: parts[2],
-                            total: workingHours
+                            raw_input: val,
+                            rounded_departure: departure,
+                            rounded_return: returnTime,
+                            rounded_break: breakTime,
+                            total_before_round: workingHours,
+                            total: roundedTotal
                         };
                         
-                        // Format the total hours with minutes
-                        const totalHours = Math.floor(workingHours);
-                        const totalMinutes = Math.round((workingHours - totalHours) * 60);
-                        const formattedTotal = totalMinutes > 0 ? 
-                            `${totalHours}.${totalMinutes.toString().padStart(2, '0')}` : 
-                            totalHours.toString();
-                        
-                        // Update the input with just the total hours
-                        input.val(formattedTotal);
-                        
+                        // Format display (show .25, .5, .75 appropriately)
+                        const displayValue = Number.isInteger(roundedTotal) 
+                            ? roundedTotal.toString() 
+                            : roundedTotal.toFixed(2).replace('.', ',');
+                        input.val(displayValue);
+
                     } catch (error) {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Format tidak valid',
-                            text: error.message + '\nContoh format: 7.30-19.00-1 atau 7.30-19.00-1.30'
+                            title: 'Kesalahan Input',
+                            html: `<div>${error.message}</div>
+                                <div class="mt-2"><strong>Contoh format benar:</strong><br>
+                                7.30-16.00-0.5 (JamMasuk-JamPulang-Istirahat)</div>
+                                <div class="text-muted small mt-2">Gunakan format 24 jam</div>`,
+                            confirmButtonText: 'Mengerti'
                         });
                         input.val('').focus();
                         return;
@@ -3161,99 +3264,118 @@
                 }
             }
             
-            // Parse input value (either direct number or after time calculation)
-            const parsedVal = parseFloat(input.val().replace(/,/g, '.')) || 0;
+            // Calculate and round totals
+            let totalJam = 0;
+            $row.find('input[name^="jam_kerja_"]').each(function() {
+                const val = $(this).val().replace(',', '.');
+                totalJam += parseFloat(val) || 0;
+            });
             
-            if (parsedVal >= 0) {
-                // Calculate total of all jam_kerja inputs
-                let totalJam = 0;
-                $row.find('input[name^="jam_kerja_"]').each(function() {
-                    const jamValue = parseFloat($(this).val().replace(/,/g, '.')) || 0;
-                    totalJam += jamValue;
-                });
-                
-                // Update total_jam field (with minutes if needed)
-                const totalHours = Math.floor(totalJam);
-                const totalMinutes = Math.round((totalJam - totalHours) * 60);
-                const formattedTotal = totalMinutes > 0 ? 
-                    `${totalHours}.${totalMinutes.toString().padStart(2, '0')}` : 
-                    totalHours.toString();
-                
-                $row.find('input[name="total_jam"]').val(formattedTotal);
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Input tidak valid',
-                    text: 'Masukkan angka yang valid (≥ 0)',
-                });
-                input.val('').focus();
-            }
+            // Apply final rounding to total jam
+            const roundedTotalJam = masterRound(totalJam, 'result');
+            $row.find('input[name="total_jam"]').val(
+                Number.isInteger(roundedTotalJam) 
+                    ? roundedTotalJam.toString() 
+                    : roundedTotalJam.toFixed(2).replace('.', ',')
+            );
             
-            // Update kg_per_jam calculation
-            calculateKgPerJam($row);
+            // Update productivity calculations
+            calculateKgPerJam(input);
         }
 
         // Eye button click handler - now just shows the details without saving
         $(document).on('click', '.eye-btn', function() {
-            const $btn = $(this);
-            const code = $btn.data('code');
-            const $row = $btn.closest('tr');
-            const employeeId = $row.data('employee-id');
-            const key = `${employeeId}_${code}`;
-            
-            // Get existing data
-            const existingData = window.employeeWorkingDetails?.[key] || {
+            const btn = $(this);
+            const input = btn.closest('.input-group').find('input');
+            const code = input.attr('name');
+            const key = input.data("employee_id");
+            // Get the working details from our stored data
+            const workingDetails = window.employeeWorkingDetails?.[key+"_"+code] || {
                 departure: 0,
                 return: 0,
                 break: 0,
                 total: 0
             };
-            
-            // Show in a simple alert (or you can use a more sophisticated UI)
+
+            console.log(workingDetails)
+
+            // Format time display (handles both number and string)
+            const formatTimeDisplay = (value) => {
+                if (typeof value === 'number') {
+                    const hours = Math.floor(value);
+                    const minutes = Math.round((value % 1) * 60);
+                    return minutes > 0 ? `${hours} ${minutes}` : `${hours} jam`;
+                }
+                return value;
+            };
+
+            // Create a beautiful SweetAlert dialog
             Swal.fire({
-                title: 'Detail Jam Kerja',
+                title: `<i class="fas fa-clock"></i> Detail Jam Kerja ${code.toUpperCase()}`,
                 html: `
-                    <div><strong>Jam Berangkat:</strong> ${existingData.departure}</div>
-                    <div><strong>Jam Pulang:</strong> ${existingData.return}</div>
-                    <div><strong>Istirahat:</strong> ${existingData.break} jam</div>
-                    <div><strong>Total:</strong> ${existingData.total} jam</div>
+                    <div class="text-left">
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-arrow-right"></i> Berangkat:</span>
+                            <span class="detail-value">${formatTimeDisplay(workingDetails.departure)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-arrow-left"></i> Pulang:</span>
+                            <span class="detail-value">${formatTimeDisplay(workingDetails.return)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-coffee"></i> Istirahat:</span>
+                            <span class="detail-value">${formatTimeDisplay(workingDetails.break)}</span>
+                        </div>
+                        <hr class="detail-divider">
+                        <div class="detail-row total">
+                            <span class="detail-label"><i class="fas fa-calculator"></i> Total:</span>
+                            <span class="detail-value">${formatTimeDisplay(workingDetails.total)}</span>
+                        </div>
+                    </div>
                 `,
-                confirmButtonText: 'Tutup'
+                confirmButtonText: '<i class="fas fa-check"></i> Tutup',
+                background: '#f8f9fa',
+                showCloseButton: true,
+                customClass: {
+                    popup: 'working-hours-popup',
+                    title: 'working-hours-title',
+                    htmlContainer: 'working-hours-content'
+                }
             });
         });
 
-        function calculateKgPerJam($row) {
+        function calculateKgPerJam(input) {
+            const $row = $(input).closest('tr');
             const employeeId = $row.data('employee-id');
+            const inputName = $(input).attr('name');
             
-            // Daftar semua kode yang ada
-            const allCodes = [
-                'SUAC', 'CUU', 'AU', 'MKU/MDU', 'BU', 'BBU', 'ATU', 'CBU', 'FU', 'BUMS', 
-                'BUM', 'KUM', 'SUM', 'SK', 'CKU', 'FKPH', 'BK', 'SKPL', 'SKPB', 'SKML', 
-                'SKMB', 'C1', 'C2', 'CUK', 'FK', 'SSSCG', 'IKSSCG', 'FSSCG', 'KSCG', 
-                'CSCG', 'MPA', 'LBL', 'SA', 'CU', 'HK'
-            ];
+            // Extract the code from input name (jam_kerja_[code])
+            const code = inputName.replace('jam_kerja_', '');
             
-            allCodes.forEach(code => {
-                const weightInput = $row.find(`input[name="${code}"]`);
-                const hoursInput = $row.find(`input[name="jam_kerja_${code.toLowerCase().replace('/', '_')}"]`);
-                const kgPerJamInput = $row.find(`input[name="kg_per_jam_${code.toLowerCase().replace('/', '_')}"]`);
+            // Find related inputs using proper scoping to the row
+            const weightInput = $row.find(`input[name="${code.toUpperCase()}"]`);
+            const hoursInput = $row.find(`input[name="${inputName}"]`);
+            const kgPerJamInput = $row.find(`input[name="kg_per_jam_${code}"]`);
+
+            // Only proceed if all required inputs exist
+            if (weightInput.length && hoursInput.length && kgPerJamInput.length) {
+                const berat = parseFloat(weightInput.val().replace(/,/g, '.')) || 0;
+                const jam = parseFloat(hoursInput.val().replace(/,/g, '.')) || 0;
                 
-                if (weightInput.length && hoursInput.length && kgPerJamInput.length) {
-                    const berat = parseFloat(weightInput.val()) || 0;
-                    const jam = parseFloat(hoursInput.val()) || 0;
-                    
-                    // Hitung kg/jam, hindari pembagian dengan 0
-                    const kgPerJam = jam > 0 ? (berat / jam) : 0;
-                    
-                    kgPerJamInput.val(kgPerJam.toFixed(2));
-                }
-            });
+                // Calculate kg/hour, avoid division by zero
+                const kgPerJam = jam > 0 ? (berat / jam) : 0;
+                
+                // Update the kg/hour field with 2 decimal places
+                kgPerJamInput.val(kgPerJam.toFixed(2));
+            }
             
-            // Hitung total kg/jam jika diperlukan
+            // Calculate total kg/hour for all codes
             let totalKgPerJam = 0;
             $row.find('input[name^="kg_per_jam_"]').each(function() {
-                totalKgPerJam += parseFloat($(this).val()) || 0;
+                totalKgPerJam += parseFloat($(this).val().replace(/,/g, '.')) || 0;
             });
+            
+            // Update total field
             $row.find('input[name="total_kg_per_jam"]').val(totalKgPerJam.toFixed(2));
         }
 
