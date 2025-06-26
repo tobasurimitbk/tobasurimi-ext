@@ -3080,56 +3080,84 @@
             $row.find(`input[name="rupiah"]`).val(greatFormatRupiah(rupiah) + ".00");
         }
 
-        // Modified handleWorkingHoursInput function
         function handleWorkingHoursInput(input) {
             const val = input.val().trim();
             const $row = input.closest('tr');
             const employeeId = $row.data('employee-id');
             const inputName = input.attr('name');
             const code = inputName.replace('jam_kerja_', '');
-            console.log("INPUTNYA INI", input)
-            // Check if the input contains time components (e.g., "19-8-1")
+            
+            // Check if the input contains time components (e.g., "7.30-19.00-1" or "7.30-19.00-1.30")
             if (val.includes('-')) {
-                const parts = val.split('-').map(part => parseFloat(part.trim()) || 0);
+                const parts = val.split('-').map(part => part.trim());
                 
                 if (parts.length === 3) {
-                    const [departure, returnTime, breakTime] = parts;
-                    
-                    // Validate times
-                    if (departure < 0 || departure >= 24 || returnTime < 0 || returnTime >= 24 || breakTime < 0) {
+                    try {
+                        // Parse each time component
+                        const parseTime = (timeStr) => {
+                            if (timeStr.includes('.')) {
+                                const [hours, minutes] = timeStr.split('.').map(Number);
+                                return hours + (minutes / 60);
+                            }
+                            return parseFloat(timeStr);
+                        };
+                        
+                        const departure = parseTime(parts[0]);
+                        const returnTime = parseTime(parts[1]);
+                        const breakTime = parseTime(parts[2]);
+                        
+                        // Validate times
+                        if (isNaN(departure) || isNaN(returnTime) || isNaN(breakTime)) {
+                            throw new Error('Format waktu tidak valid');
+                        }
+                        
+                        if (departure < 0 || departure >= 24 || 
+                            returnTime < 0 || returnTime >= 24 || 
+                            breakTime < 0) {
+                            throw new Error('Waktu harus antara 0-24');
+                        }
+                        
+                        // Calculate working hours (handle overnight work)
+                        let workingHours = 0;
+                        if (returnTime > departure) {
+                            workingHours = returnTime - departure - breakTime;
+                        } else {
+                            // Overnight work (e.g., 19-8)
+                            workingHours = (24 - departure) + returnTime - breakTime;
+                        }
+                        
+                        // Ensure working hours is not negative
+                        workingHours = Math.max(0, workingHours);
+                        
+                        // Store the detailed working hours
+                        const key = `${employeeId}_${code}`;
+                        if (!window.employeeWorkingDetails) window.employeeWorkingDetails = {};
+                        window.employeeWorkingDetails[key] = {
+                            departure: parts[0],
+                            return: parts[1],
+                            break: parts[2],
+                            total: workingHours
+                        };
+                        
+                        // Format the total hours with minutes
+                        const totalHours = Math.floor(workingHours);
+                        const totalMinutes = Math.round((workingHours - totalHours) * 60);
+                        const formattedTotal = totalMinutes > 0 ? 
+                            `${totalHours}.${totalMinutes.toString().padStart(2, '0')}` : 
+                            totalHours.toString();
+                        
+                        // Update the input with just the total hours
+                        input.val(formattedTotal);
+                        
+                    } catch (error) {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Waktu tidak valid',
-                            text: 'Format: jam_berangkat-jam_pulang-istirahat (0-24)'
+                            title: 'Format tidak valid',
+                            text: error.message + '\nContoh format: 7.30-19.00-1 atau 7.30-19.00-1.30'
                         });
                         input.val('').focus();
                         return;
                     }
-                    
-                    // Calculate working hours (handle overnight work)
-                    let workingHours = 0;
-                    if (returnTime > departure) {
-                        workingHours = returnTime - departure - breakTime;
-                    } else {
-                        // Overnight work (e.g., 19-8)
-                        workingHours = (24 - departure) + returnTime - breakTime;
-                    }
-                    
-                    // Ensure working hours is not negative
-                    workingHours = Math.max(0, workingHours);
-                    
-                    // Store the detailed working hours
-                    const key = `${employeeId}_${code}`;
-                    if (!window.employeeWorkingDetails) window.employeeWorkingDetails = {};
-                    window.employeeWorkingDetails[key] = {
-                        departure,
-                        return: returnTime,
-                        break: breakTime,
-                        total: workingHours
-                    };
-                    
-                    // Update the input with just the total hours
-                    input.val(workingHours.toFixed(2));
                 }
             }
             
@@ -3137,9 +3165,6 @@
             const parsedVal = parseFloat(input.val().replace(/,/g, '.')) || 0;
             
             if (parsedVal >= 0) {
-                // Update the current input value (format to 2 decimal places)
-                input.val(parsedVal.toFixed(2));
-                
                 // Calculate total of all jam_kerja inputs
                 let totalJam = 0;
                 $row.find('input[name^="jam_kerja_"]').each(function() {
@@ -3147,8 +3172,14 @@
                     totalJam += jamValue;
                 });
                 
-                // Update total_jam field
-                $row.find('input[name="total_jam"]').val(totalJam.toFixed(2));
+                // Update total_jam field (with minutes if needed)
+                const totalHours = Math.floor(totalJam);
+                const totalMinutes = Math.round((totalJam - totalHours) * 60);
+                const formattedTotal = totalMinutes > 0 ? 
+                    `${totalHours}.${totalMinutes.toString().padStart(2, '0')}` : 
+                    totalHours.toString();
+                
+                $row.find('input[name="total_jam"]').val(formattedTotal);
             } else {
                 Swal.fire({
                     icon: 'error',
