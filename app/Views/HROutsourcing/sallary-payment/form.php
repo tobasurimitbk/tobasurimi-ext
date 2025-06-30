@@ -467,6 +467,7 @@
             if (department == '5') {
                 headerHtml = `
                 <tr>
+                    <th class="text-center" rowspan="3">ACTION</th>
                     <th class="text-center" rowspan="3">NO</th>
                     <th class="text-center" rowspan="3">TMK</th>
                     <th class="text-center" rowspan="3">BADGE</th>
@@ -545,6 +546,7 @@
             } else {
                 headerHtml = `
                 <tr">
+                    <th class="text-center" rowspan="3">ACTION</th>
                     <th class="text-center" rowspan="3">NO</th>
                     <th class="text-center" rowspan="3">TMK</th>
                     <th class="text-center" rowspan="3">NO BADGE</th>
@@ -753,6 +755,7 @@
 
                         rowHtml = `
                         <tr data-employee-id="${employeeId}">
+                            <td><button class="btn btn-danger" id="btnDelete" data-employee_id="${employeeId}"><i class="fa fa-trash"></i></button></td>
                             <td>${$('#dataTable tbody tr').length + 1}</td>
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${tanggalMasuk}" readonly></td>
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${badge}" readonly></td>
@@ -904,6 +907,7 @@
                         // Default department table structure
                         rowHtml = `
                         <tr data-employee-id="${employeeId}">
+                            <td><button class="btn btn-danger" id="btnDelete" data-employee_id="${employeeId}"><i class="fa fa-trash"></i></button></td>
                             <td>${$('#dataTable tbody tr').length + 1}</td>
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${tanggalMasuk}" readonly></td>
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${badge}" readonly></td>
@@ -1703,6 +1707,7 @@
             if (department == '5') {
                 return `
                 <tr data-employee-id="${employeeId}">
+                    <td><button class="btn btn-danger" id="btnDelete" data-employee_id="${employeeId}"><i class="fa fa-trash"></i></button></td>
                     <td>${$('#dataTable tbody tr').length + 1}</td>
                     <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${tanggalMasuk}" readonly></td>
                     <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${badge}" readonly></td>
@@ -1865,6 +1870,7 @@
             } else {
                 return `
                 <tr data-employee-id="${employeeId}">
+                    <td><button class="btn btn-danger" id="btnDelete" data-employee_id="${employeeId}"><i class="fa fa-trash"></i></button></td>
                     <td>${$('#dataTable tbody tr').length + 1}</td>
                     <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${tanggalMasuk}" readonly></td>
                     <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${badge}" readonly></td>
@@ -2842,6 +2848,61 @@
             console.log('Collected Employee Data:', employeeData);
             return employeeData;
         }
+
+        $(document).on('click', '#btnDelete', function() {
+            const employeeId = $(this).data('employee_id');
+            const $row = $(this).closest('tr');
+            
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // 1. Hapus baris dari tabel
+                    $row.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                    
+                    // 2. Hapus data dari employeeData
+                    if (typeof employeeData !== 'undefined') {
+                        employeeData = employeeData.filter(emp => emp.employee_id !== employeeId);
+                    }
+                    
+                    // 3. Hapus data dari employeeItemDetails
+                    if (typeof employeeItemDetails !== 'undefined') {
+                        Object.keys(employeeItemDetails).forEach(key => {
+                            if (key.startsWith(`${employeeId}_`)) {
+                                delete employeeItemDetails[key];
+                            }
+                        });
+                    }
+                    
+                    // 4. Hapus data dari employeeWorkingDetails
+                    if (typeof window.employeeWorkingDetails !== 'undefined') {
+                        Object.keys(window.employeeWorkingDetails).forEach(key => {
+                            if (key.startsWith(`${employeeId}_`)) {
+                                delete window.employeeWorkingDetails[key];
+                            }
+                        });
+                    }
+                    
+                    // 5. Notifikasi sukses
+                    Swal.fire({
+                        title: 'Terhapus!',
+                        text: 'Data karyawan berhasil dihapus.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });            
+                }
+            });
+        });
 
         // Function to save data
         function saveData() {
