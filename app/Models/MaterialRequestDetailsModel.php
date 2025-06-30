@@ -215,15 +215,18 @@ class MaterialRequestDetailsModel extends Model
             );
             $stock = $stockModel->find($m['stock_id']);
 
+
             if ($stock['kemasan_id'] == 0) {
                 $barangMaster = $barangMasterModel->find($stock['barang1_id']);
                 $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stock['barang2_id']);
                 $satuan = $barangMasterSpesifikasi == null ? null : $satuanModel->find($barangMasterSpesifikasi['satuan_1']);
-                $barangName = $barangMasterSpesifikasi != null && $barangMaster != null ? $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'] : '';
+                $barangName =  $barangMaster['barang_name'];
+                $spesifikasi = $barangMasterSpesifikasi == null ? null : $barangMasterSpesifikasi['spesifikasi'];
             } else {
                 $kemasan = $kemasanModel->find($stock['kemasan_id']);
                 $satuan = $satuanModel->find($kemasan['satuan_id']);
                 $barangName = $kemasan['name'];
+                $spesifikasi = "";
             }
 
             $rmPurchaseOrder = $rmPurchaseOrderModel->where('po_no', $m['stock_dokumen'])->where('company_id', $stockList['company_id'])->first();
@@ -251,7 +254,7 @@ class MaterialRequestDetailsModel extends Model
             $stockList['no_aju'] =  $stockList['no_aju'] == "-" ? "-" : $stockList['no_aju'];
             $stockList['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
             $stockList['satuan'] = $satuan == null ? '' : $satuan['kode_satuan'];
-            $stockList['barang'] = strtoupper($barangName);
+            $stockList['barang'] = $barangName;
             $stockList['stock_id'] = $stockList['stock_id'];
             $stockList['type_barang'] = $stock['tipe_barang'];
             $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
@@ -275,6 +278,7 @@ class MaterialRequestDetailsModel extends Model
             $stockList['harga_umum'] = $m['harga_umum'];
             $stockList['harga_harian'] = $m['harga_harian'];
             $stockList['harga_bulanan'] = $m['harga_bulanan'];
+            $stockList['spesifikasi'] = $spesifikasi;
 
             array_push($result, $stockList);
         }
@@ -286,6 +290,7 @@ class MaterialRequestDetailsModel extends Model
 
             foreach ($result as $item) {
                 $key = $item['stock_dokumen'] . '|' . $item['stock_date'];
+                $spec = $item['spesifikasi'] ?? $item['sepsifikasi'] ?? '';
 
                 if (!isset($grouped[$key])) {
                     $grouped[$key] = [
@@ -322,7 +327,8 @@ class MaterialRequestDetailsModel extends Model
                         'harga_bulanan' => $item['harga_bulanan'],
 
                         'qty' => 0, // inisialisasi qty,
-                        'barang' => [],
+                        'barang' => $item['barang'],
+                        'spesifikasi_list' => [],
                     ];
                 }
 
@@ -332,24 +338,25 @@ class MaterialRequestDetailsModel extends Model
 
                 $grouped[$key]['stok_total'] += floatval($item['stok_total']);
                 $grouped[$key]['id'][] = $item['stock_id'];
-
-                if (!in_array($item['barang'], $grouped[$key]['barang'])) {
-                    $grouped[$key]['barang'][] = $item['barang'];
-                }
+                $grouped[$key]['spesifikasi_list'][] = $spec;
             }
 
             $result = [];
-            foreach ($grouped as $item) {
-                $item['barang'] = implode(', ', $item['barang']);
-                $item['id'] = encrypt(json_encode($item['id']));
-                $result[] = $item;
+            foreach ($grouped as  &$group) {
+                $group['spesifikasi_list'] = array_unique($group['spesifikasi_list']);
+                $group['barang'] = trim($group['barang'] . ' ' . implode(', ', $group['spesifikasi_list']));
+
+                $group['id'] = encrypt2(json_encode($group['id']));
+                $result[] = $group;
             }
         } else {
             // Untuk Stok Jasa Vendor
             $grouped = [];
 
+
             foreach ($result as $item) {
                 $key = $item['stock_dokumen'] . '|' . $item['stock_date'];
+                $spec = $item['spesifikasi'] ?? $item['sepsifikasi'] ?? '';
 
                 if (!isset($grouped[$key])) {
                     $grouped[$key] = [
@@ -386,7 +393,8 @@ class MaterialRequestDetailsModel extends Model
                         'harga_bulanan' => $item['harga_bulanan'],
 
                         'qty' => 0, // inisialisasi qty,
-                        'barang' => [],
+                        'barang' => $item['barang'],
+                        'spesifikasi_list' => [],
                     ];
                 }
 
@@ -396,19 +404,20 @@ class MaterialRequestDetailsModel extends Model
 
                 $grouped[$key]['stok_total'] += floatval($item['stok_total']);
                 $grouped[$key]['id'][] = $item['stock_id'];
-
-                if (!in_array($item['barang'], $grouped[$key]['barang'])) {
-                    $grouped[$key]['barang'][] = $item['barang'];
-                }
+                $grouped[$key]['spesifikasi_list'][] = $spec;
             }
+
 
             $result = [];
-            foreach ($grouped as $item) {
-                $item['barang'] = implode(', ', $item['barang']);
-                $item['id'] = encrypt2(json_encode($item['id']));
-                $result[] = $item;
+            foreach ($grouped as  &$group) {
+                $group['spesifikasi_list'] = array_unique($group['spesifikasi_list']);
+                $group['barang'] = trim($group['barang'] . ' ' . implode(', ', $group['spesifikasi_list']));
+
+                $group['id'] = encrypt2(json_encode($group['id']));
+                $result[] = $group;
             }
         }
+
 
         return $result;
     }

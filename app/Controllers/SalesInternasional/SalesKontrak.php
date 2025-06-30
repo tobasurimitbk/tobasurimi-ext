@@ -321,7 +321,8 @@ class SalesKontrak extends BaseController
                 'remark' => $b->remark,
                 'qty' => $b->qty,
                 'harga' => $b->harga,
-                'total_harga' => $b->total
+                'total_harga' => $b->total,
+                'spesifikasi' => $b->spesifikasi
             ]);
         }
 
@@ -409,7 +410,8 @@ class SalesKontrak extends BaseController
                     'remark' => $b->remark,
                     'qty' => $b->qty,
                     'harga' => $b->harga,
-                    'total_harga' => $b->total
+                    'total_harga' => $b->total,
+                    'spesifikasi' => $b->spesifikasi
                 ]);
                 array_push($id_detail_all, $check['id']);
             } else {
@@ -427,7 +429,8 @@ class SalesKontrak extends BaseController
                     'remark' => $b->remark,
                     'qty' => $b->qty,
                     'harga' => $b->harga,
-                    'total_harga' => $b->total
+                    'total_harga' => $b->total,
+                    'spesifikasi' => $b->spesifikasi
                 ]);
 
                 array_push($id_detail_all,  $id_detail_new);

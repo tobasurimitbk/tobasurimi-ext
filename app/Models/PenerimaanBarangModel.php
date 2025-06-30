@@ -306,7 +306,7 @@ class PenerimaanBarangModel extends Model
             ->join('bc_purchase_order bc_40_po', 'bc_40_po.id = penerimaan_barang.id', 'left')
             ->join('bc_23', 'bc_23.bc_purchase_order_id = bc_23_po.id', 'left')
             ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_40_po.id', 'left')
-            ->join('divisis', 'divisis.divisi = penerimaan_barang.divisi_id', 'left')
+            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
             ->groupBy('penerimaan_barang.id')
             ->where($condition)
             ->whereIn('penerimaan_barang.company_id', $companyId)

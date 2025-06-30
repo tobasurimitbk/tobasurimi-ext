@@ -29,11 +29,11 @@
         }
 
         .item-table tr th {
-            text-align: left !important;
+            text-align: center !important;
         }
 
         .item-table tr td {
-            text-align: left !important;
+            text-align: center !important;
         }
 
         .item-table tbody tr {
@@ -138,9 +138,6 @@
         <thead>
             <tr>
                 <th>
-                    <label class="label-header">No</label>
-                </th>
-                <th>
                     <label class="label-header">DESCRIPTION OF GOODS</label>
                 </th>
                 <th>
@@ -161,7 +158,6 @@
             <?php
             $total_qty = 0;
             $total_amount = 0;
-            $no = 1;
             foreach ($salesKontrakdetail as $detail) {
                 $total_qty = $total_qty + formatter($detail["qty"], "STR_TO_INT");
                 $total_amount = $total_amount + formatter($detail["total_harga"], "STR_TO_INT");
@@ -173,12 +169,7 @@
                     </tr>
                 <?php endif; ?>
                 <tr>
-                    <td>
-                        <?= $no++ ?>
-                    </td>
-                    <td>
-                        <label class="label-header"> <?= $detail["nama_barang"]; ?> <br> SPECIFICATION : <?= $detail['spesifikasi'] ?></label>
-                    </td>
+                    <td><label class="label-header"> <?= $detail["nama_barang"]; ?></label></td>
                     <td><label class="label-header"> <?= $detail["kemasan"]; ?></td>
                     <td><label class="label-header"><?= formatter($detail["qty"], "STR_TO_INT") . " " . $detail['satuan_order_name'] ?></label></td>
                     <td><label class="label-header"><?= number_format(formatter($detail["harga"], "STR_TO_INT")); ?></label></td>
@@ -191,12 +182,10 @@
                 <td><label class="label-header"></label></td>
                 <td></td>
                 <td></td>
-                <td></td>
                 <td><label class="label-header"><?= number_format($salesKontrak['potongan_harga'], 2); ?></label></td>
             </tr>
             <tr>
                 <td><label class="label-header">TOTAL</label></td>
-                <td></td>
                 <td></td>
                 <td><label class="label-header"><?= number_format($total_qty); ?></label></td>
                 <td></td>
