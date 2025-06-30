@@ -3207,9 +3207,9 @@
                 
                 if (parts.length === 3) {
                     try {
-                        // Parse with proper rounding
-                        const departure = parseTimeInput(parts[0], 'departure');
-                        const returnTime = parseTimeInput(parts[1], 'return');
+                        // Parse with proper rounding - NOTE THE ORDER CHANGE HERE
+                        const returnTime = parseTimeInput(parts[0], 'return');
+                        const departure = parseTimeInput(parts[1], 'departure');
                         const breakTime = parseTimeInput(parts[2], 'return'); // Break uses return rounding
                         
                         // Validate
@@ -3254,7 +3254,7 @@
                             title: 'Kesalahan Input',
                             html: `<div>${error.message}</div>
                                 <div class="mt-2"><strong>Contoh format benar:</strong><br>
-                                7.30-16.00-0.5 (JamMasuk-JamPulang-Istirahat)</div>
+                                16.00-7.30-0.5 (JamPulang-JamMasuk-Istirahat)</div>
                                 <div class="text-muted small mt-2">Gunakan format 24 jam</div>`,
                             confirmButtonText: 'Mengerti'
                         });
