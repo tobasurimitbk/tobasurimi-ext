@@ -2810,7 +2810,7 @@
                                     'fsscg', 'kscg', 'cscg', 'mpa', 'lbl', 'sa', 'cu', 'hk'];
 
                     allCodes.forEach(code => {
-                        const key = `${employeeId}_${code}`;
+                        const key = `${employeeId}_jam_kerja_${code}`;
                         const weightKey = `${employeeId}_${code.toUpperCase()}`;
                         
                         const hoursData = window.employeeWorkingDetails?.[key] || {
