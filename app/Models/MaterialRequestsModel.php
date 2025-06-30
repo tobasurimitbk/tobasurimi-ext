@@ -262,8 +262,12 @@ class MaterialRequestsModel extends Model
         $builder->select('req_no');
         $builder->orderBy('req_no', 'desc')
             ->where('deletedAt', null)
-            ->where('company_id', $company_id);
+            ->where('company_id', $company_id)
+            ->where('request_date >=', $thn . "-" . $bln . "-01")
+            ->where('request_date <=', $last_day);
+        $builder->groupStart();
         $builder->like('req_no', $lastStr);
+        $builder->groupEnd();
         $query = $builder->get();
 
         $kode = 'MR';
