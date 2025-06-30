@@ -3231,13 +3231,13 @@
                         const roundedTotal = masterRound(workingHours, 'result');
                         
                         // Store data
-                        const key = `${employeeId}_${code}`;
+                        const key = `${employeeId}_${inputName}`;
                         window.employeeWorkingDetails = window.employeeWorkingDetails || {};
                         window.employeeWorkingDetails[key] = {
                             raw_input: val,
-                            rounded_departure: departure,
-                            rounded_return: returnTime,
-                            rounded_break: breakTime,
+                            departure: departure,
+                            return: returnTime,
+                            break: breakTime,
                             total_before_round: workingHours,
                             total: roundedTotal
                         };
@@ -3285,10 +3285,12 @@
 
         // Eye button click handler - now just shows the details without saving
         $(document).on('click', '.eye-btn', function() {
+            console.log(window.employeeWorkingDetails);
             const btn = $(this);
             const input = btn.closest('.input-group').find('input');
             const code = input.attr('name');
             const key = input.data("employee_id");
+            console.log(key+"_"+code)
             // Get the working details from our stored data
             const workingDetails = window.employeeWorkingDetails?.[key+"_"+code] || {
                 departure: 0,
@@ -3316,20 +3318,20 @@
                     <div class="text-left">
                         <div class="detail-row">
                             <span class="detail-label"><i class="fas fa-arrow-right"></i> Berangkat:</span>
-                            <span class="detail-value">${formatTimeDisplay(workingDetails.departure)}</span>
+                            <span class="detail-value">Jam ${workingDetails.departure}</span>
                         </div>
                         <div class="detail-row">
                             <span class="detail-label"><i class="fas fa-arrow-left"></i> Pulang:</span>
-                            <span class="detail-value">${formatTimeDisplay(workingDetails.return)}</span>
+                            <span class="detail-value">Jam ${workingDetails.return}</span>
                         </div>
                         <div class="detail-row">
                             <span class="detail-label"><i class="fas fa-coffee"></i> Istirahat:</span>
-                            <span class="detail-value">${formatTimeDisplay(workingDetails.break)}</span>
+                            <span class="detail-value">${workingDetails.break} Jam</span>
                         </div>
                         <hr class="detail-divider">
                         <div class="detail-row total">
                             <span class="detail-label"><i class="fas fa-calculator"></i> Total:</span>
-                            <span class="detail-value">${formatTimeDisplay(workingDetails.total)}</span>
+                            <span class="detail-value">${workingDetails.total} Jam</span>
                         </div>
                     </div>
                 `,
