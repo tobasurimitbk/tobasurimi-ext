@@ -571,7 +571,7 @@ class PenerimaanBarangLokalBB extends BaseController
 
             $data = [
                 'dataPenerimaanBarang' => $this->penerimaanBarangModel->getById($id),
-                'dataPenerimaanBarangDetail' => $this->penerimaanBarangDetailModel->getPenerimaanBarangBakuDetail($id)
+                'dataPenerimaanBarangDetail' => $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, "BAKU", "LOKAL")
             ];
             $this->dompdf->loadHtml(view('Warehouse/penerimaanBarangLokal/bahanBaku/print', $data));
             $this->dompdf->setPaper('A4', 'portrait');
