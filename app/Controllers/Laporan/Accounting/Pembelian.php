@@ -199,7 +199,7 @@ class Pembelian extends BaseController
                     } else {
                         $valasTransaksi = $value['currencyValue'];
                     }
-                    $nominalTransaksi += floatval($value['sub_total']);
+                    $nominalTransaksi += floatval($value['total_penerimaan_detail']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
@@ -218,7 +218,7 @@ class Pembelian extends BaseController
                     } else {
                         $valasTransaksi = $value['currencyValue'] ? $value['currencyValue'] : "IDR";
                     }
-                    $nominalTransaksi += floatval($value['sub_total']);
+                    $nominalTransaksi += floatval($value['total_penerimaan_detail']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
