@@ -67,10 +67,10 @@ class JurnalUmum extends BaseController
                 'tanggal_transaksi <=' => date('Y-m-d')
             ];
         }
-        
-        if ($this->this_company_id == 1 || $this->this_company_id == 2) {
+
+        if ($this->this_company_id == "1" || $this->this_company_id == "2") {
             $companyId = [1, 2];
-        } else if ($this->this_company_id == 15) {
+        } else if ($this->this_company_id == "15") {
             $companyId = [15];
         } else {
             $companyId = [16];
@@ -202,10 +202,10 @@ class JurnalUmum extends BaseController
                 'name' => 'tipe_transaksi',
             ];
         }
-        
-        if ($this->this_company_id == 1 || $this->this_company_id == 2) {
+
+        if ($this->this_company_id == "1" || $this->this_company_id == "2") {
             $companyId = [1, 2];
-        } else if ($this->this_company_id == 15) {
+        } else if ($this->this_company_id == "15") {
             $companyId = [15];
         } else {
             $companyId = [16];
@@ -258,7 +258,6 @@ class JurnalUmum extends BaseController
 
     public function exportExcel($tglAwal, $tglAkhir, $filter)
     {
-
         $spreadsheet = new Spreadsheet();
         $dateStart = $tglAwal;
         $dateEnd = $tglAkhir;
@@ -306,6 +305,14 @@ class JurnalUmum extends BaseController
             ];
         }
 
+        if ($this->this_company_id == "1" || $this->this_company_id == "2") {
+            $companyId = [1, 2];
+        } else if ($this->this_company_id == "15") {
+            $companyId = [15];
+        } else {
+            $companyId = [16];
+        }
+
         $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue('A1', 'Tanggal')
             ->setCellValue('B1', 'Department')
@@ -338,6 +345,7 @@ class JurnalUmum extends BaseController
             ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
             ->join('divisis', 'jurnal_umum.divisi_id = divisis.id', 'left')
             ->where($condition)
+            ->whereIn('jurnal_umum.company_id', $companyId)
             ->findAll();
 
         function format_ribuan($nilai)
