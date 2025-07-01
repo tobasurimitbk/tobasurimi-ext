@@ -362,7 +362,7 @@ class Pembelian extends BaseController
                 // var_dump($lokalbb);
                 foreach ($lokalbb as $value) {
                     // $totalxqty = $value['qty_barang_po'] * $value['total_barang_po'];
-                    $nominalTransaksi += floatval($value['sub_total']);
+                    $nominalTransaksi += floatval($value['total_penerimaan_detail']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
@@ -381,7 +381,7 @@ class Pembelian extends BaseController
                     } else {
                         $valasTransaksi = $value['currencyValue'];
                     }
-                    $nominalTransaksi += floatval($value['sub_total']);
+                    $nominalTransaksi += floatval($value['total_penerimaan_detail']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
@@ -400,7 +400,7 @@ class Pembelian extends BaseController
                     } else {
                         $valasTransaksi = $value['currencyValue'] ? $value['currencyValue'] : "IDR";
                     }
-                    $nominalTransaksi += floatval($value['sub_total']);
+                    $nominalTransaksi += floatval($value['total_penerimaan_detail']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
@@ -565,7 +565,7 @@ class Pembelian extends BaseController
                 // var_dump($lokalbb);
                 foreach ($lokalbb as $value) {
                     // $totalxqty = $value['qty_barang_po'] * $value['total_barang_po'];
-                    $nominalTransaksi += floatval($value['sub_total']);
+                    $nominalTransaksi += floatval($value['total_penerimaan_detail']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
@@ -584,7 +584,7 @@ class Pembelian extends BaseController
                     } else {
                         $valasTransaksi = $value['currencyValue'];
                     }
-                    $nominalTransaksi += floatval($value['sub_total']);
+                    $nominalTransaksi += floatval($value['total_penerimaan_detail']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
@@ -603,7 +603,7 @@ class Pembelian extends BaseController
                     } else {
                         $valasTransaksi = $value['currencyValue'] ? $value['currencyValue'] : "IDR";
                     }
-                    $nominalTransaksi += floatval($value['sub_total']);
+                    $nominalTransaksi += floatval($value['total_penerimaan_detail']);
                 }
                 $totalHargaAll = $nominalTransaksi * $exchangeTransaksi;
                 $nominalIdrTransaksi += $totalHargaAll;
