@@ -57,8 +57,7 @@ class Penjualan extends BaseController
         ];
 
         $condition = [
-            'sales_order_invoice.deletedAt' => null,
-            'sales_order_invoice.id_company' => $this->this_company_id
+            'sales_order_invoice.deletedAt' => null
         ];
 
         $addCondition = [

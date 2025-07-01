@@ -535,7 +535,7 @@ class SalesOrderInvoiceModel extends Model
 
         $salesOrderInvoiceLokal = $this->asObject()
             ->select($selectQry)
-            ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+            ->join('customers', 'customers.id = sales_order_invoice.id_customer', 'LEFT')
             ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pesanan"', 'LEFT')
             ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pengiriman"', 'LEFT')
             ->where($condition)
