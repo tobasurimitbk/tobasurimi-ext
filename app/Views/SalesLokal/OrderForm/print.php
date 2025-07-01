@@ -47,7 +47,7 @@
             padding-right: 5px;
         }
 
-        .item-table {
+        /* .item-table {
             border: 1px solid;
             width: 100%;
 
@@ -68,7 +68,46 @@
         .signature-table {
             border-spacing: 30px 0;
             margin-top: 10px;
+        } */
+
+        .item-table {
+            border: 1px solid black;
+            /* border luar */
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+            margin-bottom: 10px;
         }
+
+        /* Semua sel: garis vertikal saja */
+        .item-table th,
+        .item-table td {
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+            border-top: none;
+            border-bottom: none;
+            padding: 2px 4px;
+        }
+
+        /* Hapus border kiri kolom pertama */
+        .item-table th:first-child,
+        .item-table td:first-child {
+            border-left: none;
+        }
+
+        /* Hapus border kanan kolom terakhir */
+        .item-table th:last-child,
+        .item-table td:last-child {
+            border-right: none;
+        }
+
+        /* Hanya untuk baris thead: tambahkan garis horizontal bawah */
+        .item-table thead tr {
+            border-bottom: 1px solid black;
+        }
+
+
+
 
         .txt-bold {
             font-weight: 700;
@@ -105,7 +144,7 @@
                 </div>
             </td>
             <td align="right" style="text-align: right;">
-                <div class="txt-bold txt-center" style="font-size: 17px;">ORDER FORM</div>
+                <div class="txt-bold txt-center" style="font-size: 25px; margin-bottom:3px;">ORDER FORM</div>
                 <table class="w-100" style="border: 1px solid;border-radius: 7px;margin-left: auto;margin-right: 0">
                     <tr>
                         <td style="border-right: 1px solid;border-right-style: dashed">
@@ -132,29 +171,35 @@
         </tr>
     </table>
 
-    <table class="item-table" border="1">
-        <tr>
-            <th style="height: 1px;">Item</th>
-            <th>Item Description</th>
-            <th>Qty</th>
-            <th>Satuan</th>
-        </tr>
-        <?php foreach ($soDet as $detail) : ?>
+    <table class="item-table">
+        <thead>
             <tr>
-                <td class="txt-center" style="width: 80px;height: 1px;"><?= $detail->kodeBarang ?></td>
-                <td><?= $detail->namaBarang ?></td>
-                <td class="txt-center"><?= $detail->qty ?></td>
-                <td class="txt-center"><?= $detail->kodeSatuan ?></td>
+                <th>No</th>
+                <th>Item Description</th>
+                <th>Qty</th>
+                <th>Satuan</th>
             </tr>
-        <?php endforeach; ?>
-        <?php for ($i = 0; $i < (9 - count($soDet)); $i++) : ?>
-            <tr>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
-        <?php endfor; ?>
+        </thead>
+        <tbody>
+            <?php $no = 1; ?>
+            <?php foreach ($soDet as $detail) : ?>
+                <tr>
+                    <td class="txt-center" style="width: 10px;height: 1px;"><?= $no++ ?></td>
+                    <td><?= $detail->namaBarang ?></td>
+                    <td class="txt-center"><?= $detail->qty ?></td>
+                    <td class="txt-center"><?= $detail->kodeSatuan ?></td>
+                </tr>
+            <?php endforeach; ?>
+            <?php for ($i = 0; $i < (8 - count($soDet)); $i++) : ?>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+            <?php endfor; ?>
+        </tbody>
+
     </table>
 
     <div class="description-container">

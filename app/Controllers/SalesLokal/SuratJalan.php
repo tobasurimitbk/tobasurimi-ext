@@ -15,6 +15,7 @@ use App\Models\AllNoModel;
 use App\Models\SuratJalanModel;
 use App\Models\EmployeesModel;
 use App\Models\SalesOrderInvoiceDetailModel;
+use Exception;
 
 class SuratJalan extends BaseController
 {
@@ -258,9 +259,9 @@ class SuratJalan extends BaseController
                 "note"          => $this->request->getPost('note'),
                 'multiple_id_so' => json_encode($idArray),
                 'multiple_no_so' => json_encode($noArray),
-                "id_company"    => ($this->this_company_id != 16) 
-                                ? $this->request->getPost('company_id') 
-                                : $this->this_company_id,
+                "id_company"    => ($this->this_company_id != 16)
+                    ? $this->request->getPost('company_id')
+                    : $this->this_company_id,
             ];
             $checkSJ = $this->SuratJalanModel->where('deletedAt', NULL)->where('UPPER(no_surat_jalan)', strtoupper($this->request->getVar('no_surat_jalan')))->findAll();
             if ($checkSJ) {
@@ -309,7 +310,6 @@ class SuratJalan extends BaseController
         $id = decrypt($id);
         $dataSuratJalan = $this->SuratJalanModel->getSuratJalanById(($id));
 
-
         if (empty($dataSuratJalan)) {
             return view('errors/html/error_404', ['message' => 'Not Found']);
         }
@@ -320,14 +320,12 @@ class SuratJalan extends BaseController
         $dataSo = $this->SalesOrderModel
             ->asObject()
             ->where(['id_customer' => $dataSuratJalan->id_customer, 'tipe_sales_order' => 'LOKAL', 'deletedAt' => null])
-            ->where('posting', 1)
             ->select(['id', 'no_sales_order'])
             ->findAll();
 
         $dataSuratJalan->itemList = $this->SalesOrderDetailModel->getItemListByIds($dataSuratJalan->multiple_id_so);
         $dataSuratJalan->id = encrypt($dataSuratJalan->id);
 
-        // var_dump($dataSuratJalan);
         foreach ($dataSuratJalan->itemList as $value) {
             $value->harga_barang = $value->harga_barang;
             $value->amount = $value->total_harga_barang;
@@ -341,8 +339,8 @@ class SuratJalan extends BaseController
             $getJenisPenjualan = "By Ecommerce";
         } else {
             $getJenisPenjualan = "";
-        }   
-        
+        }
+
         $data = [
             "data" => $dataSuratJalan,
             "dataCustomers" => $customers,
@@ -351,6 +349,8 @@ class SuratJalan extends BaseController
             "getJenisPenjualan" => $getJenisPenjualan
 
         ];
+        // var_dump($dataSuratJalan->multiple_id_so);
+        // // exit;
         // var_dump($dataSo);
         // exit;
         //echo json_encode($data);
@@ -419,9 +419,9 @@ class SuratJalan extends BaseController
             "note"          => $this->request->getPost('note'),
             'multiple_id_so' => json_encode($idArray),
             'multiple_no_so' => json_encode($noArray),
-            "id_company"    => ($this->this_company_id != 16) 
-                            ? $this->request->getPost('company_id') 
-                            : $this->this_company_id,
+            "id_company"    => ($this->this_company_id != 16)
+                ? $this->request->getPost('company_id')
+                : $this->this_company_id,
         ];
         try {
 
@@ -742,7 +742,6 @@ class SuratJalan extends BaseController
             ];
 
             echo json_encode($data);
-            
         } catch (Exception $e) {
             $data = [
                 "status"            => false,

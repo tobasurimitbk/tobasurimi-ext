@@ -106,7 +106,7 @@
                 </div>
             </td>
             <td align="right" style="text-align: right;">
-                <div class="txt-bold txt-center" style="font-size: 17px;">SURAT JALAN</div>
+                <div class="txt-bold txt-center" style="font-size: 25px;margin-bottom:3px;">SURAT JALAN</div>
                 <table class="w-100" style="border: 1px solid;border-radius: 7px;margin-left: auto;margin-right: 0">
                     <tr>
                         <td style="border-right: 1px solid;border-right-style: dashed;width: 50%;">

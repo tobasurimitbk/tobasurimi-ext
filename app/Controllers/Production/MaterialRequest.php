@@ -268,8 +268,8 @@ class MaterialRequest extends BaseController
                 "req_no"                 => $data->req_no,
                 // "nama_barang"           => $data->nama_barang,
                 "is_posted"           => $data->is_posted,
-                "request_date"           => $data->request_date,
-                "production_date"           => $data->production_date,
+                "request_date"           => date('d/m/Y', strtotime($data->request_date)),
+                "production_date"           => date('d/m/Y', strtotime($data->production_date)),
             ]);
         }
 
@@ -345,10 +345,12 @@ class MaterialRequest extends BaseController
     public function create()
     {
         try {
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+            $date_request =  formatDMYtoYMD($this->request->getVar('date_request'));
+            $last_day = getLastDay();
+            $date_request_explode = explode("-", $date_request);
             $reqNo = $this->request->getVar('req_no');
             if ($reqNo == "AUTO GENERATE") {
-                $no = $this->materialRequestModel->get_no(date('d'), date('m'), date('Y'), $last_day, $this->this_company_id);
+                $no = $this->materialRequestModel->get_no($date_request_explode[2], $date_request_explode[1], $date_request_explode[0], $last_day, $this->this_company_id);
             } else {
                 $no = $reqNo;
             }
@@ -1049,11 +1051,13 @@ class MaterialRequest extends BaseController
             if (!empty($supplierId) && !empty($barangMasterId)) {
                 // Untuk Dari Po & Supplier
                 $condition = [
+                    'stock.divisi_id' => $divisiAsalId,
+                    'stock.warehouse_id' => $warehouseAsalId,
                     'stock_details2.supplier_id' => $this->request->getVar('supplier_id'),
                     'stock.barang1_id' => $barangMasterId,
                 ];
 
-                $dataResult = $this->stockDetail2Model->getStockListJasaVendorOut(
+                $dataResult = $this->stockDetail2Model->getStockListMaterialRequestFromLpb(
                     $condition
                 );
             } else {
@@ -1076,40 +1080,48 @@ class MaterialRequest extends BaseController
             if (!empty($supplierId)) {
                 // Khsus Dari Supplier
                 for ($i = 0; $i < count($dataResult); $i++) {
-                    $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
-                    $stock = $this->stockModel->find($dataResult[$i]['stock_id']);
+                    // $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
+                    // $stock = $this->stockModel->find($dataResult[$i]['stock_id']);
 
-                    $rmPurchaseOrder = $this->rmPurchaseOrderModel->where('po_no', $dataResult[$i]['stock_dokumen'])
-                        ->where('company_id', $stock['company_id'])
-                        ->first();
+                    // $rmPurchaseOrder = $this->rmPurchaseOrderModel->where('po_no', $dataResult[$i]['stock_dokumen'])
+                    //     ->where('company_id', $stock['company_id'])
+                    //     ->first();
 
-                    $stockDetail = $this->stockDetail2Model->getStockListDetail(
-                        $dataResult[$i]['stock_id'],
-                        $dataResult[$i]['bc_id'],
-                        $dataResult[$i]['no_aju'],
-                        $dataResult[$i]['stock_dokumen']
-                    );
+                    // $stockDetail = $this->stockDetail2Model->getStockListDetail(
+                    //     $dataResult[$i]['stock_id'],
+                    //     $dataResult[$i]['bc_id'],
+                    //     $dataResult[$i]['no_aju'],
+                    //     $dataResult[$i]['stock_dokumen']
+                    // );
 
-                    $noDaftar = $this->stockDetail2Model->getNomorDaftar($dataResult[$i]['no_aju'], $dataResult[$i]['bc_id']);
+                    $noDaftar = "";
 
+                    if (!empty($dataResult[$i]['no_daftar_bc23'])) {
+                        $noDaftar = $dataResult[$i]['no_daftar_bc23'];
+                    } elseif (!empty($dataResult[$i]['no_daftar_bc27'])) {
+                        $noDaftar = $dataResult[$i]['no_daftar_bc27'];
+                    } elseif (!empty($dataResult[$i]['no_daftar_bc40'])) {
+                        $noDaftar = $dataResult[$i]['no_daftar_bc40'];
+                    } elseif (!empty($dataResult[$i]['no_daftar_ppbkb'])) {
+                        $noDaftar = $dataResult[$i]['no_daftar_ppbkb'];
+                    }
                     $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
                     $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
-                    $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+                    $dataResult[$i]['bc_type'] = $dataResult[$i]['bc_type'] == null ? "NON PABEAN" : $dataResult[$i]['bc_type'];
                     $dataResult[$i]['satuan'] = $dataResult[$i]['kode_satuan'];
                     $dataResult[$i]['barang'] = $dataResult[$i]['barang_name'];
                     $dataResult[$i]['sepsifikasi'] = $dataResult[$i]['spesifikasi'];
-                    $dataResult[$i]['stock_date'] = $rmPurchaseOrder == null ? "-" : date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
+                    $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
                     $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-                    $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
-                    $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
+                    $dataResult[$i]['type_barang'] = "bahan_baku";
+                    $dataResult[$i]['type_barang_text'] = "BAHAN BAKU";
                     $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
                     $dataResult[$i]['no_daftar'] = $noDaftar;
 
-                    if ($stockDetail['stok_total'] > 0) {
+                    if ($dataResult[$i]['stok_total'] > 0) {
                         array_push($resultArr, $dataResult[$i]);
                     }
                 }
-
 
                 $grouped = [];
 

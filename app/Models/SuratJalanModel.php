@@ -140,15 +140,14 @@ class SuratJalanModel extends Model
                       users.name as seller_name,
                       customers.name as customer_name ,
                       customers.address,customers.phone,
-                      
                       customers.address AS customerAddress,
                       customers.phone AS customerPhone,
                       metadata.value AS customerTermin";
 
         $dataSuratJalan = $this->asObject()
-            ->join('users', 'users.id = surat_jalan_so.id_user')
-            ->join('customers', 'customers.id = surat_jalan_so.id_customer ')
-            ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id')
+            ->join('users', 'users.id = surat_jalan_so.id_user', 'left')
+            ->join('customers', 'customers.id = surat_jalan_so.id_customer')
+            ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
             ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
             // ->join('employees', 'employees.id = sales_order.sales_id')
             ->select($selectQry)

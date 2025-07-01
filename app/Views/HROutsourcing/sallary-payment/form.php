@@ -467,6 +467,7 @@
             if (department == '5') {
                 headerHtml = `
                 <tr>
+                    <th class="text-center" rowspan="3">ACTION</th>
                     <th class="text-center" rowspan="3">NO</th>
                     <th class="text-center" rowspan="3">TMK</th>
                     <th class="text-center" rowspan="3">BADGE</th>
@@ -545,6 +546,7 @@
             } else {
                 headerHtml = `
                 <tr">
+                    <th class="text-center" rowspan="3">ACTION</th>
                     <th class="text-center" rowspan="3">NO</th>
                     <th class="text-center" rowspan="3">TMK</th>
                     <th class="text-center" rowspan="3">NO BADGE</th>
@@ -752,7 +754,8 @@
                     if (department == '5') {
 
                         rowHtml = `
-                        <tr data-employee-id="${employeeId}">
+                        <tr data-employee-id="${employeeId}" data-tmk="${tanggalMasuk}">
+                            <td><button class="btn btn-danger" id="btnDelete" data-employee_id="${employeeId}"><i class="fa fa-trash"></i></button></td>
                             <td>${$('#dataTable tbody tr').length + 1}</td>
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${tanggalMasuk}" readonly></td>
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${badge}" readonly></td>
@@ -903,7 +906,8 @@
                     } else {
                         // Default department table structure
                         rowHtml = `
-                        <tr data-employee-id="${employeeId}">
+                        <tr data-employee-id="${employeeId}" data-tmk="${tanggalMasuk}">
+                            <td><button class="btn btn-danger" id="btnDelete" data-employee_id="${employeeId}"><i class="fa fa-trash"></i></button></td>
                             <td>${$('#dataTable tbody tr').length + 1}</td>
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${tanggalMasuk}" readonly></td>
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${badge}" readonly></td>
@@ -1702,7 +1706,8 @@
         function createTableRow(department, employeeId, employeeName, tanggalMasuk, badge, payment) {
             if (department == '5') {
                 return `
-                <tr data-employee-id="${employeeId}">
+                <tr data-employee-id="${employeeId}" data-tmk="${tanggalMasuk}">
+                    <td><button class="btn btn-danger" id="btnDelete" data-employee_id="${employeeId}"><i class="fa fa-trash"></i></button></td>
                     <td>${$('#dataTable tbody tr').length + 1}</td>
                     <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${tanggalMasuk}" readonly></td>
                     <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${badge}" readonly></td>
@@ -1864,7 +1869,8 @@
             `;
             } else {
                 return `
-                <tr data-employee-id="${employeeId}">
+                <tr data-employee-id="${employeeId}" data-tmk="${tanggalMasuk}">
+                    <td><button class="btn btn-danger" id="btnDelete" data-employee_id="${employeeId}"><i class="fa fa-trash"></i></button></td>
                     <td>${$('#dataTable tbody tr').length + 1}</td>
                     <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${tanggalMasuk}" readonly></td>
                     <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${badge}" readonly></td>
@@ -2810,7 +2816,7 @@
                                     'fsscg', 'kscg', 'cscg', 'mpa', 'lbl', 'sa', 'cu', 'hk'];
 
                     allCodes.forEach(code => {
-                        const key = `${employeeId}_${code}`;
+                        const key = `${employeeId}_jam_kerja_${code}`;
                         const weightKey = `${employeeId}_${code.toUpperCase()}`;
                         
                         const hoursData = window.employeeWorkingDetails?.[key] || {
@@ -2842,6 +2848,61 @@
             console.log('Collected Employee Data:', employeeData);
             return employeeData;
         }
+
+        $(document).on('click', '#btnDelete', function() {
+            const employeeId = $(this).data('employee_id');
+            const $row = $(this).closest('tr');
+            
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // 1. Hapus baris dari tabel
+                    $row.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                    
+                    // 2. Hapus data dari employeeData
+                    if (typeof employeeData !== 'undefined') {
+                        employeeData = employeeData.filter(emp => emp.employee_id !== employeeId);
+                    }
+                    
+                    // 3. Hapus data dari employeeItemDetails
+                    if (typeof employeeItemDetails !== 'undefined') {
+                        Object.keys(employeeItemDetails).forEach(key => {
+                            if (key.startsWith(`${employeeId}_`)) {
+                                delete employeeItemDetails[key];
+                            }
+                        });
+                    }
+                    
+                    // 4. Hapus data dari employeeWorkingDetails
+                    if (typeof window.employeeWorkingDetails !== 'undefined') {
+                        Object.keys(window.employeeWorkingDetails).forEach(key => {
+                            if (key.startsWith(`${employeeId}_`)) {
+                                delete window.employeeWorkingDetails[key];
+                            }
+                        });
+                    }
+                    
+                    // 5. Notifikasi sukses
+                    Swal.fire({
+                        title: 'Terhapus!',
+                        text: 'Data karyawan berhasil dihapus.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });            
+                }
+            });
+        });
 
         // Function to save data
         function saveData() {
@@ -3165,8 +3226,14 @@
             const inputName = input.attr('name');
             const code = inputName.replace('jam_kerja_', '');
 
-            // Master rounding function for all cases
+            // Modified master rounding function that won't round if input is already in .25/.5/.75 format
             const masterRound = (timeValue, type = 'result') => {
+                // Check if the value is already in quarter-hour format
+                const decimalPart = timeValue % 1;
+                if ([0, 0.25, 0.5, 0.75].includes(decimalPart)) {
+                    return timeValue;
+                }
+                
                 const hours = Math.floor(timeValue);
                 const minutes = Math.round((timeValue - hours) * 60);
                 
@@ -3193,8 +3260,19 @@
                 }
             };
 
-            // Parse time input with rounding
+            // Parse time input - now checks for pre-rounded values first
             const parseTimeInput = (timeStr, type) => {
+                // Directly convert if it's already in decimal format
+                const decimalValue = parseFloat(timeStr.replace(',', '.'));
+                if (!isNaN(decimalValue)) {
+                    // Check if it's already in quarter-hour format
+                    const decimalPart = decimalValue % 1;
+                    if ([0, 0.25, 0.5, 0.75].includes(decimalPart)) {
+                        return decimalValue;
+                    }
+                }
+                
+                // Fallback to normal parsing if not in quarter-hour format
                 if (!timeStr.includes('.')) return parseFloat(timeStr) || 0;
                 
                 const [hours, minutes] = timeStr.split('.').map(Number);
@@ -3207,10 +3285,10 @@
                 
                 if (parts.length === 3) {
                     try {
-                        // Parse with proper rounding - NOTE THE ORDER CHANGE HERE
+                        // Parse with proper handling of pre-rounded values
                         const returnTime = parseTimeInput(parts[0], 'return');
                         const departure = parseTimeInput(parts[1], 'departure');
-                        const breakTime = parseTimeInput(parts[2], 'return'); // Break uses return rounding
+                        const breakTime = parseTimeInput(parts[2], 'return');
                         
                         // Validate
                         if (isNaN(departure) || isNaN(returnTime) || isNaN(breakTime)) {
@@ -3231,18 +3309,18 @@
                         const roundedTotal = masterRound(workingHours, 'result');
                         
                         // Store data
-                        const key = `${employeeId}_${code}`;
+                        const key = `${employeeId}_${inputName}`;
                         window.employeeWorkingDetails = window.employeeWorkingDetails || {};
                         window.employeeWorkingDetails[key] = {
                             raw_input: val,
-                            rounded_departure: departure,
-                            rounded_return: returnTime,
-                            rounded_break: breakTime,
+                            departure: departure,
+                            return: returnTime,
+                            break: breakTime,
                             total_before_round: workingHours,
                             total: roundedTotal
                         };
                         
-                        // Format display (show .25, .5, .75 appropriately)
+                        // Format display
                         const displayValue = Number.isInteger(roundedTotal) 
                             ? roundedTotal.toString() 
                             : roundedTotal.toFixed(2).replace('.', ',');
@@ -3254,8 +3332,8 @@
                             title: 'Kesalahan Input',
                             html: `<div>${error.message}</div>
                                 <div class="mt-2"><strong>Contoh format benar:</strong><br>
-                                16.00-7.30-0.5 (JamPulang-JamMasuk-Istirahat)</div>
-                                <div class="text-muted small mt-2">Gunakan format 24 jam</div>`,
+                                11.75-7.5-0 (JamPulang-JamMasuk-Istirahat)</div>
+                                <div class="text-muted small mt-2">Gunakan format desimal (.25, .5, .75) untuk menit</div>`,
                             confirmButtonText: 'Mengerti'
                         });
                         input.val('').focus();
@@ -3285,10 +3363,12 @@
 
         // Eye button click handler - now just shows the details without saving
         $(document).on('click', '.eye-btn', function() {
+            console.log(window.employeeWorkingDetails);
             const btn = $(this);
             const input = btn.closest('.input-group').find('input');
             const code = input.attr('name');
             const key = input.data("employee_id");
+            console.log(key+"_"+code)
             // Get the working details from our stored data
             const workingDetails = window.employeeWorkingDetails?.[key+"_"+code] || {
                 departure: 0,
@@ -3316,20 +3396,20 @@
                     <div class="text-left">
                         <div class="detail-row">
                             <span class="detail-label"><i class="fas fa-arrow-right"></i> Berangkat:</span>
-                            <span class="detail-value">${formatTimeDisplay(workingDetails.departure)}</span>
+                            <span class="detail-value">Jam ${workingDetails.departure}</span>
                         </div>
                         <div class="detail-row">
                             <span class="detail-label"><i class="fas fa-arrow-left"></i> Pulang:</span>
-                            <span class="detail-value">${formatTimeDisplay(workingDetails.return)}</span>
+                            <span class="detail-value">Jam ${workingDetails.return}</span>
                         </div>
                         <div class="detail-row">
                             <span class="detail-label"><i class="fas fa-coffee"></i> Istirahat:</span>
-                            <span class="detail-value">${formatTimeDisplay(workingDetails.break)}</span>
+                            <span class="detail-value">${workingDetails.break} Jam</span>
                         </div>
                         <hr class="detail-divider">
                         <div class="detail-row total">
                             <span class="detail-label"><i class="fas fa-calculator"></i> Total:</span>
-                            <span class="detail-value">${formatTimeDisplay(workingDetails.total)}</span>
+                            <span class="detail-value">${workingDetails.total} Jam</span>
                         </div>
                     </div>
                 `,
@@ -3347,27 +3427,49 @@
         function calculateKgPerJam(input) {
             const $row = $(input).closest('tr');
             const employeeId = $row.data('employee-id');
+            const tmk = $row.data('tmk'); // Format: YYYY-MM-DD
             const inputName = $(input).attr('name');
             
             // Extract the code from input name (jam_kerja_[code])
             const code = inputName.replace('jam_kerja_', '');
             
-            // Find related inputs using proper scoping to the row
+            // Find related inputs
             const weightInput = $row.find(`input[name="${code.toUpperCase()}"]`);
             const hoursInput = $row.find(`input[name="${inputName}"]`);
             const kgPerJamInput = $row.find(`input[name="kg_per_jam_${code}"]`);
+            const subsidyInput = $row.find('input[name="subsidi_rupiah"]');
+            const rupiahInput = $row.find('input[name="rupiah"]'); // Target field to update
 
             // Only proceed if all required inputs exist
             if (weightInput.length && hoursInput.length && kgPerJamInput.length) {
                 const berat = parseFloat(weightInput.val().replace(/,/g, '.')) || 0;
                 const jam = parseFloat(hoursInput.val().replace(/,/g, '.')) || 0;
                 
-                // Calculate kg/hour, avoid division by zero
+                // Calculate kg/hour (avoid division by zero)
                 const kgPerJam = jam > 0 ? (berat / jam) : 0;
-                
-                // Update the kg/hour field with 2 decimal places
                 kgPerJamInput.val(kgPerJam.toFixed(2));
+
+                // --- NEW: SUBSIDY CALCULATION ---
+                if (tmk) {
+                    const today = new Date(); // Current date
+                    const masukKerja = new Date(tmk); // TMK (start date)
+                    const diffTime = today - masukKerja;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Days since TMK
+
+                    // Check if <14 days AND worked >4 hours
+                    if (diffDays < 14 && jam > 4) {
+                        subsidyInput.val(40000); // Apply subsidy
+                        const currentRupiah = parseFloat(rupiahInput.val().replace(/[^\d]/g, '')) || 0;
+                        const newRupiah = currentRupiah - 40000;
+                        // Format back to Rupiah (e.g., "50,000.00")
+                        rupiahInput.val(formatRupiah(newRupiah.toString()) + '.00');
+                    } else {
+                        subsidyInput.val(0); // No subsidy
+                    }
+                }
             }
+            
+           
             
             // Calculate total kg/hour for all codes
             let totalKgPerJam = 0;

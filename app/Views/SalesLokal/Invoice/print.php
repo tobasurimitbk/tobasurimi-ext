@@ -7,20 +7,24 @@
     <title>Invoice Penjualan Lokal</title>
     <style>
         body {
-            font-size: 10px; /* Ukuran font diperkecil */
+            font-size: 12px;
+            /* Ukuran font diperkecil */
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
         @page {
             size: 8.27in 5.50in landscape;
-            margin: 15px; /* Margin diperkecil */
-            padding: 15px; /* Padding diperkecil */
+            margin: 15px;
+            /* Margin diperkecil */
+            padding: 15px;
+            /* Padding diperkecil */
         }
 
         .company-name {
             font-weight: 700;
             border: 1px solid;
-            padding: 3px; /* Padding diperkecil */
+            padding: 3px;
+            /* Padding diperkecil */
             border-radius: 5px;
             margin-bottom: 1px;
             display: inline-block;
@@ -30,33 +34,60 @@
         .description-container {
             border: 1px solid;
             border-radius: 5px;
-            min-height: 50px; /* Tinggi diperkecil */
-            margin-top: 3px; /* Margin diperkecil */
-            padding-left: 5px; /* Padding diperkecil */
+            min-height: 50px;
+            /* Tinggi diperkecil */
+            margin-top: 3px;
+            /* Margin diperkecil */
+            padding-left: 5px;
+            /* Padding diperkecil */
         }
 
         .item-table {
-            border: 1px solid;
+            border: 1px solid black;
+            /* border luar */
             width: 100%;
-            font-size: 10px; /* Ukuran font tabel diperkecil */
-            margin-top: 1px;
-            margin-bottom: 3px; /* Margin diperkecil */
+            border-collapse: collapse;
+            margin-top: 5px;
+            margin-bottom: 10px;
         }
 
+        /* Semua sel: garis vertikal saja */
         .item-table th,
         .item-table td {
-            border-right: 1px solid;
-            padding: 2px; /* Padding diperkecil */
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+            border-top: none;
+            border-bottom: none;
+            padding: 2px 4px;
+        }
+
+        /* Hapus border kiri kolom pertama */
+        .item-table th:first-child,
+        .item-table td:first-child {
+            border-left: none;
+        }
+
+        /* Hapus border kanan kolom terakhir */
+        .item-table th:last-child,
+        .item-table td:last-child {
+            border-right: none;
+        }
+
+        /* Hanya untuk baris thead: tambahkan garis horizontal bawah */
+        .item-table thead tr {
+            border-bottom: 1px solid black;
         }
 
         .rounded-border {
             border: 1px solid;
             border-radius: 5px;
-            padding: 3px; /* Padding diperkecil */
+            padding: 3px;
+            /* Padding diperkecil */
         }
 
         .signature-table {
-            border-spacing: 15px 0; /* Spasi diperkecil */
+            border-spacing: 15px 0;
+            /* Spasi diperkecil */
             margin-top: 1px;
         }
 
@@ -101,7 +132,7 @@
                 </div>
             </td>
             <td align="right" style="text-align: right;">
-                <div class="txt-bold txt-center" style="font-size: 17px;">Sales Invoice</div>
+                <div class="txt-bold txt-center" style="font-size: 25px;margin-bottom:3px;">Sales Invoice</div>
                 <table class="w-100 rounded-border" style="margin-left: auto;margin-right: 0">
                     <tr>
                         <td style="border-right: 1px solid;border-right-style: dashed;width: 50%;">
@@ -129,7 +160,7 @@
                             // Gantikan karakter tidak diinginkan dengan string kosong
                             $cleaned_string_document_no = str_replace($unwanted_characters, '', $invData->document_no);
                             ?>
-                            <div class="txt-center" style="font-size: 10px;"><?= $cleaned_string_document_no ?>&nbsp;</div>
+                            <div class="txt-center" style="font-size: 11px;"><?= $cleaned_string_document_no ?>&nbsp;</div>
                         </td>
                     </tr>
                 </table>
@@ -138,44 +169,49 @@
     </table>
 
     <table class=" item-table" border="1" style="border-collapse: collapse">
-        <tr>
-            <th>No</th>
-            <th style="height: 1px;">Item Description</th>
-            <th>Qty</th>
-            <th>Satuan</th>
-            <th>Unit Price</th>
-            <th>Disc %</th>
-            <th>Amount</th>
-        </tr>
-        <?php
-        $rowNumber = 1;
-        foreach ($soData as $detail) :
+        <thead>
+            <tr>
+                <th>No</th>
+                <th style="height: 1px;">Item Description</th>
+                <th>Qty</th>
+                <th>Satuan</th>
+                <th>Unit Price</th>
+                <th>Disc %</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
 
-        ?>
-            <tr>
-                <td class="txt-center" style="height: 1px;"><?= $rowNumber ?></td>
-                <td><?= $detail->nama_barang ?></td>
-                <td class="txt-center"><?= $detail->qty_invoice ?></td>
-                <td class="txt-center"><?= $detail->satuan ?></td>
-                <td class="txt-center">Rp. <?= number_format($detail->harga_barang) ?></td>
-                <td class="txt-center"><?= $detail->disc ?></td>
-                <td class="txt-right">Rp. <?= number_format($detail->amount) ?></td>
-            </tr>
-        <?php
-            $rowNumber++;
-        endforeach;
-        ?>
-        <?php for ($i = 0; $i < (8 - count($soData)); $i++) : ?>
-            <tr>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
-        <?php endfor; ?>
+            <?php
+            $rowNumber = 1;
+            foreach ($soData as $detail) :
+
+            ?>
+                <tr>
+                    <td class="txt-center" style="height: 1px;"><?= $rowNumber ?></td>
+                    <td><?= $detail->nama_barang ?></td>
+                    <td class="txt-center"><?= $detail->qty_invoice ?></td>
+                    <td class="txt-center"><?= $detail->satuan ?></td>
+                    <td class="txt-center">Rp. <?= number_format($detail->harga_barang) ?></td>
+                    <td class="txt-center"><?= $detail->disc ?></td>
+                    <td class="txt-right">Rp. <?= number_format($detail->amount) ?></td>
+                </tr>
+            <?php
+                $rowNumber++;
+            endforeach;
+            ?>
+            <?php for ($i = 0; $i < (6 - count($soData)); $i++) : ?>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+            <?php endfor; ?>
+        </tbody>
     </table>
 
     <table class="w-100" style="border-spacing: 3px 0;border: 1px;">
@@ -207,11 +243,10 @@
                         <td valign="top" style="width: 65%;">
                             <div class="description-container">
                                 <label class="description-label">Description: </label>
-                                <ol class="payment-list">
+                                <ol class="payment-list" style="margin-left: -5 px;">
                                     <?= $companyAccount ?>
                                 </ol>
-                                <?= '' //$invData->keterangan 
-                                ?>
+                                <?= $invData->keterangan ?>
                             </div>
                         </td>
                         <td valign="bottom">

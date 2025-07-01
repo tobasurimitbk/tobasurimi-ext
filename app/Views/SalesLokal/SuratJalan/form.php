@@ -175,7 +175,6 @@
     const csrfToken = '<?= csrf_token() ?>';
 
     $(document).ready(function() {
-
         const table = $('.dataTable').DataTable({
 
             processing: true,
@@ -346,7 +345,7 @@
                 $(".id_so").val("");
             }
         });
-
+        
         $(".id_so").change(function() {
             // Simpan konteks this ke dalam variabel
             let $this = $(this);
