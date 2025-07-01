@@ -3466,7 +3466,7 @@
             }
 
             const currentRupiah = parseFloat(rupiahInput.val().replace(/[^\d]/g, '')) || 0;
-            const newRupiah = currentRupiah + subsidy;
+            const newRupiah = currentRupiah - subsidy;
             
             // Format back to Rupiah (e.g., "50,000.00")
             rupiahInput.val(formatRupiah(newRupiah.toString()) + '.00');
