@@ -309,7 +309,6 @@ class SuratJalan extends BaseController
         $id = decrypt($id);
         $dataSuratJalan = $this->SuratJalanModel->getSuratJalanById(($id));
 
-
         if (empty($dataSuratJalan)) {
             return view('errors/html/error_404', ['message' => 'Not Found']);
         }
@@ -326,7 +325,6 @@ class SuratJalan extends BaseController
         $dataSuratJalan->itemList = $this->SalesOrderDetailModel->getItemListByIds($dataSuratJalan->multiple_id_so);
         $dataSuratJalan->id = encrypt($dataSuratJalan->id);
 
-        // var_dump($dataSuratJalan);
         foreach ($dataSuratJalan->itemList as $value) {
             $value->harga_barang = $value->harga_barang;
             $value->amount = $value->total_harga_barang;
