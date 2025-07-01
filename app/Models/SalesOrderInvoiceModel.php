@@ -539,7 +539,7 @@ class SalesOrderInvoiceModel extends Model
             ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pesanan"', 'LEFT')
             ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pengiriman"', 'LEFT')
             ->where($condition)
-            ->where('sales_order_invoice.id_company !=', null)
+            ->where('sales_order_invoice.document_type !=', 'import')
             ->orderBy($sort, $sortType);
 
         $totalData = $salesOrderInvoiceLokal->countAllResults(false);
