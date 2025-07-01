@@ -127,15 +127,6 @@ class Hutang extends BaseController
 
         // dd($this->this_company_id);
 
-
-        if ($this->this_company_id != "16" && $this->this_company_id != "15") {
-            $companyId = [1, 2];
-        } else if ($this->this_company_id == "15") {
-            $companyId = [15];
-        } else {
-            $companyId = [16];
-        }
-
         $condition = [
             "suppliers.deletedAt" => NULL
         ];
@@ -151,10 +142,20 @@ class Hutang extends BaseController
             "lastdate"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
+        if ($this->this_company_id != "16" && $this->this_company_id != "15") {
+            $addCondition['companyId'] = [1, 2];
+        } else if ($this->this_company_id == "15") {
+            $addCondition['companyId'] = [15];
+        } else if ($this->this_company_id == "16") {
+            $addCondition['companyId'] = [16];
+        } else {
+            $addCondition['companyId'] = [];
+        }
+
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $allData = $this->getAllHutangSummary($condition, $addCondition, $companyId);
+        $allData = $this->getAllHutangSummary($condition, $addCondition);
 
         $totalData = count($allData);
         $pagedData = array_slice($allData, $offset, $limit);
@@ -218,6 +219,16 @@ class Hutang extends BaseController
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
+        if ($this->this_company_id != "16" && $this->this_company_id != "15") {
+            $addCondition['companyId'] = [1, 2];
+        } else if ($this->this_company_id == "15") {
+            $addCondition['companyId'] = [15];
+        } else if ($this->this_company_id == "16") {
+            $addCondition['companyId'] = [16];
+        } else {
+            $addCondition['companyId'] = [];
+        }
+
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
@@ -266,7 +277,7 @@ class Hutang extends BaseController
         return response()->setJSON($data);
     }
 
-    public function getAllHutangSummary($condition, $addCondition, $companyId)
+    public function getAllHutangSummary($condition, $addCondition)
     {
         $res = [];
 

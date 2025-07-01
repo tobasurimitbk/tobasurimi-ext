@@ -1250,6 +1250,7 @@ class RMPurchaseOrderModel extends Model
         $selectQry = "rm_purchase_orders.id AS id, 
                     rm_purchase_orders.po_date AS tanggal_invoice, 
                     rm_purchase_orders.po_no AS no_invoice, 
+                    rm_purchase_orders.company_id, 
                     suppliers.id AS supplier_id, 
                     suppliers.name AS supplier_name,
                     divisis.divisi AS divisi,
@@ -1273,8 +1274,12 @@ class RMPurchaseOrderModel extends Model
 
         $totalData = $poDataQry->countAllResults(false);
 
-        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['filter']) || !empty($addCondition['divisi'])) {
+        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['filter']) || !empty($addCondition['divisi']) || $addCondition['companyId'] != []) {
             $poDataQry->groupStart();
+        }
+
+        if ($addCondition['companyId'] != []) {
+            $poDataQry->whereIn('rm_purchase_orders.company_id', $addCondition['companyId']);
         }
 
         if (!empty($addCondition['search'])) {
@@ -1302,7 +1307,7 @@ class RMPurchaseOrderModel extends Model
             $poDataQry->whereIn('suppliers.id', $addCondition['filter']);
         }
 
-        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['filter']) || !empty($addCondition['divisi'])) {
+        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['filter']) || !empty($addCondition['divisi']) || $addCondition['companyId'] != []) {
             $poDataQry->groupEnd();
         }
 

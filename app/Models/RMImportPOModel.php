@@ -356,6 +356,7 @@ class RMImportPOModel extends Model
         $selectQry = "rm_import_pos.id AS id, 
                     rm_import_pos.po_date AS tanggal_invoice, 
                     rm_import_pos.po_no AS no_invoice, 
+                    rm_import_pos.company_id, 
                     suppliers.id AS supplier_id, 
                     suppliers.name AS supplier_name,
                     divisis.divisi AS divisi,
@@ -379,8 +380,12 @@ class RMImportPOModel extends Model
 
         $totalData = $poDataQry->countAllResults(false);
 
-        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['filter']) || !empty($addCondition['divisi'])) {
+        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['filter']) || !empty($addCondition['divisi']) || $addCondition['companyId'] != []) {
             $poDataQry->groupStart();
+        }
+
+        if ($addCondition['companyId'] != []) {
+            $poDataQry->whereIn('rm_import_pos.company_id', $addCondition['companyId']);
         }
 
         if (!empty($addCondition['search'])) {
@@ -408,7 +413,7 @@ class RMImportPOModel extends Model
             $poDataQry->whereIn('suppliers.id', $addCondition['filter']);
         }
 
-        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['filter']) || !empty($addCondition['divisi'])) {
+        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['filter']) || !empty($addCondition['divisi']) || $addCondition['companyId'] != []) {
             $poDataQry->groupEnd();
         }
 
