@@ -125,9 +125,11 @@ class Hutang extends BaseController
             "lastdate"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
-        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+        dd($this->this_company_id);
+
+        if ($this->this_company_id != "16" && $this->this_company_id != "15") {
             $companyId = [1, 2];
-        } else if ($this->this_company_id == 15) {
+        } else if ($this->this_company_id == "15") {
             $companyId = [15];
         } else {
             $companyId = [16];
