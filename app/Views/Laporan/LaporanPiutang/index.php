@@ -47,7 +47,7 @@
                                     if (!empty($divisis)) {
                                         foreach ($divisis as $item) {
                                     ?>
-                                            <option value="<?= $item->id; ?>"><?= $item->divisi.' ('.$item->company.')'; ?></option>
+                                            <option value="<?= $item->id; ?>"><?= $item->divisi . ' (' . $item->company . ')'; ?></option>
                                     <?php
                                         }
                                     }
@@ -64,7 +64,7 @@
                                     if (!empty($suppliers)) {
                                         foreach ($suppliers as $sub) {
                                     ?>
-                                            <option value="<?= $sub->id; ?>"><?= $sub->name.' ('.$sub->company.')'; ?></option>
+                                            <option value="<?= $sub->id; ?>"><?= $sub->name . ' (' . $sub->company . ')'; ?></option>
                                     <?php
                                         }
                                     }
@@ -247,16 +247,16 @@
             table.ajax.reload();
         })
 
-        $('.dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            if (data) {
-                window.open(
-                    `<?= base_url("laporan-accounting/hutang/details/"); ?>${data.id}`,
-                    '_blank',
-                    'width=1000,height=700,scrollbars=yes,resizable=yes'
-                );
-            }
-        });
+        // $('.dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+        //     const data = table.row(this).data();
+        //     if (data) {
+        //         window.open(
+        //             `<?= base_url("laporan-accounting/hutang/details/"); ?>${data.id}`,
+        //             '_blank',
+        //             'width=1000,height=700,scrollbars=yes,resizable=yes'
+        //         );
+        //     }
+        // });
 
     });
     const convertDateFormat = function(dateString) {
