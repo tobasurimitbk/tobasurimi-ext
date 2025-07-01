@@ -15,6 +15,7 @@ use App\Models\AllNoModel;
 use App\Models\SuratJalanModel;
 use App\Models\EmployeesModel;
 use App\Models\SalesOrderInvoiceDetailModel;
+use Exception;
 
 class SuratJalan extends BaseController
 {
@@ -258,9 +259,9 @@ class SuratJalan extends BaseController
                 "note"          => $this->request->getPost('note'),
                 'multiple_id_so' => json_encode($idArray),
                 'multiple_no_so' => json_encode($noArray),
-                "id_company"    => ($this->this_company_id != 16) 
-                                ? $this->request->getPost('company_id') 
-                                : $this->this_company_id,
+                "id_company"    => ($this->this_company_id != 16)
+                    ? $this->request->getPost('company_id')
+                    : $this->this_company_id,
             ];
             $checkSJ = $this->SuratJalanModel->where('deletedAt', NULL)->where('UPPER(no_surat_jalan)', strtoupper($this->request->getVar('no_surat_jalan')))->findAll();
             if ($checkSJ) {
@@ -338,8 +339,8 @@ class SuratJalan extends BaseController
             $getJenisPenjualan = "By Ecommerce";
         } else {
             $getJenisPenjualan = "";
-        }   
-        
+        }
+
         $data = [
             "data" => $dataSuratJalan,
             "dataCustomers" => $customers,
@@ -418,9 +419,9 @@ class SuratJalan extends BaseController
             "note"          => $this->request->getPost('note'),
             'multiple_id_so' => json_encode($idArray),
             'multiple_no_so' => json_encode($noArray),
-            "id_company"    => ($this->this_company_id != 16) 
-                            ? $this->request->getPost('company_id') 
-                            : $this->this_company_id,
+            "id_company"    => ($this->this_company_id != 16)
+                ? $this->request->getPost('company_id')
+                : $this->this_company_id,
         ];
         try {
 
@@ -741,7 +742,6 @@ class SuratJalan extends BaseController
             ];
 
             echo json_encode($data);
-            
         } catch (Exception $e) {
             $data = [
                 "status"            => false,

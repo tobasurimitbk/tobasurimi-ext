@@ -123,7 +123,7 @@
                                     <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash">
                                         <i class="fa fa-trash"></i>
                                     </button>
-                                    <button class="btn btn-warning">
+                                    <button class="btn btn-warning" onclick="handlePrint('${id}')">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                     </button>
                                     <button type="button" class="btn btn-success" onclick="posting('${id}', 1)">
@@ -131,7 +131,7 @@
                                     </button>
                                 </div>
                             `
-                    } 
+                    }
 
                     // else {
                     //     if (request_status == "waiting") {
@@ -368,8 +368,8 @@
         })
     }
 
-    const print = function(url) {
-        window.open(url, "_blank");
+    const handlePrint = function(id) {
+        window.open("<?= base_url("material-request/print"); ?>" + '/' + id, "_blank");
     }
 
     const changeSort = function(val) {

@@ -194,7 +194,7 @@ class OrderForm extends BaseController
                 "no_sales_order" => $data->no_sales_order,
                 "createdAt" => date("d/m/Y", strtotime($data->createdAt)),
                 "order_date" => date("d/m/Y", strtotime($data->order_date)),
-                "shipping_date" => date("d/m/Y", strtotime($data->shipping_date)),
+                "shipping_date" => $data->shipping_date == "0000-00-00" ? "" : date("d/m/Y", strtotime($data->shipping_date)),
                 "nama_customer" => $customerName,
                 "destination" => $data->destination,
                 "qty_barang" => count($this->SalesOrderDetailModel->where('id_sales_order', $data->id)->where('deletedAt', null)->where('tipe_input', "order_form")->findAll()),
@@ -921,23 +921,19 @@ class OrderForm extends BaseController
 
         $id = decrypt($id);
 
-
-
-
-        $companyData = $this->companyModel->asObject()
-            ->find($this->this_company_id);
-
         $soSelectQry = "sales_order.*,
                         DATE_FORMAT(sales_order.order_date, '%d %b %Y') AS order_date, 
                         DATE_FORMAT(sales_order.shipping_date, '%d %b %Y') AS shipping_date, 
                         customers.name AS customerName, 
                         customers.phone AS customerPhone, 
                         customers.address AS customerAddress,
-                        metadata.value AS termin";
+                        metadata.value AS termin,
+                        companies.company";
         $salesOrderData = $this->SalesOrderModel->asObject()
             ->select($soSelectQry)
             ->join('customers', 'customers.id = sales_order.id_customer', 'left')
             ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
+            ->join('companies', 'companies.id = sales_order.id_company', 'left')
             ->find($id);
 
         $soDet = $this->SalesOrderDetailModel->asObject()
@@ -949,7 +945,7 @@ class OrderForm extends BaseController
             ->findAll();
 
         $data = [
-            'companyName'   => $companyData->company,
+            'companyName'   => $salesOrderData->company,
             'soData'        => $salesOrderData,
             'soDet'         => $soDet
         ];
