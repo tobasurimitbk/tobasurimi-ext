@@ -3459,14 +3459,13 @@
                     // Check if <14 days AND worked >4 hours
                     if (diffDays < 14 && jam > 4) {
                         subsidyInput.val(40000); // Apply subsidy
+                        const currentRupiah = parseFloat(rupiahInput.val().replace(/[^\d]/g, '')) || 0;
+                        const newRupiah = currentRupiah - 40000;
                     } else {
                         subsidyInput.val(0); // No subsidy
                     }
                 }
             }
-
-            const currentRupiah = parseFloat(rupiahInput.val().replace(/[^\d]/g, '')) || 0;
-            const newRupiah = currentRupiah - subsidy;
             
             // Format back to Rupiah (e.g., "50,000.00")
             rupiahInput.val(formatRupiah(newRupiah.toString()) + '.00');
