@@ -754,7 +754,7 @@
                     if (department == '5') {
 
                         rowHtml = `
-                        <tr data-employee-id="${employeeId}">
+                        <tr data-employee-id="${employeeId}" data-tmk="${tanggalMasuk}">
                             <td><button class="btn btn-danger" id="btnDelete" data-employee_id="${employeeId}"><i class="fa fa-trash"></i></button></td>
                             <td>${$('#dataTable tbody tr').length + 1}</td>
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${tanggalMasuk}" readonly></td>
@@ -906,7 +906,7 @@
                     } else {
                         // Default department table structure
                         rowHtml = `
-                        <tr data-employee-id="${employeeId}">
+                        <tr data-employee-id="${employeeId}" data-tmk="${tanggalMasuk}">
                             <td><button class="btn btn-danger" id="btnDelete" data-employee_id="${employeeId}"><i class="fa fa-trash"></i></button></td>
                             <td>${$('#dataTable tbody tr').length + 1}</td>
                             <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${tanggalMasuk}" readonly></td>
@@ -1706,7 +1706,7 @@
         function createTableRow(department, employeeId, employeeName, tanggalMasuk, badge, payment) {
             if (department == '5') {
                 return `
-                <tr data-employee-id="${employeeId}">
+                <tr data-employee-id="${employeeId}" data-tmk="${tanggalMasuk}">
                     <td><button class="btn btn-danger" id="btnDelete" data-employee_id="${employeeId}"><i class="fa fa-trash"></i></button></td>
                     <td>${$('#dataTable tbody tr').length + 1}</td>
                     <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${tanggalMasuk}" readonly></td>
@@ -1869,7 +1869,7 @@
             `;
             } else {
                 return `
-                <tr data-employee-id="${employeeId}">
+                <tr data-employee-id="${employeeId}" data-tmk="${tanggalMasuk}">
                     <td><button class="btn btn-danger" id="btnDelete" data-employee_id="${employeeId}"><i class="fa fa-trash"></i></button></td>
                     <td>${$('#dataTable tbody tr').length + 1}</td>
                     <td><input type="text" class="form-control form-control-sm" style="min-width: 100px;" value="${tanggalMasuk}" readonly></td>
@@ -3219,147 +3219,147 @@
             $row.find(`input[name="rupiah"]`).val(greatFormatRupiah(rupiah) + ".00");
         }
 
-function handleWorkingHoursInput(input) {
-    const val = input.val().trim();
-    const $row = input.closest('tr');
-    const employeeId = $row.data('employee-id');
-    const inputName = input.attr('name');
-    const code = inputName.replace('jam_kerja_', '');
+        function handleWorkingHoursInput(input) {
+            const val = input.val().trim();
+            const $row = input.closest('tr');
+            const employeeId = $row.data('employee-id');
+            const inputName = input.attr('name');
+            const code = inputName.replace('jam_kerja_', '');
 
-    // Modified master rounding function that won't round if input is already in .25/.5/.75 format
-    const masterRound = (timeValue, type = 'result') => {
-        // Check if the value is already in quarter-hour format
-        const decimalPart = timeValue % 1;
-        if ([0, 0.25, 0.5, 0.75].includes(decimalPart)) {
-            return timeValue;
-        }
-        
-        const hours = Math.floor(timeValue);
-        const minutes = Math.round((timeValue - hours) * 60);
-        
-        // Departure rounding (jam masuk)
-        if (type === 'departure') {
-            if (minutes >= 46) return hours + 1;
-            if (minutes >= 31) return hours + 0.75;
-            if (minutes >= 15) return hours + 0.5;
-            return hours + 0.25;
-        }
-        // Return rounding (jam pulang)
-        else if (type === 'return') {
-            if (minutes >= 45) return hours + 0.75;
-            if (minutes >= 30) return hours + 0.5;
-            if (minutes >= 15) return hours + 0.25;
-            return hours;
-        }
-        // Final result rounding (hasil total)
-        else {
-            if (minutes >= 46) return hours + 1;
-            if (minutes >= 31) return hours + 0.75;
-            if (minutes >= 15) return hours + 0.5;
-            return hours + 0.25;
-        }
-    };
-
-    // Parse time input - now checks for pre-rounded values first
-    const parseTimeInput = (timeStr, type) => {
-        // Directly convert if it's already in decimal format
-        const decimalValue = parseFloat(timeStr.replace(',', '.'));
-        if (!isNaN(decimalValue)) {
-            // Check if it's already in quarter-hour format
-            const decimalPart = decimalValue % 1;
-            if ([0, 0.25, 0.5, 0.75].includes(decimalPart)) {
-                return decimalValue;
-            }
-        }
-        
-        // Fallback to normal parsing if not in quarter-hour format
-        if (!timeStr.includes('.')) return parseFloat(timeStr) || 0;
-        
-        const [hours, minutes] = timeStr.split('.').map(Number);
-        const decimalTime = hours + (minutes / 60);
-        return masterRound(decimalTime, type);
-    };
-
-    if (val.includes('-')) {
-        const parts = val.split('-').map(part => part.trim());
-        
-        if (parts.length === 3) {
-            try {
-                // Parse with proper handling of pre-rounded values
-                const returnTime = parseTimeInput(parts[0], 'return');
-                const departure = parseTimeInput(parts[1], 'departure');
-                const breakTime = parseTimeInput(parts[2], 'return');
-                
-                // Validate
-                if (isNaN(departure) || isNaN(returnTime) || isNaN(breakTime)) {
-                    throw new Error('Format waktu tidak valid');
+            // Modified master rounding function that won't round if input is already in .25/.5/.75 format
+            const masterRound = (timeValue, type = 'result') => {
+                // Check if the value is already in quarter-hour format
+                const decimalPart = timeValue % 1;
+                if ([0, 0.25, 0.5, 0.75].includes(decimalPart)) {
+                    return timeValue;
                 }
-                if ([departure, returnTime, breakTime].some(t => t < 0 || t >= 24)) {
-                    throw new Error('Waktu harus antara 0-24');
+                
+                const hours = Math.floor(timeValue);
+                const minutes = Math.round((timeValue - hours) * 60);
+                
+                // Departure rounding (jam masuk)
+                if (type === 'departure') {
+                    if (minutes >= 46) return hours + 1;
+                    if (minutes >= 31) return hours + 0.75;
+                    if (minutes >= 15) return hours + 0.5;
+                    return hours + 0.25;
                 }
+                // Return rounding (jam pulang)
+                else if (type === 'return') {
+                    if (minutes >= 45) return hours + 0.75;
+                    if (minutes >= 30) return hours + 0.5;
+                    if (minutes >= 15) return hours + 0.25;
+                    return hours;
+                }
+                // Final result rounding (hasil total)
+                else {
+                    if (minutes >= 46) return hours + 1;
+                    if (minutes >= 31) return hours + 0.75;
+                    if (minutes >= 15) return hours + 0.5;
+                    return hours + 0.25;
+                }
+            };
 
-                // Calculate with overnight handling
-                let workingHours = returnTime > departure 
-                    ? returnTime - departure - breakTime 
-                    : (24 - departure) + returnTime - breakTime;
+            // Parse time input - now checks for pre-rounded values first
+            const parseTimeInput = (timeStr, type) => {
+                // Directly convert if it's already in decimal format
+                const decimalValue = parseFloat(timeStr.replace(',', '.'));
+                if (!isNaN(decimalValue)) {
+                    // Check if it's already in quarter-hour format
+                    const decimalPart = decimalValue % 1;
+                    if ([0, 0.25, 0.5, 0.75].includes(decimalPart)) {
+                        return decimalValue;
+                    }
+                }
                 
-                workingHours = Math.max(0, workingHours);
+                // Fallback to normal parsing if not in quarter-hour format
+                if (!timeStr.includes('.')) return parseFloat(timeStr) || 0;
                 
-                // Apply final rounding to result
-                const roundedTotal = masterRound(workingHours, 'result');
-                
-                // Store data
-                const key = `${employeeId}_${inputName}`;
-                window.employeeWorkingDetails = window.employeeWorkingDetails || {};
-                window.employeeWorkingDetails[key] = {
-                    raw_input: val,
-                    departure: departure,
-                    return: returnTime,
-                    break: breakTime,
-                    total_before_round: workingHours,
-                    total: roundedTotal
-                };
-                
-                // Format display
-                const displayValue = Number.isInteger(roundedTotal) 
-                    ? roundedTotal.toString() 
-                    : roundedTotal.toFixed(2).replace('.', ',');
-                input.val(displayValue);
+                const [hours, minutes] = timeStr.split('.').map(Number);
+                const decimalTime = hours + (minutes / 60);
+                return masterRound(decimalTime, type);
+            };
 
-            } catch (error) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Kesalahan Input',
-                    html: `<div>${error.message}</div>
-                        <div class="mt-2"><strong>Contoh format benar:</strong><br>
-                        11.75-7.5-0 (JamPulang-JamMasuk-Istirahat)</div>
-                        <div class="text-muted small mt-2">Gunakan format desimal (.25, .5, .75) untuk menit</div>`,
-                    confirmButtonText: 'Mengerti'
-                });
-                input.val('').focus();
-                return;
+            if (val.includes('-')) {
+                const parts = val.split('-').map(part => part.trim());
+                
+                if (parts.length === 3) {
+                    try {
+                        // Parse with proper handling of pre-rounded values
+                        const returnTime = parseTimeInput(parts[0], 'return');
+                        const departure = parseTimeInput(parts[1], 'departure');
+                        const breakTime = parseTimeInput(parts[2], 'return');
+                        
+                        // Validate
+                        if (isNaN(departure) || isNaN(returnTime) || isNaN(breakTime)) {
+                            throw new Error('Format waktu tidak valid');
+                        }
+                        if ([departure, returnTime, breakTime].some(t => t < 0 || t >= 24)) {
+                            throw new Error('Waktu harus antara 0-24');
+                        }
+
+                        // Calculate with overnight handling
+                        let workingHours = returnTime > departure 
+                            ? returnTime - departure - breakTime 
+                            : (24 - departure) + returnTime - breakTime;
+                        
+                        workingHours = Math.max(0, workingHours);
+                        
+                        // Apply final rounding to result
+                        const roundedTotal = masterRound(workingHours, 'result');
+                        
+                        // Store data
+                        const key = `${employeeId}_${inputName}`;
+                        window.employeeWorkingDetails = window.employeeWorkingDetails || {};
+                        window.employeeWorkingDetails[key] = {
+                            raw_input: val,
+                            departure: departure,
+                            return: returnTime,
+                            break: breakTime,
+                            total_before_round: workingHours,
+                            total: roundedTotal
+                        };
+                        
+                        // Format display
+                        const displayValue = Number.isInteger(roundedTotal) 
+                            ? roundedTotal.toString() 
+                            : roundedTotal.toFixed(2).replace('.', ',');
+                        input.val(displayValue);
+
+                    } catch (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Kesalahan Input',
+                            html: `<div>${error.message}</div>
+                                <div class="mt-2"><strong>Contoh format benar:</strong><br>
+                                11.75-7.5-0 (JamPulang-JamMasuk-Istirahat)</div>
+                                <div class="text-muted small mt-2">Gunakan format desimal (.25, .5, .75) untuk menit</div>`,
+                            confirmButtonText: 'Mengerti'
+                        });
+                        input.val('').focus();
+                        return;
+                    }
+                }
             }
+            
+            // Calculate and round totals
+            let totalJam = 0;
+            $row.find('input[name^="jam_kerja_"]').each(function() {
+                const val = $(this).val().replace(',', '.');
+                totalJam += parseFloat(val) || 0;
+            });
+            
+            // Apply final rounding to total jam
+            const roundedTotalJam = masterRound(totalJam, 'result');
+            $row.find('input[name="total_jam"]').val(
+                Number.isInteger(roundedTotalJam) 
+                    ? roundedTotalJam.toString() 
+                    : roundedTotalJam.toFixed(2).replace('.', ',')
+            );
+            
+            // Update productivity calculations
+            calculateKgPerJam(input);
         }
-    }
-    
-    // Calculate and round totals
-    let totalJam = 0;
-    $row.find('input[name^="jam_kerja_"]').each(function() {
-        const val = $(this).val().replace(',', '.');
-        totalJam += parseFloat(val) || 0;
-    });
-    
-    // Apply final rounding to total jam
-    const roundedTotalJam = masterRound(totalJam, 'result');
-    $row.find('input[name="total_jam"]').val(
-        Number.isInteger(roundedTotalJam) 
-            ? roundedTotalJam.toString() 
-            : roundedTotalJam.toFixed(2).replace('.', ',')
-    );
-    
-    // Update productivity calculations
-    calculateKgPerJam(input);
-}
 
         // Eye button click handler - now just shows the details without saving
         $(document).on('click', '.eye-btn', function() {
@@ -3427,27 +3427,49 @@ function handleWorkingHoursInput(input) {
         function calculateKgPerJam(input) {
             const $row = $(input).closest('tr');
             const employeeId = $row.data('employee-id');
+            const tmk = $row.data('tmk'); // Format: YYYY-MM-DD
             const inputName = $(input).attr('name');
             
             // Extract the code from input name (jam_kerja_[code])
             const code = inputName.replace('jam_kerja_', '');
             
-            // Find related inputs using proper scoping to the row
+            // Find related inputs
             const weightInput = $row.find(`input[name="${code.toUpperCase()}"]`);
             const hoursInput = $row.find(`input[name="${inputName}"]`);
             const kgPerJamInput = $row.find(`input[name="kg_per_jam_${code}"]`);
+            const subsidyInput = $row.find('input[name="subsidi_rupiah"]');
+            const rupiahInput = $row.find('input[name="rupiah"]'); // Target field to update
 
             // Only proceed if all required inputs exist
             if (weightInput.length && hoursInput.length && kgPerJamInput.length) {
                 const berat = parseFloat(weightInput.val().replace(/,/g, '.')) || 0;
                 const jam = parseFloat(hoursInput.val().replace(/,/g, '.')) || 0;
                 
-                // Calculate kg/hour, avoid division by zero
+                // Calculate kg/hour (avoid division by zero)
                 const kgPerJam = jam > 0 ? (berat / jam) : 0;
-                
-                // Update the kg/hour field with 2 decimal places
                 kgPerJamInput.val(kgPerJam.toFixed(2));
+
+                // --- NEW: SUBSIDY CALCULATION ---
+                if (tmk) {
+                    const today = new Date(); // Current date
+                    const masukKerja = new Date(tmk); // TMK (start date)
+                    const diffTime = today - masukKerja;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Days since TMK
+
+                    // Check if <14 days AND worked >4 hours
+                    if (diffDays < 14 && jam > 4) {
+                        subsidyInput.val(40000); // Apply subsidy
+                    } else {
+                        subsidyInput.val(0); // No subsidy
+                    }
+                }
             }
+
+            const currentRupiah = parseFloat(rupiahInput.val().replace(/[^\d]/g, '')) || 0;
+            const newRupiah = currentRupiah + subsidy;
+            
+            // Format back to Rupiah (e.g., "50,000.00")
+            rupiahInput.val(formatRupiah(newRupiah.toString()) + '.00');
             
             // Calculate total kg/hour for all codes
             let totalKgPerJam = 0;
