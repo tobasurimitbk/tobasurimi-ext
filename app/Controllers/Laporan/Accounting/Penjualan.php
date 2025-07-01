@@ -56,7 +56,10 @@ class Penjualan extends BaseController
             "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
-        $condition = ['sales_order_invoice.deletedAt' => null, 'sales_order_invoice.id_company' => $this->this_company_id];
+        $condition = [
+            'sales_order_invoice.deletedAt' => null,
+            'sales_order_invoice.id_company' => $this->this_company_id
+        ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),

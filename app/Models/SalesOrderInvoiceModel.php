@@ -512,7 +512,7 @@ class SalesOrderInvoiceModel extends Model
     }
 
     public function getAllSalesOrderInvoiceReport($condition, $addCondition, $limit = 10, $offset = 0)
-    {   
+    {
 
         $availableSort = [
             'tgl_invoice'          => 'sales_order_invoice.tgl_faktur',
@@ -539,6 +539,7 @@ class SalesOrderInvoiceModel extends Model
             ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pesanan"', 'LEFT')
             ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pengiriman"', 'LEFT')
             ->where($condition)
+            ->where('sales_order_invoice.id_company !=', null)
             ->orderBy($sort, $sortType);
 
         $totalData = $salesOrderInvoiceLokal->countAllResults(false);
