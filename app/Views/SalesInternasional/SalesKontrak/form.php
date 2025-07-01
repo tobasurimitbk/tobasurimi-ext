@@ -286,7 +286,20 @@
                         </div>
                     </div>
                 </div>
+                <div class="row mt-3">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Spesifikasi Detail</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <textarea autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control documents_required" id="documents_required" name="documents_required" placeholder="Document Required"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['documents_required'] : ""; ?></textarea>
+                            <label for="floatingInput">Spesifikasi Detail</label>
+                        </div>
+                    </div>
 
+                </div>
             </form>
             <div class="col-subtitle-modal mt-5">
                 <div class="row mt-3">
