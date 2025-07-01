@@ -3461,14 +3461,15 @@
                         subsidyInput.val(40000); // Apply subsidy
                         const currentRupiah = parseFloat(rupiahInput.val().replace(/[^\d]/g, '')) || 0;
                         const newRupiah = currentRupiah - 40000;
+                        // Format back to Rupiah (e.g., "50,000.00")
+                        rupiahInput.val(formatRupiah(newRupiah.toString()) + '.00');
                     } else {
                         subsidyInput.val(0); // No subsidy
                     }
                 }
             }
             
-            // Format back to Rupiah (e.g., "50,000.00")
-            rupiahInput.val(formatRupiah(newRupiah.toString()) + '.00');
+           
             
             // Calculate total kg/hour for all codes
             let totalKgPerJam = 0;
