@@ -389,7 +389,8 @@ class RMImportPOModel extends Model
         }
 
         if (!empty($addCondition['search'])) {
-            $poDataQry->like('rm_import_pos.po_no', $addCondition['search']);
+            $poDataQry->like('rm_import_pos.po_no', $addCondition['search'])
+                ->orLike('penerimaan_barang.no_penerimaan_barang', $addCondition['search']);
         }
 
         if (!empty($addCondition['dateStart'])) {
