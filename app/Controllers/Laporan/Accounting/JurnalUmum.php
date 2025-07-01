@@ -156,6 +156,8 @@ class JurnalUmum extends BaseController
 
     public function exportPDF($tglAwal, $tglAkhir, $filter)
     {
+        set_time_limit(0);
+        ini_set('memory_limit', '512M');
         $dompdf = new Dompdf();
         $dateStart = $tglAwal;
         $dateEnd = $tglAkhir;
@@ -258,6 +260,8 @@ class JurnalUmum extends BaseController
 
     public function exportExcel($tglAwal, $tglAkhir, $filter)
     {
+        set_time_limit(0);
+        ini_set('memory_limit', '512M');
         $spreadsheet = new Spreadsheet();
         $dateStart = $tglAwal;
         $dateEnd = $tglAkhir;
