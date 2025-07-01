@@ -320,7 +320,6 @@ class SuratJalan extends BaseController
         $dataSo = $this->SalesOrderModel
             ->asObject()
             ->where(['id_customer' => $dataSuratJalan->id_customer, 'tipe_sales_order' => 'LOKAL', 'deletedAt' => null])
-            ->where('posting', 1)
             ->select(['id', 'no_sales_order'])
             ->findAll();
 
@@ -351,6 +350,8 @@ class SuratJalan extends BaseController
             "getJenisPenjualan" => $getJenisPenjualan
 
         ];
+        // var_dump($dataSuratJalan->multiple_id_so);
+        // // exit;
         // var_dump($dataSo);
         // exit;
         //echo json_encode($data);
