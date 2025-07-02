@@ -277,6 +277,32 @@ class PenerimaanBarangDetailModel extends Model
             ->findAll();
     }
 
+    public function getPenerimaanBarangPenolongDetail2($id)
+    {
+        return $this->asArray()->select('
+                    penerimaan_barang_detail.*,
+                    penerimaan_barang_detail.sub_total AS total_penerimaan_detail,
+                    barang_master.barang_name as nama_barang, 
+                    satuans.kode_satuan, am_purchase_orders.po_no, 
+                    am_purchase_order_details.note as keterangan, 
+                    am_purchase_order_details.total as total_po, 
+                    am_purchase_orders.currency as currency, 
+                    barang_master_spesifikasi.spesifikasi, 
+                    metadata.value as currencyValue,
+                    purchase_requests.spp_no
+                ')
+            ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+            ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
+            ->join('am_purchase_orders', 'am_purchase_orders.id = penerimaan_barang_detail.purchase_order_id', 'left')
+            ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
+            ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
+            ->join('am_purchase_order_details', 'am_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id', 'left')
+            ->where('penerimaan_barang_detail.penerimaan_barang_id', $id)
+            ->where('penerimaan_barang_detail.deletedAt', null)
+            ->findAll();
+    }
+
     public function getPenerimaanBarangBakuDetail($id)
     {
         return $this->asArray()->select('penerimaan_barang_detail.*,barang_master.barang_name as nama_barang, satuans.kode_satuan, rm_purchase_orders.po_no, rm_purchase_order_details.note as keterangan, supplier_harga.spesifikasi, rm_purchase_order_details.qty as qty_barang_po, rm_purchase_order_details.general_price as total_barang_po, barang_master_spesifikasi.spesifikasi, SUM(rm_purchase_order_details.general_price) as sum_total_barang_po, SUM(rm_purchase_order_details.qty) as sum_qty_barang_po, sum(penerimaan_barang_detail.sub_total) as total_penerimaan_detail')

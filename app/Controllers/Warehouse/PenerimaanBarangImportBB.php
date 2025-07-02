@@ -21,7 +21,9 @@ use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 use App\Models\ReturAmPoDetailModel;
 use App\Models\BCPurchaseOrderModel;
+use App\Models\JurnalUmumModel;
 use App\Models\PengembalianBarangModel;
+use App\Models\TransaksiJurnalModel;
 use Config\Database;
 use Dompdf\Dompdf;
 use Exception;
@@ -54,6 +56,8 @@ class PenerimaanBarangImportBB extends BaseController
     protected $this_user_id;
     protected $dompdf;
     protected $pengembalianBarangModel;
+    protected $transaksiJurnalModel;
+    protected $jurnalUmumModel;
 
     public function __construct()
     {
@@ -81,6 +85,8 @@ class PenerimaanBarangImportBB extends BaseController
         $this->jurnalUmumController = new JurnalUmum();
         $this->dompdf = new Dompdf();
         $this->pengembalianBarangModel = new PengembalianBarangModel();
+        $this->transaksiJurnalModel = new TransaksiJurnalModel();
+        $this->jurnalUmumModel = new JurnalUmumModel();
     }
 
     public function index()
@@ -833,22 +839,35 @@ class PenerimaanBarangImportBB extends BaseController
                 ]);
             }
 
-            foreach ($penerimaanBarangList as $p) {
-
-                $statusOUT = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $penerimaanBarang['divisi_id'], $p['barang1_id'], $p['barang2_id'], $p['type_barang'], $penerimaanBarang['no_penerimaan_barang'], 'OUT');
-
-                if ($statusOUT) {
-                    $responseBody = json_decode($statusOUT->getBody(), true);
-                    $data = [
-                        "status"    => false,
-                        "id"    => $this->request->getVar('id'),
-                        "message"   => $responseBody['message'],
-                        'token'     => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                    return;
-                }
+            // Hapus Di Jurnal
+            $transaksiJurnal = $this->transaksiJurnalModel->where('penerimaan_barang_id', $id)->first();
+            if ($transaksiJurnal) {
+                $this->transaksiJurnalModel->where('penerimaan_barang_id', $id)->delete();
+                $this->jurnalUmumModel->where('id_transaksi', $transaksiJurnal['id']);
+            } else {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Gagal UnPosting : Jurnal Pembelian Tidak Ditemukan",
+                    'token' => csrf_hash()
+                ]);
             }
+
+            // foreach ($penerimaanBarangList as $p) {
+
+            //     $statusOUT = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $penerimaanBarang['divisi_id'], $p['barang1_id'], $p['barang2_id'], $p['type_barang'], $penerimaanBarang['no_penerimaan_barang'], 'OUT');
+
+            //     if ($statusOUT) {
+            //         $responseBody = json_decode($statusOUT->getBody(), true);
+            //         $data = [
+            //             "status"    => false,
+            //             "id"    => $this->request->getVar('id'),
+            //             "message"   => $responseBody['message'],
+            //             'token'     => csrf_hash()
+            //         ];
+            //         echo json_encode($data);
+            //         return;
+            //     }
+            // }
             // UNPOST KHUSUS NON PABEAN
             if ($penerimaanBarang['bc_type'] == 0) {
                 $this->stockModel->unPostingStockLPB(
