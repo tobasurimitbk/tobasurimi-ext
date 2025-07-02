@@ -112,7 +112,7 @@
 <body>
     <table class="w-100">
         <tr>
-            <td style="width: 60%;padding-right: 100px">
+            <td style="width: 70%;padding-right: 100px">
                 <div class="company-name">
                     Toba Fish <br>
                     <?= $companyName ?>
@@ -243,7 +243,7 @@
                         <td valign="top" style="width: 65%;">
                             <div class="description-container">
                                 <label class="description-label">Description: </label>
-                                <ol class="payment-list" style="margin-left: -5 px;">
+                                <ol class="payment-list" style="margin-left: -23px; font-size:10px;">
                                     <?= $companyAccount ?>
                                 </ol>
                                 <?= $invData->keterangan ?>

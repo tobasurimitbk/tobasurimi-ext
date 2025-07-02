@@ -91,14 +91,14 @@
 <body>
     <table class="w-100">
         <tr>
-            <td style="width: 60%;padding-right: 100px">
+            <td style="width: 70%;padding-right: 100px">
                 <div class="company-name"><?= $companyName ?></div>
                 <div>
                     <table class="w-100">
                         <tr>
                             <td style="width: 1px;vertical-align: top">Customer: </td>
                             <td style="border: 1px solid;border-radius: 7px;padding: 5px">
-                                <div><?= @$soData[0]->phone ?> - <?= $soData[0]->customerName ?></div>
+                                <div><?= $soData[0]->customerName ?> - <?= @$soData[0]->phone ?></div>
                                 <div><?= $soData[0]->customerAddress ?></div>
                             </td>
                         </tr>
