@@ -54,6 +54,7 @@ class JurnalUmum extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $this_company;
     protected $this_user_id;
     protected $Sub_AkunsModel;
     protected $jurnalUmumModel;
@@ -101,6 +102,7 @@ class JurnalUmum extends BaseController
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_company = session()->get("login")->this_company;
         $this->this_user_id = session()->get("login")->user_id;
         $this->Sub_AkunsModel = new Sub_AkunsModel();
         $this->jurnalUmumModel = new JurnalUmumModel();
@@ -257,6 +259,56 @@ class JurnalUmum extends BaseController
                 "nilai_idr"             => $data->total_debit,
                 "tutup_buku"            => 0,
                 "divisi_name"           => $data->divisi_name ?? 'ALL',
+            ];
+        }
+
+        return $dataResult;
+    }
+
+    private function getDataExport($dataJurnal, $payload)
+    {
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $dataResult = [];
+
+        foreach ($dataJurnal as $data) {
+            // Cek Tutup Buku per transaksi
+            // $tutupBuku = $this->tutupBukuModel
+            //     ->where('company_id', $this->this_company_id)
+            //     ->where('bulan', date('Y-m', strtotime($data->tanggal_transaksi)))
+            //     ->first();
+
+            // Penentuan tipe pembelian
+            $noLpb = $data->no_penerimaan_barang;
+            $tipePembelian = "";
+            if ($data->id_local_bb != null) {
+                $tipePembelian = "LOKAL BB";
+            } elseif ($data->id_import_bb != null) {
+                $tipePembelian = "IMPORT BB";
+            } elseif ($data->id_po_bp != null) {
+                $tipePembelian = ($data->po_type === "Lokal") ? "LOKAL BP" : "IMPORT BP";
+            }
+
+            $dataResult[] = [
+                "no"                    => $no++,
+                "id"                    => encrypt($data->id),
+                "transaksi_type_name"   => trim($data->transaksi_type_name . " " . $tipePembelian),
+                "no_transaksi"          => $data->metode_input === 'system' ? $data->no_transaksi : $data->no_bukti,
+                "tanggal_transaksi"     => date('d/m/Y', strtotime($data->tanggal_jurnal)),
+                "uraian_transaksi"      => $data->uraian_transaksi,
+                "keterangan_jurnal"      => $data->keterangan_jurnal,
+                "supplier"              => "0 : " . $data->supplier_name, // tidak tersedia setelah relasi dihapus
+                "no_lpb"                => $noLpb, // tidak tersedia setelah relasi dihapus
+                "metode_input"          => strtoupper($data->metode_input),
+                "valas"                 => $data->valas,
+                "exchange_rate"         => $data->exchange_rate == 1 ? 1 : $data->exchange_rate,
+                "nilai"                 => $data->exchange_rate == 1 ? 1 : $data->exchange_rate,
+                "nilai_idr"             => $data->total_debit,
+                "tutup_buku"            => 0,
+                "divisi_name"           => $data->divisi_name ?? 'ALL',
+                "debit"                 => $data->debit,
+                "kredit"                => $data->kredit,
+                "kode_coa"              => $data->kode_coa,
+                "nama_coa"              => $data->nama_coa,
             ];
         }
 
@@ -644,35 +696,36 @@ class JurnalUmum extends BaseController
 
         $payload = [
             "pageSize"      => $this->request->getVar("length"),
-            "sort" => $this->request->getVar("sort"),
-            "sorttype" => $this->request->getVar("sortType"),
+            "sort"          => $this->request->getVar("sort"),
+            "sorttype"      => $this->request->getVar("sortType"),
             "currentPage"   => 1,
-
         ];
 
+        $startDate = $this->request->getVar("start_date") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("start_date")))) : "";
+        $endDate = $this->request->getVar("end_date") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("end_date")))) : "";
+
         $addCondition = [
-            "sort"   => $this->request->getVar("sort"),
-            "sortType"  => $this->request->getVar("sortType"),
-            "start_date" =>  $this->request->getVar("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("start_date")))) : "",
-            "end_date" =>  $this->request->getVar("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("end_date")))) : "",
+            "sort"          => $this->request->getVar("sort"),
+            "sortType"      => $this->request->getVar("sortType"),
+            "start_date"    => $startDate,
+            "end_date"      => $endDate,
             "type_transaksi" => $this->request->getVar('type_transaksi'),
-            "search" => $this->request->getVar("search"),
+            "search"        => $this->request->getVar("search"),
         ];
 
         $condition = [
-            'jurnal_umum.company_id' => $this->this_company_id,
-            'transaksi_jurnal.deleted_at' => null,
+            'jurnal_umum.company_id'        => $this->this_company_id,
+            'transaksi_jurnal.deleted_at'   => null,
         ];
 
-        $dataQry = $this->transaksiJurnalModel->getList($condition, $addCondition, 0, 0);
-        $dataJurnal = $this->getData($dataQry['data'], $payload);
+        $dataQry = $this->jurnalUmumModel->getListExport($condition, $addCondition, 0, 0);
+        $dataJurnal = $this->getDataExport($dataQry['data'], $payload);
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
+
         $headerStyleArray = [
-            'font' => [
-                'bold' => true,
-            ],
+            'font' => ['bold' => true],
             'alignment' => [
                 'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
                 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
@@ -685,42 +738,72 @@ class JurnalUmum extends BaseController
                 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
             ],
         ];
-        $column = 2;
 
-        $spreadsheet->setActiveSheetIndex(0)
-            ->setCellValue('B1', 'Transaksi')
-            ->setCellValue('C1', 'Nomor')
-            ->setCellValue('D1', 'Tanggal')
-            ->setCellValue('E1', 'Departemen')
-            ->setCellValue('F1', 'No LPB')
-            ->setCellValue('G1', 'Invoice')
-            ->setCellValue('H1', 'Keterangan')
-            ->setCellValue('I1', 'Nilai')
-            ->setCellValue('J1', 'Valas')
-            ->setCellValue('K1', 'Nilai (IDR)');
+        // Nama PT di baris pertama
+        $sheet->mergeCells('A1:O1')->setCellValue('A1', 'PT. Toba Surimi Industries');
+        $sheet->getStyle('A1')->applyFromArray($headerStyleArray);
 
+        // Tanggal di baris kedua
+        $periode = ($startDate && $endDate) ? "Periode: $startDate s.d $endDate" : "Tanggal: -";
+        $sheet->mergeCells('A2:O2')->setCellValue('A2', $periode);
+        $sheet->getStyle('A2')->applyFromArray($headerStyleArray);
 
-        $sheet->getStyle('A1:J1')->applyFromArray($headerStyleArray);
+        // Judul laporan di baris ketiga
+        $sheet->mergeCells('A3:O3')->setCellValue('A3', 'Laporan Jurnal Umum');
+        $sheet->getStyle('A3')->applyFromArray($headerStyleArray);
 
-        foreach ($dataJurnal as $row) {
-            $sheet->setCellValue('A' . $column, $row['no'])
-                ->setCellValue('B' . $column, $row['transaksi_type_name'])
-                ->setCellValue('C' . $column, $row['no_transaksi'])
-                ->setCellValue('D' . $column, $row['tanggal_transaksi'])
-                ->setCellValue('E' . $column, $row['divisi_name'])
-                ->setCellValue('F' . $column, $row['no_lpb'])
+        // Header kolom mulai dari baris ke-4
+        $sheet->setCellValue('A4', 'No')
+            ->setCellValue('B4', 'Date')
+            ->setCellValue('C4', 'Department')
+            ->setCellValue('D4', 'Transaction Num')
+            ->setCellValue('E4', 'LPB Num')
+            ->setCellValue('F4', 'Information')
+            ->setCellValue('G4', 'Invoice')
+            ->setCellValue('H4', 'Estimate Num')
+            ->setCellValue('I4', 'Estimate Name')
+            ->setCellValue('J4', 'Desc')
+            ->setCellValue('K4', 'Reference')
+            ->setCellValue('L4', 'Currency')
+            ->setCellValue('M4', 'Exchange Rate')
+            ->setCellValue('N4', 'Debit')
+            ->setCellValue('O4', 'Credit');
+
+        $sheet->getStyle('A4:O4')->applyFromArray($headerStyleArray);
+
+        $column = 5;
+
+        foreach ($dataJurnal as $index => $row) {
+            $sheet->setCellValue('A' . $column, $index + 1)
+                ->setCellValue('B' . $column, $row['tanggal_transaksi'])
+                ->setCellValue('C' . $column, $row['divisi_name'])
+                ->setCellValue('D' . $column, $row['no_transaksi'])
+                ->setCellValue('E' . $column, $row['no_lpb'])
+                ->setCellValue('F' . $column, $row['transaksi_type_name'])
                 ->setCellValue('G' . $column, $row['supplier'])
-                ->setCellValue('H' . $column, $row['keterangan_jurnal'])
-                ->setCellValue('I' . $column, $row['nilai'])
-                ->setCellValue('J' . $column, $row['valas'])
-                ->setCellValue('K' . $column, $row['nilai_idr']);
+                ->setCellValue('H' . $column, $row['kode_coa'])
+                ->setCellValue('I' . $column, $row['nama_coa'])
+                ->setCellValue('J' . $column, $row['keterangan_jurnal'])
+                ->setCellValue('K' . $column, $row['uraian_transaksi'])
+                ->setCellValue('L' . $column, number_format($row['nilai_idr'], 2, ',', '.') . " " . $row['valas'])
+                ->setCellValue('M' . $column, $row['exchange_rate'])
+                ->setCellValue('N' . $column, $row['debit'])
+                ->setCellValue('O' . $column, $row['kredit']);
 
-            $sheet->getStyle('A' . $column . ':J' . $column)->applyFromArray($dataStyleArray);
+            $sheet->getStyle('N' . $column)
+                ->getNumberFormat()
+                ->setFormatCode('#,##0.00');
+
+            $sheet->getStyle('O' . $column)
+                ->getNumberFormat()
+                ->setFormatCode('#,##0.00');
+
+            $sheet->getStyle('A' . $column . ':O' . $column)->applyFromArray($dataStyleArray);
             $column++;
         }
 
-        $writer = new Xlsx($spreadsheet);
-        foreach (range('A', 'I') as $columnID) {
+        // Auto size kolom
+        foreach (range('A', 'O') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
 
@@ -728,11 +811,11 @@ class JurnalUmum extends BaseController
         $filename = 'Laporan_Transaksi_Jurnal';
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header("Content-Disposition: attachment;filename=\"$filename.xlsx\"");
         header('Cache-Control: max-age=0');
 
         $writer->save('php://output');
-        die;
+        exit;
     }
 
     public function exportPdf()
@@ -759,7 +842,7 @@ class JurnalUmum extends BaseController
             'transaksi_jurnal.deleted_at' => null,
         ];
 
-        $dataQry = $this->transaksiJurnalModel->getList($condition, $addCondition, 10000000, 0);
+        $dataQry = $this->transaksiJurnalModel->getListExport($condition, $addCondition, 10000000, 0);
         $dataJurnal = $this->getData($dataQry['data'], $payload);
 
         $data = [
