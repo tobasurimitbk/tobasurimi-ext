@@ -82,7 +82,7 @@
                                         if (!empty($dataSubAkuns)) {
                                             foreach ($dataSubAkuns as $subs) {
                                         ?>
-                                                <option value="<?= $subs->id; ?>"><?= $subs->nama_sub; ?></option>
+                                                <option value="<?= $subs->id; ?>"><?= $subs->nama_sub; ?> - <?= $subs->no_sub; ?></option>
                                         <?php
                                             }
                                         }
