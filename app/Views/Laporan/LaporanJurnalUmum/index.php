@@ -24,7 +24,7 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="input-group" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal" value="<?= $dateStart; ?>" readonly style="height: 50px;">
+                                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal" value="<?= $dateStart; ?>" disabled style="height: 50px;">
                                     <div class="input-group-prepend group-prepend-password align-items-center">
                                         <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                                     </div>
@@ -258,6 +258,11 @@
 
         $("#dateEnd").change(function(e) {
             $('#formSubmit').submit();
+        });
+
+
+        $("#formSubmit").on("submit", function() {
+            $("#dateStart").prop("disabled", false);
         });
     });
 
