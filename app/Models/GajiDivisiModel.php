@@ -93,7 +93,7 @@ class GajiDivisiModel extends Model
 
             $res[] = [
                 'id' => $d['id'],
-                'nominal' => $gajiConjunction == null ? '0' : $gajiConjunction['nominal'],
+                'nominal' => $gajiConjunction == null ? '0' : str_replace('.', ',', $gajiConjunction['nominal']),
                 'name' => $d['name'],
                 'tipe' => $d['tipe']
             ];
