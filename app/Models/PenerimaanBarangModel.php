@@ -753,6 +753,8 @@ class PenerimaanBarangModel extends Model
         }
 
         $this->autoClosePO($lpbID);
+
+        return $lpbID;
     }
 
     public function autoClosePO($penerimaanBarangID)
