@@ -234,7 +234,6 @@ class JurnalUmum extends BaseController
             $tipePembelian = "";
             if ($data->id_local_bb != null) {
                 $tipePembelian = "LOKAL BB";
-                $noLpb = "";
             } elseif ($data->id_import_bb != null) {
                 $tipePembelian = "IMPORT BB";
             } elseif ($data->id_po_bp != null) {
