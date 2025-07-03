@@ -888,11 +888,11 @@
                             <td><input type="text" class="form-control form-control-sm" name="jlhkg" style="min-width: 100px;" value="${payment.jlhkg || ''}"></td>
                             <td><input type="text" class="form-control form-control-sm" name="jlh_org" style="min-width: 100px;" value="${payment.jlh_org || ''}"></td>
                             <td><input type="text" class="form-control form-control-sm" name="ttl_jam" style="min-width: 100px;" value="${payment.ttl_jam || ''}"></td>
-                            <td><input type="text" class="form-control form-control-sm" name="rp" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" style="min-width: 100px;" value="${payment.rp || ''}"></td>
-                            <td><input type="text" class="form-control form-control-sm" name="total_rp_org" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" style="min-width: 100px;" value="${payment.total_rp_org || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="rp" onkeyup="this.value = greatFormatRupiah(this.value) + ',00'" style="min-width: 100px;" value="${payment.rp || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="total_rp_org" onkeyup="this.value = greatFormatRupiah(this.value) + ',00'" style="min-width: 100px;" value="${payment.total_rp_org || ''}"></td>
                             
                             <!-- Subsidies -->
-                            <td><input type="text" class="form-control form-control-sm" name="subsidi" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" style="min-width: 100px;" value="${payment.subsidi || ''}"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="subsidi" onkeyup="this.value = greatFormatRupiah(this.value) + ',00'" style="min-width: 100px;" value="${payment.subsidi || ''}"></td>
                             
                             <!-- Target -->
                             <td><input type="text" class="form-control form-control-sm" name="kilo400" style="min-width: 100px;" value="${payment.kilo400 || ''}"></td>
@@ -1621,13 +1621,13 @@
                             </td>
 
                             <!-- TOTAL & KALKULASI -->
-                            <td><input type="text" name="total_kg" class="form-control form-control-sm total-kg" style="min-width: 100px;" value="${payment.total_kg || ''}"></td>
-                            <td><input type="text" name="total_jam" class="form-control form-control-sm total-jam" style="min-width: 100px;" value="${payment.total_jam || ''}"></td>
+                            <td><input type="text" name="total_kg" class="form-control form-control-sm total-kg" style="min-width: 100px;" value="${greatFormatRupiah(payment.total_kg) + ',00' || ''}"></td>
+                            <td><input type="text" name="total_jam" class="form-control form-control-sm total-jam" style="min-width: 100px;" value="${greatFormatRupiah(payment.total_jam) + ',00' || ''}"></td>
                             <td><input type="text" name="total_borongan_jam" class="form-control form-control-sm total-borongan-jam" style="min-width: 100px;" value="${payment.total_borongan_jam || ''}"></td>
                             <td><input type="text" name="jumlah_org" class="form-control form-control-sm jlh-org" style="min-width: 100px;" value="${payment.jumlah_org || ''}"></td>
-                            <td><input type="text" name="rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" class="form-control form-control-sm rupiah" style="min-width: 120px;" value="${payment.rupiah || ''}"></td>
-                            <td><input type="text" name="rupiah_org" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" class="form-control form-control-sm rupiah_org" style="min-width: 120px;" value="${payment.rupiah_org || ''}"></td>
-                            <td><input type="text" name="subsidi_rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" class="form-control form-control-sm subsidi-rupiah" style="min-width: 120px;" value="${payment.subsidi_rupiah || ''}"></td>
+                            <td><input type="text" name="rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + ',00'" class="form-control form-control-sm rupiah" style="min-width: 120px;" value="${greatFormatRupiah(payment.rupiah) + ',00' || ''}"></td>
+                            <td><input type="text" name="rupiah_org" onkeyup="this.value = greatFormatRupiah(this.value) + ',00'" class="form-control form-control-sm rupiah_org" style="min-width: 120px;" value="${greatFormatRupiah(payment.rupiah_org) + ',00' || ''}"></td>
+                            <td><input type="text" name="subsidi_rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + ',00'" class="form-control form-control-sm subsidi-rupiah" style="min-width: 120px;" value="${greatFormatRupiah(payment.subsidi_rupiah) + '00' || ''}"></td>
                             <td><input type="text" name="borongan_per_jam" class="form-control form-control-sm borongan-per-jam" style="min-width: 120px;" value="${payment.borongan_per_jam || ''}"></td>
 
                             <!-- KG / JAM -->
@@ -1852,11 +1852,11 @@
                     <td><input type="text" class="form-control form-control-sm" name="jlhkg" style="min-width: 100px;"></td>
                     <td><input type="text" class="form-control form-control-sm" name="jlh_org" style="min-width: 100px;"></td>
                     <td><input type="text" class="form-control form-control-sm" name="ttl_jam" style="min-width: 100px;"></td>
-                    <td><input type="text" class="form-control form-control-sm" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" name="rp" style="min-width: 100px;"></td>
-                    <td><input type="text" class="form-control form-control-sm" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" name="total_rp_org" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" onkeyup="this.value = greatFormatRupiah(this.value) + ',00'" name="rp" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" onkeyup="this.value = greatFormatRupiah(this.value) + ',00'" name="total_rp_org" style="min-width: 100px;"></td>
                     
                     <!-- Subsidies -->
-                    <td><input type="text" class="form-control form-control-sm" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'" name="subsidi" style="min-width: 100px;"></td>
+                    <td><input type="text" class="form-control form-control-sm" onkeyup="this.value = greatFormatRupiah(this.value) + ',00'" name="subsidi" style="min-width: 100px;"></td>
                             
                     <!-- Target -->
                     <td><input type="text" class="form-control form-control-sm" name="kilo400" style="min-width: 100px;"></td>
@@ -2549,9 +2549,9 @@
                     <td><input type="text" name="total_jam" class="form-control form-control-sm total-jam" style="min-width: 100px;"></td>
                     <td><input type="text" name="total_borongan_jam"  class="form-control form-control-sm total-borongan-jam" style="min-width: 100px;"></td>
                     <td><input type="text" name="jumlah_org" class="form-control form-control-sm jlh-org" value="1" style="min-width: 100px;"></td>
-                    <td><input type="text" name="rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'"  class="form-control form-control-sm rupiah" style="min-width: 120px;"></td>
-                    <td><input type="text" name="rupiah_org" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'"  class="form-control form-control-sm rupiah_org" style="min-width: 120px;"></td>
-                    <td><input type="text" name="subsidi_rupiah" class="form-control form-control-sm subsidi-rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + '.00'"  style="min-width: 120px;"></td>
+                    <td><input type="text" name="rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + ',00'"  class="form-control form-control-sm rupiah" style="min-width: 120px;"></td>
+                    <td><input type="text" name="rupiah_org" onkeyup="this.value = greatFormatRupiah(this.value) + ',00'"  class="form-control form-control-sm rupiah_org" style="min-width: 120px;"></td>
+                    <td><input type="text" name="subsidi_rupiah" class="form-control form-control-sm subsidi-rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + ',00'"  style="min-width: 120px;"></td>
                     <td><input type="text" name="borongan_per_jam" class="form-control form-control-sm borongan-per-jam" style="min-width: 120px;"></td>
 
                     <!-- KG / JAM -->
@@ -3114,7 +3114,7 @@
                     
                     // Update input field jlhkg & rp
                     $row.find(`input[name="jlhkg"]`).val(jlhkg.toFixed(2));
-                    $row.find(`input[name="rp"]`).val(greatFormatRupiah(rp) + ".00");
+                    $row.find(`input[name="rp"]`).val(greatFormatRupiah(rp) + ",00");
                     
 
             }
@@ -3134,7 +3134,7 @@
                     const rp = employeeItemDetails[mainKey]?.rp || 0;
                     const total_rp_org = rp / val;
 
-                    $row.find(`input[name="total_rp_org"]`).val(greatFormatRupiah(total_rp_org) + ".00");
+                    $row.find(`input[name="total_rp_org"]`).val(greatFormatRupiah(total_rp_org) + ",00");
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -3216,7 +3216,7 @@
             employeeItemDetails[mainKey] = { total_kg, rupiah };
 
             $row.find(`input[name="total_kg"]`).val(total_kg.toFixed(2));
-            $row.find(`input[name="rupiah"]`).val(greatFormatRupiah(rupiah) + ".00");
+            $row.find(`input[name="rupiah"]`).val(greatFormatRupiah(rupiah) + ",00");
         }
 
         function handleWorkingHoursInput(input) {
@@ -3461,8 +3461,8 @@
                         subsidyInput.val(40000); // Apply subsidy
                         const currentRupiah = parseFloat(rupiahInput.val().replace(/[^\d]/g, '')) || 0;
                         const newRupiah = currentRupiah - 40000;
-                        // Format back to Rupiah (e.g., "50,000.00")
-                        rupiahInput.val(formatRupiah(newRupiah.toString()) + '.00');
+                        // Format back to Rupiah (e.g., "50,000,00")
+                        rupiahInput.val(formatRupiah(newRupiah.toString()) + ',00');
                     } else {
                         subsidyInput.val(0); // No subsidy
                     }
@@ -3493,7 +3493,7 @@
                 if (!isNaN(val) && val > 0) {
                     const mainKey = `${employeeId}_main`;
                     const total = val * 10500;
-                    $row.find(`input[name="borongan_per_jam"]`).val(greatFormatRupiah(total) + ".00");
+                    $row.find(`input[name="borongan_per_jam"]`).val(greatFormatRupiah(total) + ",00");
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -3664,7 +3664,7 @@
             $('#totalBeratModal').text(totalBerat.toFixed(2));
             $('#totalHargaModal').text(totalHarga.toLocaleString());
         } else {
-            $('#totalBeratModal').text('0.00');
+            $('#totalBeratModal').text('0,00');
             $('#totalHargaModal').text('0');
         }
 
