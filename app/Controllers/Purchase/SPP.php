@@ -152,11 +152,11 @@ class SPP extends BaseController
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
-        if ($addCondition['is_posted'] == "BELUM POSTING") {
-            // Jika Belum Posting Matikan Filter Start Date End Date
-            $addCondition['dateStart'] = "";
-            $addCondition['dateEnd'] = "";
-        }
+        // if ($addCondition['is_posted'] == "BELUM POSTING") {
+        //     // Jika Belum Posting Matikan Filter Start Date End Date
+        //     $addCondition['dateStart'] = "";
+        //     $addCondition['dateEnd'] = "";
+        // }
 
         $limit = $this->request->getVar("length");
         $offset = $this->request->getVar("start");
@@ -397,11 +397,26 @@ class SPP extends BaseController
     {
         $filename = "Data SPP";
 
-        $condition = [];
+        if ($this->is_admin == '1') {
+            $condition = [
+                "purchase_request_details.deletedAt" => null,
+                "purchase_requests.deletedAt" => null,
+                "purchase_requests.company_id" => $this->this_company_id,
+            ];
+        } elseif ($this->is_admin == '0') {
+            $condition = [
+                "purchase_request_details.deletedAt" => null,
+                "purchase_requests.deletedAt" => null,
+                "purchase_requests.company_id" => $this->this_company_id,
+                "purchase_requests.user_id" => $this->this_user_id
+            ];
+        }
 
         $addCondition = [
+            "divisi_id"     => $this->request->getVar('divisi_id'),
+            "is_posted"     => $this->request->getVar('is_posted'),
             "search"        => $this->request->getVar("search"),
-            "spp_type"      => $this->request->getVar("spp_type"),
+            "spp_type"      => "",
             "sort"          => $this->request->getVar("sort"),
             "sortType"      => $this->request->getVar("sortType"),
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
