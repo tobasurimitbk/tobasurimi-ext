@@ -284,9 +284,16 @@
         });
 
         function formatHHMMtoJamString(value) {
-            if (!value) return '';
+            if (!value && value !== 0) return ''; // handle null/undefined, tapi tetap allow 0
 
-            value = value.toString().padStart(4, '0'); // pastikan minimal 4 digit
+            value = value.toString();
+            
+            // Handle case ketika inputnya adalah jam tanpa menit (e.g., 10, 9, etc.)
+            if (value.length <= 2) {
+                value = value.padStart(2, '0') + '00'; // e.g., 10 -> 1000, 9 -> 0900
+            } else {
+                value = value.padStart(4, '0'); // pastikan minimal 4 digit (e.g., 945 -> 0945)
+            }
 
             const jam = value.substring(0, 2);
             const menit = value.substring(2, 4);
