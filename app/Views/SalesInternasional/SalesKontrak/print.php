@@ -105,7 +105,11 @@
             </div>
             <div class="txt-right po-customer">
                 <label class="label-header">PO NO: <?= $salesKontrak['customer_po_no']; ?></label>
+                <br>
+                <label class="label-header">CONTAINER: <?= $salesKontrak['no_container']; ?></label>
+
             </div>
+
         </div>
         <div class="d-flex flex-column">
             <div class="txt-left">
@@ -147,6 +151,9 @@
                     <label class="label-header">PACKING</label>
                 </th>
                 <th>
+                    <label class="label-header">SIZE</label>
+                </th>
+                <th>
                     <label class="label-header">QTY</label>
                 </th>
                 <th>
@@ -169,7 +176,7 @@
                 <?php if ($detail['remark'] != null): ?>
                     <tr>
                         <td><label class="label-child"> <small><?= $detail["remark"]; ?></small></label></td>
-                        <td colspan="5"></td>
+                        <td colspan="6"></td>
                     </tr>
                 <?php endif; ?>
                 <tr>
@@ -177,35 +184,38 @@
                         <?= $no++ ?>
                     </td>
                     <td>
-                        <label class="label-header"> <?= $detail["nama_barang"]; ?> <br> SPECIFICATION : <?= $detail['spesifikasi'] ?></label>
+                        <label class="label-header"> <?= $detail["nama_barang"]; ?> <br> SPECIFICATION : <?= $salesKontrak['spesifikasi'] ?></label>
                     </td>
                     <td><label class="label-header"> <?= $detail["kemasan"]; ?></td>
-                    <td><label class="label-header"><?= formatter($detail["qty"], "STR_TO_INT") . " " . $detail['satuan_order_name'] ?></label></td>
-                    <td><label class="label-header"><?= number_format(formatter($detail["harga"], "STR_TO_INT")); ?></label></td>
-                    <td><label class="label-header"><?= number_format(formatter($detail["total_harga"], "STR_TO_INT")); ?></label></td>
+                    <td><label class="label-header"> <?= $detail["size"]; ?></td>
+                    <td><label class="label-header"><?= number_format($detail["qty"], 2) . " " . $detail['satuan_order_name'] ?></label></td>
+                    <td><label class="label-header"><?= number_format($detail["harga"], 2); ?></label></td>
+                    <td><label class="label-header"><?= number_format($detail["total_harga"], 2); ?></label></td>
                 </tr>
 
             <?php } ?>
-            <tr>
+            <!-- <tr>
                 <td><label class="label-header">DISCOUNT</label></td>
                 <td><label class="label-header"></label></td>
                 <td></td>
                 <td></td>
                 <td></td>
+                <td></td>
                 <td><label class="label-header"><?= number_format($salesKontrak['potongan_harga'], 2); ?></label></td>
-            </tr>
+            </tr> -->
             <tr>
                 <td><label class="label-header">TOTAL</label></td>
                 <td></td>
                 <td></td>
-                <td><label class="label-header"><?= number_format($total_qty); ?></label></td>
                 <td></td>
-                <td><label class="label-header"><?= number_format($total_amount - $salesKontrak['potongan_harga']); ?></label></td>
+                <td><label class="label-header"><?= number_format($total_qty, 2); ?></label></td>
+                <td></td>
+                <td><label class="label-header"><?= number_format($total_amount - $salesKontrak['potongan_harga'], 2); ?></label></td>
             </tr>
         </tbody>
     </table>
     <div class="header">
-        <div class="mt-1 txt-left"><label class="label-header">TOTAL AMOUNT: <?= $salesKontrak['total_amount'] ? number_format($salesKontrak['total_amount']) : 0; ?></label></div>
+        <div class="mt-1 txt-left"><label class="label-header">TOTAL AMOUNT: <?= $salesKontrak['total_amount'] ? number_format($salesKontrak['total_amount'], 2) : 0; ?></label></div>
         <div class="mt-1 txt-left"><label class="label-header">TOLERANCE: <?= $salesKontrak['tolerance']; ?></label></div>
         <!-- <div class="mt-1 txt-left"><label class="label-header">DUE DATE: <?= date('d M Y', strtotime($salesKontrak['due_date'])); ?></label></div> -->
         <div class="mt-1 txt-left"><label class="label-header">ESTIMATED SHIPMENT DATE: </label></div>
