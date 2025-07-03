@@ -283,6 +283,16 @@
             allowClear: true
         });
 
+        function formatHHMMtoJamString(value) {
+            if (!value) return '';
+            
+            value = value.toString().padStart(4, '0'); // Biar aman, misal 930 jadi 0930
+            const jam = value.slice(0, -2);  // ambil dari depan, kecuali 2 terakhir
+            const menit = value.slice(-2);   // ambil 2 karakter terakhir
+
+            return `${jam}.${menit}`;
+        }
+
         try {
             // 1. Get payment data from PHP - ensure proper JSON encoding
             var paymentDataString = '<?= isset($data['payment_data']) ? addslashes(json_encode($data['payment_data'])) : '[]' ?>';
@@ -1622,7 +1632,7 @@
 
                             <!-- TOTAL & KALKULASI -->
                             <td><input type="text" name="total_kg" class="form-control form-control-sm total-kg" style="min-width: 100px;" value="${greatFormatRupiah(payment.total_kg) + ',00' || ''}"></td>
-                            <td><input type="text" name="total_jam" class="form-control form-control-sm total-jam" style="min-width: 100px;" value="${greatFormatRupiah(payment.total_jam) + ',00' || ''}"></td>
+                            <td><input type="text" name="total_jam" class="form-control form-control-sm total-jam" style="min-width: 100px;" value="${formatHHMMtoJamString(payment.total_jam) || ''}"></td>
                             <td><input type="text" name="total_borongan_jam" class="form-control form-control-sm total-borongan-jam" style="min-width: 100px;" value="${payment.total_borongan_jam || ''}"></td>
                             <td><input type="text" name="jumlah_org" class="form-control form-control-sm jlh-org" style="min-width: 100px;" value="${payment.jumlah_org || ''}"></td>
                             <td><input type="text" name="rupiah" onkeyup="this.value = greatFormatRupiah(this.value) + ',00'" class="form-control form-control-sm rupiah" style="min-width: 120px;" value="${greatFormatRupiah(payment.rupiah) + ',00' || ''}"></td>
