@@ -2607,9 +2607,9 @@
                     // Format data untuk departemen 5 (Canning)
                     const employee = {
                         employee_id: employeeId,
-                        employee_name: $row.find('td:eq(3) input').val(),
-                        badge: $row.find('td:eq(2) input').val(),
-                        tanggal_masuk_kerja: $row.find('td:eq(1) input').val(),
+                        employee_name: $row.find('td:eq(4) input').val(),
+                        badge: $row.find('td:eq(3) input').val(),
+                        tanggal_masuk_kerja: $row.find('td:eq(2) input').val(),
 
                         // Job data columns (26)
                         sjb: destroyFormatRupiah($row.find('[name="sjb"]').val()) || 0,
@@ -2693,9 +2693,9 @@
                     // Format data untuk departemen lain (menggunakan struktur yang disimpan sebelumnya)
                     const employee = {
                         employee_id: employeeId,
-                        employee_name: $row.find('td:eq(3) input').val(),
-                        badge: $row.find('td:eq(2) input').val(),
-                        tanggal_masuk_kerja: $row.find('td:eq(1) input').val(),
+                        employee_name: $row.find('td:eq(4) input').val(),
+                        badge: $row.find('td:eq(3) input').val(),
+                        tanggal_masuk_kerja: $row.find('td:eq(2) input').val(),
 
                         // Data pekerjaan untuk departemen lain
                         SUAC: destroyFormatRupiah($row.find('[name="SUAC"]').val()) || 0,
