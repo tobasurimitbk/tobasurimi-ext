@@ -1269,75 +1269,80 @@ class JurnalUmum extends BaseController
                             $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
                             // start input jurnal dari banyak detail barang
 
-                            try {
-                                $barangAP = "";
-                                $barangAR = "";
-                                $barangAPFound = "";
+                            foreach ($dataPOBBDetail as $dataBBDetail) {
+                                $totalPOqty = (($dataBBDetail->general_price * $dataBBDetail->qty) + ($dataBBDetail->daily_price * $dataBBDetail->qty) + ($dataBBDetail->monthly_price * $dataBBDetail->qty));
+                                $totalPO += $totalPOqty;
+                                $barangAPFound = false;
                                 foreach ($dataAccountBarang as $value) {
-                                    if ($dataPOBBDetail[0]->barang1_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataPOBBDetail[0]->barang2_id == $value->barang_master_spesifikasi_id && $dataPOBBDetail[0]->note == $value->keterangan && $dataBB->divisi_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
+                                    if ($dataBBDetail->barang1_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataBBDetail->barang2_id == $value->barang_master_spesifikasi_id && $dataBBDetail->note == $value->keterangan && $dataBB->divisi_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
                                         $barangAP = $value->ap_id;
                                         $barangAR = $value->ar_id;
                                         $barangAPFound = true;
                                     }
-                                    if ($dataPOBBDetail[0]->barang1_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataBB->divisi_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
+                                    if ($dataBBDetail->barang1_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataBB->divisi_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
                                         $barangAP = $value->ap_id;
                                         $barangAR = $value->ar_id;
                                         $barangAPFound = true;
                                     }
                                 }
-                                
-                                $result[] = array(
-                                    'id_transaksi' => $id_transaksi_jurnal,
-                                    'divisi_id' => $dataBB->divisi_id,
-                                    'company_id' => $this->this_company_id,
-                                    'id_coa' =>  $barangAP,
-                                    'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
-                                    'debit' => $dataBB->total_before_pph,
-                                    'kredit' => 0,
-                                    'valas' => $dataMetadataValutaIDR->id,
-                                    'kurs' => 1,
-                                    'keterangan' => $keteranganJurnal,
-                                    'id_inputer' => session()->get("login")->user_id
-                                );
-
-                                // Untuk insert ke jurnal umum
-                                $result[] = array(
-                                    'id_transaksi' => $id_transaksi_jurnal,
-                                    'divisi_id' => $dataBB->divisi_id,
-                                    'company_id' => $this->this_company_id,
-                                    'id_coa' =>  $UtangAP,
-                                    'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
-                                    'debit' => 0,
-                                    'kredit' => $dataBB->total_before_pph,
-                                    'valas' => $dataMetadataValutaIDR->id,
-                                    'kurs' => 1,
-                                    'keterangan' => $keteranganJurnal,
-                                    'id_inputer' => session()->get("login")->user_id
-                                );
-                            } catch (Exception $e) {
-                                // Log the error or handle it appropriately
-                                log_message('error', 'Error in journal entry processing: ' . $e->getMessage());
-                                // You might want to return an error response or re-throw the exception
-                                throw new Exception('Failed to process journal entries: ' . $e->getMessage());
+                                if (!$barangAPFound) {
+                                    // Collect errors
+                                    $errors[] = "Barang Tidak Memiliki Akun COA";
+                                } else {
+                                    $result[] = array(
+                                        'id_transaksi' => $id_transaksi_jurnal,
+                                        'divisi_id' => $dataBB->divisi_id,
+                                        'company_id' => $this->this_company_id,
+                                        'id_coa' =>  $barangAP,
+                                        'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
+                                        'debit' => $totalPOqty,
+                                        'kredit' => 0,
+                                        'valas' => $dataMetadataValutaIDR->id,
+                                        'kurs' => 1,
+                                        'keterangan' => $keteranganJurnal, // Untuk Jurnal dalam nya makai PEMB ${nama barang} ${total dibeli} ${qty} ${satuan} ${nama supplier}
+                                        'id_inputer' => session()->get("login")->user_id
+                                    );
+                                }
+                                if (!empty($errors)) {
+                                    return response()->setJSON([
+                                        "status" => false,
+                                        "message" => implode(', ', $errors),
+                                        'token' => csrf_hash()
+                                    ]);
+                                }
                             }
-                           
                             // end input jurnal dari banyak detail barang
 
                             // update total debit dan kredit dari total nilai pada jurnal umum
                             $this->transaksiJurnalModel->update(
                                 $id_transaksi_jurnal,
                                 [
-                                    'total_debit' => $dataBB->total_before_pph,
-                                    'total_kredit' => $dataBB->total_before_pph,
+                                    'total_debit' => $totalPO,
+                                    'total_kredit' => $totalPO,
                                 ]
+                            );
+
+                            //untuk insert ke jurnal umum
+                            $result[] = array(
+                                'id_transaksi' => $id_transaksi_jurnal,
+                                'divisi_id' => $dataBB->divisi_id,
+                                'company_id' => $this->this_company_id,
+                                'id_coa' =>  $UtangAP,
+                                'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
+                                'debit' => 0,
+                                'kredit' => $totalPO,
+                                'valas' => $dataMetadataValutaIDR->id,
+                                'kurs' => 1,
+                                'keterangan' => $keteranganJurnal,
+                                'id_inputer' => session()->get("login")->user_id
                             );
 
                             $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
                             $resultTransaksiJurnal[] = array(
                                 'no_transaksi' => $no_transaksi_jurnal,
                                 'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
-                                'total_debit' => $dataBB->total_before_pph,
-                                'total_kredit' => $dataBB->total_before_pph,
+                                'total_debit' => $totalPO,
+                                'total_kredit' => $totalPO,
                                 'metode_input' => 'system',
                                 'tipe_barang' => $type,
                                 'kategori_barang' => $kategori,
