@@ -285,13 +285,15 @@
 
         function formatHHMMtoJamString(value) {
             if (!value) return '';
-            
-            value = value.toString().padStart(4, '0'); // Biar aman, misal 930 jadi 0930
-            const jam = value.slice(0, -2);  // ambil dari depan, kecuali 2 terakhir
-            const menit = value.slice(-2);   // ambil 2 karakter terakhir
 
-            return `${jam}.${menit}`;
+            value = value.toString().padStart(4, '0'); // pastikan minimal 4 digit
+
+            const jam = value.substring(0, 2);
+            const menit = value.substring(2, 4);
+
+            return `${parseInt(jam)}.${menit}`;
         }
+
 
         try {
             // 1. Get payment data from PHP - ensure proper JSON encoding
