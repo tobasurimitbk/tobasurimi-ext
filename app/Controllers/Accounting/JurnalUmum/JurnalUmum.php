@@ -1269,17 +1269,17 @@ class JurnalUmum extends BaseController
                             $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
                             // start input jurnal dari banyak detail barang
 
-                            foreach ($dataPOBBDetail as $dataBBDetail) {
-                                $totalPOqty = (($dataBBDetail->general_price * $dataBBDetail->qty) + ($dataBBDetail->daily_price * $dataBBDetail->qty) + ($dataBBDetail->monthly_price * $dataBBDetail->qty));
-                                $totalPO += $totalPOqty;
-                                $barangAPFound = false;
+                            try {
+                                $barangAP = "";
+                                $barangAR = "";
+                                $barangAPFound = "";
                                 foreach ($dataAccountBarang as $value) {
-                                    if ($dataBBDetail->barang1_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataBBDetail->barang2_id == $value->barang_master_spesifikasi_id && $dataBBDetail->note == $value->keterangan && $dataBB->divisi_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
+                                    if ($dataPOBBDetail[0]->barang1_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataPOBBDetail[0]->barang2_id == $value->barang_master_spesifikasi_id && $dataPOBBDetail[0]->note == $value->keterangan && $dataBB->divisi_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
                                         $barangAP = $value->ap_id;
                                         $barangAR = $value->ar_id;
                                         $barangAPFound = true;
                                     }
-                                    if ($dataBBDetail->barang1_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataBB->divisi_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
+                                    if ($dataPOBBDetail[0]->barang1_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataBB->divisi_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
                                         $barangAP = $value->ap_id;
                                         $barangAR = $value->ar_id;
                                         $barangAPFound = true;
@@ -1336,8 +1336,8 @@ class JurnalUmum extends BaseController
                             $resultTransaksiJurnal[] = array(
                                 'no_transaksi' => $no_transaksi_jurnal,
                                 'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
-                                'total_debit' => $totalPO,
-                                'total_kredit' => $totalPO,
+                                'total_debit' => $dataBB->total_before_pph,
+                                'total_kredit' => $dataBB->total_before_pph,
                                 'metode_input' => 'system',
                                 'tipe_barang' => $type,
                                 'kategori_barang' => $kategori,
