@@ -1285,56 +1285,51 @@ class JurnalUmum extends BaseController
                                         $barangAPFound = true;
                                     }
                                 }
-                                if (!$barangAPFound) {
-                                    // Collect errors
-                                    $errors[] = "Barang Tidak Memiliki Akun COA";
-                                } else {
-                                    $result[] = array(
-                                        'id_transaksi' => $id_transaksi_jurnal,
-                                        'divisi_id' => $dataBB->divisi_id,
-                                        'company_id' => $this->this_company_id,
-                                        'id_coa' =>  $barangAP,
-                                        'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
-                                        'debit' => $totalPOqty,
-                                        'kredit' => 0,
-                                        'valas' => $dataMetadataValutaIDR->id,
-                                        'kurs' => 1,
-                                        'keterangan' => $keteranganJurnal, // Untuk Jurnal dalam nya makai PEMB ${nama barang} ${total dibeli} ${qty} ${satuan} ${nama supplier}
-                                        'id_inputer' => session()->get("login")->user_id
-                                    );
-                                }
-                                if (!empty($errors)) {
-                                    return response()->setJSON([
-                                        "status" => false,
-                                        "message" => implode(', ', $errors),
-                                        'token' => csrf_hash()
-                                    ]);
-                                }
+
+                                $result[] = array(
+                                    'id_transaksi' => $id_transaksi_jurnal,
+                                    'divisi_id' => $dataBB->divisi_id,
+                                    'company_id' => $this->this_company_id,
+                                    'id_coa' =>  $barangAP,
+                                    'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
+                                    'debit' => $dataBB->total_before_pph,
+                                    'kredit' => 0,
+                                    'valas' => $dataMetadataValutaIDR->id,
+                                    'kurs' => 1,
+                                    'keterangan' => $keteranganJurnal,
+                                    'id_inputer' => session()->get("login")->user_id
+                                );
+
+                                // Untuk insert ke jurnal umum
+                                $result[] = array(
+                                    'id_transaksi' => $id_transaksi_jurnal,
+                                    'divisi_id' => $dataBB->divisi_id,
+                                    'company_id' => $this->this_company_id,
+                                    'id_coa' =>  $barangAR ? $barangAR : $UtangAP,
+                                    'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
+                                    'debit' => 0,
+                                    'kredit' => $dataBB->total_before_pph,
+                                    'valas' => $dataMetadataValutaIDR->id,
+                                    'kurs' => 1,
+                                    'keterangan' => $keteranganJurnal,
+                                    'id_inputer' => session()->get("login")->user_id
+                                );
+                            } catch (Exception $e) {
+                                // Log the error or handle it appropriately
+                                log_message('error', 'Error in journal entry processing: ' . $e->getMessage());
+                                // You might want to return an error response or re-throw the exception
+                                throw new Exception('Failed to process journal entries: ' . $e->getMessage());
                             }
+
                             // end input jurnal dari banyak detail barang
 
                             // update total debit dan kredit dari total nilai pada jurnal umum
                             $this->transaksiJurnalModel->update(
                                 $id_transaksi_jurnal,
                                 [
-                                    'total_debit' => $totalPO,
-                                    'total_kredit' => $totalPO,
+                                    'total_debit' => $dataBB->total_before_pph,
+                                    'total_kredit' => $dataBB->total_before_pph,
                                 ]
-                            );
-
-                            //untuk insert ke jurnal umum
-                            $result[] = array(
-                                'id_transaksi' => $id_transaksi_jurnal,
-                                'divisi_id' => $dataBB->divisi_id,
-                                'company_id' => $this->this_company_id,
-                                'id_coa' =>  $UtangAP,
-                                'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
-                                'debit' => 0,
-                                'kredit' => $totalPO,
-                                'valas' => $dataMetadataValutaIDR->id,
-                                'kurs' => 1,
-                                'keterangan' => $keteranganJurnal,
-                                'id_inputer' => session()->get("login")->user_id
                             );
 
                             $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
@@ -1702,21 +1697,134 @@ class JurnalUmum extends BaseController
         }
     }
 
-    public function insertToJurnal($typeBahan, $statusPenerimaan, $poId, $poDetailId)
+    public function insertDataPembelianBB($poID, $type, $kategori, $module, $idTransaksiJurnal, $companyIDs)
     {
-        $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'Pembelian')->first();
-        if ($typeBahan == "BAHAN BAKU") {
-            if ($statusPenerimaan == "LOKAL") {
-                # code...
-            } else {
-                # code...
+        $KasAP = "";
+        $KasAR = "";
+        $UtangAP = "";
+        $UtangAR = "";
+        $barangAP = "";
+        $barangAR = "";
+
+        $db = \Config\Database::connect();
+        try {
+
+            if ($type == "BAHAN BAKU") {
+                if ($kategori == "LOKAL") {
+                    $dataPOBB = $this->rMPurchaseOrderModel->asObject()->where('deletedAt', null)->where('id', $poID)->findAll();
+                    if ($dataPOBB) {
+                        $result = array();
+                        $resultTransaksiJurnal = array();
+                        $resultTransaksiPembelian = array();
+                        foreach ($dataPOBB as $dataBB) {
+                            $totalPO = 0;
+                            $kodeTransaksi = "";
+                            $idTransaksi = "";
+                            $keteranganJurnal = $this->rMPurchaseOrderDetailModel->getSpesifikasiBarangAsString($dataBB->id);
+
+                            // $dataDepartment = $this->divisionModel->getAccountKasForJurnal($dataBB->division_id);
+                            $dataSupplier = $this->supplierModel->getSupplierForJurnal($dataBB->supplier_id);
+                            $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
+                            $dataAccountBarang = $this->accountBarangModel->getAccountBarangForJurnal();
+                            $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
+
+                            $dataPOBBDetail = $this->rMPurchaseOrderDetailModel->asObject()->where('deletedAt', null)->where('rm_purchase_order_id', $dataBB->id)->findAll();
+                            $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'Pembelian')->findAll();
+                            $dataMetadataValutaIDR = $this->MetadataModel->asObject()->where('name', 'Valuta')->where('value', 'IDR')->first();
+
+                            foreach ($dataSupplier as $value) {
+                                foreach ($dataAccountSupplier as $valueAccount) {
+                                    if ($value->id == $valueAccount->supplier_id) {
+                                        $UtangAP = $valueAccount->ap_id;
+                                        $UtangAR = $valueAccount->ar_id;
+                                    }
+                                }
+                                foreach ($dataAccountModule as $valueModule) {
+                                    if ($valueModule->type == $type && $valueModule->kategori == $kategori && $valueModule->module == $module) {
+                                        $UtangAP = $valueModule->ap_id;
+                                        $UtangAR = $valueModule->ar_id;
+                                    }
+                                }
+                            }
+                            // end inisialisasi account
+
+                            // start inisialisasi kode transaksi
+                            foreach ($dataMetadataTipeTransaksi as $val) {
+                                $kodeTransaksi = $val->description;
+                                $idTransaksi = $val->id;
+                            }
+
+                            try {
+                                $barangAP = "";
+                                $barangAR = "";
+                                $barangAPFound = "";
+                                foreach ($dataAccountBarang as $value) {
+                                    if ($dataPOBBDetail[0]->barang1_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataPOBBDetail[0]->barang2_id == $value->barang_master_spesifikasi_id && $dataPOBBDetail[0]->note == $value->keterangan && $dataBB->divisi_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
+                                        $barangAP = $value->ap_id;
+                                        $barangAR = $value->ar_id;
+                                        $barangAPFound = true;
+                                    }
+                                    if ($dataPOBBDetail[0]->barang1_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataBB->divisi_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
+                                        $barangAP = $value->ap_id;
+                                        $barangAR = $value->ar_id;
+                                        $barangAPFound = true;
+                                    }
+                                }
+
+                                $result[] = array(
+                                    'id_transaksi' => $idTransaksiJurnal,
+                                    'divisi_id' => $dataBB->divisi_id,
+                                    'company_id' => $companyIDs,
+                                    'id_coa' =>  $barangAP,
+                                    'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
+                                    'debit' => $dataBB->total_before_pph,
+                                    'kredit' => 0,
+                                    'valas' => $dataMetadataValutaIDR->id,
+                                    'kurs' => 1,
+                                    'keterangan' => $keteranganJurnal,
+                                    'id_inputer' => session()->get("login")->user_id
+                                );
+
+                                // Untuk insert ke jurnal umum
+                                $result[] = array(
+                                    'id_transaksi' => $idTransaksiJurnal,
+                                    'divisi_id' => $dataBB->divisi_id,
+                                    'company_id' => $companyIDs,
+                                    'id_coa' =>  $barangAR ? $barangAR : $UtangAP,
+                                    'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBB->po_date))),
+                                    'debit' => 0,
+                                    'kredit' => $dataBB->total_before_pph,
+                                    'valas' => $dataMetadataValutaIDR->id,
+                                    'kurs' => 1,
+                                    'keterangan' => $keteranganJurnal,
+                                    'id_inputer' => session()->get("login")->user_id
+                                );
+                            } catch (Exception $e) {
+                                // Log the error or handle it appropriately
+                                log_message('error', 'Error in journal entry processing: ' . $e->getMessage());
+                                // You might want to return an error response or re-throw the exception
+                                throw new Exception('Failed to process journal entries: ' . $e->getMessage());
+                            }
+
+                            // end input jurnal dari banyak detail barang
+
+                            // update total debit dan kredit dari total nilai pada jurnal umum
+                            $this->transaksiJurnalModel->update($idTransaksiJurnal, [
+                                'total_debit' => $dataBB->total_before_pph,
+                                'total_kredit' => $dataBB->total_before_pph,
+                            ]);
+                        }
+                        $this->jurnalUmumModel->insertJurnalBatch($result);
+                    }
+                }
             }
-        } else {
-            if ($statusPenerimaan == "LOKAL") {
-                # code...
-            } else {
-                # code...
-            }
+
+            $db->transCommit();
+            return true;
+        } catch (Exception $e) {
+            $db->transRollback();
+            var_dump($e->getMessage(), $e->getFile(), $e->getLine());
+            die;
         }
     }
 
