@@ -99,8 +99,6 @@
                             <label for="floatingInput">No. PO (Opsional)</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['loading_port'] : ""; ?>" type="text" class="form-control loading_port" id="loading_port" name="loading_port" placeholder="Loading Port">
@@ -126,8 +124,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['payment_term'] : ""; ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Opsional)">
@@ -153,8 +149,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
@@ -198,6 +192,12 @@
                                 <?php endforeach ?>
                             </select>
                             <label for="floatingInput">Pilih Bank (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['no_container'] : ""; ?>" type="text" class="form-control no_container" id="no_container" name="no_container" placeholder="Nomor Container (Opsional)">
+                            <label for="floatingInput">No Container (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -250,7 +250,20 @@
                         </div>
                     </div>
                 </div>
+                <div class="row mt-3">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Spesifikasi Detail</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <textarea autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control spesifikasi" id="spesifikasi" name="spesifikasi" placeholder="Document Required"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['spesifikasi'] : ""; ?></textarea>
+                            <label for="floatingInput">Spesifikasi Detail (Opsional)</label>
+                        </div>
+                    </div>
 
+                </div>
             </form>
             <div class="col-subtitle-modal mt-5">
                 <div class="row mt-3">
@@ -272,6 +285,7 @@
                                 <th>No</th>
                                 <th>Kode Barang</th>
                                 <th>Barang</th>
+                                <th>Size</th>
                                 <th>Satuan Order</th>
                                 <th>Kemasan</th>
                                 <th>Remark</th>
@@ -286,7 +300,7 @@
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td colspan="5"></td>
+                                <td colspan="6"></td>
                                 <td><b>TOTAL</b></td>
                                 <td><b>0,00</b></td>
                                 <td><b>0,00</b></td>
@@ -336,6 +350,12 @@
                                         </button>
                                     </div>
                                 <?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" type="text" class="form-control size" id="size" name="size" placeholder="Size">
+                                <label for="floatingInput">Size (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -568,7 +588,8 @@
                 qty: "<?= $s['qty'] ?>",
                 harga: "<?= $s['harga'] ?>",
                 remark: "<?= $s['remark'] ?>",
-                total: "<?= $s['total'] ?>"
+                total: "<?= $s['total'] ?>",
+                size: "<?= $s['size'] ?>"
             });
         <?php endforeach; ?>
         drawTable();
@@ -1174,6 +1195,7 @@
             var harga = destroyFormatRupiah($('.harga').val());
             var remark = $('.remark').val();
             var total = (qty * harga);
+            var size = $('.size').val();
 
             if (id_detail) {
                 // UPDATE
@@ -1189,6 +1211,7 @@
                         listBarang[i].harga = harga;
                         listBarang[i].remark = remark;
                         listBarang[i].total = total;
+                        listBarang[i].size = size;
                     }
                 });
             } else {
@@ -1225,7 +1248,8 @@
                         qty: qty,
                         harga: harga,
                         remark: remark,
-                        total: total
+                        total: total,
+                        size: size
                     });
                 }
             }
@@ -1362,6 +1386,7 @@
         $('.harga').val(greatFormatRupiah(item.harga));
         $('.remark').val(item.remark);
         $('.total').val(greatFormatRupiah(item.total));
+        $('.size').val(item.size);
         $(".detail-modal").modal("show")
     }
 
@@ -1407,6 +1432,7 @@
                 newRow.append($('<td style="text-align:center;">').text(no++));
                 newRow.append($('<td>').text(item.kode_barang));
                 newRow.append($('<td>').text(item.barang_name));
+                newRow.append($('<td>').text(item.size));
                 newRow.append($('<td>').text(item.satuan_order_name));
                 newRow.append($('<td>').text(item.kemasan));
                 newRow.append($('<td>').text(item.remark));
@@ -1443,7 +1469,7 @@
             $('.body-detail-table').append(row);
             table.find('tfoot').empty();
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="5"></td>'));
+            newRow.append($('<td colspan="6"></td>'));
             newRow.append($('<td><b>TOTAL</b></td>'));
             newRow.append($('<td><b>' + totalQty + '</b></td>'));
             newRow.append($('<td><b>' + greatFormatRupiah(totalHarga) + '</b></td>'));

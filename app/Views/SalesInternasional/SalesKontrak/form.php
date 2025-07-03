@@ -237,6 +237,12 @@
                             <label for="floatingInput">Pilih Bank (Opsional)</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['no_container'] : ""; ?>" type="text" class="form-control no_container" id="no_container" name="no_container" placeholder="Nomor Container (Opsional)">
+                            <label for="floatingInput">No Container (Opsional)</label>
+                        </div>
+                    </div>
                 </div>
                 <!-- <div class="row">
                     <div class="col mb-3">
@@ -294,8 +300,8 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <textarea autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control documents_required" id="documents_required" name="documents_required" placeholder="Document Required"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['documents_required'] : ""; ?></textarea>
-                            <label for="floatingInput">Spesifikasi Detail</label>
+                            <textarea autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control spesifikasi" id="spesifikasi" name="spesifikasi" placeholder="Document Required"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['spesifikasi'] : ""; ?></textarea>
+                            <label for="floatingInput">Spesifikasi Detail (Opsional)</label>
                         </div>
                     </div>
 
@@ -329,7 +335,7 @@
                                 <th>No</th>
                                 <th>Kode Barang</th>
                                 <th>Barang</th>
-                                <th>Spesifikasi Detail</th>
+                                <th>Size</th>
                                 <th>Satuan Order</th>
                                 <th>Kemasan</th>
                                 <th>Remark</th>
@@ -393,8 +399,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <input autocomplete="one-time-code" type="text" class="form-control spesifikasi" id="spesifikasi" name="kemasan" placeholder="Sepsifikasi Detail" oninput="capitalize()">
-                                <label for="floatingInput">Spesifikasi Detail (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control size" id="size" name="size" placeholder="Size">
+                                <label for="floatingInput">Size (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -627,7 +633,7 @@
                 harga: "<?= floatval($s['harga']) ?>",
                 remark: "<?= $s['remark'] ?>",
                 total: <?= floatval($s['total']) ?>,
-                spesifikasi: "<?= $s['spesifikasi'] ?>"
+                size: "<?= $s['size'] ?>"
             });
         <?php endforeach; ?>
         drawTable();
@@ -1235,7 +1241,7 @@
             var harga = destroyFormatRupiah($('.harga').val());
             var remark = $('.remark').val();
             var total = (qty * harga);
-            var spesifikasi = $('.spesifikasi').val();
+            var size = $('.size').val();
 
             if (id_detail) {
                 // UPDATE
@@ -1251,7 +1257,7 @@
                         listBarang[i].harga = harga;
                         listBarang[i].remark = remark;
                         listBarang[i].total = total;
-                        listBarang[i].spesifikasi = spesifikasi;
+                        listBarang[i].size = size;
                     }
                 });
             } else {
@@ -1289,7 +1295,7 @@
                         harga: harga,
                         remark: remark,
                         total: total,
-                        spesifikasi: spesifikasi
+                        size: size
                     });
                 }
             }
@@ -1490,7 +1496,7 @@
         $('.harga').val(greatFormatRupiah(item.harga));
         $('.remark').val(item.remark);
         $('.total').val(greatFormatRupiah(item.total.toFixed(2)));
-        $('.spesifikasi').val(item.spesifikasi);
+        $('.size').val(item.size);
         $(".detail-modal").modal("show")
     }
 
@@ -1536,7 +1542,7 @@
                 newRow.append($('<td style="text-align:center;">').text(no++));
                 newRow.append($('<td>').text(item.kode_barang));
                 newRow.append($('<td>').text(item.barang_name));
-                newRow.append($('<td>').text(item.spesifikasi));
+                newRow.append($('<td>').text(item.size));
                 newRow.append($('<td>').text(item.satuan_order_name));
                 newRow.append($('<td>').text(item.kemasan));
                 newRow.append($('<td>').text(item.remark));

@@ -309,7 +309,9 @@ class SalesKontrak extends BaseController
             'createdBy' => $this->this_user_id,
             'keterangan' => $this->request->getVar('keterangan'),
             'status_posting' => '0',
-            'bank_id' => $this->request->getVar('bank_id')
+            'bank_id' => $this->request->getVar('bank_id'),
+            'spesifikasi' => $this->request->getVar('spesifikasi'),
+            'no_container' => $this->request->getVar('no_container')
         ]);
 
         foreach ($barangs as $b) {
@@ -322,7 +324,7 @@ class SalesKontrak extends BaseController
                 'qty' => $b->qty,
                 'harga' => $b->harga,
                 'total_harga' => $b->total,
-                'spesifikasi' => $b->spesifikasi
+                'size' => $b->size
             ]);
         }
 
@@ -389,7 +391,9 @@ class SalesKontrak extends BaseController
             'print_out_broker' => $this->request->getVar('print_out_broker'),
             'createdBy' => $this->this_user_id,
             'keterangan' => $this->request->getVar('keterangan'),
-            'bank_id' => $this->request->getVar('bank_id')
+            'bank_id' => $this->request->getVar('bank_id'),
+            'spesifikasi' => $this->request->getVar('spesifikasi'),
+            'no_container' => $this->request->getVar('no_container')
         ]);
 
         // get all id detail
@@ -411,7 +415,7 @@ class SalesKontrak extends BaseController
                     'qty' => $b->qty,
                     'harga' => $b->harga,
                     'total_harga' => $b->total,
-                    'spesifikasi' => $b->spesifikasi
+                    'size' => $b->size
                 ]);
                 array_push($id_detail_all, $check['id']);
             } else {
@@ -430,7 +434,7 @@ class SalesKontrak extends BaseController
                     'qty' => $b->qty,
                     'harga' => $b->harga,
                     'total_harga' => $b->total,
-                    'spesifikasi' => $b->spesifikasi
+                    'size' => $b->size
                 ]);
 
                 array_push($id_detail_all,  $id_detail_new);
