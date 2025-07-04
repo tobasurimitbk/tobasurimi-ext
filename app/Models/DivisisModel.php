@@ -137,13 +137,28 @@ class DivisisModel extends Model
         $select = "
             tunjangan.*, gaji_divisi.nominal
         ";
-        return $this->asObject()
+        $data = $this->asObject()
             ->select($select)
-            ->join('gaji_divisi', 'gaji_divisi.division_id = divisis.id', 'INNER')
-            ->join('tunjangan', 'tunjangan.id = gaji_divisi.tunjangan_id', 'INNER')
+            ->join('gaji_divisi', 'gaji_divisi.division_id = divisis.id', 'LEFT')
+            ->join('tunjangan', 'tunjangan.id = gaji_divisi.tunjangan_id', 'LEFT')
             ->where('gaji_divisi.division_id', $divisionID)
             ->where('tunjangan.deletedAt', null)
             ->findAll();
+
+
+        $res = [];
+        foreach ($data as $d) {
+            $res[] = [
+                'id' => $d->id,
+                'nominal' => $d->nominal == null ? "" : str_replace('.', ',', $d->nominal),
+                'name' => $d->name,
+                'is_cadangan' => $d->is_cadangan,
+                'is_gaji_harian' => $d->is_gaji_harian,
+                'tipe' => $d->tipe
+            ];
+        }
+
+        return $res;
     }
 
     public function getListForAccount($condition, $addCondition, $limit = 10, $offset = 0)
