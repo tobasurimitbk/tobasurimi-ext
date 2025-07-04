@@ -90,6 +90,7 @@
                             <tr>
                                 <th width="5%">No</th>
                                 <th width="25%">Customer / No. Faktur</th>
+                                <th width="15%">Termin</th>
                                 <th width="15%">Tgl Faktur</th>
                                 <th width="15%">Jatuh Tempo</th>
                                 <th width="20%">Nilai Faktur</th>
@@ -457,6 +458,7 @@
                         <tr>
                             <td></td>
                             <td style="padding-left: 30px;">${invoice.no_faktur}</td>
+                            <td>${invoice.terms_customer}</td>
                             <td>${invoice.tanggal_faktur}</td>
                             <td>${invoice.tanggal_jatuh_tempo}</td>
                             <td class="text-right">${invoice.total_invoice}</td>
