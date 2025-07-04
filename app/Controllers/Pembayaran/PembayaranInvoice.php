@@ -596,7 +596,7 @@ class PembayaranInvoice extends BaseController
                 "nama_sales"        => $data->salesName,
                 "tipe_invoice"      => $data->tipe_invoice,
                 "counter_print"     => $data->counter_print,
-                "terms"     => $data->terms_customer,
+                "terms" => $data->terms_customer ?? 'termin belum dibuat',
                 "status_pembayaran" => $statusPembayaranInvoice,
                 "tanggal_jatuh_tempo" => $tanggalJatuhTempo,
                 "dpp" => $data->dpp,
