@@ -458,7 +458,7 @@
                         <tr>
                             <td></td>
                             <td style="padding-left: 30px;">${invoice.no_faktur}</td>
-                            <td>${invoice.terms_customer}</td>
+                            <td>${invoice.terms}</td>
                             <td>${invoice.tanggal_faktur}</td>
                             <td>${invoice.tanggal_jatuh_tempo}</td>
                             <td class="text-right">${invoice.total_invoice}</td>
