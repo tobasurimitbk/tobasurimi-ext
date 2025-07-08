@@ -777,7 +777,7 @@
                     <tr>
                         <td class="txt-center" style="text-align:center;"><?= $no++; ?></td>
                         <td class="txt-left" style="text-align:center;"><?= $detail["po_no"]; ?></td>
-                        <td class="txt-right" style="text-align:center;"><?= $detail["jml_masuk"]; ?></td>
+                        <td class="txt-right" style="text-align:center;"><?= number_format($detail["jml_masuk"], 2, '.', ','); ?></td>
                         <td class="txt-left" style="text-align:center;"><?= $detail["kode_satuan"]; ?></td>
                         <td class="txt-right" style="text-align:center;"><?= number_format($dataPO->lpb->total_before_pph, 2, '.', ','); ?></td>
                         <td class="txt-left" style="text-align:center;"><?= $detail["keterangan_lpb"]; ?></td>

@@ -546,7 +546,7 @@ class RMPurchaseOrderModel extends Model
             ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
             ->join('barang_master', 'rm_purchase_orders.barang_id = barang_master.id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
-            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id AND penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
             ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
             ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
             ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')

@@ -151,6 +151,7 @@ class PenerimaanBarangDetailModel extends Model
                 rm_purchase_orders.po_no, 
                 rm_purchase_orders.status_penerimaan,
                 supplier_harga.spesifikasi,
+                SUM(penerimaan_barang_detail.jml_masuk) as jml_masuk,
                 GROUP_CONCAT(IF(penerimaan_barang_detail.keterangan IS NOT NULL AND penerimaan_barang_detail.keterangan != '', penerimaan_barang_detail.keterangan, NULL)) as keterangan_lpb"
                 )
                     ->where($arrCondition)
