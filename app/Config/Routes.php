@@ -2093,6 +2093,7 @@ $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb/print/(:segment)/(:segment)
 $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanPendapatanSupplier', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier/all-pendapatan-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanPendapatanSupplier', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFPendapatanSupplier', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier/export-excel', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPendapatanSupplierLokalBBToExcel', ['filter' => 'Auth']);
 
 $routes->get('/laporan-supplier-lokal-bb/rincian-perbarang', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRincianPerbarang', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rincian-perbarang/all-rincian-perbarang', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRincianPerbarang', ['filter' => 'Auth']);

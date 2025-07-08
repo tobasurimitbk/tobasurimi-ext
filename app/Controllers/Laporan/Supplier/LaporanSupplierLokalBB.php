@@ -177,6 +177,9 @@ class LaporanSupplierLokalBB extends BaseController
                     'no' => $no++,
                     'supplierName' => $row->supplierName,
                     'poNum' => $row->poNum,
+                    'poDate' => $row->poDate,
+                    'satuanName' => $row->satuanName,
+                    'companyName' => $row->companyName,
                     'barangName' => $row->barangName,
                     'spekName' => $row->spekName,
                     'warehouseName' => $row->warehouseName,
@@ -238,6 +241,234 @@ class LaporanSupplierLokalBB extends BaseController
 
         echo json_encode($data);
         return;
+    }
+
+    public function exportPendapatanSupplierLokalBBToExcel()
+    {
+        $condition = [
+            'rm_purchase_orders.is_posted' => '1',
+            'penerimaan_barang.status_post' => 'FINISH',
+            'penerimaan_barang.status_penerimaan' => 'LOKAL',
+            'penerimaan_barang.tipe_bahan' => 'BAKU',
+            'rm_purchase_orders.company_id' => $this->this_company_id,
+            'penerimaan_barang.deletedAt' => null,
+            'penerimaan_barang_detail.deletedAt' => null,
+        ];
+
+        $addCondition = [
+            "dateStart"    => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"      => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "supplierId"   => $this->request->getGet("filter_supplier"),
+            "barangId"     => $this->request->getGet("filter_barang"),
+            "warehouseId"  => $this->request->getGet("filter_warehouse"),
+            "poNo"         => $this->request->getGet("filter_po_no"),
+        ];
+
+        $availableSort = [
+            'supplierName'  => 'suppliers.name',
+            'poNum'         => 'rm_purchase_orders.po_no',
+            'poDate'        => 'rm_purchase_orders.po_date',
+            'barangName'    => 'barang_master.barang_name',
+            'warehouseName' => 'warehouses.warehouse_name',
+        ];
+
+        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplier($availableSort, $condition, $addCondition, 99999, 0); // ambil semua tanpa paginasi
+
+        // Ambil hasil yang sudah digroup + total subsidi seperti allLaporanPendapatanSupplier
+        $groupedData = $this->generateLaporanPendapatanSupplierData($dataBBLokal['data']);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header
+        $header1 = [
+            "No",
+            "Supplier",
+            "No PO",
+            "Tgl PO",
+            "Bahan Baku",
+            "Gudang",
+            "Qty",
+            "Satuan",
+            "Unit",
+            "DPP Umum",
+            "PPh Umum",
+            "Dibayarkan Umum",
+            "DPP Harian",
+            "PPh Harian",
+            "Dibayarkan Harian",
+            "DPP Bulanan",
+            "PPh Bulanan",
+            "Dibayarkan Bulanan",
+            "DPP Subsidi",
+            "PPh Subsidi",
+            "Total Subsidi",
+            "Total"
+        ];
+
+        $sheet->fromArray($header1, NULL, 'A1');
+
+        $rowNo = 2;
+        foreach ($groupedData as $row) {
+            $sheet->fromArray([
+                $row['no'],
+                $row['supplierName'],
+                $row['poNum'],
+                $row['poDate'] ?? '', // bisa ambil dari model
+                $row['barangName'],
+                $row['warehouseName'],
+                $row['qtyPO'],
+                $row['satuanName'],
+                $row['companyName'] ?? '',
+
+                $row['dppUmum'],
+                $row['pphUmum'],
+                $row['totalUmum'],
+
+                $row['dppHarian'],
+                $row['pphHarian'],
+                $row['totalHarian'],
+
+                $row['dppBulanan'],
+                $row['pphBulanan'],
+                $row['totalBulanan'],
+
+                $row['subsidi'],
+                $row['pphSubsidi'],
+                $row['totalSubsidi'],
+
+                $row['totalRow'],
+            ], NULL, 'A' . $rowNo);
+            $rowNo++;
+        }
+
+        // Auto size
+        foreach (range('A', $sheet->getHighestColumn()) as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Output
+        $filename = 'Laporan_Pendapatan_Supplier_BB_Lokal_' . date('Ymd_His') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment;filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    private function generateLaporanPendapatanSupplierData($data)
+    {
+        $groupedData = [];
+        $no = 1;
+
+        foreach ($data as $row) {
+            $poId = $row->poNum;
+            $pphMode = $row->poPPH;
+            $hasNpwp = !empty($row->supplierNpwp);
+            $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
+            $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            $qty = $row->qtyPO;
+
+            // UMUM
+            if ($pphMode === "Company") {
+                $dppUmum = ($row->dppUmum / $nilai_pph) * $qty;
+                $pphUmum = ($row->dppUmum / $nilai_pph * $nilai_pph2) * $qty;
+                $totalUmum = $dppUmum - $pphUmum;
+            } else {
+                $dppUmum = $row->dppUmum * $qty;
+                $pphUmum = ($pphMode === "Supplier") ? ($row->dppUmum * $nilai_pph2) * $qty : 0;
+                $totalUmum = $dppUmum + $pphUmum;
+            }
+
+            // HARIAN
+            if ($pphMode === "Company") {
+                $dppHarian = ($row->dppHarian / $nilai_pph) * $qty;
+                $pphHarian = ($row->dppHarian / $nilai_pph * $nilai_pph2) * $qty;
+                $totalHarian = $dppHarian - $pphHarian;
+            } else {
+                $dppHarian = $row->dppHarian * $qty;
+                $pphHarian = ($pphMode === "Supplier") ? ($row->dppHarian * $nilai_pph2) * $qty : 0;
+                $totalHarian = $dppHarian + $pphHarian;
+            }
+
+            // BULANAN
+            if ($pphMode === "Company") {
+                $dppBulanan = ($row->dppBulanan / $nilai_pph) * $qty;
+                $pphBulanan = ($row->dppBulanan / $nilai_pph * $nilai_pph2) * $qty;
+                $totalBulanan = $dppBulanan - $pphBulanan;
+            } else {
+                $dppBulanan = $row->dppBulanan * $qty;
+                $pphBulanan = ($pphMode === "Supplier") ? ($row->dppBulanan * $nilai_pph2) * $qty : 0;
+                $totalBulanan = $dppBulanan + $pphBulanan;
+            }
+
+            $totalRow = $totalUmum + $totalHarian + $totalBulanan;
+
+            if (!isset($groupedData[$poId])) {
+                if ($pphMode === "Company") {
+                    $dppSubsidi = $row->subsidi / $nilai_pph;
+                    $pphSubsidi = $dppSubsidi * $nilai_pph2;
+                    $totalSubsidi = $dppSubsidi - $pphSubsidi;
+                } else {
+                    $dppSubsidi = $row->subsidi;
+                    $pphSubsidi = ($pphMode === "Supplier") ? ($row->subsidi * $nilai_pph2) : 0;
+                    $totalSubsidi = $dppSubsidi + $pphSubsidi;
+                }
+
+                $groupedData[$poId] = [
+                    'no' => $no++,
+                    'supplierName' => $row->supplierName,
+                    'poNum' => $row->poNum,
+                    'poDate' => $row->poDate ?? '',
+                    'barangName' => $row->barangName,
+                    'warehouseName' => $row->warehouseName,
+                    'qtyPO' => 0,
+                    'satuanName' => $row->satuanName,
+                    'companyName' => $row->companyName ?? '',
+                    'dppUmum' => 0,
+                    'pphUmum' => 0,
+                    'totalUmum' => 0,
+                    'dppHarian' => 0,
+                    'pphHarian' => 0,
+                    'totalHarian' => 0,
+                    'dppBulanan' => 0,
+                    'pphBulanan' => 0,
+                    'totalBulanan' => 0,
+                    'subsidi' => $dppSubsidi,
+                    'pphSubsidi' => $pphSubsidi,
+                    'totalSubsidi' => $totalSubsidi,
+                    'totalRow' => $totalRow + $totalSubsidi,
+                ];
+            } else {
+                $groupedData[$poId]['totalRow'] += $totalRow;
+            }
+
+            // Add all values
+            $groupedData[$poId]['qtyPO'] += $qty;
+            $groupedData[$poId]['dppUmum'] += $dppUmum;
+            $groupedData[$poId]['pphUmum'] += $pphUmum;
+            $groupedData[$poId]['totalUmum'] += $totalUmum;
+
+            $groupedData[$poId]['dppHarian'] += $dppHarian;
+            $groupedData[$poId]['pphHarian'] += $pphHarian;
+            $groupedData[$poId]['totalHarian'] += $totalHarian;
+
+            $groupedData[$poId]['dppBulanan'] += $dppBulanan;
+            $groupedData[$poId]['pphBulanan'] += $pphBulanan;
+            $groupedData[$poId]['totalBulanan'] += $totalBulanan;
+        }
+
+        // Format numbers
+        foreach ($groupedData as &$r) {
+            foreach ($r as $k => $v) {
+                if (is_numeric($v) && $k !== 'no') {
+                    $r[$k] = number_format($v, 2, '.', ',');
+                }
+            }
+        }
+
+        return $groupedData;
     }
 
     public function exportPDFPendapatanSupplier()
@@ -1167,10 +1398,6 @@ class LaporanSupplierLokalBB extends BaseController
 
 
         $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplier($availableSort, $condition, $addCondition, $pageSize, $offset);
-        // $dataBahanBaku = $this->barangMasterModel->asObject()->where('id', $addCondition['barangId'])->where('type_barang', 'bahan_baku')->first();
-        // $dataWarehouse = $this->warehousesModel->asObject()->where('id', $addCondition['warehouseId'])->first();
-
-
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 

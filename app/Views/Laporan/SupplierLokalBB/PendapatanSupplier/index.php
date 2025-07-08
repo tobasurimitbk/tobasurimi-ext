@@ -9,7 +9,8 @@
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/pendapatan-supplier/print"); ?>')">PDF</button></li>
+            <!-- <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/pendapatan-supplier/print"); ?>')">PDF</button></li> -->
+            <li><button class="dropdown-item excel" onclick="excel('<?= base_url("/laporan-supplier-lokal-bb/pendapatan-supplier/export-excel"); ?>')">Excel</button></li>
         </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-supplier-lokal-bb"); ?>">
@@ -372,6 +373,18 @@
         .css('z-index', '1');
 
     const pdf = function(url) {
+
+        let dateStart = $(".dateStart").val();
+        let dateEnd = $(".dateEnd").val();
+        let filter_supplier = $(".filter_supplier").val();
+        let filter_warehouse = $(".filter_warehouse").val();
+        let filter_barang = $(".filter_barang").val();
+        let filter_po_no = $(".filter_po_no").val();
+
+        window.open(url + `?filter_supplier=${filter_supplier}&filter_warehouse=${filter_warehouse}&filter_barang=${filter_barang}&filter_po_no=${filter_po_no}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
+    }
+
+    const excel = function(url) {
 
         let dateStart = $(".dateStart").val();
         let dateEnd = $(".dateEnd").val();

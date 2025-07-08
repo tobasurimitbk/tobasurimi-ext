@@ -529,7 +529,7 @@ class RMPurchaseOrderModel extends Model
         barang_master.barang_name AS barangName, 
         warehouses.warehouse_name AS warehouseName, 
         rm_purchase_order_details.qty AS qtyPO, 
-        satuans.nama_satuan AS satuanName, 
+        satuans.kode_satuan AS satuanName, 
         companies.company AS companyName, 
         rm_purchase_orders.subsidi_langsung AS subsidi, 
         rm_purchase_order_details.daily_price AS dppHarian,
