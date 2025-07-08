@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Purchase Order</title>
+    <title>Purchase Order Import Bahan Baku</title>
     <style>
         body {
             font-size: 13px;
@@ -176,70 +176,86 @@
             <td><?= $dataPO->port_destination == "-" ? "-" : strtoupper($dataPO->port_destination); ?></td>
         </tr>
     </table>
-    <table border="1" style="width: 100%; margin-top:10px;" class="table no-border">
-        <thead>
-            <tr>
-                <td style="text-align: center;">MARKS & NO</td>
-                <td style="text-align: center;">PARTICULAR</td>
-                <td style="text-align: center;">QTTY</td>
-                <td style="text-align: center;">UNIT PRICE <br>USD</td>
-                <td style="text-align: center;">TOTAL AMOUNT<br>USD</td>
-            <tr>
-                <td style="border:0px;"></td>
-                <td style="border:0px;"></td>
-                <td style="border:0px;"></td>
-                <td colspan="2" style="text-align: center;border:0px;">
-                    <?= strtoupper($valuta) ?>
-                </td>
-            </tr>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $no = 1;
-            $totalPrice = 0;
-            $totalDisc = 0;
-            $diskonTotal = 0;
-            $totalWithAdditional = 0;
-            ?>
-            <?php foreach ($dataPODetail as $detail) : ?>
-                <?php
-                $totalDisc =  (formatter($detail["price"], "CURR_TO_FLOAT") * formatter($detail["qty"], "STR_TO_FLOAT")) * ((float)$detail["disc"] / 100);
-                $totalWithAdditional = (formatter($detail["price"], "CURR_TO_FLOAT") * formatter($detail["qty"], "STR_TO_FLOAT") - $totalDisc) +  formatter($detail["additional_cost"], "CURR_TO_INT");
-                $totalPrice += $totalWithAdditional;
-                $diskonTotal += $totalDisc;
-                ?>
+    <?php
+    $chunkedDetails = array_chunk($dataPODetail, 15);
+    $no = 1;
+    $totalPrice = 0;
+    $totalDisc = 0;
+    $diskonTotal = 0;
+    $totalWithAdditional = 0;
+    foreach ($chunkedDetails as $index => $chunk) :
+        if ($index > 0) {
+            echo '<div style="page-break-before: always;"></div>';
+        }
+    ?>
+        <table border="1" style="width: 100%; margin-top:10px;" class="table no-border">
+            <thead>
                 <tr>
-                    <td style="text-align: center; border:0px;"><?= $no++; ?></td>
-                    <td style="border:0px;">
-                        <?= $detail["nama_barang"] . " " . $detail['spesifikasi'] . ($detail['note'] == null ? "" : " ( " . $detail['note'] . " )") ?>
-                    </td>
-                    <td style="text-align: center;border:0px;">
-                        <?= $detail["qty"] . " " . $detail["kode_satuan"] ?>
-                    </td>
-                    <td style="text-align: center;border:0px;">
-                        <?= $detail["price"] ?>
-                    </td>
-                    <td style="text-align: center;border:0px;">
-                        <?= number_format($totalWithAdditional, 2, '.', ','); ?>
+                    <td style="text-align: center;">MARKS & NO</td>
+                    <td style="text-align: center;">PARTICULAR</td>
+                    <td style="text-align: center;">QTTY</td>
+                    <td style="text-align: center;">UNIT PRICE <br>USD</td>
+                    <td style="text-align: center;">TOTAL AMOUNT<br>USD</td>
+                </tr>
+                <tr>
+                    <td style="border:0px;"></td>
+                    <td style="border:0px;"></td>
+                    <td style="border:0px;"></td>
+                    <td colspan="2" style="text-align: center;border:0px;">
+                        <?= strtoupper($valuta) ?>
                     </td>
                 </tr>
-            <?php endforeach; ?>
-            <tr>
-                <td colspan="4" style="text-align: center;">DISCOUNT</td>
-                <td style="text-align: center;"><?= number_format(formatter(($dataPO->potongan_harga), "STR_TO_FLOAT"), 2, '.', ',') ?></td>
-            </tr>
-            <tr>
-                <td colspan="4" style="text-align: center;">TOTAL</td>
-                <td style="text-align: center;"><?= number_format(formatter(($dataPO->total), "STR_TO_FLOAT"), 2, '.', ',') ?></td>
-            </tr>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php foreach ($chunk as $detail) : ?>
+                    <?php
+                    $totalDisc = (formatter($detail["price"], "CURR_TO_FLOAT") * formatter($detail["qty"], "STR_TO_FLOAT")) * ((float)$detail["disc"] / 100);
+                    $totalWithAdditional = (formatter($detail["price"], "CURR_TO_FLOAT") * formatter($detail["qty"], "STR_TO_FLOAT") - $totalDisc) + formatter($detail["additional_cost"], "CURR_TO_INT");
+                    $totalPrice += $totalWithAdditional;
+                    $diskonTotal += $totalDisc;
+                    ?>
+                    <tr>
+                        <td style="text-align: center; border:0px;"><?= $no++; ?></td>
+                        <td style="border:0px;">
+                            <?= $detail["nama_barang"] . " " . $detail['spesifikasi'] . ($detail['note'] == null ? "" : " ( " . $detail['note'] . " )") ?>
+                        </td>
+                        <td style="text-align: center;border:0px;">
+                            <?= $detail["qty"] . " " . $detail["kode_satuan"] ?>
+                        </td>
+                        <td style="text-align: center;border:0px;">
+                            <?= number_format($detail["price"], 2) ?>
+                        </td>
+                        <td style="text-align: center;border:0px;">
+                            <?= number_format($totalWithAdditional, 2, '.', ','); ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+
+                <?php if ($index === count($chunkedDetails) - 1): ?>
+                    <tr>
+                        <td colspan="4" style="text-align: center;">DISCOUNT</td>
+                        <td style="text-align: center;"><?= number_format(formatter(($dataPO->potongan_harga), "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" style="text-align: center;">TOTAL</td>
+                        <td style="text-align: center;"><?= number_format(formatter(($dataPO->total), "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+
+
+        <div style="position: absolute; bottom: 20px; right: 30px; font-size: 12px;">
+            Page <?= $index + 1 ?> of <?= count($chunkedDetails) ?>
+        </div>
+
+    <?php endforeach; ?>
+
     <table style="margin-top: 15px;">
         <tr>
             <td>LATEST SHIPMENT DATE</td>
             <td>:</td>
-            <td><?= date('d/m/Y', strtotime($dataPO->latest_shipment_date)); ?></td>
+            <td><?= $dataPO->latest_shipment_date; ?></td>
         </tr>
         <tr>
             <td>PAYMENT TERM</td>
@@ -260,6 +276,7 @@
             </td>
         </tr>
     </table>
+
 </body>
 
 </html>
