@@ -48,6 +48,7 @@ use App\Models\PanjarSupplierModel;
 use App\Models\PinjamanSupplierModel;
 use App\Models\EmployeesModel;
 use App\Models\LocalPOPaymentBPModel;
+use App\Models\PenerimaanBarangDetailModel;
 use Carbon\Carbon;
 
 class JurnalUmum extends BaseController
@@ -80,6 +81,7 @@ class JurnalUmum extends BaseController
     protected $otherPaymentModel;
     protected $otherPaymentDetailModel;
     protected $penerimaanBarangModel;
+    protected $penerimaanBarangDetailModel;
     protected $metadataModel;
     protected $kursModel;
     protected $tutupBukuModel;
@@ -128,6 +130,7 @@ class JurnalUmum extends BaseController
         $this->otherPaymentModel = new OtherPaymentModel();
         $this->otherPaymentDetailModel = new OtherPaymentDetailModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
+        $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
         $this->metadataModel = new MetadataModel();
         $this->kursModel = new KursModel();
         $this->tutupBukuModel = new TutupBukuModel();
@@ -1519,173 +1522,221 @@ class JurnalUmum extends BaseController
                     }
                 }
             } else {
-                $dataPOBP = $this->aMPurchaseOrderModel->asObject()->where('deletedAt', null)->where('id', $poID)->findAll();
-                if ($dataPOBP) {
-                    $result = array();
-                    $resultTransaksiJurnal = "";
-                    $resultTransaksiPembelian = array();
-                    $valasTransaksi = "IDR";
-                    $exchangeTransaksi = 1;
-                    foreach ($dataPOBP as $dataBP) {
-                        $totalPO = 0;
-                        $kodeTransaksi = "";
-                        $idTransaksi = "";
-                        $keteranganJurnal = $this->aMPurchaseOrderDetailModel->getSpesifikasiBarangAsString($dataBP->id);
+                $dataPB = $this->penerimaanBarangModel->asObject()
+                    ->where('deletedAt', null)
+                    ->where('id', $penerimaanBarangId)
+                    ->first();
 
-                        if ($dataBP->po_type == "Lokal") {
-                            $dataBP->currency = 30;
-                        }
+                $dataPBD = $this->penerimaanBarangDetailModel
+                    ->select('penerimaan_barang_detail.*, 
+                        am_purchase_orders.po_no, 
+                        am_purchase_orders.po_date, 
+                        am_purchase_orders.currency,
+                        am_purchase_order_details.note')
+                    ->join('am_purchase_orders', 'am_purchase_orders.id = penerimaan_barang_detail.purchase_order_id', 'left')
+                    ->join('am_purchase_order_details', 'am_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id', 'left')
+                    ->where('penerimaan_barang_detail.deletedAt', null)
+                    ->where('penerimaan_barang_detail.penerimaan_barang_id', $penerimaanBarangId)
+                    ->asObject()
+                    ->findAll();
 
-                        $dataDepartment = $this->divisionModel->getAccountKasForJurnal($dataBP->division_id, $dataBP->company_id);
-                        $dataSupplier = $this->supplierModel->getSupplierForJurnal($dataBP->supplier_id);
-                        $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
-                        $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
-                        $dataAccountBarang = $this->accountBarangModel->getAccountBarangForJurnal();
-                        $kursData = $this->kursModel->getByMetaId($dataBP->currency, $dataBP->po_date);
-                        $metaValuta = $this->metadataModel->get_by_name('Valuta');
-                        foreach ($metaValuta as $valueValuta) {
-                            if ($dataBP->currency == $valueValuta['id']) {
-                                $valasTransaksi = $valueValuta['value'];
-                                if ($kursData) {
-                                    $exchangeTransaksi = $kursData->nilai_kurs;
-                                } else {
-                                    $exchangeTransaksi = 1;
-                                }
-                            }
-                        }
+                if (!$dataPB || empty($dataPBD)) {
+                    return response()->setJSON([
+                        "status" => false,
+                        "message" => "Data LPB atau detail tidak ditemukan",
+                        'token' => csrf_hash()
+                    ]);
+                }
 
-                        $dataPOBPDetail = $this->aMPurchaseOrderDetailModel->asObject()->where('deletedAt', null)->where('am_purchase_order_id', $dataBP->id)->findAll();
-                        $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'Pembelian')->findAll();
+                $result = [];
+                $errors = [];
 
-                        // $id_transaksi_jurnal = $this->transaksiJurnalModel->getIdTransaksiLast();
+                $valasTransaksi = "IDR";
+                $exchangeTransaksi = 1;
+                $totalDebit = 0;
 
-                        // start inisialisasi account
-                        foreach ($dataDepartment as $value) {
-                            $KasAP = $value->coa_kas_id;
-                            $KasAR = $value->coa_piutang_id;
-                        }
-                        foreach ($dataSupplier as $value) {
-                            foreach ($dataAccountSupplier as $valueAccount) {
-                                if ($value->id == $valueAccount->supplier_id) {
-                                    $UtangAP = $valueAccount->ap_id;
-                                    $UtangAR = $valueAccount->ar_id;
-                                }
-                            }
-                            foreach ($dataAccountModule as $valueModule) {
-                                if ($valueModule->type == $type && $valueModule->kategori == $kategori && $valueModule->module == $module) {
-                                    $UtangAP = $valueModule->ap_id;
-                                    $UtangAR = $valueModule->ar_id;
-                                }
-                            }
-                        }
-                        // end inisialisasi account
-                        // start inisialisasi kode transaksi
-                        foreach ($dataMetadataTipeTransaksi as $val) {
-                            $kodeTransaksi = $val->description;
-                            $idTransaksi = $val->id;
-                        }
-                        // end inisialisasi kode transaksi
-                        // input ke transaksi jurnal
-                        $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
-                        $resultTransaksiJurnal = array(
-                            'no_transaksi' => $no_transaksi_jurnal,
-                            'tanggal_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBP->po_date))),
-                            'total_debit' => $totalPO * $exchangeTransaksi,
-                            'total_kredit' => $totalPO * $exchangeTransaksi,
-                            'metode_input' => 'system',
-                            'tipe_barang' => $type,
-                            'kategori_barang' => $kategori,
-                            'po_id' => $poID,
-                            'type_transaksi' => $idTransaksi,
-                            'no_bukti' => $no_transaksi_jurnal,
-                            'valas' => $valasTransaksi,
-                            'valas_id' => $dataBP->currency, // Jika 0 Maka Idr (Untuk Po lokal Bp)
-                            'exchange_rate' => $exchangeTransaksi,
-                            'uraian_transaksi' => $dataBP->po_no, // Untuk transaksi_jurnal memakai po_no
-                            'penerimaan_barang_id' => $penerimaanBarangId,
-                        );
+                // ambil COA dan data referensi dari LPB
+                $dataDepartment = $this->divisionModel->getAccountKasForJurnal($dataPB->divisi_id, $dataPB->company_id);
+                $dataSupplier = $this->supplierModel->getSupplierForJurnal($dataPB->supplier_id);
+                $dataAccountSupplier = $this->accountSupplierModel->getAccountSupplierForJurnal();
+                $dataAccountModule = $this->accountModuleModel->getAccountModuleForJurnal();
+                $dataAccountBarang = $this->accountBarangModel->getAccountBarangForJurnal();
+                $metaValuta = $this->metadataModel->get_by_name('Valuta');
 
-                        // ambil id dari transaksi jurnal untuk jurnal umum
-                        $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
+                // ambil kurs dari PO pertama dalam multiple_po_id
+                $kursData = null;
+                $valasID = "30";
+                $poIDs = [];
+                $poNosString = '';
 
-                        // start input jurnal dari banyak detail barang
-                        foreach ($dataPOBPDetail as $dataBPDetail) {
-                            $totalPO += ($dataBPDetail->total);
-                            $barangAPFound = false;
-                            foreach ($dataAccountBarang as $value) {
-                                if ($dataBPDetail->barang_id == $value->barang_master_id && $dataBP->company_id == $value->company_id && $dataBPDetail->spesifikasi_id == $value->barang_master_spesifikasi_id && $dataBPDetail->note == $value->keterangan && $dataBP->division_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
-                                    $barangAP = $value->ap_id;
-                                    $barangAR = $value->ar_id;
-                                    $barangAPFound = true;
-                                }
-                                if ($dataBPDetail->barang_id == $value->barang_master_id && $dataBP->company_id == $value->company_id && $dataBP->division_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
-                                    $barangAP = $value->ap_id;
-                                    $barangAR = $value->ar_id;
-                                    $barangAPFound = true;
-                                }
-                            }
-                            if (!$barangAPFound) {
-                                // Collect errors
-                                $errors[] = "Barang Tidak Memiliki Akun COA";
-                            } else {
-                                $result[] = array(
-                                    'id_transaksi' => $id_transaksi_jurnal,
-                                    'divisi_id' => $dataBP->division_id,
-                                    'company_id' => $this->this_company_id,
-                                    'id_coa' =>  $barangAP,
-                                    'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBP->po_date))),
-                                    'debit' => $dataBPDetail->total * $exchangeTransaksi,
-                                    'kredit' => 0,
-                                    'valas' =>  $dataBP->currency, // Jika 0 Maka Idr (Untuk Po lokal Bp)
-                                    'kurs' => $exchangeTransaksi,
-                                    'keterangan' => $keteranganJurnal,
-                                    'id_inputer' => session()->get("login")->user_id
-                                );
-                            }
-                            if (!empty($errors)) {
-                                return response()->setJSON([
-                                    "status" => false,
-                                    "message" => implode(', ', $errors),
-                                    'token' => csrf_hash()
-                                ]);
-                            }
-                        }
-                        // end input jurnal dari banyak detail barang
-
-                        // update total debit dan kredit dari total nilai pada jurnal umum
-                        $this->transaksiJurnalModel->update(
-                            $id_transaksi_jurnal,
-                            [
-                                'total_debit' => $totalPO,
-                                'total_kredit' => $totalPO,
-                            ]
-                        );
-
-                        //untuk insert ke jurnal umum
-                        $result[] = array(
-                            'id_transaksi' => $id_transaksi_jurnal,
-                            'divisi_id' => $dataBP->division_id,
-                            'company_id' => $this->this_company_id,
-                            'id_coa' =>  $UtangAP,
-                            'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBP->po_date))),
-                            'debit' => 0,
-                            'kredit' => $totalPO * $exchangeTransaksi,
-                            'valas' =>  $dataBP->currency,
-                            'kurs' => $exchangeTransaksi,
-                            'keterangan' => $keteranganJurnal,
-                            'id_inputer' => session()->get("login")->user_id
-                        );
-
-                        $resultTransaksiPembelian[] = array(
-                            'id_po_bp' => $poID,
-                            'id_supplier' => $dataBP->supplier_id,
-                            'id_transaksi_jurnal' => $id_transaksi_jurnal,
-                            'tgl_transaksi' => date('Y-m-d', strtotime(str_replace('/', '-', $dataBP->po_date))),
-                        );
+                if (!empty($dataPB->multiple_po_id)) {
+                    if (is_string($dataPB->multiple_po_id) && str_contains($dataPB->multiple_po_id, '[')) {
+                        $poIDs = json_decode($dataPB->multiple_po_id, true);
+                    } else {
+                        $poIDs = explode(',', $dataPB->multiple_po_id);
                     }
 
-                    $this->jurnalUmumModel->insertJurnalBatch($result);
-                    $this->transaksiPembelianModel->insertBatchTransaksiPembelian($resultTransaksiPembelian);
+                    if (!empty($poIDs)) {
+                        $firstPO = $this->aMPurchaseOrderModel->asObject()
+                            ->whereIn('id', $poIDs)
+                            ->where('deletedAt', null)
+                            ->first();
+
+                        if ($firstPO) {
+                            $valasID = $firstPO->currency == "0" ? "30" : $firstPO->currency;
+                            $kursData = $this->kursModel->getByMetaId($valasID, $firstPO->po_date);
+                        }
+                    }
+                }
+
+                // mapping valas
+                foreach ($metaValuta as $valueValuta) {
+                    if ($valasID == $valueValuta['id']) {
+                        $valasTransaksi = $valueValuta['value'];
+                        $exchangeTransaksi = $kursData ? $kursData->nilai_kurs : 1;
+                    }
+                }
+
+                // ambil akun supplier
+                $UtangAP = null;
+                foreach ($dataSupplier as $sup) {
+                    foreach ($dataAccountSupplier as $accSup) {
+                        if ($sup->id == $accSup->supplier_id) {
+                            $UtangAP = $accSup->ap_id;
+                        }
+                    }
+                    foreach ($dataAccountModule as $accMod) {
+                        if ($accMod->type == $type && $accMod->kategori == $kategori && $accMod->module == $module) {
+                            $UtangAP = $accMod->ap_id;
+                        }
+                    }
+                }
+
+                if (!$UtangAP) {
+                    return response()->setJSON([
+                        "status" => false,
+                        "message" => "Akun utang tidak ditemukan",
+                        'token' => csrf_hash()
+                    ]);
+                }
+
+                // buat transaksi jurnal utama
+                $dataMetadata = $this->MetadataModel->asObject()
+                    ->where('name', 'tipe_transaksi')
+                    ->where('value', 'Pembelian')
+                    ->first();
+
+                $kodeTransaksi = $dataMetadata->description ?? 'Pembelian';
+                $idTransaksi = $dataMetadata->id ?? null;
+                $no_transaksi_jurnal = $this->transaksiJurnalModel->getNoTransaksiLast($kodeTransaksi);
+                $tanggalJurnal = $dataPB->tanggal;
+
+                $resultTransaksiJurnal = [
+                    'no_transaksi' => $no_transaksi_jurnal,
+                    'tanggal_transaksi' => $tanggalJurnal,
+                    'total_debit' => 0,
+                    'total_kredit' => 0,
+                    'metode_input' => 'system',
+                    'tipe_barang' => $type,
+                    'kategori_barang' => $kategori,
+                    'po_id' => $dataPB->multiple_po_id,
+                    'type_transaksi' => $idTransaksi,
+                    'no_bukti' => $no_transaksi_jurnal,
+                    'valas' => $valasTransaksi,
+                    'valas_id' => $valasID,
+                    'exchange_rate' => $exchangeTransaksi,
+                    'uraian_transaksi' => $dataPB->no_penerimaan_barang,
+                    'penerimaan_barang_id' => $penerimaanBarangId,
+                ];
+
+                $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
+
+                // isi jurnal umum berdasarkan detail
+                foreach ($dataPBD as $detail) {
+                    $barangAP = null;
+                    $poNos = array_unique(array_filter(array_map(function ($d) {
+                        return $d->po_no ?? null;
+                    }, $dataPBD)));
+
+                    $poNosString = implode(', ', $poNos);
+
+                    foreach ($dataAccountBarang as $accBarang) {
+                        if (
+                            $detail->barang_id == $accBarang->barang_master_id &&
+                            $dataPB->company_id == $accBarang->company_id &&
+                            $detail->spesifikasi_id == $accBarang->barang_master_spesifikasi_id &&
+                            $detail->note == $accBarang->keterangan &&
+                            $dataPB->divisi_id == $accBarang->divisi_id &&
+                            $accBarang->ap_id
+                        ) {
+                            $barangAP = $accBarang->ap_id;
+                            break;
+                        }
+                    }
+
+                    if (!$barangAP) {
+                        $errors[] = "Barang ID {$detail->barang_id} tidak memiliki akun COA";
+                    } else {
+                        $jumlah = $detail->sub_total;
+                        $totalDebit += $jumlah;
+
+                        $result[] = [
+                            'id_transaksi' => $id_transaksi_jurnal,
+                            'divisi_id' => $dataPB->divisi_id,
+                            'company_id' => $this->this_company_id,
+                            'id_coa' => $barangAP,
+                            'tanggal_jurnal' => $tanggalJurnal,
+                            'debit' => $jumlah * $exchangeTransaksi,
+                            'kredit' => 0,
+                            'valas' => $valasID,
+                            'kurs' => $exchangeTransaksi,
+                            'keterangan' => $detail->po_no,
+                            'id_inputer' => session()->get("login")->user_id
+                        ];
+                    }
+                }
+
+                if (!empty($errors)) {
+                    return response()->setJSON([
+                        "status" => false,
+                        "message" => implode(', ', $errors),
+                        'token' => csrf_hash()
+                    ]);
+                }
+
+                // jurnal utang (kredit)
+                $result[] = [
+                    'id_transaksi' => $id_transaksi_jurnal,
+                    'divisi_id' => $dataPB->divisi_id,
+                    'company_id' => $this->this_company_id,
+                    'id_coa' => $UtangAP,
+                    'tanggal_jurnal' => $tanggalJurnal,
+                    'debit' => 0,
+                    'kredit' => $totalDebit * $exchangeTransaksi,
+                    'valas' => $valasID,
+                    'kurs' => $exchangeTransaksi,
+                    'keterangan' => $poNosString,
+                    'id_inputer' => session()->get("login")->user_id
+                ];
+
+                // simpan semua jurnal umum
+                $this->jurnalUmumModel->insertJurnalBatch($result);
+
+                // update total debit/kredit di header
+                $this->transaksiJurnalModel->update($id_transaksi_jurnal, [
+                    'total_debit' => $totalDebit * $exchangeTransaksi,
+                    'total_kredit' => $totalDebit * $exchangeTransaksi,
+                ]);
+
+                $purchaseId = json_decode($dataPB->multiple_po_id, true);
+                if (empty($purchaseId)) {
+                    // simpan ke transaksi pembelian
+                    $this->transaksiPembelianModel->insertBatchTransaksiPembelian([[
+                        'id_po_bp' => $purchaseId,
+                        'id_supplier' => $dataPB->supplier_id,
+                        'id_transaksi_jurnal' => $id_transaksi_jurnal,
+                        'tgl_transaksi' => $tanggalJurnal,
+                    ]]);
                 }
             }
 
