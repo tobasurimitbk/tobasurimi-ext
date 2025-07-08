@@ -585,7 +585,6 @@ class POLokalBahanBaku extends BaseController
     public function updateStatusPOLokalBahanBaku()
     {
         try {
-
             $id = $this->request->getVar('id');
             if (is_numeric($id)) {
                 $id = $id;
@@ -785,7 +784,7 @@ class POLokalBahanBaku extends BaseController
             $lpb = $this->penerimaanBarangModel->where('status_penerimaan', "LOKAL")->where('tipe_bahan', "BAKU")->like('multiple_po_id', $id)->first();
 
             if ($lpb != null) {
-                $lpbDetail = $this->penerimaanBarangModel->getById($lpb['id']);
+                $lpbDetail = $this->penerimaanBarangModel->getByIdPrintBahanBaku($lpb['id']);
                 $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($lpb['id'], "BAKU", "LOKAL");
                 $dataPO->lpb = $lpbDetail;
                 $dataPO->lpbDetail = $dataPenerimaanBarangDetail;
