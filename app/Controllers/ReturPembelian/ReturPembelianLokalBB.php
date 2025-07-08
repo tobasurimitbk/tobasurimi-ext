@@ -180,13 +180,13 @@ class ReturPembelianLokalBB extends BaseController
         $first = $this->pengembalianBarangModel->where('company_id', $this->this_company_id)->where('no_surat_jalan', $this->request->getVar('no_surat_jalan'))->first();
         $detailBarang = json_decode($this->request->getVar('listBarang'));
 
-        if ($first != null) {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'message' => "No Surat Jalan Sudah Ada",
-                'status' => false
-            ]);
-        }
+        // if ($first != null) {
+        //     return response()->setJSON([
+        //         'token' => csrf_hash(),
+        //         'message' => "No Surat Jalan Sudah Ada",
+        //         'status' => false
+        //     ]);
+        // }
 
         if (count($detailBarang) == 0) {
             return response()->setJSON([

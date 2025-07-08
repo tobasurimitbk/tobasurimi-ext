@@ -145,6 +145,7 @@
                 <th class="txt-left" style="text-align:center; width: 40px;">No SPP</th>
                 <th class="txt-left" style="text-align:center; width: 30px;">Jml Diterima</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Jml Retur</th>
+                <th class="txt-left" style="text-align:center; width: 60px;">Harga</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Satuan</th>
                 <th class="txt-left" style=" text-align:center; width: 150px;">Keterangan</th>
             </tr>
@@ -153,11 +154,13 @@
             $no = 1;
             $jml_diterima = 0;
             $jml_retur = 0;
+            $total_harga = 0;
             ?>
             <?php foreach ($dataPengembalianBarangDetail as $detail) : ?>
                 <?php
                 $jml_diterima += $detail['jml_diterima'];
                 $jml_retur += $detail['jml_retur'];
+                $total_harga += $detail['harga'];
                 ?>
                 <tr>
                     <td class="txt-center" style="text-align:center;"><?= $no++; ?></td>
@@ -165,6 +168,7 @@
                     <td class="txt-right" style="text-align:center;"><?= $detail["no_spp"]; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["jml_diterima"]; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["jml_retur"]; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= number_format($detail["harga"]); ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["kode_satuan"]; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["ket_retur"]; ?></td>
                 </tr>
@@ -173,6 +177,7 @@
                 <td class="txt-left" style="padding-left: 5px" colspan="3"><b>TOTAL</b></td>
                 <td class="txt-right" style="text-align:center;"><?= $jml_diterima ?></td>
                 <td class="txt-right" style="text-align:center;"><?= $jml_retur ?></td>
+                <td class="txt-right" style="text-align:center;"><?= number_format($total_harga); ?></td>
                 <td></td>
                 <td></td>
             </tr>

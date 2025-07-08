@@ -235,7 +235,6 @@ class ReturPembelianLokalBP extends BaseController
             'dataPenerimaanBarang' => $dataPenerimaanBarang,
             'title' => "Retur Pembelian Lokal Bahan Penolong"
         ];
-
         $this->dompdf->loadHtml(view('Warehouse/returnBarang/printLokalBP', $data));
         $this->dompdf->setPaper('A4', 'portrait');
         $this->dompdf->render();
