@@ -143,9 +143,10 @@
                 <th class="txt-left" style="text-align:center; width: 30px;">No</th>
                 <th class="txt-left" style="text-align:center; width: 100px;">Nama Barang</th>
                 <th class="txt-left" style="text-align:center; width: 40px;">No SPP</th>
-                <th class="txt-left" style="text-align:center; width: 30px;">Jml Diterima</th>
+                <th class="txt-left" style="text-align:center; width: 30px;">Jml Diterima(LPB)</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Jml Retur</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Harga</th>
+                <th class="txt-left" style="text-align:center; width: 60px;">Sub Total Retur</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Satuan</th>
                 <th class="txt-left" style=" text-align:center; width: 150px;">Keterangan</th>
             </tr>
@@ -155,20 +156,25 @@
             $jml_diterima = 0;
             $jml_retur = 0;
             $total_harga = 0;
+            $sub_total_retur = 0;
+
+
             ?>
             <?php foreach ($dataPengembalianBarangDetail as $detail) : ?>
                 <?php
                 $jml_diterima += $detail['jml_diterima'];
                 $jml_retur += $detail['jml_retur'];
                 $total_harga += $detail['harga'];
+                $sub_total_retur += $detail['harga'] * $detail['jml_retur'];
                 ?>
                 <tr>
                     <td class="txt-center" style="text-align:center;"><?= $no++; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail['nama_barang'] ?></td>
                     <td class="txt-right" style="text-align:center;"><?= $detail["no_spp"]; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["jml_diterima"]; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["jml_retur"]; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail['jml_retur']; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= number_format($detail["harga"]); ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= number_format($detail['harga'] * rtrim(rtrim($detail['jml_retur'], '0'), '.')); ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["kode_satuan"]; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail["ket_retur"]; ?></td>
                 </tr>
@@ -178,6 +184,7 @@
                 <td class="txt-right" style="text-align:center;"><?= $jml_diterima ?></td>
                 <td class="txt-right" style="text-align:center;"><?= $jml_retur ?></td>
                 <td class="txt-right" style="text-align:center;"><?= number_format($total_harga); ?></td>
+                <td class="txt-right" style="text-align:center;"><?= number_format($sub_total_retur); ?></td>
                 <td></td>
                 <td></td>
             </tr>
