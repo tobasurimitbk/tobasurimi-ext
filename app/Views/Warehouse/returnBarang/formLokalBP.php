@@ -75,7 +75,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= isset($dataPengembalianBarang) ? ($dataPengembalianBarang['status_post'] == "FINISH" ? 'disabled' : '') : ""  ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" onchange="generateNumber();getPenerimaanBarang()">
+                            <select <?= isset($dataPengembalianBarang) ? ($dataPengembalianBarang['status_post'] == "FINISH" ? 'disabled' : '') : ""  ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" onchange="getPenerimaanBarang()">
                                 <option value=""></option>
                                 <?php foreach ($dataDivisi as $divisi) : ?>
                                     <option value="<?= $divisi["id"]; ?>" <?= !empty($dataPengembalianBarang) ? ($dataPenerimaanBarang[0]['divisi_id'] === $divisi["id"] ? "selected" : "") : ""; ?>><?= strtoupper($divisi["divisi"]); ?></option>
@@ -498,37 +498,37 @@
         });
     }
 
-    function generateNumber() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
-        if (value) {
-            $("#no_surat_jalan").attr("readonly", true);
-            $.ajax({
-                url: `<?= base_url("retur-po-lokal-bp/generate-number"); ?>`,
-                method: "GET",
-                data: {
-                    divisi_id: $('#divisi_id option:selected').val()
-                },
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        $("#no_surat_jalan").val(res.data);
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                        $("#no_surat_jalan").attr("readonly", false);
-                        $("#auto_generate").prop("checked", false);
-                        $("#no_surat_jalan").val("");
-                    }
-                }
-            })
-        } else {
-            $("#no_surat_jalan").attr("readonly", false);
-            $("#no_surat_jalan").val("");
-        }
-    }
+    // function generateNumber() {
+    //     let value = document.getElementById('auto_generate').checked ? true : false;
+    //     if (value) {
+    //         $("#no_surat_jalan").attr("readonly", true);
+    //         $.ajax({
+    //             url: `<?= base_url("retur-po-lokal-bp/generate-number"); ?>`,
+    //             method: "GET",
+    //             data: {
+    //                 divisi_id: $('#divisi_id option:selected').val()
+    //             },
+    //             dataType: "json",
+    //             success: function(res) {
+    //                 if (res.status) {
+    //                     $("#no_surat_jalan").val(res.data);
+    //                 } else {
+    //                     Swal.fire({
+    //                         icon: 'error',
+    //                         title: res.message,
+    //                         confirmButtonColor: '#4e73df',
+    //                     })
+    //                     $("#no_surat_jalan").attr("readonly", false);
+    //                     $("#auto_generate").prop("checked", false);
+    //                     $("#no_surat_jalan").val("");
+    //                 }
+    //             }
+    //         })
+    //     } else {
+    //         $("#no_surat_jalan").attr("readonly", false);
+    //         $("#no_surat_jalan").val("");
+    //     }
+    // }
 
     function drawTable(listBarang) {
         const table = $('#dataTable');
