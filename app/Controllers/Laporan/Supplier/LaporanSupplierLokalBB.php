@@ -110,12 +110,11 @@ class LaporanSupplierLokalBB extends BaseController
         ];
 
         $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplier($availableSort, $condition, $addCondition, $pageSize, $offset);
+        // var_dump($dataBBLokal);
+        // exit;
         $groupedData = [];
         $totalTotalRow = 0;
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-        $dppSubsidi = 0;
-        $pphSubsidi = 0;
-        $totalSubsidi = 0;
 
         foreach ($dataBBLokal['data'] as $row) {
             $poId = $row->poNum;
@@ -123,7 +122,6 @@ class LaporanSupplierLokalBB extends BaseController
             $hasNpwp = !empty($row->supplierNpwp);
             $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
             $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
-
             $qty = $row->qtyPO;
 
             // UMUM
@@ -159,20 +157,20 @@ class LaporanSupplierLokalBB extends BaseController
                 $totalBulanan = $dppBulanan + $pphBulanan;
             }
 
-            // SUBSIDI
-            if ($pphMode === "Company") {
-                $dppSubsidi = $row->subsidi / $nilai_pph;
-                $pphSubsidi = $row->subsidi / $nilai_pph * $nilai_pph2;
-                $totalSubsidi = $row->subsidi + $pphSubsidi;
-            } else {
-                $dppSubsidi = $row->subsidi;
-                $pphSubsidi = ($pphMode === "Supplier") ? ($row->subsidi * $nilai_pph2) : 0;
-                $totalSubsidi = $row->subsidi + $pphSubsidi;
-            }
-
-            $totalRow = $totalUmum + $totalHarian + $totalBulanan + $totalSubsidi;
+            $totalRow = $totalUmum + $totalHarian + $totalBulanan;
 
             if (!isset($groupedData[$poId])) {
+                // Hitung subsidi hanya 1x saat pertama kali
+                if ($pphMode === "Company") {
+                    $dppSubsidi = $row->subsidi / $nilai_pph;
+                    $pphSubsidi = $dppSubsidi * $nilai_pph2;
+                    $totalSubsidi = $dppSubsidi - $pphSubsidi;
+                } else {
+                    $dppSubsidi = $row->subsidi;
+                    $pphSubsidi = ($pphMode === "Supplier") ? ($row->subsidi * $nilai_pph2) : 0;
+                    $totalSubsidi = $dppSubsidi + $pphSubsidi;
+                }
+
                 $groupedData[$poId] = [
                     'no' => $no++,
                     'supplierName' => $row->supplierName,
@@ -190,13 +188,20 @@ class LaporanSupplierLokalBB extends BaseController
                     'dppBulanan' => 0,
                     'pphBulanan' => 0,
                     'totalBulanan' => 0,
-                    'subsidi' => 0,
-                    'pphSubsidi' => 0,
-                    'totalSubsidi' => 0,
-                    'totalRow' => 0,
+                    'subsidi' => $dppSubsidi,
+                    'pphSubsidi' => $pphSubsidi,
+                    'totalSubsidi' => $totalSubsidi,
+                    'totalRow' => $totalRow + $totalSubsidi, // subsidi ditambahkan 1x di awal
                 ];
+
+                $totalTotalRow += $totalRow + $totalSubsidi;
+            } else {
+                // PO sudah pernah ada, tambahkan nilai akumulatif
+                $groupedData[$poId]['totalRow'] += $totalRow;
+                $totalTotalRow += $totalRow;
             }
 
+            // Akumulasi ke field lainnya
             $groupedData[$poId]['qtyPO'] += $qty;
             $groupedData[$poId]['dppUmum'] += $dppUmum;
             $groupedData[$poId]['pphUmum'] += $pphUmum;
@@ -209,13 +214,6 @@ class LaporanSupplierLokalBB extends BaseController
             $groupedData[$poId]['dppBulanan'] += $dppBulanan;
             $groupedData[$poId]['pphBulanan'] += $pphBulanan;
             $groupedData[$poId]['totalBulanan'] += $totalBulanan;
-
-            $groupedData[$poId]['subsidi'] = $dppSubsidi;
-            $groupedData[$poId]['pphSubsidi'] = $pphSubsidi;
-            $groupedData[$poId]['totalSubsidi'] = $totalSubsidi;
-
-            $groupedData[$poId]['totalRow'] += $totalRow;
-            $totalTotalRow += $totalRow;
         }
 
         // Format angka
@@ -233,7 +231,7 @@ class LaporanSupplierLokalBB extends BaseController
             "recordsFiltered" => $dataBBLokal['totalFilteredData'],
             'data'            => array_values($groupedData),
             "payload"         => $payload,
-            'totalTotalRow'   => number_format($totalTotalRow, 2, '.', ',')
+            'totalTotalRow'   => number_format($totalTotalRow, 2, '.', ','),
         ];
 
         echo json_encode($data);
