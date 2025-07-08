@@ -173,7 +173,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> type="text" oninput="this.value = greatFormatRupiah(this.value)" value="<?= !empty($dataPOImport) ? $dataPOImport->potongan_harga : "0"; ?>" class="form-control potongan_harga" name="potongan_harga" id="potongan_harga" placeholder="Potongan Harga (Opsional)">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> type="text" oninput="this.value = greatFormatRupiah(this.value)" value="<?= !empty($dataPOImport) ? number_format($dataPOImport->potongan_harga, 2) : "0"; ?>" class="form-control potongan_harga" name="potongan_harga" id="potongan_harga" placeholder="Potongan Harga (Opsional)">
                             <label for="floatingInput">Potongan Harga</label>
                         </div>
                     </div>
@@ -232,21 +232,16 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker latest_shipment_date" id="latest_shipment_date" name="latest_shipment_date" placeholder="Latest Shipment" value="<?= !empty($dataPOImport) ? ($dataPOImport->latest_shipment_date ? date("d/m/Y", strtotime($dataPOImport->latest_shipment_date)) : "")  : ""; ?>">
-                                    <label for="floatingInput">Latest Shipment Date</label>
-                                </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-latest-shipment-date"></i>
-                                </div>
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker latest_shipment_date" id="latest_shipment_date" name="latest_shipment_date" placeholder="Latest Shipment (Opsional)" value="<?= !empty($dataPOImport) ? ($dataPOImport->latest_shipment_date ?  $dataPOImport->latest_shipment_date : "")  : ""; ?>">
+                                <label for="floatingInput">Latest Shipment Date</label>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->attn : ""; ?>" type="text" class="form-control attn" id="attn" name="attn" placeholder="ATTN">
-                            <label for="floatingInput">ATTN</label>
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->attn : ""; ?>" type="text" class="form-control attn" id="attn" name="attn" placeholder="ATTN (Opsional)">
+                            <label for="floatingInput">ATTN (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -531,7 +526,7 @@
         )
     });
 
-    $("#payment_date,#latest_shipment_date,#po_date").datepicker({
+    $("#payment_date,#po_date").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -713,9 +708,9 @@
             latest_shipment_date: {
                 required: true
             },
-            attn: {
-                required: true
-            },
+            // attn: {
+            //     required: true
+            // },
             direktur: {
                 required: true,
             }
@@ -754,9 +749,9 @@
             latest_shipment_date: {
                 required: "Waktu pengiriman wajib diisi"
             },
-            attn: {
-                required: "ATTN wajib diisi"
-            },
+            // attn: {
+            //     required: "ATTN wajib diisi"
+            // },
             direktur: {
                 required: "Direktur wajib diisi",
             }

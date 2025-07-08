@@ -156,7 +156,7 @@ class POImportBahanPenolong extends BaseController
                 "am_purchase_orders.po_type"        => "Import",
                 "am_purchase_order_details.deletedAt" => null,
                 "am_purchase_orders.company_id" => $this->this_company_id,
-                "purchase_requests.user_id" => $this->user_id
+                "am_purchase_orders.createdBy" => $this->user_id,
             ];
         }
 
@@ -254,7 +254,7 @@ class POImportBahanPenolong extends BaseController
             'port_destination' => $this->request->getVar('portDestination'),
             'location_transaction' => $this->request->getVar('locationTransaction'),
             'shipment' => $this->request->getVar('shipment'),
-            'latest_shipment_date' => $this->request->getVar('latestShipmentDate')  ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("latestShipmentDate")))) : "",
+            'latest_shipment_date' => $this->request->getVar('latestShipmentDate'),
             'attn' => $this->request->getVar('attn'),
             'createdBy' => session()->get("login")->user_id,
             "direktur" => $this->request->getVar('direktur')
@@ -353,7 +353,7 @@ class POImportBahanPenolong extends BaseController
             'port_destination' => $this->request->getVar('portDestination'),
             'location_transaction' => $this->request->getVar('locationTransaction'),
             'shipment' => $this->request->getVar('shipment'),
-            'latest_shipment_date' => $this->request->getVar('latestShipmentDate')  ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("latestShipmentDate")))) : "",
+            'latest_shipment_date' => $this->request->getVar('latestShipmentDate'),
             'attn' => $this->request->getVar('attn'),
             "direktur" => $this->request->getVar('direktur')
         ]);

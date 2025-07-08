@@ -59,9 +59,6 @@
                                     <input autocomplete="one-time-code" <?= !empty($dataPengembalianBarang) ? "readonly" : ""; ?> value="<?= !empty($dataPengembalianBarang) ? $dataPengembalianBarang['no_surat_jalan'] : ""; ?>" type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" placeholder="No. Surat Jalan">
                                     <label for="floatingInput">No. Surat Jalan</label>
                                 </div>
-                                <div class="input-generate input-group-prepend group-prepend-password align-items-center" style="<?= !empty($dataPengembalianBarang) ?  "display: none" : ""; ?>">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="generateNumber()">
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -140,11 +137,12 @@
                                 <th style="text-align: center;">Kode Barang</th>
                                 <th style="text-align: center;">Nama Barang</th>
                                 <th style="text-align: center;">No SPP</th>
-                                <th style="text-align: center;">Jml Diterima</th>
                                 <th style="text-align: center;">Satuan</th>
+                                <th style="text-align: center;">Jml Diterima</th>
                                 <th style="text-align: center;">Harga</th>
                                 <th style="text-align: center;">Sub Total</th>
                                 <th style="text-align:center;">Jml Retur</th>
+                                <th style="text-align: center;">Sub Total Retur</th>
                                 <th style="text-align:center;">Ket Retur</th>
                                 <th style="text-align:center;">Action</th>
                             </tr>
@@ -154,7 +152,7 @@
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td colspan="4" style="text-align: right;"><b>GRAND TOTAL</b></td>
+                                <td colspan="5" style="text-align: right;"><b>GRAND TOTAL</b></td>
                                 <td style="text-align: center;"><b>0</b></td>
                                 <td style="text-align: center;"><b>0</td>
                                 <td style="text-align: center;"><b>0</b></td>
@@ -525,12 +523,11 @@
         if (listBarang.length == 0) {
             table.find('tfoot').empty();
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align:right;" colspan="4"><b>GRAND TOTAL</b></td>'));
+            newRow.append($('<td style="text-align:right;" colspan="5"><b>GRAND TOTAL</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>0</b></td>'));
-            newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
@@ -542,15 +539,20 @@
             var totalSubTotal = 0;
             var totalJmlRetur = 0;
             var sumberBarang = "-";
+            var totalSubTotalRetur = 0;
 
             $.each(listBarang, function(i, v) {
+                // Calculate sub_total_retur initially
+                var subTotalRetur = (Number(v.jml_retur) || 0) * (Number(v.harga) || 0);
+                totalSubTotalRetur += subTotalRetur;
+
                 var newRow = $('<tr style="border:0;border-color:whitesmoke;">');
                 newRow.append($('<td>').text(no++));
                 newRow.append($('<td>').text(v.kode_barang));
                 newRow.append($('<td>').text(v.nama_barang));
                 newRow.append($('<td>').text(v.no_spp));
-                newRow.append($('<td>').text(v.jml_diterima));
                 newRow.append($('<td>').text(v.kode_satuan));
+                newRow.append($('<td>').text(v.jml_diterima));
                 newRow.append($('<td>').text(greatFormatRupiah(v.harga)));
                 newRow.append($('<td>').text(greatFormatRupiah(v.sub_total)));
                 newRow.append($('<td style="text-align: center;">').html(
@@ -558,6 +560,7 @@
                         <input <?= isset($dataPengembalianBarang) ? ($dataPengembalianBarang['status_post'] == "FINISH" ? 'disabled' : '') : ""  ?> data-id="${v.id}" oninput="preventNegativeInput(this);sumTotalRetur();" style="height: 39px;" class="form-control jumlah_retur" type="text" value="${v.jml_retur}">
                     `
                 ));
+                newRow.append($('<td class="jumlah_sub_retur">').text(greatFormatRupiah(subTotalRetur)));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                         <input <?= isset($dataPengembalianBarang) ? ($dataPengembalianBarang['status_post'] == "FINISH" ? 'disabled' : '') : ""  ?> data-id="${v.id}"  style="height: 39px;" class="form-control keterangan_retur" type="text" value="${v.ket_retur}">
@@ -578,12 +581,12 @@
             });
             table.find('tfoot').empty();
             var newRow = $('<tr style="border:0;border-color:whitesmoke;">');
-            newRow.append($('<td style="text-align:right;" colspan="4"><b>GRAND TOTAL</b></td>'));
+            newRow.append($('<td style="text-align:right;" colspan="5"><b>GRAND TOTAL</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + totalJmlDiterima + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalHarga) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalSubTotal) + '</b></td>'));
             newRow.append($('<td style="text-align:left;" id="txt_total_retur"><b>' + greatFormatRupiah(totalJmlRetur) + '</b></td>'));
-            newRow.append($('<td></td>'));
+            newRow.append($('<td style="text-align:left;" id="txt_sub_total_retur"><b>' + greatFormatRupiah(totalSubTotalRetur) + '</b></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
@@ -601,6 +604,31 @@
                 $('.btn-submit-parent').attr('disabled', false);
             }
         }
+    }
+
+    function sumTotalRetur(inputElement) {
+        var row = $(inputElement).closest('tr');
+        var jmlRetur = Number($(inputElement).val()) || 0;
+        var harga = Number($(inputElement).data('harga')) || 0;
+        var subTotalRetur = jmlRetur * harga;
+        
+        // Update the row's sub total
+        row.find('.jumlah_sub_retur').text(greatFormatRupiah(subTotalRetur));
+        
+        // Recalculate grand totals
+        var totalJmlRetur = 0;
+        var totalSubTotalRetur = 0;
+        
+        $('tbody tr').each(function() {
+            var rowJmlRetur = Number($(this).find('.jumlah_retur').val()) || 0;
+            var rowHarga = Number($(this).find('.jumlah_retur').data('harga')) || 0;
+            totalJmlRetur += rowJmlRetur;
+            totalSubTotalRetur += rowJmlRetur * rowHarga;
+        });
+        
+        // Update footer totals
+        $('#txt_sub_total_retur').html('<b>' + greatFormatRupiah(totalSubTotalRetur) + '</b>');
+        $('tfoot td:nth-child(9)').html('<b>' + totalJmlRetur + '</b>'); // Update total quantity retur
     }
 
     function deleteDetail(id) {
