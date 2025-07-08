@@ -569,13 +569,13 @@ class PembayaranInvoice extends BaseController
             }
             // Calculate due date
             $tanggalJatuhTempo = "Tidak ada terms";
-            if (isset($data->terms) && $data->terms !== "" && ctype_digit($data->terms)) {  // Pengecekan lebih akurat untuk string angka
+            if (isset($data->terms_customer) && $data->terms_customer !== "" && ctype_digit($data->terms_customer)) {  // Pengecekan lebih akurat untuk string angka
                 try {
                     // Ubah format tanggal dari d/m/Y ke d-m-Y untuk pemrosesan
                     $tanggalFaktur = DateTime::createFromFormat('d/m/Y', $data->tanggal_faktur);
                     if ($tanggalFaktur) {
-                        $terms = (int)$data->terms;  // Konversi ke integer
-                        $tanggalFaktur->modify('+' . $terms . ' days');
+                        $terms_customer = (int)$data->terms_customer;  // Konversi ke integer
+                        $tanggalFaktur->modify('+' . $terms_customer . ' days');
                         $tanggalJatuhTempo = $tanggalFaktur->format('d/m/Y');  // Kembalikan ke format asal
                     }
                 } catch (Exception $e) {
@@ -596,7 +596,7 @@ class PembayaranInvoice extends BaseController
                 "nama_sales"        => $data->salesName,
                 "tipe_invoice"      => $data->tipe_invoice,
                 "counter_print"     => $data->counter_print,
-                "terms"     => $data->terms,
+                "terms" => $data->terms_customer ?? 'termin belum dibuat',
                 "status_pembayaran" => $statusPembayaranInvoice,
                 "tanggal_jatuh_tempo" => $tanggalJatuhTempo,
                 "dpp" => $data->dpp,
@@ -1092,6 +1092,8 @@ class PembayaranInvoice extends BaseController
 
     public function updateInvoice()
     {
+        // var_dump($this->request->getVar("keterangan"));
+        // die;
         $no_dokumen_req = $this->request->getVar("no_dokumen");
 
         // Validasi bahwa data adalah array

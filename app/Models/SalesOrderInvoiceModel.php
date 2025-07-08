@@ -158,6 +158,7 @@ class SalesOrderInvoiceModel extends Model
         sales_order_invoice.document_no AS doc_no,
         sales_order_invoice.document_type AS doc_type,
                       DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
+                      metadata.value AS terms_customer,
                       customers.name AS nama_pelanggan,
                       customers.kode AS kode_pelanggan,
                       CONCAT(employees.nip , ' - ', employees.name) AS salesName,
@@ -167,6 +168,7 @@ class SalesOrderInvoiceModel extends Model
             ->select($selectQry)
             ->join('customers', 'customers.id = sales_order_invoice.id_customer')
             ->join('employees', 'employees.id = customers.sales_id', 'left')
+            ->join('metadata', 'metadata.id = customers.termin', 'left')
             ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pesanan"', 'LEFT')
             ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pengiriman"', 'LEFT')
             ->where('sales_order_invoice.status_pelunasan', "UNPAID")
