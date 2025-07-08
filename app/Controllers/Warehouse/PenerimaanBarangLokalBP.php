@@ -703,21 +703,18 @@ class PenerimaanBarangLokalBP extends BaseController
                 }
             }
 
-            $multiple_po_id = json_decode($penerimaanBarang['multiple_po_id']);
-            foreach ($multiple_po_id as $key => $value) {
-                $result = $this->jurnalUmumController->insertDataPembelian($value, "BAHAN " . $penerimaanBarang['tipe_bahan'], $penerimaanBarang['status_penerimaan'], "pembelian", $id);
-                if ($result) {
-                    $responseBody = json_decode($result->getBody(), true);
-                    if ($responseBody && isset($responseBody['status'])) {
-                        $data = [
-                            "status"    => false,
-                            "message"   => $responseBody['message'],
-                            "payload"   => "",
-                            'token'     => csrf_hash()
-                        ];
-                        // echo json_encode($data);
-                        return json_encode($data);
-                    }
+            $result = $this->jurnalUmumController->insertDataPembelian($id, "BAHAN " . $penerimaanBarang['tipe_bahan'], $penerimaanBarang['status_penerimaan'], "pembelian", $id);
+            if ($result) {
+                $responseBody = json_decode($result->getBody(), true);
+                if ($responseBody && isset($responseBody['status'])) {
+                    $data = [
+                        "status"    => false,
+                        "message"   => $responseBody['message'],
+                        "payload"   => "",
+                        'token'     => csrf_hash()
+                    ];
+                    // echo json_encode($data);
+                    return json_encode($data);
                 }
             }
 

@@ -356,9 +356,13 @@ class PenerimaanBarangModel extends Model
 
     public function getById($id)
     {
-        $selectQry = "penerimaan_barang.*, suppliers.name as supplier_name,
-        suppliers.address as supplier_address, suppliers.phone as supplier_phone, warehouses.warehouse_name,
-        metadata.value as bc_type,divisis.divisi as divisi
+        $selectQry = "penerimaan_barang.*, 
+        suppliers.name as supplier_name,
+        suppliers.address as supplier_address, 
+        suppliers.phone as supplier_phone, 
+        warehouses.warehouse_name,
+        metadata.value as bc_type,divisis.divisi as divisi,
+        barang_master.barang_name as barang_name,
         ";
 
         $sppData = $this->asObject()
@@ -367,7 +371,42 @@ class PenerimaanBarangModel extends Model
             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
             ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
             ->join('metadata', 'metadata.id = penerimaan_barang.bc_type', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
             ->find($id);
+
+        return $sppData;
+    }
+
+    public function getByIdPrintBahanBaku($id)
+    {
+        $selectQry = "penerimaan_barang.*, 
+        suppliers.name as supplier_name,
+        suppliers.address as supplier_address, 
+        suppliers.phone as supplier_phone, 
+        warehouses.warehouse_name,
+        metadata.value as bc_type,
+        divisis.divisi as divisi,
+        barang_master.barang_name as barang_name,
+        rm_purchase_orders.po_no as po_no,
+        rm_purchase_orders.total_after_pph as total_after_pph,
+        rm_purchase_orders.total_before_pph as total_before_pph";
+
+        $sppData = $this->asObject()
+            ->select($selectQry)
+            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+            ->join('metadata', 'metadata.id = penerimaan_barang.bc_type', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join(
+                'rm_purchase_orders',
+                'FIND_IN_SET(rm_purchase_orders.id, REPLACE(REPLACE(REPLACE(penerimaan_barang.multiple_po_id, "[", ""), "]", ""), " ", ""))',
+                'left'
+            )
+            ->where('penerimaan_barang.id', $id)
+            ->first();
 
         return $sppData;
     }

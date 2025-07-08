@@ -136,7 +136,7 @@ class PenerimaanBarangDetailModel extends Model
         if ($status_penerimaan === "LOKAL") {
             if ($tipe_bahan === "BAKU") {
                 $builder->select(
-                    'penerimaan_barang_detail.*, satuans.id as id_satuan, 
+                    "penerimaan_barang_detail.*, satuans.id as id_satuan, 
                     penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
                 satuans.kode_satuan, 
                 barang_master.kode_barang, 
@@ -150,7 +150,8 @@ class PenerimaanBarangDetailModel extends Model
                 rm_purchase_order_details.note as keterangan,
                 rm_purchase_orders.po_no, 
                 rm_purchase_orders.status_penerimaan,
-                supplier_harga.spesifikasi'
+                supplier_harga.spesifikasi,
+                GROUP_CONCAT(IF(penerimaan_barang_detail.keterangan IS NOT NULL AND penerimaan_barang_detail.keterangan != '', penerimaan_barang_detail.keterangan, NULL)) as keterangan_lpb"
                 )
                     ->where($arrCondition)
                     ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'LEFT')
@@ -159,7 +160,8 @@ class PenerimaanBarangDetailModel extends Model
                     ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'LEFT')
                     ->join('rm_purchase_order_details', 'rm_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id', 'LEFT')
                     ->join('supplier_harga', 'rm_purchase_order_details.supplier_harga_id = supplier_harga.id', 'LEFT')
-                    ->join('rm_purchase_orders', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'LEFT');
+                    ->join('rm_purchase_orders', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'LEFT')
+                    ->groupBy('penerimaan_barang_detail.penerimaan_barang_id');
                 $query = $builder->get();
             }
             if ($tipe_bahan === "PENOLONG") {

@@ -750,17 +750,18 @@
                     <td>
                         <div><span class="txt-bold">Gudang: <?= $dataPO->lpb->warehouse_name; ?></span></div>
                     </td>
+                    <td class="txt-right">
+                        <div><span class="txt-bold">Bahan Baku: <?= $dataPO->lpb->barang_name; ?></span></div>
+                    </td>
                 </tr>
             </table>
             <table class="item-table mt-050">
                 <tr>
                     <th class="txt-left" style="text-align:center; width: 30px;">No</th>
-                    <th class="txt-left" style="text-align:center; width: 100px;">Nama Barang</th>
+                    <th class="txt-left" style=" text-align:center; width: 150px;">No PO</th>
                     <th class="txt-left" style="text-align:center; width: 40px;">Qty</th>
                     <th class="txt-left" style="text-align:center; width: 30px;">Satuan</th>
-                    <th class="txt-left" style="text-align:center; width: 60px;">@ Rp</th>
                     <th class="txt-left" style="text-align:center; width: 60px;">Jumlah</th>
-                    <th class="txt-left" style=" text-align:center; width: 150px;">No PO</th>
                     <th class="txt-left" style="text-align:center; width: 60px;">Keterangan</th>
                 </tr>
 
@@ -775,19 +776,26 @@
                     ?>
                     <tr>
                         <td class="txt-center" style="text-align:center;"><?= $no++; ?></td>
-                        <td class="txt-left" style="text-align:center;"><?= strtoupper($detail["nama_barang"] . ' (' . $detail['spesifikasi'] . ')'); ?></td>
+                        <td class="txt-left" style="text-align:center;"><?= $detail["po_no"]; ?></td>
                         <td class="txt-right" style="text-align:center;"><?= $detail["jml_masuk"]; ?></td>
                         <td class="txt-left" style="text-align:center;"><?= $detail["kode_satuan"]; ?></td>
-                        <td class="txt-right" style="text-align:center;"><?= number_format(($detail['harga'] + $detail['harga_harian'] + $detail['harga_bulanan']), 2, '.', ',') ?></td>
-                        <td class="txt-right" style="text-align:center;"><?= number_format($jumlah, 2, '.', ','); ?></td>
-                        <td class="txt-left" style="text-align:center;"><?= $detail["po_no"]; ?></td>
-                        <td class="txt-left" style="text-align:center;"><?= $detail["keterangan"]; ?></td>
+                        <td class="txt-right" style="text-align:center;"><?= number_format($dataPO->lpb->total_before_pph, 2, '.', ','); ?></td>
+                        <td class="txt-left" style="text-align:center;"><?= $detail["keterangan_lpb"]; ?></td>
                     </tr>
                 <?php endforeach; ?>
                 <tr>
-                    <td class="txt-left" style="padding-left: 5px" colspan="5"><b>TOTAL</b></td>
-                    <td class="txt-right" style="text-align:center;"><?= number_format($jml_sub_total, 2, '.', ','); ?></td>
+                    <td class="txt-left" style="padding-left: 5px" colspan="4"><b>TOTAL</b></td>
+                    <td class="txt-right" style="text-align:center;"><?= number_format($dataPO->lpb->total_before_pph, 2, '.', ','); ?></td>
                     <td></td>
+                </tr>
+                <tr>
+                    <td class="txt-left" style="padding-left: 5px" colspan="4"><b>PPh</b></td>
+                    <td class="txt-right" style="text-align:center;"><?= number_format($dataPO->lpb->total_before_pph - $dataPO->lpb->total_after_pph, 2, '.', ','); ?></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="txt-left" style="padding-left: 5px" colspan="4"><b>TOTAL DIBAYARKAN</b></td>
+                    <td class="txt-right" style="text-align:center;"><?= number_format($dataPO->lpb->total_after_pph, 2, '.', ','); ?></td>
                     <td></td>
                 </tr>
             </table>

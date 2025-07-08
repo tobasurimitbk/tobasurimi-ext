@@ -105,6 +105,7 @@ class RMPurchaseOrderDetailModel extends Model
         satuans.id as id_satuan, 
         satuans.nama_satuan,
         satuans.kode_satuan,
+        barang_master.barang_name as nama_barang,
         barang_master_spesifikasi.spesifikasi";
 
         $condition = [
@@ -116,6 +117,7 @@ class RMPurchaseOrderDetailModel extends Model
             ->where($condition)
             ->join('supplier_harga', 'rm_purchase_order_details.supplier_harga_id = supplier_harga.id', 'left')
             ->join('satuans', 'rm_purchase_order_details.satuan_id = satuans.id', 'left')
+            ->join('barang_master', 'barang_master.id = rm_purchase_order_details.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_purchase_order_details.barang2_id', 'left')
             ->findAll();
 
