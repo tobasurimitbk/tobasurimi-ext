@@ -116,7 +116,7 @@
 
         let min = false;
         x = parseFloat(x); // Pastikan x dalam bentuk angka
-        
+
         if (isNaN(x)) {
             return ""; // Jika bukan angka valid, kembalikan string kosong
         }
@@ -290,7 +290,13 @@
         }
 
         $(document).on('select2:open', () => {
-            document.querySelector('.select2-search__field').focus();
+            setTimeout(() => {
+                // Ambil semua search field, lalu fokus ke yang terakhir (paling baru di-inject)
+                const searchFields = document.querySelectorAll('.select2-search__field');
+                if (searchFields.length) {
+                    searchFields[searchFields.length - 1].focus();
+                }
+            }, 5); // kasih delay sedikit agar DOM siap
         });
     </script>
     <!-- General JS Scripts -->
