@@ -274,6 +274,19 @@
         },
     });
 
+    $(document).on('select2:open', function(e) {
+        // Pastikan ini adalah elemen yang kita inginkan (form-select)
+        const target = e.target;
+        if ($(target).hasClass('form-select')) {
+            // Cari input search yang baru saja dibuka
+            let searchInput = document.querySelector('.select2-container--open .select2-search__field');
+            if (searchInput) {
+                searchInput.focus();
+            }
+        }
+    });
+
+
     $('.btn-submit-parent').click(function(e) {
         e.preventDefault();
         if ($('.create-form').valid()) {
