@@ -291,9 +291,12 @@
 
         $(document).on('select2:open', () => {
             setTimeout(() => {
-                const searchField = document.querySelector('.select2-search__field');
-                if (searchField) searchField.focus();
-            }, 10); // delay sedikit supaya elemen siap
+                // Ambil semua search field, lalu fokus ke yang terakhir (paling baru di-inject)
+                const searchFields = document.querySelectorAll('.select2-search__field');
+                if (searchFields.length) {
+                    searchFields[searchFields.length - 1].focus();
+                }
+            }, 5); // kasih delay sedikit agar DOM siap
         });
     </script>
     <!-- General JS Scripts -->
