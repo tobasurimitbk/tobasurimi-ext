@@ -4,12 +4,13 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Rekap All Barang</h1>
+        <h1>Rekap All Barang (Summary)</h1>
         <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-barang/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item pdf" onclick="exportData('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-barang/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item excel" onclick="exportData('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-barang/export-excel"); ?>')">Excel</button></li>
         </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-supplier-lokal-bb"); ?>">
@@ -20,25 +21,35 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end row-col-spp">
-                <!-- <div class="col-md-2">
-                    <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+            <div class="row justify-content-center">
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" value="01/<?= date("m/Y") ?>" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" value="<?= date('t/m/Y') ?>" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
                         </div>
                     </div>
-                </div> -->
+                </div>
 
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_divisi" name="filter_divisi" id="filter_divisi">
                             <option value="" data-code=""></option>
@@ -54,7 +65,7 @@
                 </div>
 
 
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_barang" name="filter_barang" id="filter_barang">
                             <option value="" data-code=""></option>
@@ -80,18 +91,26 @@
                                 <th onclick="changeSort('bagianName')" class="sort" rowspan="2">Departemen</th>
                                 <th rowspan="2">Qty</th>
                                 <th rowspan="2">Satuan</th>
-                                <th colspan="3">Harian</th>
+                                <th colspan="3">Umum</th>
                                 <th colspan="3">Tambahan Harian</th>
                                 <th colspan="3">Tambahan Bulanan</th>
-
+                                <th colspan="3">Tambahan Langsung</th>
+                                <th onclick="changeSort('bagianName')" class="sort" rowspan="2">Total</th>
                             </tr>
                             <tr>
+                                <!-- Umum -->
                                 <th>DPP</th>
                                 <th>PPh</th>
                                 <th>Dibayarkan</th>
+                                <!-- Harian -->
                                 <th>DPP</th>
                                 <th>PPh</th>
                                 <th>Dibayarkan</th>
+                                <!-- Bulanan -->
+                                <th>DPP</th>
+                                <th>PPh</th>
+                                <th>Dibayarkan</th>
+                                <!-- Langsung -->
                                 <th>DPP</th>
                                 <th>PPh</th>
                                 <th>Dibayarkan</th>
@@ -216,7 +235,22 @@
                 className: "text-center",
             },
 
-
+            {
+                data: "subsidi",
+                className: "text-center",
+            },
+            {
+                data: "pphSubsidi",
+                className: "text-center",
+            },
+            {
+                data: "totalSubsidi",
+                className: "text-center",
+            },
+            {
+                data: "totalRow",
+                className: "text-center",
+            },
         ],
         columnDefs: [{
             defaultContent: "-",
@@ -304,7 +338,7 @@
         .find('label')
         .css('z-index', '1');
 
-    const pdf = function(url) {
+    const exportData = function(url) {
 
         let dateStart = $(".dateStart").val();
         let dateEnd = $(".dateEnd").val();

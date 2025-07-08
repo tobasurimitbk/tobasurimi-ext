@@ -2112,6 +2112,7 @@ $routes->get('/laporan-supplier-lokal-bb/rekap-persupplier/print', 'Laporan\Supp
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-barang', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRekapAllBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-barang/all-rekap-all-barang', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRekapAllBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-barang/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRekapAllBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rekap-all-barang/export-excel', 'Laporan\Supplier\LaporanSupplierLokalBB::exportExcelLaporanRekapAllBarang', ['filter' => 'Auth']);
 
 $routes->get('/laporan-supplier-lokal-bb/rekap-perbarang', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRekapPerbarang', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-perbarang/all-rekap-perbarang', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRekapPerbarang', ['filter' => 'Auth']);
