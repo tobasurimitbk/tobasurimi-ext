@@ -376,6 +376,7 @@ class SupplierModel extends Model
     public function getKwitansiTBBySupplier($supplierID, $year, $month)
     {
         $rmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $supplierModel = new SupplierModel();
 
         $supplierDet = $supplierModel->where('id', $supplierID)->first();
@@ -385,20 +386,23 @@ class SupplierModel extends Model
             'YEAR(rm_purchase_orders.po_date)' => $year,
             'rm_purchase_orders.supplier_id' => $supplierID,
             'rm_purchase_orders.is_posted' => 1,
-            // 'rm_purchase_orders.status_penerimaan' => 1,
             'rm_purchase_orders.deletedAt' => null,
             'rm_purchase_order_details.deletedAt' => null,
         ];
 
         $selectQry = "
-            rm_purchase_orders.pph,
-            rm_purchase_orders.po_date,
-            rm_purchase_order_details.*,
-            barang_master.barang_name,
-            barang_master_spesifikasi.spesifikasi,
-            SUM(qty) AS qty_total,
-            satuans.kode_satuan
-        ";
+        rm_purchase_orders.id AS po_id,
+        rm_purchase_orders.pph,
+        rm_purchase_orders.po_date,
+        rm_purchase_orders.cong_batasan,
+        rm_purchase_orders.cong_sebenarnya,
+        rm_purchase_orders.subsidi_langsung,
+        rm_purchase_order_details.monthly_price,
+        rm_purchase_order_details.qty,
+        barang_master.barang_name,
+        barang_master_spesifikasi.spesifikasi,
+        satuans.kode_satuan
+    ";
 
         $res = $rmPurchaseOrderModel
             ->asObject()
@@ -408,46 +412,41 @@ class SupplierModel extends Model
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_purchase_order_details.barang2_id', 'left')
             ->join('satuans', 'barang_master_spesifikasi.satuan_1 = satuans.id', 'left')
             ->where($condition)
-            ->groupBy('rm_purchase_order_details.barang1_id')
-            ->groupBy('rm_purchase_order_details.barang2_id')
             ->findAll();
 
         $finalRes = [];
         $total = 0;
 
         foreach ($res as $r) {
-            if ($r->pph == "None") {
-                // tidak ada pph
-                $pph = 0;
+            $hasNpwp = !empty($supplierDet['no_npwp']);
+            $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
+            $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+
+            $qty = $r->qty;
+            $hargaSatuan = $r->monthly_price;
+            $pphMode = $r->pph;
+
+            // Hitung DPP, PPh, dan setelah PPh hanya untuk monthly_price
+            if ($pphMode === "Company") {
+                $dpp = ($hargaSatuan / $nilai_pph) * $qty;
+                $pph = ($hargaSatuan / $nilai_pph * $nilai_pph2) * $qty;
+                $dibayarkan = $dpp - $pph;
             } else {
-                if ($supplierDet['no_npwp'] != "") {
-                    // ada npwp
-                    $pph = $r->monthly_price * 0.0025;
-                } else {
-                    // tidak ada npwp
-                    $pph = $r->monthly_price * 0.005;
-                }
+                $dpp = $hargaSatuan * $qty;
+                $pph = ($pphMode === "Supplier") ? ($hargaSatuan * $nilai_pph2) * $qty : 0;
+                $dibayarkan = $dpp + $pph;
             }
 
-            if ($r->pph == "Company") {
-                $hargaBulananPph = ($r->monthly_price * $r->qty_total) - $pph;
-                $hargaBulanan =  ($r->monthly_price * $r->qty_total) + $pph;
-            } else {
-                $hargaBulananPph = ($r->monthly_price * $r->qty_total) + $pph;
-                $hargaBulanan =  ($r->monthly_price * $r->qty_total);
-            }
-
-
-            $total += $hargaBulananPph;
+            $total += $dibayarkan;
 
             $finalRes[] = [
                 'nama_barang' => $r->barang_name,
                 'spesifikasi' => $r->spesifikasi,
                 'kode_satuan' => $r->kode_satuan,
-                'qty'          => $r->qty_total,
-                'harga_bulanan' =>  $hargaBulanan,
-                'pph'   => $pph,
-                'harga_bulanan_pph' => $hargaBulananPph
+                'qty'         => $qty,
+                'harga_bulanan' => $dpp,
+                'pph'         => $pph,
+                'harga_bulanan_pph' => $dibayarkan,
             ];
         }
 
@@ -457,7 +456,6 @@ class SupplierModel extends Model
             'total' => $total
         ];
     }
-
 
     public function getSupplierForJurnal($supplierID)
     {
