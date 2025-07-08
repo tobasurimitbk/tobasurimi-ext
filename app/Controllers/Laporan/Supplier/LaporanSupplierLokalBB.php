@@ -71,8 +71,7 @@ class LaporanSupplierLokalBB extends BaseController
     public function allLaporanPendapatanSupplier()
     {
         $pageSize = $this->request->getGet("length");
-        $currentPage = ($this->request->getGet("start") / $this->request->getGet("length")) + 1;
-        $offset = $currentPage - 1;
+        $currentPage = ($this->request->getGet("start") / $pageSize) + 1;
 
         $condition = [
             'rm_purchase_orders.is_posted' => '1',
@@ -82,14 +81,6 @@ class LaporanSupplierLokalBB extends BaseController
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'penerimaan_barang.deletedAt' => null,
             'penerimaan_barang_detail.deletedAt' => null,
-        ];
-
-        $payload = [
-            "pageSize"    => $pageSize,
-            "currentPage" => $currentPage,
-            "search"      => $this->request->getGet("search"),
-            "sort"        => $this->request->getGet("sort"),
-            "sortType"    => $this->request->getGet("sortType"),
         ];
 
         $addCondition = [
@@ -111,12 +102,11 @@ class LaporanSupplierLokalBB extends BaseController
             'warehouseName' => 'warehouses.warehouse_name',
         ];
 
-        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplier($availableSort, $condition, $addCondition, $pageSize, $offset);
-        // var_dump($dataBBLokal);
-        // exit;
+        // Ambil SEMUA data dulu tanpa pagination
+        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplier($availableSort, $condition, $addCondition, null, null);
+
         $groupedData = [];
         $totalTotalRow = 0;
-        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($dataBBLokal['data'] as $row) {
             $poId = $row->poNum;
@@ -162,7 +152,6 @@ class LaporanSupplierLokalBB extends BaseController
             $totalRow = $totalUmum + $totalHarian + $totalBulanan;
 
             if (!isset($groupedData[$poId])) {
-                // Hitung subsidi hanya 1x saat pertama kali
                 if ($pphMode === "Company") {
                     $dppSubsidi = $row->subsidi / $nilai_pph;
                     $pphSubsidi = $dppSubsidi * $nilai_pph2;
@@ -174,7 +163,6 @@ class LaporanSupplierLokalBB extends BaseController
                 }
 
                 $groupedData[$poId] = [
-                    'no' => $no++,
                     'supplierName' => $row->supplierName,
                     'poNum' => $row->poNum,
                     'poDate' => $row->poDate,
@@ -196,33 +184,37 @@ class LaporanSupplierLokalBB extends BaseController
                     'subsidi' => $dppSubsidi,
                     'pphSubsidi' => $pphSubsidi,
                     'totalSubsidi' => $totalSubsidi,
-                    'totalRow' => $totalRow + $totalSubsidi, // subsidi ditambahkan 1x di awal
+                    'totalRow' => $totalRow + $totalSubsidi,
                 ];
 
                 $totalTotalRow += $totalRow + $totalSubsidi;
             } else {
-                // PO sudah pernah ada, tambahkan nilai akumulatif
                 $groupedData[$poId]['totalRow'] += $totalRow;
                 $totalTotalRow += $totalRow;
             }
 
-            // Akumulasi ke field lainnya
             $groupedData[$poId]['qtyPO'] += $qty;
             $groupedData[$poId]['dppUmum'] += $dppUmum;
             $groupedData[$poId]['pphUmum'] += $pphUmum;
             $groupedData[$poId]['totalUmum'] += $totalUmum;
-
             $groupedData[$poId]['dppHarian'] += $dppHarian;
             $groupedData[$poId]['pphHarian'] += $pphHarian;
             $groupedData[$poId]['totalHarian'] += $totalHarian;
-
             $groupedData[$poId]['dppBulanan'] += $dppBulanan;
             $groupedData[$poId]['pphBulanan'] += $pphBulanan;
             $groupedData[$poId]['totalBulanan'] += $totalBulanan;
         }
 
-        // Format angka
-        foreach ($groupedData as &$row) {
+        $groupedData = array_values($groupedData); // reset index numerik
+        $totalGrouped = count($groupedData);
+
+        // Pagination manual
+        $paginatedData = array_slice($groupedData, ($currentPage - 1) * $pageSize, $pageSize);
+
+        // Format angka dan nomor urut
+        foreach ($paginatedData as $i => &$row) {
+            $row['no'] = ($currentPage - 1) * $pageSize + $i + 1;
+
             foreach ($row as $key => $val) {
                 if (is_numeric($val) && $key !== 'no') {
                     $row[$key] = number_format($val, 2, '.', ',');
@@ -232,10 +224,13 @@ class LaporanSupplierLokalBB extends BaseController
 
         $data = [
             "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $dataBBLokal['totalData'],
-            "recordsFiltered" => $dataBBLokal['totalFilteredData'],
-            'data'            => array_values($groupedData),
-            "payload"         => $payload,
+            "recordsTotal"    => $totalGrouped,
+            "recordsFiltered" => $totalGrouped,
+            'data'            => $paginatedData,
+            "payload"         => [
+                "pageSize"    => $pageSize,
+                "currentPage" => $currentPage,
+            ],
             'totalTotalRow'   => number_format($totalTotalRow, 2, '.', ','),
         ];
 

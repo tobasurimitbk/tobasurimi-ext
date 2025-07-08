@@ -591,7 +591,11 @@ class RMPurchaseOrderModel extends Model
         }
 
         $totalFilteredData = $poBBLokalData->countAllResults(false);
-        $data = $poBBLokalData->findAll($limit, $offset);
+        if ($limit == null && $offset == null) {
+            $data = $poBBLokalData->findAll();
+        } else {
+            $data = $poBBLokalData->findAll($limit, $offset);
+        }
 
         return [
             'data'              => $data,
