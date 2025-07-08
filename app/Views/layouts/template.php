@@ -116,7 +116,7 @@
 
         let min = false;
         x = parseFloat(x); // Pastikan x dalam bentuk angka
-        
+
         if (isNaN(x)) {
             return ""; // Jika bukan angka valid, kembalikan string kosong
         }
@@ -290,7 +290,10 @@
         }
 
         $(document).on('select2:open', () => {
-            document.querySelector('.select2-search__field').focus();
+            setTimeout(() => {
+                const searchField = document.querySelector('.select2-search__field');
+                if (searchField) searchField.focus();
+            }, 10); // delay sedikit supaya elemen siap
         });
     </script>
     <!-- General JS Scripts -->
