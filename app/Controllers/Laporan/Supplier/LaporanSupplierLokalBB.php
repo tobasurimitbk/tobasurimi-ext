@@ -267,7 +267,7 @@ class LaporanSupplierLokalBB extends BaseController
             'warehouseName' => 'warehouses.warehouse_name',
         ];
 
-        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplier($availableSort, $condition, $addCondition, 99999, 0); // ambil semua tanpa paginasi
+        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplier($availableSort, $condition, $addCondition, null, null); // ambil semua tanpa paginasi
 
         // Ambil hasil yang sudah digroup + total subsidi seperti allLaporanPendapatanSupplier
         $groupedData = $this->generateLaporanPendapatanSupplierData($dataBBLokal['data']);
