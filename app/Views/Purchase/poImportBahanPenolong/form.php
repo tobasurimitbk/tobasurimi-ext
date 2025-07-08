@@ -1154,11 +1154,11 @@
         table.find('tfoot').empty();
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="4"><b>TOTAL</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalHargaSatuan) + '</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalQty) + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalHargaSatuan.toFixed(2)) + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalQty.toFixed(2)) + '</b></td>'));
         newRow.append($('<td style="text-align:left;"></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalTambahan) + '</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalHarga) + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalTambahan.toFixed(2)) + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalHarga.toFixed(2)) + '</b></td>'));
         newRow.append($('<td></td>'));
         table.find('tfoot').append(newRow);
 
