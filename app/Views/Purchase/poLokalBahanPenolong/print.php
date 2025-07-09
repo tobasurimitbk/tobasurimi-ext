@@ -222,8 +222,8 @@
                     <td style="padding-left: 5px;"><?= $detail->nama_barang . " " . $detail->spesifikasi ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= "" . number_format(formatter(round($detail->price), "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= $detail->disc ?></b></td>
-                    <td class="txt-right" style="padding-right: 5px;"><?= 
-                    "" . number_format(formatter(round($detail->totalPriceWithoutAdditional), "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
+                    <td class="txt-right" style="padding-right: 5px;"><?=
+                                                                        "" . number_format(formatter(round($detail->totalPriceWithoutAdditional), "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
                 </tr>
             <?php } ?>
             <tr>
@@ -251,11 +251,16 @@
                 <td colspan="2" style="text-align:right; padding-right: 5px; margin-top:30px; font-weight:bold;">Grand Total :</td>
                 <td style="text-align:right; padding-right: 5px; margin-top:30px; font-weight:bold;"> <?= $dataPOLokal->totalPo ?></td>
             </tr>
+            <tr>
+                <td colspan="6">
+                    <b><u>Keterangan: <?= $dataPOLokal->keterangan ?></u></b>
+                </td>
+            </tr>
         </table>
 
         <div class="footer">
-            <b><u>Keterangan: <?= $dataPOLokal->keterangan ?></u></b>
-            <table class="w-100 sign-table border-collapse " style="padding-top: 0px;margin-left:-30px;">
+            <table class="w-100 sign-table border-collapse"
+                style="padding-top: 0px; margin-left:-30px; <?= count($dataPOLokal->am_purchase_order_details) >= 6 ? 'margin-top: 5px;!important' : '' ?>">
                 <tr>
                     <td style="text-align: center;"></td>
                 </tr>
