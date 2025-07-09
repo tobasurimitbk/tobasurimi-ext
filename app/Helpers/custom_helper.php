@@ -177,9 +177,12 @@ function penyebut(int $nilai): string
 
 function terbilang($x)
 {
+   // Hapus pemisah ribuan (koma) jika ada
+   $x = str_replace(',', '', $x);
+
    $angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
 
-   // Cek apakah ada koma
+   // Cek apakah ada koma desimal
    if (strpos($x, '.') !== false) {
       $parts = explode('.', $x);
       $hasil = trim(terbilang($parts[0])) . " Koma";

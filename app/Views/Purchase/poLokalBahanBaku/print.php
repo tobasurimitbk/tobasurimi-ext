@@ -510,11 +510,11 @@
                     <td style="vertical-align: top;">Banyaknya Uang <br> (Amount)</td>
                     <td style="vertical-align: top;">: </td>
                     <?php if ($dataPO->pph === "Company") { ?>
-                        <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(round(($nilai_total_harian - ($nilai_total_harian * $dataPO->nilai_pph2))), "STR_TO_FLOAT"))) ?></td>
+                        <td style="vertical-align: top;"><?= strtoupper(terbilang(number_format((($nilai_total_harian - ($nilai_total_harian * $dataPO->nilai_pph2))), 2))) ?></td>
                     <?php } else if ($dataPO->pph === "Supplier") { ?>
-                        <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(round(($nilai_total_harian - ($nilai_total_harian * $dataPO->nilai_pph2))), "STR_TO_FLOAT"))) ?></td>
+                        <td style="vertical-align: top;"><?= strtoupper(terbilang(number_format((($nilai_total_harian - ($nilai_total_harian * $dataPO->nilai_pph2))), 2))) ?></td>
 
-                    <?php } else { ?> <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(($nilai_total_harian), "STR_TO_FLOAT"))) ?></td>
+                    <?php } else { ?> <td style="vertical-align: top;"><?= strtoupper(terbilang(number_format(($nilai_total_harian), 2))) ?></td>
                     <?php } ?>
                 </tr>
                 <tr>
