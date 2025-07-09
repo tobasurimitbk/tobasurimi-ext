@@ -354,6 +354,7 @@ class POLokalBahanPenolong extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
 
+
         if ($this->request->getVar('poNo') != "AUTO GENERATE") {
             $noPoNew = $this->request->getVar('poNo');
         } else {
@@ -413,6 +414,28 @@ class POLokalBahanPenolong extends BaseController
         $aMPurchaseOrderDetailData = json_decode($this->request->getVar('listBarang'));
         // get all id detail
         $id_detail_all = [];
+
+
+        // Cek Apakah Ada di LPB
+        foreach ($aMPurchaseOrderDetailData as $d) {
+            $check = $this->penerimaanBarangDetailModel
+                ->select('barang_master.barang_name,barang_master_spesifikasi.spesifikasi')
+                ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', "left")
+                ->join('barang_master', 'penerimaan_barang_detail.barang_id = barang_master.id', 'left')
+                ->join('barang_master_spesifikasi', 'penerimaan_barang_detail.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+                ->where('penerimaan_barang_detail.barang_id', $d->barang_id)
+                ->where('penerimaan_barang_detail.spesifikasi_id', $d->spesifikasi_id)
+                ->where('status_penerimaan', "LOKAL")
+                ->where('tipe_bahan', "PENOLONG")
+                ->first();
+
+            if ($check != null) {
+                return response()->setJSON([
+                    'message' => "Barang " . $check['barang_name'] . " " . $check['spesifikasi'] . ", Sudah Terdapat di LPB (Silahkan Reload Halaman Ini Dahulu)",
+                    'status' => false,
+                ]);
+            }
+        }
 
         foreach ($aMPurchaseOrderDetailData as $d) {
             // UPDATE
