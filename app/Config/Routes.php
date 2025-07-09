@@ -932,6 +932,7 @@ $routes->group('barang-master', ['filter' => 'Auth'], function ($routes) {
     $routes->get('generate-new-code', 'Warehouse\Barang::generateNewCode');
     $routes->post('import', 'Warehouse\Barang::import');
     $routes->get('export-excel', 'Warehouse\Barang::exportExcel');
+    $routes->get('export-excel-history', 'Warehouse\Barang::exportExcelHistory');
 });
 $routes->get('barang/supplier/(:num)', 'Warehouse\Barang::getBySupplier/$1', ['filter' => 'Auth']);
 $routes->get('barang-bahan-penolong/histori', 'Warehouse\Barang::historiHargaPOBahanPenolong', ['filter' => 'Auth']);
