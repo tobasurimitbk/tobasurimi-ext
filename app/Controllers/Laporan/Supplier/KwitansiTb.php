@@ -44,6 +44,7 @@ class KwitansiTb extends BaseController
 
         $condition = [
             "suppliers.type"        => "BAHAN BAKU",
+            "suppliers.company_id" => $this->this_company_id
         ];
 
         $month = $this->request->getVar('month');
