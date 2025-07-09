@@ -677,11 +677,11 @@
                         <th>TOTAL TAMBAHAN</th>
                     </tr>
                     <tr>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>000</td>
+                        <td><?= htmlspecialchars($dataPO->totalQty ?? 0) ?></td>
+                        <td><?= number_format($dataPO->cong_sebenarnya ?? 0, 2, '.', ',') ?></td>
+                        <td><?= number_format($dataPO->cong_batasan ?? 0, 2, '.', ',') ?></td>
+                        <td><?= number_format(abs($dataPO->selisih) ?? 0, 2, '.', ',') ?></td>
+                        <td><?= number_format(abs($dataPO->totalTambahan) ?? 0, 2, '.', ',') ?></td>
                     </tr>
 
                     <tr>
@@ -689,14 +689,19 @@
                         <td></td>
                         <td></td>
                         <td>PPH</td>
-                        <td>000</td>
+                        <td><?= number_format(abs(($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0)), 2, '.', ',') ?></td>
                     </tr>
                     <tr>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td>DIBAYARKAN</td>
-                        <td>000</td>
+                        <td><?= number_format(
+                                abs(($dataPO->totalTambahan ?? 0)  - (($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0))),
+                                2,
+                                '.',
+                                ','
+                            ) ?></td>
                     </tr>
                 </table>
             <?php } ?>
