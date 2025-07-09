@@ -209,6 +209,7 @@
                 <button style="right: 10px;" class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
                     Export
                 </button>
+
                 <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
                     <li><button class="dropdown-item" onclick="printExcelPoLokal()">EXCEL</button></li>
                 </ul>
