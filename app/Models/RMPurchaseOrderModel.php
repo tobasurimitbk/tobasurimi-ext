@@ -1093,8 +1093,15 @@ class RMPurchaseOrderModel extends Model
 
         foreach ($resultRmPurchaseOrder as $r) {
             $dataPODetail = $rmPurchaseOrderDetailModel->getPoBBLokalDetailById($r->id);
-            $nilai_pph = !empty($r->no_npwp) ? (1.00 - 0.0025) : (1.00 - 0.005);
-            $nilai_pph2 = !empty($r->no_npwp) ? 0.0025 : 0.005;
+
+            if ($r->po_date <=  '2025-06-30') {
+                $nilai_pph = !empty($r->no_npwp) ? (1.00 - 0.0025) : (1.00 - 0.005);
+                $nilai_pph2 = !empty($r->no_npwp) ? 0.0025 : 0.005;
+            } else {
+                $nilai_pph = !empty($r->no_npwp) ? (1.00 - 0.0025) : (1.00 - 0.0025);
+                $nilai_pph2 = !empty($r->no_npwp) ? 0.0025 : 0.0025;
+            }
+
             $nilai_total = 0;
             // detail 
             foreach ($dataPODetail as $d) {
@@ -1169,8 +1176,14 @@ class RMPurchaseOrderModel extends Model
             ->where('rm_purchase_orders.id', $id)
             ->first();
 
-        $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
-        $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.005;
+        if ($data->po_date <=  '2025-06-30') {
+            $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
+            $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.005;
+        } else {
+            $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.0025);
+            $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.0025;
+        }
+
         $detailPurchase = $rmPurchaseOrderDetailModel->where('rm_purchase_order_id', $data->id)->where('deletedAt', null)->findAll();
 
         // PUNYA NPWP 0.25

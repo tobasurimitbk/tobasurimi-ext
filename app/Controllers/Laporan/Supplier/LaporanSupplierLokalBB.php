@@ -113,8 +113,14 @@ class LaporanSupplierLokalBB extends BaseController
             $poId = $row->poNum;
             $pphMode = $row->poPPH;
             $hasNpwp = !empty($row->supplierNpwp);
-            $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
-            $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            if ($row->poDate <=  '2025-06-30') {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            } else {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.0025);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.0025;
+            }
+
             $qty = $row->qtyPO;
 
             // UMUM
@@ -124,7 +130,8 @@ class LaporanSupplierLokalBB extends BaseController
                 $totalUmum = $dppUmum - $pphUmum;
             } else {
                 $dppUmum = $row->dppUmum * $qty;
-                $pphUmum = ($pphMode === "Supplier") ? ($row->dppUmum * $nilai_pph2) * $qty : 0;
+                $pphUmum = ($pphMode === "Supplier") ? (($row->dppUmum / $nilai_pph) * $nilai_pph2) * $qty : 0;
+                // dd($pphUmum);
                 $totalUmum = $dppUmum + $pphUmum;
             }
 
@@ -362,8 +369,13 @@ class LaporanSupplierLokalBB extends BaseController
             $poId = $row->poNum;
             $pphMode = $row->poPPH;
             $hasNpwp = !empty($row->supplierNpwp);
-            $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
-            $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            if ($row->poDate <=  '2025-06-30') {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            } else {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.0025);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.0025;
+            }
             $qty = $row->qtyPO;
 
             // UMUM
@@ -890,8 +902,13 @@ class LaporanSupplierLokalBB extends BaseController
 
             $pphMode = $row->poPPH;
             $hasNpwp = !empty($row->supplierNpwp);
-            $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
-            $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            if ($row->poDate <=  '2025-06-30') {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            } else {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.0025);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.0025;
+            }
             $qty = $row->qtyPO;
 
             // UMUM
@@ -1084,8 +1101,13 @@ class LaporanSupplierLokalBB extends BaseController
 
             $pphMode = $row->poPPH;
             $hasNpwp = !empty($row->supplierNpwp);
-            $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
-            $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            if ($row->poDate <=  '2025-06-30') {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            } else {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.0025);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.0025;
+            }
             $qty = $row->qtyPO;
 
             // UMUM
@@ -1287,8 +1309,13 @@ class LaporanSupplierLokalBB extends BaseController
 
             $pphMode = $row->poPPH;
             $hasNpwp = !empty($row->supplierNpwp);
-            $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
-            $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            if ($row->poDate <=  '2025-06-30') {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            } else {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.0025);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.0025;
+            }
             $qty = $row->qtyPO;
 
             // UMUM
@@ -1879,8 +1906,13 @@ class LaporanSupplierLokalBB extends BaseController
             $row->no = $no++;  // Add the 'No' field
             $pphMode = $row->poPPH;
             $hasNpwp = !empty($row->supplierNpwp);
-            $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
-            $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            if ($row->poDate <=  '2025-06-30') {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            } else {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.0025);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.0025;
+            }
             $qty = $row->qtyPO;
 
             // UMUM
@@ -2030,8 +2062,13 @@ class LaporanSupplierLokalBB extends BaseController
             $pphMode = $row->poPPH;
             $pphMode = $row->poPPH;
             $hasNpwp = !empty($row->supplierNpwp);
-            $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
-            $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            if ($row->poDate <=  '2025-06-30') {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            } else {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.0025);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.0025;
+            }
             $qty = $row->qtyPO;
 
             // UMUM
@@ -2272,8 +2309,13 @@ class LaporanSupplierLokalBB extends BaseController
             foreach ($dataBBLokal as $row) {
                 $pphMode = $row->poPPH;
                 $hasNpwp = !empty($row->supplierNpwp);
-                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
-                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+                if ($row->poDate <=  '2025-06-30') {
+                    $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
+                    $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+                } else {
+                    $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.0025);
+                    $nilai_pph2 = $hasNpwp ? 0.0025 : 0.0025;
+                }
                 $qty = $row->qtyPO;
 
                 // UMUM
