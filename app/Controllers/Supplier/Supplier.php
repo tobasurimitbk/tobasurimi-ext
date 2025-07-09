@@ -159,6 +159,7 @@ class Supplier extends BaseController
                 "name"          => strtoupper($data->name),
                 "address"       => strtoupper($data->address),
                 "no_npwp"       => formatNpwp($data->no_npwp),
+                "no_ktp"       => formatNpwp($data->no_ktp),
                 "phone"       => formatNpwp($data->phone)
             ]);
         }
@@ -189,6 +190,9 @@ class Supplier extends BaseController
                     "rules" => "permit_empty|string"
                 ],
                 "no_npwp" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "no_ktp" => [
                     "rules" => "permit_empty|string"
                 ],
                 "phone" => [
@@ -237,6 +241,7 @@ class Supplier extends BaseController
                 "name" => strtoupper($this->request->getVar("name")),
                 "address" => strtoupper($this->request->getVar("address")),
                 "no_npwp" => str_replace(['.', '-'], '',  $this->request->getPost("no_npwp")),
+                "no_ktp" => str_replace(['.', '-'], '',  $this->request->getPost("no_ktp")),
                 "phone" => $this->request->getPost("phone"),
                 "contact_person" => $this->request->getPost("contact_person"),
                 "email" => $this->request->getPost("email"),
@@ -313,6 +318,9 @@ class Supplier extends BaseController
                 "no_npwp" => [
                     "rules" => "permit_empty|string"
                 ],
+                "no_ktp" => [
+                    "rules" => "permit_empty|string"
+                ],
                 "phone" => [
                     "rules" => "permit_empty|string"
                 ],
@@ -362,6 +370,7 @@ class Supplier extends BaseController
                     "name" => strtoupper($this->request->getVar("name")),
                     "address" => strtoupper($this->request->getVar("address")),
                     "no_npwp" => str_replace(['.', '-'], '',  $this->request->getPost("no_npwp")),
+                    "no_ktp" => str_replace(['.', '-'], '',  $this->request->getPost("no_ktp")),
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),
                     "email" => $this->request->getPost("email"),
@@ -481,6 +490,7 @@ class Supplier extends BaseController
                 "name"          => strtoupper($data->name),
                 "address"       => strtoupper($data->address),
                 "no_npwp"       => formatNpwp($data->no_npwp),
+                "no_ktp"       => $data->no_ktp,
                 "phone"         => $data->phone
             ]);
         }
@@ -511,6 +521,9 @@ class Supplier extends BaseController
                     "rules" => "permit_empty|string"
                 ],
                 "no_npwp" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "no_ktp" => [
                     "rules" => "permit_empty|string"
                 ],
                 "phone" => [
@@ -553,6 +566,7 @@ class Supplier extends BaseController
                 "name" => strtoupper($this->request->getVar("name")),
                 "address" => strtoupper($this->request->getVar("address")),
                 "no_npwp" => str_replace(['.', '-'], '',  $this->request->getPost("no_npwp")),
+                "no_ktp" => str_replace(['.', '-'], '',  $this->request->getPost("no_ktp")),
                 "phone" => $this->request->getPost("phone"),
                 "contact_person" => $this->request->getPost("contact_person"),
                 "email" => $this->request->getPost("email"),
@@ -623,6 +637,9 @@ class Supplier extends BaseController
                 "no_npwp" => [
                     "rules" => "permit_empty|string"
                 ],
+                "no_ktp" => [
+                    "rules" => "permit_empty|string"
+                ],
                 "phone" => [
                     "rules" => "permit_empty|string"
                 ],
@@ -666,6 +683,7 @@ class Supplier extends BaseController
                     "name" => strtoupper($this->request->getVar("name")),
                     "address" => strtoupper($this->request->getVar("address")),
                     "no_npwp" => str_replace(['.', '-'], '',  $this->request->getPost("no_npwp")),
+                    "no_ktp" => str_replace(['.', '-'], '',  $this->request->getPost("no_ktp")),
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),
                     "email" => $this->request->getPost("email"),
@@ -1611,9 +1629,10 @@ class Supplier extends BaseController
                 $alamat = trim($data[$i][2]);
                 $kodePos = trim($data[$i][3]);
                 $npwp = trim($data[$i][4]);
-                $notelp = trim($data[$i][5]);
-                $contactPerson = trim($data[$i][6]);
-                $email = trim($data[$i][7]);
+                $ktp = trim($data[$i][5]);
+                $notelp = trim($data[$i][6]);
+                $contactPerson = trim($data[$i][7]);
+                $email = trim($data[$i][8]);
 
                 if ($kodeSupplier != null || $kodeSupplier != "") {
                     $this->supplierModel->insert([
@@ -1623,6 +1642,7 @@ class Supplier extends BaseController
                         'name' => $namaSupplier,
                         'address' => $alamat,
                         'no_npwp' => $npwp,
+                        'no_ktp' => $ktp,
                         'phone' => $notelp,
                         'type' => $type,
                         'contact_person' => $contactPerson,
@@ -1684,6 +1704,7 @@ class Supplier extends BaseController
                 "address"       => $data->address,
                 "postal_code"   => $data->postal_code,
                 "npwp"          => $data->no_npwp,
+                "ktp"          => $data->no_ktp,
                 "phone"         => $data->phone,
                 "contact_person" => $data->contact_person,
                 "email" => $data->email
@@ -1699,9 +1720,10 @@ class Supplier extends BaseController
             ->setCellValue('C1', 'ALAMAT')
             ->setCellValue('D1', 'KODE POS')
             ->setCellValue('E1', 'NPWP')
-            ->setCellValue('F1', 'NO TELPON')
-            ->setCellValue('G1', 'CONTACT PERSON')
-            ->setCellValue('H1', 'EMAIL');
+            ->setCellValue('F1', 'ktp')
+            ->setCellValue('G1', 'NO TELPON')
+            ->setCellValue('H1', 'CONTACT PERSON')
+            ->setCellValue('I1', 'EMAIL');
 
 
 
@@ -1712,9 +1734,10 @@ class Supplier extends BaseController
                 ->setCellValue('C' . $column, $l['address'])
                 ->setCellValue('D' . $column, $l['postal_code'])
                 ->setCellValue('E' . $column, $l['npwp'])
-                ->setCellValue('F' . $column, $l['phone'])
-                ->setCellValue('G' . $column, $l['contact_person'])
-                ->setCellValue('H' . $column, $l['email']);
+                ->setCellValue('F' . $column, $l['KTP'])
+                ->setCellValue('G' . $column, $l['phone'])
+                ->setCellValue('H' . $column, $l['contact_person'])
+                ->setCellValue('I' . $column, $l['email']);
 
             $sheet->getColumnDimension('A')->setAutoSize(true);
             $sheet->getColumnDimension('B')->setAutoSize(true);
@@ -1724,6 +1747,7 @@ class Supplier extends BaseController
             $sheet->getColumnDimension('F')->setAutoSize(true);
             $sheet->getColumnDimension('G')->setAutoSize(true);
             $sheet->getColumnDimension('H')->setAutoSize(true);
+            $sheet->getColumnDimension('I')->setAutoSize(true);
 
             $column++;
         }

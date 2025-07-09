@@ -97,18 +97,24 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control no_ktp" id="no_ktp" name="no_ktp" placeholder="KTP (Opsional)">
+                                <label for="floatingInput">KTP (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
                                 <textarea name="phone" id="phone" class="form-control phone"></textarea>
                                 <label for="floatingInput">No. Telepon (Opsional)</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person (Opsional)">
                                 <label for="floatingInput">Contact Person (Opsional)</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="email" class="form-control email" id="email" name="email" placeholder="Email">
@@ -163,6 +169,7 @@
                                 <th onclick="changeSort('kode')" class="sort">Kode</th>
                                 <th onclick="changeSort('name')" class="sort">Nama</th>
                                 <th onclick="changeSort('no_npwp')" class="sort">NPWP</th>
+                                <th onclick="changeSort('no_ktp')" class="sort">KTP</th>
                                 <th onclick="changeSort('address')" class="sort">No Telephone</th>
                                 <th onclick="changeSort('phone')" class="sort">Alamat</th>
                                 <th onclick="changeSort('phone')" class="sort">Histori</th>
@@ -232,7 +239,6 @@
                         <tr>
                             <th scope="col">No</th>
                             <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.purchase_request_id')" class="sort">No SPP</th>
-                            <th scope="col" onclick="changeShortPoLokal('penerimaan_barang.no_penerimaan_barang')" class="sort">No LPB</th>
                             <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_date')" class="sort">Tanggal</th>
                             <th scope="col" onclick="changeShortPoLokal('suppliers.name')" class="sort">Supplier</th>
                             <th scope="col" onclick="changeShortPoLokal('barang_master_spesifikasi.spesifikasi')" class="sort">Barang</th>
@@ -370,6 +376,9 @@
             data: "no_npwp",
             className: "text-center"
         }, {
+            data: "no_ktp",
+            className: "text-center"
+        }, {
             data: "phone",
             className: "text-center"
         }, {
@@ -442,9 +451,6 @@
                 sortable: false
             }, {
                 data: "spp_no",
-                className: "text-center"
-            }, {
-                data: "no_penerimaan_barang",
                 className: "text-center"
             }, {
                 data: "po_date",
@@ -619,6 +625,7 @@
                         $(".name").val(res.data.name);
                         $(".address").val(res.data.address);
                         $(".no_npwp").val(formatNpwp(res.data.no_npwp));
+                        $(".no_ktp").val(formatNpwp(res.data.no_ktp));
                         $(".phone").val(res.data.phone);
                         $(".contact_person").val(res.data.contact_person);
                         $(".email").val(res.data.email);
@@ -935,38 +942,6 @@
             sortTypePoLokal = sortTypePoLokal === "asc" ? "desc" : "asc";
         }
         tablePoLokal.ajax.reload();
-    }
-
-    function convertDateFormat(dateStr) {
-        const parts = dateStr.split("/");
-        if (parts.length === 3) {
-            return `${parts[2]}-${parts[1]}-${parts[0]}`;
-        }
-        return "";
-    }
-
-    function printExcelPoLokal() {
-        var tanggal = $(".po-date-lokal").val() ? convertDateFormat($(".po-date-lokal").val()) : "";
-        var search = $(".search-po-lokal").val() ?? "";
-        if (!supplierId) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Supplier belum dipilih!',
-            });
-            return;
-        }
-
-        const url = "<?= base_url("barang-bahan-penolong/export-histori-supplier") ?>";
-        const params = new URLSearchParams({
-            supplier_id: supplierId,
-            po_date: tanggal,
-            search: search,
-            sort: sortPoLokal,
-            sortType: sortTypePoLokal,
-        });
-
-        window.open(url + "?" + params.toString(), "_blank");
     }
 </script>
 
