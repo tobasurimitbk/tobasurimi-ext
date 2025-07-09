@@ -410,7 +410,7 @@
                     <div style="text-decoration: underline; font-size: 1.2em;">
                         KWITANSI<br>
                     </div>
-                    No. PO : <?= $dataPO->po_no ?><br>
+                    No : <?= $dataPO->po_no ?><br>
                 </div>
             </div>
             <table class="w-100 mt-05">
