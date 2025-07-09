@@ -177,7 +177,7 @@ function penyebut(int $nilai): string
 
 function terbilang($x)
 {
-   // Hapus pemisah ribuan (koma) jika ada
+   // Hapus pemisah ribuan (koma)
    $x = str_replace(',', '', $x);
 
    $angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
@@ -185,11 +185,17 @@ function terbilang($x)
    // Cek apakah ada koma desimal
    if (strpos($x, '.') !== false) {
       $parts = explode('.', $x);
-      $hasil = trim(terbilang($parts[0])) . " Koma";
-      $digitKoma = str_split($parts[1]);
-      foreach ($digitKoma as $digit) {
-         $hasil .= " " . $angka[$digit];
+      $hasil = trim(terbilang($parts[0]));
+
+      // Hanya tampilkan koma jika bagian desimal tidak 00
+      if ((int)$parts[1] > 0) {
+         $hasil .= " Koma";
+         $digitKoma = str_split($parts[1]);
+         foreach ($digitKoma as $digit) {
+            $hasil .= " " . $angka[$digit];
+         }
       }
+
       return trim($hasil);
    }
 
@@ -218,6 +224,7 @@ function terbilang($x)
 
    return "";
 }
+
 
 function convertToIndonesianMonth($date)
 {
