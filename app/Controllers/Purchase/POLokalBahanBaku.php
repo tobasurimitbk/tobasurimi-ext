@@ -734,7 +734,12 @@ class POLokalBahanBaku extends BaseController
                 $totalDailyPrice = 0;
                 $totalQty = 0;
                 $pph = 0.00;
-                $pphTax = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
+
+                if ($dataPO->po_date <=  '2025-06-30') {
+                    $pphTax = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
+                } else {
+                    $pphTax = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.0025;
+                }
 
                 $objPph = [
                     "None" => 0,
@@ -744,8 +749,16 @@ class POLokalBahanBaku extends BaseController
 
                 $pphTax *= $objPph[$dataPO->pph];
 
-                $dataPO->nilai_pph = !empty($dataPO->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
-                $dataPO->nilai_pph2 = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
+                if ($dataPO->po_date <=  '2025-06-30') {
+                    $dataPO->nilai_pph = !empty($dataPO->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
+                    $dataPO->nilai_pph2 = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
+                } else {
+                    $dataPO->nilai_pph = !empty($dataPO->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.0025);
+                    $dataPO->nilai_pph2 = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.0025;
+                }
+
+                // $dataPO->nilai_pph = !empty($dataPO->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
+                // $dataPO->nilai_pph2 = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
 
                 foreach ($dataPODetail as $value) {
                     $totalPrice += formatter($value->general_price, "CURR_TO_FLOAT") * formatter($value->qty, "CURR_TO_FLOAT");
