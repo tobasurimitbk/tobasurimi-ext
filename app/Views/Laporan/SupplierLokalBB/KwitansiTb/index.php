@@ -118,7 +118,7 @@
             data: function(data) {
                 data.year = $(".year").val();
                 data.month = $(".month").val();
-                // data.tb_search = $(".tb_search").val();
+                data.tb_search = $(".tb_search").val();
                 data.supplier_search = $(".supplier_search").val();
                 data.sort = sort;
                 data.sortType = sortType;
