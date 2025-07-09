@@ -56,7 +56,7 @@
                     </div>
                     <div class="card-wrap">
                         <div class="card-header">
-                            <h4>Rekap All Barang</h4>
+                            <h4>Rekap All Barang (Summary)</h4>
                         </div>
                     </div>
                 </div>
