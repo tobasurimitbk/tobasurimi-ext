@@ -1178,13 +1178,13 @@ class RMPurchaseOrderModel extends Model
             ->where('rm_purchase_orders.id', $id)
             ->first();
 
-        if ($data->po_date <=  '2025-06-30') {
-            $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
-            $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.005;
-        } else {
-            $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.0025);
-            $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.0025;
-        }
+        // if ($data->po_date <=  '2025-06-30') {
+        //     $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
+        //     $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.005;
+        // } else {
+        $nilaiPph = !empty($data->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
+        $nilaiPph2 = !empty($data->supplierNPWP) ? 0.0025 : 0.005;
+        // }
 
         $detailPurchase = $rmPurchaseOrderDetailModel->where('rm_purchase_order_id', $data->id)->where('deletedAt', null)->findAll();
 
