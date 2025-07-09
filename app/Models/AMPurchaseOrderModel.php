@@ -419,6 +419,7 @@ class AMPurchaseOrderModel extends Model
             'am_purchase_order_details.price' => 'am_purchase_order_details.price',
             'am_purchase_orders.division_id' => 'am_purchase_orders.division_id',
             'am_purchase_orders.note' => 'am_purchase_orders.note',
+            'penerimaan_barang.no_penerimaan_barang' => 'penerimaan_barang.no_penerimaan_barang'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -435,7 +436,8 @@ class AMPurchaseOrderModel extends Model
             am_purchase_order_details.qty,
             divisis.divisi,
             satuans.kode_satuan,
-            purchase_requests.spp_no
+            purchase_requests.spp_no,
+            penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
         ";
 
         $poDataQry = $this->asArray()
@@ -448,6 +450,8 @@ class AMPurchaseOrderModel extends Model
             ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id', 'left')
             ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
             ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id AND penerimaan_barang_detail.purchase_order_details_id = am_purchase_order_details.id', 'right')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id AND penerimaan_barang.tipe_bahan = "PENOLONG"', 'right')
             ->orderBy($sort, $sortType);
 
         $totalData = $poDataQry->countAllResults(false);
@@ -476,7 +480,11 @@ class AMPurchaseOrderModel extends Model
         }
 
         $totalFilteredData = $poDataQry->countAllResults(false);
-        $data = $poDataQry->findAll($limit, $offset);
+        if ($limit == null && $offset == null) {
+            $data = $poDataQry->findAll();
+        } else {
+            $data = $poDataQry->findAll($limit, $offset);
+        }
 
         return [
             'data'              => $data,

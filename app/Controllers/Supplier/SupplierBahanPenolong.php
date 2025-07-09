@@ -180,7 +180,7 @@ class SupplierBahanPenolong extends BaseController
 
             $supplierCode = $this->request->getPost("kode");
             if ($supplierCode == 'AUTO GENERATE') {
-                $supplierCode = $supplierModel->generateSupplierCode("BP");
+                $supplierCode = $supplierModel->generateSupplierCode("BP", $this->this_company_id);
             }
 
             $insertData = [

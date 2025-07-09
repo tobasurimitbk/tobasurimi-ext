@@ -620,6 +620,7 @@ class Barang extends BaseController
                 "no"                    => $no++,
                 "po_no"                 => $data['po_no'],
                 "spp_no"                => $data['spp_no'],
+                "no_penerimaan_barang"  => $data['no_penerimaan_barang'],
                 "po_date"               => date('d/m/Y', strtotime($data['po_date'])),
                 "nama_supplier"         => $data['nama_supplier'],
                 "nama_barang"           => $data['nama_barang'],
@@ -640,6 +641,77 @@ class Barang extends BaseController
         ];
 
         return response()->setJSON($data);
+    }
+
+    public function exportHistoriHargaPOBahanPenolongBySupplier()
+    {
+        $supplierId = $this->request->getGet('supplier_id');
+        $poDate     = $this->request->getGet('po_date');
+        $search     = $this->request->getGet('search');
+        $sort       = $this->request->getGet('sort');
+        $sortType   = $this->request->getGet('sortType');
+
+        $condition = [
+            "am_purchase_orders.company_id"  => $this->this_company_id,
+            "am_purchase_orders.deletedAt" => null,
+            "am_purchase_order_details.deletedAt" => null,
+            "am_purchase_orders.po_type" => "Lokal"
+        ];
+        if ($supplierId && $supplierId !== "all") {
+            $condition["am_purchase_orders.supplier_id"] = $supplierId;
+        }
+
+        $addCondition = [
+            "search" => $search !== "all" ? $search : "",
+            "sort" => $sort ?? "am_purchase_orders.id",
+            "sortType" => $sortType ?? "desc",
+            "po_date" => $poDate ? date("Y-m-d", strtotime($poDate)) : ""
+        ];
+
+        $amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $res = $amPurchaseOrderModel->historiHargaPOBahanPenolong($condition, $addCondition, null, null);
+
+        // --- Export to Excel ---
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'No SPP');
+        $sheet->setCellValue('C1', 'No LPB');
+        $sheet->setCellValue('D1', 'Tanggal PO');
+        $sheet->setCellValue('E1', 'Supplier');
+        $sheet->setCellValue('F1', 'Barang');
+        $sheet->setCellValue('G1', 'Keterangan');
+        $sheet->setCellValue('H1', 'Departemen');
+        $sheet->setCellValue('I1', 'Qty');
+        $sheet->setCellValue('J1', 'Satuan');
+        $sheet->setCellValue('K1', 'Harga');
+
+        $row = 2;
+        $no = 1;
+        foreach ($res['data'] as $data) {
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $data['spp_no']);
+            $sheet->setCellValue('C' . $row, $data['no_penerimaan_barang']);
+            $sheet->setCellValue('D' . $row, date("d/m/Y", strtotime($data['po_date'])));
+            $sheet->setCellValue('E' . $row, $data['nama_supplier']);
+            $sheet->setCellValue('F' . $row, $data['nama_barang']);
+            $sheet->setCellValue('G' . $row, $data['note']);
+            $sheet->setCellValue('H' . $row, $data['divisi']);
+            $sheet->setCellValue('I' . $row, $data['qty']);
+            $sheet->setCellValue('J' . $row, $data['kode_satuan']);
+            $sheet->setCellValue('K' . $row, $data['price']);
+            $row++;
+        }
+
+        $filename = 'Histori_PO_Bahan_Penolong_' . date('YmdHis') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 
     public function dropdownBarangType()

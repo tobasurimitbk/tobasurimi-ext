@@ -206,6 +206,12 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="historiModalLabel">Histori Purchase Order</h5>
+                <button style="right: 10px;" class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                    Export
+                </button>
+                <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                    <li><button class="dropdown-item" onclick="printExcelPoLokal()">EXCEL</button></li>
+                </ul>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -225,6 +231,7 @@
                         <tr>
                             <th scope="col">No</th>
                             <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.purchase_request_id')" class="sort">No SPP</th>
+                            <th scope="col" onclick="changeShortPoLokal('penerimaan_barang.no_penerimaan_barang')" class="sort">No LPB</th>
                             <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_date')" class="sort">Tanggal</th>
                             <th scope="col" onclick="changeShortPoLokal('suppliers.name')" class="sort">Supplier</th>
                             <th scope="col" onclick="changeShortPoLokal('barang_master_spesifikasi.spesifikasi')" class="sort">Barang</th>
@@ -434,6 +441,9 @@
                 sortable: false
             }, {
                 data: "spp_no",
+                className: "text-center"
+            }, {
+                data: "no_penerimaan_barang",
                 className: "text-center"
             }, {
                 data: "po_date",
@@ -924,6 +934,38 @@
             sortTypePoLokal = sortTypePoLokal === "asc" ? "desc" : "asc";
         }
         tablePoLokal.ajax.reload();
+    }
+
+    function convertDateFormat(dateStr) {
+        const parts = dateStr.split("/");
+        if (parts.length === 3) {
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+        return "";
+    }
+
+    function printExcelPoLokal() {
+        var tanggal = $(".po-date-lokal").val() ? convertDateFormat($(".po-date-lokal").val()) : "";
+        var search = $(".search-po-lokal").val() ?? "";
+        if (!supplierId) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Supplier belum dipilih!',
+            });
+            return;
+        }
+
+        const url = "<?= base_url("barang-bahan-penolong/export-histori-supplier") ?>";
+        const params = new URLSearchParams({
+            supplier_id: supplierId,
+            po_date: tanggal,
+            search: search,
+            sort: sortPoLokal,
+            sortType: sortTypePoLokal,
+        });
+
+        window.open(url + "?" + params.toString(), "_blank");
     }
 </script>
 
