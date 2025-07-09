@@ -9,6 +9,7 @@
         body {
             font-size: 15px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            text-transform: uppercase;
         }
 
         @page {
@@ -162,13 +163,12 @@
                         Tanggal: <?= date('d-m-Y', strtotime($tanggal))  ?>
                     </u>
                 </b><br><br>
-                Kwitansi <br>
+                <b>Kwitansi Bulanan</b> <br>
                 No. Nota : <?= $noKwitansi ?>
             </div>
             <div class="w-50 d-flex content-between" style="margin-top: -40px;">
                 <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
-                    <?= $company['company'] ?><br>
-                    <?= $company['address'] ?>
+                    <b> PT TOBASURIMI INDUSTRIES (<?= $company['company'] ?>)</b> <br>
                 </div>
 
             </div>
@@ -211,7 +211,7 @@
 
             <div class="w-100" style="margin-top: -20px;text-align:center;">
                 <div style="text-align: right;">
-                    <div><?= $provinsi['province_name'] ?>, <?= date('d-m-Y', strtotime($tanggal))  ?></div>
+                    <div>Medan, <?= date('d-m-Y', strtotime($tanggal))  ?></div>
                     <div>yang Menerima</div><br><br>
                     <div class="mt-2">(<?= $kwitansis['supplier']['name'] ?>)</div>
                 </div>
@@ -224,15 +224,13 @@
                             Tanggal: <?= date('d-m-Y', strtotime($tanggal))  ?>
                         </u>
                     </b><br><br>
-                    Kwitansi <br>
+                    <b>Kwitansi Bulanan</b> <br>
                     No. Nota : <?= $noKwitansi ?>
                 </div>
                 <div class="w-50 d-flex content-between" style="margin-top: -40px;">
                     <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
-                        <?= $company['company'] ?><br>
-                        <?= $company['address'] ?>
+                        <b> PT TOBASURIMI INDUSTRIES (<?= $company['company'] ?>)</b> <br>
                     </div>
-
                 </div>
 
                 <table class="w-100 mt-2">
@@ -273,7 +271,7 @@
 
                 <div class="w-100" style="margin-top: -20px;text-align:center;">
                     <div style="text-align: right;">
-                        <div><?= $provinsi['province_name'] ?>, <?= date('d-m-Y', strtotime($tanggal))  ?></div>
+                        <div>Medan, <?= date('d-m-Y', strtotime($tanggal))  ?></div>
                         <div>yang Menerima</div><br><br>
                         <div class="mt-2">(<?= $kwitansis['supplier']['name'] ?>)</div>
                     </div>
