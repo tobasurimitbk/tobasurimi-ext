@@ -57,13 +57,13 @@
             <div class="row justify-content-end row-col-spp">
                 <?= csrf_field() ?>
                 <div class="row justify-content-end row-col-spp mb-3">
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <select class="form-select tb_search" name="tb_search" id="tb_search" aria-label="Floating label select example">
                             <option value="" selected>SEMUA SUPPLIER</option>
                             <option value="1">SUPPLIER PUNYA NILAI TB</option>
                             <option value="0">SUPPLIER TIDAK PUNYA NILAI TB</option>
                         </select>
-                    </div>
+                    </div> -->
                     <div class="col-md-3">
                         <input autocomplete="one-time-code" class="form-control search supplier_search form-out-search" placeholder="Cari Supplier" value="" />
                     </div>
@@ -118,7 +118,7 @@
             data: function(data) {
                 data.year = $(".year").val();
                 data.month = $(".month").val();
-                data.tb_search = $(".tb_search").val();
+                // data.tb_search = $(".tb_search").val();
                 data.supplier_search = $(".supplier_search").val();
                 data.sort = sort;
                 data.sortType = sortType;
@@ -219,9 +219,9 @@
         table.ajax.reload();
     });
 
-    $('.tb_search').change(function() {
-        table.ajax.reload();
-    });
+    // $('.tb_search').change(function() {
+    //     table.ajax.reload();
+    // });
 
     $(".supplier_search").change(function() {
         table.ajax.reload();
