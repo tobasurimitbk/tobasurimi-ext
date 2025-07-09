@@ -219,9 +219,9 @@
         table.ajax.reload();
     });
 
-    // $('.tb_search').change(function() {
-    //     table.ajax.reload();
-    // });
+    $('.tb_search').change(function() {
+        table.ajax.reload();
+    });
 
     $(".supplier_search").change(function() {
         table.ajax.reload();
