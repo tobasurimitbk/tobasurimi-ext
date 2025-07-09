@@ -747,7 +747,7 @@
                         <div><span class="txt-bold">Supplier : <?= $dataPO->lpb->supplier_name; ?></span></div>
                     </td>
                     <td class="txt-right">
-                        <div><span class="txt-bold">Tipe: <?= $dataPO->lpb->tipe_bahan; ?></span></div>
+                        <div><span class="txt-bold">Tipe: BAHAN <?= $dataPO->lpb->tipe_bahan; ?></span></div>
                     </td>
                 </tr>
                 <tr>
@@ -763,7 +763,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <div><span class="txt-bold">Dokumen : <?= ($dataPO->lpb->bc_type == 0) ? "Non Pabean - 0" : $dataPO->lpb->bc_type ?></span></div>
+                        <div><span class="txt-bold">Dokumen : <?= ($dataPO->lpb->bc_type == 0) ? "Non Pabean" : $dataPO->lpb->bc_type ?></span></div>
                     </td>
                     <td>
                         <div><span class="txt-bold">Gudang: <?= $dataPO->lpb->warehouse_name; ?></span></div>
