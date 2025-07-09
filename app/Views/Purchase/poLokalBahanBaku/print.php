@@ -423,10 +423,10 @@
                     <td style="vertical-align: top;">BANYAKNYA UANG (AMOUNT)</td>
                     <td style="vertical-align: top;">: </td>
                     <?php if ($dataPO->pph === "Company") { ?>
-                        <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(($nilai_total - ($nilai_total * $dataPO->nilai_pph2)), "STR_TO_FLOAT"))) ?></td>
+                        <td style="vertical-align: top;"><?= strtoupper(terbilang(number_format(($nilai_total - ($nilai_total * $dataPO->nilai_pph2)), 2))) ?></td>
                     <?php } else if ($dataPO->pph === "Supplier") { ?>
-                        <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(($nilai_total - ($nilai_total * $dataPO->nilai_pph2)), "STR_TO_FLOAT"))) ?></td>
-                    <?php } else { ?> <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(($nilai_total), "STR_TO_FLOAT"))) ?></td>
+                        <td style="vertical-align: top;"><?= strtoupper(terbilang(number_format(($nilai_total - ($nilai_total * $dataPO->nilai_pph2)), 2))) ?></td>
+                    <?php } else { ?> <td style="vertical-align: top;"><?= strtoupper(terbilang(number_format(($nilai_total), 2))) ?></td>
                     <?php } ?>
                 </tr>
                 <tr>
