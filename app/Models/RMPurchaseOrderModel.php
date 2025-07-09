@@ -836,6 +836,7 @@ class RMPurchaseOrderModel extends Model
     public function getPoBBLokalForSupplierReportRekapPdf($dateStart, $dateEnd, $divisi, $bahanBaku, $companyId)
     {
         $selectQry = "
+        suppliers.no_npwp AS supplierNpwp,
         suppliers.name AS supplierName, 
         barang_master.barang_name AS barangName, 
         divisis.divisi AS bagianName, 
@@ -845,19 +846,25 @@ class RMPurchaseOrderModel extends Model
         SUM(rm_purchase_order_details.general_price) AS dppUmum,
         SUM(rm_purchase_order_details.qty) AS qtyPO,
         rm_purchase_orders.pph AS poPPH,
+        rm_purchase_orders.supplier_id,
+        rm_purchase_orders.barang_id,
         barang_master_spesifikasi.spesifikasi AS spekName, 
-        satuans.nama_satuan AS satuanName, 
+        satuans.kode_satuan AS satuanName, 
         ";
         $condition = [
             'rm_purchase_orders.is_posted' => '1',
             'penerimaan_barang.status_post' => 'FINISH',
             'penerimaan_barang.status_penerimaan' => 'LOKAL',
             'penerimaan_barang.tipe_bahan' => 'BAKU',
-            'rm_purchase_orders.company_id'  => $companyId
+            'rm_purchase_orders.company_id'  => $companyId,
+            'rm_purchase_orders.deletedAt'  => null,
         ];
 
-        if (!empty($dateStart) and !empty($dateEnd)) {
+        if (!empty($dateStart)) {
             $condition['rm_purchase_orders.po_date >='] = $dateStart;
+        }
+
+        if (!empty($dateEnd)) {
             $condition['rm_purchase_orders.po_date <='] = $dateEnd;
         }
 
@@ -886,7 +893,7 @@ class RMPurchaseOrderModel extends Model
             // ->join('bagian', 'bagian.division_id = divisis.id', 'left')
             // ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
             ->where($condition)
-            ->groupBy(['divisis.divisi', 'barang_master.barang_name', 'suppliers.name'])
+            ->groupBy(['divisis.id', 'barang_master_spesifikasi.spesifikasi'])
             ->findAll();
 
         return $poBBLokalData;
@@ -902,6 +909,7 @@ class RMPurchaseOrderModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "
+        suppliers.no_npwp AS supplierNpwp,
         suppliers.name AS supplierName, 
         barang_master.barang_name AS barangName, 
         divisis.divisi AS bagianName, 
@@ -912,7 +920,9 @@ class RMPurchaseOrderModel extends Model
         SUM(rm_purchase_order_details.qty) AS qtyPO,
         rm_purchase_orders.pph AS poPPH,
         barang_master_spesifikasi.spesifikasi AS spekName, 
-        satuans.nama_satuan AS satuanName, 
+        satuans.kode_satuan AS satuanName, 
+        rm_purchase_orders.barang_id,
+        rm_purchase_orders.supplier_id
         ";
 
 
@@ -932,7 +942,7 @@ class RMPurchaseOrderModel extends Model
             // ->join('bagian', 'bagian.division_id = divisis.id', 'left')
             // ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
             ->where($condition)
-            ->groupBy(['divisis.divisi', 'barang_master_spesifikasi.spesifikasi'])
+            ->groupBy(['divisis.id', 'barang_master_spesifikasi.spesifikasi'])
             ->orderBy($sort, $sortType);
 
         $totalData = $poBBLokalData->countAllResults(false);

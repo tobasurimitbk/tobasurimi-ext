@@ -388,6 +388,8 @@ class SupplierModel extends Model
             'rm_purchase_orders.is_posted' => 1,
             'rm_purchase_orders.deletedAt' => null,
             'rm_purchase_order_details.deletedAt' => null,
+            'rm_purchase_order_details.monthly_price !=' => null,
+            'rm_purchase_order_details.monthly_price !=' => 0,
         ];
 
         $selectQry = "
@@ -413,6 +415,8 @@ class SupplierModel extends Model
             ->join('satuans', 'barang_master_spesifikasi.satuan_1 = satuans.id', 'left')
             ->where($condition)
             ->findAll();
+
+
 
         $finalRes = [];
         $total = 0;
