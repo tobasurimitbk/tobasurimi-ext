@@ -1532,9 +1532,13 @@ class JurnalUmum extends BaseController
                         am_purchase_orders.po_no, 
                         am_purchase_orders.po_date, 
                         am_purchase_orders.currency,
-                        am_purchase_order_details.note')
+                        am_purchase_order_details.note,
+                        barang_master.barang_name as nama_barang,
+                        barang_master_spesifikasi.spesifikasi as nama_spesifikasi')
                     ->join('am_purchase_orders', 'am_purchase_orders.id = penerimaan_barang_detail.purchase_order_id', 'left')
                     ->join('am_purchase_order_details', 'am_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id', 'left')
+                    ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                    ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
                     ->where('penerimaan_barang_detail.deletedAt', null)
                     ->where('penerimaan_barang_detail.penerimaan_barang_id', $penerimaanBarangId)
                     ->asObject()
@@ -1665,7 +1669,7 @@ class JurnalUmum extends BaseController
                             $detail->barang_id == $accBarang->barang_master_id &&
                             $dataPB->company_id == $accBarang->company_id &&
                             $detail->spesifikasi_id == $accBarang->barang_master_spesifikasi_id &&
-                            $detail->note == $accBarang->keterangan &&
+                            strtolower($detail->note) == strtolower($accBarang->keterangan) &&
                             $dataPB->divisi_id == $accBarang->divisi_id &&
                             $accBarang->ap_id
                         ) {
@@ -1675,7 +1679,7 @@ class JurnalUmum extends BaseController
                     }
 
                     if (!$barangAP) {
-                        $errors[] = "Barang ID {$detail->barang_id} tidak memiliki akun COA";
+                        $errors[] = "Barang {$detail->nama_barang} {$detail->nama_spesifikasi} tidak memiliki akun COA";
                     } else {
                         $jumlah = $detail->sub_total;
                         $totalDebit += $jumlah;
