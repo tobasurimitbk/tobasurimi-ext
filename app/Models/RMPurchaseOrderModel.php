@@ -850,6 +850,7 @@ class RMPurchaseOrderModel extends Model
         rm_purchase_orders.pph AS poPPH,
         rm_purchase_orders.supplier_id,
         rm_purchase_orders.barang_id,
+         rm_purchase_orders.po_date,
         barang_master_spesifikasi.spesifikasi AS spekName, 
         satuans.kode_satuan AS satuanName, 
         ";
@@ -924,7 +925,8 @@ class RMPurchaseOrderModel extends Model
         barang_master_spesifikasi.spesifikasi AS spekName, 
         satuans.kode_satuan AS satuanName, 
         rm_purchase_orders.barang_id,
-        rm_purchase_orders.supplier_id
+        rm_purchase_orders.supplier_id,
+         rm_purchase_orders.po_date
         ";
 
 

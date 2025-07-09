@@ -1906,7 +1906,7 @@ class LaporanSupplierLokalBB extends BaseController
             $row->no = $no++;  // Add the 'No' field
             $pphMode = $row->poPPH;
             $hasNpwp = !empty($row->supplierNpwp);
-            if ($row->poDate <=  '2025-06-30') {
+            if ($row->po_date <=  '2025-06-30') {
                 $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
                 $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
             } else {
@@ -2062,7 +2062,7 @@ class LaporanSupplierLokalBB extends BaseController
             $pphMode = $row->poPPH;
             $pphMode = $row->poPPH;
             $hasNpwp = !empty($row->supplierNpwp);
-            if ($row->poDate <=  '2025-06-30') {
+            if ($row->po_date <=  '2025-06-30') {
                 $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
                 $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
             } else {
@@ -2309,7 +2309,7 @@ class LaporanSupplierLokalBB extends BaseController
             foreach ($dataBBLokal as $row) {
                 $pphMode = $row->poPPH;
                 $hasNpwp = !empty($row->supplierNpwp);
-                if ($row->poDate <=  '2025-06-30') {
+                if ($row->po_date <=  '2025-06-30') {
                     $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
                     $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
                 } else {
