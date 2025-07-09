@@ -550,23 +550,25 @@ class Barang extends BaseController
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $res = $amPurchaseOrderModel->historiHargaPOBahanPenolong($condition, $addCondition, $limit, $offset);
-
+        $res = $amPurchaseOrderModel->historiHargaPOBahanPenolongByLpb($condition, $addCondition, $limit, $offset);
+    
         $rdata = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         foreach ($res['data'] as $data) {
             array_push($rdata, [
                 "no"                    => $no++,
                 "po_no"                 => $data['po_no'],
+                "no_lpb"                => $data['no_penerimaan_barang'],
                 "spp_no"                => $data['spp_no'],
                 "po_date"               => date('d/m/Y', strtotime($data['po_date'])),
                 "nama_supplier"         => $data['nama_supplier'],
                 "nama_barang"           => $data['nama_barang'],
                 'divisi'                => $data['divisi'],
                 'note'                  => $data['note'],
-                'qty'                   => floatval($data['qty']),
+                'qty'                   => floatval($data['total_qty']),
                 'kode_satuan'           => $data['kode_satuan'],
-                "price"                 => number_format($data['price'], 2, ',', '.'),
+                "price"                 => number_format($data['total_harga'], 2, ',', '.'),
+                "sub_total"             => number_format($data['total_sub_total'], 2, ',', '.'),
             ]);
         }
 
@@ -1004,6 +1006,111 @@ class Barang extends BaseController
                 ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         }
 
+        ob_start();
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        $excelOutput = ob_get_clean();
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '.xlsx"');
+        header('Cache-Control: max-age=0');
+        header('Content-Length: ' . strlen($excelOutput));
+
+        echo $excelOutput;
+        exit();
+    }
+
+    public function exportExcelHistory()
+    {
+        $search = $this->request->getVar("search");
+        $sort = $this->request->getVar("sort") ?? 'am_purchase_orders.po_date';
+        $sortType = $this->request->getVar("sortType") ?? 'DESC';
+        $po_date = $this->request->getVar("po_date");
+        $po_type = $this->request->getVar("po_type");
+        $id = $this->request->getVar("id");
+
+        $filename = "HISTORI Penerimaan per Barang" . strtoupper($po_type) . "_" . date('YmdHis');
+
+        $condition = [
+            "am_purchase_orders.company_id" => $this->this_company_id,
+            "am_purchase_order_details.spesifikasi_id" => $id,
+            "am_purchase_orders.deletedAt" => NULL,
+            "am_purchase_order_details.deletedAt" => NULL,
+            "am_purchase_orders.po_type" => $po_type
+        ];
+
+        // Buat model instance
+        $amPurchaseOrderModel = new AMPurchaseOrderModel();
+
+        // Dapatkan data dengan parameter yang sama seperti fungsi historiHargaPOBahanPenolong()
+        $res = $amPurchaseOrderModel->historiHargaPOBahanPenolongByLpb(
+            $condition, 
+            [
+                'search' => $search,
+                "sort" => $sort,
+                "sortType" => $sortType,
+                "po_date" => $po_date ? date("Y/m/d", strtotime(str_replace("/", "-", $po_date))) : ""
+            ],
+            0, // tanpa limit
+            0  // tanpa offset
+        );
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header Excel
+        $sheet->setCellValue('A1', 'NO');
+        $sheet->setCellValue('B1', 'NO SPP');
+        $sheet->setCellValue('C1', 'NO PO');
+        $sheet->setCellValue('D1', 'NO LPB');
+        $sheet->setCellValue('E1', 'TANGGAL PO');
+        $sheet->setCellValue('F1', 'SUPPLIER');
+        $sheet->setCellValue('G1', 'BARANG');
+        $sheet->setCellValue('H1', 'DEPARTEMEN');
+        $sheet->setCellValue('I1', 'KETERANGAN');
+        $sheet->setCellValue('J1', 'QTY');
+        $sheet->setCellValue('K1', 'SATUAN');
+        $sheet->setCellValue('L1', 'HARGA');
+        $sheet->setCellValue('M1', 'SUB TOTAL');
+
+        // Style untuk header
+        $sheet->getStyle('A1:M1')->applyFromArray([
+            'font' => ['bold' => true],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]
+        ]);
+
+        // Isi data
+        $no = 1;
+        $rowNum = 2;
+        foreach ($res['data'] as $data) {
+            $sheet->setCellValue('A' . $rowNum, $no++);
+            $sheet->setCellValue('B' . $rowNum, $data['spp_no']);
+            $sheet->setCellValue('C' . $rowNum, $data['po_no']);
+            $sheet->setCellValue('D' . $rowNum, $data['no_penerimaan_barang']);
+            $sheet->setCellValue('E' . $rowNum, date('d/m/Y', strtotime($data['po_date'])));
+            $sheet->setCellValue('F' . $rowNum, $data['nama_supplier']);
+            $sheet->setCellValue('G' . $rowNum, $data['nama_barang']);
+            $sheet->setCellValue('H' . $rowNum, $data['divisi']);
+            $sheet->setCellValue('I' . $rowNum, $data['note']);
+            $sheet->setCellValue('J' . $rowNum, floatval($data['total_qty']));
+            $sheet->setCellValue('K' . $rowNum, $data['kode_satuan']);
+            $sheet->setCellValue('L' . $rowNum, $data['total_harga']);
+            $sheet->setCellValue('M' . $rowNum, $data['total_sub_total']);
+            
+            // Format angka untuk kolom harga dan sub total
+            $sheet->getStyle('L' . $rowNum . ':M' . $rowNum)
+                ->getNumberFormat()
+                ->setFormatCode('#,##0.00');
+                
+            $rowNum++;
+        }
+
+        // Auto size semua kolom
+        foreach (range('A', 'M') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Output file Excel
         ob_start();
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
