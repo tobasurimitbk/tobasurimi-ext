@@ -254,6 +254,14 @@
                         <?php if (can('Pembelian', 'PO Lokal BP', 'r')) : ?>
                             <div class="row justify-content-end">
                                 <div class="col-md-3">
+                                    <button class="btn btn-success btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Export
+                                    </button>
+                                    <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                                        <li><button class="dropdown-item" onclick="excelHsitory('<?= base_url("barang-master/export-excel-history"); ?>')">Export Excel</button></li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-3">
                                     <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Tanggal PO" class="form-control form-control-lg po-date-lokal">
                                 </div>
                                 <div class="col-md-3">
@@ -266,6 +274,8 @@
                                     <tr>
                                         <th scope="col">No</th>
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.purchase_request_id')" class="sort">No SPP</th>
+                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.purchase_request_id')" class="sort">No Po</th>
+                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.purchase_request_id')" class="sort">No LPB</th>
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_date')" class="sort">Tanggal</th>
                                         <th scope="col" onclick="changeShortPoLokal('suppliers.name')" class="sort">Supplier</th>
                                         <th scope="col" onclick="changeShortPoLokal('barang_master_spesifikasi.spesifikasi')" class="sort">Barang</th>
@@ -274,6 +284,7 @@
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.qty')" class="sort">Qty</th>
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.unit')" class="sort">Satuan</th>
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.price')" class="sort">Harga</th>
+                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.price')" class="sort">Sub Total Harga</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -814,6 +825,12 @@
                 data: "spp_no",
                 className: "text-center"
             }, {
+                data: "po_no",
+                className: "text-center"
+            }, {
+                data: "no_lpb",
+                className: "text-center"
+            }, {
                 data: "po_date",
                 className: "text-center"
             }, {
@@ -836,6 +853,10 @@
                 className: "text-center"
             }, {
                 data: "price",
+                className: "text-center"
+            },
+            {
+                data: "sub_total",
                 className: "text-center"
             }],
             columnDefs: [{
@@ -1651,6 +1672,20 @@
         let filter_coa = $(".filter_coa").val();
 
         window.open(url + `?search=${search}&parent_type=${parent_type}&filter_coa=${filter_coa}&sort=${sort}&sortType=${sortType}`, "_blank");
+    }
+
+    function excelHsitory(url) {
+        // Ambil parameter yang diperlukan dari halaman
+        const id = id_barang;
+        const search = $(".search-po-lokal").val();
+        const po_date = $(".po-date-lokal").val();
+        const sort = sortPoLokal;
+        const sortType = sortTypePoLokal;
+        const po_type = "Lokal";
+        
+        // Redirect ke URL export dengan parameter
+        window.location.href = url + '?id=' + id + '&po_type=' + po_type + 
+                            '&search=' + search + '&po_date=' + po_date;
     }
 </script>
 

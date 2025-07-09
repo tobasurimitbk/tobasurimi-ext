@@ -129,38 +129,38 @@
             <?php foreach ($dataOrder as $do) : ?>
                 <tr>
                     <td><?= $no++; ?></td>
-                    <td><?= $do->supplierName; ?></td>
-                    <td><?= $do->barangName; ?></td>
-                    <td><?= number_format($do->dppUmum); ?></td>
-                    <td><?= number_format($do->pphUmum); ?></td>
-                    <td><?= number_format($do->totalUmum); ?></td>
-                    <td><?= number_format($do->dppHarian); ?></td>
-                    <td><?= number_format($do->pphHarian); ?></td>
-                    <td><?= number_format($do->totalHarian); ?></td>
-                    <td><?= number_format($do->dppBulanan); ?></td>
-                    <td><?= number_format($do->pphBulanan); ?></td>
-                    <td><?= number_format($do->totalBulanan); ?></td>
-                    <td><?= number_format($do->subsidi); ?></td>
-                    <td><?= number_format($do->pphSubsidi); ?></td>
-                    <td><?= number_format($do->totalSubsidi); ?></td>
-                    <td><?= number_format($do->totalRow); ?></td>
+                    <td><?= $do['supplierName']; ?></td>
+                    <td><?= $do['barangName']; ?></td>
+                    <td><?= number_format($do['dppUmum'], 2); ?></td>
+                    <td><?= number_format($do['pphUmum'], 2); ?></td>
+                    <td><?= number_format($do['totalUmum'], 2); ?></td>
+                    <td><?= number_format($do['dppHarian'], 2); ?></td>
+                    <td><?= number_format($do['pphHarian'], 2); ?></td>
+                    <td><?= number_format($do['totalHarian'], 2); ?></td>
+                    <td><?= number_format($do['dppBulanan'], 2); ?></td>
+                    <td><?= number_format($do['pphBulanan'], 2); ?></td>
+                    <td><?= number_format($do['totalBulanan'], 2); ?></td>
+                    <td><?= number_format($do['subsidi'], 2); ?></td>
+                    <td><?= number_format($do['pphSubsidi'], 2); ?></td>
+                    <td><?= number_format($do['totalSubsidi'], 2); ?></td>
+                    <td><?= number_format($do['totalRow'], 2); ?></td>
                 </tr>
             <?php endforeach; ?>
             <tr>
                 <td colspan="3">Total</td>
-                <td id="totalDppUmum"><?= number_format($totalDppUmum); ?></td>
-                <td id="totalPphUmum"><?= number_format($totalPphUmum); ?></td>
-                <td id="totalTotalUmum"><?= number_format($totalTotalUmum); ?></td>
-                <td id="totalDppHarian"><?= number_format($totalDppHarian); ?></td>
-                <td id="totalPphHarian"><?= number_format($totalPphHarian); ?></td>
-                <td id="totalTotalHarian"><?= number_format($totalTotalHarian); ?></td>
-                <td id="totalDppBulanan"><?= number_format($totalDppBulanan); ?></td>
-                <td id="totalPphBulanan"><?= number_format($totalPphBulanan); ?></td>
-                <td id="totalTotalBulanan"><?= number_format($totalTotalBulanan); ?></td>
-                <td id="totalDppSubsidi"><?= number_format($totalDppSubsidi); ?></td>
-                <td id="totalPphSubsidi"><?= number_format($totalPphSubsidi); ?></td>
-                <td id="totalTotalSubsidi"><?= number_format($totalTotalSubsidi); ?></td>
-                <td id="totalTotalRow"><?= number_format($totalTotalRow); ?></td>
+                <td id="totalDppUmum"><?= number_format($totalDppUmum, 2); ?></td>
+                <td id="totalPphUmum"><?= number_format($totalPphUmum, 2); ?></td>
+                <td id="totalTotalUmum"><?= number_format($totalTotalUmum, 2); ?></td>
+                <td id="totalDppHarian"><?= number_format($totalDppHarian, 2); ?></td>
+                <td id="totalPphHarian"><?= number_format($totalPphHarian, 2); ?></td>
+                <td id="totalTotalHarian"><?= number_format($totalTotalHarian, 2); ?></td>
+                <td id="totalDppBulanan"><?= number_format($totalDppBulanan, 2); ?></td>
+                <td id="totalPphBulanan"><?= number_format($totalPphBulanan, 2); ?></td>
+                <td id="totalTotalBulanan"><?= number_format($totalTotalBulanan, 2); ?></td>
+                <td id="totalDppSubsidi"><?= number_format($totalDppSubsidi, 2); ?></td>
+                <td id="totalPphSubsidi"><?= number_format($totalPphSubsidi, 2); ?></td>
+                <td id="totalTotalSubsidi"><?= number_format($totalTotalSubsidi, 2); ?></td>
+                <td id="totalTotalRow"><?= number_format($totalTotalRow, 2); ?></td>
 
             </tr>
         <?php else : ?>

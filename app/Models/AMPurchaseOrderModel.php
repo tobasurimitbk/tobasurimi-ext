@@ -495,6 +495,89 @@ class AMPurchaseOrderModel extends Model
         ];
     }
 
+    public function historiHargaPOBahanPenolongByLpb($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'am_purchase_orders.po_no' => 'am_purchase_orders.po_no',
+            'am_purchase_orders.po_date' => 'am_purchase_orders.po_date',
+            'suppliers.name'  => 'suppliers.name',
+            'barang_master_spesifikasi.spesifikasi' => 'barang_master_spesifikasi.spesifikasi',
+            'am_purchase_order_details.price' => 'am_purchase_order_details.price',
+            'am_purchase_orders.division_id' => 'am_purchase_orders.division_id',
+            'am_purchase_orders.note' => 'am_purchase_orders.note',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'am_purchase_orders.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+        
+        $selectQry = "
+            CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) as nama_barang, 
+            am_purchase_orders.po_no,
+            am_purchase_orders.po_date,
+            am_purchase_order_details.note,
+            suppliers.name as nama_supplier,
+            SUM(penerimaan_barang_detail.harga) as total_harga, 
+            SUM(penerimaan_barang_detail.qty) as total_qty,
+            SUM(penerimaan_barang_detail.sub_total) as total_sub_total, 
+            divisis.divisi,
+            satuans.kode_satuan,
+            purchase_requests.spp_no,
+            penerimaan_barang.no_penerimaan_barang
+        ";
+
+        $poDataQry = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
+            ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id')
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id', 'left')
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id', 'left')
+            ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
+            ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+            ->groupBy('penerimaan_barang.id, nama_barang, po_no, po_date, note, nama_supplier, divisi, kode_satuan, spp_no, no_penerimaan_barang')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $poDataQry->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $poDataQry->groupStart();
+        }
+
+        if ($addCondition['po_date']) {
+            $poDataQry->where('am_purchase_orders.po_date', $addCondition['po_date']);
+        }
+
+        if ($addCondition['search']) {
+            $poDataQry->like('purchase_requests.spp_no', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
+                ->orLike('am_purchase_orders.note', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('am_purchase_order_details.qty', $addCondition['search'])
+                ->orLike('satuans.kode_satuan', $addCondition['search'])
+                ->orLike('am_purchase_order_details.price', $addCondition['search']);
+        }
+
+        if ($addCondition['search']) {
+            $poDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $poDataQry->countAllResults(false);
+        $data = $poDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
+
     public function historiHargaPOBahanPenolongFirst($barangID, $spesifikasiBarangID, $poType, $companyID)
     {
         $condition = [

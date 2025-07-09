@@ -526,6 +526,8 @@ class RMPurchaseOrderModel extends Model
         suppliers.name AS supplierName, 
         rm_purchase_orders.po_no AS poNum, 
         rm_purchase_orders.po_date AS poDate, 
+        rm_purchase_orders.barang_id,
+        rm_purchase_orders.supplier_id,
         barang_master.barang_name AS barangName, 
         warehouses.warehouse_name AS warehouseName, 
         rm_purchase_order_details.qty AS qtyPO, 
