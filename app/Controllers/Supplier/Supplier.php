@@ -490,7 +490,7 @@ class Supplier extends BaseController
                 "name"          => strtoupper($data->name),
                 "address"       => strtoupper($data->address),
                 "no_npwp"       => formatNpwp($data->no_npwp),
-                "no_ktp"       => $data->no_ktp,
+                "no_ktp"        => $data->no_ktp,
                 "phone"         => $data->phone
             ]);
         }
