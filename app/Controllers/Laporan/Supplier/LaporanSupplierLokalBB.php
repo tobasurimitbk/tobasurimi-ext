@@ -128,6 +128,10 @@ class LaporanSupplierLokalBB extends BaseController
                 $dppUmum = ($row->dppUmum / $nilai_pph) * $qty;
                 $pphUmum = ($row->dppUmum / $nilai_pph * $nilai_pph2) * $qty;
                 $totalUmum = $dppUmum - $pphUmum;
+            } elseif ($pphMode === "Supplier") {
+                $dppUmum = $row->dppUmum * $qty;
+                $pphUmum = ($row->dppUmum * $nilai_pph2) * $qty;
+                $totalUmum = $dppUmum - $pphUmum;
             } else {
                 $dppUmum = $row->dppUmum * $qty;
                 $pphUmum = ($pphMode === "Supplier") ? ($row->dppUmum / $nilai_pph * $nilai_pph2) * $qty : 0;
@@ -140,6 +144,10 @@ class LaporanSupplierLokalBB extends BaseController
                 $dppHarian = ($row->dppHarian / $nilai_pph) * $qty;
                 $pphHarian = ($row->dppHarian / $nilai_pph * $nilai_pph2) * $qty;
                 $totalHarian = $dppHarian - $pphHarian;
+            } elseif ($pphMode === "Supplier") {
+                $dppHarian = $row->dppHarian * $qty;
+                $pphHarian = ($row->dppHarian * $nilai_pph2) * $qty;
+                $totalHarian = $dppHarian - $pphHarian;
             } else {
                 $dppHarian = $row->dppHarian * $qty;
                 $pphHarian = ($pphMode === "Supplier") ? ($row->dppHarian * $nilai_pph2) * $qty : 0;
@@ -150,6 +158,10 @@ class LaporanSupplierLokalBB extends BaseController
             if ($pphMode === "Company") {
                 $dppBulanan = ($row->dppBulanan / $nilai_pph) * $qty;
                 $pphBulanan = ($row->dppBulanan / $nilai_pph * $nilai_pph2) * $qty;
+                $totalBulanan = $dppBulanan - $pphBulanan;
+            } elseif ($pphMode === "Supplier") {
+                $dppBulanan = $row->dppBulanan * $qty;
+                $pphBulanan = ($row->dppBulanan * $nilai_pph2) * $qty;
                 $totalBulanan = $dppBulanan - $pphBulanan;
             } else {
                 $dppBulanan = $row->dppBulanan * $qty;
@@ -163,6 +175,10 @@ class LaporanSupplierLokalBB extends BaseController
                 if ($pphMode === "Company") {
                     $dppSubsidi = $row->subsidi / $nilai_pph;
                     $pphSubsidi = $dppSubsidi * $nilai_pph2;
+                    $totalSubsidi = $dppSubsidi - $pphSubsidi;
+                } elseif ($pphMode === "Supplier") {
+                    $dppSubsidi = $row->subsidi;
+                    $pphSubsidi = ($row->subsidi * $nilai_pph2);
                     $totalSubsidi = $dppSubsidi - $pphSubsidi;
                 } else {
                     $dppSubsidi = $row->subsidi;
@@ -383,6 +399,10 @@ class LaporanSupplierLokalBB extends BaseController
                 $dppUmum = ($row->dppUmum / $nilai_pph) * $qty;
                 $pphUmum = ($row->dppUmum / $nilai_pph * $nilai_pph2) * $qty;
                 $totalUmum = $dppUmum - $pphUmum;
+            } elseif ($pphMode === "Supplier") {
+                $dppUmum = $row->dppUmum * $qty;
+                $pphUmum = ($row->dppUmum * $nilai_pph2) * $qty;
+                $totalUmum = $dppUmum - $pphUmum;
             } else {
                 $dppUmum = $row->dppUmum * $qty;
                 $pphUmum = ($pphMode === "Supplier") ? ($row->dppUmum * $nilai_pph2) * $qty : 0;
@@ -394,6 +414,10 @@ class LaporanSupplierLokalBB extends BaseController
                 $dppHarian = ($row->dppHarian / $nilai_pph) * $qty;
                 $pphHarian = ($row->dppHarian / $nilai_pph * $nilai_pph2) * $qty;
                 $totalHarian = $dppHarian - $pphHarian;
+            } elseif ($pphMode === "Supplier") {
+                $dppHarian = $row->dppHarian * $qty;
+                $pphHarian = ($row->dppHarian * $nilai_pph2) * $qty;
+                $totalHarian = $dppHarian - $pphHarian;
             } else {
                 $dppHarian = $row->dppHarian * $qty;
                 $pphHarian = ($pphMode === "Supplier") ? ($row->dppHarian * $nilai_pph2) * $qty : 0;
@@ -404,6 +428,10 @@ class LaporanSupplierLokalBB extends BaseController
             if ($pphMode === "Company") {
                 $dppBulanan = ($row->dppBulanan / $nilai_pph) * $qty;
                 $pphBulanan = ($row->dppBulanan / $nilai_pph * $nilai_pph2) * $qty;
+                $totalBulanan = $dppBulanan - $pphBulanan;
+            } elseif ($pphMode === "Supplier") {
+                $dppBulanan = $row->dppBulanan * $qty;
+                $pphBulanan = ($row->dppBulanan * $nilai_pph2) * $qty;
                 $totalBulanan = $dppBulanan - $pphBulanan;
             } else {
                 $dppBulanan = $row->dppBulanan * $qty;
@@ -417,6 +445,10 @@ class LaporanSupplierLokalBB extends BaseController
                 if ($pphMode === "Company") {
                     $dppSubsidi = $row->subsidi / $nilai_pph;
                     $pphSubsidi = $dppSubsidi * $nilai_pph2;
+                    $totalSubsidi = $dppSubsidi - $pphSubsidi;
+                } elseif ($pphMode === "Supplier") {
+                    $dppSubsidi = $row->subsidi;
+                    $pphSubsidi = ($row->subsidi * $nilai_pph2);
                     $totalSubsidi = $dppSubsidi - $pphSubsidi;
                 } else {
                     $dppSubsidi = $row->subsidi;
@@ -916,6 +948,10 @@ class LaporanSupplierLokalBB extends BaseController
                 $dppUmum = ($row->dppUmum / $nilai_pph) * $qty;
                 $pphUmum = ($row->dppUmum / $nilai_pph * $nilai_pph2) * $qty;
                 $totalUmum = $dppUmum - $pphUmum;
+            } elseif ($pphMode === "Supplier") {
+                $dppUmum = $row->dppUmum * $qty;
+                $pphUmum = ($row->dppUmum * $nilai_pph2) * $qty;
+                $totalUmum = $dppUmum - $pphUmum;
             } else {
                 $dppUmum = $row->dppUmum * $qty;
                 $pphUmum = ($pphMode === "Supplier") ? ($row->dppUmum * $nilai_pph2) * $qty : 0;
@@ -927,6 +963,10 @@ class LaporanSupplierLokalBB extends BaseController
                 $dppHarian = ($row->dppHarian / $nilai_pph) * $qty;
                 $pphHarian = ($row->dppHarian / $nilai_pph * $nilai_pph2) * $qty;
                 $totalHarian = $dppHarian - $pphHarian;
+            } elseif ($pphMode === "Supplier") {
+                $dppHarian = $row->dppHarian * $qty;
+                $pphHarian = ($row->dppHarian * $nilai_pph2) * $qty;
+                $totalHarian = $dppHarian - $pphHarian;
             } else {
                 $dppHarian = $row->dppHarian * $qty;
                 $pphHarian = ($pphMode === "Supplier") ? ($row->dppHarian * $nilai_pph2) * $qty : 0;
@@ -937,6 +977,10 @@ class LaporanSupplierLokalBB extends BaseController
             if ($pphMode === "Company") {
                 $dppBulanan = ($row->dppBulanan / $nilai_pph) * $qty;
                 $pphBulanan = ($row->dppBulanan / $nilai_pph * $nilai_pph2) * $qty;
+                $totalBulanan = $dppBulanan - $pphBulanan;
+            } elseif ($pphMode === "Supplier") {
+                $dppBulanan = $row->dppBulanan * $qty;
+                $pphBulanan = ($row->dppBulanan * $nilai_pph2) * $qty;
                 $totalBulanan = $dppBulanan - $pphBulanan;
             } else {
                 $dppBulanan = $row->dppBulanan * $qty;
@@ -989,6 +1033,10 @@ class LaporanSupplierLokalBB extends BaseController
                 if ($pphMode === "Company") {
                     $dppSubsidi = $row->subsidi / $nilai_pph;
                     $pphSubsidi = $dppSubsidi * $nilai_pph2;
+                    $totalSubsidi = $dppSubsidi - $pphSubsidi;
+                } elseif ($pphMode === "Supplier") {
+                    $dppSubsidi = $row->subsidi;
+                    $pphSubsidi = ($row->subsidi * $nilai_pph2);
                     $totalSubsidi = $dppSubsidi - $pphSubsidi;
                 } else {
                     $dppSubsidi = $row->subsidi;
@@ -1115,6 +1163,10 @@ class LaporanSupplierLokalBB extends BaseController
                 $dppUmum = ($row->dppUmum / $nilai_pph) * $qty;
                 $pphUmum = ($row->dppUmum / $nilai_pph * $nilai_pph2) * $qty;
                 $totalUmum = $dppUmum - $pphUmum;
+            } elseif ($pphMode === "Supplier") {
+                $dppUmum = $row->dppUmum * $qty;
+                $pphUmum = ($row->dppUmum * $nilai_pph2) * $qty;
+                $totalUmum = $dppUmum - $pphUmum;
             } else {
                 $dppUmum = $row->dppUmum * $qty;
                 $pphUmum = ($pphMode === "Supplier") ? ($row->dppUmum * $nilai_pph2) * $qty : 0;
@@ -1126,6 +1178,10 @@ class LaporanSupplierLokalBB extends BaseController
                 $dppHarian = ($row->dppHarian / $nilai_pph) * $qty;
                 $pphHarian = ($row->dppHarian / $nilai_pph * $nilai_pph2) * $qty;
                 $totalHarian = $dppHarian - $pphHarian;
+            } elseif ($pphMode === "Supplier") {
+                $dppHarian = $row->dppHarian * $qty;
+                $pphHarian = ($row->dppHarian * $nilai_pph2) * $qty;
+                $totalHarian = $dppHarian - $pphHarian;
             } else {
                 $dppHarian = $row->dppHarian * $qty;
                 $pphHarian = ($pphMode === "Supplier") ? ($row->dppHarian * $nilai_pph2) * $qty : 0;
@@ -1136,6 +1192,10 @@ class LaporanSupplierLokalBB extends BaseController
             if ($pphMode === "Company") {
                 $dppBulanan = ($row->dppBulanan / $nilai_pph) * $qty;
                 $pphBulanan = ($row->dppBulanan / $nilai_pph * $nilai_pph2) * $qty;
+                $totalBulanan = $dppBulanan - $pphBulanan;
+            } elseif ($pphMode === "Supplier") {
+                $dppBulanan = $row->dppBulanan * $qty;
+                $pphBulanan = ($row->dppBulanan * $nilai_pph2) * $qty;
                 $totalBulanan = $dppBulanan - $pphBulanan;
             } else {
                 $dppBulanan = $row->dppBulanan * $qty;
@@ -1188,6 +1248,10 @@ class LaporanSupplierLokalBB extends BaseController
                 if ($pphMode === "Company") {
                     $dppSubsidi = $row->subsidi / $nilai_pph;
                     $pphSubsidi = $dppSubsidi * $nilai_pph2;
+                    $totalSubsidi = $dppSubsidi - $pphSubsidi;
+                } elseif ($pphMode === "Supplier") {
+                    $dppSubsidi = $row->subsidi;
+                    $pphSubsidi = ($row->subsidi * $nilai_pph2);
                     $totalSubsidi = $dppSubsidi - $pphSubsidi;
                 } else {
                     $dppSubsidi = $row->subsidi;
@@ -1323,6 +1387,10 @@ class LaporanSupplierLokalBB extends BaseController
                 $dppUmum = ($row->dppUmum / $nilai_pph) * $qty;
                 $pphUmum = ($row->dppUmum / $nilai_pph * $nilai_pph2) * $qty;
                 $totalUmum = $dppUmum - $pphUmum;
+            } elseif ($pphMode === "Supplier") {
+                $dppUmum = $row->dppUmum * $qty;
+                $pphUmum = ($row->dppUmum * $nilai_pph2) * $qty;
+                $totalUmum = $dppUmum - $pphUmum;
             } else {
                 $dppUmum = $row->dppUmum * $qty;
                 $pphUmum = ($pphMode === "Supplier") ? ($row->dppUmum * $nilai_pph2) * $qty : 0;
@@ -1334,6 +1402,10 @@ class LaporanSupplierLokalBB extends BaseController
                 $dppHarian = ($row->dppHarian / $nilai_pph) * $qty;
                 $pphHarian = ($row->dppHarian / $nilai_pph * $nilai_pph2) * $qty;
                 $totalHarian = $dppHarian - $pphHarian;
+            } elseif ($pphMode === "Supplier") {
+                $dppHarian = $row->dppHarian * $qty;
+                $pphHarian = ($row->dppHarian * $nilai_pph2) * $qty;
+                $totalHarian = $dppHarian - $pphHarian;
             } else {
                 $dppHarian = $row->dppHarian * $qty;
                 $pphHarian = ($pphMode === "Supplier") ? ($row->dppHarian * $nilai_pph2) * $qty : 0;
@@ -1344,6 +1416,10 @@ class LaporanSupplierLokalBB extends BaseController
             if ($pphMode === "Company") {
                 $dppBulanan = ($row->dppBulanan / $nilai_pph) * $qty;
                 $pphBulanan = ($row->dppBulanan / $nilai_pph * $nilai_pph2) * $qty;
+                $totalBulanan = $dppBulanan - $pphBulanan;
+            } elseif ($pphMode === "Supplier") {
+                $dppBulanan = $row->dppBulanan * $qty;
+                $pphBulanan = ($row->dppBulanan * $nilai_pph2) * $qty;
                 $totalBulanan = $dppBulanan - $pphBulanan;
             } else {
                 $dppBulanan = $row->dppBulanan * $qty;
@@ -1396,6 +1472,10 @@ class LaporanSupplierLokalBB extends BaseController
                 if ($pphMode === "Company") {
                     $dppSubsidi = $row->subsidi / $nilai_pph;
                     $pphSubsidi = $dppSubsidi * $nilai_pph2;
+                    $totalSubsidi = $dppSubsidi - $pphSubsidi;
+                } elseif ($pphMode === "Supplier") {
+                    $dppSubsidi = $row->subsidi;
+                    $pphSubsidi = ($row->subsidi * $nilai_pph2);
                     $totalSubsidi = $dppSubsidi - $pphSubsidi;
                 } else {
                     $dppSubsidi = $row->subsidi;
@@ -1921,6 +2001,10 @@ class LaporanSupplierLokalBB extends BaseController
                 $dppUmum = ($row->dppUmum / $nilai_pph) * $qty;
                 $pphUmum = ($row->dppUmum / $nilai_pph * $nilai_pph2) * $qty;
                 $totalUmum = $dppUmum - $pphUmum;
+            } elseif ($pphMode === "Supplier") {
+                $dppUmum = $row->dppUmum * $qty;
+                $pphUmum = ($row->dppUmum * $nilai_pph2) * $qty;
+                $totalUmum = $dppUmum - $pphUmum;
             } else {
                 $dppUmum = $row->dppUmum * $qty;
                 $pphUmum = ($pphMode === "Supplier") ? ($row->dppUmum * $nilai_pph2) * $qty : 0;
@@ -1931,6 +2015,10 @@ class LaporanSupplierLokalBB extends BaseController
             if ($pphMode === "Company") {
                 $dppHarian = ($row->dppHarian / $nilai_pph) * $qty;
                 $pphHarian = ($row->dppHarian / $nilai_pph * $nilai_pph2) * $qty;
+                $totalHarian = $dppHarian - $pphHarian;
+            } elseif ($pphMode === "Supplier") {
+                $dppHarian = $row->dppHarian * $qty;
+                $pphHarian = ($row->dppHarian * $nilai_pph2) * $qty;
                 $totalHarian = $dppHarian - $pphHarian;
             } else {
                 $dppHarian = $row->dppHarian * $qty;
@@ -1943,6 +2031,10 @@ class LaporanSupplierLokalBB extends BaseController
                 $dppBulanan = ($row->dppBulanan / $nilai_pph) * $qty;
                 $pphBulanan = ($row->dppBulanan / $nilai_pph * $nilai_pph2) * $qty;
                 $totalBulanan = $dppBulanan - $pphBulanan;
+            } elseif ($pphMode === "Supplier") {
+                $dppBulanan = $row->dppBulanan * $qty;
+                $pphBulanan = ($row->dppBulanan * $nilai_pph2) * $qty;
+                $totalBulanan = $dppBulanan - $pphBulanan;
             } else {
                 $dppBulanan = $row->dppBulanan * $qty;
                 $pphBulanan = ($pphMode === "Supplier") ? ($row->dppBulanan * $nilai_pph2) * $qty : 0;
@@ -1953,6 +2045,10 @@ class LaporanSupplierLokalBB extends BaseController
             if ($pphMode === "Company") {
                 $dppSubsidi = $row->subsidi / $nilai_pph;
                 $pphSubsidi = $dppSubsidi * $nilai_pph2;
+                $totalSubsidi = $dppSubsidi - $pphSubsidi;
+            } elseif ($pphMode === "Supplier") {
+                $dppSubsidi = $row->subsidi;
+                $pphSubsidi = ($row->subsidi * $nilai_pph2);
                 $totalSubsidi = $dppSubsidi - $pphSubsidi;
             } else {
                 $dppSubsidi = $row->subsidi;
@@ -2077,6 +2173,10 @@ class LaporanSupplierLokalBB extends BaseController
                 $dppUmum = ($row->dppUmum / $nilai_pph) * $qty;
                 $pphUmum = ($row->dppUmum / $nilai_pph * $nilai_pph2) * $qty;
                 $totalUmum = $dppUmum - $pphUmum;
+            } elseif ($pphMode === "Supplier") {
+                $dppUmum = $row->dppUmum * $qty;
+                $pphUmum = ($row->dppUmum * $nilai_pph2) * $qty;
+                $totalUmum = $dppUmum - $pphUmum;
             } else {
                 $dppUmum = $row->dppUmum * $qty;
                 $pphUmum = ($pphMode === "Supplier") ? ($row->dppUmum * $nilai_pph2) * $qty : 0;
@@ -2087,6 +2187,10 @@ class LaporanSupplierLokalBB extends BaseController
             if ($pphMode === "Company") {
                 $dppHarian = ($row->dppHarian / $nilai_pph) * $qty;
                 $pphHarian = ($row->dppHarian / $nilai_pph * $nilai_pph2) * $qty;
+                $totalHarian = $dppHarian - $pphHarian;
+            } elseif ($pphMode === "Supplier") {
+                $dppHarian = $row->dppHarian * $qty;
+                $pphHarian = ($row->dppHarian * $nilai_pph2) * $qty;
                 $totalHarian = $dppHarian - $pphHarian;
             } else {
                 $dppHarian = $row->dppHarian * $qty;
@@ -2099,6 +2203,10 @@ class LaporanSupplierLokalBB extends BaseController
                 $dppBulanan = ($row->dppBulanan / $nilai_pph) * $qty;
                 $pphBulanan = ($row->dppBulanan / $nilai_pph * $nilai_pph2) * $qty;
                 $totalBulanan = $dppBulanan - $pphBulanan;
+            } elseif ($pphMode === "Supplier") {
+                $dppBulanan = $row->dppBulanan * $qty;
+                $pphBulanan = ($row->dppBulanan * $nilai_pph2) * $qty;
+                $totalBulanan = $dppBulanan - $pphBulanan;
             } else {
                 $dppBulanan = $row->dppBulanan * $qty;
                 $pphBulanan = ($pphMode === "Supplier") ? ($row->dppBulanan * $nilai_pph2) * $qty : 0;
@@ -2109,6 +2217,10 @@ class LaporanSupplierLokalBB extends BaseController
             if ($pphMode === "Company") {
                 $dppSubsidi = $row->subsidi / $nilai_pph;
                 $pphSubsidi = $dppSubsidi * $nilai_pph2;
+                $totalSubsidi = $dppSubsidi - $pphSubsidi;
+            } elseif ($pphMode === "Supplier") {
+                $dppSubsidi = $row->subsidi;
+                $pphSubsidi = ($row->subsidi * $nilai_pph2);
                 $totalSubsidi = $dppSubsidi - $pphSubsidi;
             } else {
                 $dppSubsidi = $row->subsidi;
@@ -2324,6 +2436,10 @@ class LaporanSupplierLokalBB extends BaseController
                     $dppUmum = ($row->dppUmum / $nilai_pph) * $qty;
                     $pphUmum = ($row->dppUmum / $nilai_pph * $nilai_pph2) * $qty;
                     $totalUmum = $dppUmum - $pphUmum;
+                } elseif ($pphMode === "Supplier") {
+                    $dppUmum = $row->dppUmum * $qty;
+                    $pphUmum = ($row->dppUmum * $nilai_pph2) * $qty;
+                    $totalUmum = $dppUmum - $pphUmum;
                 } else {
                     $dppUmum = $row->dppUmum * $qty;
                     $pphUmum = ($pphMode === "Supplier") ? ($row->dppUmum * $nilai_pph2) * $qty : 0;
@@ -2334,6 +2450,10 @@ class LaporanSupplierLokalBB extends BaseController
                 if ($pphMode === "Company") {
                     $dppHarian = ($row->dppHarian / $nilai_pph) * $qty;
                     $pphHarian = ($row->dppHarian / $nilai_pph * $nilai_pph2) * $qty;
+                    $totalHarian = $dppHarian - $pphHarian;
+                } elseif ($pphMode === "Supplier") {
+                    $dppHarian = $row->dppHarian * $qty;
+                    $pphHarian = ($row->dppHarian * $nilai_pph2) * $qty;
                     $totalHarian = $dppHarian - $pphHarian;
                 } else {
                     $dppHarian = $row->dppHarian * $qty;
@@ -2346,6 +2466,10 @@ class LaporanSupplierLokalBB extends BaseController
                     $dppBulanan = ($row->dppBulanan / $nilai_pph) * $qty;
                     $pphBulanan = ($row->dppBulanan / $nilai_pph * $nilai_pph2) * $qty;
                     $totalBulanan = $dppBulanan - $pphBulanan;
+                } elseif ($pphMode === "Supplier") {
+                    $dppBulanan = $row->dppBulanan * $qty;
+                    $pphBulanan = ($row->dppBulanan * $nilai_pph2) * $qty;
+                    $totalBulanan = $dppBulanan - $pphBulanan;
                 } else {
                     $dppBulanan = $row->dppBulanan * $qty;
                     $pphBulanan = ($pphMode === "Supplier") ? ($row->dppBulanan * $nilai_pph2) * $qty : 0;
@@ -2356,6 +2480,10 @@ class LaporanSupplierLokalBB extends BaseController
                 if ($pphMode === "Company") {
                     $dppSubsidi = $row->subsidi / $nilai_pph;
                     $pphSubsidi = $dppSubsidi * $nilai_pph2;
+                    $totalSubsidi = $dppSubsidi - $pphSubsidi;
+                } elseif ($pphMode === "Supplier") {
+                    $dppSubsidi = $row->subsidi;
+                    $pphSubsidi = ($row->subsidi * $nilai_pph2);
                     $totalSubsidi = $dppSubsidi - $pphSubsidi;
                 } else {
                     $dppSubsidi = $row->subsidi;
