@@ -116,20 +116,20 @@
                     </div>
                 </div>
                 <div class="row">
-                    <!-- <div class="col-md-4">
+                    <div class="col-md-4">
                         <div class="form-floating" style="height: 50px;">
                             <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-select spp_id" id="spp_id" name="spp_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php if (!empty($dataListSPP)) : ?>
                                     <?php foreach ($dataListSPP as $d) : ?>
-                                        <option value="<?= $d['id'] ?>"><?= $d['spp_no'] ?></option>
+                                        <option value="<?= $d['id'] ?>" <?= !empty($dataPOImport) && $d['id'] == $dataPOImport->purchase_order_id ? 'selected' : '' ?>><?= $d['spp_no'] ?></option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">SPP (Opsional)</label>
                         </div>
                         <small class="mb-3 mt-1"><i><?= !empty($dataPOImport) ? ($dataPOImport->spp_no != null ? "Nomor SPP : " . $dataPOImport->spp_no : '')  : ' -' ?></i></small>
-                    </div> -->
+                    </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
@@ -1303,6 +1303,7 @@
                     listBarang = [];
                     $.each(response.data, function(i, v) {
                         listBarang.push({
+                            id: getID(),
                             barang_id: v.barang_id,
                             spesifikasi_id: v.spesifikasi_id,
                             kode_barang: v.kode_barang,
