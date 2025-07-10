@@ -208,7 +208,6 @@ class POImportBahanPenolong extends BaseController
 
     public function savePOImportBahanPenolong()
     {
-
         if ($this->request->getVar('poNo') != "AUTO GENERATE") {
             $noPoNew = $this->request->getVar('poNo');
         } else {
@@ -237,7 +236,7 @@ class POImportBahanPenolong extends BaseController
         $poID = $this->amPurchaseOrderModel->insert([
             'company_id' => $this->this_company_id,
             'division_id' => $this->request->getVar('divisionID'),
-            'purchase_request_id' => $this->request->getVar('spp_id'),
+            'purchase_request_id' => (int) $this->request->getVar('spp_id'),
             'po_no' => $noPoNew,
             'po_date' => $this->request->getPost("poDate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("poDate")))) : "",
             'po_type' => "Import",
@@ -337,7 +336,7 @@ class POImportBahanPenolong extends BaseController
         $this->amPurchaseOrderModel->update($id, [
             'company_id' => $this->this_company_id,
             'division_id' => $this->request->getVar('divisionID'),
-            'purchase_request_id' => $sppID,
+            'purchase_request_id' => (int) $sppID,
             'po_type' => "Import",
             'po_no' => $noPoNew,
             'currency' => formatter($this->request->getVar("currency"), "STR_TO_INT"),
@@ -467,6 +466,9 @@ class POImportBahanPenolong extends BaseController
     public function deletePOImportBahanPenolong()
     {
         $id = decrypt($this->request->getPost("id"));
+        $this->sppModel->update($this->amPurchaseOrderModel->getPOById($id)->purchase_request_id, [
+            'request_status' => 'waiting'
+        ]);
         $this->amPurchaseOrderModel->delete($id);
         $this->amPurchaseOrderDetailModel->where('am_purchase_order_id', $id)->delete();
         return response()->setJSON([

@@ -115,13 +115,13 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4" style="display: none;">
+                    <div class="col-md-4">
                         <div class="form-floating" style="height: 50px;">
                             <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> class="form-select spp_id" id="spp_id" name="spp_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php if (!empty($dataListSPP)) : ?>
                                     <?php foreach ($dataListSPP as $d) : ?>
-                                        <option value="<?= $d['id'] ?>"><?= $d['spp_no'] ?></option>
+                                        <option value="<?= $d['id'] ?>" <?= !empty($dataPOImport) && $d['id'] == $dataPOImport->purchase_order_id ? 'selected' : '' ?>><?= $d['spp_no'] ?></option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
@@ -1105,6 +1105,7 @@
         totalTambahan = 0;
         totalHarga = 0;
         $.each(listBarang, function(i, v) {
+
             var newRow = $('<tr style="color:whitesmoke;">');
             newRow.append($('<td>').text(no++));
             newRow.append($('<td>').text(v.kode_barang));
@@ -1117,12 +1118,14 @@
             newRow.append($('<td>').text(v.total));
             <?php if (!empty($dataPOImport)) : ?>
                 <?php if ($dataPOImport->is_posted) : ?>
+                    console.log("posted : " + v);
                     newRow.append($('<td>').html(
                         `
                         -
                     `
                     ));
                 <?php else : ?>
+                    console.log("not posted : " + v);
                     newRow.append($('<td>').html(
                         `
                         <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.id}')">
@@ -1134,6 +1137,7 @@
                     ));
                 <?php endif ?>
             <?php else : ?>
+                console.log(v);
                 newRow.append($('<td>').html(
                     `
                         <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.id}')">
@@ -1182,12 +1186,16 @@
 
     function detailRow(id) {
         var item = null;
+
+
         for (var i = 0; i < listBarang.length; i++) {
+            console.log(listBarang[i].id, id);
             if (listBarang[i].id == id) {
                 item = listBarang[i];
                 break;
             }
         }
+        console.log(item, id, listBarang);
         $('#id_detail').val(id);
         $('#barang_id')
             .val(item.spesifikasi_id)
@@ -1289,6 +1297,7 @@
                     listBarang = [];
                     $.each(response.data, function(i, v) {
                         listBarang.push({
+                            id: getID(),
                             barang_id: v.barang_id,
                             spesifikasi_id: v.spesifikasi_id,
                             kode_barang: v.kode_barang,
