@@ -172,7 +172,7 @@
             <br>
             <br>
             <br>
-            <hr style="border: none; border-top: 1px dashed #000; margin-top:-5px;">
+            <hr style="border: none; border-top: 1px dashed #000;">
             <br>
             <br>
             <br>
