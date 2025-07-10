@@ -544,7 +544,8 @@ class Barang extends BaseController
             'search' => $this->request->getGet('search'),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : ""
+            "start_date" => $this->request->getVar("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("start_date")))) : "",
+            "end_date" => $this->request->getVar("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("end_date")))) : "",
         ];
 
         $limit = $this->request->getGet("length");
@@ -607,11 +608,15 @@ class Barang extends BaseController
             'search' => $this->request->getGet('search'),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : ""
+            "start_date" => $this->request->getVar("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("start_date")))) : "",
+            "end_date" => $this->request->getVar("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("end_date")))) : ""
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
+
+        // var_dump($addCondition);
+        // die;
 
         $res = $amPurchaseOrderModel->historiHargaPOBahanPenolong($condition, $addCondition, $limit, $offset);
 
@@ -1097,7 +1102,8 @@ class Barang extends BaseController
         $search = $this->request->getVar("search");
         $sort = $this->request->getVar("sort") ?? 'am_purchase_orders.po_date';
         $sortType = $this->request->getVar("sortType") ?? 'DESC';
-        $po_date = $this->request->getVar("po_date");
+        $start_date = $this->request->getVar("start_date");
+        $end_date = $this->request->getVar("end_date");
         $po_type = $this->request->getVar("po_type");
         $id = $this->request->getVar("id");
 
@@ -1111,17 +1117,18 @@ class Barang extends BaseController
             "am_purchase_orders.po_type" => $po_type
         ];
 
-        // Buat model instance
+
         $amPurchaseOrderModel = new AMPurchaseOrderModel();
 
-        // Dapatkan data dengan parameter yang sama seperti fungsi historiHargaPOBahanPenolong()
+        
         $res = $amPurchaseOrderModel->historiHargaPOBahanPenolongByLpb(
             $condition, 
             [
                 'search' => $search,
                 "sort" => $sort,
                 "sortType" => $sortType,
-                "po_date" => $po_date ? date("Y/m/d", strtotime(str_replace("/", "-", $po_date))) : ""
+                "start_date" => $start_date ? date("Y/m/d", strtotime(str_replace("/", "-", $start_date))) : "",
+                "end_date" => $end_date ? date("Y/m/d", strtotime(str_replace("/", "-", $end_date))) : ""
             ],
             0, // tanpa limit
             0  // tanpa offset

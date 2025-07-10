@@ -164,7 +164,7 @@ class POLokalBahanPenolong extends BaseController
                 'am_purchase_order_id' => $poID,
                 'barang_id' => $d->barang_id,
                 'spesifikasi_id' => $d->spesifikasi_id,
-                'note' => $d->keterangan,
+                'note' => trim($d->keterangan),
                 'unit' => $d->satuan_id,
                 'qty' => $d->qty,
                 'price' => $d->harga_satuan,
@@ -175,7 +175,7 @@ class POLokalBahanPenolong extends BaseController
                 'total' => repairDouble($d->total),
                 'remaining_qty' => $d->qty
             ]);
-            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id, $d->spesifikasi_id, $d->keterangan);
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id, $d->spesifikasi_id, trim($d->keterangan));
         }
 
 
@@ -417,25 +417,25 @@ class POLokalBahanPenolong extends BaseController
 
 
         // Cek Apakah Ada di LPB
-        foreach ($aMPurchaseOrderDetailData as $d) {
-            $check = $this->penerimaanBarangDetailModel
-                ->select('barang_master.barang_name,barang_master_spesifikasi.spesifikasi')
-                ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', "left")
-                ->join('barang_master', 'penerimaan_barang_detail.barang_id = barang_master.id', 'left')
-                ->join('barang_master_spesifikasi', 'penerimaan_barang_detail.spesifikasi_id = barang_master_spesifikasi.id', 'left')
-                ->where('penerimaan_barang_detail.barang_id', $d->barang_id)
-                ->where('penerimaan_barang_detail.spesifikasi_id', $d->spesifikasi_id)
-                ->where('status_penerimaan', "LOKAL")
-                ->where('tipe_bahan', "PENOLONG")
-                ->first();
+        // foreach ($aMPurchaseOrderDetailData as $d) {
+        //     $check = $this->penerimaanBarangDetailModel
+        //         ->select('barang_master.barang_name,barang_master_spesifikasi.spesifikasi')
+        //         ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', "left")
+        //         ->join('barang_master', 'penerimaan_barang_detail.barang_id = barang_master.id', 'left')
+        //         ->join('barang_master_spesifikasi', 'penerimaan_barang_detail.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+        //         ->where('penerimaan_barang_detail.barang_id', $d->barang_id)
+        //         ->where('penerimaan_barang_detail.spesifikasi_id', $d->spesifikasi_id)
+        //         ->where('status_penerimaan', "LOKAL")
+        //         ->where('tipe_bahan', "PENOLONG")
+        //         ->first();
 
-            if ($check != null) {
-                return response()->setJSON([
-                    'message' => "Barang " . $check['barang_name'] . " " . $check['spesifikasi'] . ", Sudah Terdapat di LPB (Silahkan Reload Halaman Ini Dahulu)",
-                    'status' => false,
-                ]);
-            }
-        }
+        //     if ($check != null) {
+        //         return response()->setJSON([
+        //             'message' => "Barang " . $check['barang_name'] . " " . $check['spesifikasi'] . ", Sudah Terdapat di LPB (Silahkan Reload Halaman Ini Dahulu)",
+        //             'status' => false,
+        //         ]);
+        //     }
+        // }
 
         foreach ($aMPurchaseOrderDetailData as $d) {
             // UPDATE
@@ -443,7 +443,7 @@ class POLokalBahanPenolong extends BaseController
                 ->where('am_purchase_order_details.am_purchase_order_id', $id)
                 ->where('spesifikasi_id', $d->spesifikasi_id)
                 ->where('barang_id', $d->barang_id)
-                ->where('note', $d->keterangan)
+                ->where('note', trim($d->keterangan))
                 ->first();
 
             if ($check != null) {
@@ -452,7 +452,7 @@ class POLokalBahanPenolong extends BaseController
                     'am_purchase_order_id' => $id,
                     'barang_id' => $d->barang_id,
                     'spesifikasi_id' => $d->spesifikasi_id,
-                    'note' => $d->keterangan,
+                    'note' => trim($d->keterangan),
                     'unit' => $d->satuan_id,
                     'qty' => $d->qty,
                     'price' => $d->harga_satuan,
@@ -465,7 +465,7 @@ class POLokalBahanPenolong extends BaseController
                 ]);
                 array_push($id_detail_all, $check['id']);
 
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id, $d->spesifikasi_id, $d->keterangan);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id, $d->spesifikasi_id, trim($d->keterangan));
             } else {
                 // NEW BARANG
                 // DELETE
@@ -480,7 +480,7 @@ class POLokalBahanPenolong extends BaseController
                     'am_purchase_order_id' => $id,
                     'barang_id' => $d->barang_id,
                     'spesifikasi_id' => $d->spesifikasi_id,
-                    'note' => $d->keterangan,
+                    'note' => trim($d->keterangan),
                     'unit' => $d->satuan_id,
                     'qty' => $d->qty,
                     'price' => $d->harga_satuan,
@@ -493,7 +493,7 @@ class POLokalBahanPenolong extends BaseController
                 ]);
                 array_push($id_detail_all, $id_detail_new);
 
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id, $d->spesifikasi_id, $d->keterangan);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id, $d->spesifikasi_id, trim($d->keterangan));
             }
         }
 
