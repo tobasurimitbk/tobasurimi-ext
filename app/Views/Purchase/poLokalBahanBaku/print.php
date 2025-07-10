@@ -691,19 +691,33 @@
                         <td></td>
                         <td></td>
                         <td>PPH</td>
-                        <td><?= number_format(abs(($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0)), 2, '.', ',') ?></td>
+                        <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier"): ?>
+                            <td><?= number_format(abs(($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0)), 2, '.', ',') ?></td>
+                        <?php else: ?>
+                            <td>0.00</td>
+                        <?php endif ?>
                     </tr>
                     <tr>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td>DIBAYARKAN</td>
-                        <td><?= number_format(
-                                abs(($dataPO->totalTambahan ?? 0)  - (($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0))),
-                                2,
-                                '.',
-                                ','
-                            ) ?></td>
+                        <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier"): ?>
+                            <td><?= number_format(
+                                    abs(($dataPO->totalTambahan ?? 0)  - (($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0))),
+                                    2,
+                                    '.',
+                                    ','
+                                ) ?></td>
+                        <?php else: ?>
+                            <td><?= number_format(
+                                    abs(($dataPO->totalTambahan ?? 0)),
+                                    2,
+                                    '.',
+                                    ','
+                                ) ?>
+                            </td>
+                        <?php endif ?>
                     </tr>
                 </table>
             <?php } ?>

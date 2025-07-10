@@ -130,7 +130,7 @@ class LaporanSupplierLokalBB extends BaseController
                 $totalUmum = $dppUmum - $pphUmum;
             } else {
                 $dppUmum = $row->dppUmum * $qty;
-                $pphUmum = ($pphMode === "Supplier") ? (($row->dppUmum / $nilai_pph) * $nilai_pph2) * $qty : 0;
+                $pphUmum = ($pphMode === "Supplier") ? ($row->dppUmum / $nilai_pph * $nilai_pph2) * $qty : 0;
                 // dd($pphUmum);
                 $totalUmum = $dppUmum + $pphUmum;
             }
@@ -1520,24 +1520,25 @@ class LaporanSupplierLokalBB extends BaseController
         foreach ($dataOrder as $item) {
             $sheet->fromArray([
                 $no++,
-                $item['supplierName'],
-                $item['barangName'],
-                $item['dppUmum'],
-                $item['pphUmum'],
-                $item['totalUmum'],
-                $item['dppHarian'],
-                $item['pphHarian'],
-                $item['totalHarian'],
-                $item['dppBulanan'],
-                $item['pphBulanan'],
-                $item['totalBulanan'],
-                $item['subsidi'],
-                $item['pphSubsidi'],
-                $item['totalSubsidi'],
-                $item['totalRow']
-            ], NULL, 'A' . $startRow);
+                $item['supplierName'] ?? '',
+                $item['barangName'] ?? '',
+                $item['dppUmum'] ?? 0,
+                $item['pphUmum'] ?? 0,
+                $item['totalUmum'] ?? 0,
+                $item['dppHarian'] ?? 0,
+                $item['pphHarian'] ?? 0,
+                $item['totalHarian'] ?? 0,
+                $item['dppBulanan'] ?? 0,
+                $item['pphBulanan'] ?? 0,
+                $item['totalBulanan'] ?? 0,
+                $item['subsidi'] ?? 0,
+                $item['pphSubsidi'] ?? 0,
+                $item['totalSubsidi'] ?? 0,
+                $item['totalRow'] ?? 0
+            ], null, 'A' . $startRow);
             $startRow++;
         }
+
 
         // Baris total
         $sheet->fromArray([
