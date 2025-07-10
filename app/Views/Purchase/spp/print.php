@@ -35,7 +35,7 @@
         }
 
         .mt-5 {
-            margin-top: 5px;
+            margin-top: 3px;
         }
 
         .mt-3 {
@@ -105,11 +105,11 @@
                         <td class="table-border" style="width: 5px;"><b class="table-font-size">No</b></td>
                         <td class="table-border" style="width: 70px;"><b class="table-font-size">Kode Barang</b></td>
                         <td class="table-border" style="width: 220px;"><b class="table-font-size">Nama Barang</b></td>
-                        <td class="table-border" style="width: 90px;"><b class="table-font-size">Qty</b></td>
-                        <td class="table-border" style="width: 10px;"><b class="table-font-size">Keterangan</b></td>
-                        <td class="table-border" style="width: 80px;"><b class="table-font-size">Supplier</b></td>
-                        <td class="table-border" style="width: 80px;"><b class="table-font-size">Harga</b></td>
-                        <td class="table-border" style="width: 60px;"><b class="table-font-size">PBP</b></td>
+                        <td class="table-border" style="width: 50px;"><b class="table-font-size">Qty</b></td>
+                        <td class="table-border" style="width: 120px;"><b class="table-font-size">Keterangan</b></td>
+                        <td class="table-border" style="width: 50px;"><b class="table-font-size">Supplier</b></td>
+                        <td class="table-border" style="width: 50px;"><b class="table-font-size">Harga</b></td>
+                        <td class="table-border" style="width: 50px;"><b class="table-font-size">PBP</b></td>
                     </tr>
                 </thead>
                 <tbody>
