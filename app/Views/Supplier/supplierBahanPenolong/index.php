@@ -227,7 +227,10 @@
             <div class="modal-body">
                 <div class="row justify-content-end ">
                     <div class="col-md-3">
-                        <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Tanggal PO" class="form-control form-control-lg po-date-lokal">
+                        <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Dari Tanggal PO" class="form-control form-control-lg po-start-date-lokal">
+                    </div>
+                    <div class="col-md-3">
+                        <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Sampai Tanggal PO" class="form-control form-control-lg po-end-date-lokal" disabled>
                     </div>
                     <div class="col-md-3">
                         <input autocomplete="one-time-code" style="height: 40px;" placeholder="Cari Data" value="" type="text" class="form-control form-control-lg search-po-lokal">
@@ -324,7 +327,14 @@
         .find('label')
         .css('z-index', '1');
 
-    $(".po-date-lokal").datepicker({
+    $(".po-start-date-lokal").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
+    $(".po-end-date-lokal").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -434,7 +444,8 @@
                 data: function(data) {
                     data.supplier_id = supplierId;
                     data.search = $(".search-po-lokal").val();
-                    data.po_date = $(".po-date-lokal").val();
+                    data.start_date = $(".po-start-date-lokal").val();
+                    data.end_date = $(".po-end-date-lokal").val();
                     data.sort = sortPoLokal;
                     data.sortType = sortTypePoLokal;
                 }
@@ -501,15 +512,21 @@
         tablePoLokal.ajax.reload();
     })
 
-    $(".po-date-lokal").change(function() {
+    $(".po-start-date-lokal").change(function() {
+        // tablePoLokal.ajax.reload();
+        $(".po-end-date-lokal").prop('disabled', false); // Enable the end date field
+     });
+
+    $(".po-end-date-lokal").change(function() {
         tablePoLokal.ajax.reload();
-    })
+    });
 
     function displayHistory(id) {
         supplierId = id;
         tablePoLokal.ajax.reload();
         $('.search-po-lokal').val();
-        $('.po-date-lokal').val();
+        $('.po-start-date-lokal').val();
+        $('.po-end-date-lokal').val();
         $('#historiModal').modal('show');
     }
 
@@ -957,7 +974,8 @@
     }
 
     function printExcelPoLokal() {
-        var tanggal = $(".po-date-lokal").val() ? convertDateFormat($(".po-date-lokal").val()) : "";
+        var start_Date = $(".po-start-date-lokal").val() ? convertDateFormat($(".po-start-date-lokal").val()) : "";
+        var end_date = $(".po-end-date-lokal").val() ? convertDateFormat($(".po-end-date-lokal").val()) : "";
         var search = $(".search-po-lokal").val() ?? "";
         if (!supplierId) {
             Swal.fire({
@@ -971,7 +989,8 @@
         const url = "<?= base_url("barang-bahan-penolong/export-histori-supplier") ?>";
         const params = new URLSearchParams({
             supplier_id: supplierId,
-            po_date: tanggal,
+            start_date: start_Date,
+            end_date: end_date,
             search: search,
             sort: sortPoLokal,
             sortType: sortTypePoLokal,

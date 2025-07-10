@@ -460,8 +460,12 @@ class AMPurchaseOrderModel extends Model
             $poDataQry->groupStart();
         }
 
-        if ($addCondition['po_date']) {
-            $poDataQry->where('am_purchase_orders.po_date', $addCondition['po_date']);
+        if ($addCondition['start_date'] && $addCondition['end_date']) {
+            $startDate = date('Y-m-d', strtotime($addCondition['start_date']));
+            $endDate = date('Y-m-d', strtotime($addCondition['end_date']));
+            
+            $poDataQry->where('am_purchase_orders.po_date >=', $startDate)
+                    ->where('am_purchase_orders.po_date <=', $endDate);
         }
 
         if ($addCondition['search']) {
@@ -547,8 +551,12 @@ class AMPurchaseOrderModel extends Model
             $poDataQry->groupStart();
         }
 
-        if ($addCondition['po_date']) {
-            $poDataQry->where('am_purchase_orders.po_date', $addCondition['po_date']);
+       if ($addCondition['start_date'] && $addCondition['end_date']) {
+            $startDate = date('Y-m-d', strtotime($addCondition['start_date']));
+            $endDate = date('Y-m-d', strtotime($addCondition['end_date']));
+            
+            $poDataQry->where('am_purchase_orders.po_date >=', $startDate)
+                    ->where('am_purchase_orders.po_date <=', $endDate);
         }
 
         if ($addCondition['search']) {

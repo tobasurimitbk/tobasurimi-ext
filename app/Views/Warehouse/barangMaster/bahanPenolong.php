@@ -262,7 +262,10 @@
                                     </ul>
                                 </div>
                                 <div class="col-md-3">
-                                    <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Tanggal PO" class="form-control form-control-lg po-date-lokal">
+                                    <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Tanggal PO" class="form-control form-control-lg po-start-date-lokal">
+                                </div>
+                                <div class="col-md-3">
+                                    <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Tanggal PO" class="form-control form-control-lg po-end-date-lokal" disabled>
                                 </div>
                                 <div class="col-md-3">
                                     <input autocomplete="one-time-code" style="height: 40px;" placeholder="Cari Data" value="" type="text" class="form-control form-control-lg search-po-lokal">
@@ -500,7 +503,14 @@
             };
         }
 
-        $(".po-date-lokal").datepicker({
+        $(".po-start-date-lokal").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".po-end-date-lokal").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
@@ -804,7 +814,8 @@
                 data: function(data) {
                     data.id = id_barang;
                     data.search = $(".search-po-lokal").val();
-                    data.po_date = $(".po-date-lokal").val();
+                    data.start_date = $(".po-start-date-lokal").val();
+                    data.end_date = $(".po-end-date-lokal").val();
                     data.sort = sortPoLokal;
                     data.sortType = sortTypePoLokal;
                     data.po_type = "Lokal";
@@ -947,9 +958,14 @@
             tablePoLokal.ajax.reload();
         })
 
-        $(".po-date-lokal").change(function() {
+        $(".po-start-date-lokal").change(function() {
+            // tablePoLokal.ajax.reload();
+            $(".po-end-date-lokal").prop('disabled', false); // Enable the end date field
+        });
+
+        $(".po-end-date-lokal").change(function() {
             tablePoLokal.ajax.reload();
-        })
+        });
     });
 
     $('.btn-submit-excel').click(function() {
@@ -1566,7 +1582,8 @@
     function displayHistory(id) {
         id_barang = id;
         $('.search-po-lokal').val();
-        $('.po-date-lokal').val();
+        $('.po-start-date-lokal').val();
+        $('.po-end-date-lokal').val();
         $('.search-po-import').val();
         tablePoLokal.ajax.reload();
         tablePoImport.ajax.reload();
@@ -1678,14 +1695,15 @@
         // Ambil parameter yang diperlukan dari halaman
         const id = id_barang;
         const search = $(".search-po-lokal").val();
-        const po_date = $(".po-date-lokal").val();
+        const start_date = $(".po-start-date-lokal").val();
+        const end_date = $(".po-end-date-lokal").val();
         const sort = sortPoLokal;
         const sortType = sortTypePoLokal;
         const po_type = "Lokal";
         
         // Redirect ke URL export dengan parameter
         window.location.href = url + '?id=' + id + '&po_type=' + po_type + 
-                            '&search=' + search + '&po_date=' + po_date;
+                            '&search=' + search + '&start_date=' + start_date + '&end_date=' + end_date;
     }
 </script>
 
