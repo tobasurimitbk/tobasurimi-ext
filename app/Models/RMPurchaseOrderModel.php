@@ -358,7 +358,7 @@ class RMPurchaseOrderModel extends Model
         $first_day = "$thn-$bln-01";
         $last_day = date("Y-m-t", strtotime($first_day));
 
-        if ($companyId == 16) {
+        if ($companyId == 16 || $companyId == 15) {
             $lastPO = $this->select('po_no')
                 ->like('po_no', "PO/LBB-")
                 ->where('rm_purchase_orders.po_date >=', $first_day)

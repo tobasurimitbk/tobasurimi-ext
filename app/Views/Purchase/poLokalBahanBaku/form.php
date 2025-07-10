@@ -669,7 +669,7 @@
             // GET DEPARTEMEN
             getListDepartemen();
             var spp = $(".spp_id").val();
-            list_items = [];
+            // list_items = [];
             drawTable();
             $('.barang_id').val(null).change();
             $(".barang_id").attr("disabled", false);
