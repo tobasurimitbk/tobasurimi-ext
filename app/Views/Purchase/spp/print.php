@@ -87,7 +87,7 @@
 
 <body>
     <?php for ($i = 0; $i < 3; $i++): ?>
-        <div class="txt-center txt-bold"> <b>SURAT PERMINTAAN PEMBELIAN </b></div>
+        <div class="txt-center txt-bold" style="margin-top:-30px;"> <b>SURAT PERMINTAAN PEMBELIAN </b></div>
         <?php if (!empty($dataSPP)) { ?>
             <table class="mt-5">
                 <tr>
@@ -132,14 +132,14 @@
             <div>
                 <div class="mt-5">Keterangan: <?= $dataSPP->note ?></div>
             </div>
-            <div class="footer" style="margin-top:30px;">
+            <div class="footer" style="margin-top:0px;">
                 <div style="text-align:left">
                     <div>Barang tersebut agar kami terima dalam keadaan baik.</div>
                     <div>Pada tanggal:</div>
                 </div>
                 <table class="w-100 sign-table border-collapse signed-info" style="border: 0px;">
                     <tr style="border: 0px;">
-                        <td style="height: 30px; border: 0px;">Diterima Oleh</td>
+                        <td style="height: 25px; border: 0px;">Diterima Oleh</td>
                         <td style="border: 0px;">Disetujui Oleh</td>
                         <td style="border: 0px;">Diorder Oleh</td>
                     </tr>
@@ -168,7 +168,8 @@
         <?php } ?>
         <br> <br>
         <?php if ($i != 2): ?>
-            <hr style="border: none; border-top: 1px dashed #000;">
+
+            <!-- <hr style="border: none; border-top: 1px dashed #000; margin-top:-5px;"> -->
             <br>
         <?php endif; ?>
     <?php endfor; ?>
