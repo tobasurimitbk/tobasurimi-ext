@@ -1531,8 +1531,10 @@ class LaporanSupplierLokalBB extends BaseController
         $totalDppBulanan = $totalPphBulanan = $totalTotalBulanan = 0;
         $totalDppSubsidi = $totalPphSubsidi = $totalTotalSubsidi = 0;
         $totalTotalRow = 0;
+        $totalQty = 0;
 
         foreach ($dataOrder as $item) {
+            $totalQty += $item['qtyPO'];
             $totalDppUmum += $item['dppUmum'];
             $totalPphUmum += $item['pphUmum'];
             $totalTotalUmum += $item['totalUmum'];
@@ -1574,6 +1576,8 @@ class LaporanSupplierLokalBB extends BaseController
                 'No.',
                 'Supplier',
                 'Bahan Baku',
+                'Nama Satuan',
+                'QTY',
                 'DPP Umum',
                 'PPh Umum',
                 'Total Umum',
@@ -1602,6 +1606,8 @@ class LaporanSupplierLokalBB extends BaseController
                 $no++,
                 $item['supplierName'] ?? '',
                 $item['barangName'] ?? '',
+                $item['satuanName'] ?? '',
+                $item['qtyPO'] ?? '',
                 $item['dppUmum'] ?? 0,
                 $item['pphUmum'] ?? 0,
                 $item['totalUmum'] ?? 0,
@@ -1624,7 +1630,9 @@ class LaporanSupplierLokalBB extends BaseController
         $sheet->fromArray([
             '',
             '',
+            '',
             'Total',
+            $totalQty,
             $totalDppUmum,
             $totalPphUmum,
             $totalTotalUmum,
@@ -1824,6 +1832,7 @@ class LaporanSupplierLokalBB extends BaseController
         $totalPphSubsidi = 0;
         $totalTotalSubsidi = 0;
         $totalTotalRow = 0;
+        $totalTotalQty = 0;
 
         $dateStart = $this->request->getVar('dateStart');
         $newDateStart = $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "";
@@ -1849,6 +1858,7 @@ class LaporanSupplierLokalBB extends BaseController
                 $row->pphSubsidi    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
                 $row->totalSubsidi  = $row->subsidi - $row->pphSubsidi;
                 $row->totalRow      = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
+                $totalTotalQty += $row->qtyPO;
                 $totalDppUmum += $row->dppUmum;
                 $totalPphUmum += $row->pphUmum;
                 $totalTotalUmum += $row->totalUmum;
@@ -1874,6 +1884,7 @@ class LaporanSupplierLokalBB extends BaseController
             'supplierName'        => !empty($dataSupplier) ? $dataSupplier->name : "",
             'supplierAddress'      => !empty($dataSupplier) ? $dataSupplier->address : "",
             'dataOrder' => $dataBBLokal,
+            'totalQtyPO' => $totalTotalQty,
             'totalDppUmum' => $totalDppUmum,
             'totalPphUmum' => $totalPphUmum,
             'totalTotalUmum' => $totalTotalUmum,

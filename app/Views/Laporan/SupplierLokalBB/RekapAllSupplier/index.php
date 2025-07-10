@@ -85,8 +85,9 @@
                             <tr>
                                 <th rowspan="2">No</th>
                                 <th onclick="changeSort('supplierName')" class="sort" rowspan="2">Supplier</th>
-
                                 <th onclick="changeSort('barangName')" class="sort" rowspan="2">Bahan Baku</th>
+                                <th onclick="changeSort('barangName')" class="sort" rowspan="2">Satuan</th>
+                                <th onclick="changeSort('barangName')" class="sort" rowspan="2">Qty</th>
                                 <th colspan="3">Harian</th>
                                 <th colspan="3">Tambahan Harian</th>
                                 <th colspan="3">Tambahan Bulanan</th>
@@ -110,6 +111,25 @@
                         </thead>
                         <tbody class="body-table" id="body-table">
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="4">TOTAL</th>
+                                <th class="text-center">-</th> <!-- Satuan -->
+                                <th class="text-center">0</th> <!-- DPP Harian -->
+                                <th class="text-center">0</th> <!-- PPh Harian -->
+                                <th class="text-center">0</th> <!-- Dibayarkan Harian -->
+                                <th class="text-center">0</th> <!-- DPP Tambahan Harian -->
+                                <th class="text-center">0</th> <!-- PPh Tambahan Harian -->
+                                <th class="text-center">0</th> <!-- Dibayarkan Tambahan Harian -->
+                                <th class="text-center">0</th> <!-- DPP Tambahan Bulanan -->
+                                <th class="text-center">0</th> <!-- PPh Tambahan Bulanan -->
+                                <th class="text-center">0</th> <!-- Dibayarkan Tambahan Bulanan -->
+                                <th class="text-center">0</th> <!-- DPP Subsidi -->
+                                <th class="text-center">0</th> <!-- PPh Subsidi -->
+                                <th class="text-center">0</th> <!-- Dibayarkan Subsidi -->
+                                <th class="text-center">0</th> <!-- Grand Total -->
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -173,7 +193,14 @@
                 data: "barangName",
                 className: "text-center",
             },
-
+            {
+                data: "satuanName",
+                className: "text-center",
+            },
+            {
+                data: "qtyPO",
+                className: "text-center",
+            },
             {
                 data: "dppUmum",
                 className: "text-center",
@@ -232,6 +259,24 @@
             defaultContent: "-",
             targets: "_all"
         }],
+        footerCallback: function(row, data, start, end, display) {
+            var api = this.api();
+
+            // Kolom-kolom yang ingin di-total (indeks dimulai dari 0)
+            var columnsToSum = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+            
+            columnsToSum.forEach(function(col) {
+                var total = api
+                    .column(col, { page: 'current' })
+                    .data()
+                    .reduce(function(a, b) {
+                        return destroyFormatRupiah(a) + destroyFormatRupiah(b);
+                    }, 0);
+
+                // Update footer
+                $(api.column(col).footer()).html(greatFormatRupiah(total));
+            });
+        },
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",

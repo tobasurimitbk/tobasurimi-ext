@@ -1043,14 +1043,13 @@ class PenerimaanBarangLokalBP extends BaseController
             'am_purchase_orders.is_posted' => '1',
             'am_purchase_orders.status_penerimaan' => '0',
             'am_purchase_orders.po_type' => 'Lokal',
-            'divisis.company_id' => $this->this_company_id,
-            'divisis.deletedAt' => null
+            'am_purchase_orders.company_id' => $this->this_company_id,
         ];
 
         $selectQry = "divisis.*";
         $result = $this->divisiModel->select($selectQry)
             ->join('am_purchase_orders', 'am_purchase_orders.division_id = divisis.id', 'left')
-            ->whereIn('divisis.id', session()->get('login')->this_access_divisi_id)
+            // ->whereIn('divisis.id', session()->get('login')->this_access_divisi_id)
             ->where($condition)
             ->groupBy('divisis.id')
             ->findAll();

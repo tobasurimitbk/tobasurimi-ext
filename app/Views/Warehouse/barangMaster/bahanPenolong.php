@@ -48,8 +48,8 @@
                                 <th onclick="changeSort('kode_barang')" class="sort" style="text-align:left;">Kode Barang</th>
                                 <th onclick="changeSort('barang_name')" class="sort" style="text-align:left;">Nama Barang</th>
                                 <th class="sort">Satuan</th>
-                                <!-- <th class="sort">Satuan 2</th>
-                                <th class="sort">Satuan 3</th> -->
+                                <th class="sort">Satuan 2</th>
+                                <th class="sort">Satuan 3</th>
                                 <th class="sort" style="text-align:left;">Harga Terakhir</th>
                                 <th class="sort" style="text-align:left;">Supplier Terakhir</th>
                                 <th class="sort" style="text-align:center;">Akun COA</th>
@@ -431,16 +431,16 @@
                 className: "text-center",
                 sortable: false,
             },
-            // {
-            //     data: "satuan2",
-            //     className: "text-center",
-            //     sortable: false,
-            // },
-            // {
-            //     data: "satuan3",
-            //     className: "text-center",
-            //     sortable: false,
-            // },
+            {
+                data: "satuan2",
+                className: "text-center",
+                sortable: false,
+            },
+            {
+                data: "satuan3",
+                className: "text-center",
+                sortable: false,
+            },
             {
                 data: "harga_terakhir",
                 className: "text-left",
@@ -829,47 +829,48 @@
             display: "stripe",
             searching: false,
             columns: [{
-                data: "no",
-                className: "text-center",
-                sortable: false
-            }, {
-                data: "spp_no",
-                className: "text-center"
-            }, {
-                data: "po_no",
-                className: "text-center"
-            }, {
-                data: "no_lpb",
-                className: "text-center"
-            }, {
-                data: "po_date",
-                className: "text-center"
-            }, {
-                data: "nama_supplier",
-                className: "text-center"
-            }, {
-                data: "nama_barang",
-                className: "text-center"
-            }, {
-                data: "note",
-                className: "text-center"
-            }, {
-                data: "divisi",
-                className: "text-center"
-            }, {
-                data: "qty",
-                className: "text-center"
-            }, {
-                data: "kode_satuan",
-                className: "text-center"
-            }, {
-                data: "price",
-                className: "text-center"
-            },
-            {
-                data: "sub_total",
-                className: "text-center"
-            }],
+                    data: "no",
+                    className: "text-center",
+                    sortable: false
+                }, {
+                    data: "spp_no",
+                    className: "text-center"
+                }, {
+                    data: "po_no",
+                    className: "text-center"
+                }, {
+                    data: "no_lpb",
+                    className: "text-center"
+                }, {
+                    data: "po_date",
+                    className: "text-center"
+                }, {
+                    data: "nama_supplier",
+                    className: "text-center"
+                }, {
+                    data: "nama_barang",
+                    className: "text-center"
+                }, {
+                    data: "note",
+                    className: "text-center"
+                }, {
+                    data: "divisi",
+                    className: "text-center"
+                }, {
+                    data: "qty",
+                    className: "text-center"
+                }, {
+                    data: "kode_satuan",
+                    className: "text-center"
+                }, {
+                    data: "price",
+                    className: "text-center"
+                },
+                {
+                    data: "sub_total",
+                    className: "text-center"
+                }
+            ],
             columnDefs: [{
                 defaultContent: "-",
                 targets: "_all"
@@ -1700,10 +1701,10 @@
         const sort = sortPoLokal;
         const sortType = sortTypePoLokal;
         const po_type = "Lokal";
-        
+
         // Redirect ke URL export dengan parameter
-        window.location.href = url + '?id=' + id + '&po_type=' + po_type + 
-                            '&search=' + search + '&start_date=' + start_date + '&end_date=' + end_date;
+        window.location.href = url + '?id=' + id + '&po_type=' + po_type +
+            '&search=' + search + '&start_date=' + start_date + '&end_date=' + end_date;
     }
 </script>
 
