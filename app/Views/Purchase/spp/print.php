@@ -169,7 +169,12 @@
         <br> <br>
         <?php if ($i != 2): ?>
 
-            <!-- <hr style="border: none; border-top: 1px dashed #000; margin-top:-5px;"> -->
+            <br>
+            <br>
+            <br>
+            <hr style="border: none; border-top: 1px dashed #000; margin-top:-5px;">
+            <br>
+            <br>
             <br>
         <?php endif; ?>
     <?php endfor; ?>

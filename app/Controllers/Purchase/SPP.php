@@ -486,7 +486,7 @@ class SPP extends BaseController
                 // dd($dataSppDetail);
             }
             $this->dompdf->loadHtml(view('Purchase/spp/print', $data));
-            $this->dompdf->setPaper('F4', 'portrait');
+            $this->dompdf->setPaper([0, 0, 595.28, 935.43], 'portrait'); // F4 in points
             $this->dompdf->render();
             $this->dompdf->stream($filename, array("Attachment" => false));
             exit(0);
