@@ -41,8 +41,8 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control fax" id="fax" name="fax" placeholder="Fax (Opsional)">
-                                <label for="floatingInput">Fax (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control fax" id="fax" name="fax" placeholder="Email Address (Opsional)">
+                                <label for="floatingInput">Email Address (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -105,7 +105,7 @@
                                 <th>No.</th>
                                 <th onclick="changeSort('kode')" class="sort">Kode</th>
                                 <th onclick="changeSort('name')" class="sort">Nama</th>
-                                <th onclick="changeSort('fax')" class="sort">Fax</th>
+                                <th onclick="changeSort('fax')" class="sort">Email Address</th>
                                 <th onclick="changeSort('address')" class="sort">Alamat</th>
                             </tr>
                         </thead>
