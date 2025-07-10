@@ -425,8 +425,13 @@ class SupplierModel extends Model
 
         foreach ($res as $r) {
             $hasNpwp = !empty($supplierDet['no_npwp']);
-            $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
-            $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            if ($r->po_date <= "2025-07-01") {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
+            } else {
+                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.0025);
+                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.0025;
+            }
 
             $qty = $r->qty;
             $hargaSatuan = $r->monthly_price;
