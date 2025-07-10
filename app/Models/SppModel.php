@@ -173,7 +173,7 @@ class SppModel extends Model
         return $query->getResultArray();
     }
 
-    public function generateNoSpp($divisi, $companyId, $month, $year)
+    public function generateNoSpp($divisi, $companyId, $month, $year, $sppType)
     {
         $romanNumb = [
             'I',
@@ -191,35 +191,38 @@ class SppModel extends Model
         ];
 
         $divisi = str_replace(' ', '', $divisi);
+        $monthRoman = $romanNumb[intval($month) - 1];
+        $yearShort = substr($year, -2);
 
-        $lastStrQry =   $romanNumb[intval($month) - 1] . '/' . substr($year, -2);
+        $lastStr = $divisi . '/' . $monthRoman . '/' . $yearShort;
 
+        // Tambahkan prefix IMP jika sppType import
+        $isImport = in_array($sppType, ['Import BB', 'Import BP']);
+        $searchStr = $isImport ? '/IMP/' . $lastStr : '/' . $lastStr;
+
+        // Ambil nomor terakhir untuk jenis ini (import / non-import)
         $builder = $this->db->table('purchase_requests');
         $builder->select('spp_no');
-        $builder->orderBy('spp_no', 'desc');
         $builder->where('company_id', $companyId);
-        $builder->like('spp_no', $lastStrQry);
+        $builder->like('spp_no', $searchStr);
+        $builder->orderBy('spp_no', 'desc');
         $query = $builder->get();
 
-        $lastStr =  $divisi . '/' . $romanNumb[intval($month) - 1] . '/' . substr($year, -2);
         $increment = '01';
 
         if ($query->getResultArray()) {
-            $lastSpp = explode('/', $query->getResultArray()[0]['spp_no']);
-            $lastSpp = intval($lastSpp[0]) + 1;
+            $lastSppNo = $query->getResultArray()[0]['spp_no'];
+            $lastParts = explode('/', $lastSppNo);
+            $lastNumber = intval($lastParts[0]) + 1;
+            $increment = str_pad($lastNumber, 2, '0', STR_PAD_LEFT);
+        }
 
-            if ($lastSpp < 10) {
-                $lastSpp = "0" . $lastSpp . "";
-            } else {
-                $lastSpp = strval($lastSpp);
-            }
-
-            $increment = $lastSpp;
-        };
-
-
-
-        $generatedSppNo = $increment . '/' . $lastStr;
+        // Format final
+        if ($isImport) {
+            $generatedSppNo = $increment . '/IMP/' . $lastStr;
+        } else {
+            $generatedSppNo = $increment . '/' . $lastStr;
+        }
 
         return $generatedSppNo;
     }

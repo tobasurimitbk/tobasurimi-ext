@@ -1303,7 +1303,7 @@
         }
     }
 
-    $('#request_date,#divisi_id').change(function() {
+    $('#request_date,#divisi_id,#spp_type').change(function() {
         let value = document.getElementById('auto_generate').checked ? true : false;
         if (value) {
             changeStatus();
@@ -1322,7 +1322,8 @@
                 dataType: "json",
                 data: {
                     divisi_name: $(".divisi_id option:selected").text(),
-                    request_date: $('#request_date').val()
+                    request_date: $('#request_date').val(),
+                    spp_type: $('.spp_type').val()
                 },
                 success: function(res) {
                     $(".spp_no").val(res.data);

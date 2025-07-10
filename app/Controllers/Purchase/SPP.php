@@ -335,6 +335,7 @@ class SPP extends BaseController
     {
         $divisi_name = $this->request->getVar("divisi_name");
         $request_date =  $this->request->getVar("request_date");
+        $spp_type =  $this->request->getVar("spp_type");
 
         if (empty($request_date) || empty($divisi_name)) {
             $data = [
@@ -348,7 +349,7 @@ class SPP extends BaseController
         $tanggalExplode = explode('-', $request_date);
         $year = $tanggalExplode[0];
         $month = $tanggalExplode[1];
-        $response = $this->SppModel->generateNoSpp($divisi_name, $this->this_company_id, $month, $year);
+        $response = $this->SppModel->generateNoSpp($divisi_name, $this->this_company_id, $month, $year, $spp_type);
 
         if ($response) {
             $data = [
