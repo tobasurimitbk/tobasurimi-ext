@@ -106,7 +106,7 @@
                         <td class="table-border" style="width: 70px;"><b class="table-font-size">Kode Barang</b></td>
                         <td class="table-border" style="width: 220px;"><b class="table-font-size">Nama Barang</b></td>
                         <td class="table-border" style="width: 50px;"><b class="table-font-size">Qty</b></td>
-                        <td class="table-border" style="width: 120px;"><b class="table-font-size">Keterangan</b></td>
+                        <td class="table-border" style="width: 140px;"><b class="table-font-size">Keterangan</b></td>
                         <td class="table-border" style="width: 50px;"><b class="table-font-size">Supplier</b></td>
                         <td class="table-border" style="width: 50px;"><b class="table-font-size">Harga</b></td>
                         <td class="table-border" style="width: 50px;"><b class="table-font-size">PBP</b></td>
