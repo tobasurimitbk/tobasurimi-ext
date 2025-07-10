@@ -175,53 +175,48 @@ class SppModel extends Model
 
     public function generateNoSpp($divisi, $companyId, $month, $year, $sppType)
     {
-        $romanNumb = [
-            'I',
-            'II',
-            'III',
-            'IV',
-            'V',
-            'VI',
-            'VII',
-            'VIII',
-            'IX',
-            'X',
-            'XI',
-            'XII',
-        ];
+        $romanNumb = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
 
         $divisi = str_replace(' ', '', $divisi);
         $monthRoman = $romanNumb[intval($month) - 1];
         $yearShort = substr($year, -2);
 
-        $lastStr = $divisi . '/' . $monthRoman . '/' . $yearShort;
-
-        // Tambahkan prefix IMP jika sppType import
         $isImport = in_array($sppType, ['Import BB', 'Import BP']);
-        $searchStr = $isImport ? '/IMP/' . $lastStr : '/' . $lastStr;
 
-        // Ambil nomor terakhir untuk jenis ini (import / non-import)
+        $baseStr = $divisi . '/' . $monthRoman . '/' . $yearShort;
+        $searchStr = $isImport ? '/IMP/' . $baseStr : '/' . $baseStr;
+
+        // Ambil semua SPP aktif (belum dihapus) dengan pola yang sama
         $builder = $this->db->table('purchase_requests');
         $builder->select('spp_no');
         $builder->where('company_id', $companyId);
+        $builder->where('deletedAt', null);
         $builder->like('spp_no', $searchStr);
-        $builder->orderBy('spp_no', 'desc');
-        $query = $builder->get();
+        $builder->orderBy('spp_no', 'asc');
+        $result = $builder->get()->getResultArray();
 
-        $increment = '01';
-
-        if ($query->getResultArray()) {
-            $lastSppNo = $query->getResultArray()[0]['spp_no'];
-            $lastParts = explode('/', $lastSppNo);
-            $lastNumber = intval($lastParts[0]) + 1;
-            $increment = str_pad($lastNumber, 2, '0', STR_PAD_LEFT);
+        // Kumpulkan semua nomor urut yg sudah dipakai
+        $usedNumbers = [];
+        foreach ($result as $row) {
+            $parts = explode('/', $row['spp_no']);
+            $num = intval($parts[0]);
+            $usedNumbers[] = $num;
         }
 
-        // Format final
+        // Cari nomor terkecil yang belum dipakai
+        $nextNumber = 1;
+        while (in_array($nextNumber, $usedNumbers)) {
+            $nextNumber++;
+        }
+
+        // Format nomor jadi 2 digit
+        $increment = str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
+
+        // Format akhir SPP No
         if ($isImport) {
-            $generatedSppNo = $increment . '/IMP/' . $lastStr;
+            $generatedSppNo = $increment . '/IMP/' . $baseStr;
         } else {
-            $generatedSppNo = $increment . '/' . $lastStr;
+            $generatedSppNo = $increment . '/' . $baseStr;
         }
 
         return $generatedSppNo;
