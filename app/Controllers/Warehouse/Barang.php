@@ -424,8 +424,8 @@ class Barang extends BaseController
                 "kode_barang"           => $data['kode_barang'],
                 "barang_name"           => $data['barang_name'] . " - " . $data['spesifikasi'],
                 "satuan"                => $satuan1_kode, // Adjust 'some_property' to the actual property you want to display
-                "satuan2"               => $satuan2_kode == "-" ? "-" : $satuan2_kode . " (" . $data['konversi_satuan_2'] . " " . $satuan1_kode . ")",
-                "satuan3"               => $satuan3_kode == "-" ? "-" : $satuan3_kode . " (" . $data['konversi_satuan_3'] . " " . $satuan1_kode . ")",
+                "satuan2"               => $satuan2_kode == "-" ? "-" : $satuan2_kode,
+                "satuan3"               => $satuan3_kode == "-" ? "-" : $satuan3_kode,
                 "akun_coa"               => $accountBarang ? $accountBarang : "",
                 "harga_terakhir"  => $hargaTerakhir,
                 "supplier_terakhir" => $supplierTerakhir,
@@ -552,7 +552,7 @@ class Barang extends BaseController
         $offset = $this->request->getGet("start");
 
         $res = $amPurchaseOrderModel->historiHargaPOBahanPenolongByLpb($condition, $addCondition, $limit, $offset);
-    
+
         $rdata = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         foreach ($res['data'] as $data) {
@@ -1120,9 +1120,9 @@ class Barang extends BaseController
 
         $amPurchaseOrderModel = new AMPurchaseOrderModel();
 
-        
+
         $res = $amPurchaseOrderModel->historiHargaPOBahanPenolongByLpb(
-            $condition, 
+            $condition,
             [
                 'search' => $search,
                 "sort" => $sort,
@@ -1175,12 +1175,12 @@ class Barang extends BaseController
             $sheet->setCellValue('K' . $rowNum, $data['kode_satuan']);
             $sheet->setCellValue('L' . $rowNum, $data['total_harga']);
             $sheet->setCellValue('M' . $rowNum, $data['total_sub_total']);
-            
+
             // Format angka untuk kolom harga dan sub total
             $sheet->getStyle('L' . $rowNum . ':M' . $rowNum)
                 ->getNumberFormat()
                 ->setFormatCode('#,##0.00');
-                
+
             $rowNum++;
         }
 
