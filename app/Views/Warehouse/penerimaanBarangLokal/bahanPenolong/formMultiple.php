@@ -49,14 +49,18 @@
                 <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select multiple_spp_id" id="multiple_spp_id[]" multiple name="multiple_spp_id[]" aria-label="Floating label select example">
                     <option value=""></option>
                     <?php if (!empty($dataPenerimaanBarang)) : ?>
-                        <?php foreach ($dataSPP as $d) : ?>
+                        <?php foreach ($dataSPPSelected as $d) : ?>
                             <option selected value="<?= $d["id"]; ?>"><?= strtoupper($d["spp_no"]); ?></option>
+                        <?php endforeach; ?>
+
+                        <?php foreach ($dataSPP as $d) : ?>
+                            <option value="<?= $d["id"]; ?>"><?= strtoupper($d["spp_no"]); ?></option>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </select>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" style="display: none;">
             <div class="form-floating mb-3" style="height: 50px;">
                 <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> multiple class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
                     <option value=""></option>
@@ -99,6 +103,29 @@
             </div>
         </div>
         <div class="col-md-4">
+            <div class="input-group input-group-password">
+                <div class="form-floating mb-3" style="height: 50px;">
+                    <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ?  date('d/m/Y', strtotime($dataPenerimaanBarang['tanggal'])) : ""; ?>" onchange="changeStatus()" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
+                    <label for="floatingInput">Tanggal Barang Diterima</label>
+                </div>
+                <div class="input-group-prepend group-prepend-password align-items-center">
+                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-floating" style="height: 50px;">
+                <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
+                    <option value="">Pilih Dokumen Pabean</option>
+                    <?php foreach ($dataAJU as $aju) : ?>
+                        <option <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['bc_type'] === $aju["id"] ? "selected" : "") : ""; ?> value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <label for="floatingInput">Jenis Dokumen Pabean (Opsional)</label>
+            </div>
+            <small class="mb-3"><i>Kosongkan jika non pabean</i></small>
+        </div>
+        <div class="col-md-4">
             <div class="form-floating mb-3" style="height: 50px;">
                 <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['kemasan'] : ""; ?>" type="text" class="form-control kemasan" id="kemasan" name="kemasan" placeholder="Kemasan">
                 <label for="floatingInput">Keterangan Kemasan (Opsional)</label>
@@ -117,29 +144,8 @@
                 <label for="floatingInput">Nomor Invoice (Opsional)</label>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="form-floating" style="height: 50px;">
-                <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
-                    <option value="">Pilih Dokumen Pabean</option>
-                    <?php foreach ($dataAJU as $aju) : ?>
-                        <option <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['bc_type'] === $aju["id"] ? "selected" : "") : ""; ?> value="<?= $aju["id"]; ?>"><?= $aju["value"]; ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <label for="floatingInput">Jenis Dokumen Pabean (Opsional)</label>
-            </div>
-            <small class="mb-3"><i>Kosongkan jika non pabean</i></small>
-        </div>
-        <div class="col-md-4">
-            <div class="input-group input-group-password">
-                <div class="form-floating mb-3" style="height: 50px;">
-                    <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ?  date('d/m/Y', strtotime($dataPenerimaanBarang['tanggal'])) : ""; ?>" onchange="changeStatus()" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
-                    <label for="floatingInput">Tanggal Barang Diterima</label>
-                </div>
-                <div class="input-group-prepend group-prepend-password align-items-center">
-                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
-                </div>
-            </div>
-        </div>
+
+
         <div class="col-md-4">
             <div class="form-floating mb-3" style="height: 50px;">
                 <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['ongkos_kirim'] == 0 ? "" : number_format($dataPenerimaanBarang['ongkos_kirim'])) : ""; ?>" class="form-control ongkos_kirim" type="text" oninput="this.value=greatFormatRupiah(this.value)" id="ongkos_kirim" name="ongkos_kirim" placeholder="Ongkos Kirim">
@@ -908,6 +914,7 @@
         if (indexToRemove !== -1) {
             listData.result.splice(indexToRemove, 1);
         }
+        removeSppList(listData);
         drawTable(listData);
     }
 
@@ -946,6 +953,18 @@
             $(".no_penerimaan_barang").attr("readonly", false);
             $(".no_penerimaan_barang").val("");
         }
+    }
+
+    function removeSppList(listData) {
+        var sppIdSelected = $('.multiple_spp_id option:selected').val();
+        var sppIdList = [];
+        var listDataResult = listData.result;
+        for (let i = 0; i < listDataResult.length; i++) {
+            sppIdList.push(listDataResult[i].purchase_request_id);
+        }
+
+        sppIdListUnique = [...new Set(listData.result.map(item => item.purchase_request_id))];
+        $('.multiple_spp_id').val(sppIdListUnique).trigger('change.select2');
     }
 </script>
 

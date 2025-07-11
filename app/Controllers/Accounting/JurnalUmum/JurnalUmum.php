@@ -1391,7 +1391,15 @@ class JurnalUmum extends BaseController
                                 }
                             }
 
-                            $dataPOBBDetail = $this->rmImportPODetailModel->asObject()->where('deletedAt', null)->where('rm_import_po_id', $dataBB->id)->findAll();
+                            $dataPOBBDetail = $this->rmImportPODetailModel
+                                ->asObject()
+                                ->select('rm_import_po_details.*,barang_master.barang_name,barang_master_spesifikasi.spesifikasi')
+                                ->join('barang_master', 'barang_master.id = rm_import_po_details.barang_id', 'left')
+                                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_import_po_details.spesifikasi_id', 'left')
+                                ->where('rm_import_po_details.deletedAt', null)
+                                ->where('rm_import_po_id', $dataBB->id)
+                                ->findAll();
+
                             $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'Pembelian')->findAll();
 
                             // $id_transaksi_jurnal = $this->transaksiJurnalModel->getIdTransaksiLast();
@@ -1462,7 +1470,7 @@ class JurnalUmum extends BaseController
                                 }
                                 if (!$barangAPFound) {
                                     // Collect errors
-                                    $errors[] = "Barang Tidak Memiliki Akun COA";
+                                    $errors[] = "Barang {$dataBBDetail->barang_name} {$dataBBDetail->spesifikasi} Tidak Memiliki Akun COA";
                                 } else {
                                     $result[] = array(
                                         'id_transaksi' => $id_transaksi_jurnal,

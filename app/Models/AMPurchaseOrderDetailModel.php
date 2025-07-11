@@ -147,6 +147,8 @@ class AMPurchaseOrderDetailModel extends Model
         $selectQry = "
             purchase_requests.spp_no,
             am_purchase_orders.po_no,
+            am_purchase_orders.status_penerimaan,
+            am_purchase_orders.purchase_request_id,
             am_purchase_order_details.*,
             barang_master.barang_name AS nama_barang,
             barang_master.kode_barang,
@@ -173,6 +175,7 @@ class AMPurchaseOrderDetailModel extends Model
             ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
             ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
             ->join('barang_master_spesifikasi', 'am_purchase_order_details.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->orderBy('am_purchase_orders.purchase_request_id', "asc")
             ->findAll();
 
 
@@ -267,7 +270,9 @@ class AMPurchaseOrderDetailModel extends Model
                         'satuan_konversi_id' => $satuanKonversiId,
                         'satuan_konversi' => $kodeSatuanKonversi,
                         'nilai_konversi' => $nilaiKonversi,
-                        'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi)
+                        'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi),
+                        'purchase_request_id' => $b['purchase_request_id'],
+                        'status_penerimaan' => $b['status_penerimaan']
                     ];
 
                     $jmlOrderTotal += $b['qty'];
@@ -307,7 +312,9 @@ class AMPurchaseOrderDetailModel extends Model
                         'satuan_konversi_id' => $satuanKonversiId,
                         'satuan_konversi' => $kodeSatuanKonversi,
                         'nilai_konversi' => $nilaiKonversi,
-                        'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi)
+                        'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi),
+                        'purchase_request_id' => $b['purchase_request_id'],
+                        'status_penerimaan' => $b['status_penerimaan']
                     ];
 
                     $jmlOrderTotal += $b['qty'];
@@ -344,7 +351,9 @@ class AMPurchaseOrderDetailModel extends Model
                         'satuan_konversi_id' => $satuanKonversiId,
                         'satuan_konversi' => $kodeSatuanKonversi,
                         'nilai_konversi' => $nilaiKonversi,
-                        'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi)
+                        'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi),
+                        'purchase_request_id' => $b['purchase_request_id'],
+                        'status_penerimaan' => $b['status_penerimaan']
                     ];
 
                     $jmlOrderTotal += $b['qty'];

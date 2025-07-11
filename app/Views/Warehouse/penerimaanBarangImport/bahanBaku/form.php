@@ -3,7 +3,7 @@
 
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name"><?= !empty($dataPenerimaanBarang) ? "Update Penerimaan Barang Import Bahan Paku" : "Tambah Penerimaan Barang Import Bahan Baku" ?></h1>
+        <h1 class="title-name"><?= !empty($dataPenerimaanBarang) ? "Update Penerimaan Barang Import Bahan Baku" : "Tambah Penerimaan Barang Import Bahan Baku" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-barang-import-bb"); ?>">
                 Kembali
@@ -135,21 +135,14 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['kemasan'] : ""; ?>" type="text" class="form-control kemasan" id="kemasan" name="kemasan" placeholder="Kemasan">
-                            <label for="floatingInput">Keterangan Kemasan (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['no_surat_jalan'] : ""; ?>" type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" placeholder="Nomor Surat Jalan">
-                            <label for="floatingInput">Nomor Surat Jalan (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['no_invoice'] : ""; ?>" type="text" class="form-control no_invoice" id="no_invoice" name="no_invoice" placeholder="Nomor Invoice">
-                            <label for="floatingInput">Nomor Invoice (Opsional)</label>
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ?  date('d/m/Y', strtotime($dataPenerimaanBarang['tanggal'])) : ''; ?>" onchange="changeStatus()" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
+                                <label for="floatingInput">Tanggal Barang Diterima</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -165,14 +158,21 @@
                         <small class="mb-3"><i>Kosongkan jika non pabean</i></small>
                     </div>
                     <div class="col-md-4">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ?  date('d/m/Y', strtotime($dataPenerimaanBarang['tanggal'])) : ''; ?>" onchange="changeStatus()" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
-                                <label for="floatingInput">Tanggal Barang Diterima</label>
-                            </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
-                            </div>
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['kemasan'] : ""; ?>" type="text" class="form-control kemasan" id="kemasan" name="kemasan" placeholder="Kemasan">
+                            <label for="floatingInput">Keterangan Kemasan (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['no_surat_jalan'] : ""; ?>" type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" placeholder="Nomor Surat Jalan">
+                            <label for="floatingInput">Nomor Surat Jalan (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['no_invoice'] : ""; ?>" type="text" class="form-control no_invoice" id="no_invoice" name="no_invoice" placeholder="Nomor Invoice">
+                            <label for="floatingInput">Nomor Invoice (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -867,7 +867,11 @@
                 newRow.append($('<td>').text(no++));
                 newRow.append($('<td>').text(v.kode_barang));
                 newRow.append($('<td>').text(v.nama_barang));
-                newRow.append($('<td>').text(v.po_no));
+                if (v.status_penerimaan == 1) {
+                    newRow.append($('<td>').text(v.po_no + " (PO CLOSED)"));
+                } else {
+                    newRow.append($('<td>').text(v.po_no));
+                }
                 newRow.append($('<td>').text(v.satuan));
                 newRow.append($('<td>').text(parseFloat(v.jml_order)));
                 newRow.append($('<td>').text(parseFloat(v.jml_diterima_lpb)));
@@ -875,9 +879,13 @@
                     $('<td>').text(parseFloat(v.jml_diterima_lpb_konversi) + " (" + v.satuan_konversi + ")")
                 );
                 newRow.append($('<td>').text(parseFloat(v.jml_diterima_total)));
-                newRow.append($('<td>').text(parseFloat(v.sisa_total)));
+                if (v.status_penerimaan == 1) {
+                    newRow.append($('<td>').text(0));
+                } else {
+                    newRow.append($('<td>').text(parseFloat(v.sisa_total)));
+                }
                 newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.harga) || 0)));
-                newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.sub_total) || 0)));
+                newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.sub_total).toFixed(2) || 0)));
                 newRow.append($('<td>').text(v.keterangan));
                 newRow.append($('<td>').html(
                     <?php if (!empty($dataPenerimaanBarang)) : ?> <?php if ($dataPenerimaanBarang['status_post'] === "FINISH") : ?> `-`
@@ -907,13 +915,13 @@
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td style="text-align:right;" colspan="3"><b>GRAND TOTAL</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(jmlOrderTotal * 1000) / 1000 + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(jmlDiterimaLPBTotal * 1000) / 1000 + '</b></td>'));
-            newRow.append($('<td style="text-align:left;">' + Math.floor(jmlDiterimaLpbKonversi * 1000) / 1000 + '</td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(jmlDiterimaTotal * 1000) / 1000 + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(sisaTotal * 1000) / 1000 + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(hargaTotal) || 0) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(subTotal) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(jmlOrderTotal.toFixed(2) * 1000) / 1000 + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(jmlDiterimaLPBTotal.toFixed(2) * 1000) / 1000 + '</b></td>'));
+            newRow.append($('<td style="text-align:left;">' + Math.floor(jmlDiterimaLpbKonversi.toFixed(2) * 1000) / 1000 + '</td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(jmlDiterimaTotal.toFixed(2) * 1000) / 1000 + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(sisaTotal.toFixed(2) * 1000) / 1000 + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(hargaTotal).toFixed(2) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(subTotal).toFixed(2) || 0) + '</b></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
@@ -943,10 +951,10 @@
         $('.keterangan').val(item.keterangan);
         $('.jml_diterima_lpb').val(item.jml_diterima_lpb);
         $('.jml_diterima_total').val(item.jml_diterima_total);
-        $('.sisa_total').val(item.sisa_total.toFixed(4));
+        $('.sisa_total').val(item.sisa_total.toFixed(2));
         $('.nama_barang_dokumen').val(item.nama_barang_master);
         $('.harga_satuan').val("" + greatFormatRupiah(Number(item.harga) || 0));
-        $('.sub_total').val("" + greatFormatRupiah(Number(item.sub_total) || 0));
+        $('.sub_total').val("" + greatFormatRupiah(Number(item.sub_total).toFixed(2) || 0));
         $('.jml_diterima_lpb_last').val(item.jml_diterima_lpb);
     }
 
