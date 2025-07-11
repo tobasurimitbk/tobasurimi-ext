@@ -366,36 +366,35 @@
                         <?php } ?>
                     </tr>
                 <?php } ?>
-                <tr class="table-border">
+                <tr>
                     <td class="skip" colspan="3">JUMLAH</td>
-                    <td class="skip txt-right"><?= $dataPO->totalQty ?></td>
-                    <td class="skip"></td>
-                    <td class="txt-right"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                    <td class="skip txt-right" style="border: none;"><?= $dataPO->totalQty ?></td>
+                    <td class="skip" style="border: none;"></td>
+                    <td class="txt-right" style="border: 1px solid black;"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr>
-                <tr class="table-border">
-                    <td class="skip" colspan="5">PPH</td>
-                    <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
-                        <td class="txt-right"><?= number_format(($nilai_total * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
-                    <?php } else { ?>
-                        <td class="txt-right">0.00</td>
-                    <?php } ?>
+                <tr>
+                    <td class="skip" colspan="5" style="border: none;">PPH</td>
+                    <td class="txt-right" style="border: 1px solid black;">
+                        <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
+                            <?= number_format(($nilai_total * $dataPO->nilai_pph2), 2, '.', ',') ?>
+                        <?php } else { ?>
+                            0.00
+                        <?php } ?>
+                    </td>
                 </tr>
-                <!-- <tr class="table-border">
-                    <td class="skip" colspan="5">TAMBAHAN LANGSUNG</td>
-                    <td class="txt-right"><?= number_format(formatter($dataPO->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
-                </tr> -->
-                <tr class="table-border">
-                    <td class="skip" colspan="5">DIBAYARKAN</td>
-                    <?php if ($dataPO->pph === "Company") { ?>
-                        <td class="txt-right"><?= number_format($nilai_total - ($nilai_total * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
-                    <?php } else if ($dataPO->pph === "Supplier") { ?>
-                        <td class="txt-right"><?= number_format($nilai_total - ($nilai_total * $dataPO->nilai_pph2), 2, '.', ',') ?></td>
+                <tr>
+                    <td class="skip" colspan="5" style="border: none;">DIBAYARKAN</td>
+                    <td class="txt-right" style="border: 1px solid black;">
+                        <?php
+                        if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") {
+                            echo number_format($nilai_total - ($nilai_total * $dataPO->nilai_pph2), 2, '.', ',');
+                        } else {
+                            echo number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',');
+                        }
+                        ?>
+                    </td>
+                </tr>
 
-                    <?php } else { ?>
-
-                        <td class="txt-right"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
-                    <?php } ?>
-                </tr>
             </table>
             <table class="w-100 sign-table border-collapse signed-info footer mt-3">
 
