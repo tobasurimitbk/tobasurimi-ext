@@ -108,18 +108,20 @@ class RMImportPOModel extends Model
             $poDataQry->groupStart();
         }
 
-        if ($addCondition['search']) {
-            $poDataQry->like('rm_import_pos.po_no', $addCondition['search'])
-                ->orLike('suppliers.name', $addCondition['search'])
-                ->orLike('divisis.divisi', $addCondition['search']);
-        }
-
         if ($addCondition['dateStart']) {
             $poDataQry->where('rm_import_pos.po_date >=', $addCondition['dateStart']);
         }
 
         if ($addCondition['dateEnd']) {
             $poDataQry->where('rm_import_pos.po_date <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['search']) {
+            $poDataQry->groupStart();
+            $poDataQry->like('rm_import_pos.po_no', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search']);
+            $poDataQry->groupEnd();
         }
 
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
