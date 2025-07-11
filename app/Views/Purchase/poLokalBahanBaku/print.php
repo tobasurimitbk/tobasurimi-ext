@@ -336,37 +336,32 @@
                 <?php
                 $nilai_total = 0;
                 $nilai_total_harian = 0;
-                // echo '<pre>';
-                // print_r($dataPODetail);
-                // echo '</pre>';
-                // exit;
                 foreach ($dataPODetail as $detail) {
                 ?>
-                    <tr style="border: 1px solid black;">
-                        <td><?= $detail->peti ?></td>
-                        <td><?= $dataPO->divisi ?></td>
-                        <td><?= $detail->note ?></td>
-                        <td class="txt-right"><?= $detail->qty ?></td>
+                    <tr>
+                        <td style="border-left: 1px solid black; border-right: 1px solid black;"><?= $detail->peti ?></td>
+                        <td style="border-left: 1px solid black; border-right: 1px solid black;"><?= $dataPO->divisi ?></td>
+                        <td style="border-left: 1px solid black; border-right: 1px solid black;"><?= $detail->note ?></td>
+                        <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;"><?= $detail->qty ?></td>
+
                         <?php if ($dataPO->pph === "None") {
-                            $nilai_total_harian = $nilai_total_harian + (($detail->daily_price) * formatter($detail->qty, "STR_TO_FLOAT"));
-                            $nilai_total = $nilai_total + (($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT"));
+                            $nilai_total_harian += ($detail->daily_price) * formatter($detail->qty, "STR_TO_FLOAT");
+                            $nilai_total += ($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT");
                         ?>
-                            <td class="txt-right"><?= number_format(($detail->general_price), 2, '.', ',') ?></td>
-                            <td class="txt-right"><?= number_format(($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
-                        <?php }
-                        if ($dataPO->pph === "Supplier") {
-                            $nilai_total_harian = $nilai_total_harian + (($detail->daily_price) * formatter($detail->qty, "STR_TO_FLOAT"));
-                            $nilai_total = $nilai_total + (($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT"));
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;"><?= number_format($detail->general_price, 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;"><?= number_format($detail->general_price * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                        <?php } elseif ($dataPO->pph === "Supplier") {
+                            $nilai_total_harian += ($detail->daily_price) * formatter($detail->qty, "STR_TO_FLOAT");
+                            $nilai_total += ($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT");
                         ?>
-                            <td class="txt-right"><?= number_format(($detail->general_price), 2, '.', ',') ?></td>
-                            <td class="txt-right"><?= number_format(($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
-                        <?php }
-                        if ($dataPO->pph === "Company") {
-                            $nilai_total_harian = $nilai_total_harian + (($detail->daily_price / ($dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT")));
-                            $nilai_total = $nilai_total + (($detail->general_price / ($dataPO->nilai_pph)) * formatter($detail->qty, "STR_TO_FLOAT"));
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;"><?= number_format($detail->general_price, 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;"><?= number_format($detail->general_price * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                        <?php } elseif ($dataPO->pph === "Company") {
+                            $nilai_total_harian += ($detail->daily_price / $dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT");
+                            $nilai_total += ($detail->general_price / $dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT");
                         ?>
-                            <td class="txt-right"><?= number_format(($detail->general_price / ($dataPO->nilai_pph)), 2, '.', ',') ?></td>
-                            <td class="txt-right"><?= number_format(($detail->general_price / ($dataPO->nilai_pph)) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;"><?= number_format(($detail->general_price / $dataPO->nilai_pph), 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;"><?= number_format(($detail->general_price / $dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                         <?php } ?>
                     </tr>
                 <?php } ?>
