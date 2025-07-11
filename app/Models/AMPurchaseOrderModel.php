@@ -463,9 +463,9 @@ class AMPurchaseOrderModel extends Model
         if ($addCondition['start_date'] && $addCondition['end_date']) {
             $startDate = date('Y-m-d', strtotime($addCondition['start_date']));
             $endDate = date('Y-m-d', strtotime($addCondition['end_date']));
-            
+
             $poDataQry->where('am_purchase_orders.po_date >=', $startDate)
-                    ->where('am_purchase_orders.po_date <=', $endDate);
+                ->where('am_purchase_orders.po_date <=', $endDate);
         }
 
         if ($addCondition['search']) {
@@ -514,7 +514,7 @@ class AMPurchaseOrderModel extends Model
 
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'am_purchase_orders.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
-        
+
         $selectQry = "
             CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) as nama_barang, 
             am_purchase_orders.po_no,
@@ -551,12 +551,12 @@ class AMPurchaseOrderModel extends Model
             $poDataQry->groupStart();
         }
 
-       if ($addCondition['start_date'] && $addCondition['end_date']) {
+        if ($addCondition['start_date'] && $addCondition['end_date']) {
             $startDate = date('Y-m-d', strtotime($addCondition['start_date']));
             $endDate = date('Y-m-d', strtotime($addCondition['end_date']));
-            
+
             $poDataQry->where('am_purchase_orders.po_date >=', $startDate)
-                    ->where('am_purchase_orders.po_date <=', $endDate);
+                ->where('am_purchase_orders.po_date <=', $endDate);
         }
 
         if ($addCondition['search']) {
