@@ -11,9 +11,15 @@
             font-size: 12px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
             text-transform: uppercase;
-
         }
 
+        @page {
+            size: 8.27in 5.50in landscape;
+            margin: 25px;
+            /* Margin diperkecil */
+            padding: 25px;
+            /* Padding diperkecil */
+        }
 
         .pagebreak {
             clear: both;
@@ -143,12 +149,12 @@
         }
 
 
-
+        /* 
         @page {
             size: 8.27in 5.50in landscape;
             margin: 25px;
             padding: 25px;
-        }
+        } */
 
         .header {
             display: flex;
@@ -419,7 +425,7 @@
                 <tr>
                     <td style="vertical-align: top; width: 40%;">SUDAH TERIMA DARI (RECEIVED FROM)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top; width: 55%;"><?= $dataPO->companyName ?></td>
+                    <td style="vertical-align: top; width: 55%;"><?= $dataPO->holdingCompany ?> (<?= $dataPO->companyName ?>)</td>
                 </tr>
                 <tr>
                     <td style="vertical-align: top;">BANYAKNYA UANG (AMOUNT)</td>
