@@ -60,11 +60,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'readonly=true' : '')   : ''; ?> type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. PO" value="<?= !empty($detail) ? $detail['pembayaranDetail']['payment_no'] : ""; ?>">
+                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'readonly' : '') : '' ?> <?= !empty($detail) ? ' value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
                                     <label for="floatingInput">No. Pembayaran</label>
-                                </div>
-                                <div style="<?= !empty($detail) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input <?= empty($detail) ? "checked" : "" ?> autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -519,7 +516,7 @@
     <script>
         $('.bulanan-form,.harian-form').hide();
         $(document).ready(function() {
-            changeStatus();
+            generatePaymentNumber();
 
         });
     </script>
@@ -651,6 +648,11 @@
 
 
     $(document).ready(function() {
+
+        <?php if(empty($detail)): ?>
+            generatePaymentNumber();
+        <?php endif; ?>
+
         $("#akun_kas_panjar, #akun_selisih_panjar, #akun_kas_panjar_tb, #akun_selisih_panjar_tb, #akun_selisih_pinjaman, #akun_kas_pinjaman").select2({
             theme: "bootstrap-5",
             placeholder: "Pilih Akun",
@@ -689,14 +691,14 @@
     });
 
     $('#payment_date').change(function() {
-        // changeStatus();
+        generatePaymentNumber();
     });
 
     $('#bank_id').select2({
         placeholder: "Pilih kode bank",
         theme: "bootstrap-5"
     }).change(function() {
-        changeStatus();
+        generatePaymentNumber();
     });
 
     $('#po').select2({
@@ -724,7 +726,7 @@
         placeholder: "Pilih Departemen",
         theme: "bootstrap-5"
     }).change(function() {
-        changeStatus();
+        generatePaymentNumber();
         generateLPBNo();
         resetTable();
     });
@@ -1251,35 +1253,35 @@
     }
 
 
-    function changeStatus() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
-        let bankId = $("#bank_id option:selected").text();
-        let divisiId = $("#divisi_id option:selected").text();
+    // function changeStatus() {
+    //     let value = document.getElementById('auto_generate').checked ? true : false;
+    //     let bankId = $("#bank_id option:selected").text();
+    //     let divisiId = $("#divisi_id option:selected").text();
 
-        if (value) {
-            let url = "<?= base_url('pembayaran-po-lokal-bb/generate-no-pembayaran'); ?>";
-            url += `?divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}`;
+    //     if (value) {
+    //         let url = "<?= base_url('pembayaran-po-lokal-bb/generate-no-pembayaran'); ?>";
+    //         url += `?divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}`;
 
-            $.ajax({
-                url: url,
-                method: "GET",
-                dataType: "json",
-                success: function(response) {
-                    console.log("Nomor pembayaran berhasil di-generate:", response);
-                    // Misalnya ingin menampilkan hasil ke input field
-                    $("#no_bukti_pembayaran").val(response.paymentNo);
-                    $("#no_bukti_pembayaran").attr('readonly', true);
-                },
-                error: function(xhr, status, error) {
-                    console.error("Terjadi kesalahan:", error);
-                    $("#no_bukti_pembayaran").attr('readonly', false);
-                }
-            });
-        } else {
-            $("#no_bukti_pembayaran").val("");
-            $("#no_bukti_pembayaran").attr('readonly', false);
-        }
-    }
+    //         $.ajax({
+    //             url: url,
+    //             method: "GET",
+    //             dataType: "json",
+    //             success: function(response) {
+    //                 console.log("Nomor pembayaran berhasil di-generate:", response);
+    //                 // Misalnya ingin menampilkan hasil ke input field
+    //                 $("#no_bukti_pembayaran").val(response.paymentNo);
+    //                 $("#no_bukti_pembayaran").attr('readonly', true);
+    //             },
+    //             error: function(xhr, status, error) {
+    //                 console.error("Terjadi kesalahan:", error);
+    //                 $("#no_bukti_pembayaran").attr('readonly', false);
+    //             }
+    //         });
+    //     } else {
+    //         $("#no_bukti_pembayaran").val("");
+    //         $("#no_bukti_pembayaran").attr('readonly', false);
+    //     }
+    // }
 
     function drawPaidTable(data) {
         var no = 1;
@@ -1927,6 +1929,57 @@
         keterangan = "Pembayaran " + supplierName + " " + poNoText;
         $('#keterangan').val(keterangan);
     }
+
+
+    function generatePaymentNumber() {
+        // Get selected divisi and bank values
+        let divisiId = $("#divisi_id option:selected").text();
+        let bankId = $("#bank_id option:selected").text();
+        
+        // Only generate if this is a new record (empty detail)
+        <?php if(empty($detail)): ?>
+            const csrfToken = '<?= csrf_token() ?>';
+            const csrf = $(`[name="${csrfToken}"]`);
+            
+            // Build URL with query parameters
+            let url = "<?= base_url('pembayaran-po-lokal-bb/generate-no-pembayaran'); ?>";
+            url += `?divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}`;
+            
+            // Additional data if needed
+            var formData = new FormData();
+            formData.append("type", "Bahan Penolong");
+            formData.append("payment_date", $("#payment_date").val());
+            
+            $(".no_bukti_pembayaran").attr("readonly", true);
+            
+            $.ajax({
+                url: url,
+                method: "GET",
+                data: formData,
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    $(".no_bukti_pembayaran").val(response.paymentNo);
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terjadi kesalahan pada sistem',
+                        text: 'Gagal menghasilkan nomor pembayaran otomatis',
+                        confirmButtonColor: '#4e73df',
+                    });
+                    $(".no_bukti_pembayaran").attr("readonly", false);
+                }
+            });
+        <?php endif; ?>
+    }
+
+
 </script>
 
 <?= $this->endSection(); ?>
