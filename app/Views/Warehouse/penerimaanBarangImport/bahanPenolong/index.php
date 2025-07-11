@@ -101,17 +101,6 @@
             data.dateStart = $(".dateStart").val();
             data.dateEnd = $(".dateEnd").val();
             data.status = $(".status").val();
-            localStorage.setItem('DataTables_' + settings.sInstance, JSON.stringify(data));
-        },
-        "stateLoadCallback": function(settings) {
-            const data = JSON.parse(localStorage.getItem('DataTables_' + settings.sInstance));
-            if (data) {
-                $(".search").val(data.searchValue);
-                $(".dateStart").val(data.dateStart);
-                $(".dateEnd").val(data.dateEnd);
-                $(".status").val(data.status);
-            }
-            return data;
         },
         pageLength: 25,
         ajax: {
