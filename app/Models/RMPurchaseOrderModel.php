@@ -577,7 +577,7 @@ class RMPurchaseOrderModel extends Model
             $poBBLokalData->where('penerimaan_barang.warehouse_id', $addCondition['warehouseId']);
         }
 
-        if ($addCondition['divisiId']) {
+        if (!empty($addCondition['divisiId'])) {
             $poBBLokalData->where('penerimaan_barang.divisi_id', $addCondition['divisiId']);
         }
 
