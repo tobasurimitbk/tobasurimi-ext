@@ -264,17 +264,19 @@
 
             // Kolom-kolom yang ingin di-total (indeks dimulai dari 0)
             var columnsToSum = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
-            
+
             columnsToSum.forEach(function(col) {
                 var total = api
-                    .column(col, { page: 'current' })
+                    .column(col, {
+                        page: 'current'
+                    })
                     .data()
                     .reduce(function(a, b) {
                         return destroyFormatRupiah(a) + destroyFormatRupiah(b);
                     }, 0);
 
                 // Update footer
-                $(api.column(col).footer()).html(greatFormatRupiah(total));
+                $(api.column(col).footer()).html(greatFormatRupiah(total.toFixed(2)));
             });
         },
         language: {
