@@ -873,16 +873,16 @@
                     newRow.append($('<td>').text(v.po_no));
                 }
                 newRow.append($('<td>').text(v.satuan));
-                newRow.append($('<td>').text(parseFloat(v.jml_order)));
-                newRow.append($('<td>').text(parseFloat(v.jml_diterima_lpb)));
+                newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.jml_order))));
+                newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.jml_diterima_lpb))));
                 newRow.append(
-                    $('<td>').text(parseFloat(v.jml_diterima_lpb_konversi) + " (" + v.satuan_konversi + ")")
+                    $('<td>').text(greatFormatRupiah(parseFloat(v.jml_diterima_lpb_konversi)) + " (" + v.satuan_konversi + ")")
                 );
-                newRow.append($('<td>').text(parseFloat(v.jml_diterima_total)));
+                newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.jml_diterima_total))));
                 if (v.status_penerimaan == 1) {
                     newRow.append($('<td>').text(0));
                 } else {
-                    newRow.append($('<td>').text(parseFloat(v.sisa_total)));
+                    newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.sisa_total))));
                 }
                 newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.harga) || 0)));
                 newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.sub_total).toFixed(2) || 0)));
@@ -915,13 +915,13 @@
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td style="text-align:right;" colspan="3"><b>GRAND TOTAL</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(jmlOrderTotal.toFixed(2) * 1000) / 1000 + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(jmlDiterimaLPBTotal.toFixed(2) * 1000) / 1000 + '</b></td>'));
-            newRow.append($('<td style="text-align:left;">' + Math.floor(jmlDiterimaLpbKonversi.toFixed(2) * 1000) / 1000 + '</td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(jmlDiterimaTotal.toFixed(2) * 1000) / 1000 + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(sisaTotal.toFixed(2) * 1000) / 1000 + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(hargaTotal).toFixed(2) || 0) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(subTotal).toFixed(2) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(Math.floor(jmlOrderTotal.toFixed(2) * 1000) / 1000) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(Math.floor(jmlDiterimaLPBTotal.toFixed(2) * 1000) / 1000) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;">' + greatFormatRupiah(Math.floor(jmlDiterimaLpbKonversi.toFixed(2) * 1000) / 1000) + '</td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(Math.floor(jmlDiterimaTotal.toFixed(2) * 1000) / 1000) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(Math.floor(sisaTotal.toFixed(2) * 1000) / 1000) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(hargaTotal.toFixed(2)) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(subTotal.toFixed(2)) || 0) + '</b></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
